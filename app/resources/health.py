@@ -5,5 +5,6 @@ class Health(Resource):
 
     """Rest endpoint to provide health monitoring statistics"""
 
-    def get(self):
+    @staticmethod
+    def get():
         return "{status : healthy}"

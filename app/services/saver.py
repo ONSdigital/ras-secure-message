@@ -1,15 +1,14 @@
 from app.data_model.database import db
 from app.data_model import database
-from app.domain_model import domain
-
-class Saver():
 
 
-    def saveMessage(self, message):
-        db_message = self.convertToDataModel(message)
+class Saver:
+
+    def save_message(self, message):
+        db_message = self.convert_to_datamodel(message)
         db.session.add(db_message)
         db.session.commit()
 
-    def convertToDataModel(self, domainMessage):
-        return database.Message(domainMessage.msg_to, domainMessage.msg_from, domainMessage.body)
-
+    @staticmethod
+    def convert_to_datamodel(domain_message):
+        return database.Message(domain_message.msg_to, domain_message.msg_from, domain_message.body)
