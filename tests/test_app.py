@@ -50,7 +50,7 @@ class FlaskTestCase(unittest.TestCase):
     def test_get_request_message(self):
         url = "http://localhost:5050/message/21"
         response = self.app.get(url)
-        self.assertEqual(json.loads(response.get_data()), {'status': "ok"})
+        self.assertEqual(json.loads(response.get_data()), {'status': "ok", 'message_id': 21})
 
     def test_that_checks_post_request_is_within_database(self):
         # check if json message is inside the database

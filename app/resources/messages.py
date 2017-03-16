@@ -1,4 +1,4 @@
-from flask_restful import Resource, abort
+from flask_restful import Resource
 from flask import request
 from flask import jsonify
 from app.domain_model.domain import Message
@@ -6,10 +6,12 @@ from app.services.saver import Saver
 
 """Rest endpoint for message resources. Messages are immutable, they can only be created and archived."""
 
+
 class MessageList(Resource):
 
     """Return a list of messages for the user"""
-    def get(self):
+    @staticmethod
+    def get():
         resp = jsonify({'status': "ok"})
         resp.status_code = 200
         return resp
@@ -18,7 +20,8 @@ class MessageList(Resource):
 class MessageSend(Resource):
 
     """Send message for a user"""
-    def post(self):
+    @staticmethod
+    def post():
         message_json = request.get_json()
         message = Message(message_json['to'], message_json['from'], message_json['body'])
         message_service = Saver()
@@ -31,13 +34,15 @@ class MessageSend(Resource):
 class MessageById(Resource):
 
     """Get message by id"""
-    def get(self, id):
-        resp = jsonify({'status': "ok"})
+    @staticmethod
+    def get(message_id):
+        resp = jsonify({"status": "ok", "message_id": message_id})
         resp.status_code = 200
         return resp
 
     """Update message by id"""
-    def put(self):
-        resp = jsonify({'status': "ok"})
+    @staticmethod
+    def put():
+        resp = jsonify({"status": "ok"})
         resp.status_code = 200
         return resp

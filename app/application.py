@@ -20,4 +20,4 @@ with app.app_context():
 api.add_resource(Health, '/health')
 api.add_resource(MessageList, '/messages', )
 api.add_resource(MessageSend, '/message/send')
-api.add_resource(MessageById, '/message/<int:id>')
+api.add_resource(MessageById, '/message/<int:message_id>')
