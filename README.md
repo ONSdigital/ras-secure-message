@@ -1,4 +1,4 @@
-# secure-messaging-api
+# ras-secure-message
 [![Build Status](https://travis-ci.org/ONSdigital/ras-secure-message.svg?branch=master)](https://travis-ci.org/ONSdigital/ras-secure-message)
 
 ## Setup
