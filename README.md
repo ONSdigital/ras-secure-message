@@ -29,6 +29,6 @@ Test the response
 
 Now open up a new prompt to test out your API using curl
 ```
-$ curl http://127.0.0.1:5000/
-{"hello": "world"}
+$ curl http://127.0.0.1:5000/health
+{"status": "healthy"}
 ```
