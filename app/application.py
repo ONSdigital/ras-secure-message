@@ -1,5 +1,5 @@
 from flask import Flask
-from flask_restful import Resource, Api
+from flask_restful import Api
 from app.resources.messages import MessageList, MessageSend, MessageById
 from app.resources.health import Health
 from structlog import get_logger
@@ -12,6 +12,10 @@ app = Flask(__name__)
 api = Api(app)
 app.config['SQLALCHEMY_DATABASE_URI'] = settings.SECURE_MESSAGING_DATABASE_URL
 database.db.init_app(app)
+
+
+def drop_database():
+    database.db.drop_all()
 
 with app.app_context():
     database.db.create_all()
