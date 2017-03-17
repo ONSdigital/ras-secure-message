@@ -1,10 +1,15 @@
 from sqlalchemy import Column, String, Integer
 from flask_sqlalchemy import SQLAlchemy
+from structlog import get_logger
+
+logger = get_logger()
 
 db = SQLAlchemy()
 
 
 class Message(db.Model):
+
+    logger.debug("Hit database message")
 
     __tablename__ = "secure_message"
     id = Column(Integer, primary_key=True)

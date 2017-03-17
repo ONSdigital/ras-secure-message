@@ -3,6 +3,10 @@ from flask import request
 from flask import jsonify
 from app.domain_model.domain import Message
 from app.services.saver import Saver
+from structlog import get_logger
+
+logger = get_logger()
+
 
 """Rest endpoint for message resources. Messages are immutable, they can only be created and archived."""
 
@@ -22,12 +26,14 @@ class MessageSend(Resource):
     """Send message for a user"""
     @staticmethod
     def post():
+        logger.info("Hit post message send endpoint")
         message_json = request.get_json()
         message = Message(message_json['to'], message_json['from'], message_json['body'])
         message_service = Saver()
         message_service.save_message(message)
         resp = jsonify({'status': "ok"})
         resp.status_code = 200
+        logger.info("Receive response" + str(resp))
         return resp
 
 
