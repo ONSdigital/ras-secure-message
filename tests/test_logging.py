@@ -1,9 +1,9 @@
+import sys
+sys.path.append('../ras-secure-message')
 from app.domain_model.domain import MessageSchema
 import unittest
 from io import StringIO
 from app import application
-import sys
-sys.path.append('../ras-secure-message')
 
 saved_stdout = sys.stdout
 
