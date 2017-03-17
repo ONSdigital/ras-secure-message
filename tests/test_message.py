@@ -3,6 +3,10 @@ import json
 import sys
 sys.path.append('../ras-secure-message')
 from app.domain_model.domain import Message, MessageSchema
+from unittest.mock import Mock, patch
+from logging import RootLogger, getLogger
+from app.resources.messages import MessageSend, logger
+from app import application
 
 
 class MessageTestCase(unittest.TestCase):
@@ -76,4 +80,5 @@ class MessageTestCase(unittest.TestCase):
         schema = MessageSchema()
         data, errors = schema.load(message)
         self.assertTrue(errors == {'body': ['Missing data for required field.']})
+
 

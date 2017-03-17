@@ -5,6 +5,8 @@ from app.domain_model.domain import Message
 from app.repository.saver import Saver
 from structlog import get_logger
 from app.authentication.authenticator import authenticate
+import sys
+
 
 logger = get_logger()
 
