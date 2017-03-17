@@ -5,3 +5,6 @@ import os
     All configuration may be overridden by setting the appropriate environment variable name. '''
 
 SECURE_MESSAGING_DATABASE_URL = os.getenv('SECURE_MESSAGING_DATABASE_URL', 'sqlite:////tmp/messages.db')
+SMS_LOG_LEVEL = os.getenv('SMS_LOG_LEVEL', 'INFO')
+SMS_WERKZEUG_LOG_LEVEL = os.getenv('SMS_WERKZEUG_LOG_LEVEL', 'INFO')
+SMS_DEVELOPER_LOGGING = os.getenv('SMS_DEVELOPER_LOGGING', 'FALSE').upper() == 'TRUE'

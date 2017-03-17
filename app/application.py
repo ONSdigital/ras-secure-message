@@ -10,10 +10,6 @@ import logging
 
 logger = get_logger(__name__)
 
-SMS_LOG_LEVEL = os.getenv('SMS_LOG_LEVEL', 'INFO')
-SMS_WERKZEUG_LOG_LEVEL = os.getenv('SMS_WERKZEUG_LOG_LEVEL', 'INFO')
-SMS_DEVELOPER_LOGGING = os.getenv('SMS_DEVELOPER_LOGGING', 'FALSE').upper() == 'TRUE'
-
 
 def configure_logging():
     log_format = "%(message)s"
@@ -25,10 +21,10 @@ def configure_logging():
         'DEBUG': logging.DEBUG,
     }
     handler = logging.StreamHandler()
-    logging.basicConfig(level=levels[SMS_LOG_LEVEL], format=log_format, handlers=[handler])
+    logging.basicConfig(level=levels[settings.SMS_LOG_LEVEL], format=log_format, handlers=[handler])
 
     werkzeug_logger = logging.getLogger('werkzeug')
-    werkzeug_logger.setLevel(level=levels[SMS_WERKZEUG_LOG_LEVEL])
+    werkzeug_logger.setLevel(level=levels[settings.SMS_WERKZEUG_LOG_LEVEL])
 
 configure_logging()
 
