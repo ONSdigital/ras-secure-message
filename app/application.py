@@ -1,5 +1,4 @@
 from flask import Flask
-import os
 from flask_restful import Api
 from app.resources.messages import MessageList, MessageSend, MessageById
 from app.resources.health import Health
@@ -23,6 +22,7 @@ def configure_logging():
     handler = logging.StreamHandler()
     logging.basicConfig(level=levels[settings.SMS_LOG_LEVEL], format=log_format, handlers=[handler])
 
+    # set werkzeug logging level
     werkzeug_logger = logging.getLogger('werkzeug')
     werkzeug_logger.setLevel(level=levels[settings.SMS_WERKZEUG_LOG_LEVEL])
 
@@ -31,6 +31,8 @@ configure_logging()
 app = Flask(__name__)
 api = Api(app)
 app.config['SQLALCHEMY_DATABASE_URI'] = settings.SECURE_MESSAGING_DATABASE_URL
+app.logger.addHandler(logging.StreamHandler())
+app.logger.setLevel(settings.APP_LOG_LEVEL)
 database.db.init_app(app)
 
 
@@ -45,8 +47,3 @@ api.add_resource(Health, '/health')
 api.add_resource(MessageList, '/messages', )
 api.add_resource(MessageSend, '/message/send')
 api.add_resource(MessageById, '/message/<int:message_id>')
-
-
-app.logger.addHandler(logging.StreamHandler())
-app.logger.setLevel(logging.INFO)
-
