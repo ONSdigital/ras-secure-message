@@ -4,6 +4,7 @@ Flask-SQLAlchemy==2.1
 marshmallow==2.13.1
 psycopg2==2.6.2
 SQLAlchemy==1.1.5
+python-jose==1.2.0
 aniso8601==1.2.0
 appdirs==1.4.1
 packaging==16.8

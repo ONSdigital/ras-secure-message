@@ -13,6 +13,9 @@ install:
 
 script:
     - python tests/test_app.py
+    - python tests/test_authenticator.py
+    - python tests/test_logging.py
+    - python tests/domain_model/test_message.py
 
 # after_success:
 

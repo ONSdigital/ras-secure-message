@@ -1,13 +1,14 @@
+import sys
+sys.path.append('../ras-secure-message')
 from app.domain_model.domain import MessageSchema
 import unittest
 from io import StringIO
-import sys
-sys.path.append('../ras-secure-message')
+
 
 saved_stdout = sys.stdout
 
 
-class test_logging(unittest.TestCase):
+class LoggingTestCase(unittest.TestCase):
 
     def test_loggingmessageendpoint(self):
         out = StringIO()

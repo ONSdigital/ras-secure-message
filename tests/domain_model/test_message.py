@@ -1,5 +1,7 @@
 import unittest
 import json
+import sys
+sys.path.append('../../ras-secure-message')
 from app.domain_model.domain import Message, MessageSchema
 
 
