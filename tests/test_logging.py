@@ -3,14 +3,18 @@ sys.path.append('../ras-secure-message')
 from app.domain_model.domain import MessageSchema
 import unittest
 from io import StringIO
-
+from app import application
 
 saved_stdout = sys.stdout
 
 
 class LoggingTestCase(unittest.TestCase):
 
-    def test_loggingmessageendpoint(self):
+    def setUp(self):
+        # creates a test client
+        self.app = application.app.test_client()
+
+    def test_logging_message_endpoint(self):
         out = StringIO()
         sys.stdout = out
         message = {'msg_to': 'richard', 'msg_from': 'torrance', 'subject': 'hello', 'body': 'hello world',
@@ -18,5 +22,7 @@ class LoggingTestCase(unittest.TestCase):
         schema = MessageSchema()
         schema.load(message)
         output = out.getvalue().strip()
-        self.assertTrue(output, "event='Build message'")
-        #print("jk")
+        self.assertIsNotNone(output)
+
+if __name__ == '__main__':
+    unittest.main()

@@ -2,31 +2,35 @@ from flask import Flask
 from flask_restful import Api
 from app.resources.messages import MessageList, MessageSend, MessageById
 from app.resources.health import Health
-from structlog import get_logger
 from app.data_model import database
 from app import settings
 import logging
+from logging.config import dictConfig
 
-logger = get_logger(__name__)
+""" initialise logging defaults for project """
+logging_config = dict(
+        version = 1,
+        disable_existing_loggers = False,
+        formatters={
+            'f': {'format':
+                      '%(asctime)s %(levelname)s %(name)s %(message)s'}
+        },
+        handlers={
+            'h': {'class': 'logging.StreamHandler',
+                  'formatter': 'f',
+                  'level': settings.SMS_LOG_LEVEL}
+        },
+        root={
+            'handlers': ['h'],
+            'level': settings.SMS_LOG_LEVEL,
+        },
+    )
 
-
-def configure_logging():
-    log_format = "%(message)s"
-    levels = {
-        'CRITICAL': logging.CRITICAL,
-        'ERROR': logging.ERROR,
-        'WARNING': logging.WARNING,
-        'INFO': logging.INFO,
-        'DEBUG': logging.DEBUG,
-    }
-    handler = logging.StreamHandler()
-    logging.basicConfig(level=levels[settings.SMS_LOG_LEVEL], format=log_format, handlers=[handler])
-
-    # set werkzeug logging level
-    werkzeug_logger = logging.getLogger('werkzeug')
-    werkzeug_logger.setLevel(level=levels[settings.SMS_WERKZEUG_LOG_LEVEL])
-
-configure_logging()
+dictConfig(logging_config)
+logger = logging.getLogger(__name__)
+# set werkzeug logging level
+werkzeug_logger = logging.getLogger('werkzeug')
+werkzeug_logger.setLevel(level=settings.SMS_WERKZEUG_LOG_LEVEL)
 
 app = Flask(__name__)
 api = Api(app)
@@ -35,6 +39,7 @@ app.logger.addHandler(logging.StreamHandler())
 app.logger.setLevel(settings.APP_LOG_LEVEL)
 database.db.init_app(app)
 
+logger.info("Starting application")
 
 def drop_database():
     database.db.drop_all()

@@ -29,19 +29,6 @@ class FlaskTestCase(unittest.TestCase):
         """ assert the status code of the response """
         self.assertEqual(response.status_code, 200)
 
-    def test_post_request_message_goes_to_database(self):
-        # post json message written up in the ui
-        url = "http://localhost:5050/message/send"
-        data = {'to': "Emilio", 'from': "Tej", 'body': "Hello World"}
-        headers = {'Content-Type': 'application/json'}
-        response = self.app.post(url, data=json.dumps(data), headers=headers)
-        self.assertEqual(json.loads(response.get_data()), {'status': "ok"})
-
-    def test_get_request_all_message(self):
-        url = "http://localhost:5050/messages"
-        response = self.app.get(url)
-        self.assertEqual(json.loads(response.get_data()), {'status': "ok"})
-
     def test_post_request_all_message_fails(self):
         url = "http://localhost:5050/messages"
         response = self.app.post(url)
@@ -51,6 +38,14 @@ class FlaskTestCase(unittest.TestCase):
         url = "http://localhost:5050/message/21"
         response = self.app.get(url)
         self.assertEqual(json.loads(response.get_data()), {'status': "ok", 'message_id': 21})
+
+    def test_post_request_message_goes_to_database(self):
+        # post json message written up in the ui
+        url = "http://localhost:5050/message/send"
+        data = {'to': "Emilio", 'from': "Tej", 'body': "Hello World"}
+        headers = {'Content-Type': 'application/json'}
+        response = self.app.post(url, data=json.dumps(data), headers=headers)
+        self.assertEqual(json.loads(response.get_data()), {'status': "ok"})
 
     def test_that_checks_post_request_is_within_database(self):
         # check if json message is inside the database

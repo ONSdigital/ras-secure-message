@@ -1,10 +1,11 @@
 from sqlalchemy import Column, String, Integer, Boolean, DateTime
 from flask_sqlalchemy import SQLAlchemy
-from structlog import get_logger
+from datetime import datetime, timezone
 from app import constants
+import logging
 
 
-logger = get_logger()
+logger = logging.getLogger(__name__)
 
 db = SQLAlchemy()
 
@@ -26,7 +27,8 @@ class Message(db.Model):
     create_date = Column("create_date", DateTime)
     read_date = Column("read_date", DateTime)
 
-    def __init__(self, msg_to, msg_from, subject, body, thread, archived, marked_as_read, create_date, read_date):
+    def __init__(self, msg_to="", msg_from="", subject="", body="", thread="", archived=False, marked_as_read=False,
+                 create_date=datetime.now(timezone.utc), read_date=None):
         self.msg_to = msg_to
         self.msg_from = msg_from
         self.subject = subject
@@ -36,3 +38,14 @@ class Message(db.Model):
         self.marked_as_read = marked_as_read
         self.create_date = create_date
         self.read_date = read_date
+
+    @property
+    def serialize(self):
+        """Return object data in easily serializeable format"""
+        data = {
+           'id': self.id,
+           'msg_to': self.msg_to,
+           'msg_from': self.msg_from,
+           'body': self.body
+        }
+        return data

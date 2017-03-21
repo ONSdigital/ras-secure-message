@@ -1,16 +1,16 @@
 from marshmallow import Schema, fields, post_load, validates, ValidationError
-from structlog import get_logger
+import logging
 from datetime import datetime, timezone
 from app import constants
 
-logger = get_logger()
+logger = logging.getLogger(__name__)
 
 
 class Message:
 
     def __init__(self, msg_to, msg_from, subject, body, thread, archived, marked_as_read,
                  create_date=datetime.now(timezone.utc), read_date=None):
-
+        logger.debug("Message Class created %s, %s, %s %s" % (msg_to, msg_from, subject, body))
         self.msg_to = msg_to
         self.msg_from = msg_from
         self.subject = subject

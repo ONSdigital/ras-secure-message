@@ -1,0 +1,206 @@
+swagger: '2.0'
+info:
+  description: This is the RAS Secure Message API
+  version: 1.0.0
+  title: Secure Message API
+  # put the contact info for your development or API team
+  contact:
+    email: richard.weeks@ons.gov.uk
+
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+
+tags:
+- name: Respondents
+  description: Respond to surveys on behalf of a Reporting Unit
+- name: Respondent Liason
+  description: ONS staff supporting surveys
+schemes:
+- https
+paths:
+  /messages:
+    get:
+      tags:
+      - Respondents
+      - Respondent Liason
+      summary: fetches a list of users secure messages
+      operationId: getMessages
+      description: returns list of secure messages
+      produces:
+      - application/json
+      parameters:
+      - in: query
+        name: reportingUnit
+        description: Reporting Unit
+        required: true
+        type: string
+      - in: query
+        name: respondentName
+        description: Respondent name
+        type: string
+      - in: query
+        name: case
+        description: Case ID
+        type: integer
+        format: int32
+        minimum: 0
+        maximum: 50
+      responses:
+        200:
+          description: search results matching criteria
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Message'
+        400:
+          description: bad input parameter
+
+  /message/{id}:
+    get:
+      parameters:
+      - name: id
+        in: path
+        description: Message ID
+        required: true
+        type: integer
+        format: int64
+      tags:
+      - Respondents
+      - Respondent Liason
+      summary: Fetch message by id
+      operationId: getMessage
+      description: Fetch message by id
+      responses:
+        200:
+          description: Returns message by id
+        404:
+          description: Message not found
+    put:
+      parameters:
+      - name: id
+        in: path
+        description: Message ID
+        required: true
+        type: integer
+        format: int64
+      tags:
+      - Respondents
+      - Respondent Liason
+      summary: Update message status by id
+      operationId: updateMessage
+      description: Update message status by id
+      responses:
+        200:
+          description: Updated message by id
+        404:
+          description: Message not found
+          
+  /message/send:
+    post:
+      tags:
+      - Respondents
+      - Respondent Liason
+      summary: Sends a secure message
+      operationId: sendMessage
+      description: Sends a secure message
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      parameters:
+      - in: body
+        name: Message
+        description: Message to send
+        schema:
+          $ref: '#/definitions/Message'
+      responses:
+        201:
+          description: message sent
+        400:
+          description: invalid input, object invalid
+          
+  /drafts:
+    get:
+      tags:
+      - Respondents
+      - Respondent Liason
+      summary: Returns a list of draft messages
+      operationId: getDrafts
+      description: Returns a list of draft messages
+      responses:
+        200:
+          description: draft messages
+
+  /draft/save:
+      post:
+        tags:
+        - Respondents
+        - Respondent Liason
+        summary: Save a draft message
+        operationId: saveDraft
+        description: Save a draft message
+        responses:
+          201:
+            description: Draft message saved.
+          400:
+            description: Invalid draft message
+          
+  /draft/{id}:
+    get:
+      parameters:
+      - name: id
+        in: path
+        description: Message ID
+        required: true
+        type: integer
+        format: int64
+      tags:
+      - Respondents
+      - Respondent Liason
+      summary: Get a draft message by ID
+      operationId: getDraft
+      description: Get a draft message by ID
+      responses:
+        200:
+          description: Get draft message     
+    put:
+      parameters:
+      - name: id
+        in: path
+        description: Message ID
+        required: true
+        type: integer
+        format: int64
+      tags:
+      - Respondents
+      - Respondent Liason
+      summary: Update a draft message
+      operationId: updateDrafts
+      description: Update a draft message
+      responses:
+        200:
+          description: Update draft message     
+          
+          
+definitions:
+  Message:
+    type: object
+    required:
+    - msg_to
+    - msg_from
+    - body
+    properties:
+      msg_to:
+        type: string
+        example: richard weeks
+      msg_from:
+        type: string
+        example: andrew torrance
+      body:
+        type: string
+        
+        
+# Added by API Auto Mocking Plugin
+host: virtserver.swaggerhub.com
+basePath: /rjweeks/securemessage/1.0.0
