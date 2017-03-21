@@ -1,5 +1,5 @@
 # ras-secure-message
-[![Build Status](https://travis-ci.org/ONSdigital/ras-secure-message.svg?branch=master)](https://travis-ci.org/ONSdigital/ras-secure-message)
+[![Build Status](https://travis-ci.org/ONSdigital/ras-secure-message.svg?branch=master)](https://travis-ci.org/ONSdigital/ras-secure-message) [![Code Issues](https://www.quantifiedcode.com/app/project/d02278acae1a498bae910f4eeac7c96f/badge.svg)](https://www.quantifiedcode.com/app/project/d02278acae1a498bae910f4eeac7c96f) 
 
 ## Setup
 Based on python 3.4
