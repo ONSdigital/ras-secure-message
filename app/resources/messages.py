@@ -4,12 +4,9 @@ from flask import jsonify
 from app.domain_model.domain import Message
 from app.repository.saver import Saver
 from app.repository.retriever import Retriever
-from structlog import get_logger
-# from app.authentication.authenticator import authenticate
-# import sys
+import logging
 
-
-logger = get_logger()
+logger = logging.getLogger(__name__)
 
 """Rest endpoint for message resources. Messages are immutable, they can only be created and archived."""
 
@@ -39,14 +36,13 @@ class MessageSend(Resource):
         #res = authenticate(request)
         res = {'status': "ok"}
         if res == {'status': "ok"}:
-            logger.info("Hit post message send endpoint")
+            logger.info("Message send POST request.")
             message_json = request.get_json()
             message = Message(message_json['to'], message_json['from'], message_json['body'])
             message_service = Saver()
             message_service.save_message(message)
             resp = jsonify({'status': "ok"})
             resp.status_code = 200
-            logger.info("Receive response" + str(resp))
             return resp
         else:
             return res

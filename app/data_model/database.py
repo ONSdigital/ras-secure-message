@@ -1,9 +1,9 @@
 from sqlalchemy import Column, String, Integer
 from flask_sqlalchemy import SQLAlchemy
-from structlog import get_logger
+import logging
 
 
-logger = get_logger()
+logger = logging.getLogger(__name__)
 
 db = SQLAlchemy()
 

@@ -1,9 +1,9 @@
 from app.authentication.jwt import decode
 from flask import Response
 from jose import JWTError
-from structlog import get_logger
+import logging
 
-logger = get_logger()
+logger = logging.getLogger(__name__)
 
 
 def authenticate(request):
