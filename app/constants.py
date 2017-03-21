@@ -1,3 +1,4 @@
+# Message Definition Constants
 
 MAX_TO_LEN = 100                  # Maximum size of a message TO field
 MAX_FROM_LEN = 100                # Maximum size of a From Field in a message
