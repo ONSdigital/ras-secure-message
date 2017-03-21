@@ -17,6 +17,7 @@ script:
     - python tests/test_authenticator.py
     - python tests/test_logging.py
     - python tests/test_message.py
+    - python tests/test_retriever.py
 
 after_success:
     - codecov
