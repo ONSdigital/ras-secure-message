@@ -13,7 +13,8 @@ class LoggingTestCase(unittest.TestCase):
     def test_loggingmessageendpoint(self):
         out = StringIO()
         sys.stdout = out
-        message = {'msg_to': 'richard', 'msg_from': 'torrance', 'body': 'hello'}
+        message = {'msg_to': 'richard', 'msg_from': 'torrance', 'subject': 'hello', 'body': 'hello world',
+                   'archived': 'archived', 'mark_as_read': 'False'}
         schema = MessageSchema()
         schema.load(message)
         output = out.getvalue().strip()
