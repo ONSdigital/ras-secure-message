@@ -10,6 +10,7 @@ cache:
 install:
     - pip install -r requirements.txt
     - pip install -r test_requirements.txt
+    - pip install codecov
 
 script:
     - python tests/test_app.py
@@ -17,7 +18,8 @@ script:
     - python tests/test_logging.py
     - python tests/test_message.py
 
-# after_success:
+after_success:
+    - codecov
 
 branches:
     only:
