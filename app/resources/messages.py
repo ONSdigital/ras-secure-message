@@ -3,9 +3,10 @@ from flask import request
 from flask import jsonify
 from app.domain_model.domain import Message
 from app.repository.saver import Saver
+from app.repository.retriever import Retriever
 from structlog import get_logger
-from app.authentication.authenticator import authenticate
-import sys
+# from app.authentication.authenticator import authenticate
+# import sys
 
 
 logger = get_logger()
@@ -18,9 +19,16 @@ class MessageList(Resource):
     """Return a list of messages for the user"""
     @staticmethod
     def get():
-        resp = jsonify({'status': "ok"})
-        resp.status_code = 200
-        return resp
+        # res = authenticate(request)
+        res = {'status': "ok"}
+        if res == {'status': "ok"}:
+            message_service = Retriever()
+            # msg_list = message_service.retrieve_message_list()
+            resp = message_service.retrieve_message_list()
+            resp.status_code = 200
+            return resp
+        else:
+            return res
 
 
 class MessageSend(Resource):
