@@ -3,14 +3,14 @@ from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime, timezone
 from app import constants
 import logging
-
+from app.domain_model import domain
 
 logger = logging.getLogger(__name__)
 
 db = SQLAlchemy()
 
 
-class Message(db.Model):
+class DbMessage(db.Model):
     """Secure messaging datasbase model"""
     logger.debug("Hit database message")
 
@@ -39,6 +39,17 @@ class Message(db.Model):
         self.create_date = create_date
         self.read_date = read_date
 
+    def set_from_domain_model(self, domain_model):
+        self.msg_to = domain_model.msg_to
+        self.msg_from = domain_model.msg_from
+        self.subject = domain_model.subject
+        self.body = domain_model.body
+        self.thread = domain_model.thread
+        self.archived = domain_model.archived
+        self.marked_as_read = domain_model.marked_as_read
+        self.create_date = domain_model.create_date
+        self.read_date = domain_model.read_date
+
     @property
     def serialize(self):
         """Return object data in easily serializeable format"""
@@ -46,6 +57,12 @@ class Message(db.Model):
            'id': self.id,
            'msg_to': self.msg_to,
            'msg_from': self.msg_from,
-           'body': self.body
+           'subject': self.subject,
+           'body': self.body,
+           'thread': self.thread,
+           'archived': self.archived,
+           'marked_as_read': self.marked_as_read,
+           'create_date': self.create_date,
+           'read_date': self.read_date
         }
         return data

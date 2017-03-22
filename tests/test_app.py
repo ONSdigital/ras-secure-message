@@ -6,14 +6,24 @@ from sqlalchemy import create_engine
 import unittest
 from flask import json
 from datetime import datetime, timezone
-from app.domain_model.domain import Message, MessageSchema
+
+from app.application import app
+from flask import current_app
+from app.data_model import database
 
 
 class FlaskTestCase(unittest.TestCase):
     """Test case for application endpoints"""
     @classmethod
     def setUpClass(cls):
-        pass
+        app.testing = True
+        app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:////tmp/messages.db'
+        cls.engine = create_engine('sqlite:////tmp/messages.db', echo=True)
+        with app.app_context():
+            database.db.init_app(current_app)
+            database.db.drop_all()
+            database.db.create_all()
+            cls.db = database.db
 
     @classmethod
     def tearDownClass(cls):
@@ -48,32 +58,46 @@ class FlaskTestCase(unittest.TestCase):
         # post json message written up in the ui
         url = "http://localhost:5050/message/send"
         headers = {'Content-Type': 'application/json'}
-        message = Message(**{'msg_to': 'richard',
-                             'msg_from': 'torrance',
-                             'subject': 'MyMessage',
-                             'body': 'hello',
-                             'thread': "?",
-                             'archived': False,
-                             'marked_as_read': False,
-                             'create_date': datetime.now(timezone.utc),
-                             'read_date': datetime.now(timezone.utc)})
+        data = {'msg_to': 'richard',
+                'msg_from': 'torrance',
+                'subject': 'MyMessage',
+                'body': 'hello',
+                'thread': "?",
+                'archived': False,
+                'marked_as_read': False,
+                'create_date': datetime.now(timezone.utc),
+                'read_date': datetime.now(timezone.utc)}
 
-        json_data = MessageSchema().dumps(message)
-        response = self.app.post(url, data=json_data, headers=headers)
+        response = self.app.post(url, data=json.dumps(data), headers=headers)
         self.assertEqual(json.loads(response.get_data()), {'status': "ok"})
 
     def test_that_checks_post_request_is_within_database(self):
         """check messages from messageSend endpoint saved in database correctly"""
         # check if json message is inside the database
+
+        url = "http://localhost:5050/message/send"
+        headers = {'Content-Type': 'application/json'}
+        data = {'msg_to': 'richard',
+                'msg_from': 'torrance',
+                'subject': 'MyMessage',
+                'body': 'hello',
+                'thread': "?",
+                'archived': False,
+                'marked_as_read': False,
+                'create_date': datetime.now(timezone.utc),
+                'read_date': datetime.now(timezone.utc)}
+
+        response = self.app.post(url, data=json.dumps(data), headers=headers)
+
         engine = create_engine(settings.SECURE_MESSAGING_DATABASE_URL, echo=True)
 
         with engine.connect() as con:
-            request = con.execute('SELECT * FROM secure_message WHERE id = (SELECT MAX(id) FROM secure_message)')
+            request = con.execute('SELECT * FROM secure_message') # WHERE id = (SELECT MAX(id) FROM secure_message)')
             for row in request:
-                data = {"to": row['msg_to'], "from": row['msg_from'], "body": row['body']}
+                data = {"to": row['msg_to'], "from": row['msg_from'], "subject": row['subject'], "body": row['body']}
                 # print("to:", row['msg_to'], "from:", row['msg_from'], "body:", row['body'])
-                self.assertEqual({'to': 'Emilio', 'from': 'Tej', 'body': 'Hello World'}, data)
-                # con.close()
+                self.assertEqual({'to': 'richard', 'from': 'torrance', 'subject': 'MyMessage', 'body': 'hello'}, data)
+     
 
     # def tearDown(self):
     #     # Closing down the database

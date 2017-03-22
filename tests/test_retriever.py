@@ -20,7 +20,7 @@ class RetrieverTestCase(unittest.TestCase):
             database.db.drop_all()
             database.db.create_all()
             self.db = database.db
-        pass
+
 
     def populate_database(self, x=0):
         with self.engine.connect() as con:
@@ -28,7 +28,7 @@ class RetrieverTestCase(unittest.TestCase):
                 query = 'INSERT INTO secure_message VALUES ({},"test", "test", "test","test","",0,0,\
                 "2017-02-03 00:00:00", "2017-02-03 00:00:00")'.format(i)
                 con.execute(query)
-        pass
+
 
     def test_0_msg_returned_when_db_empty_true(self):
         """retrieves messages from empty database"""

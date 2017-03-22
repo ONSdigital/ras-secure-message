@@ -6,7 +6,7 @@ from app import constants
 logger = logging.getLogger(__name__)
 
 
-class Message:
+class DomainMessage:
 
     def __init__(self, msg_to, msg_from, subject, body, thread, archived, marked_as_read,
                  create_date=datetime.now(timezone.utc), read_date=None):
@@ -20,12 +20,13 @@ class Message:
         self.marked_as_read = marked_as_read
         self.create_date = create_date
         self.read_date = read_date
+        self.read_date = read_date
 
     def __repr__(self):
         return '<Message(msg_to={self.msg_to} msg_from={self.msg_from} subject={self.subject} body={self.body} thread={self.thread} archived={self.archived} marked_as_read={self.marked_as_read} create_date={self.create_date} read_date={self.read_date})>'.format(self=self)
 
     def __eq__(self, other):
-        if isinstance(other, Message):
+        if isinstance(other, DomainMessage):
             if self.msg_to == other.msg_to and\
                 self.msg_from == other.msg_from and\
                 self.subject == other.subject and\
@@ -81,7 +82,7 @@ class MessageSchema(Schema):
     def make_message(self, data):
         logger.debug("Build message")
 
-        return Message(**data)
+        return DomainMessage(**data)
 
     def validate_non_zero_field_length(self, field_name, length, max_field_len):
         if length <= 0:
