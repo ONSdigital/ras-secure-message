@@ -26,7 +26,7 @@ class AuthenticationTestCase(unittest.TestCase):
                         'uKn_qlmXLsYd_k1hNt2QfLabypLOXjO1_9cEuArJ-hE')
         self.assertEqual(res.response, expected_res.response)
 
-    def test_authentication_jwt_RU_invalid_fail(self):
+    def test_authentication_jwt_ru_invalid_fail(self):
         expected_res = Response(response="Missing RU or invalid RU supplied to access this Microservice Resource",
                                 status=400, mimetype="text/html")
         data = {

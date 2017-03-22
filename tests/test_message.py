@@ -11,7 +11,7 @@ from app import application
 
 class MessageTestCase(unittest.TestCase):
 
-    def testMarshalJson(self):
+    def test_marshal_json(self):
         message = Message('richard', 'torrance', 'hello')
         schema = MessageSchema()
         json_result = schema.dumps(message)
