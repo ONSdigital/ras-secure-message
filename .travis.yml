@@ -21,6 +21,8 @@ script:
 
 after_success:
     - bash <(curl -s https://codecov.io/bash)
+    - pip install codacy-coverage
+    - python-codacy-coverage -r coverage.xml
 
 branches:
     only:
