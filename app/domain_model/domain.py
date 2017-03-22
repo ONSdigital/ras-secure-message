@@ -22,9 +22,7 @@ class Message:
         self.read_date = read_date
 
     def __repr__(self):
-        return '<Message(msg_to={self.msg_to} msg_from={self.msg_from} subject={self.subject} body={self.body}\
-          thread={self.thread} archived={self.archived} marked_as_read={self.marked_as_read}\
-          create_date={self.create_date} read_date={self.read_date})>'.format(self=self)
+        return '<Message(msg_to={self.msg_to} msg_from={self.msg_from} subject={self.subject} body={self.body} thread={self.thread} archived={self.archived} marked_as_read={self.marked_as_read} create_date={self.create_date} read_date={self.read_date})>'.format(self=self)
 
     def __eq__(self, other):
         if isinstance(other, Message):

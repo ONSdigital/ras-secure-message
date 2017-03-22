@@ -5,6 +5,8 @@ from app import settings
 from sqlalchemy import create_engine
 import unittest
 from flask import json
+from datetime import datetime, timezone
+from app.domain_model.domain import Message, MessageSchema
 
 
 class FlaskTestCase(unittest.TestCase):
@@ -42,9 +44,19 @@ class FlaskTestCase(unittest.TestCase):
     def test_post_request_message_goes_to_database(self):
         # post json message written up in the ui
         url = "http://localhost:5050/message/send"
-        data = {'to': "Emilio", 'from': "Tej", 'body': "Hello World"}
         headers = {'Content-Type': 'application/json'}
-        response = self.app.post(url, data=json.dumps(data), headers=headers)
+        message = Message(**{'msg_to': 'richard',
+                             'msg_from': 'torrance',
+                             'subject': 'MyMessage',
+                             'body': 'hello',
+                             'thread': "?",
+                             'archived': False,
+                             'marked_as_read': False,
+                             'create_date': datetime.now(timezone.utc),
+                             'read_date': datetime.now(timezone.utc)})
+
+        json_data = MessageSchema().dumps(message)
+        response = self.app.post(url, data=json_data, headers=headers)
         self.assertEqual(json.loads(response.get_data()), {'status': "ok"})
 
     def test_that_checks_post_request_is_within_database(self):

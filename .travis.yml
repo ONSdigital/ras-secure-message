@@ -20,7 +20,7 @@ script:
     - python tests/test_retriever.py
 
 after_success:
-    - codecov
+    - bash <(curl -s https://codecov.io/bash)
 
 branches:
     only:
