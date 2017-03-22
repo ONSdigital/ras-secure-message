@@ -1,0 +1,18 @@
+import unittest
+from unittest.mock import MagicMock
+from app import settings
+from app.common.alerts import AlertUser, AlertViaGovNotify
+
+
+class AlertsTestCase(unittest.TestCase):
+
+    @staticmethod
+    def test_email_notification_send():
+        alert_service = AlertViaGovNotify()
+        sut = AlertUser(alert_service)
+        alert_service.send = MagicMock()
+        sut.send('gemma.irving@ons.gov.uk', settings.NOTIFICATION_TEMPLATE_ID, None)
+        alert_service.send.assert_called_with('gemma.irving@ons.gov.uk', settings.NOTIFICATION_TEMPLATE_ID, None)
+
+if __name__ == '__main__':
+    unittest.main()
