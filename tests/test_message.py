@@ -11,6 +11,20 @@ from app import application
 
 class MessageTestCase(unittest.TestCase):
 
+    def test_message(self):
+        message = Message('me', 'you', 'tomorrow')
+        self.assertEquals(repr(message), '<Message(msg_to=me msg_from=you body=tomorrow)>')
+
+    def test_message_not_equal(self):
+        message1 = Message('1', '2', '3')
+        message2 = Message('1', '2', '4')
+        self.assertTrue(message1 != message2)
+
+    def test_message_equal(self):
+        message1 = Message('1', '2', '3')
+        message2 = Message('1', '2', '3')
+        self.assertTrue(message1 == message2)
+
     def test_marshal_json(self):
         message = Message('richard', 'torrance', 'hello')
         schema = MessageSchema()
