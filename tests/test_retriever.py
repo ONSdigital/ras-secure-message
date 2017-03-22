@@ -9,7 +9,7 @@ from flask import current_app
 from app.data_model import database
 
 
-class FlaskTestCase(unittest.TestCase):
+class RetrieverTestCase(unittest.TestCase):
 
     def setUp(self):
         app.testing = True
@@ -41,11 +41,20 @@ class FlaskTestCase(unittest.TestCase):
         with app.app_context():
             with current_app.test_request_context():
                 response = Retriever().retrieve_message_list()
-        self.assertEqual(len(json.loads(response.get_data())), 5)
+                self.assertEqual(len(json.loads(response.get_data())), 5)
 
     def test_15_msg_returned_when_db_greater_than_15(self):
         self.populate_database(20)
         with app.app_context():
             with current_app.test_request_context():
                 response = Retriever().retrieve_message_list()
-        self.assertEqual(len(json.loads(response.get_data())), 15)
+                self.assertEqual(len(json.loads(response.get_data())), 15)
+
+    def test_msg_returned_with_msg_id_true(self):
+        id = 5
+        self.populate_database(20)
+        with app.app_context():
+            with current_app.test_request_context():
+                response = Retriever().retrieve_message(id)
+                msg = json.loads(response.get_data())
+                self.assertEqual(msg['id'], id)
