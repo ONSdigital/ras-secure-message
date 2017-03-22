@@ -3,7 +3,7 @@ from notifications_python_client import NotificationsAPIClient
 
 
 class AlertUser:
-
+    """Alert User"""
     def __init__(self, alerter):
         self._alerter = alerter
 
@@ -12,6 +12,7 @@ class AlertUser:
 
 
 class AlertViaGovNotify:
+    """Notify Api handler"""
     def __init__(self):
         self.notifications_client = NotificationsAPIClient(settings.NOTIFICATION_COMBINED_KEY)
 

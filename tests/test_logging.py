@@ -15,6 +15,7 @@ class LoggingTestCase(unittest.TestCase):
         self.app = application.app.test_client()
 
     def test_logging_message_endpoint(self):
+        """logging message endpoint"""
         out = StringIO()
         sys.stdout = out
         message = {'msg_to': 'richard', 'msg_from': 'torrance', 'body': 'hello'}

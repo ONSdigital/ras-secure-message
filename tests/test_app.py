@@ -30,16 +30,19 @@ class FlaskTestCase(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
 
     def test_post_request_all_message_fails(self):
+        """sends POST request to the application messageList endpoint"""
         url = "http://localhost:5050/messages"
         response = self.app.post(url)
         self.assertEqual(response.status_code, 405)
 
     def test_get_request_message(self):
+        """sends GET request to the application message by id endpoint"""
         url = "http://localhost:5050/message/21"
         response = self.app.get(url)
         self.assertEqual(json.loads(response.get_data()), {'status': "ok", 'message_id': 21})
 
     def test_post_request_message_goes_to_database(self):
+        """check messages from messageSend endpoint saved in database"""
         # post json message written up in the ui
         url = "http://localhost:5050/message/send"
         data = {'to': "Emilio", 'from': "Tej", 'body': "Hello World"}
@@ -48,6 +51,7 @@ class FlaskTestCase(unittest.TestCase):
         self.assertEqual(json.loads(response.get_data()), {'status': "ok"})
 
     def test_that_checks_post_request_is_within_database(self):
+        """check messages from messageSend endpoint saved in database correctly"""
         # check if json message is inside the database
         engine = create_engine(settings.SECURE_MESSAGING_DATABASE_URL, echo=True)
 

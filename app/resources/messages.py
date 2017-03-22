@@ -50,7 +50,7 @@ class MessageSend(Resource):
             message_service.save_message(message)
             resp = jsonify({'status': "ok"})
             resp.status_code = 200
-            self.alert_recipients()
+            # self.alert_recipients()
             return resp
         else:
             return res

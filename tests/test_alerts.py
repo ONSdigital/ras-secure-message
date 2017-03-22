@@ -5,9 +5,10 @@ from app.common.alerts import AlertUser, AlertViaGovNotify
 
 
 class AlertsTestCase(unittest.TestCase):
-
+    """Test case for Alerts"""
     @staticmethod
     def test_email_notification_send():
+        """sending email notification"""
         alert_service = AlertViaGovNotify()
         sut = AlertUser(alert_service)
         alert_service.send = MagicMock()

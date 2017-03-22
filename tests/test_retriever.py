@@ -30,12 +30,14 @@ class RetrieverTestCase(unittest.TestCase):
         pass
 
     def test_0_msg_returned_when_db_empty_true(self):
+        """retrieves messages from empty database"""
         with app.app_context():
             with current_app.test_request_context():
                 response = Retriever().retrieve_message_list()
                 self.assertEqual(json.loads(response.get_data()), [])
 
     def test_all_msg_returned_when_db_less_than_15(self):
+        """retrieves messages from database with less entries than retrieval amount"""
         self.populate_database(5)
 
         with app.app_context():
@@ -44,6 +46,7 @@ class RetrieverTestCase(unittest.TestCase):
                 self.assertEqual(len(json.loads(response.get_data())), 5)
 
     def test_15_msg_returned_when_db_greater_than_15(self):
+        """retrieves x messages when database has greater than x entries"""
         self.populate_database(20)
         with app.app_context():
             with current_app.test_request_context():
@@ -51,6 +54,7 @@ class RetrieverTestCase(unittest.TestCase):
                 self.assertEqual(len(json.loads(response.get_data())), 15)
 
     def test_msg_returned_with_msg_id_true(self):
+        """retrieves message using id"""
         id = 5
         self.populate_database(20)
         with app.app_context():
