@@ -92,12 +92,12 @@ class FlaskTestCase(unittest.TestCase):
         engine = create_engine(settings.SECURE_MESSAGING_DATABASE_URL, echo=True)
 
         with engine.connect() as con:
-            request = con.execute('SELECT * FROM secure_message') # WHERE id = (SELECT MAX(id) FROM secure_message)')
+            request = con.execute('SELECT * FROM secure_message WHERE id = (SELECT MAX(id) FROM secure_message)')
             for row in request:
                 data = {"to": row['msg_to'], "from": row['msg_from'], "subject": row['subject'], "body": row['body']}
                 # print("to:", row['msg_to'], "from:", row['msg_from'], "body:", row['body'])
                 self.assertEqual({'to': 'richard', 'from': 'torrance', 'subject': 'MyMessage', 'body': 'hello'}, data)
-     
+
 
     # def tearDown(self):
     #     # Closing down the database
