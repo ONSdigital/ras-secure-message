@@ -7,7 +7,7 @@ import unittest
 
 
 class AuthenticationTestCase(unittest.TestCase):
-
+    """Test case for request authentication"""
     def test_authentication_jwt_pass(self):
         expected_res = {'status': "ok"}
         data = {

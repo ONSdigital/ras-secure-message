@@ -8,7 +8,7 @@ from flask import json
 
 
 class FlaskTestCase(unittest.TestCase):
-
+    """Test case for application endpoints"""
     @classmethod
     def setUpClass(cls):
         pass

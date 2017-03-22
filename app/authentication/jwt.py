@@ -3,9 +3,10 @@ Module to generate jwt token
 """
 
 from jose import jwt
+from app import settings
 
 JWT_ALGORITHM = 'HS256'
-JWT_SECRET = 'vrwgLNWEffe45thh545yuby' #vrwgLNWEffe45thh545yuby
+JWT_SECRET = settings.JWT_SECRET
 
 
 def encode(data):

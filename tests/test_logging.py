@@ -9,7 +9,7 @@ saved_stdout = sys.stdout
 
 
 class LoggingTestCase(unittest.TestCase):
-
+    """Test case for logging"""
     def setUp(self):
         # creates a test client
         self.app = application.app.test_client()

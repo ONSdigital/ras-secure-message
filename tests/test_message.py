@@ -6,7 +6,7 @@ from app.domain_model.domain import Message, MessageSchema
 
 
 class MessageTestCase(unittest.TestCase):
-
+    """Test case for message validation"""
     def test_message(self):
         message = Message('me', 'you', 'tomorrow')
         self.assertEquals(repr(message), '<Message(msg_to=me msg_from=you body=tomorrow)>')

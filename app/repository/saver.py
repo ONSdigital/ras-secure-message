@@ -3,7 +3,7 @@ from app.data_model import database
 
 
 class Saver:
-
+    """Created when saving a message"""
     def save_message(self, message):
         db_message = self.convert_to_datamodel(message)
         db.session.add(db_message)

@@ -10,7 +10,7 @@ from app.data_model import database
 
 
 class RetrieverTestCase(unittest.TestCase):
-
+    """Test case for message retrieval"""
     def setUp(self):
         app.testing = True
         app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:////tmp/messages.db'
