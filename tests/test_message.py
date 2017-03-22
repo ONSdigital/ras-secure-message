@@ -3,10 +3,6 @@ import json
 import sys
 sys.path.append('../ras-secure-message')
 from app.domain_model.domain import Message, MessageSchema
-from unittest.mock import Mock, patch
-from logging import RootLogger, getLogger
-from app.resources.messages import MessageSend, logger
-from app import application
 
 
 class MessageTestCase(unittest.TestCase):
