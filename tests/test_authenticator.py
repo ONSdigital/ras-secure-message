@@ -37,7 +37,7 @@ class AuthenticationTestCase(unittest.TestCase):
         res = check_jwt(encode(data))
         self.assertEqual(res.response, expected_res.response)
 
-    def test_authentication_jwt_RU_missing_fail(self):
+    def test_authentication_jwt_ru_missing_fail(self):
         expected_res = Response(response="Missing RU or invalid RU supplied to access this Microservice Resource",
                                 status=400, mimetype="text/html")
         data = {
