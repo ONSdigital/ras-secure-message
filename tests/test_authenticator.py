@@ -70,7 +70,7 @@ class AuthenticationTestCase(unittest.TestCase):
         res = check_jwt(encode(data))
         self.assertEqual(res.response, expected_res.response)
 
-    def test_authentication_jwt_CC_invalid_fail(self):
+    def test_authentication_jwt_cc_invalid_fail(self):
         expected_res = Response(response="Collection Case required to access this Microservice Resource",
                                 status=400, mimetype="text/html")
         data = {
@@ -81,7 +81,7 @@ class AuthenticationTestCase(unittest.TestCase):
         res = check_jwt(encode(data))
         self.assertEqual(res.response, expected_res.response)
 
-    def test_authentication_jwt_CC_missing_fail(self):
+    def test_authentication_jwt_cc_missing_fail(self):
         expected_res = Response(response="Collection Case required to access this Microservice Resource",
                                 status=400, mimetype="text/html")
         data = {

@@ -7,7 +7,7 @@ logger = logging.getLogger(__name__)
 class Message:
 
     def __init__(self, msg_to, msg_from, body):
-        logger.debug("Message Class created %s, %s, %s" % (msg_to, msg_from, body))
+        logger.debug('Message Class created {}, {}, {}'.format(msg_to, msg_from, body))
         self.msg_to = msg_to
         self.msg_from = msg_from
         self.body = body
