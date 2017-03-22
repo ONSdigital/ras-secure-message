@@ -11,7 +11,7 @@ db = SQLAlchemy()
 
 
 class Message(db.Model):
-
+    """Secure messaging datasbase model"""
     logger.debug("Hit database message")
 
     __tablename__ = "secure_message"

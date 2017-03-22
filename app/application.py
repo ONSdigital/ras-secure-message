@@ -27,7 +27,6 @@ logging_config = dict(
     )
 
 dictConfig(logging_config)
-logger = logging.getLogger(__name__)
 # set werkzeug logging level
 werkzeug_logger = logging.getLogger('werkzeug')
 werkzeug_logger.setLevel(level=settings.SMS_WERKZEUG_LOG_LEVEL)
@@ -39,7 +38,11 @@ app.logger.addHandler(logging.StreamHandler())
 app.logger.setLevel(settings.APP_LOG_LEVEL)
 database.db.init_app(app)
 
-logger.info("Starting application")
+logger = logging.getLogger(__name__)
+logger.info('Starting application')
+logger.info('SMS Log level: {}'.format(settings.SMS_LOG_LEVEL))
+logger.info('APP Log Level: {}'.format(settings.APP_LOG_LEVEL))
+logger.debug('Database URL: {}'.format(settings.SECURE_MESSAGING_DATABASE_URL))
 
 def drop_database():
     database.db.drop_all()

@@ -9,12 +9,13 @@ saved_stdout = sys.stdout
 
 
 class LoggingTestCase(unittest.TestCase):
-
+    """Test case for logging"""
     def setUp(self):
         # creates a test client
         self.app = application.app.test_client()
 
     def test_logging_message_endpoint(self):
+        """logging message endpoint"""
         out = StringIO()
         sys.stdout = out
         message = {'msg_to': 'richard', 'msg_from': 'torrance', 'subject': 'hello', 'body': 'hello world',

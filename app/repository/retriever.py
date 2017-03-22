@@ -3,7 +3,7 @@ from flask import jsonify
 
 
 class Retriever:
-
+    """Created when retrieving messages"""
     @staticmethod
     def retrieve_message_list():
         db_model = Message()

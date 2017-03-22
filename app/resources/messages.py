@@ -5,6 +5,8 @@ from app.domain_model.domain import Message
 from app.repository.saver import Saver
 from app.repository.retriever import Retriever
 import logging
+from app.common.alerts import AlertUser, AlertViaGovNotify
+from app import settings
 
 logger = logging.getLogger(__name__)
 
@@ -30,10 +32,15 @@ class MessageList(Resource):
 
 class MessageSend(Resource):
 
-    """Send message for a user"""
     @staticmethod
-    def post():
-        #res = authenticate(request)
+    def alert_recipients():
+        recipient_email = settings.NOTIFICATION_DEV_EMAIL  # change this when know more about party service
+        alerter = AlertUser(AlertViaGovNotify())
+        alerter.send(recipient_email, settings.NOTIFICATION_TEMPLATE_ID, None)
+
+    """Send message for a user"""
+    def post(self):
+        # res = authenticate(request)
         res = {'status': "ok"}
         if res == {'status': "ok"}:
             logger.info("Message send POST request.")
@@ -43,6 +50,7 @@ class MessageSend(Resource):
             message_service.save_message(message)
             resp = jsonify({'status': "ok"})
             resp.status_code = 200
+            # self.alert_recipients()
             return resp
         else:
             return res
@@ -53,7 +61,7 @@ class MessageById(Resource):
     """Get message by id"""
     @staticmethod
     def get(message_id):
-        #res = authenticate(request)
+        # res = authenticate(request)
         res = {'status': "ok"}
         if res == {'status': "ok"}:
             resp = jsonify({"status": "ok", "message_id": message_id})

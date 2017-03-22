@@ -80,7 +80,8 @@ class MessageTestCase(unittest.TestCase):
         sut = self.serialise_and_deserialize_message()
         self.assertTrue(expected_error in sut.errors['msg_from'])
 
-    def test_msg_from_field_missing_from_Json_causes_error(self):
+    def test_msg_from_required_validation_false(self):
+        """message marshalling fails msg_from not given"""
         message = {'msg_to': 'torrance', 'body': 'hello'}
         schema = MessageSchema()
         data, errors = schema.load(message)
