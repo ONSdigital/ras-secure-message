@@ -64,8 +64,8 @@ class MessageById(Resource):
         # res = authenticate(request)
         res = {'status': "ok"}
         if res == {'status': "ok"}:
-            resp = jsonify({"status": "ok", "message_id": message_id})
-            resp.status_code = 200
+            message_service = Retriever()
+            resp = message_service.retrieve_message(message_id)
             return resp
         else:
             return res

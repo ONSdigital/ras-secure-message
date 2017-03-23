@@ -16,7 +16,6 @@ install:
 script:
     - coverage run tests/test_app.py
     - coverage run tests/test_authenticator.py
-    - coverage run tests/test_logging.py
     - coverage run tests/test_message.py
     - coverage run tests/test_retriever.py
 

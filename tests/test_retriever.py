@@ -7,6 +7,7 @@ from app.repository.retriever import Retriever
 from app.application import app
 from flask import current_app
 from app.data_model import database
+from werkzeug.exceptions import NotFound
 
 
 class RetrieverTestCase(unittest.TestCase):
@@ -56,10 +57,27 @@ class RetrieverTestCase(unittest.TestCase):
 
     def test_msg_returned_with_msg_id_true(self):
         """retrieves message using id"""
-        id = 5
+        message_id = 5
         self.populate_database(20)
         with app.app_context():
             with current_app.test_request_context():
-                response = Retriever().retrieve_message(id)
+                response = Retriever().retrieve_message(message_id)
                 msg = json.loads(response.get_data())
-                self.assertEqual(msg['id'], id)
+                self.assertEqual(msg['id'], message_id)
+
+    def test_msg_returned_with_msg_id_returns_404(self):
+        """retrieves message using id that doesn't exist"""
+        message_id = 1
+        with app.app_context():
+            with current_app.test_request_context():
+                with self.assertRaises(NotFound):
+                    Retriever().retrieve_message(message_id)
+
+    def test_msg_returned_with_msg_id_msg_not_in_database(self):
+        """retrieves message using id"""
+        message_id = 21
+        self.populate_database(20)
+        with app.app_context():
+            with current_app.test_request_context():
+                with self.assertRaises(NotFound):
+                    Retriever().retrieve_message(message_id)
