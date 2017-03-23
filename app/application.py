@@ -44,6 +44,7 @@ logger.info('SMS Log level: {}'.format(settings.SMS_LOG_LEVEL))
 logger.info('APP Log Level: {}'.format(settings.APP_LOG_LEVEL))
 logger.debug('Database URL: {}'.format(settings.SECURE_MESSAGING_DATABASE_URL))
 
+
 def drop_database():
     database.db.drop_all()
 

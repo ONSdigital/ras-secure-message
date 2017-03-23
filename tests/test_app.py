@@ -35,12 +35,6 @@ class FlaskTestCase(unittest.TestCase):
         response = self.app.post(url)
         self.assertEqual(response.status_code, 405)
 
-    def test_get_request_message(self):
-        """sends GET request to the application message by id endpoint"""
-        url = "http://localhost:5050/message/21"
-        response = self.app.get(url)
-        self.assertEqual(json.loads(response.get_data()), {'status': "ok", 'message_id': 21})
-
     def test_post_request_message_goes_to_database(self):
         """check messages from messageSend endpoint saved in database"""
         # post json message written up in the ui
