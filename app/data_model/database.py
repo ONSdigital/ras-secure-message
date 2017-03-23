@@ -3,7 +3,6 @@ from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime, timezone
 from app import constants
 import logging
-from app.domain_model import domain
 
 logger = logging.getLogger(__name__)
 

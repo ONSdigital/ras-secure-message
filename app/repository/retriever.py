@@ -11,7 +11,7 @@ class Retriever:
         return jsonify([i.serialize for i in result])
 
     @staticmethod
-    def retrieve_message(id):
+    def retrieve_message(message_id):
         db_model = DbMessage()
-        result = db_model.query.filter_by(id=id).first()
+        result = db_model.query.filter_by(id=message_id).first()
         return jsonify(result.serialize)

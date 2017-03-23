@@ -1,10 +1,10 @@
+from app.domain_model.domain import DomainMessage, MessageSchema
 import unittest
 import json
 import sys
 from datetime import datetime, timezone
 import app.constants
 sys.path.append('../ras-secure-message')
-from app.domain_model.domain import DomainMessage, MessageSchema
 
 
 class MessageTestCase(unittest.TestCase):
@@ -12,15 +12,10 @@ class MessageTestCase(unittest.TestCase):
     maxDiff = None      # Needed as some of the strings are bigger than maxDiff
 
     def setUp(self):
-        self.domain_message = DomainMessage(**{'msg_to': 'richard',
-                                            'msg_from': 'torrance',
-                                            'subject': 'MyMessage',
-                                            'body': 'hello',
-                                            'thread': "?",
-                                            'archived': False,
-                                            'marked_as_read': False,
-                                            'create_date': datetime.now(timezone.utc),
-                                            'read_date': datetime.now(timezone.utc)})
+        self.domain_message = DomainMessage(**{'msg_to': 'richard', 'msg_from': 'torrance', 'subject': 'MyMessage',
+                                            'body': 'hello', 'thread': "?", 'archived': False, 'marked_as_read': False,
+                                               'create_date': datetime.now(timezone.utc),
+                                               'read_date': datetime.now(timezone.utc)})
 
     def testMarshalJson(self):
         sut = self.serialise_and_deserialize_message()
@@ -30,7 +25,7 @@ class MessageTestCase(unittest.TestCase):
         now = datetime.now(timezone.utc)
         now_string = now.__str__()
         sut = DomainMessage('me', 'you', 'subject', 'body', '5', False, False, now, now)
-        sut_str= repr(sut)
+        sut_str = repr(sut)
         expected = '<Message(msg_to=me msg_from=you subject=subject body=body thread=5 archived=False marked_as_read=False create_date={0} read_date={0})>'.format(now_string)
         self.assertEquals(sut_str, expected)
 

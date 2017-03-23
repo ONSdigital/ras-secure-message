@@ -6,7 +6,6 @@ from sqlalchemy import create_engine
 import unittest
 from flask import json
 from datetime import datetime, timezone
-
 from app.application import app
 from flask import current_app
 from app.data_model import database
@@ -17,13 +16,6 @@ class FlaskTestCase(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         app.testing = True
-        app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:////tmp/messages.db'
-        cls.engine = create_engine('sqlite:////tmp/messages.db', echo=True)
-        with app.app_context():
-            database.db.init_app(current_app)
-            database.db.drop_all()
-            database.db.create_all()
-            cls.db = database.db
 
     @classmethod
     def tearDownClass(cls):
@@ -32,8 +24,13 @@ class FlaskTestCase(unittest.TestCase):
     def setUp(self):
         # creates a test client
         self.app = application.app.test_client()
-        # propagate the exceptions to the test client
-        # self.app.testing = True
+        app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:////tmp/messages.db'
+        self.engine = create_engine('sqlite:////tmp/messages.db', echo=True)
+        with app.app_context():
+            database.db.init_app(current_app)
+            database.db.drop_all()
+            database.db.create_all()
+            self.db = database.db
 
     def test_health_status(self):
         """sends GET request to the application health monitor endpoint"""
@@ -87,7 +84,7 @@ class FlaskTestCase(unittest.TestCase):
                 'create_date': datetime.now(timezone.utc),
                 'read_date': datetime.now(timezone.utc)}
 
-        response = self.app.post(url, data=json.dumps(data), headers=headers)
+        self.app.post(url, data=json.dumps(data), headers=headers)
 
         engine = create_engine(settings.SECURE_MESSAGING_DATABASE_URL, echo=True)
 
@@ -97,12 +94,6 @@ class FlaskTestCase(unittest.TestCase):
                 data = {"to": row['msg_to'], "from": row['msg_from'], "subject": row['subject'], "body": row['body']}
                 # print("to:", row['msg_to'], "from:", row['msg_from'], "body:", row['body'])
                 self.assertEqual({'to': 'richard', 'from': 'torrance', 'subject': 'MyMessage', 'body': 'hello'}, data)
-
-
-    # def tearDown(self):
-    #     # Closing down the database
-    #     self.db.session.remove()
-    #     self.db.drop_all()
 
 if __name__ == '__main__':
     unittest.main()

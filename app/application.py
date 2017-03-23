@@ -9,11 +9,10 @@ from logging.config import dictConfig
 
 """ initialise logging defaults for project """
 logging_config = dict(
-        version = 1,
-        disable_existing_loggers = False,
+        version=1,
+        disable_existing_loggers=False,
         formatters={
-            'f': {'format':
-                      '%(asctime)s %(levelname)s %(name)s %(message)s'}
+            'f': {'format': '%(asctime)s %(levelname)s %(name)s %(message)s'}
         },
         handlers={
             'h': {'class': 'logging.StreamHandler',
@@ -43,6 +42,7 @@ logger.info('Starting application')
 logger.info('SMS Log level: {}'.format(settings.SMS_LOG_LEVEL))
 logger.info('APP Log Level: {}'.format(settings.APP_LOG_LEVEL))
 logger.debug('Database URL: {}'.format(settings.SECURE_MESSAGING_DATABASE_URL))
+
 
 def drop_database():
     database.db.drop_all()

@@ -4,11 +4,11 @@ from app.data_model import database
 
 class Saver:
     """Created when saving a message"""
-    def save_message(self, domain_message):
 
+    @staticmethod
+    def save_message(domain_message):
         db_message = database.DbMessage()
         db_message.set_from_domain_model(domain_message)
-
         db.session.add(db_message)
         db.session.commit()
 

@@ -27,19 +27,9 @@ class DomainMessage:
 
     def __eq__(self, other):
         if isinstance(other, DomainMessage):
-            if self.msg_to == other.msg_to and\
-                self.msg_from == other.msg_from and\
-                self.subject == other.subject and\
-                self.body == other.body and\
-                self.thread == other.thread and\
-                self.archived == other.archived and\
-                self.marked_as_read == other.marked_as_read and\
-                self.create_date.ctime() == other.create_date.ctime() and\
-                    self.read_date.ctime() == other.read_date.ctime():
-                    return True
-            return False
+            return self.__dict__ == other.__dict__
         else:
-            return NotImplemented
+            return False
 
 
 class MessageSchema(Schema):
