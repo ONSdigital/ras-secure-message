@@ -21,7 +21,6 @@ class RetrieverTestCase(unittest.TestCase):
             database.db.drop_all()
             database.db.create_all()
             self.db = database.db
-        pass
 
     def populate_database(self, x=0):
         with self.engine.connect() as con:
