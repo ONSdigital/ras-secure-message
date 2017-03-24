@@ -1,9 +1,9 @@
-from app.domain_model.domain import DomainMessage, MessageSchema
 import unittest
 import json
 import sys
 from datetime import datetime, timezone
 sys.path.append('../ras-secure-message')
+from app.domain_model.domain import DomainMessage, MessageSchema
 import app.constants
 
 
