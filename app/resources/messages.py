@@ -7,7 +7,6 @@ from app.repository.retriever import Retriever
 import logging
 from app.common.alerts import AlertUser, AlertViaGovNotify
 from app import settings
-import json
 
 logger = logging.getLogger(__name__)
 
@@ -32,6 +31,7 @@ class MessageList(Resource):
 
 
 class MessageSend(Resource):
+    """Send message for a user"""
 
     @staticmethod
     def alert_recipients():
@@ -39,7 +39,6 @@ class MessageSend(Resource):
         alerter = AlertUser(AlertViaGovNotify())
         alerter.send(recipient_email, settings.NOTIFICATION_TEMPLATE_ID, None)
 
-    """Send message for a user"""
     def post(self):
         # res = authenticate(request)
         res = {'status': "ok"}
@@ -50,7 +49,7 @@ class MessageSend(Resource):
             message_service.save_message(message.data)
             resp = jsonify({'status': "ok"})
             resp.status_code = 200
-            # self.alert_recipients()
+            self.alert_recipients()
             return resp
         else:
             return res

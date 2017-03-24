@@ -1,7 +1,7 @@
 from flask import Flask
 from flask_restful import Api
 from app.resources.messages import MessageList, MessageSend, MessageById
-from app.resources.health import Health
+from app.resources.health import Health, DatabaseHealth, Details
 from app.data_model import database
 from app import settings
 import logging
@@ -39,9 +39,6 @@ database.db.init_app(app)
 
 logger = logging.getLogger(__name__)
 logger.info('Starting application')
-logger.info('SMS Log level: {}'.format(settings.SMS_LOG_LEVEL))
-logger.info('APP Log Level: {}'.format(settings.APP_LOG_LEVEL))
-logger.debug('Database URL: {}'.format(settings.SECURE_MESSAGING_DATABASE_URL))
 
 
 def drop_database():
@@ -52,6 +49,8 @@ with app.app_context():
     database.db.session.commit()
 
 api.add_resource(Health, '/health')
-api.add_resource(MessageList, '/messages', )
+api.add_resource(DatabaseHealth, '/health/db')
+api.add_resource(Details, '/health/details')
+api.add_resource(MessageList, '/messages')
 api.add_resource(MessageSend, '/message/send')
 api.add_resource(MessageById, '/message/<int:message_id>')

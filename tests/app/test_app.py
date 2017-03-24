@@ -30,12 +30,6 @@ class FlaskTestCase(unittest.TestCase):
             database.db.create_all()
             self.db = database.db
 
-    def test_health_status(self):
-        """sends GET request to the application health monitor endpoint"""
-        response = self.app.get('/health')
-        """ assert the status code of the response """
-        self.assertEqual(response.status_code, 200)
-
     def test_post_request_all_message_fails(self):
         """sends POST request to the application messageList endpoint"""
         url = "http://localhost:5050/messages"
