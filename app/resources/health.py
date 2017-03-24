@@ -2,7 +2,6 @@ from flask_restful import Resource
 from flask import jsonify
 from app.repository.retriever import Retriever
 from app import settings
-from app import application
 
 
 class Health(Resource):
@@ -29,7 +28,7 @@ class Details(Resource):
 
     @staticmethod
     def get():
-
+        from app import application
         func_list = {}
         for rule in application.app.url_map.iter_rules():
             if rule.endpoint != 'static':

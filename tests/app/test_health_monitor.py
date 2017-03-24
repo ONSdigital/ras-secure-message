@@ -1,5 +1,3 @@
-import sys
-sys.path.append('../../ras-secure-message')
 from app import application
 import unittest
 from app.application import app

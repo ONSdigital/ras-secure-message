@@ -1,6 +1,4 @@
 import unittest
-import sys
-sys.path.append('../../ras-secure-message')
 from app import application
 from app import settings
 from sqlalchemy import create_engine
