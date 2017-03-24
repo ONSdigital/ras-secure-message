@@ -14,10 +14,7 @@ install:
     - pip install coverage
 
 script:
-    - coverage run tests/test_app.py
-    - coverage run tests/test_authenticator.py
-    - coverage run tests/test_message.py
-    - coverage run tests/test_retriever.py
+    - coverage run run_tests.py 
 
 after_success:
     - codecov
