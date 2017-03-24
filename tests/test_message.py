@@ -3,8 +3,8 @@ import unittest
 import json
 import sys
 from datetime import datetime, timezone
-import app.constants
 sys.path.append('../ras-secure-message')
+import app.constants
 
 
 class MessageTestCase(unittest.TestCase):
