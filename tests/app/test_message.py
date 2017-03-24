@@ -1,10 +1,8 @@
 import unittest
 import json
-from datetime import datetime, timezone
-# import sys
-# sys.path.append('../ras-secure-message')
-from app.domain_model.domain import DomainMessage, MessageSchema
 import app.constants
+from datetime import datetime, timezone
+from app.domain_model.domain import DomainMessage, MessageSchema
 
 
 class MessageTestCase(unittest.TestCase):

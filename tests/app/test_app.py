@@ -1,9 +1,7 @@
-import sys
-sys.path.append('../ras-secure-message')
+import unittest
 from app import application
 from app import settings
 from sqlalchemy import create_engine
-import unittest
 from flask import json
 from datetime import datetime, timezone
 from app.application import app

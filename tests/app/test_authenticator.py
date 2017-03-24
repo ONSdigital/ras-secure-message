@@ -1,5 +1,3 @@
-import sys
-sys.path.append('../ras-secure-message')
 from app.authentication.authenticator import check_jwt
 from app.authentication.jwt import encode
 from flask import Response
