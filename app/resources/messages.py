@@ -1,7 +1,7 @@
 from flask_restful import Resource
 from flask import request
 from flask import jsonify
-from app.domain_model.domain import DomainMessage, MessageSchema
+from app.domain_model.domain import MessageSchema
 from app.repository.saver import Saver
 from app.repository.retriever import Retriever
 import logging

@@ -3,7 +3,6 @@ from flask import jsonify
 from app.repository.retriever import Retriever
 from app import settings
 from app import application
-import urllib
 
 
 class Health(Resource):

@@ -1,5 +1,5 @@
 import sys
-sys.path.append('../ras-secure-message')
+sys.path.append('../../ras-secure-message')
 import unittest
 from flask import json
 from sqlalchemy import create_engine
