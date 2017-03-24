@@ -27,7 +27,6 @@ class RetrieverTestCase(unittest.TestCase):
             for i in range(x):
                 query = 'INSERT INTO secure_message VALUES ({},"test", "test", "test")'.format(i)
                 con.execute(query)
-        pass
 
     def test_0_msg_returned_when_db_empty_true(self):
         """retrieves messages from empty database"""
