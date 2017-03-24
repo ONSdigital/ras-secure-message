@@ -13,5 +13,5 @@ class Retriever:
     @staticmethod
     def retrieve_message(message_id):
         db_model = DbMessage()
-        result = db_model.query.filter_by(id=message_id).first()
+        result = db_model.query.filter_by(id=message_id).first_or_404()
         return jsonify(result.serialize)
