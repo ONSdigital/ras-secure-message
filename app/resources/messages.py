@@ -62,13 +62,9 @@ class MessageById(Resource):
     @staticmethod
     def get(message_id):
         # res = authenticate(request)
-        res = {'status': "ok"}
-        if res == {'status': "ok"}:
-            message_service = Retriever()
-            resp = message_service.retrieve_message(message_id)
-            return resp
-        else:
-            return res
+        message_service = Retriever()
+        resp = message_service.retrieve_message(message_id)
+        return resp
 
     """Update message by id"""
     @staticmethod
