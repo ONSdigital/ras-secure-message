@@ -81,5 +81,23 @@ class FlaskTestCase(unittest.TestCase):
                 # print("to:", row['msg_to'], "from:", row['msg_from'], "body:", row['body'])
                 self.assertEqual({'to': 'richard', 'from': 'torrance', 'subject': 'MyMessage', 'body': 'hello'}, data)
 
+    def test_post_request_returns_201_on_success(self):
+        """check messages from messageSend endpoint saved in database"""
+        # post json message written up in the ui
+        url = "http://localhost:5050/message/send"
+        headers = {'Content-Type': 'application/json'}
+        data = {'msg_to': 'richard',
+                'msg_from': 'torrance',
+                'subject': 'MyMessage',
+                'body': 'hello',
+                'thread': "?",
+                'archived': False,
+                'marked_as_read': False,
+                'create_date': datetime.now(timezone.utc),
+                'read_date': datetime.now(timezone.utc)}
+
+        response = self.app.post(url, data=json.dumps(data), headers=headers)
+        self.assertEqual(response.status_code, 201)
+
 if __name__ == '__main__':
     unittest.main()
