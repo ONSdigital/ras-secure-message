@@ -10,6 +10,7 @@ from flask import json
 class HelathTestCase(unittest.TestCase):
     """Test case for application health monitor"""
     def setUp(self):
+        """setup test environment"""
         self.app = application.app.test_client()
         app.testing = True
         app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:////tmp/messages.db'

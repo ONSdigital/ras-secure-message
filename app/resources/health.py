@@ -28,6 +28,7 @@ class Details(Resource):
 
     @staticmethod
     def get():
+        """returns environment and api endpoint details"""
         from app import application
         func_list = {}
         for rule in application.app.url_map.iter_rules():

@@ -39,6 +39,7 @@ class DbMessage(db.Model):
         self.read_date = read_date
 
     def set_from_domain_model(self, domain_model):
+        """set dbMessage attributes to domain_model attributes"""
         self.msg_to = domain_model.msg_to
         self.msg_from = domain_model.msg_from
         self.subject = domain_model.subject

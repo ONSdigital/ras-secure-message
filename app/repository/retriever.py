@@ -6,18 +6,21 @@ class Retriever:
     """Created when retrieving messages"""
     @staticmethod
     def retrieve_message_list():
+        """returns list of messages from db"""
         db_model = DbMessage()
         result = db_model.query.limit(15).all()
         return jsonify([i.serialize for i in result])
 
     @staticmethod
     def retrieve_message(message_id):
+        """returns single message from db"""
         db_model = DbMessage()
         result = db_model.query.filter_by(id=message_id).first_or_404()
         return jsonify(result.serialize)
 
     @staticmethod
     def check_db_connection():
+        """checks if db connection is working"""
         database_status = {"status": "healthy", "errors": "none"}
         resp = jsonify(database_status)
         resp.status_code = 200

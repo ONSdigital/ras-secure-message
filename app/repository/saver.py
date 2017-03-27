@@ -7,6 +7,7 @@ class Saver:
 
     @staticmethod
     def save_message(domain_message):
+        """save message to database"""
         db_message = database.DbMessage()
         db_message.set_from_domain_model(domain_message)
         db.session.add(db_message)
