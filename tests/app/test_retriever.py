@@ -11,6 +11,7 @@ from werkzeug.exceptions import NotFound
 class RetrieverTestCase(unittest.TestCase):
     """Test case for message retrieval"""
     def setUp(self):
+        """setup test environment"""
         app.testing = True
         app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:////tmp/messages.db'
         self.engine = create_engine('sqlite:////tmp/messages.db', echo=True)

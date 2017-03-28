@@ -10,7 +10,7 @@ class DomainMessage:
     """Class to hold message attributes"""
     def __init__(self, msg_to, msg_from, subject, body, thread, archived, marked_as_read,
                  create_date=datetime.now(timezone.utc), read_date=None):
-        logger.debug("Message Class created %s, %s, %s %s" % (msg_to, msg_from, subject, body))
+        logger.debug("Message Class created {}, {}, {}, {}".format(msg_to, msg_from, subject, body))
         self.msg_to = msg_to
         self.msg_from = msg_from
         self.subject = subject

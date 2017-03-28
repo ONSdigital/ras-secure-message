@@ -7,9 +7,10 @@ if __name__ == "__main__":
     suites_list = []
     loader = unittest.TestLoader()
     for directory in test_dirs:
-        test_path = "./tests/{}".format(directory)
-        suite = loader.discover(test_path)
-        suites_list.append(suite)
-        result = unittest.TextTestRunner(verbosity=2).run(suite)
-        if len(result.failures) != 0:
-            sys.exit(1)
+        if directory == "app":
+            test_path = "./tests/{}".format(directory)
+            suite = loader.discover(test_path)
+            suites_list.append(suite)
+            result = unittest.TextTestRunner(verbosity=2).run(suite)
+            if len(result.failures) != 0:
+                sys.exit(1)
