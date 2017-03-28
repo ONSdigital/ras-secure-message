@@ -2,3 +2,4 @@
 .idea
 .coverage
 app/__pycache__
+.DS_Store
