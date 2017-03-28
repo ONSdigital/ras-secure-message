@@ -1,11 +1,11 @@
-from behave import *
+import behave
 from app.application import app
 from flask import json
 from datetime import timezone, datetime
 from nose.tools import assert_equal
 
 
-@given('a message is sent without a Thread id')
+@behave.given('a message is sent without a Thread id')
 def step_impl(context):
     url = "http://localhost:5050/message/send"
     headers = {'Content-Type': 'application/json'}
@@ -22,7 +22,7 @@ def step_impl(context):
     context.response = app.test_client().post(url, data=json.dumps(data), headers=headers)
 
 
-@then('a 201 status code is the response')
+@behave.then('a 201 status code is the response')
 def step_impl(context):
     assert_equal(context.response.status_code, int(201))
 
