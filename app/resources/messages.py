@@ -46,11 +46,10 @@ class MessageSend(Resource):
             logger.info("Message send POST request.")
             message = MessageSchema().load(request.get_json())
             message_service = Saver()
-            print(message.data)
             message_service.save_message(message.data)
             resp = jsonify({'status': "ok"})
             resp.status_code = 201
-            # self.alert_recipients()
+            self.alert_recipients()
             return resp
         else:
             return res
