@@ -3,7 +3,7 @@ import os
 import sys
 
 if __name__ == "__main__":
-    test_dirs = os.listdir('./tests/app')
+    test_dirs = os.listdir('./tests')
     suites_list = []
     loader = unittest.TestLoader()
     for directory in test_dirs:
