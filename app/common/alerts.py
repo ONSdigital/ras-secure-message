@@ -30,6 +30,6 @@ class AlertViaGovNotify:
             )
         except BaseException as e:
             logger.info(e)
-            raise ValueError("Incorrect Email")
+            raise ValueError(e)
 
 

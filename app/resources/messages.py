@@ -1,6 +1,5 @@
 from flask_restful import Resource
-from flask import request
-from flask import jsonify
+from flask import request, Response, jsonify
 from app.domain_model.domain import MessageSchema
 from app.repository.saver import Saver
 from app.repository.retriever import Retriever
@@ -39,18 +38,23 @@ class MessageSend(Resource):
         alerter = AlertUser(AlertViaGovNotify())
         alerter.send(recipient_email, settings.NOTIFICATION_TEMPLATE_ID, None)
 
-    def post(self):
+    @staticmethod
+    def post():
         # res = authenticate(request)
         res = {'status': "ok"}
         if res == {'status': "ok"}:
             logger.info("Message send POST request.")
             message = MessageSchema().load(request.get_json())
-            message_service = Saver()
-            message_service.save_message(message.data)
-            resp = jsonify({'status': "ok"})
-            resp.status_code = 201
-            self.alert_recipients()
-            return resp
+            if message.errors == {}:
+                message_service = Saver()
+                message_service.save_message(message.data)
+                resp = jsonify({'status': "ok"})
+                resp.status_code = 201
+                # self.alert_recipients()
+                return resp
+            else:
+                res = Response(response=message.errors, status=400, mimetype="text/html")
+                return res
         else:
             return res
 
