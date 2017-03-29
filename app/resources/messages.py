@@ -33,26 +33,30 @@ class MessageList(Resource):
 class MessageSend(Resource):
     """Send message for a user"""
 
-    @staticmethod
-    def alert_recipients():
-        recipient_email = settings.NOTIFICATION_DEV_EMAIL  # change this when know more about party service
-        alerter = AlertUser(AlertViaGovNotify())
-        alerter.send(recipient_email, settings.NOTIFICATION_TEMPLATE_ID, None)
+    _alertMethod = AlertViaGovNotify()
+
+    @property                   # By using a property we can inject an alerter during test
+    def alert_method(self):
+        return self._alertMethod
+
+    @alert_method.setter
+    def alert_method(self, value):
+        self._alertMethod = value
+
+    def alert_recipients(self):
+        recipient_email = settings.NOTIFICATION_DEV_EMAIL  # TODO change this when know more about party service
+        alert_user = AlertUser(self.alert_method)
+        alert_status, alert_detail = alert_user.send(recipient_email, settings.NOTIFICATION_TEMPLATE_ID, None)
+        resp = jsonify({'status': '{0}'.format(alert_detail)})
+        resp.status_code = alert_status
+        return resp
 
     def post(self):
-        # res = authenticate(request)
-        res = {'status': "ok"}
-        if res == {'status': "ok"}:
-            logger.info("Message send POST request.")
-            message = MessageSchema().load(request.get_json())
-            message_service = Saver()
-            message_service.save_message(message.data)
-            resp = jsonify({'status': "ok"})
-            resp.status_code = 201
-            self.alert_recipients()
-            return resp
-        else:
-            return res
+        logger.info("Message send POST request.")
+        message = MessageSchema().load(request.get_json())
+        Saver().save_message(message.data)
+        return self.alert_recipients( )
+
 
 
 class MessageById(Resource):

@@ -2,20 +2,25 @@ from marshmallow import Schema, fields, post_load, validates, ValidationError
 import logging
 from datetime import datetime, timezone
 from app import constants
+import uuid
 
 logger = logging.getLogger(__name__)
 
 
 class DomainMessage:
+
+
     """Class to hold message attributes"""
-    def __init__(self, msg_to, msg_from, subject, body, thread, archived, marked_as_read,
-                 create_date=datetime.now(timezone.utc), read_date=None):
+    def __init__(self,  msg_to, msg_from, subject, body, thread, archived, marked_as_read,
+                 create_date=datetime.now(timezone.utc), read_date=None, msg_id=''):
+
         logger.debug("Message Class created {}, {}, {}, {}".format(msg_to, msg_from, subject, body))
+        self.msg_id = str(uuid.uuid4()) if len(msg_id) == 0 else msg_id  # If empty msg_id assign to a uuid
         self.msg_to = msg_to
         self.msg_from = msg_from
         self.subject = subject
         self.body = body
-        self.thread = thread
+        self.thread = msg_id if len(thread) == 0 else thread  # If empty thread then set to message id
         self.archived = archived
         self.marked_as_read = marked_as_read
         self.create_date = create_date
@@ -23,7 +28,7 @@ class DomainMessage:
         self.read_date = read_date
 
     def __repr__(self):
-        return '<Message(msg_to={self.msg_to} msg_from={self.msg_from} subject={self.subject} body={self.body} thread={self.thread} archived={self.archived} marked_as_read={self.marked_as_read} create_date={self.create_date} read_date={self.read_date})>'.format(self=self)
+        return '<Message(msg_id={self.msg_id} to={self.msg_to} msg_from={self.msg_from} subject={self.subject} body={self.body} thread={self.thread} archived={self.archived} marked_as_read={self.marked_as_read} create_date={self.create_date} read_date={self.read_date})>'.format(self=self)
 
     def __eq__(self, other):
         if isinstance(other, DomainMessage):
@@ -35,7 +40,7 @@ class DomainMessage:
 class MessageSchema(Schema):
 
     """ Class to marshal JSON to Message"""
-
+    msg_id = fields.Str(allow_none=True)
     msg_to = fields.Str(required=True)
     msg_from = fields.Str(required=True)
     body = fields.Str(required=True)

@@ -1,5 +1,5 @@
 import unittest
-from unittest.mock import MagicMock
+from unittest.mock import Mock
 from app import settings
 from app.common.alerts import AlertUser, AlertViaGovNotify
 
@@ -11,7 +11,7 @@ class AlertsTestCase(unittest.TestCase):
         """sending email notification"""
         alert_service = AlertViaGovNotify()
         sut = AlertUser(alert_service)
-        alert_service.send = MagicMock()
+        alert_service.send = Mock()
         sut.send('gemma.irving@ons.gov.uk', settings.NOTIFICATION_TEMPLATE_ID, None)
         alert_service.send.assert_called_with('gemma.irving@ons.gov.uk', settings.NOTIFICATION_TEMPLATE_ID, None)
 

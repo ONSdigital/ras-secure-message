@@ -5,6 +5,7 @@ from datetime import datetime, timezone
 from app.domain_model.domain import DomainMessage, MessageSchema
 
 
+
 class MessageTestCase(unittest.TestCase):
     """Test case for Messages"""
 
@@ -26,9 +27,9 @@ class MessageTestCase(unittest.TestCase):
         """creating domainMessage object"""
         now = datetime.now(timezone.utc)
         now_string = now.__str__()
-        sut = DomainMessage('me', 'you', 'subject', 'body', '5', False, False, now, now)
+        sut = DomainMessage('me', 'you', 'subject', 'body', '5', False, False, now, now, 'AMsgId')
         sut_str = repr(sut)
-        expected = '<Message(msg_to=me msg_from=you subject=subject body=body thread=5 archived=False marked_as_read=False create_date={0} read_date={0})>'.format(now_string)
+        expected = '<Message(msg_id=AMsgId to=me msg_from=you subject=subject body=body thread=5 archived=False marked_as_read=False create_date={0} read_date={0})>'.format(now_string)
         self.assertEquals(sut_str, expected)
 
     def test_message_not_equal(self):
@@ -41,8 +42,8 @@ class MessageTestCase(unittest.TestCase):
     def test_message_equal(self):
         """testing two same domainMessage objects are equal"""
         now = datetime.now(timezone.utc)
-        message1 = DomainMessage('1', '2', '3', '4', '5', False, False, now, now)
-        message2 = DomainMessage('1', '2', '3', '4', '5', False, False, now, now)
+        message1 = DomainMessage('1', '2', '3', '4', '5', False, False, now, now, 'MsgId')
+        message2 = DomainMessage('1', '2', '3', '4', '5', False, False, now, now, 'MsgId')
         self.assertTrue(message1 == message2)
 
     def test_valid_message_passes_validation(self):
@@ -57,14 +58,14 @@ class MessageTestCase(unittest.TestCase):
         sut = self.serialise_and_deserialize_message()
         self.assertTrue(expected_error in sut.errors['msg_to'])
 
-    def test_msg_to_min_length_validation_false(self):
+    def test_msg_to_zero_length_causes_validation_error(self):
         """marshalling message with msg_to field too short """
         self.domain_message.msg_to = ''
         expected_error = 'To field not populated.'
         sut = self.serialise_and_deserialize_message()
         self.assertTrue(expected_error in sut.errors['msg_to'])
 
-    def test_msg_to_field_in_json_causes_error(self):
+    def test_missing_msg_to_field_in_json_causes_error(self):
         """marshalling message with not msg_to field"""
         message = {'msg_from': 'torrance', 'body': 'hello'}
         schema = MessageSchema()
@@ -78,14 +79,14 @@ class MessageTestCase(unittest.TestCase):
         sut = self.serialise_and_deserialize_message()
         self.assertTrue(expected_error in sut.errors['msg_from'])
 
-    def test_msg_from_min_length_validation_false(self):
+    def test_msg_from_zero_length_causes_validation_error(self):
         """marshalling message with msg_from field too short """
         self.domain_message.msg_from = ""
         expected_error = 'From field not populated.'
         sut = self.serialise_and_deserialize_message()
         self.assertTrue(expected_error in sut.errors['msg_from'])
 
-    def test_msg_from_required_validation_false(self):
+    def test_missing_msg_from_causes_validation_error(self):
         """marshalling message with no msg_from field """
         message = {'msg_to': 'torrance', 'body': 'hello'}
         schema = MessageSchema()
@@ -141,8 +142,15 @@ class MessageTestCase(unittest.TestCase):
         sut = self.serialise_and_deserialize_message()
         self.assertTrue(expected_error in sut.errors['thread'])
 
+    def test_missing_msg_id_causes_a_string_the_same_length_as_uuid_to_be_used(self):
+        self.domain_message.msg_id = ''
+        sut = self.serialise_and_deserialize_message()
+        self.assertEquals(len(sut.data.msg_id), 36)
+
     def serialise_and_deserialize_message(self):
         """serialising and deserializing message"""
         schema = MessageSchema()
         json_result = schema.dumps(self.domain_message)
         return schema.load(json.loads(json_result.data))
+
+

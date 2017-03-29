@@ -17,4 +17,5 @@ class Saver:
     def convert_to_datamodel(domain_message):
         return database.DbMessage(domain_message.msg_to, domain_message.msg_from, domain_message.subject,
                                   domain_message.body, domain_message.thread, domain_message.archived,
-                                  domain_message.marked_as_read, domain_message.create_date, domain_message.read_date)
+                                  domain_message.marked_as_read, domain_message.create_date, domain_message.read_date,
+                                  domain_message.msg_id)

@@ -25,7 +25,7 @@ class RetrieverTestCase(unittest.TestCase):
     def populate_database(self, x=0):
         with self.engine.connect() as con:
             for i in range(x):
-                query = 'INSERT INTO secure_message VALUES ({},"test", "test", "test","test","",0,0,\
+                query = 'INSERT INTO secure_message VALUES ({}, "AMsg_Id", "test", "test", "test","test","",0,0,\
                 "2017-02-03 00:00:00", "2017-02-03 00:00:00")'.format(i)
                 con.execute(query)
 
