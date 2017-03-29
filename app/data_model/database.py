@@ -63,6 +63,7 @@ class DbMessage(db.Model):
            'archived': self.archived,
            'marked_as_read': self.marked_as_read,
            'create_date': self.create_date,
-           'read_date': self.read_date
+           'read_date': self.read_date,
+           '_links': ''
         }
         return data

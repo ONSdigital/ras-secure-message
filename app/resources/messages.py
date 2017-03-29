@@ -1,11 +1,12 @@
 from flask_restful import Resource
-from flask import request, Response, jsonify
+from flask import request, jsonify
 from app.domain_model.domain import MessageSchema
 from app.repository.saver import Saver
 from app.repository.retriever import Retriever
 import logging
 from app.common.alerts import AlertUser, AlertViaGovNotify
 from app import settings
+from app.settings import MESSAGE_QUERY_LIMIT
 
 logger = logging.getLogger(__name__)
 
@@ -15,28 +16,56 @@ logger = logging.getLogger(__name__)
 class MessageList(Resource):
 
     """Return a list of messages for the user"""
+
     @staticmethod
     def get():
         # res = authenticate(request)
         res = {'status': "ok"}
         if res == {'status': "ok"}:
+            page = 1
+            limit = MESSAGE_QUERY_LIMIT
+
+            if request.args.get('limit') and request.args.get('page'):
+                page = int(request.args.get('page'))
+                limit = int(request.args.get('limit'))
+
             message_service = Retriever()
-            # msg_list = message_service.retrieve_message_list()
-            resp = message_service.retrieve_message_list()
-            resp.status_code = 200
-            return resp
+            status, result = message_service.retrieve_message_list(page, limit)
+            if status:
+                resp = MessageList._paginated_list_to_json(result, page, limit)
+                resp.status_code = 200
+                return resp
         else:
             return res
+
+    @staticmethod
+    def _paginated_list_to_json(paginated_list, page, limit):
+        messages = {}
+        msg_count = 0
+        for message in paginated_list.items:
+            msg_count += 1
+            msg = message.serialize
+            msg['_link'] = {"self": {"href": "{0}/message/{1}".format("http://localhost:5050", msg['id'])}}
+            messages["{0}".format(msg_count)] = msg
+
+        links = {
+            'first': {"href": "{0}/messages".format("http://localhost:5050")},
+            'self': {"href": "{0}/messages?page={1}&limit={2}".format("http://localhost:5050", page, limit)}
+        }
+
+        if paginated_list.has_next:
+            links['next'] = {
+                "href": "{0}/messages?page={1}&limit={2}".format("http://localhost:5050", (page + 1), limit)}
+
+        if paginated_list.has_prev:
+            links['prev'] = {
+                "href": "{0}/messages?page={1}&limit={2}".format("http://localhost:5050", (page - 1), limit)}
+
+        return jsonify({"messages": messages, "_links": links})
 
 
 class MessageSend(Resource):
     """Send message for a user"""
-
-    @staticmethod
-    def alert_recipients():
-        recipient_email = settings.NOTIFICATION_DEV_EMAIL  # change this when know more about party service
-        alerter = AlertUser(AlertViaGovNotify())
-        alerter.send(recipient_email, settings.NOTIFICATION_TEMPLATE_ID, None)
 
     @staticmethod
     def post():
@@ -50,13 +79,20 @@ class MessageSend(Resource):
                 message_service.save_message(message.data)
                 resp = jsonify({'status': "ok"})
                 resp.status_code = 201
-                # self.alert_recipients()
+                # MessageSend._alert_recipients()
                 return resp
             else:
-                res = Response(response=message.errors, status=400, mimetype="text/html")
+                res = jsonify(message.errors)
+                res.status_code = 400
                 return res
         else:
             return res
+
+    @staticmethod
+    def _alert_recipients():
+        recipient_email = settings.NOTIFICATION_DEV_EMAIL  # change this when know more about party service
+        alerter = AlertUser(AlertViaGovNotify())
+        alerter.send(recipient_email, settings.NOTIFICATION_TEMPLATE_ID, None)
 
 
 class MessageById(Resource):
