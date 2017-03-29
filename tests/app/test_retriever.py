@@ -6,6 +6,7 @@ from app.application import app
 from flask import current_app
 from app.data_model import database
 from werkzeug.exceptions import NotFound
+from app.settings import MESSAGE_QUERY_LIMIT
 
 
 class RetrieverTestCase(unittest.TestCase):
@@ -21,7 +22,6 @@ class RetrieverTestCase(unittest.TestCase):
             database.db.create_all()
             self.db = database.db
 
-
     def populate_database(self, x=0):
         with self.engine.connect() as con:
             for i in range(x):
@@ -29,30 +29,38 @@ class RetrieverTestCase(unittest.TestCase):
                 "2017-02-03 00:00:00", "2017-02-03 00:00:00")'.format(i)
                 con.execute(query)
 
-
     def test_0_msg_returned_when_db_empty_true(self):
         """retrieves messages from empty database"""
         with app.app_context():
             with current_app.test_request_context():
-                response = Retriever().retrieve_message_list()
-                self.assertEqual(json.loads(response.get_data()), [])
+                status, response = Retriever().retrieve_message_list(1, MESSAGE_QUERY_LIMIT)
+                msg = []
+                for message in response.items:
+                    msg.append(message.serialize)
+                self.assertEqual(msg, [])
 
-    def test_all_msg_returned_when_db_less_than_15(self):
+    def test_all_msg_returned_when_db_less_than_limit(self):
         """retrieves messages from database with less entries than retrieval amount"""
         self.populate_database(5)
 
         with app.app_context():
             with current_app.test_request_context():
-                response = Retriever().retrieve_message_list()
-                self.assertEqual(len(json.loads(response.get_data())), 5)
+                status, response = Retriever().retrieve_message_list(1, MESSAGE_QUERY_LIMIT)
+                msg = []
+                for message in response.items:
+                    msg.append(message.serialize)
+                self.assertEqual(len(msg), 5)
 
-    def test_15_msg_returned_when_db_greater_than_15(self):
+    def test_15_msg_returned_when_db_greater_than_limit(self):
         """retrieves x messages when database has greater than x entries"""
-        self.populate_database(20)
+        self.populate_database(MESSAGE_QUERY_LIMIT+5)
         with app.app_context():
             with current_app.test_request_context():
-                response = Retriever().retrieve_message_list()
-                self.assertEqual(len(json.loads(response.get_data())), 15)
+                status, response = Retriever().retrieve_message_list(1, MESSAGE_QUERY_LIMIT)
+                msg = []
+                for message in response.items:
+                    msg.append(message.serialize)
+                self.assertEqual(len(msg), MESSAGE_QUERY_LIMIT)
 
     def test_msg_returned_with_msg_id_true(self):
         """retrieves message using id"""

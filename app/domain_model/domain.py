@@ -14,7 +14,7 @@ class DomainMessage:
     def __init__(self,  msg_to, msg_from, subject, body, thread, archived, marked_as_read,
                  create_date=datetime.now(timezone.utc), read_date=None, msg_id=''):
 
-        logger.debug("Message Class created {}, {}, {}, {}".format(msg_to, msg_from, subject, body))
+        logger.debug("Message Class created {0}, {1}, {2}, {3}".format(msg_to, msg_from, subject, body))
         self.msg_id = str(uuid.uuid4()) if len(msg_id) == 0 else msg_id  # If empty msg_id assign to a uuid
         self.msg_to = msg_to
         self.msg_from = msg_from

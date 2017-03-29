@@ -1,15 +1,24 @@
 from app.data_model.database import DbMessage
 from flask import jsonify
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 class Retriever:
     """Created when retrieving messages"""
     @staticmethod
-    def retrieve_message_list():
+    def retrieve_message_list(page, limit):
         """returns list of messages from db"""
         db_model = DbMessage()
-        result = db_model.query.limit(15).all()
-        return jsonify([i.serialize for i in result])
+
+        try:
+            result = db_model.query.order_by('create_date desc').paginate(page, limit, False)
+        except Exception as e:
+            logger.error(e)
+            return False
+
+        return True, result
 
     @staticmethod
     def retrieve_message(message_id):
