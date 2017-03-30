@@ -35,6 +35,7 @@ werkzeug_logger.setLevel(level=settings.SMS_WERKZEUG_LOG_LEVEL)
 app = Flask(__name__)
 api = Api(app)
 app.config['SQLALCHEMY_DATABASE_URI'] = settings.SECURE_MESSAGING_DATABASE_URL
+app.config['SQLALCHEMY_POOL_SIZE'] = settings.SQLALCHEMY_POOL_SIZE
 app.logger.addHandler(logging.StreamHandler())
 app.logger.setLevel(settings.APP_LOG_LEVEL)
 database.db.init_app(app)

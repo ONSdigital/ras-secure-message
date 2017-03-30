@@ -1,6 +1,8 @@
 from app.data_model.database import DbMessage
 from flask import jsonify
 import logging
+from werkzeug.exceptions import InternalServerError
+from sqlalchemy.exc import SQLAlchemyError
 
 logger = logging.getLogger(__name__)
 
@@ -16,7 +18,7 @@ class Retriever:
             result = db_model.query.order_by('sent_date desc').paginate(page, limit, False)
         except Exception as e:
             logger.error(e)
-            return False
+            raise(InternalServerError(description="Error retrieving messages from database"))
 
         return True, result
 
@@ -24,7 +26,12 @@ class Retriever:
     def retrieve_message(message_id):
         """returns single message from db"""
         db_model = DbMessage()
-        result = db_model.query.filter_by(id=message_id).first_or_404()
+
+        try:
+            result = db_model.query.filter_by(id=message_id).first_or_404()
+        except SQLAlchemyError as e:
+            logger.error(e)
+            raise(InternalServerError(description="Error retrieving message from database"))
         return jsonify(result.serialize)
 
     @staticmethod

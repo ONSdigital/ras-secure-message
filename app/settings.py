@@ -24,3 +24,7 @@ NOTIFICATION_DEV_EMAIL = os.getenv('NOTIFICATION_DEV_EMAIL', 'gemma.irving@ons.g
 
 
 MESSAGE_QUERY_LIMIT = os.getenv('MESSAGE_QUERY_LIMIT', 15)
+
+# SQLAlchemy configuration
+
+SQLALCHEMY_POOL_SIZE = os.getenv('SQLALCHEMY_POOL_SIZE', None)
