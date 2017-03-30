@@ -172,6 +172,7 @@ class MessageTestCase(unittest.TestCase):
         self.assertTrue(expected_error in sut.errors['thread_id'])
 
     def test_missing_msg_id_causes_a_string_the_same_length_as_uuid_to_be_used(self):
+        """Missing msg_id causes a uuid is used"""
         self.domain_message.msg_id = ''
         sut = self.serialise_and_deserialize_message()
         self.assertEquals(len(sut.data.msg_id), 36)
