@@ -5,7 +5,7 @@ from app.repository.retriever import Retriever
 from app.application import app
 from flask import current_app
 from app.data_model import database
-from werkzeug.exceptions import NotFound
+from werkzeug.exceptions import NotFound, InternalServerError
 from app.settings import MESSAGE_QUERY_LIMIT
 from app.resources.messages import MessageList
 
@@ -41,6 +41,14 @@ class RetrieverTestCase(unittest.TestCase):
                 for message in response.items:
                     msg.append(message.serialize)
                 self.assertEqual(msg, [])
+
+    def test_retrieve_message_list_raises_error(self):
+        """retrieves messages from when db does not exist"""
+        with app.app_context():
+            database.db.drop_all()
+            with current_app.test_request_context():
+                with self.assertRaises(InternalServerError):
+                    Retriever().retrieve_message_list(1, MESSAGE_QUERY_LIMIT)
 
     def test_all_msg_returned_when_db_less_than_limit(self):
         """retrieves messages from database with less entries than retrieval amount"""
@@ -91,6 +99,14 @@ class RetrieverTestCase(unittest.TestCase):
             with current_app.test_request_context():
                 with self.assertRaises(NotFound):
                     Retriever().retrieve_message(message_id)
+
+    def test_retrieve_message_raises_error(self):
+        """retrieves message from when db does not exist"""
+        with app.app_context():
+            database.db.drop_all()
+            with current_app.test_request_context():
+                with self.assertRaises(InternalServerError):
+                    Retriever().retrieve_message(1)
 
     def test_paginated_to_json_returns_correct_messages_len(self):
         """turns paginated result list to json checking correct amount of messages are given"""
