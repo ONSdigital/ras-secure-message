@@ -6,9 +6,12 @@ from app.repository.retriever import Retriever
 import logging
 from app.common.alerts import AlertUser, AlertViaGovNotify
 from app import settings
-from app.settings import MESSAGE_QUERY_LIMIT, MESSAGE_LIST_ENDPOINT, MESSAGE_BY_ID_ENDPOINT
+from app.settings import MESSAGE_QUERY_LIMIT
 
 logger = logging.getLogger(__name__)
+
+MESSAGE_LIST_ENDPOINT = "messages"
+MESSAGE_BY_ID_ENDPOINT = "message"
 
 """Rest endpoint for message resources. Messages are immutable, they can only be created and archived."""
 
@@ -32,34 +35,34 @@ class MessageList(Resource):
             message_service = Retriever()
             status, result = message_service.retrieve_message_list(page, limit)
             if status:
-                resp = MessageList._paginated_list_to_json(result, page, limit)
+                resp = MessageList._paginated_list_to_json(result, page, limit, request.host_url)
                 resp.status_code = 200
                 return resp
         else:
             return res
 
     @staticmethod
-    def _paginated_list_to_json(paginated_list, page, limit):
+    def _paginated_list_to_json(paginated_list, page, limit, host_url):
         messages = {}
         msg_count = 0
         for message in paginated_list.items:
             msg_count += 1
             msg = message.serialize
-            msg['_links'] = {"self": {"href": "{0}{1}".format(MESSAGE_BY_ID_ENDPOINT, msg['id'])}}
+            msg['_links'] = {"self": {"href": "{0}{1}/{2}".format(host_url, MESSAGE_BY_ID_ENDPOINT, msg['id'])}}
             messages["{0}".format(msg_count)] = msg
 
         links = {
-            'first': {"href": MESSAGE_LIST_ENDPOINT},
-            'self': {"href": "{0}?page={1}&limit={2}".format(MESSAGE_LIST_ENDPOINT, page, limit)}
+            'first': {"href": "{0}{1}".format(host_url, "messages")},
+            'self': {"href": "{0}{1}?page={2}&limit={3}".format(host_url, MESSAGE_LIST_ENDPOINT, page, limit)}
         }
 
         if paginated_list.has_next:
             links['next'] = {
-                "href": "{0}?page={1}&limit={2}".format(MESSAGE_LIST_ENDPOINT, (page + 1), limit)}
+                "href": "{0}{1}?page={2}&limit={3}".format(host_url, MESSAGE_LIST_ENDPOINT, (page + 1), limit)}
 
         if paginated_list.has_prev:
             links['prev'] = {
-                "href": "{0}?page={1}&limit={2}".format(MESSAGE_LIST_ENDPOINT, (page - 1), limit)}
+                "href": "{0}{1}?page={2}&limit={3}".format(host_url, MESSAGE_LIST_ENDPOINT, (page - 1), limit)}
 
         return jsonify({"messages": messages, "_links": links})
 
