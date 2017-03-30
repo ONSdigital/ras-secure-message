@@ -4,7 +4,7 @@ from app.domain_model.domain import MessageSchema
 from app.repository.saver import Saver
 from app.repository.retriever import Retriever
 import logging
-from app.common.alerts import AlertUser, AlertViaGovNotify
+from app.common.alerts import AlertUser
 from app import settings
 from app.settings import MESSAGE_QUERY_LIMIT
 
@@ -67,38 +67,29 @@ class MessageList(Resource):
 class MessageSend(Resource):
     """Send message for a user"""
 
-    _alertMethod = AlertViaGovNotify()
-
-    @property                   # By using a property we can inject an alerter during test
-    def alert_method(self):
-        return self._alertMethod
-
-    @alert_method.setter
-    def alert_method(self, value):
-        self._alertMethod = value
-
-    def post(self):
+    @staticmethod
+    def post():
         logger.info("Message send POST request.")
         message = MessageSchema().load(request.get_json())
         if message.errors == {}:
             Saver().save_message(message.data)
-            return self._alert_recipients( )
+            return MessageSend._alert_recipients(message.data.msg_id)
         else:
             res = jsonify(message.errors)
             res.status_code = 400
             return res
 
-    def _alert_recipients(self):
+    @staticmethod
+    def _alert_recipients(reference):
         recipient_email = settings.NOTIFICATION_DEV_EMAIL  # TODO change this when know more about party service
-        alert_user = AlertUser(self.alert_method)
-        alert_status, alert_detail = alert_user.send(recipient_email, settings.NOTIFICATION_TEMPLATE_ID, None)
+        alert_user = AlertUser()
+        alert_status, alert_detail = alert_user.send(recipient_email, reference)
         resp = jsonify({'status': '{0}'.format(alert_detail)})
         resp.status_code = alert_status
         return resp
 
 
 class MessageById(Resource):
-
     """Get message by id"""
     @staticmethod
     def get(message_id):

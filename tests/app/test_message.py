@@ -5,7 +5,6 @@ from datetime import datetime, timezone
 from app.domain_model.domain import DomainMessage, MessageSchema
 
 
-
 class MessageTestCase(unittest.TestCase):
     """Test case for Messages"""
 
@@ -152,5 +151,3 @@ class MessageTestCase(unittest.TestCase):
         schema = MessageSchema()
         json_result = schema.dumps(self.domain_message)
         return schema.load(json.loads(json_result.data))
-
-

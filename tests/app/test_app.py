@@ -8,8 +8,7 @@ from datetime import datetime, timezone
 from app.application import app
 from flask import current_app
 from app.data_model import database
-from app.resources.messages import MessageSend
-from app.common.alerts import AlertViaGovNotify
+from app.common.alerts import AlertUser, AlertViaGovNotify
 
 
 class FlaskTestCase(unittest.TestCase):
@@ -28,7 +27,7 @@ class FlaskTestCase(unittest.TestCase):
         app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:////tmp/messages.db'
         self.engine = create_engine('sqlite:////tmp/messages.db', echo=True)
 
-        MessageSend.alert_method = mock.PropertyMock(return_value=mock.Mock(AlertViaGovNotify))
+        AlertUser.alertMethod = mock.Mock(AlertViaGovNotify)
 
         with app.app_context():
             database.db.init_app(current_app)
@@ -107,8 +106,6 @@ class FlaskTestCase(unittest.TestCase):
 
             for row in request:
                 self.assertEqual(len(row['msg_id']), 36)
-
-
 
 if __name__ == '__main__':
     unittest.main()
