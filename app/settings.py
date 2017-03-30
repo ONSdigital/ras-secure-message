@@ -24,3 +24,6 @@ NOTIFICATION_DEV_EMAIL = os.getenv('NOTIFICATION_DEV_EMAIL', 'gemma.irving@ons.g
 
 
 MESSAGE_QUERY_LIMIT = os.getenv('MESSAGE_QUERY_LIMIT', 15)
+
+MESSAGE_LIST_ENDPOINT = os.getenv('MESSAGE_LIST_ENDPOINT', "http://localhost:5050/messages")
+MESSAGE_BY_ID_ENDPOINT = os.getenv('MESSAGE_BY_ID_ENDPOINT', "http://localhost:5050/message/")

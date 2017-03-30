@@ -6,7 +6,8 @@ from app.application import app
 from flask import current_app
 from app.data_model import database
 from werkzeug.exceptions import NotFound
-from app.settings import MESSAGE_QUERY_LIMIT
+from app.settings import MESSAGE_QUERY_LIMIT, MESSAGE_BY_ID_ENDPOINT, MESSAGE_LIST_ENDPOINT
+from app.resources.messages import MessageList
 
 
 class RetrieverTestCase(unittest.TestCase):
@@ -88,3 +89,75 @@ class RetrieverTestCase(unittest.TestCase):
             with current_app.test_request_context():
                 with self.assertRaises(NotFound):
                     Retriever().retrieve_message(message_id)
+
+    def test_paginated_to_json_returns_correct_messages_len(self):
+        """turns paginated result list to json checking correct amount of messages are given"""
+        self.populate_database(MESSAGE_QUERY_LIMIT-1)
+        with app.app_context():
+            with current_app.test_request_context():
+                status, resp = Retriever().retrieve_message_list(1, MESSAGE_QUERY_LIMIT)
+                json_data = MessageList()._paginated_list_to_json(resp, 1, MESSAGE_QUERY_LIMIT)
+                data = json.loads(json_data.get_data())
+                self.assertEqual(len(data['messages']), (MESSAGE_QUERY_LIMIT-1))
+
+    def test_paginated_to_json_returns_correct_message_self_link(self):
+        """turns paginated result list to json checking correct self link has been added for message"""
+        self.populate_database(MESSAGE_QUERY_LIMIT-1)
+        with app.app_context():
+            with current_app.test_request_context():
+                status, resp = Retriever().retrieve_message_list(1, MESSAGE_QUERY_LIMIT)
+                json_data = MessageList()._paginated_list_to_json(resp, 1, MESSAGE_QUERY_LIMIT)
+                data = json.loads(json_data.get_data())
+                self.assertEqual(data['messages']['4']['_links']['self']['href'],
+                                 "{0}{1}".format(MESSAGE_BY_ID_ENDPOINT, data["messages"]['4']['id']))
+
+    def test_paginated_to_json_returns_prev_page(self):
+        """turns paginated result list to json checking prev page is returned if needed"""
+        self.populate_database(MESSAGE_QUERY_LIMIT*2)
+        with app.app_context():
+            with current_app.test_request_context():
+                status, resp = Retriever().retrieve_message_list(2, MESSAGE_QUERY_LIMIT)
+                json_data = MessageList()._paginated_list_to_json(resp, 2, MESSAGE_QUERY_LIMIT)
+                data = json.loads(json_data.get_data())
+                self.assertTrue('prev' in data['_links'])
+
+    def test_paginated_to_json_does_not_return_prev_page(self):
+        """turns paginated result list to json checking prev page is not returned if not needed"""
+        self.populate_database(MESSAGE_QUERY_LIMIT-1)
+        with app.app_context():
+            with current_app.test_request_context():
+                status, resp = Retriever().retrieve_message_list(1, MESSAGE_QUERY_LIMIT)
+                json_data = MessageList()._paginated_list_to_json(resp, 1, MESSAGE_QUERY_LIMIT)
+                data = json.loads(json_data.get_data())
+                self.assertFalse('prev' in data['_links'])
+
+    def test_paginated_to_json_returns_next_page(self):
+        """turns paginated result list to json checking next page is returned if needed"""
+        self.populate_database(MESSAGE_QUERY_LIMIT*2)
+        with app.app_context():
+            with current_app.test_request_context():
+                status, resp = Retriever().retrieve_message_list(1, MESSAGE_QUERY_LIMIT)
+                json_data = MessageList()._paginated_list_to_json(resp, 1, MESSAGE_QUERY_LIMIT)
+                data = json.loads(json_data.get_data())
+                self.assertTrue('next' in data['_links'])
+
+    def test_paginated_to_json_does_not_return_next_page(self):
+        """turns paginated result list to json checking next page is not returned if not needed"""
+        self.populate_database(MESSAGE_QUERY_LIMIT-1)
+        with app.app_context():
+            with current_app.test_request_context():
+                status, resp = Retriever().retrieve_message_list(1, MESSAGE_QUERY_LIMIT)
+                json_data = MessageList()._paginated_list_to_json(resp, 1, MESSAGE_QUERY_LIMIT)
+                data = json.loads(json_data.get_data())
+                self.assertFalse('next' in data['_links'])
+
+    def test_paginated_to_json_has_correct_self_link(self):
+        """turns paginated result list to json checking correct self link has been added for list"""
+        self.populate_database(MESSAGE_QUERY_LIMIT - 1)
+        with app.app_context():
+            with current_app.test_request_context():
+                status, resp = Retriever().retrieve_message_list(1, MESSAGE_QUERY_LIMIT)
+                json_data = MessageList()._paginated_list_to_json(resp, 1, MESSAGE_QUERY_LIMIT)
+                data = json.loads(json_data.get_data())
+                self.assertEqual(data['_links']['self']['href'],
+                                 "{0}?page={1}&limit={2}".format(MESSAGE_LIST_ENDPOINT, 1, MESSAGE_QUERY_LIMIT))

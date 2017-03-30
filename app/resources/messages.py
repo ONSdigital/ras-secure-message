@@ -6,7 +6,7 @@ from app.repository.retriever import Retriever
 import logging
 from app.common.alerts import AlertUser, AlertViaGovNotify
 from app import settings
-from app.settings import MESSAGE_QUERY_LIMIT
+from app.settings import MESSAGE_QUERY_LIMIT, MESSAGE_LIST_ENDPOINT, MESSAGE_BY_ID_ENDPOINT
 
 logger = logging.getLogger(__name__)
 
@@ -45,21 +45,21 @@ class MessageList(Resource):
         for message in paginated_list.items:
             msg_count += 1
             msg = message.serialize
-            msg['_link'] = {"self": {"href": "{0}/message/{1}".format("http://localhost:5050", msg['id'])}}
+            msg['_links'] = {"self": {"href": "{0}{1}".format(MESSAGE_BY_ID_ENDPOINT, msg['id'])}}
             messages["{0}".format(msg_count)] = msg
 
         links = {
-            'first': {"href": "{0}/messages".format("http://localhost:5050")},
-            'self': {"href": "{0}/messages?page={1}&limit={2}".format("http://localhost:5050", page, limit)}
+            'first': {"href": MESSAGE_LIST_ENDPOINT},
+            'self': {"href": "{0}?page={1}&limit={2}".format(MESSAGE_LIST_ENDPOINT, page, limit)}
         }
 
         if paginated_list.has_next:
             links['next'] = {
-                "href": "{0}/messages?page={1}&limit={2}".format("http://localhost:5050", (page + 1), limit)}
+                "href": "{0}?page={1}&limit={2}".format(MESSAGE_LIST_ENDPOINT, (page + 1), limit)}
 
         if paginated_list.has_prev:
             links['prev'] = {
-                "href": "{0}/messages?page={1}&limit={2}".format("http://localhost:5050", (page - 1), limit)}
+                "href": "{0}?page={1}&limit={2}".format(MESSAGE_LIST_ENDPOINT, (page - 1), limit)}
 
         return jsonify({"messages": messages, "_links": links})
 
