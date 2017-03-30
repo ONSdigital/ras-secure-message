@@ -6,6 +6,8 @@ from app.data_model import database
 from app import settings
 import logging
 from logging.config import dictConfig
+from flask import request, jsonify
+from app.exception.exceptions import MessageSaveException
 
 """ initialise logging defaults for project """
 logging_config = dict(
@@ -54,3 +56,10 @@ api.add_resource(Details, '/health/details')
 api.add_resource(MessageList, '/messages')
 api.add_resource(MessageSend, '/message/send')
 api.add_resource(MessageById, '/message/<int:message_id>')
+
+
+@app.errorhandler(MessageSaveException)
+def handle_save_exception(error):
+    response = jsonify(error.to_dict())
+    response.status_code = error.status_code
+    return response
