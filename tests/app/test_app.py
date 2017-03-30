@@ -28,6 +28,20 @@ class FlaskTestCase(unittest.TestCase):
         self.engine = create_engine('sqlite:////tmp/messages.db', echo=True)
 
         AlertUser.alertMethod = mock.Mock(AlertViaGovNotify)
+        now = datetime.now(timezone.utc)
+        self.test_message = {'msg_id': 'AMsgId',
+                             'msg_to': 'richard',
+                             'msg_from': 'torrance',
+                             'subject': 'MyMessage',
+                             'body': 'hello',
+                             'thread_id': "?",
+                             'archive_status': False,
+                             'read_status': False,
+                             'sent_date': now,
+                             'read_date': now,
+                             'collection_case': 'ACollectionCase',
+                             'reporting_unit': 'AReportingUnit',
+                             'collection_instrument': 'ACollectionInstrument'}
 
         with app.app_context():
             database.db.init_app(current_app)
@@ -47,17 +61,8 @@ class FlaskTestCase(unittest.TestCase):
 
         url = "http://localhost:5050/message/send"
         headers = {'Content-Type': 'application/json'}
-        data = {'msg_to': 'richard',
-                'msg_from': 'torrance',
-                'subject': 'MyMessage',
-                'body': 'hello',
-                'thread_id': "?",
-                'archive_status': False,
-                'read_status': False,
-                'sent_date': datetime.now(timezone.utc),
-                'read_date': datetime.now(timezone.utc)}
 
-        self.app.post(url, data=json.dumps(data), headers=headers)
+        self.app.post(url, data=json.dumps(self.test_message), headers=headers)
 
         engine = create_engine(settings.SECURE_MESSAGING_DATABASE_URL, echo=True)
 
@@ -73,33 +78,17 @@ class FlaskTestCase(unittest.TestCase):
         # post json message written up in the ui
         url = "http://localhost:5050/message/send"
         headers = {'Content-Type': 'application/json'}
-        data = {'msg_to': 'richard',
-                'msg_from': 'torrance',
-                'subject': 'MyMessage',
-                'body': 'hello',
-                'thread_id': "?",
-                'archive_status': False,
-                'read_status': False,
-                'sent_date': datetime.now(timezone.utc)}
 
-        response = self.app.post(url, data=json.dumps(data), headers=headers)
+        response = self.app.post(url, data=json.dumps(self.test_message), headers=headers)
         self.assertEqual(response.status_code, 201)
 
-    def test_post_request_stores_uuid_if_message_post_called(self):
+    def test_post_request_stores_uuid_in_msg_id_if_message_post_called_with_no_msg_id_set(self):
         """check default_msg_id is stored when messageSend endpoint called with no msg_id"""
         # post json message written up in the ui
         url = "http://localhost:5050/message/send"
         headers = {'Content-Type': 'application/json'}
-        data = {'msg_to': 'richard',
-                'msg_from': 'torrance',
-                'subject': 'MyMessage',
-                'body': 'hello',
-                'thread_id': "?",
-                'archive_status': False,
-                'read_status': False,
-                'sent_date': datetime.now(timezone.utc)}
-
-        self.app.post(url, data=json.dumps(data), headers=headers)
+        self.test_message['msg_id'] = ''
+        self.app.post(url, data=json.dumps(self.test_message), headers=headers)
         engine = create_engine(settings.SECURE_MESSAGING_DATABASE_URL, echo=True)
         with engine.connect() as con:
             request = con.execute('SELECT * FROM secure_message WHERE id = (SELECT MAX(id) FROM secure_message)')
