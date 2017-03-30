@@ -13,7 +13,7 @@ class Retriever:
         db_model = DbMessage()
 
         try:
-            result = db_model.query.order_by('create_date desc').paginate(page, limit, False)
+            result = db_model.query.order_by('sent_date desc').paginate(page, limit, False)
         except Exception as e:
             logger.error(e)
             return False

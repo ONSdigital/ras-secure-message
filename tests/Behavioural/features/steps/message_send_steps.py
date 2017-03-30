@@ -13,10 +13,10 @@ def step_impl(context):
             'msg_from': 'torrance',
             'subject': 'MyMessage',
             'body': 'hello',
-            'thread': '',
-            'archived': False,
-            'marked_as_read': False,
-            'create_date': datetime.now(timezone.utc),
+            'thread_id': '',
+            'archive_status': False,
+            'read_status': False,
+            'sent_date': datetime.now(timezone.utc),
             'read_date': datetime.now(timezone.utc)}
 
     context.response = app.test_client().post(url, data=json.dumps(data), headers=headers)

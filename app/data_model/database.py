@@ -22,24 +22,31 @@ class DbMessage(db.Model):
     msg_from = Column("msg_from", String(constants.MAX_FROM_LEN+1))
     subject = Column("subject", String(constants.MAX_SUBJECT_LEN+1))
     body = Column("body", String(constants.MAX_BODY_LEN+1))
-    thread = Column("thread", String(constants.MAX_THREAD_LEN+1))
-    archived = Column("archived", Boolean)
-    marked_as_read = Column("marked_as_read", Boolean)
-    create_date = Column("create_date", DateTime)
+    thread_id = Column("thread_id", String(constants.MAX_THREAD_LEN + 1))
+    archive_status = Column("archive_status", Boolean)
+    read_status = Column("read_status", Boolean)
+    sent_date = Column("sent_date", DateTime)
     read_date = Column("read_date", DateTime)
+    collection_case = Column("collection_case", String(constants.MAX_COLLECTION_CASE_LEN+1))
+    reporting_unit = Column("reporting_unit", String(constants.MAX_REPORTING_UNIT_LEN+1))
+    collection_instrument= Column("collection_instrument", String(constants.MAX_COLLECTION_INSTRUMENT_LEN+1))
 
-    def __init__(self, msg_id="", msg_to="", msg_from="", subject="", body="", thread="", archived=False, marked_as_read=False,
-                 create_date=datetime.now(timezone.utc), read_date=None):
+    def __init__(self, msg_id="", msg_to="", msg_from="", subject="", body="", thread_id="", archive_status=False,
+                 read_status=False, sent_date=datetime.now(timezone.utc), read_date=None, collection_case='',
+                 reporting_unit='', collectiion_instrument=''):
         self.msg_id = msg_id
         self.msg_to = msg_to
         self.msg_from = msg_from
         self.subject = subject
         self.body = body
-        self.thread = thread
-        self.archived = archived
-        self.marked_as_read = marked_as_read
-        self.create_date = create_date
+        self.thread_id = thread_id
+        self.archive_status = archive_status
+        self.read_status = read_status
+        self.sent_date = sent_date
         self.read_date = read_date
+        self.collection_case = collection_case
+        self.reporting_unit = reporting_unit
+        self.collection_instrument = collectiion_instrument
 
     def set_from_domain_model(self, domain_model):
         """set dbMessage attributes to domain_model attributes"""
@@ -48,27 +55,33 @@ class DbMessage(db.Model):
         self.msg_from = domain_model.msg_from
         self.subject = domain_model.subject
         self.body = domain_model.body
-        self.thread = domain_model.thread
-        self.archived = domain_model.archived
-        self.marked_as_read = domain_model.marked_as_read
-        self.create_date = domain_model.create_date
+        self.thread_id = domain_model.thread_id
+        self.archive_status = domain_model.archive_status
+        self.read_status = domain_model.read_status
+        self.sent_date = domain_model.sent_date
         self.read_date = domain_model.read_date
+        self.collection_case = domain_model.collection_case
+        self.reporting_unit = domain_model.reporting_unit
+        self.collection_instrument = domain_model.reporting_unit
 
     @property
     def serialize(self):
         """Return object data in easily serializeable format"""
         data = {
-           'id': self.id,
-           'msg_id': self.msg_id,
-           'msg_to': self.msg_to,
-           'msg_from': self.msg_from,
-           'subject': self.subject,
-           'body': self.body,
-           'thread': self.thread,
-           'archived': self.archived,
-           'marked_as_read': self.marked_as_read,
-           'create_date': self.create_date,
-           'read_date': self.read_date,
+            'id': self.id,
+            'msg_id': self.msg_id,
+            'msg_to': self.msg_to,
+            'msg_from': self.msg_from,
+            'subject': self.subject,
+            'body': self.body,
+            'thread_id': self.thread_id,
+            'archive_status': self.archive_status,
+            'read_status': self.read_status,
+            'sent_date': self.sent_date,
+            'read_date': self.read_date,
+            'collection_case': self.collection_case,
+            'reporting_unit': self.reporting_unit,
+            'collection_instrument': self.collection_instrument,
            '_links': ''
         }
         return data

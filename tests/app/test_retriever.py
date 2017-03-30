@@ -29,7 +29,8 @@ class RetrieverTestCase(unittest.TestCase):
         with self.engine.connect() as con:
             for i in range(x):
                 query = 'INSERT INTO secure_message VALUES ({}, "AMsg_Id", "test", "test", "test","test","",0,0,\
-                "2017-02-03 00:00:00", "2017-02-03 00:00:00")'.format(i)
+                "2017-02-03 00:00:00", "2017-02-03 00:00:00", "ACollectionCase",\
+                "AReportingUnit", "ACollectionInstrument")'.format(i)
                 con.execute(query)
 
     def test_0_msg_returned_when_db_empty_true(self):

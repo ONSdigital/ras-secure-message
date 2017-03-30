@@ -51,10 +51,10 @@ class FlaskTestCase(unittest.TestCase):
                 'msg_from': 'torrance',
                 'subject': 'MyMessage',
                 'body': 'hello',
-                'thread': "?",
-                'archived': False,
-                'marked_as_read': False,
-                'create_date': datetime.now(timezone.utc),
+                'thread_id': "?",
+                'archive_status': False,
+                'read_status': False,
+                'sent_date': datetime.now(timezone.utc),
                 'read_date': datetime.now(timezone.utc)}
 
         self.app.post(url, data=json.dumps(data), headers=headers)
@@ -77,10 +77,10 @@ class FlaskTestCase(unittest.TestCase):
                 'msg_from': 'torrance',
                 'subject': 'MyMessage',
                 'body': 'hello',
-                'thread': "?",
-                'archived': False,
-                'marked_as_read': False,
-                'create_date': datetime.now(timezone.utc)}
+                'thread_id': "?",
+                'archive_status': False,
+                'read_status': False,
+                'sent_date': datetime.now(timezone.utc)}
 
         response = self.app.post(url, data=json.dumps(data), headers=headers)
         self.assertEqual(response.status_code, 201)
@@ -94,10 +94,10 @@ class FlaskTestCase(unittest.TestCase):
                 'msg_from': 'torrance',
                 'subject': 'MyMessage',
                 'body': 'hello',
-                'thread': "?",
-                'archived': False,
-                'marked_as_read': False,
-                'create_date': datetime.now(timezone.utc)}
+                'thread_id': "?",
+                'archive_status': False,
+                'read_status': False,
+                'sent_date': datetime.now(timezone.utc)}
 
         self.app.post(url, data=json.dumps(data), headers=headers)
         engine = create_engine(settings.SECURE_MESSAGING_DATABASE_URL, echo=True)

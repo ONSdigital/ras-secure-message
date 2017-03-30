@@ -13,8 +13,8 @@ class MessageTestCase(unittest.TestCase):
     def setUp(self):
         """setup test environment"""
         self.domain_message = DomainMessage(**{'msg_to': 'richard', 'msg_from': 'torrance', 'subject': 'MyMessage',
-                                            'body': 'hello', 'thread': "?", 'archived': False, 'marked_as_read': False,
-                                               'create_date': datetime.now(timezone.utc),
+                                            'body': 'hello', 'thread_id': "?", 'archive_status': False, 'read_status': False,
+                                               'sent_date': datetime.now(timezone.utc),
                                                'read_date': datetime.now(timezone.utc)})
 
     def test_marshal_json(self):
@@ -26,16 +26,46 @@ class MessageTestCase(unittest.TestCase):
         """creating domainMessage object"""
         now = datetime.now(timezone.utc)
         now_string = now.__str__()
-        sut = DomainMessage('me', 'you', 'subject', 'body', '5', False, False, now, now, 'AMsgId')
+        sut = DomainMessage('me', 'you', 'subject', 'body', '5', False, False, now, now, 'AMsgId','ACollectionCase',
+                            'AReportingUnit', 'ACollectionInstrument')
         sut_str = repr(sut)
-        expected = '<Message(msg_id=AMsgId to=me msg_from=you subject=subject body=body thread=5 archived=False marked_as_read=False create_date={0} read_date={0})>'.format(now_string)
+        expected = '<Message(msg_id=AMsgId to=me msg_from=you subject=subject body=body thread_id=5 archive_status=False read_status=False sent_date={0} read_date={0} collection_case=ACollectionCase reporting_unit=AReportingUnit collection_instrument=ACollectionInstrument)>'.format(now_string)
         self.assertEquals(sut_str, expected)
 
-    def test_message_not_equal(self):
+    def test_message_with_different_to_not_equal(self):
         """testing two different domainMessage objects are not equal"""
         now = datetime.now(timezone.utc)
-        message1 = DomainMessage('1', '2', '3', '4', '5', False, False, now, now)
-        message2 = DomainMessage('1', '33', '3', '4', '5', False, False, now, now)
+        message1 = DomainMessage('1', '2', '3', '4', '5', False, False, now, now, 'ACollectionCase', 'AReportingUnit',
+                                 'ACollectionInstrument')
+        message2 = DomainMessage('1', '33', '3', '4', '5', False, False, now, now,'ACollectionCase', 'AReportingUnit',
+                                 'ACollectionInstrument')
+        self.assertTrue(message1 != message2)
+
+    def test_message_with_different_collection_case_not_equal(self):
+        """testing two different domainMessage objects are not equal"""
+        now = datetime.now(timezone.utc)
+        message1 = DomainMessage('1', '2', '3', '4', '5', False, False, now, now, 'ACollectionCase',
+                                 'AReportingUnit','ACollectionInstrument')
+        message2 = DomainMessage('1', '2', '3', '4', '5', False, False, now, now, 'AnotherCollectionCase',
+                                 'AReportingUnit', 'ACollectionInstrument')
+        self.assertTrue(message1 != message2)
+
+    def test_message_with_different_reporting_unit_not_equal(self):
+        """testing two different domainMessage objects are not equal"""
+        now = datetime.now(timezone.utc)
+        message1 = DomainMessage('1', '2', '3', '4', '5', False, False, now, now, 'ACollectionCase',
+                                 'AReportingUnit', 'ACollectionInstrument')
+        message2 = DomainMessage('1', '2', '3', '4', '5', False, False, now, now, 'ACollectionCase',
+                                 'AnotherReportingUnit', 'ACollectionInstrument')
+        self.assertTrue(message1 != message2)
+
+    def test_message_with_different_collection_instrument_not_equal(self):
+        """testing two different domainMessage objects are not equal"""
+        now = datetime.now(timezone.utc)
+        message1 = DomainMessage('1', '2', '3', '4', '5', False, False, now, now, 'ACollectionCase',
+                                 'AReportingUnit', 'ACollectionInstrument')
+        message2 = DomainMessage('1', '2', '3', '4', '5', False, False, now, now, 'ACollectionCase',
+                                 'AReportingUnit', 'AnotherCollectionInstrument')
         self.assertTrue(message1 != message2)
 
     def test_message_equal(self):
@@ -128,18 +158,18 @@ class MessageTestCase(unittest.TestCase):
         self.assertTrue(expected_error in sut.errors['subject'])
 
     def test_missing_thread_field_does_not_cause_error(self):
-        """marshalling message with no thread field"""
+        """marshalling message with no thread_id field"""
         message = {'msg_to': 'torrance', 'msg_from': 'someone'}
         schema = MessageSchema()
         data, errors = schema.load(message)
-        self.assertTrue(errors != {'thread': ['Missing data for required field.']})
+        self.assertTrue(errors != {'thread_id': ['Missing data for required field.']})
 
     def test_thread_field_too_long_causes_error(self):
-        """marshalling message with thread field too long"""
-        self.domain_message.thread = "x" * (app.constants.MAX_THREAD_LEN + 1)
+        """marshalling message with thread_id field too long"""
+        self.domain_message.thread_id = "x" * (app.constants.MAX_THREAD_LEN + 1)
         expected_error = 'Thread field length must not be greater than {0}.'.format(app.constants.MAX_THREAD_LEN)
         sut = self.serialise_and_deserialize_message()
-        self.assertTrue(expected_error in sut.errors['thread'])
+        self.assertTrue(expected_error in sut.errors['thread_id'])
 
     def test_missing_msg_id_causes_a_string_the_same_length_as_uuid_to_be_used(self):
         self.domain_message.msg_id = ''
@@ -151,3 +181,6 @@ class MessageTestCase(unittest.TestCase):
         schema = MessageSchema()
         json_result = schema.dumps(self.domain_message)
         return schema.load(json.loads(json_result.data))
+
+if __name__ == '__main__':
+    unittest.main()

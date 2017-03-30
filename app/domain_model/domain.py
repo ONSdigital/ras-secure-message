@@ -11,8 +11,9 @@ class DomainMessage:
 
 
     """Class to hold message attributes"""
-    def __init__(self,  msg_to, msg_from, subject, body, thread, archived, marked_as_read,
-                 create_date=datetime.now(timezone.utc), read_date=None, msg_id=''):
+    def __init__(self, msg_to, msg_from, subject, body, thread_id, archive_status, read_status,
+                 sent_date=datetime.now(timezone.utc), read_date=None, msg_id='', collection_case='',
+                 reporting_unit='', collection_instrument=''):
 
         logger.debug("Message Class created {0}, {1}, {2}, {3}".format(msg_to, msg_from, subject, body))
         self.msg_id = str(uuid.uuid4()) if len(msg_id) == 0 else msg_id  # If empty msg_id assign to a uuid
@@ -20,15 +21,17 @@ class DomainMessage:
         self.msg_from = msg_from
         self.subject = subject
         self.body = body
-        self.thread = msg_id if len(thread) == 0 else thread  # If empty thread then set to message id
-        self.archived = archived
-        self.marked_as_read = marked_as_read
-        self.create_date = create_date
+        self.thread_id = msg_id if len(thread_id) == 0 else thread_id  # If empty thread_id then set to message id
+        self.archive_status = archive_status
+        self.read_status = read_status
+        self.sent_date = sent_date
         self.read_date = read_date
-        self.read_date = read_date
+        self.collection_case = collection_case
+        self.reporting_unit = reporting_unit
+        self.collection_instrument = collection_instrument
 
     def __repr__(self):
-        return '<Message(msg_id={self.msg_id} to={self.msg_to} msg_from={self.msg_from} subject={self.subject} body={self.body} thread={self.thread} archived={self.archived} marked_as_read={self.marked_as_read} create_date={self.create_date} read_date={self.read_date})>'.format(self=self)
+        return '<Message(msg_id={self.msg_id} to={self.msg_to} msg_from={self.msg_from} subject={self.subject} body={self.body} thread_id={self.thread_id} archive_status={self.archive_status} read_status={self.read_status} sent_date={self.sent_date} read_date={self.read_date} collection_case={self.collection_case} reporting_unit={self.reporting_unit} collection_instrument={self.collection_instrument})>'.format(self=self)
 
     def __eq__(self, other):
         if isinstance(other, DomainMessage):
@@ -45,11 +48,14 @@ class MessageSchema(Schema):
     msg_from = fields.Str(required=True)
     body = fields.Str(required=True)
     subject = fields.Str(allow_none=True)
-    thread = fields.Str(allow_none=True)
-    archived = fields.Bool()
-    marked_as_read = fields.Bool()
-    create_date = fields.DateTime()
+    thread_id = fields.Str(allow_none=True)
+    archive_status = fields.Bool()
+    read_status = fields.Bool()
+    sent_date = fields.DateTime()
     read_date = fields.DateTime()
+    collection_case = fields.Str(allow_none=True)
+    reporting_unit = fields.Str(allow_none=True)
+    collection_instrument = fields.Str(allow_none=True)
 
     @validates('msg_to')
     def validate_to(self, msg_to):
@@ -68,10 +74,10 @@ class MessageSchema(Schema):
         if subject is not None:
             self.validate_field_length("Subject", len(subject), constants.MAX_SUBJECT_LEN)
 
-    @validates("thread")
-    def validate_thread(self, thread):
-        if thread is not None:
-            self.validate_field_length("Thread", len(thread), constants.MAX_THREAD_LEN)
+    @validates("thread_id")
+    def validate_thread(self, thread_id):
+        if thread_id is not None:
+            self.validate_field_length("Thread", len(thread_id), constants.MAX_THREAD_LEN)
 
     @post_load
     def make_message(self, data):
