@@ -1,5 +1,10 @@
 from app.data_model.database import db
 from app.data_model import database
+import logging
+from app.exception.exceptions import MessageSaveException
+
+
+logger = logging.getLogger(__name__)
 
 
 class Saver:
@@ -10,8 +15,12 @@ class Saver:
         """save message to database"""
         db_message = database.DbMessage()
         db_message.set_from_domain_model(domain_message)
-        db.session.add(db_message)
-        db.session.commit()
+        try:
+            db.session.add(db_message)
+            db.session.commit()
+        except Exception as e:
+            logger.error("Message save failed {}".format(e))
+            raise MessageSaveException(e)
 
     @staticmethod
     def convert_to_datamodel(domain_message):
