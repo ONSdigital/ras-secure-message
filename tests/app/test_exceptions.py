@@ -13,3 +13,8 @@ class ExceptionsTestCase(unittest.TestCase):
     def test_status_code(self):
         ex = MessageSaveException("", 200)
         self.assertTrue(ex.status_code == 200)
+
+    def test_payload(self):
+        ex = MessageSaveException("", 0, dict(one=1, two=2))
+        rv = ex.to_dict()
+        self.assertTrue(rv['one'] == 1)
