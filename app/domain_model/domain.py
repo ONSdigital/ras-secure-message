@@ -22,8 +22,8 @@ class DomainMessage:
         self.subject = subject
         self.body = body
         self.thread_id = msg_id if len(thread_id) == 0 else thread_id  # If empty thread_id then set to message id
-        self.archive_status = archive_status
-        self.read_status = read_status
+        self.archive_status = False if not archive_status else archive_status
+        self.read_status = False if not read_status else read_status
         self.sent_date = sent_date
         self.read_date = read_date
         self.collection_case = collection_case
@@ -49,8 +49,8 @@ class MessageSchema(Schema):
     body = fields.Str(required=True)
     subject = fields.Str(allow_none=True)
     thread_id = fields.Str(allow_none=True)
-    archive_status = fields.Bool()
-    read_status = fields.Bool()
+    archive_status = fields.Bool(allow_none=True)
+    read_status = fields.Bool(allow_none=True)
     sent_date = fields.DateTime()
     read_date = fields.DateTime()
     collection_case = fields.Str(allow_none=True)

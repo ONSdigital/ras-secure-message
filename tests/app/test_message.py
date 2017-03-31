@@ -177,6 +177,62 @@ class MessageTestCase(unittest.TestCase):
         sut = self.serialise_and_deserialize_message()
         self.assertEquals(len(sut.data.msg_id), 36)
 
+    def test_missing_read_status_causes_false_to_be_used_for_read_status(self):
+        """Missing read status causes False to be stored """
+        self.domain_message.read_status = None
+        sut = self.serialise_and_deserialize_message()
+        self.assertIsNotNone(sut.data.read_status)
+        self.assertFalse(sut.data.read_status)
+
+    def test_true_read_status_causes_true_to_be_used_for_read_status(self):
+        """True read status causes True to be stored """
+        self.domain_message.read_status = True
+        sut = self.serialise_and_deserialize_message()
+        self.assertIsNotNone(sut.data.read_status)
+        self.assertTrue(sut.data.read_status)
+
+    def test_false_read_status_causes_false_to_be_used_for_read_status(self):
+        """False read status causes False to be stored """
+        self.domain_message.read_status = False
+        sut = self.serialise_and_deserialize_message()
+        self.assertIsNotNone(sut.data.read_status)
+        self.assertFalse(sut.data.read_status)
+
+    def test_empty_read_status_causes_false_to_be_used_for_read_status(self):
+        """Empty read status causes False to be stored """
+        self.domain_message.read_status = ''
+        sut = self.serialise_and_deserialize_message()
+        self.assertIsNotNone(sut.data.read_status)
+        self.assertFalse(sut.data.read_status)
+
+    def test_setting_archive_status_true_causes_true_to_be_used_for_archive_status(self):
+        """True archive status causes True to be stored """
+        self.domain_message.archive_status = True
+        sut = self.serialise_and_deserialize_message()
+        self.assertIsNotNone(sut.data.archive_status)
+        self.assertTrue(sut.data.archive_status)
+
+    def test_setting_archive_status_false_causes_false_to_be_used_for_archive_status(self):
+        """False archive status causes False to be stored """
+        self.domain_message.archive_status = False
+        sut = self.serialise_and_deserialize_message()
+        self.assertIsNotNone(sut.data.archive_status)
+        self.assertFalse(sut.data.archive_status)
+
+    def test_missing_archive_status_causes_false_to_be_used_for_archive_status(self):
+        """Missing archive status causes False to be stored """
+        self.domain_message.archive_status = None
+        sut = self.serialise_and_deserialize_message()
+        self.assertIsNotNone(sut.data.archive_status)
+        self.assertFalse(sut.data.archive_status)
+
+    def test_empty_archive_status_causes_false_to_be_used_for_archive_status(self):
+        """Empty archive status causes False to be stored """
+        self.domain_message.archive_status = ''
+        sut = self.serialise_and_deserialize_message()
+        self.assertIsNotNone(sut.data.archive_status)
+        self.assertFalse(sut.data.archive_status)
+
     def serialise_and_deserialize_message(self):
         """serialising and deserializing message"""
         schema = MessageSchema()
