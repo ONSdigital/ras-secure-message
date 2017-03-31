@@ -1,6 +1,7 @@
 
 """Specialised exceptions for secure messages"""
 
+
 class MessageSaveException(Exception):
 
     """ This exception is used when the service fails to save a secure message"""

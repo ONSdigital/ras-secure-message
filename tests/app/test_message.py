@@ -13,8 +13,8 @@ class MessageTestCase(unittest.TestCase):
     def setUp(self):
         """setup test environment"""
         self.domain_message = DomainMessage(**{'msg_to': 'richard', 'msg_from': 'torrance', 'subject': 'MyMessage',
-                                            'body': 'hello', 'thread_id': "?", 'archive_status': False, 'read_status': False,
-                                               'sent_date': datetime.now(timezone.utc),
+                                            'body': 'hello', 'thread_id': "", 'archive_status': False,
+                                               'read_status': False, 'sent_date': datetime.now(timezone.utc),
                                                'read_date': datetime.now(timezone.utc)})
 
     def test_marshal_json(self):
@@ -26,7 +26,7 @@ class MessageTestCase(unittest.TestCase):
         """creating domainMessage object"""
         now = datetime.now(timezone.utc)
         now_string = now.__str__()
-        sut = DomainMessage('me', 'you', 'subject', 'body', '5', False, False, now, now, 'AMsgId','ACollectionCase',
+        sut = DomainMessage('me', 'you', 'subject', 'body', '5', False, False, now, now, 'AMsgId', 'ACollectionCase',
                             'AReportingUnit', 'ACollectionInstrument')
         sut_str = repr(sut)
         expected = '<Message(msg_id=AMsgId to=me msg_from=you subject=subject body=body thread_id=5 archive_status=False read_status=False sent_date={0} read_date={0} collection_case=ACollectionCase reporting_unit=AReportingUnit collection_instrument=ACollectionInstrument)>'.format(now_string)
@@ -37,7 +37,7 @@ class MessageTestCase(unittest.TestCase):
         now = datetime.now(timezone.utc)
         message1 = DomainMessage('1', '2', '3', '4', '5', False, False, now, now, 'ACollectionCase', 'AReportingUnit',
                                  'ACollectionInstrument')
-        message2 = DomainMessage('1', '33', '3', '4', '5', False, False, now, now,'ACollectionCase', 'AReportingUnit',
+        message2 = DomainMessage('1', '33', '3', '4', '5', False, False, now, now, 'ACollectionCase', 'AReportingUnit',
                                  'ACollectionInstrument')
         self.assertTrue(message1 != message2)
 
@@ -45,7 +45,7 @@ class MessageTestCase(unittest.TestCase):
         """testing two different domainMessage objects are not equal"""
         now = datetime.now(timezone.utc)
         message1 = DomainMessage('1', '2', '3', '4', '5', False, False, now, now, 'ACollectionCase',
-                                 'AReportingUnit','ACollectionInstrument')
+                                 'AReportingUnit', 'ACollectionInstrument')
         message2 = DomainMessage('1', '2', '3', '4', '5', False, False, now, now, 'AnotherCollectionCase',
                                  'AReportingUnit', 'ACollectionInstrument')
         self.assertTrue(message1 != message2)

@@ -16,7 +16,7 @@ class DbMessage(db.Model):
 
     __tablename__ = "secure_message"
 
-    id = Column(Integer, primary_key=True)
+    id = Column("id", Integer, primary_key=True)
     msg_id = Column("msg_id", String(constants.MAX_MSG_ID_LEN))
     msg_to = Column("msg_to", String(constants.MAX_TO_LEN+1))
     msg_from = Column("msg_from", String(constants.MAX_FROM_LEN+1))
@@ -29,7 +29,7 @@ class DbMessage(db.Model):
     read_date = Column("read_date", DateTime)
     collection_case = Column("collection_case", String(constants.MAX_COLLECTION_CASE_LEN+1))
     reporting_unit = Column("reporting_unit", String(constants.MAX_REPORTING_UNIT_LEN+1))
-    collection_instrument= Column("collection_instrument", String(constants.MAX_COLLECTION_INSTRUMENT_LEN+1))
+    collection_instrument = Column("collection_instrument", String(constants.MAX_COLLECTION_INSTRUMENT_LEN+1))
 
     def __init__(self, msg_id="", msg_to="", msg_from="", subject="", body="", thread_id="", archive_status=False,
                  read_status=False, sent_date=datetime.now(timezone.utc), read_date=None, collection_case='',
@@ -82,6 +82,6 @@ class DbMessage(db.Model):
             'collection_case': self.collection_case,
             'reporting_unit': self.reporting_unit,
             'collection_instrument': self.collection_instrument,
-           '_links': ''
+            '_links': ''
         }
         return data

@@ -23,27 +23,26 @@ class AlertsTestCase(unittest.TestCase):
         self.assertTrue(isinstance(sut.alertMethod, Mock))
 
     def test_init_with_alerter_no_params_sets_alert_method_to_AlertViaGovNotify(self):
-        """test uses AlertViaGovNotify ifno alet_method specified"""
+        """test uses AlertViaGovNotify if no alert_method specified"""
         sut = AlertUser()
         self.assertTrue(isinstance(sut.alertMethod, AlertViaGovNotify))
 
     @patch.object(AlertViaGovNotify, 'send')
-    def test_when_alert_method_throws_an_exception_the_http_status_is_400(self, mock_alerter):
-        """test an exception other than http exception returns a 400"""
-        mock_alerter.send.side_effect=Exception('Oh Dear')
+    def test_when_alert_method_throws_an_exception_the_http_status_is_201(self, mock_alerter):
+        """test an exception other than http exception returns a 201"""
+        mock_alerter.send.side_effect = Exception('Oh Dear')
         sut = AlertUser(mock_alerter)
 
-        resp=sut.send("MyEmail", "MyRef")
-        self.assertTrue( resp[0] == 400)
+        resp = sut.send("MyEmail", "MyRef")
+        self.assertTrue(resp[0] == 201)
 
     @patch.object(AlertViaGovNotify, 'send')
-    def test_when_alert_method_throws_a_http_exception_the_http_status_is_the_same_as_the_exception(self, mock_alerter):
+    def test_when_alert_method_throws_a_http_exception_the_http_status_is_201(self, mock_alerter):
         """test given a http exception the http error code is returned"""
         mock_alerter.send.side_effect = errors.HTTPError()
         sut = AlertUser(mock_alerter)
         resp = sut.send("MyEmail", "MyRef")
-        self.assertTrue(resp[0] == 503)
-
+        self.assertTrue(resp[0] == 201)
 
 
 if __name__ == '__main__':

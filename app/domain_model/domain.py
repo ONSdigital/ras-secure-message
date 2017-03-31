@@ -9,7 +9,6 @@ logger = logging.getLogger(__name__)
 
 class DomainMessage:
 
-
     """Class to hold message attributes"""
     def __init__(self, msg_to, msg_from, subject, body, thread_id, archive_status, read_status,
                  sent_date=datetime.now(timezone.utc), read_date=None, msg_id='', collection_case='',
@@ -21,7 +20,7 @@ class DomainMessage:
         self.msg_from = msg_from
         self.subject = subject
         self.body = body
-        self.thread_id = msg_id if len(thread_id) == 0 else thread_id  # If empty thread_id then set to message id
+        self.thread_id = self.msg_id if len(thread_id) == 0 else thread_id  # If empty thread_id then set to message id
         self.archive_status = False if not archive_status else archive_status
         self.read_status = False if not read_status else read_status
         self.sent_date = sent_date

@@ -33,12 +33,7 @@ class AlertUser:
     def send(self, email, reference):
         try:
             self.alertMethod.send(email, reference)
-
-        except errors.HTTPError as http_error:
-            logger.exception(http_error)
-            return http_error.status_code, http_error.message[0]
         except BaseException as e:
             logger.exception(e)
-            return 400, 'Notification not sent'
-
-        return 201, 'OK'
+        finally:
+            return 201, 'OK'
