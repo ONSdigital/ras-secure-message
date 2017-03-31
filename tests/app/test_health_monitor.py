@@ -23,13 +23,11 @@ class HelathTestCase(unittest.TestCase):
     def test_health_status(self):
         """sends GET request to the application health monitor endpoint"""
         response = self.app.get('/health')
-        """ assert the status code of the response """
         self.assertEqual(response.status_code, 200)
 
     def test_db_health_status_healthy(self):
         """sends GET request to the application db health monitor endpoint"""
         response = self.app.get('/health/db')
-        """ assert the status code of the response """
         self.assertEqual(response.status_code, 200)
 
     def test_db_connection_test_fails(self):

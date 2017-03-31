@@ -6,10 +6,10 @@ from app.data_model import database
 from app import settings
 import logging
 from logging.config import dictConfig
-from flask import request, jsonify
+from flask import jsonify
 from app.exception.exceptions import MessageSaveException
 
-""" initialise logging defaults for project """
+# initialise logging defaults for project
 logging_config = dict(
         version=1,
         disable_existing_loggers=False,

@@ -114,7 +114,7 @@ class RetrieverTestCase(unittest.TestCase):
         self.populate_database(MESSAGE_QUERY_LIMIT-1)
         with app.app_context():
             with current_app.test_request_context():
-                status, resp = Retriever().retrieve_message_list(1, MESSAGE_QUERY_LIMIT)
+                resp = Retriever().retrieve_message_list(1, MESSAGE_QUERY_LIMIT)[1]
                 json_data = MessageList()._paginated_list_to_json(resp, 1, MESSAGE_QUERY_LIMIT,
                                                                   "http://localhost:5050/")
                 data = json.loads(json_data.get_data())
@@ -125,7 +125,7 @@ class RetrieverTestCase(unittest.TestCase):
         self.populate_database(MESSAGE_QUERY_LIMIT-1)
         with app.app_context():
             with current_app.test_request_context():
-                status, resp = Retriever().retrieve_message_list(1, MESSAGE_QUERY_LIMIT)
+                resp = Retriever().retrieve_message_list(1, MESSAGE_QUERY_LIMIT)[1]
                 json_data = MessageList()._paginated_list_to_json(resp, 1, MESSAGE_QUERY_LIMIT,
                                                                   "http://localhost:5050/")
                 data = json.loads(json_data.get_data())
@@ -137,7 +137,7 @@ class RetrieverTestCase(unittest.TestCase):
         self.populate_database(MESSAGE_QUERY_LIMIT*2)
         with app.app_context():
             with current_app.test_request_context():
-                status, resp = Retriever().retrieve_message_list(2, MESSAGE_QUERY_LIMIT)
+                resp = Retriever().retrieve_message_list(2, MESSAGE_QUERY_LIMIT)[1]
                 json_data = MessageList()._paginated_list_to_json(resp, 2, MESSAGE_QUERY_LIMIT,
                                                                   "http://localhost:5050/")
                 data = json.loads(json_data.get_data())
@@ -148,7 +148,7 @@ class RetrieverTestCase(unittest.TestCase):
         self.populate_database(MESSAGE_QUERY_LIMIT-1)
         with app.app_context():
             with current_app.test_request_context():
-                status, resp = Retriever().retrieve_message_list(1, MESSAGE_QUERY_LIMIT)
+                resp = Retriever().retrieve_message_list(1, MESSAGE_QUERY_LIMIT)[1]
                 json_data = MessageList()._paginated_list_to_json(resp, 1, MESSAGE_QUERY_LIMIT,
                                                                   "http://localhost:5050/")
                 data = json.loads(json_data.get_data())
@@ -159,7 +159,7 @@ class RetrieverTestCase(unittest.TestCase):
         self.populate_database(MESSAGE_QUERY_LIMIT*2)
         with app.app_context():
             with current_app.test_request_context():
-                status, resp = Retriever().retrieve_message_list(1, MESSAGE_QUERY_LIMIT)
+                resp = Retriever().retrieve_message_list(1, MESSAGE_QUERY_LIMIT)[1]
                 json_data = MessageList()._paginated_list_to_json(resp, 1, MESSAGE_QUERY_LIMIT,
                                                                   "http://localhost:5050/")
                 data = json.loads(json_data.get_data())
@@ -170,7 +170,7 @@ class RetrieverTestCase(unittest.TestCase):
         self.populate_database(MESSAGE_QUERY_LIMIT-1)
         with app.app_context():
             with current_app.test_request_context():
-                status, resp = Retriever().retrieve_message_list(1, MESSAGE_QUERY_LIMIT)
+                resp = Retriever().retrieve_message_list(1, MESSAGE_QUERY_LIMIT)[1]
                 json_data = MessageList()._paginated_list_to_json(resp, 1, MESSAGE_QUERY_LIMIT,
                                                                   "http://localhost:5050/")
                 data = json.loads(json_data.get_data())
@@ -181,7 +181,7 @@ class RetrieverTestCase(unittest.TestCase):
         self.populate_database(MESSAGE_QUERY_LIMIT - 1)
         with app.app_context():
             with current_app.test_request_context():
-                status, resp = Retriever().retrieve_message_list(1, MESSAGE_QUERY_LIMIT)
+                resp = Retriever().retrieve_message_list(1, MESSAGE_QUERY_LIMIT)[1]
                 json_data = MessageList()._paginated_list_to_json(resp, 1, MESSAGE_QUERY_LIMIT,
                                                                   "http://localhost:5050/")
                 data = json.loads(json_data.get_data())

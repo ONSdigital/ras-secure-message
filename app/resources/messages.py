@@ -43,6 +43,7 @@ class MessageList(Resource):
 
     @staticmethod
     def _paginated_list_to_json(paginated_list, page, limit, host_url):
+        """used to change a pagination object to json format with links"""
         messages = {}
         msg_count = 0
         for message in paginated_list.items:
@@ -93,17 +94,20 @@ class MessageSend(Resource):
 
 
 class MessageById(Resource):
-    """Get message by id"""
+
+    """Get and update message by id"""
+
     @staticmethod
     def get(message_id):
+        """Get message by id"""
         # res = authenticate(request)
         message_service = Retriever()
         resp = message_service.retrieve_message(message_id)
         return resp
 
-    """Update message by id"""
     @staticmethod
     def put():
+        """Update message by id"""
         resp = jsonify({"status": "ok"})
         resp.status_code = 200
         return resp
