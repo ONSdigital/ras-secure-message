@@ -68,7 +68,7 @@ class MessageTestCase(unittest.TestCase):
         """marshalling message with not msg_to field"""
         message = {'msg_from': 'torrance', 'body': 'hello'}
         schema = MessageSchema()
-        data, errors = schema.load(message)
+        errors = schema.load(message)[1]
         self.assertTrue(errors == {'msg_to': ['Missing data for required field.']})
 
     def test_msg_from_field_too_long_fails_validation(self):
@@ -89,7 +89,7 @@ class MessageTestCase(unittest.TestCase):
         """marshalling message with no msg_from field """
         message = {'msg_to': 'torrance', 'body': 'hello'}
         schema = MessageSchema()
-        data, errors = schema.load(message)
+        errors = schema.load(message)[1]
         self.assertTrue(errors == {'msg_from': ['Missing data for required field.']})
 
     def test_body_too_big_fails_validation(self):
@@ -103,21 +103,21 @@ class MessageTestCase(unittest.TestCase):
         """marshalling message with no body field """
         message = {'msg_to': 'richard', 'msg_from': 'torrance', 'body': ''}
         schema = MessageSchema()
-        data, errors = schema.load(message)
+        errors = schema.load(message)[1]
         self.assertTrue(errors == {'body': ['Body field not populated.']})
 
     def test_body_field_missing_from_json_causes_error(self):
         """marshalling message with no body field """
         message = {'msg_to': 'torrance', 'msg_from': 'someone'}
         schema = MessageSchema()
-        data, errors = schema.load(message)
+        errors = schema.load(message)[1]
         self.assertTrue(errors == {'body': ['Missing data for required field.']})
 
     def test_missing_subject_field_does_not_cause_error(self):
         """marshalling message with no subject field """
         message = {'msg_to': 'torrance', 'msg_from': 'someone'}
         schema = MessageSchema()
-        data, errors = schema.load(message)
+        errors = schema.load(message)[1]
         self.assertTrue(errors != {'subject': ['Missing data for required field.']})
 
     def test_subject_field_too_long_causes_error(self):
@@ -131,7 +131,7 @@ class MessageTestCase(unittest.TestCase):
         """marshalling message with no thread field"""
         message = {'msg_to': 'torrance', 'msg_from': 'someone'}
         schema = MessageSchema()
-        data, errors = schema.load(message)
+        errors = schema.load(message)[1]
         self.assertTrue(errors != {'thread': ['Missing data for required field.']})
 
     def test_thread_field_too_long_causes_error(self):

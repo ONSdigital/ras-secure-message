@@ -22,7 +22,7 @@ class AlertViaGovNotify:
     def send(self, email, template_id, reference):
 
         try:
-            response = self.notifications_client.send_email_notification(
+            self.notifications_client.send_email_notification(
                 email_address=email,
                 template_id=template_id,
                 personalisation=None,
