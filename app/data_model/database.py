@@ -85,3 +85,13 @@ class DbMessage(db.Model):
             '_links': ''
         }
         return data
+
+
+class Status(db.Model):
+    """Label Assignment table model"""
+    __tablename__ = "status"
+
+    id = Column("id", Integer, primary_key=True)
+    label = Column('label', db.String(50))
+    msg_id = Column('msg_id', db.String(constants.MAX_MSG_ID_LEN), db.ForeignKey('secure_message.msg_id'))
+    actor = Column('actor', db.String(512))
