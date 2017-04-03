@@ -1,6 +1,5 @@
 from app import settings
 from notifications_python_client import NotificationsAPIClient
-from notifications_python_client import errors
 
 import logging
 

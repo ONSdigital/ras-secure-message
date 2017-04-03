@@ -158,7 +158,7 @@ class FlaskTestCase(unittest.TestCase):
             self.app.post(url, data=json.dumps(test_message), headers=headers)
             self.assertTrue(True)  # i.e no exception
         except Exception as e:
-            self.fail( "post rasied unexpected exception: {0}".format(e))
+            self.fail("post rasied unexpected exception: {0}".format(e))
 
     def test_missing_archive_status_does_not_cause_exception(self):
         url = "http://localhost:5050/message/send"
@@ -180,7 +180,7 @@ class FlaskTestCase(unittest.TestCase):
             self.app.post(url, data=json.dumps(test_message), headers=headers)
             self.assertTrue(True)  # i.e no exception
         except Exception as e:
-            self.fail( "post raised unexpected exception: {0}".format(e))
+            self.fail("post raised unexpected exception: {0}".format(e))
 
     def test_missing_thread_id_does_not_cause_exception(self):
         url = "http://localhost:5050/message/send"
