@@ -71,7 +71,6 @@ class FlaskTestCase(unittest.TestCase):
             request = con.execute('SELECT * FROM secure_message WHERE id = (SELECT MAX(id) FROM secure_message)')
             for row in request:
                 data = {"to": row['msg_to'], "from": row['msg_from'], "subject": row['subject'], "body": row['body']}
-                # print("to:", row['msg_to'], "from:", row['msg_from'], "body:", row['body'])
                 self.assertEqual({'to': 'richard', 'from': 'torrance', 'subject': 'MyMessage', 'body': 'hello'}, data)
 
     def test_post_request_returns_201_on_success(self):
@@ -204,7 +203,6 @@ class FlaskTestCase(unittest.TestCase):
             self.assertTrue(True)  # i.e no exception
         except Exception as e:
             self.fail("post raised unexpected exception: {0}".format(e))
-
 
 if __name__ == '__main__':
     unittest.main()
