@@ -12,7 +12,8 @@ from app.common.alerts import AlertUser, AlertViaGovNotify
 
 
 class FlaskTestCase(unittest.TestCase):
-    """Test case for application endpoints"""
+    """Test case for application endpoints"""\
+
     @classmethod
     def setUpClass(cls):
         app.testing = True
@@ -63,7 +64,18 @@ class FlaskTestCase(unittest.TestCase):
         url = "http://localhost:5050/message/send"
         headers = {'Content-Type': 'application/json'}
 
-        self.app.post(url, data=json.dumps(self.test_message), headers=headers)
+        data = {'msg_to': 'richard',
+                'msg_from': 'torrance',
+                'subject': 'MyMessage',
+                'body': 'hello',
+                'thread': "?",
+                'archived': False,
+                'marked_as_read': False,
+                'create_date': datetime.now(timezone.utc),
+                'read_date': datetime.now(timezone.utc)}
+
+
+        self.app.post(url, data=json.dumps(data), headers=headers)
 
         engine = create_engine(settings.SECURE_MESSAGING_DATABASE_URL, echo=True)
 
