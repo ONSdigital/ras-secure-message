@@ -17,7 +17,7 @@ script:
     - coverage run run_tests.py
     - coverage report
 
-after_success:cover
+after_success:
     - codecov
 
 branches:
