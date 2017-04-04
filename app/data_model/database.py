@@ -16,7 +16,7 @@ class DbMessage(db.Model):
     __tablename__ = "secure_message"
 
     id = Column("id", Integer, primary_key=True)
-    msg_id = Column("msg_id", String(constants.MAX_MSG_ID_LEN))
+    msg_id = Column("msg_id", String(constants.MAX_MSG_ID_LEN), unique=True)
     msg_to = Column("msg_to", String(constants.MAX_TO_LEN+1))
     msg_from = Column("msg_from", String(constants.MAX_FROM_LEN+1))
     subject = Column("subject", String(constants.MAX_SUBJECT_LEN+1))
@@ -32,7 +32,7 @@ class DbMessage(db.Model):
 
     def __init__(self, msg_id="", msg_to="", msg_from="", subject="", body="", thread_id="", archive_status=False,
                  read_status=False, sent_date=datetime.now(timezone.utc), read_date=None, collection_case='',
-                 reporting_unit='', collectiion_instrument=''):
+                 reporting_unit='', collection_instrument=''):
         self.msg_id = msg_id
         self.msg_to = msg_to
         self.msg_from = msg_from
@@ -45,7 +45,7 @@ class DbMessage(db.Model):
         self.read_date = read_date
         self.collection_case = collection_case
         self.reporting_unit = reporting_unit
-        self.collection_instrument = collectiion_instrument
+        self.collection_instrument = collection_instrument
 
     def set_from_domain_model(self, domain_model):
         """set dbMessage attributes to domain_model attributes"""

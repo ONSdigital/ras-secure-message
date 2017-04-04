@@ -8,6 +8,7 @@ from app.data_model import database
 from werkzeug.exceptions import NotFound, InternalServerError
 from app.settings import MESSAGE_QUERY_LIMIT
 from app.resources.messages import MessageList
+import uuid
 
 
 class RetrieverTestCase(unittest.TestCase):
@@ -28,9 +29,10 @@ class RetrieverTestCase(unittest.TestCase):
     def populate_database(self, x=0):
         with self.engine.connect() as con:
             for i in range(x):
-                query = 'INSERT INTO secure_message VALUES ({}, "AMsg_Id", "test", "test", "test","test","",0,0,\
+                msg_id = str(uuid.uuid4())
+                query = 'INSERT INTO secure_message VALUES ({0}, "{1}", "test", "test", "test","test","",0,0,\
                 "2017-02-03 00:00:00", "2017-02-03 00:00:00", "ACollectionCase",\
-                "AReportingUnit", "ACollectionInstrument")'.format(i)
+                "AReportingUnit", "ACollectionInstrument")'.format(i,msg_id)
                 con.execute(query)
 
     def test_0_msg_returned_when_db_empty_true(self):
