@@ -164,7 +164,7 @@ class FlaskTestCase(unittest.TestCase):
         url = "http://localhost:5050/message/send"
         headers = {'Content-Type': 'application/json'}
         now = datetime.now(timezone.utc)
-        test_message = {'msg_id': 'AMsgId',    # No read_Status
+        test_message = {'msg_id': 'AMsgId',
                         'msg_to': 'richard',
                         'msg_from': 'torrance',
                         'subject': 'MyMessage',
@@ -186,7 +186,7 @@ class FlaskTestCase(unittest.TestCase):
         url = "http://localhost:5050/message/send"
         headers = {'Content-Type': 'application/json'}
         now = datetime.now(timezone.utc)
-        test_message = {'msg_id': 'AMsgId',  # No read_Status
+        test_message = {'msg_id': 'AMsgId',
                         'msg_to': 'richard',
                         'msg_from': 'torrance',
                         'subject': 'MyMessage',
@@ -203,6 +203,17 @@ class FlaskTestCase(unittest.TestCase):
             self.assertTrue(True)  # i.e no exception
         except Exception as e:
             self.fail("post raised unexpected exception: {0}".format(e))
+
+    def test_message_post_missing_msg_to_returns_error_to_caller(self):
+        url = "http://localhost:5050/message/send"
+        headers = {'Content-Type': 'application/json'}
+
+        self.test_message['msg_to'] = ''
+
+        response = self.app.post(url, data=json.dumps(self.test_message), headers=headers)
+        self.assertEqual(response.status_code, 400)
+        self.assertTrue('To field not populated' in response.data.decode("utf-8"))
+
 
 if __name__ == '__main__':
     unittest.main()
