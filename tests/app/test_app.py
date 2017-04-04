@@ -151,6 +151,7 @@ class FlaskTestCase(unittest.TestCase):
         self.assertTrue(len(reply_msg_id) == 36)
 
     def test_missing_read_status_does_not_cause_exception(self):
+        """posts to message send end point without 'read-status'"""
         url = "http://localhost:5050/message/send"
         headers = {'Content-Type': 'application/json'}
         now = datetime.now(timezone.utc)
@@ -173,6 +174,7 @@ class FlaskTestCase(unittest.TestCase):
             self.fail("post rasied unexpected exception: {0}".format(e))
 
     def test_missing_archive_status_does_not_cause_exception(self):
+        """posts to message send end point without 'archive_status'"""
         url = "http://localhost:5050/message/send"
         headers = {'Content-Type': 'application/json'}
         now = datetime.now(timezone.utc)
@@ -195,6 +197,7 @@ class FlaskTestCase(unittest.TestCase):
             self.fail("post raised unexpected exception: {0}".format(e))
 
     def test_missing_thread_id_does_not_cause_exception(self):
+        """posts to message send end point without 'thread_id'"""
         url = "http://localhost:5050/message/send"
         headers = {'Content-Type': 'application/json'}
         now = datetime.now(timezone.utc)
