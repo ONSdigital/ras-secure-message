@@ -23,11 +23,11 @@ class AlertViaGovNotify:
 
 class AlertUser:
     """Alert User"""
-    alertMethod = AlertViaGovNotify()
+    alert_method = AlertViaGovNotify()
 
     def __init__(self, alerter=None):
         if alerter is not None:
-            self.alertMethod = alerter
+            self.alert_method = alerter
 
     def send(self, email, reference):
         try:
