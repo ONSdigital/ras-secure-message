@@ -31,7 +31,7 @@ class AlertUser:
 
     def send(self, email, reference):
         try:
-            self.alertMethod.send(email, reference)
+            self.alert_method.send(email, reference)
         except BaseException as e:
             logger.exception(e)
         finally:
