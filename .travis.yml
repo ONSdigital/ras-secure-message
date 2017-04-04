@@ -14,9 +14,10 @@ install:
     - pip install coverage
 
 script:
-    - coverage run run_tests.py 
+    - coverage run run_tests.py
+    - coverage report
 
-after_success:
+after_success:cover
     - codecov
 
 branches:
