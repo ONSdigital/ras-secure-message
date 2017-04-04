@@ -10,7 +10,7 @@ class AlertsTestCase(unittest.TestCase):
     """Test case for Alerts"""
 
     @staticmethod
-    def test_alert_user_send_if_forwarded_to_alertMethod():
+    def test_alert_user_send_if_forwarded_to_alert_method():
         """sending email notification"""
         sut = AlertUser()
         sut.alertMethod = Mock(AlertViaGovNotify)
@@ -22,7 +22,7 @@ class AlertsTestCase(unittest.TestCase):
         sut = AlertUser(Mock(AlertViaGovNotify))
         self.assertTrue(isinstance(sut.alertMethod, Mock))
 
-    def test_init_with_alerter_no_params_sets_alert_method_to_AlertViaGovNotify(self):
+    def test_init_with_alerter_no_params_sets_alert_method_to_alert_via_gov_notify(self):
         """test uses AlertViaGovNotify if no alert_method specified"""
         sut = AlertUser()
         self.assertTrue(isinstance(sut.alertMethod, AlertViaGovNotify))

@@ -3,7 +3,7 @@ from app.exception.exceptions import MessageSaveException
 
 
 class ExceptionsTestCase(unittest.TestCase):
-
+    """Test case for checking custom exceptions"""
     def test_message(self):
         ex = MessageSaveException("Test", 200)
         rv = ex.to_dict()

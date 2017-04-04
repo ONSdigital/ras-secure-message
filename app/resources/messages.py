@@ -85,6 +85,7 @@ class MessageSend(Resource):
 
     @staticmethod
     def _alert_recipients(reference):
+        """used to alert user once messages have been saved"""
         recipient_email = settings.NOTIFICATION_DEV_EMAIL  # TODO change this when know more about party service
         alert_user = AlertUser()
         alert_status, alert_detail = alert_user.send(recipient_email, reference)
