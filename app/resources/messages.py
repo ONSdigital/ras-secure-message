@@ -13,7 +13,7 @@ logger = logging.getLogger(__name__)
 MESSAGE_LIST_ENDPOINT = "messages"
 MESSAGE_BY_ID_ENDPOINT = "message"
 
-"""Rest endpoint for message resources. Messages are immutable, they can only be created and archive_status."""
+"""Rest endpoint for message resources. Messages are immutable, they can only be created."""
 
 
 class MessageList(Resource):

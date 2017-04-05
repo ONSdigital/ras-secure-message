@@ -19,7 +19,7 @@ class LoggingTestCase(unittest.TestCase):
         out = StringIO()
         sys.stdout = out
         message = {'msg_to': 'richard', 'msg_from': 'torrance', 'subject': 'hello', 'body': 'hello world',
-                   'archive_status': 'False', 'read_status': 'False' , 'thread_id' :''}
+                   'thread_id': ''}
         schema = MessageSchema()
         schema.load(message)
         output = out.getvalue().strip()

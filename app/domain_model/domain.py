@@ -10,9 +10,8 @@ logger = logging.getLogger(__name__)
 class DomainMessage:
 
     """Class to hold message attributes"""
-    def __init__(self, msg_to, msg_from, subject, body, thread_id=None, archive_status=None, read_status=None,
-                 sent_date=datetime.now(timezone.utc), read_date=None, msg_id='', collection_case='',
-                 reporting_unit='', collection_instrument=''):
+    def __init__(self, msg_to, msg_from, subject, body, thread_id=None, sent_date=datetime.now(timezone.utc),
+                 read_date=None, msg_id='', collection_case='', reporting_unit='', collection_instrument=''):
 
         logger.debug("Message Class created {0}, {1}, {2}, {3}".format(msg_to, msg_from, subject, body))
         self.msg_id = str(uuid.uuid4()) if len(msg_id) == 0 else msg_id  # If empty msg_id assign to a uuid
@@ -21,8 +20,6 @@ class DomainMessage:
         self.subject = subject
         self.body = body
         self.thread_id = self.msg_id if not thread_id else thread_id  # If empty thread_id then set to message id
-        self.archive_status = False if not archive_status else archive_status
-        self.read_status = False if not read_status else read_status
         self.sent_date = sent_date
         self.read_date = read_date
         self.collection_case = collection_case
@@ -30,7 +27,7 @@ class DomainMessage:
         self.collection_instrument = collection_instrument
 
     def __repr__(self):
-        return '<Message(msg_id={self.msg_id} to={self.msg_to} msg_from={self.msg_from} subject={self.subject} body={self.body} thread_id={self.thread_id} archive_status={self.archive_status} read_status={self.read_status} sent_date={self.sent_date} read_date={self.read_date} collection_case={self.collection_case} reporting_unit={self.reporting_unit} collection_instrument={self.collection_instrument})>'.format(self=self)
+        return '<Message(msg_id={self.msg_id} to={self.msg_to} msg_from={self.msg_from} subject={self.subject} body={self.body} thread_id={self.thread_id} sent_date={self.sent_date} read_date={self.read_date} collection_case={self.collection_case} reporting_unit={self.reporting_unit} collection_instrument={self.collection_instrument})>'.format(self=self)
 
     def __eq__(self, other):
         if isinstance(other, DomainMessage):
@@ -48,8 +45,6 @@ class MessageSchema(Schema):
     body = fields.Str(required=True)
     subject = fields.Str(allow_none=True)
     thread_id = fields.Str(allow_none=True)
-    archive_status = fields.Bool(allow_none=True)
-    read_status = fields.Bool(allow_none=True)
     sent_date = fields.DateTime()
     read_date = fields.DateTime()
     collection_case = fields.Str(allow_none=True)

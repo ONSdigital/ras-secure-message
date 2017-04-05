@@ -16,11 +16,11 @@ def before_scenario(context):
         database.db.create_all()
         db = database.db
 
-    def populate_database(self, x=0):
-        with self.engine.connect() as con:
-            for i in range(x):
-                msg_id = str(uuid.uuid4())
-                query = 'INSERT INTO secure_message VALUES ({0}, "{1}", "test", "test", "test","test","",0,0,\
-                  "2017-02-03 00:00:00", "2017-02-03 00:00:00", "ACollectionCase",\
-                  "AReportingUnit", "ACollectionInstrument")'.format(i, msg_id)
-                con.execute(query)
+    with engine.connect() as con:
+        for i in range(3):
+            msg_id = str(uuid.uuid4())
+            query = 'INSERT INTO secure_message VALUES ({0}, "{1}", "test", "test", "test","test","",\
+                             "2017-02-03 00:00:00", "2017-02-03 00:00:00", "ACollectionCase",\
+                             "AReportingUnit", "ACollectionInstrument")'.format(i, msg_id)
+
+            con.execute(query)

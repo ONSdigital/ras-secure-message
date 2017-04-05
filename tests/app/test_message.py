@@ -13,8 +13,7 @@ class MessageTestCase(unittest.TestCase):
     def setUp(self):
         """setup test environment"""
         self.domain_message = DomainMessage(**{'msg_to': 'richard', 'msg_from': 'torrance', 'subject': 'MyMessage',
-                                            'body': 'hello', 'thread_id': "", 'archive_status': False,
-                                               'read_status': False, 'sent_date': datetime.now(timezone.utc),
+                                            'body': 'hello', 'thread_id': "", 'sent_date': datetime.now(timezone.utc),
                                                'read_date': datetime.now(timezone.utc)})
 
     def test_marshal_json(self):
@@ -26,53 +25,53 @@ class MessageTestCase(unittest.TestCase):
         """creating domainMessage object"""
         now = datetime.now(timezone.utc)
         now_string = now.__str__()
-        sut = DomainMessage('me', 'you', 'subject', 'body', '5', False, False, now, now, 'AMsgId', 'ACollectionCase',
+        sut = DomainMessage('me', 'you', 'subject', 'body', '5', now, now, 'AMsgId', 'ACollectionCase',
                             'AReportingUnit', 'ACollectionInstrument')
         sut_str = repr(sut)
-        expected = '<Message(msg_id=AMsgId to=me msg_from=you subject=subject body=body thread_id=5 archive_status=False read_status=False sent_date={0} read_date={0} collection_case=ACollectionCase reporting_unit=AReportingUnit collection_instrument=ACollectionInstrument)>'.format(now_string)
+        expected = '<Message(msg_id=AMsgId to=me msg_from=you subject=subject body=body thread_id=5 sent_date={0} read_date={0} collection_case=ACollectionCase reporting_unit=AReportingUnit collection_instrument=ACollectionInstrument)>'.format(now_string)
         self.assertEquals(sut_str, expected)
 
     def test_message_with_different_to_not_equal(self):
         """testing two different domainMessage objects are not equal"""
         now = datetime.now(timezone.utc)
-        message1 = DomainMessage('1', '2', '3', '4', '5', False, False, now, now, 'ACollectionCase', 'AReportingUnit',
+        message1 = DomainMessage('1', '2', '3', '4', '5', now, now, 'ACollectionCase', 'AReportingUnit',
                                  'ACollectionInstrument')
-        message2 = DomainMessage('1', '33', '3', '4', '5', False, False, now, now, 'ACollectionCase', 'AReportingUnit',
+        message2 = DomainMessage('1', '33', '3', '4', '5', now, now, 'ACollectionCase', 'AReportingUnit',
                                  'ACollectionInstrument')
         self.assertTrue(message1 != message2)
 
     def test_message_with_different_collection_case_not_equal(self):
         """testing two different domainMessage objects are not equal"""
         now = datetime.now(timezone.utc)
-        message1 = DomainMessage('1', '2', '3', '4', '5', False, False, now, now, 'ACollectionCase',
+        message1 = DomainMessage('1', '2', '3', '4', '5', now, now, 'ACollectionCase',
                                  'AReportingUnit', 'ACollectionInstrument')
-        message2 = DomainMessage('1', '2', '3', '4', '5', False, False, now, now, 'AnotherCollectionCase',
+        message2 = DomainMessage('1', '2', '3', '4', '5', now, now, 'AnotherCollectionCase',
                                  'AReportingUnit', 'ACollectionInstrument')
         self.assertTrue(message1 != message2)
 
     def test_message_with_different_reporting_unit_not_equal(self):
         """testing two different domainMessage objects are not equal"""
         now = datetime.now(timezone.utc)
-        message1 = DomainMessage('1', '2', '3', '4', '5', False, False, now, now, 'ACollectionCase',
+        message1 = DomainMessage('1', '2', '3', '4', '5', now, now, 'ACollectionCase',
                                  'AReportingUnit', 'ACollectionInstrument')
-        message2 = DomainMessage('1', '2', '3', '4', '5', False, False, now, now, 'ACollectionCase',
+        message2 = DomainMessage('1', '2', '3', '4', '5', now, now, 'ACollectionCase',
                                  'AnotherReportingUnit', 'ACollectionInstrument')
         self.assertTrue(message1 != message2)
 
     def test_message_with_different_collection_instrument_not_equal(self):
         """testing two different domainMessage objects are not equal"""
         now = datetime.now(timezone.utc)
-        message1 = DomainMessage('1', '2', '3', '4', '5', False, False, now, now, 'ACollectionCase',
+        message1 = DomainMessage('1', '2', '3', '4', '5', now, now, 'ACollectionCase',
                                  'AReportingUnit', 'ACollectionInstrument')
-        message2 = DomainMessage('1', '2', '3', '4', '5', False, False, now, now, 'ACollectionCase',
+        message2 = DomainMessage('1', '2', '3', '4', '5', now, now, 'ACollectionCase',
                                  'AReportingUnit', 'AnotherCollectionInstrument')
         self.assertTrue(message1 != message2)
 
     def test_message_equal(self):
         """testing two same domainMessage objects are equal"""
         now = datetime.now(timezone.utc)
-        message1 = DomainMessage('1', '2', '3', '4', '5', False, False, now, now, 'MsgId')
-        message2 = DomainMessage('1', '2', '3', '4', '5', False, False, now, now, 'MsgId')
+        message1 = DomainMessage('1', '2', '3', '4', '5', now, now, 'MsgId')
+        message2 = DomainMessage('1', '2', '3', '4', '5', now, now, 'MsgId')
         self.assertTrue(message1 == message2)
 
     def test_valid_message_passes_validation(self):
@@ -176,62 +175,6 @@ class MessageTestCase(unittest.TestCase):
         self.domain_message.msg_id = ''
         sut = self.serialise_and_deserialize_message()
         self.assertEquals(len(sut.data.msg_id), 36)
-
-    def test_missing_read_status_causes_false_to_be_used_for_read_status(self):
-        """Missing read status causes False to be stored """
-        self.domain_message.read_status = None
-        sut = self.serialise_and_deserialize_message()
-        self.assertIsNotNone(sut.data.read_status)
-        self.assertFalse(sut.data.read_status)
-
-    def test_true_read_status_causes_true_to_be_used_for_read_status(self):
-        """True read status causes True to be stored """
-        self.domain_message.read_status = True
-        sut = self.serialise_and_deserialize_message()
-        self.assertIsNotNone(sut.data.read_status)
-        self.assertTrue(sut.data.read_status)
-
-    def test_false_read_status_causes_false_to_be_used_for_read_status(self):
-        """False read status causes False to be stored """
-        self.domain_message.read_status = False
-        sut = self.serialise_and_deserialize_message()
-        self.assertIsNotNone(sut.data.read_status)
-        self.assertFalse(sut.data.read_status)
-
-    def test_empty_read_status_causes_false_to_be_used_for_read_status(self):
-        """Empty read status causes False to be stored """
-        self.domain_message.read_status = ''
-        sut = self.serialise_and_deserialize_message()
-        self.assertIsNotNone(sut.data.read_status)
-        self.assertFalse(sut.data.read_status)
-
-    def test_setting_archive_status_true_causes_true_to_be_used_for_archive_status(self):
-        """True archive status causes True to be stored """
-        self.domain_message.archive_status = True
-        sut = self.serialise_and_deserialize_message()
-        self.assertIsNotNone(sut.data.archive_status)
-        self.assertTrue(sut.data.archive_status)
-
-    def test_setting_archive_status_false_causes_false_to_be_used_for_archive_status(self):
-        """False archive status causes False to be stored """
-        self.domain_message.archive_status = False
-        sut = self.serialise_and_deserialize_message()
-        self.assertIsNotNone(sut.data.archive_status)
-        self.assertFalse(sut.data.archive_status)
-
-    def test_missing_archive_status_causes_false_to_be_used_for_archive_status(self):
-        """Missing archive status causes False to be stored """
-        self.domain_message.archive_status = None
-        sut = self.serialise_and_deserialize_message()
-        self.assertIsNotNone(sut.data.archive_status)
-        self.assertFalse(sut.data.archive_status)
-
-    def test_empty_archive_status_causes_false_to_be_used_for_archive_status(self):
-        """Empty archive status causes False to be stored """
-        self.domain_message.archive_status = ''
-        sut = self.serialise_and_deserialize_message()
-        self.assertIsNotNone(sut.data.archive_status)
-        self.assertFalse(sut.data.archive_status)
 
     def serialise_and_deserialize_message(self):
         """serialising and deserializing message"""

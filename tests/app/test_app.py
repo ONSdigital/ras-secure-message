@@ -37,8 +37,6 @@ class FlaskTestCase(unittest.TestCase):
                              'subject': 'MyMessage',
                              'body': 'hello',
                              'thread_id': "",
-                             'archive_status': False,
-                             'read_status': False,
                              'sent_date': now,
                              'read_date': now,
                              'collection_case': 'ACollectionCase',
@@ -69,8 +67,6 @@ class FlaskTestCase(unittest.TestCase):
                 'subject': 'MyMessage',
                 'body': 'hello',
                 'thread': "?",
-                'archived': False,
-                'marked_as_read': False,
                 'create_date': datetime.now(timezone.utc),
                 'read_date': datetime.now(timezone.utc)}
 
@@ -150,52 +146,6 @@ class FlaskTestCase(unittest.TestCase):
         self.assertTrue(len(original_thread_id) == 36)  # UUID length
         self.assertTrue(len(reply_msg_id) == 36)
 
-    def test_missing_read_status_does_not_cause_exception(self):
-        """posts to message send end point without 'read-status'"""
-        url = "http://localhost:5050/message/send"
-        headers = {'Content-Type': 'application/json'}
-        now = datetime.now(timezone.utc)
-        test_message = {'msg_id': 'AMsgId',    # No read_Status
-                        'msg_to': 'richard',
-                        'msg_from': 'torrance',
-                        'subject': 'MyMessage',
-                        'body': 'hello',
-                        'thread_id': "",
-                        'archive_status': False,
-                        'sent_date': now,
-                        'read_date': now,
-                        'collection_case': 'ACollectionCase',
-                        'reporting_unit': 'AReportingUnit',
-                        'collection_instrument': 'ACollectionInstrument'}
-        try:
-            self.app.post(url, data=json.dumps(test_message), headers=headers)
-            self.assertTrue(True)  # i.e no exception
-        except Exception as e:
-            self.fail("post rasied unexpected exception: {0}".format(e))
-
-    def test_missing_archive_status_does_not_cause_exception(self):
-        """posts to message send end point without 'archive_status'"""
-        url = "http://localhost:5050/message/send"
-        headers = {'Content-Type': 'application/json'}
-        now = datetime.now(timezone.utc)
-        test_message = {'msg_id': 'AMsgId',
-                        'msg_to': 'richard',
-                        'msg_from': 'torrance',
-                        'subject': 'MyMessage',
-                        'body': 'hello',
-                        'thread_id': "",
-                        'read_status': False,
-                        'sent_date': now,
-                        'read_date': now,
-                        'collection_case': 'ACollectionCase',
-                        'reporting_unit': 'AReportingUnit',
-                        'collection_instrument': 'ACollectionInstrument'}
-        try:
-            self.app.post(url, data=json.dumps(test_message), headers=headers)
-            self.assertTrue(True)  # i.e no exception
-        except Exception as e:
-            self.fail("post raised unexpected exception: {0}".format(e))
-
     def test_missing_thread_id_does_not_cause_exception(self):
         """posts to message send end point without 'thread_id'"""
         url = "http://localhost:5050/message/send"
@@ -206,8 +156,6 @@ class FlaskTestCase(unittest.TestCase):
                         'msg_from': 'torrance',
                         'subject': 'MyMessage',
                         'body': 'hello',
-                        'read_status': False,
-                        'archive_status': False,
                         'sent_date': now,
                         'read_date': now,
                         'collection_case': 'ACollectionCase',
