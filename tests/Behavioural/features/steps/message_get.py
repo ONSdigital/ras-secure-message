@@ -1,8 +1,8 @@
-from app.application import app
 import flask
-import datetime
 import nose.tools
 from behave import given, then, when
+from app import application
+import datetime
 
 url = "http://localhost:5050/message/send"
 headers = {'Content-Type': 'application/json'}
@@ -15,8 +15,6 @@ def before_scenario(context):
                  'subject': 'Hello World',
                  'body': 'Test',
                  'thread': '?',
-                 'archived': False,
-                 'marked_as_read': False,
                  'create_date': datetime.datetime.now(datetime.timezone.utc),
                  'read_date': datetime.datetime.now(datetime.timezone.utc)})
 
@@ -29,7 +27,7 @@ def step_impl_code(context):
 
 @when('it is sent')
 def step_impl(context):
-    context.response = app.test_client().post(url, data=flask.json.dumps(data), headers=headers)
+    context.response = application.app.test_client().post(url, data=flask.json.dumps(data), headers=headers)
 
 
 @then('a 201 HTTP response is returned')
@@ -103,7 +101,7 @@ def step_impl(context):
 
 # BDD Test 6
 @given('a message is sent with an empty "Thread ID"')
-def step_impl(context):
+def step_impl(context, ):
     before_scenario(context)
 
 
