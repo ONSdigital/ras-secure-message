@@ -13,7 +13,7 @@ class Saver:
     @staticmethod
     def save_message(domain_message):
         """save message to database"""
-        db_message = database.DbMessage()
+        db_message = database.SecureMessage()
         db_message.set_from_domain_model(domain_message)
         try:
             db.session.add(db_message)
@@ -24,6 +24,6 @@ class Saver:
 
     @staticmethod
     def convert_to_datamodel(domain_message):
-        return database.DbMessage(domain_message.msg_to, domain_message.msg_from, domain_message.subject,
-                                  domain_message.body, domain_message.thread_id, domain_message.sent_date,
-                                  domain_message.read_date, domain_message.msg_id)
+        return database.SecureMessage(domain_message.msg_to, domain_message.msg_from, domain_message.subject,
+                                      domain_message.body, domain_message.thread_id, domain_message.sent_date,
+                                      domain_message.read_date, domain_message.msg_id)

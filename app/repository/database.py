@@ -9,7 +9,7 @@ logger = logging.getLogger(__name__)
 db = SQLAlchemy()
 
 
-class DbMessage(db.Model):
+class SecureMessage(db.Model):
     """Secure messaging database model"""
     logger.debug("Hit database message")
 
