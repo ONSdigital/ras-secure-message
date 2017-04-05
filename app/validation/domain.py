@@ -76,7 +76,6 @@ class MessageSchema(Schema):
     @post_load
     def make_message(self, data):
         logger.debug("Build message")
-
         return Message(**data)
 
     def validate_non_zero_field_length(self, field_name, length, max_field_len):

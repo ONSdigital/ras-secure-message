@@ -16,7 +16,7 @@ def before_scenario(context):
         database.db.init_app(current_app)
         database.db.drop_all()
         database.db.create_all()
-        db = database.db
+        database.db
 
     with engine.connect() as con:
         for i in range(3):

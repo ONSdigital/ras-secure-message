@@ -23,7 +23,7 @@ def before_scenario(context):
 
 
 @given('a valid message')
-def step_impl_code(context):
+def step_impl(context):
     before_scenario(context)
 
 
@@ -38,7 +38,7 @@ def step_impl(context):
 
 
 @given('a message with an empty "To" field')
-def step_impl_code(context):
+def step_impl(context):
     data['msg_to'] = ''
 
 
