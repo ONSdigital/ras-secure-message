@@ -23,15 +23,15 @@ class AlertViaGovNotify:
 
 class AlertUser:
     """Alert User"""
-    alert_method = AlertViaGovNotify()
+    alertMethod = AlertViaGovNotify()
 
     def __init__(self, alerter=None):
         if alerter is not None:
-            self.alert_method = alerter
+            self.alertMethod = alerter
 
     def send(self, email, reference):
         try:
-            self.alert_method.send(email, reference)
+            self.alertMethod.send(email, reference)
         except BaseException as e:
             logger.exception(e)
         finally:
