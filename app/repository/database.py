@@ -11,7 +11,6 @@ db = SQLAlchemy()
 
 class SecureMessage(db.Model):
     """Secure messaging database model"""
-    logger.debug("Hit database message")
 
     __tablename__ = "secure_message"
 
@@ -31,6 +30,7 @@ class SecureMessage(db.Model):
     def __init__(self, msg_id="", msg_to="", msg_from="", subject="", body="", thread_id="",
                  sent_date=datetime.now(timezone.utc), read_date=None, collection_case='',
                  reporting_unit='', collection_instrument=''):
+        logger.debug("Initialised Secure Message entity: msg_id: {}".format(id))
         self.msg_id = msg_id
         self.msg_to = msg_to
         self.msg_from = msg_from
