@@ -72,7 +72,6 @@ class FlaskTestCase(unittest.TestCase):
                 'create_date': datetime.now(timezone.utc),
                 'read_date': datetime.now(timezone.utc)}
 
-
         self.app.post(url, data=json.dumps(data), headers=headers)
 
         engine = create_engine(settings.SECURE_MESSAGING_DATABASE_URL, echo=True)

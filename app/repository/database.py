@@ -1,4 +1,4 @@
-from sqlalchemy import Column, String, Integer, DateTime
+from sqlalchemy import Column, String, Integer, DateTime, ForeignKey
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime, timezone
 from app import constants
@@ -83,6 +83,6 @@ class Status(db.Model):
     __tablename__ = "status"
 
     id = Column("id", Integer, primary_key=True)
-    label = Column('label', db.String(50))
-    msg_id = Column('msg_id', db.String(constants.MAX_MSG_ID_LEN), db.ForeignKey('secure_message.msg_id'))
-    actor = Column('actor', db.String(512))
+    label = Column('label', String(constants.MAX_STATUS_LABEL_LEN + 1))
+    msg_id = Column('msg_id', String(constants.MAX_MSG_ID_LEN + 1), ForeignKey('secure_message.msg_id'))
+    actor = Column('actor', String(constants.MAX_STATUS_ACTOR_LEN + 1))
