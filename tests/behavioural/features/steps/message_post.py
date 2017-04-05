@@ -3,6 +3,8 @@ import nose.tools
 from behave import given, then, when
 from app import application
 import datetime
+from unittest import mock
+from app.common.alerts import AlertUser, AlertViaGovNotify
 
 url = "http://localhost:5050/message/send"
 headers = {'Content-Type': 'application/json'}
@@ -10,6 +12,7 @@ data = {}
 
 
 def before_scenario(context):
+    AlertUser.alertMethod = mock.Mock(AlertViaGovNotify)
     data.update({'msg_to': 'Richard',
                  'msg_from': 'Torrance',
                  'subject': 'Hello World',
