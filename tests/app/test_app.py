@@ -1,14 +1,16 @@
 import unittest
+from datetime import datetime, timezone
 from unittest import mock
+
+from flask import current_app
+from flask import json
+from sqlalchemy import create_engine
+
 from app import application
 from app import settings
-from sqlalchemy import create_engine
-from flask import json
-from datetime import datetime, timezone
 from app.application import app
-from flask import current_app
-from app.data_model import database
 from app.common.alerts import AlertUser, AlertViaGovNotify
+from app.repository import database
 
 
 class FlaskTestCase(unittest.TestCase):

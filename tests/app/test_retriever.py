@@ -1,14 +1,16 @@
 import unittest
+import uuid
+
+from flask import current_app
 from flask import json
 from sqlalchemy import create_engine
-from app.repository.retriever import Retriever
-from app.application import app
-from flask import current_app
-from app.data_model import database
 from werkzeug.exceptions import NotFound, InternalServerError
-from app.settings import MESSAGE_QUERY_LIMIT
+
+from app.application import app
+from app.repository import database
+from app.repository.retriever import Retriever
 from app.resources.messages import MessageList
-import uuid
+from app.settings import MESSAGE_QUERY_LIMIT
 
 
 class RetrieverTestCase(unittest.TestCase):

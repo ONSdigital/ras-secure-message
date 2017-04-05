@@ -1,10 +1,12 @@
-from app import application
 import unittest
-from app.application import app
-from app.data_model import database
+
 from flask import current_app
-from app.repository.retriever import Retriever
 from flask import json
+
+from app import application
+from app.application import app
+from app.repository import database
+from app.repository.retriever import Retriever
 
 
 class HelathTestCase(unittest.TestCase):

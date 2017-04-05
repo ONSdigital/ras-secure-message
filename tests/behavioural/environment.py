@@ -1,9 +1,11 @@
 import uuid
-from app.data_model import database
-from sqlalchemy import create_engine
+
 from flask import current_app
-from app.application import app
+from sqlalchemy import create_engine
+
 from app import application
+from app.application import app
+from app.repository import database
 
 
 def before_scenario(context):

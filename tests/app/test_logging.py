@@ -1,6 +1,6 @@
 import sys
 sys.path.append('../../ras-secure-message')
-from app.domain_model.domain import MessageSchema
+from app.validation.domain import MessageSchema
 import unittest
 from io import StringIO
 from app import application

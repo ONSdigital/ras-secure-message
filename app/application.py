@@ -1,13 +1,15 @@
-from flask import Flask
-from flask_restful import Api
-from app.resources.messages import MessageList, MessageSend, MessageById
-from app.resources.health import Health, DatabaseHealth, Details
-from app.data_model import database
-from app import settings
 import logging
 from logging.config import dictConfig
+
+from flask import Flask
 from flask import jsonify
+from flask_restful import Api
+
+from app import settings
 from app.exception.exceptions import MessageSaveException
+from app.repository import database
+from app.resources.health import Health, DatabaseHealth, Details
+from app.resources.messages import MessageList, MessageSend, MessageById
 
 # initialise logging defaults for project
 logging_config = dict(

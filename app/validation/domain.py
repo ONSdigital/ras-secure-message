@@ -7,7 +7,7 @@ import uuid
 logger = logging.getLogger(__name__)
 
 
-class DomainMessage:
+class Message:
 
     """Class to hold message attributes"""
     def __init__(self, msg_to, msg_from, subject, body, thread_id=None, sent_date=datetime.now(timezone.utc),
@@ -30,7 +30,7 @@ class DomainMessage:
         return '<Message(msg_id={self.msg_id} to={self.msg_to} msg_from={self.msg_from} subject={self.subject} body={self.body} thread_id={self.thread_id} sent_date={self.sent_date} read_date={self.read_date} collection_case={self.collection_case} reporting_unit={self.reporting_unit} collection_instrument={self.collection_instrument})>'.format(self=self)
 
     def __eq__(self, other):
-        if isinstance(other, DomainMessage):
+        if isinstance(other, Message):
             return self.__dict__ == other.__dict__
         else:
             return False
@@ -77,7 +77,7 @@ class MessageSchema(Schema):
     def make_message(self, data):
         logger.debug("Build message")
 
-        return DomainMessage(**data)
+        return Message(**data)
 
     def validate_non_zero_field_length(self, field_name, length, max_field_len):
         if length <= 0:

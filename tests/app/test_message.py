@@ -2,7 +2,7 @@ import unittest
 import json
 import app.constants
 from datetime import datetime, timezone
-from app.domain_model.domain import DomainMessage, MessageSchema
+from app.validation.domain import Message, MessageSchema
 
 
 class MessageTestCase(unittest.TestCase):
@@ -12,7 +12,7 @@ class MessageTestCase(unittest.TestCase):
 
     def setUp(self):
         """setup test environment"""
-        self.domain_message = DomainMessage(**{'msg_to': 'richard', 'msg_from': 'torrance', 'subject': 'MyMessage',
+        self.domain_message = Message(**{'msg_to': 'richard', 'msg_from': 'torrance', 'subject': 'MyMessage',
                                             'body': 'hello', 'thread_id': "", 'sent_date': datetime.now(timezone.utc),
                                                'read_date': datetime.now(timezone.utc)})
 
@@ -25,7 +25,7 @@ class MessageTestCase(unittest.TestCase):
         """creating domainMessage object"""
         now = datetime.now(timezone.utc)
         now_string = now.__str__()
-        sut = DomainMessage('me', 'you', 'subject', 'body', '5', now, now, 'AMsgId', 'ACollectionCase',
+        sut = Message('me', 'you', 'subject', 'body', '5', now, now, 'AMsgId', 'ACollectionCase',
                             'AReportingUnit', 'ACollectionInstrument')
         sut_str = repr(sut)
         expected = '<Message(msg_id=AMsgId to=me msg_from=you subject=subject body=body thread_id=5 sent_date={0} read_date={0} collection_case=ACollectionCase reporting_unit=AReportingUnit collection_instrument=ACollectionInstrument)>'.format(now_string)
@@ -34,44 +34,44 @@ class MessageTestCase(unittest.TestCase):
     def test_message_with_different_to_not_equal(self):
         """testing two different domainMessage objects are not equal"""
         now = datetime.now(timezone.utc)
-        message1 = DomainMessage('1', '2', '3', '4', '5', now, now, 'ACollectionCase', 'AReportingUnit',
+        message1 = Message('1', '2', '3', '4', '5', now, now, 'ACollectionCase', 'AReportingUnit',
                                  'ACollectionInstrument')
-        message2 = DomainMessage('1', '33', '3', '4', '5', now, now, 'ACollectionCase', 'AReportingUnit',
+        message2 = Message('1', '33', '3', '4', '5', now, now, 'ACollectionCase', 'AReportingUnit',
                                  'ACollectionInstrument')
         self.assertTrue(message1 != message2)
 
     def test_message_with_different_collection_case_not_equal(self):
         """testing two different domainMessage objects are not equal"""
         now = datetime.now(timezone.utc)
-        message1 = DomainMessage('1', '2', '3', '4', '5', now, now, 'ACollectionCase',
+        message1 = Message('1', '2', '3', '4', '5', now, now, 'ACollectionCase',
                                  'AReportingUnit', 'ACollectionInstrument')
-        message2 = DomainMessage('1', '2', '3', '4', '5', now, now, 'AnotherCollectionCase',
+        message2 = Message('1', '2', '3', '4', '5', now, now, 'AnotherCollectionCase',
                                  'AReportingUnit', 'ACollectionInstrument')
         self.assertTrue(message1 != message2)
 
     def test_message_with_different_reporting_unit_not_equal(self):
         """testing two different domainMessage objects are not equal"""
         now = datetime.now(timezone.utc)
-        message1 = DomainMessage('1', '2', '3', '4', '5', now, now, 'ACollectionCase',
+        message1 = Message('1', '2', '3', '4', '5', now, now, 'ACollectionCase',
                                  'AReportingUnit', 'ACollectionInstrument')
-        message2 = DomainMessage('1', '2', '3', '4', '5', now, now, 'ACollectionCase',
+        message2 = Message('1', '2', '3', '4', '5', now, now, 'ACollectionCase',
                                  'AnotherReportingUnit', 'ACollectionInstrument')
         self.assertTrue(message1 != message2)
 
     def test_message_with_different_collection_instrument_not_equal(self):
         """testing two different domainMessage objects are not equal"""
         now = datetime.now(timezone.utc)
-        message1 = DomainMessage('1', '2', '3', '4', '5', now, now, 'ACollectionCase',
+        message1 = Message('1', '2', '3', '4', '5', now, now, 'ACollectionCase',
                                  'AReportingUnit', 'ACollectionInstrument')
-        message2 = DomainMessage('1', '2', '3', '4', '5', now, now, 'ACollectionCase',
+        message2 = Message('1', '2', '3', '4', '5', now, now, 'ACollectionCase',
                                  'AReportingUnit', 'AnotherCollectionInstrument')
         self.assertTrue(message1 != message2)
 
     def test_message_equal(self):
         """testing two same domainMessage objects are equal"""
         now = datetime.now(timezone.utc)
-        message1 = DomainMessage('1', '2', '3', '4', '5', now, now, 'MsgId')
-        message2 = DomainMessage('1', '2', '3', '4', '5', now, now, 'MsgId')
+        message1 = Message('1', '2', '3', '4', '5', now, now, 'MsgId')
+        message2 = Message('1', '2', '3', '4', '5', now, now, 'MsgId')
         self.assertTrue(message1 == message2)
 
     def test_valid_message_passes_validation(self):

@@ -1,8 +1,10 @@
-from app.data_model.database import DbMessage
-from flask import jsonify
 import logging
-from werkzeug.exceptions import InternalServerError
+
+from flask import jsonify
 from sqlalchemy.exc import SQLAlchemyError
+from werkzeug.exceptions import InternalServerError
+
+from app.repository.database import DbMessage
 
 logger = logging.getLogger(__name__)
 
