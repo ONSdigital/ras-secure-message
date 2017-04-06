@@ -3,6 +3,7 @@ import logging
 from app.exception.exceptions import MessageSaveException
 from app.repository import database
 from app.repository.database import db
+from datetime import datetime, timezone
 
 logger = logging.getLogger(__name__)
 
@@ -13,7 +14,9 @@ class Saver:
     @staticmethod
     def save_message(domain_message):
         """save message to database"""
+
         db_message = database.SecureMessage()
+        domain_message.sent_date = datetime.now(timezone.utc)  # LOGIC NEEDED: set sent_date only for sent message
         db_message.set_from_domain_model(domain_message)
         try:
             db.session.add(db_message)

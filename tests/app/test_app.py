@@ -32,15 +32,12 @@ class FlaskTestCase(unittest.TestCase):
 
         AlertUser.alertMethod = mock.Mock(AlertViaGovNotify)
 
-        now = datetime.now(timezone.utc)
         self.test_message = {'msg_id': 'AMsgId',
                              'msg_to': 'richard',
                              'msg_from': 'torrance',
                              'subject': 'MyMessage',
                              'body': 'hello',
                              'thread_id': "",
-                             'sent_date': now,
-                             'read_date': now,
                              'collection_case': 'ACollectionCase',
                              'reporting_unit': 'AReportingUnit',
                              'collection_instrument': 'ACollectionInstrument'}
@@ -74,9 +71,7 @@ class FlaskTestCase(unittest.TestCase):
 
         self.app.post(url, data=json.dumps(data), headers=headers)
 
-        engine = create_engine(settings.SECURE_MESSAGING_DATABASE_URL, echo=True)
-
-        with engine.connect() as con:
+        with self.engine.connect() as con:
             request = con.execute('SELECT * FROM secure_message WHERE id = (SELECT MAX(id) FROM secure_message)')
             for row in request:
                 data = {"to": row['msg_to'], "from": row['msg_from'], "subject": row['subject'], "body": row['body']}

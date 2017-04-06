@@ -1,6 +1,5 @@
-from marshmallow import Schema, fields, post_load, validates, ValidationError
+from marshmallow import Schema, fields, post_load, validates, ValidationError, pre_load
 import logging
-from datetime import datetime, timezone
 from app import constants
 import uuid
 
@@ -10,7 +9,7 @@ logger = logging.getLogger(__name__)
 class Message:
 
     """Class to hold message attributes"""
-    def __init__(self, msg_to, msg_from, subject, body, thread_id=None, sent_date=datetime.now(timezone.utc),
+    def __init__(self, msg_to, msg_from, subject, body, thread_id=None, sent_date=None,
                  read_date=None, msg_id='', collection_case='', reporting_unit='', collection_instrument=''):
 
         logger.debug("Message Class created {0}, {1}, {2}, {3}".format(msg_to, msg_from, subject, body))
@@ -45,11 +44,20 @@ class MessageSchema(Schema):
     body = fields.Str(required=True)
     subject = fields.Str(allow_none=True)
     thread_id = fields.Str(allow_none=True)
-    sent_date = fields.DateTime()
-    read_date = fields.DateTime()
+    sent_date = fields.DateTime(allow_none=True)
+    read_date = fields.DateTime(allow_none=True)
     collection_case = fields.Str(allow_none=True)
     reporting_unit = fields.Str(allow_none=True)
     collection_instrument = fields.Str(allow_none=True)
+
+    @pre_load
+    def check_sent_and_read_date(self, data):
+        if 'sent_date' in data.keys():
+            raise ValidationError('Field "sent_date" can not be set.')
+        elif 'read_date' in data.keys():
+            raise ValidationError('Field "read_date" can not be set.')
+        else:
+            return data
 
     @validates('msg_to')
     def validate_to(self, msg_to):
