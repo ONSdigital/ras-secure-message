@@ -14,15 +14,7 @@ from app.repository import database
 
 
 class FlaskTestCase(unittest.TestCase):
-    """Test case for application endpoints"""\
-
-    @classmethod
-    def setUpClass(cls):
-        app.testing = True
-
-    @classmethod
-    def tearDownClass(cls):
-        pass
+    """Test case for application endpoints"""
 
     def setUp(self):
         """setup test environment"""
@@ -164,6 +156,7 @@ class FlaskTestCase(unittest.TestCase):
             self.fail("post raised unexpected exception: {0}".format(e))
 
     def test_message_post_missing_msg_to_returns_error_to_caller(self):
+        """posts to message send end point without 'msg_id'"""
         url = "http://localhost:5050/message/send"
         headers = {'Content-Type': 'application/json'}
 
