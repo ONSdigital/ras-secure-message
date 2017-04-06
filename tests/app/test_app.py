@@ -22,7 +22,7 @@ class FlaskTestCase(unittest.TestCase):
         app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:////tmp/messages.db'
         self.engine = create_engine('sqlite:////tmp/messages.db', echo=True)
 
-        AlertUser.alertMethod = mock.Mock(AlertViaGovNotify)
+        AlertUser.alert_method = mock.Mock(AlertViaGovNotify)
 
         self.test_message = {'msg_id': 'AMsgId',
                              'msg_to': 'richard',

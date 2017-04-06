@@ -12,7 +12,7 @@ data = {}
 
 
 def before_scenario(context):
-    AlertUser.alertMethod = mock.Mock(AlertViaGovNotify)
+    AlertUser.alert_method = mock.Mock(AlertViaGovNotify)
     data.update({'msg_to': 'Richard',
                  'msg_from': 'Torrance',
                  'subject': 'Hello World',
