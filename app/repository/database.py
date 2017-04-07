@@ -86,3 +86,24 @@ class Status(db.Model):
     label = Column('label', String(constants.MAX_STATUS_LABEL_LEN + 1))
     msg_id = Column('msg_id', String(constants.MAX_MSG_ID_LEN + 1), ForeignKey('secure_message.msg_id'))
     actor = Column('actor', String(constants.MAX_STATUS_ACTOR_LEN + 1))
+
+    def __init__(self, label='', msg_id='', actor=''):
+        self.label = label
+        self.msg_id = msg_id
+        self.actor = actor
+
+    def set_from_domain_model(self, domain_model):
+        self.label = domain_model.label
+        self.msg_id = domain_model.msg_id
+        self.actor = domain_model.actor
+
+    @property
+    def serialize(self):
+        """Return object data in easily serializeable format"""
+        data = {
+            'id': self.id,
+            'label': self.label,
+            'msg_id': self.msg_id,
+            'actor': self.actor
+        }
+        return data
