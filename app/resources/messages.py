@@ -75,6 +75,13 @@ class MessageSend(Resource):
     def post():
         logger.info("Message send POST request.")
         message = MessageSchema().load(request.get_json())
+
+        if 'msg_to' not in request.get_json() or len(request.get_json()['msg_to']) == 0:
+            message.errors.update({'msg_to': 'Expected a msg_to field to be given'})
+
+        if 'msg_from' not in request.get_json() or len(request.get_json()['msg_from']) == 0:
+            message.errors.update({'msg_from': 'Expected a msg_from field to be given'})
+
         if message.errors == {}:
             Saver().save_message(message.data)
             return MessageSend._alert_recipients(message.data.msg_id)

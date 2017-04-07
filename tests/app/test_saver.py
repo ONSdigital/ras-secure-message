@@ -23,7 +23,7 @@ class SaverTestCase(unittest.TestCase):
 
     def test_saved_message_has_saved_sent_date(self):
         """retrieves messages from database with less entries than retrieval amount"""
-        message_object = Message(**{'msg_to': 'richard', 'msg_from': 'torrance', 'subject': 'MyMessage',
+        message_object = Message(**{'subject': 'MyMessage',
                                     'body': 'hello', 'thread_id': ""})
         with app.app_context():
             with current_app.test_request_context():

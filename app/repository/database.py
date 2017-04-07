@@ -23,7 +23,7 @@ class SecureMessage(db.Model):
     read_date = Column("read_date", DateTime)
     collection_case = Column("collection_case", String(constants.MAX_COLLECTION_CASE_LEN+1))
     reporting_unit = Column("reporting_unit", String(constants.MAX_REPORTING_UNIT_LEN+1))
-    collection_instrument = Column("collection_instrument", String(constants.MAX_COLLECTION_INSTRUMENT_LEN+1))
+    survey = Column("suvery", String(constants.MAX_COLLECTION_INSTRUMENT_LEN+1))
 
     def __init__(self, msg_id="", subject="", body="", thread_id="",
                  sent_date=datetime.now(timezone.utc), read_date=None, collection_case='',

@@ -164,7 +164,6 @@ class FlaskTestCase(unittest.TestCase):
 
         response = self.app.post(url, data=json.dumps(self.test_message), headers=headers)
         self.assertEqual(response.status_code, 400)
-        self.assertTrue('To field not populated' in response.data.decode("utf-8"))
 
 
 if __name__ == '__main__':
