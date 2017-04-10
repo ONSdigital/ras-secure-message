@@ -34,7 +34,7 @@ class RetrieverTestCase(unittest.TestCase):
                 msg_id = str(uuid.uuid4())
                 query = 'INSERT INTO secure_message VALUES ({0}, "{1}", "test","test","",\
                 "2017-02-03 00:00:00", "2017-02-03 00:00:00", "ACollectionCase",\
-                "AReportingUnit", "ACollectionInstrument")'.format(i,msg_id)
+                "AReportingUnit", "ACollectionInstrument")'.format(i, msg_id)
                 con.execute(query)
 
     def test_0_msg_returned_when_db_empty_true(self):
@@ -131,70 +131,70 @@ class RetrieverTestCase(unittest.TestCase):
                 data = json.loads(json_data.get_data())
                 self.assertEqual(len(data['messages']), (MESSAGE_QUERY_LIMIT-1))
 
-    # def test_paginated_to_json_returns_correct_message_self_link(self):
-    #     """turns paginated result list to json checking correct self link has been added for message"""
-    #     self.populate_database(MESSAGE_QUERY_LIMIT-1)
-    #     with app.app_context():
-    #         with current_app.test_request_context():
-    #             resp = Retriever().retrieve_message_list(1, MESSAGE_QUERY_LIMIT)[1]
-    #             json_data = MessageList()._paginated_list_to_json(resp, 1, MESSAGE_QUERY_LIMIT,
-    #                                                               "http://localhost:5050/")
-    #             data = json.loads(json_data.get_data())
-    #             self.assertEqual(data['messages']['4']['_links']['self']['href'],
-    #                              "{0}{1}".format(self.MESSAGE_BY_ID_ENDPOINT, data["messages"]['4']['id']))
+    def test_paginated_to_json_returns_correct_message_self_link(self):
+        """turns paginated result list to json checking correct self link has been added for message"""
+        self.populate_database(MESSAGE_QUERY_LIMIT-1)
+        with app.app_context():
+            with current_app.test_request_context():
+                resp = Retriever().retrieve_message_list(1, MESSAGE_QUERY_LIMIT)[1]
+                json_data = MessageList()._paginated_list_to_json(resp, 1, MESSAGE_QUERY_LIMIT,
+                                                                  "http://localhost:5050/")
+                data = json.loads(json_data.get_data())
+                self.assertEqual(data['messages']['4']['_links']['self']['href'],
+                                 "{0}{1}".format(self.MESSAGE_BY_ID_ENDPOINT, data["messages"]['4']['msg_id']))
 
-    # def test_paginated_to_json_returns_prev_page(self):
-    #     """turns paginated result list to json checking prev page is returned if needed"""
-    #     self.populate_database(MESSAGE_QUERY_LIMIT*2)
-    #     with app.app_context():
-    #         with current_app.test_request_context():
-    #             resp = Retriever().retrieve_message_list(2, MESSAGE_QUERY_LIMIT)[1]
-    #             json_data = MessageList()._paginated_list_to_json(resp, 2, MESSAGE_QUERY_LIMIT,
-    #                                                               "http://localhost:5050/")
-    #             data = json.loads(json_data.get_data())
-    #             self.assertTrue('prev' in data['_links'])
+    def test_paginated_to_json_returns_prev_page(self):
+        """turns paginated result list to json checking prev page is returned if needed"""
+        self.populate_database(MESSAGE_QUERY_LIMIT*2)
+        with app.app_context():
+            with current_app.test_request_context():
+                resp = Retriever().retrieve_message_list(2, MESSAGE_QUERY_LIMIT)[1]
+                json_data = MessageList()._paginated_list_to_json(resp, 2, MESSAGE_QUERY_LIMIT,
+                                                                  "http://localhost:5050/")
+                data = json.loads(json_data.get_data())
+                self.assertTrue('prev' in data['_links'])
 
-    # def test_paginated_to_json_does_not_return_prev_page(self):
-    #     """turns paginated result list to json checking prev page is not returned if not needed"""
-    #     self.populate_database(MESSAGE_QUERY_LIMIT-1)
-    #     with app.app_context():
-    #         with current_app.test_request_context():
-    #             resp = Retriever().retrieve_message_list(1, MESSAGE_QUERY_LIMIT)[1]
-    #             json_data = MessageList()._paginated_list_to_json(resp, 1, MESSAGE_QUERY_LIMIT,
-    #                                                               "http://localhost:5050/")
-    #             data = json.loads(json_data.get_data())
-    #             self.assertFalse('prev' in data['_links'])
+    def test_paginated_to_json_does_not_return_prev_page(self):
+        """turns paginated result list to json checking prev page is not returned if not needed"""
+        self.populate_database(MESSAGE_QUERY_LIMIT-1)
+        with app.app_context():
+            with current_app.test_request_context():
+                resp = Retriever().retrieve_message_list(1, MESSAGE_QUERY_LIMIT)[1]
+                json_data = MessageList()._paginated_list_to_json(resp, 1, MESSAGE_QUERY_LIMIT,
+                                                                  "http://localhost:5050/")
+                data = json.loads(json_data.get_data())
+                self.assertFalse('prev' in data['_links'])
 
-    # def test_paginated_to_json_returns_next_page(self):
-    #     """turns paginated result list to json checking next page is returned if needed"""
-    #     self.populate_database(MESSAGE_QUERY_LIMIT*2)
-    #     with app.app_context():
-    #         with current_app.test_request_context():
-    #             resp = Retriever().retrieve_message_list(1, MESSAGE_QUERY_LIMIT)[1]
-    #             json_data = MessageList()._paginated_list_to_json(resp, 1, MESSAGE_QUERY_LIMIT,
-    #                                                               "http://localhost:5050/")
-    #             data = json.loads(json_data.get_data())
-    #             self.assertTrue('next' in data['_links'])
+    def test_paginated_to_json_returns_next_page(self):
+        """turns paginated result list to json checking next page is returned if needed"""
+        self.populate_database(MESSAGE_QUERY_LIMIT*2)
+        with app.app_context():
+            with current_app.test_request_context():
+                resp = Retriever().retrieve_message_list(1, MESSAGE_QUERY_LIMIT)[1]
+                json_data = MessageList()._paginated_list_to_json(resp, 1, MESSAGE_QUERY_LIMIT,
+                                                                  "http://localhost:5050/")
+                data = json.loads(json_data.get_data())
+                self.assertTrue('next' in data['_links'])
 
-    # def test_paginated_to_json_does_not_return_next_page(self):
-    #     """turns paginated result list to json checking next page is not returned if not needed"""
-    #     self.populate_database(MESSAGE_QUERY_LIMIT-1)
-    #     with app.app_context():
-    #         with current_app.test_request_context():
-    #             resp = Retriever().retrieve_message_list(1, MESSAGE_QUERY_LIMIT)[1]
-    #             json_data = MessageList()._paginated_list_to_json(resp, 1, MESSAGE_QUERY_LIMIT,
-    #                                                               "http://localhost:5050/")
-    #             data = json.loads(json_data.get_data())
-    #             self.assertFalse('next' in data['_links'])
+    def test_paginated_to_json_does_not_return_next_page(self):
+        """turns paginated result list to json checking next page is not returned if not needed"""
+        self.populate_database(MESSAGE_QUERY_LIMIT-1)
+        with app.app_context():
+            with current_app.test_request_context():
+                resp = Retriever().retrieve_message_list(1, MESSAGE_QUERY_LIMIT)[1]
+                json_data = MessageList()._paginated_list_to_json(resp, 1, MESSAGE_QUERY_LIMIT,
+                                                                  "http://localhost:5050/")
+                data = json.loads(json_data.get_data())
+                self.assertFalse('next' in data['_links'])
 
-    # def test_paginated_to_json_has_correct_self_link(self):
-    #     """turns paginated result list to json checking correct self link has been added for list"""
-    #     self.populate_database(MESSAGE_QUERY_LIMIT - 1)
-    #     with app.app_context():
-    #         with current_app.test_request_context():
-    #             resp = Retriever().retrieve_message_list(1, MESSAGE_QUERY_LIMIT)[1]
-    #             json_data = MessageList()._paginated_list_to_json(resp, 1, MESSAGE_QUERY_LIMIT,
-    #                                                               "http://localhost:5050/")
-    #             data = json.loads(json_data.get_data())
-    #             self.assertEqual(data['_links']['self']['href'],
-    #                              "{0}?page={1}&limit={2}".format(self.MESSAGE_LIST_ENDPOINT, 1, MESSAGE_QUERY_LIMIT))
+    def test_paginated_to_json_has_correct_self_link(self):
+        """turns paginated result list to json checking correct self link has been added for list"""
+        self.populate_database(MESSAGE_QUERY_LIMIT - 1)
+        with app.app_context():
+            with current_app.test_request_context():
+                resp = Retriever().retrieve_message_list(1, MESSAGE_QUERY_LIMIT)[1]
+                json_data = MessageList()._paginated_list_to_json(resp, 1, MESSAGE_QUERY_LIMIT,
+                                                                  "http://localhost:5050/")
+                data = json.loads(json_data.get_data())
+                self.assertEqual(data['_links']['self']['href'],
+                                 "{0}?page={1}&limit={2}".format(self.MESSAGE_LIST_ENDPOINT, 1, MESSAGE_QUERY_LIMIT))

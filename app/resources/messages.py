@@ -53,7 +53,7 @@ class MessageList(Resource):
         for message in paginated_list.items:
             msg_count += 1
             msg = message.serialize
-            msg['_links'] = {"self": {"href": "{0}{1}/{2}".format(host_url, MESSAGE_BY_ID_ENDPOINT, msg['id'])}}
+            msg['_links'] = {"self": {"href": "{0}{1}/{2}".format(host_url, MESSAGE_BY_ID_ENDPOINT, msg['msg_id'])}}
             messages["{0}".format(msg_count)] = msg
 
         links = {
@@ -117,8 +117,8 @@ class MessageById(Resource):
         return resp
 
     @staticmethod
-    def put(request):
-        pass;
+    def put():
+        pass
 
 # class MessageStatus(Resource):
 #     """Ability to add and delete labels for a message."""

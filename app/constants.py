@@ -10,7 +10,6 @@ MAX_COLLECTION_CASE_LEN = 60      # Maximum size of the message collection case 
 MAX_REPORTING_UNIT_LEN = 60       # Maximum size of the message reporting_unit identifier
 MAX_SURVEY_LEN = 60      # Maximum size of the message collection instrument identifier
 
-
 # Status Table Column Size Definitions
 
 MAX_STATUS_LABEL_LEN =50          # Maximum length of a label column
