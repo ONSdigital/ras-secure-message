@@ -1,9 +1,14 @@
+from app.authentication.jwt import decode
 from flask_restful import Resource
-from flask import request, jsonify
+from flask import request, jsonify, Response
+from sqlalchemy import engine
+
+
 from app.validation.domain import MessageSchema
 from app.repository.saver import Saver
 from app.repository.retriever import Retriever
 import logging
+import uuid
 from app.common.alerts import AlertUser
 from app import settings
 from app.settings import MESSAGE_QUERY_LIMIT
@@ -17,7 +22,6 @@ MESSAGE_BY_ID_ENDPOINT = "message"
 
 
 class MessageList(Resource):
-
     """Return a list of messages for the user"""
 
     @staticmethod
@@ -102,7 +106,6 @@ class MessageSend(Resource):
 
 
 class MessageById(Resource):
-
     """Get and update message by id"""
 
     @staticmethod
@@ -114,8 +117,75 @@ class MessageById(Resource):
         return resp
 
     @staticmethod
-    def put():
-        """Update message by id"""
+    def put(request):
+        pass;
+
+
+def check_urn(urn_token):
+        try:
+            decrypted_urn_token = decode(urn_token)
+
+            request_authenticated = False
+            if 'urn' in decrypted_urn_token and len(decrypted_urn_token['urn']) == 11:
+                        request_authenticated = True
+            else:
+                        res = Response(response="Collection Case required to access this Microservice Resource",
+                                       status=400, mimetype="text/html")
+                        return res
+
+
+            if request_authenticated:
+                # create user model
+                logger.debug("""The message has the correct claims and it can be decrypted properly. JWT value is: {},
+                                RU is: {}, survey is: {}, CC is: {}""".format(decrypted_urn_token,
+                                                                              decrypted_urn_token['RU'],
+                                                                           ))
+                return {'status': "ok"}
+
+        except JWTError:
+            res = Response(response="Invalid token to access this Microservice Resource", status=400,
+                           mimetype="text/html")
+            logger.debug(
+                'The message does not have a JWT that I can decrypted. Is the JWT Algorithm and Secret setup correctly?')
+            return res
+
+class MessageStatus(Resource):
+    """Ability to add and delete labels for a message."""
+
+    @staticmethod
+    def get(message_id):
+        """Get message by id"""
+        # res = authenticate(request)
+        message_service = Retriever()
+        resp = message_service.retrieve_message(message_id)
+        return resp
+
+    @staticmethod
+    def put(request):
+        """Update message by status"""
+
+        # user_urn = str(uuid.uuid4())
+
+        if request.headersb.get('urn'):
+            urn_token = request.headers.get('urn')
+
+            res = check_urn(urn_token)
+
+            return res
+
+        else:
+            res = Response(response="Invalid token to access this MicroService Resource", status=400,
+                           mimetype="text/html")
+            logger.debug("""The message does not have any JWT needed for Authorisation.
+                                The only headers I have are: {}""").format(request.headers)
+            return res
+
+        msg_id = str(uuid.uuid4())
+        query = 'INSERT INTO status VALUES ("1","INBOX,UNREAD","get.msg_id","user_urn")'.format(urn_token,msg_id)
+        with engine.connect() as con:
+            con.execute(query)
+
         resp = jsonify({"status": "ok"})
+
         resp.status_code = 200
         return resp

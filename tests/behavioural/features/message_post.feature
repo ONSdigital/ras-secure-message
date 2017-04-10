@@ -30,12 +30,12 @@ Feature: Message Send Endpoint
     When it is sent
     Then a 201 status code is the response
 
-  Scenario: Setting a message archived status as "false" and receive a 201
-    Given a message is marked as archived
-    When it is sent
-    Then a 201 response is received
-
-  Scenario: Setting a message read status as "false" and receive a 201
-    Given a message is marked as read
-    When it is sent
-    Then a 201 response is acquired
+#  Scenario: Setting a message archived status as "false" and receive a 201
+#    Given a message is marked as archived
+#    When it is sent
+#    Then a 201 response is received
+#
+#  Scenario: Setting a message read status as "false" and receive a 201
+#    Given a message is marked as read
+#    When it is sent
+#    Then a 201 response is acquired

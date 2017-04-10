@@ -2,7 +2,6 @@ import flask
 import nose.tools
 from behave import given, then, when
 from app import application
-import datetime
 from unittest import mock
 from app.common.alerts import AlertUser, AlertViaGovNotify
 
@@ -13,13 +12,15 @@ data = {}
 
 def before_scenario(context):
     AlertUser.alert_method = mock.Mock(AlertViaGovNotify)
-    data.update({'msg_to': 'Richard',
-                 'msg_from': 'Torrance',
+
+    data.update({'msg_to':'test',
+                 'msg_from':'test',
                  'subject': 'Hello World',
                  'body': 'Test',
-                 'thread': '?',
-                 'create_date': datetime.datetime.now(datetime.timezone.utc),
-                 'read_date': datetime.datetime.now(datetime.timezone.utc)})
+                 'thread_id': '',
+                 'collection_case': 'collection case1',
+                 'reporting_case': 'reporting case1',
+                 'survey': 'survey'})
 
 
 @given('a valid message')
@@ -79,7 +80,7 @@ def step_impl(context):
 
 @then('a 400 HTTP response is returned as a response after')
 def step_impl(context):
-    context.execute_steps('then a 400 HTTP response is returned')
+    nose.tools.assert_equal(context.response.status_code, 400)
 
 
 @given('a message with an empty "Subject" field')
@@ -94,11 +95,11 @@ def step_impl(context):
 
 @then('a 400 HTTP response is returned as a response')
 def step_impl(context):
-    context.execute_steps('then a 400 HTTP response is returned')
+    context.execute_steps('then a 400 HTTP response is returned as a response after')
 
 
 @given('a message is sent with an empty "Thread ID"')
-def step_impl(context, ):
+def step_impl(context):
     before_scenario(context)
 
 
@@ -109,39 +110,41 @@ def step_impl(context, ):
 
 @then('a 201 status code is the response')
 def step_impl(context):
+    print(context.response.data)
     nose.tools.assert_equal(context.response.status_code, 201)
 
 
-@given('a message is marked as archived')
-def step_impl(context):
-    data['archived'] = 'True'
-
-
-# @when('it is sent')
+# @given('a message is marked as archived')
 # def step_impl(context):
-#     context.execute_steps("when it is sent")
-
-
-@then('a 201 response is received')
-def step_impl(context):
-    nose.tools.assert_equal(context.response.status_code, 201)
-
-
-@given('a message is marked as read')
-def step_impl(context):
-    data['marked_as_read'] = 'True'
-
-
-# @when('it is sent')
+#     data['archived'] = 'True'
+#
+#
+# # @when('it is sent')
+# # def step_impl(context):
+# #     context.execute_steps("when it is sent")
+#
+#
+# @then('a 201 response is received')
 # def step_impl(context):
-#     context.execute_steps("when it is sent")
-
-
-@then('a 201 response is acquired')
-def step_impl(context):
-    nose.tools.assert_equal(context.response.status_code, 201)
+#     nose.tools.assert_equal(context.response.status_code, 201)
+#
+#
+# @given('a message is marked as read')
+# def step_impl(context):
+#     data['marked_as_read'] = 'True'
+#
+#
+# # @when('it is sent')
+# # def step_impl(context):
+# #     context.execute_steps("when it is sent")
+#
+#
+# @then('a 201 response is acquired')
+# def step_impl(context):
+#     nose.tools.assert_equal(context.response.status_code, 201)
 
 
 if __name__ == '__main__':
     from behave import __main__ as behave_executable
+
     behave_executable.main(None)
