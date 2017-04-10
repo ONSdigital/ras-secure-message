@@ -8,7 +8,7 @@ MAX_THREAD_LEN = 60               # Maximum size of a thread_id UUID in a messag
 MAX_MSG_ID_LEN = 60               # Maximum size of a message UUID in a message
 MAX_COLLECTION_CASE_LEN = 60      # Maximum size of the message collection case identifier
 MAX_REPORTING_UNIT_LEN = 60       # Maximum size of the message reporting_unit identifier
-MAX_COLLECTION_INSTRUMENT_LEN = 60      # Maximum size of the message collection instrument identifier
+MAX_SURVEY_LEN = 60      # Maximum size of the message collection instrument identifier
 
 
 # Status Table Column Size Definitions

@@ -30,7 +30,7 @@ class Retriever:
         db_model = SecureMessage()
 
         try:
-            result = db_model.query.filter_by(id=message_id).first_or_404()
+            result = db_model.query.filter_by(msg_id=message_id).first_or_404()
         except SQLAlchemyError as e:
             logger.error(e)
             raise(InternalServerError(description="Error retrieving message from database"))
