@@ -73,7 +73,7 @@ class Status(db.Model):
     """Label Assignment table model"""
     __tablename__ = "status"
 
-    id = Column("id", Integer, primary_key=True)
+    id = Column('id', Integer, primary_key=True)
     label = Column('label', String(constants.MAX_STATUS_LABEL_LEN + 1))
     msg_id = Column('msg_id', String(constants.MAX_MSG_ID_LEN + 1), ForeignKey('secure_message.msg_id'))
     actor = Column('actor', String(constants.MAX_STATUS_ACTOR_LEN + 1))
@@ -83,10 +83,10 @@ class Status(db.Model):
         self.msg_id = msg_id
         self.actor = actor
 
-    def set_from_domain_model(self, domain_model):
-        self.label = domain_model.label
-        self.msg_id = domain_model.msg_id
-        self.actor = domain_model.actor
+    def set_from_domain_model(self, msg_id, actor, label):
+        self.label = label
+        self.msg_id = msg_id
+        self.actor = actor
 
     @property
     def serialize(self):

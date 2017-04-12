@@ -2,8 +2,7 @@ from app.authentication.jwt import decode
 from flask_restful import Resource
 from flask import request, jsonify, Response
 from sqlalchemy import engine
-
-
+from app import constants
 from app.validation.domain import MessageSchema
 from app.repository.saver import Saver
 from app.repository.retriever import Retriever
@@ -80,14 +79,21 @@ class MessageSend(Resource):
         logger.info("Message send POST request.")
         message = MessageSchema().load(request.get_json())
 
-        if 'msg_to' not in request.get_json() or len(request.get_json()['msg_to']) == 0:
-            message.errors.update({'msg_to': 'Expected a msg_to field to be given'})
+        if 'urn_to' not in request.get_json() or len(request.get_json()['urn_to']) == 0:
+            message.errors.update({'urn_to': 'Expected a msg_to field to be given'})
+        elif len(request.get_json()['urn_to']) >= constants.MAX_TO_LEN:
+            message.errors.update({'urn_to': 'Expected a msg_to field to with character length under 100'})
 
-        if 'msg_from' not in request.get_json() or len(request.get_json()['msg_from']) == 0:
-            message.errors.update({'msg_from': 'Expected a msg_from field to be given'})
+        if 'urn_from' not in request.get_json() or len(request.get_json()['urn_from']) == 0:
+            message.errors.update({'urn_from': 'Expected a msg_from field to be given'})
+        elif len(request.get_json()['urn_from']) >= constants.MAX_FROM_LEN:
+            message.errors.update({'urn_from': 'Expected a msg_from field to with character length under 100'})
 
         if message.errors == {}:
+            post = request.get_json()
             Saver().save_message(message.data)
+            Saver().save_msg_status(post['urn_from'], post['msg_id'], "SENT")
+            Saver().save_msg_status(post['urn_to'], post['msg_id'], "INBOX, UNREAD")
             return MessageSend._alert_recipients(message.data.msg_id)
         else:
             res = jsonify(message.errors)

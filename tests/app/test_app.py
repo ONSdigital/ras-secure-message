@@ -25,8 +25,8 @@ class FlaskTestCase(unittest.TestCase):
         AlertUser.alert_method = mock.Mock(AlertViaGovNotify)
 
         self.test_message = {'msg_id': 'AMsgId',
-                             'msg_to': 'richard',
-                             'msg_from': 'torrance',
+                             'urn_to': 'richard',
+                             'urn_from': 'torrance',
                              'subject': 'MyMessage',
                              'body': 'hello',
                              'thread_id': "",
@@ -53,8 +53,8 @@ class FlaskTestCase(unittest.TestCase):
         url = "http://localhost:5050/message/send"
         headers = {'Content-Type': 'application/json'}
 
-        data = {'msg_to': 'richard',
-                'msg_from': 'torrance',
+        data = {'urn_to': 'richard',
+                'urn_from': 'torrance',
                 'subject': 'MyMessage',
                 'body': 'hello',
                 'thread': "?",
@@ -66,8 +66,8 @@ class FlaskTestCase(unittest.TestCase):
         with self.engine.connect() as con:
             request = con.execute('SELECT * FROM secure_message WHERE id = (SELECT MAX(id) FROM secure_message)')
             for row in request:
-                data = {"to": row['msg_to'], "from": row['msg_from'], "subject": row['subject'], "body": row['body']}
-                self.assertEqual({'to': 'richard', 'from': 'torrance', 'subject': 'MyMessage', 'body': 'hello'}, data)
+                data = {"subject": row['subject'], "body": row['body']}
+                self.assertEqual({'subject': 'MyMessage', 'body': 'hello'}, data)
 
     def test_post_request_returns_201_on_success(self):
         """check messages from messageSend endpoint saved in database"""
@@ -140,8 +140,8 @@ class FlaskTestCase(unittest.TestCase):
         headers = {'Content-Type': 'application/json'}
         now = datetime.now(timezone.utc)
         test_message = {'msg_id': 'AMsgId',
-                        'msg_to': 'richard',
-                        'msg_from': 'torrance',
+                        'urn_to': 'richard',
+                        'urn_from': 'torrance',
                         'subject': 'MyMessage',
                         'body': 'hello',
                         'sent_date': now,
@@ -156,15 +156,68 @@ class FlaskTestCase(unittest.TestCase):
             self.fail("post raised unexpected exception: {0}".format(e))
 
     def test_message_post_missing_msg_to_returns_error_to_caller(self):
-        """posts to message send end point without 'msg_id'"""
+        """posts to message send end point without 'urn_to'"""
         url = "http://localhost:5050/message/send"
         headers = {'Content-Type': 'application/json'}
 
-        self.test_message['msg_to'] = ''
+        self.test_message['urn_to'] = ''
 
         response = self.app.post(url, data=json.dumps(self.test_message), headers=headers)
         self.assertEqual(response.status_code, 400)
 
+    def test_message_post_missing_urn_from_returns_error(self):
+        """posts to message send end point without 'urn_from'"""
+        url = "http://localhost:5050/message/send"
+        headers = {'Content-Type': 'application/json'}
+
+        self.test_message['urn_from'] = ''
+
+        response = self.app.post(url, data=json.dumps(self.test_message), headers=headers)
+        self.assertEqual(response.status_code, 400)
+
+    def test_message_post_too_large_urn_from_returns_error(self):
+        """posts to message send end point with too large 'urn_from'"""
+        url = "http://localhost:5050/message/send"
+        headers = {'Content-Type': 'application/json'}
+
+        self.test_message['urn_from'] = 'x' * 100
+
+        response = self.app.post(url, data=json.dumps(self.test_message), headers=headers)
+        self.assertEqual(response.status_code, 400)
+
+    def test_message_post_too_large_urn_to_returns_error(self):
+        """posts to message send end point with too large 'urn_from'"""
+        url = "http://localhost:5050/message/send"
+        headers = {'Content-Type': 'application/json'}
+
+        self.test_message['urn_to'] = 'x' * 100
+
+        response = self.app.post(url, data=json.dumps(self.test_message), headers=headers)
+        self.assertEqual(response.status_code, 400)
+
+    def test_message_post_stores_labels_correctly_for_sender_of_message(self):
+        """posts to message send end point to ensure labels are saved as expected"""
+        url = "http://localhost:5050/message/send"
+        headers = {'Content-Type': 'application/json'}
+
+        self.app.post(url, data=json.dumps(self.test_message), headers=headers)
+
+        with self.engine.connect() as con:
+            request = con.execute("SELECT label FROM status WHERE label='SENT' AND msg_id='" + self.test_message['msg_id'] + "' AND actor='" + self.test_message['urn_from'] + "'")
+            for row in request:
+                self.assertTrue(row is not None)
+
+    def test_message_post_stores_labels_correctly_for_recipient_of_message(self):
+        """posts to message send end point to ensure labels are saved as expected"""
+        url = "http://localhost:5050/message/send"
+        headers = {'Content-Type': 'application/json'}
+
+        self.app.post(url, data=json.dumps(self.test_message), headers=headers)
+
+        with self.engine.connect() as con:
+            request = con.execute("SELECT label FROM status WHERE label='INBOX, UNREAD' AND msg_id='" + self.test_message['msg_id'] + "' AND actor='" + self.test_message['urn_to'] + "'")
+            for row in request:
+                self.assertTrue(row is not None)
 
 if __name__ == '__main__':
     unittest.main()

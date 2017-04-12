@@ -30,3 +30,19 @@ class Saver:
         return database.SecureMessage(domain_message.msg_to, domain_message.msg_from, domain_message.subject,
                                       domain_message.body, domain_message.thread_id, domain_message.sent_date,
                                       domain_message.read_date, domain_message.msg_id)
+
+    @staticmethod
+    def save_msg_status(msg_id, msg_urn, label):
+        """save message status to database"""
+
+        db_status_to = database.Status()
+        db_status_to.set_from_domain_model(msg_id, msg_urn, label)
+        try:
+            db.session.add(db_status_to)
+            db.session.commit()
+        except Exception as e:
+            logger.error("Message status save failed {}".format(e))
+            raise MessageSaveException(e)
+
+
+

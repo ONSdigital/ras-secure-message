@@ -2,10 +2,10 @@ import unittest
 from app.repository.saver import Saver
 from sqlalchemy import create_engine
 from app.repository import database
-from flask import current_app
+from flask import current_app, json
 from app.application import app
 
-from app.validation.domain import Message
+from app.validation.domain import Message, MessageStatus
 
 
 class SaverTestCase(unittest.TestCase):
@@ -34,3 +34,15 @@ class SaverTestCase(unittest.TestCase):
             for row in request:
                 data = {"sent_date": row['sent_date']}
                 self.assertTrue(data['sent_date'] is not None)
+
+    def test_saved_msg_status_has_been_saved(self):
+        """retrieves message status from database"""
+        messagestatus_object = {'msg_id': 'AMsgId', 'actor': 'Tej'}
+        with app.app_context():
+            with current_app.test_request_context():
+                Saver().save_msg_status(messagestatus_object['msg_id'], messagestatus_object['actor'], 'INBOX, UNREAD')
+
+        with self.engine.connect() as con:
+            request = con.execute('SELECT * FROM status')
+            for row in request:
+                self.assertTrue(row is not None)
