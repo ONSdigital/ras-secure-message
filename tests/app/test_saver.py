@@ -2,10 +2,10 @@ import unittest
 from app.repository.saver import Saver
 from sqlalchemy import create_engine
 from app.repository import database
-from flask import current_app, json
+from flask import current_app
 from app.application import app
 
-from app.validation.domain import Message, MessageStatus
+from app.validation.domain import Message
 
 
 class SaverTestCase(unittest.TestCase):

@@ -4,6 +4,7 @@ from behave import given, then, when
 from app import application
 from unittest import mock
 from app.common.alerts import AlertUser, AlertViaGovNotify
+from datetime import datetime, timezone
 
 url = "http://localhost:5050/message/send"
 headers = {'Content-Type': 'application/json'}
@@ -13,8 +14,9 @@ data = {}
 def before_scenario(context):
     AlertUser.alert_method = mock.Mock(AlertViaGovNotify)
 
-    data.update({'msg_to':'test',
-                 'msg_from':'test',
+    data.update({'msg_id': '',
+                 'urn_to': 'test',
+                 'urn_from': 'test',
                  'subject': 'Hello World',
                  'body': 'Test',
                  'thread_id': '',
@@ -40,7 +42,7 @@ def step_impl(context):
 
 @given('a message with an empty "To" field')
 def step_impl(context):
-    data['msg_to'] = ''
+    data['urn_to'] = ''
 
 
 # @when('it is sent a')
@@ -55,7 +57,7 @@ def step_impl(context):
 
 @given('a message with an empty "From" field')
 def step_impl(context):
-    data['msg_from'] = ''
+    data['urn_from'] = ''
 
 
 # @when('it is sent')
@@ -143,6 +145,39 @@ def step_impl(context):
 # def step_impl(context):
 #     nose.tools.assert_equal(context.response.status_code, 201)
 
+
+# Scenario: Message sent with a urn_to too long
+
+@given("a message is sent with a urn_to which exceeds the max limit")
+def step_impl(context):
+    data['urn_to'] = "x" * 100
+
+
+@when("the message is sent")
+def step_impl(context):
+    context.response = application.app.test_client().post(url, data=flask.json.dumps(data), headers=headers)
+
+
+@then("a 400 error status is given")
+def step_impl(context):
+    nose.tools.assert_equal(context.response.status_code, 400)
+
+# Scenario: Message sent with a urn_from too long
+
+
+@given("a message is sent with a urn_from which exceeds the field length")
+def step_impl(context):
+    data['urn_from'] = "y" * 100
+
+
+@when("a message is sent")
+def step_impl(context):
+    context.response = application.app.test_client().post(url, data=flask.json.dumps(data), headers=headers)
+
+
+@then("a 400 error is given")
+def step_impl(context):
+    nose.tools.assert_equal(context.response.status_code, 400)
 
 if __name__ == '__main__':
     from behave import __main__ as behave_executable

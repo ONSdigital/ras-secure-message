@@ -30,12 +30,15 @@ Feature: Message Send Endpoint
     When it is sent
     Then a 201 status code is the response
 
-#  Scenario: Setting a message archived status as "false" and receive a 201
-#    Given a message is marked as archived
-#    When it is sent
-#    Then a 201 response is received
-#
-#  Scenario: Setting a message read status as "false" and receive a 201
-#    Given a message is marked as read
-#    When it is sent
-#    Then a 201 response is acquired
+  Scenario: Message sent with a urn_to too long
+    Given a message is sent with a urn_to which exceeds the max limit
+    When the message is sent
+    Then a 400 error status is given
+
+  Scenario: Message sent with a msg_from too long
+    Given a message is sent with a urn_from which exceeds the field length
+    When a message is sent
+    Then a 400 error is given
+
+
+

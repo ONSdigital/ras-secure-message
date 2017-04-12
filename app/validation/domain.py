@@ -92,7 +92,7 @@ class MessageStatus:
     """Class to hold message attributes"""
     def __init__(self, label='', msg_id='', actor=''):
 
-        logger.debug("Message Class created {0}, {1}".format(label, msg_id, actor))
+        logger.debug("Message Class created {0}, {1}, {2}".format(label, msg_id, actor))
         self.label = label
         self.msg_id = str(uuid.uuid4()) if len(msg_id) == 0 else msg_id  # If empty msg_id assign to a uuid
         self.actor = actor
