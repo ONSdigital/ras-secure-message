@@ -84,7 +84,7 @@ class RetrieverTestCase(unittest.TestCase):
         self.populate_database(20)
         with self.engine.connect() as con:
             query = 'SELECT msg_id FROM secure_message LIMIT 1'
-            query_x = self.engine.execute(query)
+            query_x = con.execute(query)
             names = []
             for row in query_x:
                 names.append(row[0])
