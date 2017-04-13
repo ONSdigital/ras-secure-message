@@ -58,7 +58,7 @@ api.add_resource(DatabaseHealth, '/health/db')
 api.add_resource(Details, '/health/details')
 api.add_resource(MessageList, '/messages')
 api.add_resource(MessageSend, '/message/send')
-api.add_resource(MessageById, '/message/<int:message_id>')
+api.add_resource(MessageById, '/message/<message_id>')
 
 
 @app.errorhandler(MessageSaveException)

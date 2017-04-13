@@ -91,7 +91,7 @@ class RetrieverTestCase(unittest.TestCase):
             with app.app_context():
                 with current_app.test_request_context():
                     msg_id = str(names[0])
-                    response = Retriever().retrieve_message(msg_id)
+                    response = Retriever().retrieve_message(msg_id, 'Internal.2134532')
                     msg = json.loads(response.get_data())
                     self.assertEqual(msg['msg_id'], str(names[0]))
 
@@ -101,7 +101,7 @@ class RetrieverTestCase(unittest.TestCase):
         with app.app_context():
             with current_app.test_request_context():
                 with self.assertRaises(NotFound):
-                    Retriever().retrieve_message(message_id)
+                    Retriever().retrieve_message(message_id, 'Internal.2134532')
 
     def test_msg_returned_with_msg_id_msg_not_in_database(self):
         """retrieves message using id"""
@@ -110,7 +110,7 @@ class RetrieverTestCase(unittest.TestCase):
         with app.app_context():
             with current_app.test_request_context():
                 with self.assertRaises(NotFound):
-                    Retriever().retrieve_message(message_id)
+                    Retriever().retrieve_message(message_id, 'Internal.2134532')
 
     def test_retrieve_message_raises_error(self):
         """retrieves message from when db does not exist"""
@@ -118,7 +118,7 @@ class RetrieverTestCase(unittest.TestCase):
             database.db.drop_all()
             with current_app.test_request_context():
                 with self.assertRaises(InternalServerError):
-                    Retriever().retrieve_message(1)
+                    Retriever().retrieve_message(1, 'Internal.2134532')
 
     def test_paginated_to_json_returns_correct_messages_len(self):
         """turns paginated result list to json checking correct amount of messages are given"""

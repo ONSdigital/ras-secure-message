@@ -25,7 +25,7 @@ class Retriever:
         return True, result
 
     @staticmethod
-    def retrieve_message(message_id):
+    def retrieve_message(message_id, user_urn):
         """returns single message from db"""
         db_model = SecureMessage()
 
@@ -34,7 +34,30 @@ class Retriever:
         except SQLAlchemyError as e:
             logger.error(e)
             raise(InternalServerError(description="Error retrieving message from database"))
-        return jsonify(result.serialize)
+
+        message = {
+            'msg_id': result.msg_id,
+            'subject': result.subject,
+            'body': result.body,
+            'thread_id': result.thread_id,
+            'sent_date': result.sent_date,
+            'read_date': result.read_date,
+            'collection_case': result.collection_case,
+            'reporting_unit': result.reporting_unit,
+            'survey': result.survey,
+            '_links': '',
+            'labels': []
+        }
+
+        if 'Respondent' in user_urn:
+            actor = user_urn
+        else:
+            actor = result.survey
+
+        for status in result.statuses.filter_by(actor=actor):
+            message['labels'].append(status.label)
+
+        return jsonify(message)
 
     @staticmethod
     def check_db_connection():

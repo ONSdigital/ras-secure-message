@@ -1,4 +1,5 @@
 from sqlalchemy import Column, String, Integer, DateTime, ForeignKey
+from sqlalchemy.orm import relationship
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime, timezone
 from app import constants
@@ -24,6 +25,7 @@ class SecureMessage(db.Model):
     collection_case = Column("collection_case", String(constants.MAX_COLLECTION_CASE_LEN+1))
     reporting_unit = Column("reporting_unit", String(constants.MAX_REPORTING_UNIT_LEN+1))
     survey = Column("survey", String(constants.MAX_SURVEY_LEN+1))
+    statuses = relationship('Status', backref='secure_message', lazy='dynamic')
 
     def __init__(self, msg_id="", subject="", body="", thread_id="",
                  sent_date=datetime.now(timezone.utc), read_date=None, collection_case='',
