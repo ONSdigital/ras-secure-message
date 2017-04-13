@@ -1,17 +1,5 @@
 import unittest
-from app.authentication.jwt import decode
-from flask_restful import Resource
-from flask import request, jsonify, Response
-from sqlalchemy import engine
 
-from app.validation.domain import MessageSchema
-from app.repository.saver import Saver
-from app.repository.retriever import Retriever
-import logging
-import uuid
-from app.common.alerts import AlertUser
-from app import settings
-from app.settings import MESSAGE_QUERY_LIMIT
 
 
 class MessageStatusTestCase(unittest.TestCase):

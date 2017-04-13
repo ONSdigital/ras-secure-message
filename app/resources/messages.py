@@ -126,42 +126,33 @@ class MessageById(Resource):
     def put():
         pass
 
-# class MessageStatus(Resource):
-#     """Ability to add and delete labels for a message."""
-#
-#     @staticmethod
-#     def get(message_id):
-#         """Get message by id"""
-#         # res = authenticate(request)
-#         message_service = Retriever()
-#         resp = message_service.retrieve_message(message_id)
-#         return resp
-#
-#     @staticmethod
-#     def put(request):
-#         """Update message by status"""
-#
-#         # user_urn = str(uuid.uuid4())
-#
-#         if request.headersb.get('urn'):
-#             urn_token = request.headers.get('urn')
-#
-#             res = check_urn(urn_token)
-#             return res
-#
-#         else:
-#             res = Response(response="Invalid token to access this MicroService Resource", status=400,
-#                            mimetype="text/html")
-#             logger.debug("""The message does not have any JWT needed for Authorisation.
-#                                 The only headers I have are: {}""").format(request.headers)
-#             return res
-#
-#         msg_id = str(uuid.uuid4())
-#         query = 'INSERT INTO status VALUES ("1","INBOX,UNREAD","get.msg_id","user_urn")'.format(urn_token,msg_id)
-#         with engine.connect() as con:
-#             con.execute(query)
-#
-#         resp = jsonify({"status": "ok"})
-#
-#         resp.status_code = 200
-#         return resp
+class MessageStatus(Resource):
+    """Ability to add and delete labels for a message."""
+
+    @staticmethod
+    def get(message_id):
+        """Get message by id"""
+        # res = authenticate(request)
+        message_service = Retriever()
+        resp = message_service.retrieve_message(message_id)
+        return resp
+
+    @staticmethod
+    def put(request):
+        """Update message by status"""
+
+        # user_urn = str(uuid.uuid4())
+
+        if request.headersb.get('urn'):
+            urn_token = request.headers.get('urn')
+            return urn_token
+
+        msg_id = str(uuid.uuid4())
+        query = 'INSERT INTO status VALUES ("1","INBOX,UNREAD","get.msg_id","user_urn")'.format(urn_token,msg_id)
+        with engine.connect() as con:
+            con.execute(query)
+
+        resp = jsonify({"status": "ok"})
+
+        resp.status_code = 200
+        return resp

@@ -45,11 +45,6 @@ def step_impl(context):
     data['urn_to'] = ''
 
 
-# @when('it is sent a')
-# def step_impl(context):
-#     context.execute_steps("when it is sent")
-
-
 @then('a 400 HTTP response is returned')
 def step_impl(context):
     nose.tools.assert_equal(context.response.status_code, 400)
@@ -58,11 +53,6 @@ def step_impl(context):
 @given('a message with an empty "From" field')
 def step_impl(context):
     data['urn_from'] = ''
-
-
-# @when('it is sent')
-# def step_impl(context):
-#     context.execute_steps("when it is sent")
 
 
 @then('a 400 HTTP response is returned as the response afterwards')
@@ -75,11 +65,6 @@ def step_impl(context):
     data['body'] = ''
 
 
-# @when('it is sent')
-# def step_impl(context):
-#     context.execute_steps("when it is sent")
-
-
 @then('a 400 HTTP response is returned as a response after')
 def step_impl(context):
     nose.tools.assert_equal(context.response.status_code, 400)
@@ -88,11 +73,6 @@ def step_impl(context):
 @given('a message with an empty "Subject" field')
 def step_impl(context):
     data['subject'] = ""
-
-
-# @when('it is sent')
-# def step_impl(context):
-#     context.execute_steps("when it is sent")
 
 
 @then('a 400 HTTP response is returned as a response')
@@ -105,45 +85,10 @@ def step_impl(context):
     before_scenario(context)
 
 
-# @when('it is sent')
-# def step_impl(context):
-#     context.execute_steps("when it is sent")
-
-
 @then('a 201 status code is the response')
 def step_impl(context):
     print(context.response.data)
     nose.tools.assert_equal(context.response.status_code, 201)
-
-
-# @given('a message is marked as archived')
-# def step_impl(context):
-#     data['archived'] = 'True'
-#
-#
-# # @when('it is sent')
-# # def step_impl(context):
-# #     context.execute_steps("when it is sent")
-#
-#
-# @then('a 201 response is received')
-# def step_impl(context):
-#     nose.tools.assert_equal(context.response.status_code, 201)
-#
-#
-# @given('a message is marked as read')
-# def step_impl(context):
-#     data['marked_as_read'] = 'True'
-#
-#
-# # @when('it is sent')
-# # def step_impl(context):
-# #     context.execute_steps("when it is sent")
-#
-#
-# @then('a 201 response is acquired')
-# def step_impl(context):
-#     nose.tools.assert_equal(context.response.status_code, 201)
 
 
 # Scenario: Message sent with a urn_to too long
@@ -162,6 +107,7 @@ def step_impl(context):
 def step_impl(context):
     nose.tools.assert_equal(context.response.status_code, 400)
 
+
 # Scenario: Message sent with a urn_from too long
 
 
@@ -178,6 +124,7 @@ def step_impl(context):
 @then("a 400 error is given")
 def step_impl(context):
     nose.tools.assert_equal(context.response.status_code, 400)
+
 
 if __name__ == '__main__':
     from behave import __main__ as behave_executable
