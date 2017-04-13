@@ -79,21 +79,14 @@ class MessageSend(Resource):
         logger.info("Message send POST request.")
         message = MessageSchema().load(request.get_json())
 
-        if 'urn_to' not in request.get_json() or len(request.get_json()['urn_to']) == 0:
-            message.errors.update({'urn_to': 'Expected a urn_to field to be given'})
-        elif len(request.get_json()['urn_to']) >= constants.MAX_TO_LEN:
-            message.errors.update({'urn_to': 'Expected a urn_to field to with character length under 100'})
+        validated_message = MessageSend.validate_message(request, message)
 
-        if 'urn_from' not in request.get_json() or len(request.get_json()['urn_from']) == 0:
-            message.errors.update({'urn_from': 'Expected a urn_from field to be given'})
-        elif len(request.get_json()['urn_from']) >= constants.MAX_FROM_LEN:
-            message.errors.update({'urn_from': 'Expected a urn_from field to with character length under 100'})
-
-        if message.errors == {}:
+        if validated_message.errors == {}:
             post = request.get_json()
             Saver().save_message(message.data)
-            Saver().save_msg_status(post['urn_from'], post['msg_id'], "SENT")
-            Saver().save_msg_status(post['urn_to'], post['msg_id'], "INBOX, UNREAD")
+            Saver().save_msg_status(post['urn_from'], post['msg_id'], constants.LABEL_SENT)
+            Saver().save_msg_status(post['urn_to'], post['msg_id'], constants.LABEL_INBOX)
+            Saver().save_msg_status(post['urn_to'], post['msg_id'], constants.LABEL_UNREAD)
             return MessageSend._alert_recipients(message.data.msg_id)
         else:
             res = jsonify(message.errors)
@@ -109,6 +102,20 @@ class MessageSend(Resource):
         resp = jsonify({'status': '{0}'.format(alert_detail)})
         resp.status_code = alert_status
         return resp
+
+    @staticmethod
+    def validate_message(request1, message):
+        if 'urn_to' not in request1.get_json() or len(request1.get_json()['urn_to']) == 0:
+            message.errors.update({'urn_to': 'Expected a urn_to field to be given'})
+        elif len(request1.get_json()['urn_to']) >= constants.MAX_TO_LEN:
+            message.errors.update({'urn_to': 'Expected a urn_to field to with character length under 100'})
+
+        if 'urn_from' not in request1.get_json() or len(request1.get_json()['urn_from']) == 0:
+            message.errors.update({'urn_from': 'Expected a urn_from field to be given'})
+        elif len(request1.get_json()['urn_from']) >= constants.MAX_FROM_LEN:
+            message.errors.update({'urn_from': 'Expected a urn_from field to with character length under 100'})
+
+        return message
 
 
 class MessageById(Resource):

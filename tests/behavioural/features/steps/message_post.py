@@ -1,7 +1,7 @@
 import flask
 import nose.tools
 from behave import given, then, when
-from app import application
+from app import application, constants
 from unittest import mock
 from app.common.alerts import AlertUser, AlertViaGovNotify
 from datetime import datetime, timezone
@@ -21,7 +21,7 @@ def before_scenario(context):
                  'body': 'Test',
                  'thread_id': '',
                  'collection_case': 'collection case1',
-                 'reporting_case': 'reporting case1',
+                 'reporting_unit': 'reporting case1',
                  'survey': 'survey'})
 
 
@@ -95,7 +95,7 @@ def step_impl(context):
 
 @given("a message is sent with a urn_to which exceeds the max limit")
 def step_impl(context):
-    data['urn_to'] = "x" * 100
+    data['urn_to'] = "x" * (constants.MAX_TO_LEN+1)
 
 
 @when("the message is sent")
@@ -113,7 +113,7 @@ def step_impl(context):
 
 @given("a message is sent with a urn_from which exceeds the field length")
 def step_impl(context):
-    data['urn_from'] = "y" * 100
+    data['urn_from'] = "y" * (constants.MAX_FROM_LEN+1)
 
 
 @when("a message is sent")
