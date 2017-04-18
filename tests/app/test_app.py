@@ -71,7 +71,7 @@ class FlaskTestCase(unittest.TestCase):
         """check messages from messageSend endpoint saved in database"""
         # post json message written up in the ui
         url = "http://localhost:5050/message/send"
-        headers = {'Content-Type': 'application/json'}
+        headers = {'Content-Type': 'application/json', 'user_urn': ''}
 
         response = self.app.post(url, data=json.dumps(self.test_message), headers=headers)
         self.assertEqual(response.status_code, 201)
@@ -95,7 +95,7 @@ class FlaskTestCase(unittest.TestCase):
         # post json message written up in the ui
 
         url = "http://localhost:5050/message/send"
-        headers = {'Content-Type': 'application/json'}
+        headers = {'Content-Type': 'application/json', 'user_urn': ''}
         self.test_message['msg_id'] = ''
         self.app.post(url, data=json.dumps(self.test_message), headers=headers)
 

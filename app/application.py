@@ -1,15 +1,16 @@
 import logging
 from logging.config import dictConfig
 
-from flask import Flask
+from flask import Flask, request
 from flask import jsonify
 from flask_restful import Api
 
 from app import settings
 from app.exception.exceptions import MessageSaveException
 from app.repository import database
-from app.resources.health import Health, DatabaseHealth, Details
+from app.resources.health import Health, DatabaseHealth, HealthDetails
 from app.resources.messages import MessageList, MessageSend, MessageById
+from werkzeug.exceptions import BadRequest
 
 # initialise logging defaults for project
 logging_config = dict(
@@ -55,10 +56,17 @@ with app.app_context():
 
 api.add_resource(Health, '/health')
 api.add_resource(DatabaseHealth, '/health/db')
-api.add_resource(Details, '/health/details')
+api.add_resource(HealthDetails, '/health/details')
 api.add_resource(MessageList, '/messages')
 api.add_resource(MessageSend, '/message/send')
 api.add_resource(MessageById, '/message/<message_id>')
+
+
+@app.before_request
+def before_request():
+    if request.endpoint is not None and 'health' not in request.endpoint:
+        if 'user_urn' not in request.headers:
+            raise (BadRequest(description="User URN required to access this Microservice Resource"))
 
 
 @app.errorhandler(MessageSaveException)

@@ -32,9 +32,19 @@ class RetrieverTestCase(unittest.TestCase):
         with self.engine.connect() as con:
             for i in range(x):
                 msg_id = str(uuid.uuid4())
-                query = 'INSERT INTO secure_message VALUES ({0}, "{1}", "test","test","",\
-                "2017-02-03 00:00:00", "2017-02-03 00:00:00", "ACollectionCase",\
-                "AReportingUnit", "ACollectionInstrument")'.format(i, msg_id)
+                query = 'INSERT INTO secure_message(id, msg_id, subject, body, thread_id, sent_date, read_date,' \
+                        ' collection_case, reporting_unit, survey) VALUES ({0}, "{1}", "test","test","", ' \
+                        '"2017-02-03 00:00:00", "2017-02-03 00:00:00", "ACollectionCase", "AReportingUnit", ' \
+                        '"SurveyType")'.format(i, msg_id)
+                con.execute(query)
+                query = 'INSERT INTO status(label, msg_id, actor) VALUES("SENT", "{0}", "Respondent.21345")'.format(
+                    msg_id)
+                con.execute(query)
+                query = 'INSERT INTO status(label, msg_id, actor) VALUES("INBOX", "{0}", "SurveyType")'.format(
+                    msg_id)
+                con.execute(query)
+                query = 'INSERT INTO status(label, msg_id, actor) VALUES("UNREAD", "{0}", "SurveyType")'.format(
+                    msg_id)
                 con.execute(query)
 
     def test_0_msg_returned_when_db_empty_true(self):
@@ -91,7 +101,7 @@ class RetrieverTestCase(unittest.TestCase):
             with app.app_context():
                 with current_app.test_request_context():
                     msg_id = str(names[0])
-                    response = Retriever().retrieve_message(msg_id, 'Internal.2134532')
+                    response = Retriever().retrieve_message(msg_id, 'Internal.21345')
                     msg = json.loads(response.get_data())
                     self.assertEqual(msg['msg_id'], str(names[0]))
 
@@ -101,7 +111,7 @@ class RetrieverTestCase(unittest.TestCase):
         with app.app_context():
             with current_app.test_request_context():
                 with self.assertRaises(NotFound):
-                    Retriever().retrieve_message(message_id, 'Internal.2134532')
+                    Retriever().retrieve_message(message_id, 'Internal.21345')
 
     def test_msg_returned_with_msg_id_msg_not_in_database(self):
         """retrieves message using id"""
@@ -110,7 +120,43 @@ class RetrieverTestCase(unittest.TestCase):
         with app.app_context():
             with current_app.test_request_context():
                 with self.assertRaises(NotFound):
-                    Retriever().retrieve_message(message_id, 'Internal.2134532')
+                    Retriever().retrieve_message(message_id, 'Internal.21345')
+
+    def test_correct_labels_returned_internal(self):
+        """retrieves message using id and checks the labels are correct"""
+        self.populate_database(5)
+        with self.engine.connect() as con:
+            query = 'SELECT msg_id FROM secure_message LIMIT 1'
+            query_x = con.execute(query)
+            names = []
+            for row in query_x:
+                names.append(row[0])
+
+            with app.app_context():
+                with current_app.test_request_context():
+                    msg_id = str(names[0])
+                    response = Retriever().retrieve_message(msg_id, 'Internal.21345')
+                    msg = json.loads(response.get_data())
+                    labels = ['INBOX', 'UNREAD']
+                    self.assertEqual(msg['labels'], labels)
+
+    def test_correct_labels_returned_external(self):
+        """retrieves message using id and checks the labels are correct"""
+        self.populate_database(5)
+        with self.engine.connect() as con:
+            query = 'SELECT msg_id FROM secure_message LIMIT 1'
+            query_x = con.execute(query)
+            names = []
+            for row in query_x:
+                names.append(row[0])
+
+            with app.app_context():
+                with current_app.test_request_context():
+                    msg_id = str(names[0])
+                    response = Retriever().retrieve_message(msg_id, 'Respondent.21345')
+                    msg = json.loads(response.get_data())
+                    labels = ['SENT']
+                    self.assertEqual(msg['labels'], labels)
 
     def test_retrieve_message_raises_error(self):
         """retrieves message from when db does not exist"""
@@ -118,7 +164,7 @@ class RetrieverTestCase(unittest.TestCase):
             database.db.drop_all()
             with current_app.test_request_context():
                 with self.assertRaises(InternalServerError):
-                    Retriever().retrieve_message(1, 'Internal.2134532')
+                    Retriever().retrieve_message(1, 'Internal.21345')
 
     def test_paginated_to_json_returns_correct_messages_len(self):
         """turns paginated result list to json checking correct amount of messages are given"""

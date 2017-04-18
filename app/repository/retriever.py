@@ -2,7 +2,7 @@ import logging
 
 from flask import jsonify
 from sqlalchemy.exc import SQLAlchemyError
-from werkzeug.exceptions import InternalServerError
+from werkzeug.exceptions import InternalServerError, NotFound
 
 from app.repository.database import SecureMessage
 
@@ -30,7 +30,9 @@ class Retriever:
         db_model = SecureMessage()
 
         try:
-            result = db_model.query.filter_by(msg_id=message_id).first_or_404()
+            result = db_model.query.filter_by(msg_id=message_id).first()
+            if result is None:
+                raise (NotFound(description="Message with msg_id '{0}' does not exist".format(message_id)))
         except SQLAlchemyError as e:
             logger.error(e)
             raise(InternalServerError(description="Error retrieving message from database"))

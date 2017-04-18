@@ -11,6 +11,7 @@ import uuid
 from app.common.alerts import AlertUser
 from app import settings
 from app.settings import MESSAGE_QUERY_LIMIT
+from werkzeug.exceptions import BadRequest
 
 logger = logging.getLogger(__name__)
 
@@ -124,6 +125,8 @@ class MessageById(Resource):
     @staticmethod
     def get(message_id):
         """Get message by id"""
+        if message_id is None:
+            raise(BadRequest(description="Please provide a message ID"))
         # res = authenticate(request)
         user_urn = request.headers.get('user_urn') # getting user urn from header request
         # check user is authorised to view message

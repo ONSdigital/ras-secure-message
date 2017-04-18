@@ -22,7 +22,7 @@ class DatabaseHealth(Resource):
         return Retriever().check_db_connection()
 
 
-class Details(Resource):
+class HealthDetails(Resource):
 
     """Rest endpoint to provide application details"""
 
