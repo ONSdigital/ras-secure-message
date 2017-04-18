@@ -64,8 +64,7 @@ api.add_resource(MessageById, '/message/<message_id>')
 
 @app.before_request
 def before_request():
-    if request.endpoint is not None and 'health' not in request.endpoint:
-        if 'user_urn' not in request.headers:
+    if request.endpoint is not None and 'health' not in request.endpoint and 'user_urn' not in request.headers:
             raise (BadRequest(description="User URN required to access this Microservice Resource"))
 
 

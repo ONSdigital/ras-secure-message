@@ -104,20 +104,6 @@ class MessageSend(Resource):
         resp.status_code = alert_status
         return resp
 
-    # @staticmethod
-    # def validate_message(request1, message):
-    #     if 'urn_to' not in request1.get_json() or len(request1.get_json()['urn_to']) == 0:
-    #         message.errors.update({'urn_to': 'Missing To Field'})
-    #     elif len(request1.get_json()['urn_to']) >= constants.MAX_TO_LEN:
-    #         message.errors.update({'urn_to': 'Expected a urn_to field to with character length under 100'})
-    #
-    #     if 'urn_from' not in request1.get_json() or len(request1.get_json()['urn_from']) == 0:
-    #         message.errors.update({'urn_from': 'Missing from field'})
-    #     elif len(request1.get_json()['urn_from']) >= constants.MAX_FROM_LEN:
-    #         message.errors.update({'urn_from': 'Expected a urn_from field to with character length under 100'})
-    #
-    #     return message
-
 
 class MessageById(Resource):
     """Get and update message by id"""
@@ -128,7 +114,7 @@ class MessageById(Resource):
         if message_id is None:
             raise(BadRequest(description="Please provide a message ID"))
         # res = authenticate(request)
-        user_urn = request.headers.get('user_urn') # getting user urn from header request
+        user_urn = request.headers.get('user_urn')  # getting user urn from header request
         # check user is authorised to view message
         message_service = Retriever()
         # pass msg_id and user urn
