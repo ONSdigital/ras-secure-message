@@ -52,18 +52,16 @@ class MessageSchema(Schema):
             raise ValidationError('Field "sent_date" can not be set.')
         elif 'read_date' in data.keys():
             raise ValidationError('Field "read_date" can not be set.')
-        else:
-            return data
-
-        if 'urn_to' not in data or len(data['urn_to']) == 0:
+        elif 'urn_to' not in data or len(data['urn_to']) == 0:
             raise ValidationError('Field urn_to expected')
-        elif len(request1.get_json()['urn_to']) >= constants.MAX_TO_LEN:
-            raise ValidationError('Field urn_to must have a length oof 100 or lower')
-
-        if 'urn_from' not in data or len(data['urn_from']) == 0:
+        elif len(data['urn_to']) >= constants.MAX_TO_LEN:
+            raise ValidationError('Field urn_to must have a length of' + constants.MAX_TO_LEN + ' or lower')
+        elif 'urn_from' not in data or len(data['urn_from']) == 0:
             raise ValidationError({'urn_from': 'Missing from field'})
         elif len(data['urn_from']) >= constants.MAX_FROM_LEN:
-            raise ValidationError({'urn_from': 'Expected a urn_from field to with character length under 100'})
+            raise ValidationError({'urn_from': 'Expected a urn_from field to with character length under ' + constants.MAX_FROM_LEN})
+        else:
+            return data
 
     @validates('body')
     def validate_body(self, body):

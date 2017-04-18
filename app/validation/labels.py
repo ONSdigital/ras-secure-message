@@ -8,6 +8,3 @@ class Labels(Enum):
     ARCHIVE = "ARCHIVE"
     DRAFT = "DRAFT"
     DRAFT_INBOX = "DRAFT_INBOX"
-
-for label in Labels.__members__.items():
-    print(label)
