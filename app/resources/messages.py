@@ -1,17 +1,17 @@
-from app.authentication.jwt import decode
+# from app.authentication.jwt import decode
 from flask_restful import Resource
-from flask import request, jsonify, Response
-from sqlalchemy import engine
+from flask import request, jsonify
 from app import constants
 from app.validation.domain import MessageSchema
 from app.repository.saver import Saver
 from app.repository.retriever import Retriever
 import logging
-import uuid
 from app.common.alerts import AlertUser
 from app import settings
 from app.settings import MESSAGE_QUERY_LIMIT
 from werkzeug.exceptions import BadRequest
+from app.validation.labels import Labels
+
 
 logger = logging.getLogger(__name__)
 
@@ -80,14 +80,14 @@ class MessageSend(Resource):
         logger.info("Message send POST request.")
         message = MessageSchema().load(request.get_json())
 
-        validated_message = MessageSend.validate_message(request, message)
+        # validated_message = MessageSend.validate_message(request, message)
 
-        if validated_message.errors == {}:
+        if message.errors == {}:
             post = request.get_json()
             Saver().save_message(message.data)
-            Saver().save_msg_status(post['urn_from'], post['msg_id'], constants.LABEL_SENT)
-            Saver().save_msg_status(post['urn_to'], post['msg_id'], constants.LABEL_INBOX)
-            Saver().save_msg_status(post['urn_to'], post['msg_id'], constants.LABEL_UNREAD)
+            Saver().save_msg_status(post['urn_from'], post['msg_id'], Labels.SENT.value)
+            Saver().save_msg_status(post['urn_to'], post['msg_id'], Labels.INBOX.value)
+            Saver().save_msg_status(post['urn_to'], post['msg_id'], Labels.UNREAD.value)
             return MessageSend._alert_recipients(message.data.msg_id)
         else:
             res = jsonify(message.errors)
@@ -104,19 +104,19 @@ class MessageSend(Resource):
         resp.status_code = alert_status
         return resp
 
-    @staticmethod
-    def validate_message(request1, message):
-        if 'urn_to' not in request1.get_json() or len(request1.get_json()['urn_to']) == 0:
-            message.errors.update({'urn_to': 'Expected a urn_to field to be given'})
-        elif len(request1.get_json()['urn_to']) >= constants.MAX_TO_LEN:
-            message.errors.update({'urn_to': 'Expected a urn_to field to with character length under 100'})
-
-        if 'urn_from' not in request1.get_json() or len(request1.get_json()['urn_from']) == 0:
-            message.errors.update({'urn_from': 'Expected a urn_from field to be given'})
-        elif len(request1.get_json()['urn_from']) >= constants.MAX_FROM_LEN:
-            message.errors.update({'urn_from': 'Expected a urn_from field to with character length under 100'})
-
-        return message
+    # @staticmethod
+    # def validate_message(request1, message):
+    #     if 'urn_to' not in request1.get_json() or len(request1.get_json()['urn_to']) == 0:
+    #         message.errors.update({'urn_to': 'Missing To Field'})
+    #     elif len(request1.get_json()['urn_to']) >= constants.MAX_TO_LEN:
+    #         message.errors.update({'urn_to': 'Expected a urn_to field to with character length under 100'})
+    #
+    #     if 'urn_from' not in request1.get_json() or len(request1.get_json()['urn_from']) == 0:
+    #         message.errors.update({'urn_from': 'Missing from field'})
+    #     elif len(request1.get_json()['urn_from']) >= constants.MAX_FROM_LEN:
+    #         message.errors.update({'urn_from': 'Expected a urn_from field to with character length under 100'})
+    #
+    #     return message
 
 
 class MessageById(Resource):

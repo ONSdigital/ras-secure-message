@@ -4,14 +4,13 @@ from behave import given, then, when
 from app import application, constants
 from unittest import mock
 from app.common.alerts import AlertUser, AlertViaGovNotify
-from datetime import datetime, timezone
 
 url = "http://localhost:5050/message/send"
 headers = {'Content-Type': 'application/json'}
 data = {}
 
 
-def before_scenario(context):
+def before_scenario():
     AlertUser.alert_method = mock.Mock(AlertViaGovNotify)
 
     data.update({'msg_id': '',
@@ -26,8 +25,8 @@ def before_scenario(context):
 
 
 @given('a valid message')
-def step_impl(context):
-    before_scenario(context)
+def step_impl():
+    before_scenario()
 
 
 @when('it is sent')
@@ -41,7 +40,7 @@ def step_impl(context):
 
 
 @given('a message with an empty "To" field')
-def step_impl(context):
+def step_impl():
     data['urn_to'] = ''
 
 
@@ -51,7 +50,7 @@ def step_impl(context):
 
 
 @given('a message with an empty "From" field')
-def step_impl(context):
+def step_impl():
     data['urn_from'] = ''
 
 
@@ -61,7 +60,7 @@ def step_impl(context):
 
 
 @given('a message with an empty "Body" field')
-def step_impl(context):
+def step_impl():
     data['body'] = ''
 
 
@@ -71,7 +70,7 @@ def step_impl(context):
 
 
 @given('a message with an empty "Subject" field')
-def step_impl(context):
+def step_impl():
     data['subject'] = ""
 
 
@@ -81,8 +80,8 @@ def step_impl(context):
 
 
 @given('a message is sent with an empty "Thread ID"')
-def step_impl(context):
-    before_scenario(context)
+def step_impl():
+    before_scenario()
 
 
 @then('a 201 status code is the response')
@@ -94,7 +93,7 @@ def step_impl(context):
 # Scenario: Message sent with a urn_to too long
 
 @given("a message is sent with a urn_to which exceeds the max limit")
-def step_impl(context):
+def step_impl():
     data['urn_to'] = "x" * (constants.MAX_TO_LEN+1)
 
 
@@ -112,7 +111,7 @@ def step_impl(context):
 
 
 @given("a message is sent with a urn_from which exceeds the field length")
-def step_impl(context):
+def step_impl():
     data['urn_from'] = "y" * (constants.MAX_FROM_LEN+1)
 
 
@@ -128,5 +127,4 @@ def step_impl(context):
 
 if __name__ == '__main__':
     from behave import __main__ as behave_executable
-
     behave_executable.main(None)

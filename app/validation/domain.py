@@ -55,6 +55,16 @@ class MessageSchema(Schema):
         else:
             return data
 
+        if 'urn_to' not in data or len(data['urn_to']) == 0:
+            raise ValidationError('Field urn_to expected')
+        elif len(request1.get_json()['urn_to']) >= constants.MAX_TO_LEN:
+            raise ValidationError('Field urn_to must have a length oof 100 or lower')
+
+        if 'urn_from' not in data or len(data['urn_from']) == 0:
+            raise ValidationError({'urn_from': 'Missing from field'})
+        elif len(data['urn_from']) >= constants.MAX_FROM_LEN:
+            raise ValidationError({'urn_from': 'Expected a urn_from field to with character length under 100'})
+
     @validates('body')
     def validate_body(self, body):
         self.validate_non_zero_field_length("Body", len(body), constants.MAX_BODY_LEN)

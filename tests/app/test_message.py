@@ -11,15 +11,17 @@ class MessageTestCase(unittest.TestCase):
 
     def setUp(self):
         """setup test environment"""
-        self.domain_message = Message(**{'subject': 'MyMessage', 'body': 'hello', 'thread_id': ""})
-        self.json_message = {'subject': 'MyMessage', 'body': 'hello', 'thread_id': ""}
+        self.domain_message = Message(**{'subject': 'MyMessage', 'body': 'hello',
+                                         'thread_id': ""})
+        self.json_message = {'urn_to': 'Tej', 'urn_from': 'Gemma', 'subject': 'MyMessage', 'body': 'hello',
+                             'thread_id': ""}
 
     def test_message(self):
         """creating Message object"""
         now = datetime.now(timezone.utc)
         now_string = now.__str__()
         sut = Message('subject', 'body', '5', now, now, 'AMsgId', 'ACollectionCase',
-                            'AReportingUnit', 'ASurveyType')
+                      'AReportingUnit', 'ASurveyType')
         sut_str = repr(sut)
         expected = '<Message(msg_id=AMsgId subject=subject body=body thread_id=5 sent_date={0} read_date={0} collection_case=ACollectionCase reporting_unit=AReportingUnit survey=ASurveyType)>'.format(now_string)
         self.assertEquals(sut_str, expected)
@@ -84,14 +86,14 @@ class MessageTestCase(unittest.TestCase):
 
     def test_missing_body_fails_validation(self):
         """marshalling message with no body field """
-        message = {'msg_to': 'richard', 'msg_from': 'torrance', 'body': ''}
+        message = {'urn_to': 'richard', 'urn_from': 'torrance', 'body': ''}
         schema = MessageSchema()
         data, errors = schema.load(message)
         self.assertTrue(errors == {'body': ['Body field not populated.']})
 
     def test_body_field_missing_from_json_causes_error(self):
         """marshalling message with no body field """
-        message = {'msg_to': 'torrance', 'msg_from': 'someone'}
+        message = {'urn_to': 'torrance', 'urn_from': 'someone'}
         schema = MessageSchema()
         data, errors = schema.load(message)
         self.assertTrue(errors == {'body': ['Missing data for required field.']})

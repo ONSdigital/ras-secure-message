@@ -9,6 +9,7 @@ from app import settings
 from app.application import app
 from app.common.alerts import AlertUser, AlertViaGovNotify
 from app.repository import database
+from app import constants
 
 
 class FlaskTestCase(unittest.TestCase):
@@ -153,8 +154,8 @@ class FlaskTestCase(unittest.TestCase):
         except Exception as e:
             self.fail("post raised unexpected exception: {0}".format(e))
 
-    def test_message_post_missing_msg_to_returns_error_to_caller(self):
-        """posts to message send end point without 'urn_to'"""
+    def test_message_post_missing_urn_to_returns_error(self):
+        """posts to message send end point without 'urn_from'"""
         url = "http://localhost:5050/message/send"
         headers = {'Content-Type': 'application/json'}
 
@@ -178,7 +179,7 @@ class FlaskTestCase(unittest.TestCase):
         url = "http://localhost:5050/message/send"
         headers = {'Content-Type': 'application/json'}
 
-        self.test_message['urn_from'] = 'x' * 100
+        self.test_message['urn_from'] = 'x' * (constants.MAX_FROM_LEN+1)
 
         response = self.app.post(url, data=json.dumps(self.test_message), headers=headers)
         self.assertEqual(response.status_code, 400)
@@ -188,7 +189,7 @@ class FlaskTestCase(unittest.TestCase):
         url = "http://localhost:5050/message/send"
         headers = {'Content-Type': 'application/json'}
 
-        self.test_message['urn_to'] = 'x' * 100
+        self.test_message['urn_to'] = 'x' * (constants.MAX_TO_LEN+1)
 
         response = self.app.post(url, data=json.dumps(self.test_message), headers=headers)
         self.assertEqual(response.status_code, 400)
