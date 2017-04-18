@@ -6,11 +6,11 @@ from unittest import mock
 from app.common.alerts import AlertUser, AlertViaGovNotify
 
 url = "http://localhost:5050/message/send"
-headers = {'Content-Type': 'application/json'}
+headers = {'Content-Type': 'application/json', 'user-urn': '0000000000'}
 data = {}
 
 
-def before_scenario():
+def before_scenario(context):
     AlertUser.alert_method = mock.Mock(AlertViaGovNotify)
 
     data.update({'msg_id': '',
@@ -25,8 +25,8 @@ def before_scenario():
 
 
 @given('a valid message')
-def step_impl():
-    before_scenario()
+def step_impl(context):
+    before_scenario(context)
 
 
 @when('it is sent')
@@ -40,7 +40,7 @@ def step_impl(context):
 
 
 @given('a message with an empty "To" field')
-def step_impl():
+def step_impl(context):
     data['urn_to'] = ''
 
 
@@ -50,7 +50,7 @@ def step_impl(context):
 
 
 @given('a message with an empty "From" field')
-def step_impl():
+def step_impl(context):
     data['urn_from'] = ''
 
 
@@ -60,7 +60,7 @@ def step_impl(context):
 
 
 @given('a message with an empty "Body" field')
-def step_impl():
+def step_impl(context):
     data['body'] = ''
 
 
@@ -70,7 +70,7 @@ def step_impl(context):
 
 
 @given('a message with an empty "Subject" field')
-def step_impl():
+def step_impl(context):
     data['subject'] = ""
 
 
@@ -80,8 +80,8 @@ def step_impl(context):
 
 
 @given('a message is sent with an empty "Thread ID"')
-def step_impl():
-    before_scenario()
+def step_impl(context):
+    before_scenario(context)
 
 
 @then('a 201 status code is the response')
@@ -93,7 +93,7 @@ def step_impl(context):
 # Scenario: Message sent with a urn_to too long
 
 @given("a message is sent with a urn_to which exceeds the max limit")
-def step_impl():
+def step_impl(context):
     data['urn_to'] = "x" * (constants.MAX_TO_LEN+1)
 
 
@@ -111,7 +111,7 @@ def step_impl(context):
 
 
 @given("a message is sent with a urn_from which exceeds the field length")
-def step_impl():
+def step_impl(context):
     data['urn_from'] = "y" * (constants.MAX_FROM_LEN+1)
 
 

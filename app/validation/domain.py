@@ -55,11 +55,12 @@ class MessageSchema(Schema):
         elif 'urn_to' not in data or len(data['urn_to']) == 0:
             raise ValidationError('Field urn_to expected')
         elif len(data['urn_to']) >= constants.MAX_TO_LEN:
-            raise ValidationError('Field urn_to must have a length of' + constants.MAX_TO_LEN + ' or lower')
+            raise ValidationError('Field urn_to must have a length of' + str(constants.MAX_TO_LEN) + ' or lower')
         elif 'urn_from' not in data or len(data['urn_from']) == 0:
             raise ValidationError({'urn_from': 'Missing from field'})
         elif len(data['urn_from']) >= constants.MAX_FROM_LEN:
-            raise ValidationError({'urn_from': 'Expected a urn_from field to with character length under ' + constants.MAX_FROM_LEN})
+            raise ValidationError({'urn_from': 'Expected a urn_from field to with character length under ' +
+                                               str(constants.MAX_FROM_LEN)})
         else:
             return data
 
