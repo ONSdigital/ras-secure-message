@@ -14,12 +14,3 @@ MAX_SURVEY_LEN = 60      # Maximum size of the message collection instrument ide
 
 MAX_STATUS_LABEL_LEN = 50          # Maximum length of a label column
 MAX_STATUS_ACTOR_LEN = 100        # Maximum length of the actor column
-
-# Label Constants
-
-LABEL_INBOX = "INBOX"
-LABEL_UNREAD = "UNREAD"
-LABEL_SENT = "SENT"
-LABEL_ARCHIVE = "ARCHIVE"
-LABEL_DRAFT = "DRAFT"
-LABEL_DRAFT_INBOX = "DRAFT_INBOX"

@@ -48,21 +48,14 @@ class MessageSchema(Schema):
 
     @pre_load
     def check_sent_and_read_date(self, data):
-        if 'sent_date' in data.keys():
-            raise ValidationError('Field "sent_date" can not be set.')
-        elif 'read_date' in data.keys():
-            raise ValidationError('Field "read_date" can not be set.')
-        elif 'urn_to' not in data or len(data['urn_to']) == 0:
-            raise ValidationError('Field urn_to expected')
-        elif len(data['urn_to']) >= constants.MAX_TO_LEN:
-            raise ValidationError('Field urn_to must have a length of' + str(constants.MAX_TO_LEN) + ' or lower')
-        elif 'urn_from' not in data or len(data['urn_from']) == 0:
-            raise ValidationError({'urn_from': 'Missing from field'})
-        elif len(data['urn_from']) >= constants.MAX_FROM_LEN:
-            raise ValidationError({'urn_from': 'Expected a urn_from field to with character length under ' +
-                                               str(constants.MAX_FROM_LEN)})
-        else:
-            return data
+
+        self.validate_not_present(data, 'sent_date')
+        self.validate_not_present(data, 'read_date')
+
+        self.validate_field(data, 'urn_to', constants.MAX_TO_LEN)
+        self.validate_field(data, 'urn_from', constants.MAX_FROM_LEN)
+
+        return data
 
     @validates('body')
     def validate_body(self, body):
@@ -82,6 +75,21 @@ class MessageSchema(Schema):
     def make_message(self, data):
         logger.debug("Build message")
         return Message(**data)
+
+    @staticmethod
+    def validate_not_present(data, field_name):
+        if field_name in data.keys():
+            raise ValidationError("{0} can not be set.".format(field_name))
+
+    def validate_field(self, data, field_name, max_len):
+        self.validate_present_with_non_zero_length(data, field_name)
+
+        self.validate_field_length(field_name, len(data[field_name]), max_len)
+
+    @staticmethod
+    def validate_present_with_non_zero_length(data, field_name):
+        if field_name not in data.keys() or len(data[field_name]) == 0:
+            raise ValidationError("{0} Missing".format(field_name))
 
     def validate_non_zero_field_length(self, field_name, length, max_field_len):
         if length <= 0:

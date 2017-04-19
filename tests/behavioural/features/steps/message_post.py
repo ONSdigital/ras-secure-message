@@ -123,8 +123,3 @@ def step_impl(context):
 @then("a 400 error is given")
 def step_impl(context):
     nose.tools.assert_equal(context.response.status_code, 400)
-
-
-if __name__ == '__main__':
-    from behave import __main__ as behave_executable
-    behave_executable.main(None)

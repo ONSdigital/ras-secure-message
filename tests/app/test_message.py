@@ -140,14 +140,14 @@ class MessageTestCase(unittest.TestCase):
         message = {'msg_to': 'torrance', 'msg_from': 'someone', 'body': 'hello', 'subject': 'subject', 'read_date': datetime.now(timezone.utc)}
         schema = MessageSchema()
         data, errors = schema.load(message)
-        self.assertTrue(errors == {'_schema': ['Field "read_date" can not be set.']})
+        self.assertTrue(errors == {'_schema': ['read_date can not be set.']})
 
     def test_setting_sent_date_field_causes_error(self):
         """marshalling message with no thread_id field"""
         message = {'msg_to': 'torrance', 'msg_from': 'someone', 'body': 'hello', 'subject': 'subject', 'sent_date': datetime.now(timezone.utc)}
         schema = MessageSchema()
         data, errors = schema.load(message)
-        self.assertTrue(errors == {'_schema': ['Field "sent_date" can not be set.']})
+        self.assertTrue(errors == {'_schema': ['sent_date can not be set.']})
 
 
 if __name__ == '__main__':

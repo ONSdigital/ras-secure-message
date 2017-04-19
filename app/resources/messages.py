@@ -80,8 +80,6 @@ class MessageSend(Resource):
         logger.info("Message send POST request.")
         message = MessageSchema().load(request.get_json())
 
-        # validated_message = MessageSend.validate_message(request, message)
-
         if message.errors == {}:
             post = request.get_json()
             Saver().save_message(message.data)
