@@ -81,22 +81,22 @@ class Status(db.Model):
     actor = Column('actor', String(constants.MAX_STATUS_ACTOR_LEN + 1))
 
     def __init__(self, label='', msg_id='', actor=''):
-        self.label = label
         self.msg_id = msg_id
         self.actor = actor
+        self.label = label
 
     def set_from_domain_model(self, msg_id, actor, label):
-        self.label = label
         self.msg_id = msg_id
         self.actor = actor
+        self.label = label
 
     @property
     def serialize(self):
         """Return object data in easily serializeable format"""
         data = {
-            'label': self.label,
             'msg_id': self.msg_id,
-            'actor': self.actor
+            'actor': self.actor,
+            'label': self.label
         }
         return data
 
@@ -113,9 +113,9 @@ class InternalSentAudit(db.Model):
         self.msg_id = msg_id
         self.internal_urn = internal_user
 
-    def set_from_domain_model(self, domain_model):
-        self.msg_id = domain_model.msg_id
-        self.internal_user = domain_model.internal_user
+    def set_from_domain_model(self, msg_id, msg_urn):
+        self.msg_id = msg_id
+        self.internal_user = msg_urn
 
     @property
     def serialize(self):

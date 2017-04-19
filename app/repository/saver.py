@@ -44,5 +44,17 @@ class Saver:
             logger.error("Message status save failed {}".format(e))
             raise MessageSaveException(e)
 
+    @staticmethod
+    def save_msg_audit(msg_id, msg_urn):
+
+        db_audit = database.InternalSentAudit()
+        db_audit.set_from_domain_model(msg_id, msg_urn)
+        try:
+            db.session.add(db_audit)
+            db.session.commit()
+        except Exception as e:
+            logger.error("Message audit save failed {}".format(e))
+            raise MessageSaveException(e)
+
 
 
