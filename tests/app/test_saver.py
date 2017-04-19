@@ -23,7 +23,7 @@ class SaverTestCase(unittest.TestCase):
 
     def test_saved_message_has_saved_sent_date(self):
         """retrieves messages from database with less entries than retrieval amount"""
-        message_object = Message(**{'subject': 'MyMessage',
+        message_object = Message(**{'urn_to': 'tej', 'urn_from': 'gemma','subject': 'MyMessage',
                                     'body': 'hello', 'thread_id': ""})
         with app.app_context():
             with current_app.test_request_context():
@@ -36,7 +36,7 @@ class SaverTestCase(unittest.TestCase):
                 self.assertTrue(data['sent_date'] is not None)
 
     def test_saved_message_does_not_include_urn_to_or_from(self):
-        message_object = Message(**{'subject': 'MyMessage',
+        message_object = Message(**{'urn_to': 'tej', 'urn_from': 'gem', 'subject': 'MyMessage',
                                     'body': 'hello', 'thread_id': ""})
         with app.app_context():
             with current_app.test_request_context():

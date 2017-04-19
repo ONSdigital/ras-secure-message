@@ -9,11 +9,13 @@ logger = logging.getLogger(__name__)
 class Message:
 
     """Class to hold message attributes"""
-    def __init__(self, subject, body, thread_id=None, sent_date=None,
+    def __init__(self, urn_to, urn_from, subject, body, thread_id=None, sent_date=None,
                  read_date=None, msg_id='', collection_case='', reporting_unit='', survey=''):
 
         logger.debug("Message Class created {0}, {1}".format(subject, body))
         self.msg_id = str(uuid.uuid4()) if len(msg_id) == 0 else msg_id  # If empty msg_id assign to a uuid
+        self.urn_to = urn_to
+        self.urn_from = urn_from
         self.subject = subject
         self.body = body
         self.thread_id = self.msg_id if not thread_id else thread_id  # If empty thread_id then set to message id
@@ -24,7 +26,7 @@ class Message:
         self.survey = survey
 
     def __repr__(self):
-        return '<Message(msg_id={self.msg_id} subject={self.subject} body={self.body} thread_id={self.thread_id} sent_date={self.sent_date} read_date={self.read_date} collection_case={self.collection_case} reporting_unit={self.reporting_unit} survey={self.survey})>'.format(self=self)
+        return '<Message(msg_id={self.msg_id} urn_to={self.urn_to} urn_from={self.urn_from} subject={self.subject} body={self.body} thread_id={self.thread_id} sent_date={self.sent_date} read_date={self.read_date} collection_case={self.collection_case} reporting_unit={self.reporting_unit} survey={self.survey})>'.format(self=self)
 
     def __eq__(self, other):
         if isinstance(other, Message):
@@ -37,6 +39,8 @@ class MessageSchema(Schema):
 
     """ Class to marshal JSON to Message"""
     msg_id = fields.Str(allow_none=True)
+    urn_to = fields.Str(required=True)
+    urn_from = fields.Str(required=True)
     body = fields.Str(required=True)
     subject = fields.Str(allow_none=True)
     thread_id = fields.Str(allow_none=True)
@@ -51,11 +55,15 @@ class MessageSchema(Schema):
 
         self.validate_not_present(data, 'sent_date')
         self.validate_not_present(data, 'read_date')
-
-        self.validate_field(data, 'urn_to', constants.MAX_TO_LEN)
-        self.validate_field(data, 'urn_from', constants.MAX_FROM_LEN)
-
         return data
+
+    @validates('urn_to')
+    def validate_to(self, urn_to):
+        self.validate_non_zero_field_length("urn_to", len(urn_to), constants.MAX_TO_LEN)
+
+    @validates('urn_from')
+    def validate_from(self, urn_from):
+        self.validate_non_zero_field_length("urn_from", len(urn_from), constants.MAX_FROM_LEN)
 
     @validates('body')
     def validate_body(self, body):

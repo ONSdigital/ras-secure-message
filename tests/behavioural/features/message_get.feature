@@ -7,5 +7,5 @@ Feature: Message get by ID Endpoint
 
   Scenario: Retrieve a message with incorrect missing ID
     Given there is a message to be retrieved
-    When the get request has been made with an incorrect
+    When the get request has been made with an incorrect message id
     Then a 404 HTTP response is returned

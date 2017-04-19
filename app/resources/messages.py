@@ -81,16 +81,22 @@ class MessageSend(Resource):
         message = MessageSchema().load(request.get_json())
 
         if message.errors == {}:
-            post = request.get_json()
-            Saver().save_message(message.data)
-            Saver().save_msg_status(post['urn_from'], post['msg_id'], Labels.SENT.value)
-            Saver().save_msg_status(post['urn_to'], post['msg_id'], Labels.INBOX.value)
-            Saver().save_msg_status(post['urn_to'], post['msg_id'], Labels.UNREAD.value)
-            return MessageSend._alert_recipients(message.data.msg_id)
+            return MessageSend.message_save(message)
         else:
             res = jsonify(message.errors)
             res.status_code = 400
             return res
+
+    @staticmethod
+    def message_save(message):
+        Saver().save_message(message.data)
+        if "respondent" in message.data.urn_from:
+            Saver().save_msg_status(message.data.urn_from, message.data.msg_id, Labels.SENT.value)
+        else:
+            Saver().save_msg_status(message.data.survey, message.data.msg_id, Labels.SENT.value)
+            Saver().save_msg_status(message.data.urn_to, message.data.msg_id, Labels.INBOX.value)
+            Saver().save_msg_status(message.data.urn_to, message.data.msg_id, Labels.UNREAD.value)
+        return MessageSend._alert_recipients(message.data.msg_id)
 
     @staticmethod
     def _alert_recipients(reference):

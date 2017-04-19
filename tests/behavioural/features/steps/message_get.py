@@ -6,17 +6,17 @@ from app import application
 url = "http://localhost:5050/message/"
 headers = {'Content-Type': 'application/json', 'user_urn': ''}
 data = {'msg_id': '9',
-         'urn_to': 'test',
-         'urn_from': 'test',
-         'subject': 'Hello World',
-         'body': 'Test',
-         'thread_id': '',
-         'collection_case': 'collection case1',
-         'reporting_unit': 'reporting case1',
-         'survey': 'survey'}
+        'urn_to': 'test',
+        'urn_from': 'test',
+        'subject': 'Hello World',
+        'body': 'Test',
+        'thread_id': '',
+        'collection_case': 'collection case1',
+        'reporting_unit': 'reporting case1',
+        'survey': 'survey'}
 
 
-# Scenario: Retrieve a message with correct missing ID
+# Scenario 1: Retrieve a message with correct missing ID
 
 @given("there is a message to be retrieved")
 def step_impl(context):
@@ -35,10 +35,10 @@ def step_impl(context):
     nose.tools.assert_equal(context.response.status_code, 200)
 
 
-# Scenario: Retrieve a message with incorrect missing ID
+# Scenario 2: Retrieve a message with incorrect missing ID
 
 
-@when("the get request has been made with an incorrect")
+@when("the get request has been made with an incorrect message id")
 def step_impl(context):
     new_url = url+str(2)
     context.response = application.app.test_client().get(new_url, headers=headers)
