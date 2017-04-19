@@ -59,3 +59,15 @@ class SaverTestCase(unittest.TestCase):
             request = con.execute('SELECT * FROM status')
             for row in request:
                 self.assertTrue(row is not None)
+
+    def test_msg_audit_has_been_saved(self):
+        """Tests message audif is saved to database"""
+        messageaudit_object = {'msg_id': 'MsgId', 'msg_urn': 'Tej'}
+        with app.app_context():
+            with current_app.test_request_context():
+                Saver().save_msg_audit(messageaudit_object['msg_id'], messageaudit_object['msg_urn'])
+
+        with self.engine.connect() as con:
+            request = con.execute('SELECT * FROM internal_sent_audit')
+            for row in request:
+                self.assertTrue(row is not None)

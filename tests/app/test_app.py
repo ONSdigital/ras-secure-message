@@ -218,5 +218,17 @@ class FlaskTestCase(unittest.TestCase):
             for row in request:
                 self.assertTrue(row is not None)
 
+    def test_message_post_stores_status_and_audit_correctly_for_internal_user(self):
+        """posts to message send end point to ensure survey is saved for internal user"""
+        url = "http://localhost:5050/message/send"
+        headers = {'Content-Type': 'application/json'}
+
+        self.app.post(url, data=json.dumps(self.test_message), headers=headers)
+
+        with self.engine.connect() as con:
+            request = con.execute("SELECT * FROM internal_sent_audit WHERE msg_id='" + self.test_message['msg_id'] + "' AND internal_user='" + self.test_message['urn_from'] + "'")
+            for row in request:
+                self.assertTrue(row is not None)
+
 if __name__ == '__main__':
     unittest.main()
