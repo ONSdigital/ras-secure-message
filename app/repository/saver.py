@@ -32,7 +32,7 @@ class Saver:
                                       domain_message.read_date, domain_message.msg_id)
 
     @staticmethod
-    def save_msg_status(msg_id, msg_urn, label):
+    def save_msg_status(msg_urn, msg_id, label):
         """save message status to database"""
 
         db_status_to = database.Status()

@@ -51,7 +51,7 @@ class Retriever:
             'labels': []
         }
 
-        if 'Respondent' in user_urn:
+        if 'respondent' in user_urn:
             actor = user_urn
         else:
             actor = result.survey
