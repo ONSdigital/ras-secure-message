@@ -1,7 +1,7 @@
 import flask
 import nose.tools
 from behave import given, then, when
-from app import application
+from app.application import app
 import uuid
 
 url = "http://localhost:5050/message/"
@@ -24,14 +24,14 @@ def step_impl(context):
     data['msg_id'] = str(uuid.uuid4())
     data['urn_to'] = 'internal.12344'
     data['urn_from'] = 'respondent.122342'
-    context.response = application.app.test_client().post("http://localhost:5050/message/send",
+    context.response = app.test_client().post("http://localhost:5050/message/send",
                                                           data=flask.json.dumps(data), headers=headers)
 
 
 @when("the get request is made with a correct message id")
 def step_impl(context):
     new_url = url+data['msg_id']
-    context.response = application.app.test_client().get(new_url, headers=headers)
+    context.response = app.test_client().get(new_url, headers=headers)
 
 
 @then("a 200 HTTP response is returned")
@@ -43,7 +43,7 @@ def step_impl(context):
 @when("the get request has been made with an incorrect message id")
 def step_impl(context):
     new_url = url+str(uuid.uuid4())
-    context.response = application.app.test_client().get(new_url, headers=headers)
+    context.response = app.test_client().get(new_url, headers=headers)
 
 
 @then("a 404 HTTP response is returned")
@@ -57,7 +57,7 @@ def step_impl(context):
     data['msg_id'] = str(uuid.uuid4())
     data['urn_to'] = 'internal.12344'
     data['urn_from'] = 'respondent.122342'
-    context.response = application.app.test_client().post("http://localhost:5050/message/send",
+    context.response = app.test_client().post("http://localhost:5050/message/send",
                                                           data=flask.json.dumps(data), headers=headers)
 
 
@@ -65,7 +65,7 @@ def step_impl(context):
 def step_impl(context):
     headers['user_urn'] = 'respondent.122342'
     new_url = url+data['msg_id']
-    context.response = application.app.test_client().get(new_url, headers=headers)
+    context.response = app.test_client().get(new_url, headers=headers)
 
 
 @then("the retrieved message should have the label SENT")
@@ -80,7 +80,7 @@ def step_impl(context):
     data['msg_id'] = str(uuid.uuid4())
     data['urn_to'] = 'respondent.122342'
     data['urn_from'] = 'internal.12344'
-    context.response = application.app.test_client().post("http://localhost:5050/message/send",
+    context.response = app.test_client().post("http://localhost:5050/message/send",
                                                           data=flask.json.dumps(data), headers=headers)
 
 
@@ -88,7 +88,7 @@ def step_impl(context):
 def step_impl(context):
     headers['user_urn'] = 'internal.12344'
     new_url = url+data['msg_id']
-    context.response = application.app.test_client().get(new_url, headers=headers)
+    context.response = app.test_client().get(new_url, headers=headers)
 
 
 #  Scenario: Internal user sends message and respondent retrieves the same message with it's labels

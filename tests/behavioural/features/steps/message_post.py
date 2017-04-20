@@ -1,7 +1,10 @@
 import flask
 import nose.tools
 from behave import given, then, when
-from app import application, constants
+from app import constants
+from app.application import app
+from app.repository import database
+from flask import current_app
 from unittest import mock
 from app.common.alerts import AlertUser, AlertViaGovNotify
 
@@ -12,6 +15,11 @@ data = {}
 
 def before_scenario(context):
     AlertUser.alert_method = mock.Mock(AlertViaGovNotify)
+
+    with app.app_context():
+        database.db.init_app(current_app)
+        database.db.drop_all()
+        database.db.create_all()
 
     data.update({'msg_id': '',
                  'urn_to': 'test',
@@ -77,7 +85,7 @@ def step_impl(context):
 
 @when("the message is sent")
 def step_impl(context):
-    context.response = application.app.test_client().post(url, data=flask.json.dumps(data), headers=headers)
+    context.response = app.test_client().post(url, data=flask.json.dumps(data), headers=headers)
 
 
 @then("a 400 error status is returned")
