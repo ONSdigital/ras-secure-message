@@ -25,7 +25,7 @@ class SecureMessage(db.Model):
     collection_case = Column("collection_case", String(constants.MAX_COLLECTION_CASE_LEN+1))
     reporting_unit = Column("reporting_unit", String(constants.MAX_REPORTING_UNIT_LEN+1))
     survey = Column("survey", String(constants.MAX_SURVEY_LEN+1))
-    statuses = relationship('Status', backref='secure_message', lazy='dynamic')
+    statuses = relationship('Status', backref='secure_message')
 
     def __init__(self, msg_id="", subject="", body="", thread_id="",
                  sent_date=datetime.now(timezone.utc), read_date=None, collection_case='',
@@ -53,10 +53,11 @@ class SecureMessage(db.Model):
         self.reporting_unit = domain_model.reporting_unit
         self.survey = domain_model.survey
 
-    @property
-    def serialize(self):
+    def serialize(self, user_urn):
         """Return object data in easily serializeable format"""
-        data = {
+        message = {
+            'msg_to': [],
+            'msg_from': '',
             'msg_id': self.msg_id,
             'subject': self.subject,
             'body': self.body,
@@ -66,9 +67,25 @@ class SecureMessage(db.Model):
             'collection_case': self.collection_case,
             'reporting_unit': self.reporting_unit,
             'survey': self.survey,
-            '_links': ''
+            '_links': '',
+            'labels': []
         }
-        return data
+
+        if 'respondent' in user_urn:
+            actor = user_urn
+        else:
+            actor = self.survey
+
+        for row in self.statuses:
+            if row.actor == actor:
+                message['labels'].append(row.label)
+
+            if row.label == 'INBOX':
+                message['msg_to'].append(row.actor)
+            elif row.label == 'SENT':
+                message['msg_from'] = row.actor
+
+        return message
 
 
 class Status(db.Model):

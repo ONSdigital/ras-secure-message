@@ -1,9 +1,10 @@
-import flask
-import nose.tools
-from behave import given, then, when
-from app import application
+from behave import given, when
+from app.application import app
+from app.repository import database
+from flask import current_app
 
 headers = {'Content-Type': 'application/json', 'user_urn': ''}
+
 
 # Scenario: Retrieve a message with correct missing ID
 
@@ -17,7 +18,7 @@ def step_impl(context):
 @when("a GET request is made")
 def step_impl(context):
     url = "http://localhost:5050/message/1"
-    context.response = application.app.test_client().get(url, headers=headers)
+    context.response = app.test_client().get(url, headers=headers)
 
 
 # Scenario: Retrieve a message with incorrect missing ID
@@ -26,4 +27,4 @@ def step_impl(context):
 @when("a POST request is made")
 def step_impl(context):
     url = "http://localhost:5050/message/send"
-    context.response = application.app.test_client().post(url, headers=headers)
+    context.response = app.test_client().post(url, headers=headers)

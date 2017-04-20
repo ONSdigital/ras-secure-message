@@ -173,7 +173,7 @@ class RetrieverTestCase(unittest.TestCase):
             with current_app.test_request_context():
                 resp = Retriever().retrieve_message_list(1, MESSAGE_QUERY_LIMIT)[1]
                 json_data = MessageList()._paginated_list_to_json(resp, 1, MESSAGE_QUERY_LIMIT,
-                                                                  "http://localhost:5050/")
+                                                                  "http://localhost:5050/", 'respondent.21345')
                 data = json.loads(json_data.get_data())
                 self.assertEqual(len(data['messages']), (MESSAGE_QUERY_LIMIT-1))
 
@@ -184,7 +184,7 @@ class RetrieverTestCase(unittest.TestCase):
             with current_app.test_request_context():
                 resp = Retriever().retrieve_message_list(1, MESSAGE_QUERY_LIMIT)[1]
                 json_data = MessageList()._paginated_list_to_json(resp, 1, MESSAGE_QUERY_LIMIT,
-                                                                  "http://localhost:5050/")
+                                                                  "http://localhost:5050/", 'respondent.21345')
                 data = json.loads(json_data.get_data())
                 self.assertEqual(data['messages']['4']['_links']['self']['href'],
                                  "{0}{1}".format(self.MESSAGE_BY_ID_ENDPOINT, data["messages"]['4']['msg_id']))
@@ -196,7 +196,7 @@ class RetrieverTestCase(unittest.TestCase):
             with current_app.test_request_context():
                 resp = Retriever().retrieve_message_list(2, MESSAGE_QUERY_LIMIT)[1]
                 json_data = MessageList()._paginated_list_to_json(resp, 2, MESSAGE_QUERY_LIMIT,
-                                                                  "http://localhost:5050/")
+                                                                  "http://localhost:5050/", 'respondent.21345')
                 data = json.loads(json_data.get_data())
                 self.assertTrue('prev' in data['_links'])
 
@@ -207,7 +207,7 @@ class RetrieverTestCase(unittest.TestCase):
             with current_app.test_request_context():
                 resp = Retriever().retrieve_message_list(1, MESSAGE_QUERY_LIMIT)[1]
                 json_data = MessageList()._paginated_list_to_json(resp, 1, MESSAGE_QUERY_LIMIT,
-                                                                  "http://localhost:5050/")
+                                                                  "http://localhost:5050/", 'respondent.21345')
                 data = json.loads(json_data.get_data())
                 self.assertFalse('prev' in data['_links'])
 
@@ -218,7 +218,7 @@ class RetrieverTestCase(unittest.TestCase):
             with current_app.test_request_context():
                 resp = Retriever().retrieve_message_list(1, MESSAGE_QUERY_LIMIT)[1]
                 json_data = MessageList()._paginated_list_to_json(resp, 1, MESSAGE_QUERY_LIMIT,
-                                                                  "http://localhost:5050/")
+                                                                  "http://localhost:5050/", 'respondent.21345')
                 data = json.loads(json_data.get_data())
                 self.assertTrue('next' in data['_links'])
 
@@ -229,7 +229,7 @@ class RetrieverTestCase(unittest.TestCase):
             with current_app.test_request_context():
                 resp = Retriever().retrieve_message_list(1, MESSAGE_QUERY_LIMIT)[1]
                 json_data = MessageList()._paginated_list_to_json(resp, 1, MESSAGE_QUERY_LIMIT,
-                                                                  "http://localhost:5050/")
+                                                                  "http://localhost:5050/", 'respondent.21345')
                 data = json.loads(json_data.get_data())
                 self.assertFalse('next' in data['_links'])
 
@@ -240,7 +240,7 @@ class RetrieverTestCase(unittest.TestCase):
             with current_app.test_request_context():
                 resp = Retriever().retrieve_message_list(1, MESSAGE_QUERY_LIMIT)[1]
                 json_data = MessageList()._paginated_list_to_json(resp, 1, MESSAGE_QUERY_LIMIT,
-                                                                  "http://localhost:5050/")
+                                                                  "http://localhost:5050/", 'respondent.21345')
                 data = json.loads(json_data.get_data())
                 self.assertEqual(data['_links']['self']['href'],
                                  "{0}?page={1}&limit={2}".format(self.MESSAGE_LIST_ENDPOINT, 1, MESSAGE_QUERY_LIMIT))

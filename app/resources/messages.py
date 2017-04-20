@@ -37,20 +37,21 @@ class MessageList(Resource):
             message_service = Retriever()
             status, result = message_service.retrieve_message_list(page, limit)
             if status:
-                resp = MessageList._paginated_list_to_json(result, page, limit, request.host_url)
+                resp = MessageList._paginated_list_to_json(result, page, limit, request.host_url,
+                                                           request.headers.get('user_urn'))
                 resp.status_code = 200
                 return resp
         else:
             return res
 
     @staticmethod
-    def _paginated_list_to_json(paginated_list, page, limit, host_url):
+    def _paginated_list_to_json(paginated_list, page, limit, host_url, user_urn):
         """used to change a pagination object to json format with links"""
         messages = {}
         msg_count = 0
         for message in paginated_list.items:
             msg_count += 1
-            msg = message.serialize
+            msg = message.serialize(user_urn)
             msg['_links'] = {"self": {"href": "{0}{1}/{2}".format(host_url, MESSAGE_BY_ID_ENDPOINT, msg['msg_id'])}}
             messages["{0}".format(msg_count)] = msg
 
