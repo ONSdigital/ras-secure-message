@@ -199,7 +199,7 @@ class FlaskTestCase(unittest.TestCase):
         url = "http://localhost:5050/message/send"
         headers = {'Content-Type': 'application/json', 'user_urn': ''}
 
-        response = self.app.post(url, data=json.dumps(self.test_message), headers=headers)
+        self.app.post(url, data=json.dumps(self.test_message), headers=headers)
 
         with self.engine.connect() as con:
             request = con.execute("SELECT * FROM status WHERE label='SENT' AND msg_id='" + self.test_message['msg_id'] + "' AND actor='" + self.test_message['survey'] + "'")
@@ -211,7 +211,7 @@ class FlaskTestCase(unittest.TestCase):
         url = "http://localhost:5050/message/send"
         headers = {'Content-Type': 'application/json', 'user_urn': ''}
 
-        response = self.app.post(url, data=json.dumps(self.test_message), headers=headers)
+        self.app.post(url, data=json.dumps(self.test_message), headers=headers)
 
         with self.engine.connect() as con:
             request = con.execute("SELECT * FROM status WHERE label='INBOX' OR label='UNREAD' AND msg_id='" + self.test_message['msg_id'] + "' AND actor='" + self.test_message['urn_to'] + "'")

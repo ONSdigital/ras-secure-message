@@ -114,6 +114,7 @@ class InternalSentAudit(db.Model):
         self.internal_urn = internal_user
 
     def set_from_domain_model(self, msg_id, msg_urn):
+        """Set internal sent audit table me"""
         self.msg_id = msg_id
         self.internal_user = msg_urn
 
