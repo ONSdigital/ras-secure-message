@@ -8,14 +8,14 @@ url = "http://localhost:5050/message/"
 headers = {'Content-Type': 'application/json', 'user_urn': ''}
 
 data = {'msg_id': '',
-         'urn_to': 'test',
-         'urn_from': 'test',
-         'subject': 'Hello World',
-         'body': 'Test',
-         'thread_id': '',
-         'collection_case': 'collection case1',
-         'reporting_unit': 'reporting case1',
-         'survey': 'survey'}
+        'urn_to': 'test',
+        'urn_from': 'test',
+        'subject': 'Hello World',
+        'body': 'Test',
+        'thread_id': '',
+        'collection_case': 'collection case1',
+        'reporting_unit': 'reporting case1',
+        'survey': 'survey'}
 
 
 # Scenario: Retrieve a message with correct message ID
@@ -102,5 +102,3 @@ def step_impl(context):
 def step_impl(context):
     response = flask.json.loads(context.response.data)
     nose.tools.assert_equal(response['labels'], ['INBOX', 'UNREAD'])
-
-

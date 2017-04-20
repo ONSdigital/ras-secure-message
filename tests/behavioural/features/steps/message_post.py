@@ -31,43 +31,43 @@ def step_impl(context):
 
 
 # Scenario 2: Submit a message with a missing "To" field and receive a 400 error
-@given('a message with an empty "To" field')
+@given("the 'To' field is empty")
 def step_impl(context):
     data['urn_to'] = ''
 
 
 # Scenario 3: Submit a message with a missing "From" field and receive a 400 error
-@given('a message with an empty "From" field')
+@given("the 'From' field is empty")
 def step_impl(context):
     data['urn_from'] = ''
 
 
 # Scenario 4: Submit a message with a missing "Body" field and receive a 400 error
-@given('a message with an empty "Body" field')
+@given("the 'Body' field is empty")
 def step_impl(context):
     data['body'] = ''
 
 
 # Scenario 5: Submit a message with a missing "Subject" field and receive a 400
-@given('a message with an empty "Subject" field')
+@given("the 'Subject' field is empty")
 def step_impl(context):
     data['subject'] = ""
 
 
 # Scenario 6: Message sent without a thread id
-@given('a message is sent with an empty "Thread ID"')
+@given("the 'Thread ID' field is empty")
 def step_impl(context):
     before_scenario(context)
 
 
 # Scenario 7: Message sent with a urn_to too long
-@given("a message is sent with a urn_to which exceeds the max limit")
+@given("the 'To' field exceeds max limit in size")
 def step_impl(context):
     data['urn_to'] = "x" * (constants.MAX_TO_LEN+1)
 
 
 # Scenario 8: Message sent with a urn_from too long
-@given("a message is sent with a urn_from which exceeds the field length")
+@given("the 'From' field exceeds max limit in size")
 def step_impl(context):
     data['urn_from'] = "y" * (constants.MAX_FROM_LEN+1)
 
@@ -75,7 +75,7 @@ def step_impl(context):
 # Common Steps: used in multiple scenarios
 
 
-@when("a message is sent")
+@when("the message is sent")
 def step_impl(context):
     context.response = application.app.test_client().post(url, data=flask.json.dumps(data), headers=headers)
 
