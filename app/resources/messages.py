@@ -89,6 +89,7 @@ class MessageSend(Resource):
 
     @staticmethod
     def message_save(message):
+        """Saves the message to the database along with the subsequent status and audit"""
         save = Saver()
         save.save_message(message.data)
         if "respondent" in message.data.urn_from:
