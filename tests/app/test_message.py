@@ -7,20 +7,14 @@ from app.validation.domain import Message, MessageSchema
 class MessageTestCase(unittest.TestCase):
     """Test case for Messages"""
 
-    max_diff = None      # Needed as some of the strings are bigger than max_diff
-
     def setUp(self):
         """setup test environment"""
-        self.domain_message = Message(**{'urn_to': 'Tej', 'urn_from': 'Gemma', 'subject': 'MyMessage', 'body': 'hello',
-                                         'thread_id': ""})
-        self.json_message = {'urn_to': 'Tej', 'urn_from': 'Gemma', 'subject': 'MyMessage', 'body': 'hello',
-                             'thread_id': ""}
+        self.now = datetime.now(timezone.utc)
 
     def test_message(self):
         """creating Message object"""
-        now = datetime.now(timezone.utc)
-        now_string = now.__str__()
-        sut = Message('to', 'from', 'subject', 'body', '5', now, now, 'AMsgId', 'ACollectionCase',
+        now_string = self.now.__str__()
+        sut = Message('to', 'from', 'subject', 'body', '5', self.now, self.now, 'AMsgId', 'ACollectionCase',
                       'AReportingUnit', 'ASurveyType')
         sut_str = repr(sut)
         expected = '<Message(msg_id=AMsgId urn_to=to urn_from=from subject=subject body=body thread_id=5 sent_date={0} read_date={0} collection_case=ACollectionCase reporting_unit=AReportingUnit survey=ASurveyType)>'.format(now_string)
@@ -28,37 +22,48 @@ class MessageTestCase(unittest.TestCase):
 
     def test_message_with_different_collection_case_not_equal(self):
         """testing two different Message objects are not equal"""
-        now = datetime.now(timezone.utc)
-        message1 = Message('1', '2', '3', '4', '5', now, now, 'ACollectionCase',
+        message1 = Message('1', '2', '3', '4', '5', self.now, self.now, 'ACollectionCase',
                            'AReportingUnit', 'ASurveyType')
-        message2 = Message('1', '2', '3', '4', '5', now, now, 'AnotherCollectionCase',
+        message2 = Message('1', '2', '3', '4', '5', self.now, self.now, 'AnotherCollectionCase',
                            'AReportingUnit', 'ASurveyType')
         self.assertTrue(message1 != message2)
 
     def test_message_with_different_reporting_unit_not_equal(self):
         """testing two different Message objects are not equal"""
-        now = datetime.now(timezone.utc)
-        message1 = Message('1', '2', '3', '4', '5', now, now, 'ACollectionCase',
+        message1 = Message('1', '2', '3', '4', '5', self.now, self.now, 'ACollectionCase',
                            'AReportingUnit', 'ASurveyType')
-        message2 = Message('1', '2', '3', '4', '5', now, now, 'ACollectionCase',
+        message2 = Message('1', '2', '3', '4', '5', self.now, self.now, 'ACollectionCase',
                            'AnotherReportingUnit', 'ASurveyType')
         self.assertTrue(message1 != message2)
 
     def test_message_with_different_survey_not_equal(self):
         """testing two different Message objects are not equal"""
-        now = datetime.now(timezone.utc)
-        message1 = Message('1', '2', '3', '4', '5', now, now, 'ACollectionCase',
+        message1 = Message('1', '2', '3', '4', '5', self.now, self.now, 'ACollectionCase',
                            'AReportingUnit', 'ASurveyType')
-        message2 = Message('1', '2', '3', '4', '5', now, now, 'ACollectionCase',
+        message2 = Message('1', '2', '3', '4', '5', self.now, self.now, 'ACollectionCase',
                            'AReportingUnit', 'AnotherSurveyType')
         self.assertTrue(message1 != message2)
 
     def test_message_equal(self):
         """testing two same Message objects are equal"""
-        now = datetime.now(timezone.utc)
-        message1 = Message('1', '2', '3', '4', '5', now, now, 'MsgId')
-        message2 = Message('1', '2', '3', '4', '5', now, now, 'MsgId')
+        message1 = Message('1', '2', '3', '4', '5', self.now, self.now, 'MsgId')
+        message2 = Message('1', '2', '3', '4', '5', self.now, self.now, 'MsgId')
         self.assertTrue(message1 == message2)
+
+    def test_message_not_equal_to_different_type(self):
+
+        message1 = Message('1', '2', '3', '4', '5', self.now, self.now, 'ACollectionCase',
+                           'AReportingUnit', 'ASurveyType')
+        self.assertFalse(message1 == "Message1")
+
+
+class MessageSchemaTestCase(unittest.TestCase):
+
+    def setUp(self):
+        """setup test environment"""
+        self.json_message = {'urn_to': 'Tej', 'urn_from': 'Gemma', 'subject': 'MyMessage', 'body': 'hello',
+                             'thread_id': ""}
+        self.now = datetime.now(timezone.utc)
 
     def test_valid_message_passes_validation(self):
         """marshaling a valid message"""
@@ -69,8 +74,9 @@ class MessageTestCase(unittest.TestCase):
     def test_valid_domain_message_passes_deserialization(self):
         """checking marshaling message object to json does not raise errors"""
         schema = MessageSchema()
-        message_object = Message(**{'urn_to': 'Tej', 'urn_from': 'Gemma', 'subject': 'MyMessage', 'body': 'hello', 'thread_id': "",
-                                    'sent_date': datetime.now(timezone.utc), 'read_date': datetime.now(timezone.utc)})
+        message_object = Message(**{'urn_to': 'Tej', 'urn_from': 'Gemma', 'subject': 'MyMessage', 'body': 'hello',
+                                    'thread_id': "", 'sent_date': datetime.now(timezone.utc),
+                                    'read_date': datetime.now(timezone.utc)})
         message_json = schema.dumps(message_object)
         self.assertTrue(message_json.errors == {})
         self.assertTrue('sent_date' in message_json.data)
@@ -137,14 +143,16 @@ class MessageTestCase(unittest.TestCase):
 
     def test_setting_read_date_field_causes_error(self):
         """marshalling message with no thread_id field"""
-        message = {'urn_to': 'torrance', 'urn_from': 'someone', 'body': 'hello', 'subject': 'subject', 'read_date': datetime.now(timezone.utc)}
+        message = {'urn_to': 'torrance', 'urn_from': 'someone', 'body': 'hello', 'subject': 'subject',
+                   'read_date': self.now}
         schema = MessageSchema()
         data, errors = schema.load(message)
         self.assertTrue(errors == {'_schema': ['read_date can not be set.']})
 
     def test_setting_sent_date_field_causes_error(self):
         """marshalling message with no thread_id field"""
-        message = {'urn_to': 'torrance', 'urn_from': 'someone', 'body': 'hello', 'subject': 'subject', 'sent_date': datetime.now(timezone.utc)}
+        message = {'urn_to': 'torrance', 'urn_from': 'someone', 'body': 'hello', 'subject': 'subject',
+                   'sent_date': self.now}
         schema = MessageSchema()
         data, errors = schema.load(message)
         self.assertTrue(errors == {'_schema': ['sent_date can not be set.']})

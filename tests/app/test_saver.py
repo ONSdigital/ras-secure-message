@@ -51,10 +51,10 @@ class SaverTestCase(unittest.TestCase):
 
     def test_saved_msg_status_has_been_saved(self):
         """retrieves message status from database"""
-        messagestatus_object = {'msg_id': 'AMsgId', 'actor': 'Tej'}
+        message_status = {'msg_id': 'AMsgId', 'actor': 'Tej'}
         with app.app_context():
             with current_app.test_request_context():
-                Saver().save_msg_status(messagestatus_object['msg_id'], messagestatus_object['actor'], 'INBOX, UNREAD')
+                Saver().save_msg_status(message_status['msg_id'], message_status['actor'], 'INBOX, UNREAD')
 
         with self.engine.connect() as con:
             request = con.execute('SELECT * FROM status')
@@ -72,10 +72,10 @@ class SaverTestCase(unittest.TestCase):
 
     def test_msg_audit_has_been_saved(self):
         """Tests message audit is saved to database"""
-        messageaudit_object = {'msg_id': 'MsgId', 'msg_urn': 'Tej'}
+        message_audit = {'msg_id': 'MsgId', 'msg_urn': 'Tej'}
         with app.app_context():
             with current_app.test_request_context():
-                Saver().save_msg_audit(messageaudit_object['msg_id'], messageaudit_object['msg_urn'])
+                Saver().save_msg_audit(message_audit['msg_id'], message_audit['msg_urn'])
 
         with self.engine.connect() as con:
             request = con.execute('SELECT * FROM internal_sent_audit')
@@ -85,8 +85,8 @@ class SaverTestCase(unittest.TestCase):
     def test_save_msg_audit_raises_MessageSaveException_on_db_error(self):
         mock_session = mock.Mock(db.session)
         mock_session.commit.side_effect = Exception("Not Saved")
-        messageaudit_object = {'msg_id': 'MsgId', 'msg_urn': 'Tej'}
+        message_audit = {'msg_id': 'MsgId', 'msg_urn': 'Tej'}
         with app.app_context():
             with current_app.test_request_context():
                 with self.assertRaises(MessageSaveException):
-                    Saver().save_msg_audit(messageaudit_object['msg_id'], messageaudit_object['msg_urn'],mock_session)
+                    Saver().save_msg_audit(message_audit['msg_id'], message_audit['msg_urn'],mock_session)

@@ -89,16 +89,6 @@ class MessageSchema(Schema):
         if field_name in data.keys():
             raise ValidationError("{0} can not be set.".format(field_name))
 
-    def validate_field(self, data, field_name, max_len):
-        self.validate_present_with_non_zero_length(data, field_name)
-
-        self.validate_field_length(field_name, len(data[field_name]), max_len)
-
-    @staticmethod
-    def validate_present_with_non_zero_length(data, field_name):
-        if field_name not in data.keys() or len(data[field_name]) == 0:
-            raise ValidationError("{0} Missing".format(field_name))
-
     def validate_non_zero_field_length(self, field_name, length, max_field_len):
         if length <= 0:
             logger.debug("{0} field not populated".format(field_name))
