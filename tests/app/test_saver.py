@@ -39,9 +39,8 @@ class SaverTestCase(unittest.TestCase):
                 data = {"sent_date": row['sent_date']}
                 self.assertTrue(data['sent_date'] is not None)
 
-    def test_save_message_rasies_MessageSaveException_on_db_error(self):
+    def test_save_message_rasies_message_save_exception_on_db_error(self):
         """Tests exception is logged if message save fails"""
-
         mock_session = mock.Mock(db.session)
         mock_session.commit.side_effect = Exception("Not Saved")
         with app.app_context():
@@ -61,7 +60,8 @@ class SaverTestCase(unittest.TestCase):
             for row in request:
                 self.assertTrue(row is not None)
 
-    def test_save_msg_status_raises_MessageSaveException_on_db_error(self):
+    def test_save_msg_status_raises_message_save_exception_on_db_error(self):
+        """Tests MessageSaveException generated if db commit fails saving message"""
         mock_session = mock.Mock(db.session)
         mock_session.commit.side_effect = Exception("Not Saved")
         message_status = {'msg_id': 'AMsgId', 'actor': 'Tej'}
@@ -82,11 +82,12 @@ class SaverTestCase(unittest.TestCase):
             for row in request:
                 self.assertTrue(row is not None)
 
-    def test_save_msg_audit_raises_MessageSaveException_on_db_error(self):
+    def test_save_msg_audit_raises_message_save_exception_on_db_error(self):
+        """Tests MessageSaveException generated if db commit fails saving message audit"""
         mock_session = mock.Mock(db.session)
         mock_session.commit.side_effect = Exception("Not Saved")
         message_audit = {'msg_id': 'MsgId', 'msg_urn': 'Tej'}
         with app.app_context():
             with current_app.test_request_context():
                 with self.assertRaises(MessageSaveException):
-                    Saver().save_msg_audit(message_audit['msg_id'], message_audit['msg_urn'],mock_session)
+                    Saver().save_msg_audit(message_audit['msg_id'], message_audit['msg_urn'], mock_session)

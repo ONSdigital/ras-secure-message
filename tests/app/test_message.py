@@ -58,7 +58,7 @@ class MessageTestCase(unittest.TestCase):
 
 
 class MessageSchemaTestCase(unittest.TestCase):
-
+    """Test case for MessageSchema"""
     def setUp(self):
         """setup test environment"""
         self.json_message = {'urn_to': 'Tej', 'urn_from': 'Gemma', 'subject': 'MyMessage', 'body': 'hello',
