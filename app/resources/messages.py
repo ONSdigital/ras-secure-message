@@ -9,6 +9,7 @@ from app.common.alerts import AlertUser
 from app import settings
 from app.settings import MESSAGE_QUERY_LIMIT
 from app.validation.labels import Labels
+from app.validation.user import User
 
 
 logger = logging.getLogger(__name__)
@@ -91,7 +92,7 @@ class MessageSend(Resource):
         """Saves the message to the database along with the subsequent status and audit"""
         save = Saver()
         save.save_message(message.data)
-        if "respondent" in message.data.urn_from:
+        if User(message.data.urn_from).is_respondent:
             save.save_msg_status(message.data.urn_from, message.data.msg_id, Labels.SENT.value)
             save.save_msg_status(message.data.survey, message.data.msg_id, Labels.INBOX.value)
             save.save_msg_status(message.data.survey, message.data.msg_id, Labels.UNREAD.value)

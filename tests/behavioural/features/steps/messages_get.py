@@ -40,7 +40,7 @@ def step_impl(context):
                                                               data=flask.json.dumps(data), headers=headers)
 
 
-@when("the respondent wants to get their messages")
+@when("the respondent gets their messages")
 def step_impl(context):
     headers['user_urn'] = 'respondent.122342'
     context.response = app.test_client().get(url, headers=headers)
@@ -67,7 +67,7 @@ def step_impl(context):
                                                               data=flask.json.dumps(data), headers=headers)
 
 
-@when("the Internal user wants to get their messages")
+@when("the Internal user gets their messages")
 def step_impl(context):
     headers['user_urn'] = 'internal.122342'
     context.response = app.test_client().get(url, headers=headers)

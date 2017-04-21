@@ -4,6 +4,7 @@ from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime, timezone
 from app import constants
 import logging
+from app.validation.user import User
 
 logger = logging.getLogger(__name__)
 
@@ -71,7 +72,7 @@ class SecureMessage(db.Model):
             'labels': []
         }
 
-        if 'respondent' in user_urn:
+        if User(user_urn).is_respondent:
             actor = user_urn
         else:
             actor = self.survey

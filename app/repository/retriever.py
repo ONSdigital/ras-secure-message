@@ -57,38 +57,3 @@ class Retriever:
             resp.status_code = 500
 
         return resp
-
-    # @staticmethod
-    # def format_secure_message(result, user_urn):
-    #
-    #     message = {
-    #         'msg_to': [],
-    #         'msg_from': '',
-    #         'msg_id': result.msg_id,
-    #         'subject': result.subject,
-    #         'body': result.body,
-    #         'thread_id': result.thread_id,
-    #         'sent_date': result.sent_date,
-    #         'read_date': result.read_date,
-    #         'collection_case': result.collection_case,
-    #         'reporting_unit': result.reporting_unit,
-    #         'survey': result.survey,
-    #         '_links': '',
-    #         'labels': []
-    #     }
-    #
-    #     if 'respondent' in user_urn:
-    #         actor = user_urn
-    #     else:
-    #         actor = result.survey
-    #
-    #     for row in result.statuses:
-    #         if row.actor == actor:
-    #             message['labels'].append(row.label)
-    #
-    #         if row.label == 'INBOX':
-    #             message['msg_to'].append(row.actor)
-    #         elif row.label == 'SENT':
-    #             message['msg_from'] = row.actor
-    #
-    #     return message
