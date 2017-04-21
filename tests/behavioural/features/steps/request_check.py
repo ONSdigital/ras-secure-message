@@ -1,7 +1,5 @@
 from behave import given, when
 from app.application import app
-from app.repository import database
-from flask import current_app
 
 headers = {'Content-Type': 'application/json', 'user_urn': ''}
 

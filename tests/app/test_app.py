@@ -201,7 +201,8 @@ class FlaskTestCase(unittest.TestCase):
         self.app.post(url, data=json.dumps(self.test_message), headers=headers)
 
         with self.engine.connect() as con:
-            request = con.execute("SELECT * FROM status WHERE label='SENT' AND msg_id='" + self.test_message['msg_id'] + "' AND actor='" + self.test_message['survey'] + "'")
+            request = con.execute("SELECT * FROM status WHERE label='SENT' AND msg_id='{0}' AND actor='{1}'"
+                                  .format(self.test_message['msg_id'], self.test_message['survey']))
             for row in request:
                 self.assertTrue(row is not None)
 
@@ -213,7 +214,8 @@ class FlaskTestCase(unittest.TestCase):
         self.app.post(url, data=json.dumps(self.test_message), headers=headers)
 
         with self.engine.connect() as con:
-            request = con.execute("SELECT * FROM status WHERE label='INBOX' OR label='UNREAD' AND msg_id='" + self.test_message['msg_id'] + "' AND actor='" + self.test_message['urn_to'] + "'")
+            request = con.execute("SELECT * FROM status WHERE label='INBOX' OR label='UNREAD' AND msg_id='{0}'"
+                                  " AND actor='{1}'".format(self.test_message['msg_id'], self.test_message['urn_to']))
             for row in request:
                 self.assertTrue(row is not None)
 
@@ -225,7 +227,8 @@ class FlaskTestCase(unittest.TestCase):
         self.app.post(url, data=json.dumps(self.test_message), headers=headers)
 
         with self.engine.connect() as con:
-            request = con.execute("SELECT * FROM internal_sent_audit WHERE msg_id='" + self.test_message['msg_id'] + "' AND internal_user='" + self.test_message['urn_from'] + "'")
+            request = con.execute("SELECT * FROM internal_sent_audit WHERE msg_id='{0}' AND internal_user='{1}'"
+                                  .format(self.test_message['msg_id'], self.test_message['urn_from']))
             for row in request:
                 self.assertTrue(row is not None)
 

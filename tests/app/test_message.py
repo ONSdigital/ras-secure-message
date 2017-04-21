@@ -94,7 +94,7 @@ class MessageSchemaTestCase(unittest.TestCase):
         """marshalling message with no body field """
         message = {'urn_to': 'richard', 'urn_from': 'torrance', 'body': ''}
         schema = MessageSchema()
-        data, errors = schema.load(message)
+        errors = schema.load(message)[1]
         self.assertTrue(errors == {'body': ['Body field not populated.']})
 
     def test_body_field_missing_from_json_causes_error(self):

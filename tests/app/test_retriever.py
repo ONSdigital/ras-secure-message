@@ -51,7 +51,7 @@ class RetrieverTestCase(unittest.TestCase):
         """retrieves messages from empty database"""
         with app.app_context():
             with current_app.test_request_context():
-                status, response = Retriever().retrieve_message_list(1, MESSAGE_QUERY_LIMIT)
+                response = Retriever().retrieve_message_list(1, MESSAGE_QUERY_LIMIT)[1]
                 msg = []
                 for message in response.items:
                     msg.append(message.serialize)
@@ -124,7 +124,7 @@ class RetrieverTestCase(unittest.TestCase):
 
     def test_correct_labels_returned_internal(self):
         """retrieves message using id and checks the labels are correct"""
-        self.populate_database(5)
+        self.populate_database(1)
         with self.engine.connect() as con:
             query = 'SELECT msg_id FROM secure_message LIMIT 1'
             query_x = con.execute(query)
@@ -142,7 +142,7 @@ class RetrieverTestCase(unittest.TestCase):
 
     def test_correct_labels_returned_external(self):
         """retrieves message using id and checks the labels are correct"""
-        self.populate_database(5)
+        self.populate_database(1)
         with self.engine.connect() as con:
             query = 'SELECT msg_id FROM secure_message LIMIT 1'
             query_x = con.execute(query)
@@ -157,6 +157,25 @@ class RetrieverTestCase(unittest.TestCase):
                     msg = json.loads(response.get_data())
                     labels = ['SENT']
                     self.assertEqual(msg['labels'], labels)
+
+    def test_correct_to_and_from_returned(self):
+        """retrieves message using id and checks the to and from urns are correct"""
+        self.populate_database(1)
+        with self.engine.connect() as con:
+            query = 'SELECT msg_id FROM secure_message LIMIT 1'
+            query_x = con.execute(query)
+            names = []
+            for row in query_x:
+                names.append(row[0])
+
+            with app.app_context():
+                with current_app.test_request_context():
+                    msg_id = str(names[0])
+                    response = Retriever().retrieve_message(msg_id, 'respondent.21345')
+                    msg = json.loads(response.get_data())
+                    msg_to = ['SurveyType']
+                    self.assertEqual(msg['msg_to'], msg_to)
+                    self.assertEqual(msg['msg_from'], 'respondent.21345')
 
     def test_retrieve_message_raises_error(self):
         """retrieves message from when db does not exist"""
