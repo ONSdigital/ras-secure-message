@@ -7,8 +7,8 @@ from flask import current_app
 from app.application import app
 from unittest import mock
 from app.exception.exceptions import MessageSaveException
-
 from app.validation.domain import Message
+from datetime import datetime, timezone
 
 
 class SaverTestCase(unittest.TestCase):
@@ -26,18 +26,48 @@ class SaverTestCase(unittest.TestCase):
             database.db.create_all()
             self.db = database.db
 
+    # def test_saved_message_has_saved_sent_date(self):
+    #     """retrieves messages from database with less entries than retrieval amount"""
+    #
+    #     with app.app_context():
+    #         with current_app.test_request_context():
+    #             Saver().save_message(self.test_message)
+    #
+    #     with self.engine.connect() as con:
+    #         request = con.execute('SELECT * FROM secure_message')
+    #         for row in request:
+    #             data = {"sent_date": row['sent_date']}
+    #             self.assertTrue(data['sent_date'] is not None)
+
     def test_saved_message_has_saved_sent_date(self):
-        """retrieves messages from database with less entries than retrieval amount"""
+
+        message = Message(**{'msg_id': 'Amsgid','urn_to': 'tej', 'urn_from': 'gemma', 'subject': 'MyMessage',
+                          'body': 'hello', 'thread_id': ""})
 
         with app.app_context():
             with current_app.test_request_context():
-                Saver().save_message(self.test_message)
+                Saver().save_message(message, datetime.now(timezone.utc))
 
-        with self.engine.connect() as con:
-            request = con.execute('SELECT * FROM secure_message')
-            for row in request:
-                data = {"sent_date": row['sent_date']}
-                self.assertTrue(data['sent_date'] is not None)
+            with self.engine.connect() as con:
+                request = con.execute("SELECT * FROM secure_message WHERE msg_id='Amsgid'")
+                for row in request:
+                    data = {"sent_date": row['sent_date']}
+                    self.assertTrue(data['sent_date'] is not None)
+
+    def test_saved_message_has_not_saved_sent_date(self):
+
+        message = Message(**{'msg_id': 'Amsgid','urn_to': 'tej', 'urn_from': 'gemma', 'subject': 'MyMessage',
+                          'body': 'hello', 'thread_id': ""})
+
+        with app.app_context():
+            with current_app.test_request_context():
+                Saver().save_message(message)
+
+            with self.engine.connect() as con:
+                request = con.execute("SELECT * FROM secure_message WHERE msg_id='Amsgid'")
+                for row in request:
+                    data = {"sent_date": row['sent_date']}
+                    self.assertTrue(data['sent_date'] is None)
 
     def test_save_message_rasies_message_save_exception_on_db_error(self):
         """Tests exception is logged if message save fails"""

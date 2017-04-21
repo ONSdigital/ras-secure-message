@@ -10,6 +10,7 @@ from app.exception.exceptions import MessageSaveException
 from app.repository import database
 from app.resources.health import Health, DatabaseHealth, HealthDetails
 from app.resources.messages import MessageList, MessageSend, MessageById
+from app.resources.drafts import Drafts
 from werkzeug.exceptions import BadRequest
 
 # initialise logging defaults for project
@@ -60,6 +61,7 @@ api.add_resource(HealthDetails, '/health/details')
 api.add_resource(MessageList, '/messages')
 api.add_resource(MessageSend, '/message/send')
 api.add_resource(MessageById, '/message/<message_id>')
+api.add_resource(Drafts, '/draft/save')
 
 
 @app.before_request

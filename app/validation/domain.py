@@ -52,7 +52,6 @@ class MessageSchema(Schema):
 
     @pre_load
     def check_sent_and_read_date(self, data):
-
         self.validate_not_present(data, 'sent_date')
         self.validate_not_present(data, 'read_date')
         return data
@@ -109,7 +108,7 @@ class MessageStatus:
 
         logger.debug("Message Class created {0}, {1}, {2}".format(label, msg_id, actor))
         self.label = label
-        self.msg_id = str(uuid.uuid4()) if len(msg_id) == 0 else msg_id  # If empty msg_id assign to a uuid
+        self.msg_id = msg_id
         self.actor = actor
 
     def __repr__(self):
@@ -120,3 +119,60 @@ class MessageStatus:
             return self.__dict__ == other.__dict__
         else:
             return False
+
+
+class DraftSchema(Schema):
+    """Class to marshal JSON to Draft"""
+
+    msg_id = fields.Str(allow_none=True)
+    urn_to = fields.Str(allow_none=True)
+    urn_from = fields.Str(required=True)
+    body = fields.Str(allow_none=True)
+    subject = fields.Str(allow_none=True)
+    thread_id = fields.Str(allow_none=True)
+    sent_date = fields.DateTime(allow_none=True)
+    read_date = fields.DateTime(allow_none=True)
+    collection_case = fields.Str(allow_none=True)
+    reporting_unit = fields.Str(allow_none=True)
+    survey = fields.Str(allow_none=True)
+
+    @pre_load
+    def check_msg_id_not_set(self, data):
+        if 'msg_id' in data:
+            raise ValidationError("{0} can not be set.".format('msg_id'))
+        if 'urn_from' not in data or len(data['urn_from']) == 0:
+            raise ValidationError("{0} Missing".format('urn_from'))
+
+    @validates("urn_to")
+    def validate_to(self, urn_to):
+        if urn_to is not None:
+            self.validate_field_length(urn_to, len(urn_to), constants.MAX_TO_LEN)
+
+    @validates("urn_from")
+    def validate_from(self, urn_from):
+        self.validate_field_length(urn_from, len(urn_from), constants.MAX_FROM_LEN)
+
+    @validates("body")
+    def validate_body(self, body):
+        if body is not None:
+            self.validate_field_length(body, len(body), constants.MAX_BODY_LEN)
+
+    @validates("subject")
+    def validate_subject(self, subject):
+        if subject is not None:
+            self.validate_field_length(subject, len(subject), constants.MAX_SUBJECT_LEN)
+
+    @validates("thread_id")
+    def validate_thread_id(self, thread_id):
+        if thread_id is not None:
+            self.validate_field_length(thread_id, len(thread_id), constants.MAX_THREAD_LEN)
+
+    @post_load
+    def make_draft(self, data):
+        return Message(**data)
+
+    @staticmethod
+    def validate_field_length(field_name, length, max_field_len):
+        if length > max_field_len:
+            logger.debug("{0} field is too large {1}  max size: {2}".format(field_name, length, max_field_len))
+            raise ValidationError('{0} field length must not be greater than {1}.'.format(field_name, max_field_len))

@@ -1,5 +1,6 @@
 
 class User:
+    """Determines whether the user is internal or external"""
 
     user_urn = None
 

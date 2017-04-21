@@ -30,7 +30,7 @@ class FlaskTestCase(unittest.TestCase):
                              'thread_id': "",
                              'collection_case': 'ACollectionCase',
                              'reporting_unit': 'AReportingUnit',
-                             'survey': 'ACollectionInstrument'}
+                             'survey': 'test-123'}
 
         with app.app_context():
             database.db.init_app(current_app)
@@ -146,7 +146,7 @@ class FlaskTestCase(unittest.TestCase):
                         'read_date': now,
                         'collection_case': 'ACollectionCase',
                         'reporting_unit': 'AReportingUnit',
-                        'collection_instrument': 'ACollectionInstrument'}
+                        'survey': 'ACollectionInstrument'}
         try:
             self.app.post(url, data=json.dumps(test_message), headers=headers)
             self.assertTrue(True)  # i.e no exception
@@ -219,8 +219,22 @@ class FlaskTestCase(unittest.TestCase):
             for row in request:
                 self.assertTrue(row is not None)
 
-    def test_message_post_stores_status_and_audit_correctly_for_internal_user(self):
+    def test_message_post_stores_status_correctly_for_internal_user(self):
         """posts to message send end point to ensure survey is saved for internal user"""
+        url = "http://localhost:5050/message/send"
+        headers = {'Content-Type': 'application/json', 'user_urn': ''}
+
+        self.app.post(url, data=json.dumps(self.test_message), headers=headers)
+
+        with self.engine.connect() as con:
+            request = con.execute("SELECT * FROM status WHERE msg_id='{0}' AND actor='{1}' AND label='SENT'"
+                                  .format(self.test_message['msg_id'], self.test_message['survey']))
+            for row in request:
+                self.assertTrue(row is not None)
+
+    def test_message_post_stores_audit_correctly_for_internal_user(self):
+        """Test internal user details have been added to audit table on send message"""
+
         url = "http://localhost:5050/message/send"
         headers = {'Content-Type': 'application/json', 'user_urn': ''}
 
@@ -229,6 +243,7 @@ class FlaskTestCase(unittest.TestCase):
         with self.engine.connect() as con:
             request = con.execute("SELECT * FROM internal_sent_audit WHERE msg_id='{0}' AND internal_user='{1}'"
                                   .format(self.test_message['msg_id'], self.test_message['urn_from']))
+
             for row in request:
                 self.assertTrue(row is not None)
 
