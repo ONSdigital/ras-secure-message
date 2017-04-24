@@ -157,16 +157,16 @@ class ModifyById(Resource):
         resp = False
 
         if request_data['action'] == 'add' and request_data['label'] == 'ARCHIVE':
-            resp = modifier.add_archived(message, message_id, user_urn)
+            resp = modifier.add_archived(message, user_urn)
 
         elif request_data['action'] == 'remove' and request_data['label'] == 'ARCHIVE':
-            resp = modifier.del_archived(message, message_id, user_urn)
+            resp = modifier.del_archived(message, user_urn)
 
         elif request_data['action'] == 'add' and request_data['label'] == 'UNREAD':
-            resp = modifier.add_unread(message, message_id, user_urn)
+            resp = modifier.add_unread(message, user_urn)
 
         elif request_data['action'] == 'remove' and request_data['label'] == 'UNREAD':
-            resp = modifier.del_unread(message, message_id, user_urn)
+            resp = modifier.del_unread(message, user_urn)
 
         if resp:
             res = jsonify({'status':'ok'})

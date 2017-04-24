@@ -82,3 +82,6 @@ def step_impl(context):
     for x in range(0, len(response['messages'])):
         num = x+1
         nose.tools.assert_equal(response['messages'][str(num)]['labels'], ['INBOX', 'UNREAD'])
+        nose.tools.assert_true(len(response['messages'][str(num)]['labels']), 2)
+        nose.tools.assert_true('INBOX' in response['messages'][str(num)]['labels'])
+        nose.tools.assert_true('UNREAD' in response['messages'][str(num)]['labels'])

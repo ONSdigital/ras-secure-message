@@ -59,7 +59,7 @@ class ModifyTestCase(unittest.TestCase):
                 message_service = Retriever()
                 # pass msg_id and user urn
                 message = message_service.retrieve_message(msg_id, 'respondent.21345')
-                Modifier.add_archived(message, msg_id, 'respondent.21345')
+                Modifier.add_archived(message, 'respondent.21345')
                 message = message_service.retrieve_message(msg_id, 'respondent.21345')
                 self.assertCountEqual(message['labels'], ['SENT', 'ARCHIVE'])
 
@@ -79,9 +79,9 @@ class ModifyTestCase(unittest.TestCase):
                 # pass msg_id and user urn
                 message = message_service.retrieve_message(msg_id, 'respondent.21345')
                 modifier = Modifier()
-                modifier.add_archived(message, msg_id, 'respondent.21345')
+                modifier.add_archived(message, 'respondent.21345')
                 message = message_service.retrieve_message(msg_id, 'respondent.21345')
-                modifier.del_archived(message, msg_id, 'respondent.21345')
+                modifier.del_archived(message, 'respondent.21345')
                 message = message_service.retrieve_message(msg_id, 'respondent.21345')
                 self.assertCountEqual(message['labels'], ['SENT'])
 
@@ -101,7 +101,7 @@ class ModifyTestCase(unittest.TestCase):
                 # pass msg_id and user urn
                 message = message_service.retrieve_message(msg_id, 'internal.21345')
                 modifier = Modifier()
-                modifier.del_unread(message, msg_id, 'internal.21345')
+                modifier.del_unread(message, 'internal.21345')
                 message = message_service.retrieve_message(msg_id, 'internal.21345')
                 self.assertCountEqual(message['labels'], ['INBOX'])
 
@@ -121,26 +121,26 @@ class ModifyTestCase(unittest.TestCase):
                 # pass msg_id and user urn
                 message = message_service.retrieve_message(msg_id, 'internal.21345')
                 modifier = Modifier()
-                modifier.del_unread(message, msg_id, 'internal.21345')
-                modifier.add_unread(message, msg_id, 'internal.21345')
+                modifier.del_unread(message, 'internal.21345')
+                modifier.add_unread(message, 'internal.21345')
                 message = message_service.retrieve_message(msg_id, 'internal.21345')
                 self.assertCountEqual(message['labels'], ['UNREAD', 'INBOX'])
 
-        def test_add_archive_is_added_to_internal(self):
-            """testing message is added to database with archived label attached"""
-            self.populate_database(1)
-            with self.engine.connect() as con:
-                query = 'SELECT msg_id FROM secure_message LIMIT 1'
-                query_x = con.execute(query)
-                names = []
-                for row in query_x:
-                    names.append(row[0])
-            with app.app_context():
-                with current_app.test_request_context():
-                    msg_id = str(names[0])
-                    message_service = Retriever()
-                    # pass msg_id and user urn
-                    message = message_service.retrieve_message(msg_id, 'internal.21345')
-                    Modifier.add_archived(message, msg_id, 'internal.21345')
-                    message = message_service.retrieve_message(msg_id, 'internal.21345')
-                    self.assertCountEqual(message['labels'], ['SENT', 'ARCHIVE'])
+    def test_add_archive_is_added_to_internal(self):
+        """testing message is added to database with archived label attached"""
+        self.populate_database(1)
+        with self.engine.connect() as con:
+            query = 'SELECT msg_id FROM secure_message LIMIT 1'
+            query_x = con.execute(query)
+            names = []
+            for row in query_x:
+                names.append(row[0])
+        with app.app_context():
+            with current_app.test_request_context():
+                msg_id = str(names[0])
+                message_service = Retriever()
+                # pass msg_id and user urn
+                message = message_service.retrieve_message(msg_id, 'internal.21345')
+                Modifier.add_archived(message, 'internal.21345')
+                message = message_service.retrieve_message(msg_id, 'internal.21345')
+                self.assertCountEqual(message['labels'], ['UNREAD', 'INBOX', 'ARCHIVE'])

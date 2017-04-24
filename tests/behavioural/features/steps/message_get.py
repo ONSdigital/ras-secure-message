@@ -95,4 +95,6 @@ def step_impl(context):
 @then("the retrieved message should have the labels INBOX and UNREAD")
 def step_impl(context):
     response = flask.json.loads(context.response.data)
-    nose.tools.assert_equal(response['labels'], ['INBOX', 'UNREAD'])
+    nose.tools.assert_true(len(response['labels']), 2)
+    nose.tools.assert_true('INBOX' in response['labels'])
+    nose.tools.assert_true('UNREAD' in response['labels'])

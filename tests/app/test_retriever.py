@@ -136,7 +136,7 @@ class RetrieverTestCase(unittest.TestCase):
                     msg_id = str(names[0])
                     response = Retriever().retrieve_message(msg_id, 'internal.21345')
                     labels = ['INBOX', 'UNREAD']
-                    self.assertEqual(response['labels'], labels)
+                    self.assertCountEqual(response['labels'], labels)
 
     def test_correct_labels_returned_external(self):
         """retrieves message using id and checks the labels are correct"""
@@ -153,7 +153,7 @@ class RetrieverTestCase(unittest.TestCase):
                     msg_id = str(names[0])
                     response = Retriever().retrieve_message(msg_id, 'respondent.21345')
                     labels = ['SENT']
-                    self.assertEqual(response['labels'], labels)
+                    self.assertCountEqual(response['labels'], labels)
 
     def test_correct_to_and_from_returned(self):
         """retrieves message using id and checks the to and from urns are correct"""
