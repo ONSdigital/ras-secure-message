@@ -62,7 +62,7 @@ class MessageSchemaTestCase(unittest.TestCase):
     def setUp(self):
         """setup test environment"""
         self.json_message = {'urn_to': 'Tej', 'urn_from': 'Gemma', 'subject': 'MyMessage', 'body': 'hello',
-                             'thread_id': ""}
+                             'thread_id': "", 'survey': "RSI"}
         self.now = datetime.now(timezone.utc)
 
     def test_valid_message_passes_validation(self):
@@ -92,17 +92,10 @@ class MessageSchemaTestCase(unittest.TestCase):
 
     def test_missing_body_fails_validation(self):
         """marshalling message with no body field """
-        message = {'urn_to': 'richard', 'urn_from': 'torrance', 'body': ''}
+        message = {'urn_to': 'richard', 'urn_from': 'torrance', 'body': '', 'survey': 'RSI'}
         schema = MessageSchema()
         errors = schema.load(message)[1]
         self.assertTrue(errors == {'body': ['Body field not populated.']})
-
-    def test_body_field_missing_from_json_causes_error(self):
-        """marshalling message with no body field """
-        message = {'urn_to': 'torrance', 'urn_from': 'someone'}
-        schema = MessageSchema()
-        data, errors = schema.load(message)
-        self.assertTrue(errors == {'body': ['Missing data for required field.']})
 
     def test_missing_subject_field_does_not_cause_error(self):
         """marshalling message with no subject field """
@@ -157,6 +150,12 @@ class MessageSchemaTestCase(unittest.TestCase):
         data, errors = schema.load(message)
         self.assertTrue(errors == {'_schema': ['sent_date can not be set.']})
 
+    def test_missing_survey_causes_error(self):
+        """marshalling message with no survey field"""
+        self.json_message['survey'] = ''
+        schema = MessageSchema()
+        data, errors = schema.load(self.json_message)
+        self.assertTrue(errors == {'survey': ['Survey field not populated.']})
 
 if __name__ == '__main__':
     unittest.main()
