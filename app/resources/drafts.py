@@ -29,11 +29,15 @@ class Drafts(Resource):
         saver.save_message(draft.data)
 
         if draft.data.urn_to is not None and len(draft.data.urn_to) != 0:
-            if User(draft.data.urn_to).is_internal:
-                saver.save_msg_status(draft.data.survey, draft.data.msg_id, Labels.DRAFT_INBOX.value)
-            else:
-                saver.save_msg_status(draft.data.urn_to, draft.data.msg_id, Labels.DRAFT_INBOX.value)
-        if User(draft.data.urn_from).is_internal:
-            saver.save_msg_status(draft.data.survey, draft.data.msg_id, Labels.DRAFT.value)
-        else:
-            saver.save_msg_status(draft.data.urn_from, draft.data.msg_id, Labels.DRAFT.value)
+            Drafts._save_draft_status(saver, draft.data.msg_id, draft.data.urn_to, draft.data.survey,
+                                      Labels.DRAFT.value)
+
+        Drafts._save_draft_status(saver, draft.data.msg_id, draft.data.urn_from, draft.data.survey, Labels.DRAFT.value)
+
+    @staticmethod
+    def _save_draft_status(saver, msg_id, person, survey, label):
+        """Save labels with correct actor for internal and respondent"""
+
+        actor = survey if User(person).is_internal else person
+        if person is not None and len(person) != 0:
+            saver.save_msg_status(actor, msg_id, label)

@@ -40,6 +40,11 @@ Feature: Message Send Endpoint
     When the message is sent
     Then a 400 error status is returned
 
+  Scenario: Message sent with an empty survey field return 400
+    Given the survey field is empty
+    When the message is sent
+    Then a 400 error status is returned
+
 
 
 

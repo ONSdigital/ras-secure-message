@@ -124,6 +124,19 @@ def step_impl(context):
                  'survey': 'survey'})
 
 
+# Scenario 9: Save a draft with an empty survey field return 400
+@given('a draft with a survey field set as empty')
+def step_impl(context):
+    data.update({'urn_to': 'test',
+                 'urn_from': 'test',
+                 'subject': 'test',
+                 'body': 'Test',
+                 'thread_id': '',
+                 'collection_case': 'collection case1',
+                 'reporting_unit': 'reporting case1',
+                 'survey': ''})
+
+
 # Common
 @when('the draft is saved')
 def step_impl(context):

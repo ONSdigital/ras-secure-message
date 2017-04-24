@@ -40,3 +40,7 @@ Feature: Draft Save Endpoint
     When the draft is saved
     Then a 400 error status is returned
 
+  Scenario: Save a draft with an empty survey field return 400
+    Given a draft with a survey field set as empty
+    When the draft is saved
+    Then a 400 error status is returned

@@ -80,6 +80,12 @@ def step_impl(context):
     data['urn_from'] = "y" * (constants.MAX_FROM_LEN+1)
 
 
+# Scenario 9: Message sent with an empty survey field return 400
+@given('the survey field is empty')
+def step_impl(context):
+    data['survey'] = ''
+
+
 # Common Steps: used in multiple scenarios
 
 
