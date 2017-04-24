@@ -48,7 +48,7 @@ class MessageSchema(Schema):
     read_date = fields.DateTime(allow_none=True)
     collection_case = fields.Str(allow_none=True)
     reporting_unit = fields.Str(allow_none=True)
-    survey = fields.Str(allow_none=True)
+    survey = fields.Str(required=True)
 
     @pre_load
     def check_sent_and_read_date(self, data):
@@ -77,6 +77,11 @@ class MessageSchema(Schema):
     def validate_thread(self, thread_id):
         if thread_id is not None:
             self.validate_field_length("Thread", len(thread_id), constants.MAX_THREAD_LEN)
+
+    @validates("survey")
+    def validate_survey(self, survey):
+        if survey is not None:
+            self.validate_non_zero_field_length("Survey", len(survey), constants.MAX_SURVEY_LEN)
 
     @post_load
     def make_message(self, data):
@@ -134,7 +139,7 @@ class DraftSchema(Schema):
     read_date = fields.DateTime(allow_none=True)
     collection_case = fields.Str(allow_none=True)
     reporting_unit = fields.Str(allow_none=True)
-    survey = fields.Str(allow_none=True)
+    survey = fields.Str(required=True)
 
     @pre_load
     def check_msg_id_not_set(self, data):
@@ -142,6 +147,8 @@ class DraftSchema(Schema):
             raise ValidationError("{0} can not be set.".format('msg_id'))
         if 'urn_from' not in data or len(data['urn_from']) == 0:
             raise ValidationError("{0} Missing".format('urn_from'))
+        if 'survey' not in data or len(data['survey']) == 0:
+            raise ValidationError("{0} Missing".format('survey'))
 
     @validates("urn_to")
     def validate_to(self, urn_to):
@@ -166,6 +173,9 @@ class DraftSchema(Schema):
     def validate_thread_id(self, thread_id):
         if thread_id is not None:
             self.validate_field_length(thread_id, len(thread_id), constants.MAX_THREAD_LEN)
+
+    def validate_survey(self, survey):
+        self.validate_field_length(survey, len(survey), constants.MAX_SURVEY_LEN)
 
     @post_load
     def make_draft(self, data):

@@ -106,8 +106,18 @@ class DraftTestCase(unittest.TestCase):
         response = self.app.post(self.url, data=json.dumps(self.test_message), headers=self.headers)
         self.assertEqual(response.status_code, 400)
 
+    def test_draft_empty_survey_field_returns_400(self):
+        """Test survey field is required"""
+
+        self.test_message['survey'] = ''
+
+        response = self.app.post(self.url, data=json.dumps(self.test_message), headers=self.headers)
+        self.assertEqual(response.status_code, 400)
+
     def test_draft_correct_labels_saved_to_status_without_to(self):
         """Check correct labels are saved to status table for draft saved without a to"""
+
+        self.test_message['urn_to'] = ''
 
         self.app.post(self.url, data=json.dumps(self.test_message), headers=self.headers)
 
@@ -117,11 +127,14 @@ class DraftTestCase(unittest.TestCase):
             for row in request:
                 self.msg_id = row['msg_id']
 
-            label_request = con.execute("SELECT * FROM status WHERE msg_id='{0}' AND actor='{1}' AND label='DRAFT'"
-                                        .format(str(self.msg_id), self.test_message['urn_from']))
+            label_request = con.execute("SELECT * FROM status")
+
+            self.assertTrue(label_request is not None)
 
             for row in label_request:
-                self.assertTrue(row is not None)
+                self.assertEqual(row['msg_id'], self.msg_id)
+                self.assertEqual(row['actor'], self.test_message['urn_from'])
+                self.assertEqual(row['label'], Labels.DRAFT.value)
 
     def test_draft_correct_labels_saved_to_status_with_to(self):
         """Check correct labels are saved to status table for draft saved without a to"""
@@ -134,8 +147,20 @@ class DraftTestCase(unittest.TestCase):
             for row in request:
                 self.msg_id = row['msg_id']
 
-            label_request = con.execute("SELECT * FROM status WHERE msg_id='{0}' AND actor='{1}'" 
-                                        "AND label='DRAFT_INBOX'".format(self.msg_id, self.test_message['urn_to']))
+            label_request = con.execute("SELECT * FROM status")
+
+            self.assertTrue(label_request is not None)
 
             for row in label_request:
-                self.assertTrue(row is not None)
+                self.assertTrue(row['msg_id'], self.msg_id)
+                self.assertTrue(row['actor'], self.test_message['urn_to'])
+                self.assertTrue(row['label'], Labels.DRAFT_INBOX.value)
+
+    def test_draft_inserted_into_msg_table(self):
+        """Check draft has been added to SecureMessage table"""
+
+        self.app.post(self.url, data=json.dumps(self.test_message), headers=self.headers)
+
+        with self.engine.connect() as con:
+            request = con.execute("SELECT * FROM secure_message LIMIT 1")
+            self.assertTrue(request is not None)
