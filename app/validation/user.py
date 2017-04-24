@@ -9,14 +9,10 @@ class User:
 
     @property
     def is_internal(self):
-        if 'internal' in self.user_urn:
-            return True
-        else:
-            return False
+        return bool('internal' in self.user_urn)
 
     @property
     def is_respondent(self):
-        if 'respondent' in self.user_urn:
-            return True
-        else:
-            return False
+        return bool('respondent' in self.user_urn)
+
+

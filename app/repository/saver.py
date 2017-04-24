@@ -3,7 +3,6 @@ import logging
 from app.exception.exceptions import MessageSaveException
 from app.repository import database
 from app.repository.database import db
-from datetime import datetime, timezone
 
 logger = logging.getLogger(__name__)
 

@@ -6,7 +6,6 @@ from behave import given, then, when
 from app.application import app
 from app.repository import database
 from flask import current_app
-from app.repository.database import db
 
 url = "http://localhost:5050/message/{}/modify"
 headers = {'Content-Type': 'application/json', 'user_urn': 'internal.12344'}

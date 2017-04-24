@@ -20,7 +20,7 @@ class Modifier:
             query = "DELETE FROM status WHERE label = '{}' and msg_id = '{}' and actor = '{}'".format(label, message_id,survey)
 
         try:
-            result = db.get_engine(app=db.get_app()).execute(query)
+             db.get_engine(app=db.get_app()).execute(query)
         except Exception as e:
             logger.error(e)
             raise (InternalServerError(description="Error retrieving messages from database"))

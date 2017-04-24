@@ -101,7 +101,7 @@ class MessageSchemaTestCase(unittest.TestCase):
         """marshalling message with no subject field """
         message = {'msg_to': 'torrance', 'msg_from': 'someone'}
         schema = MessageSchema()
-        data, errors = schema.load(message)
+        errors = schema.load(message)[1]
         self.assertTrue(errors != {'subject': ['Missing data for required field.']})
 
     def test_subject_field_too_long_causes_error(self):
@@ -116,7 +116,7 @@ class MessageSchemaTestCase(unittest.TestCase):
         """marshalling message with no thread_id field"""
         message = {'msg_to': 'torrance', 'msg_from': 'someone'}
         schema = MessageSchema()
-        data, errors = schema.load(message)
+        errors = schema.load(message)[1]
         self.assertTrue(errors != {'thread_id': ['Missing data for required field.']})
 
     def test_thread_field_too_long_causes_error(self):
@@ -139,7 +139,7 @@ class MessageSchemaTestCase(unittest.TestCase):
         message = {'urn_to': 'torrance', 'urn_from': 'someone', 'body': 'hello', 'subject': 'subject',
                    'read_date': self.now}
         schema = MessageSchema()
-        data, errors = schema.load(message)
+        errors = schema.load(message)[1]
         self.assertTrue(errors == {'_schema': ['read_date can not be set.']})
 
     def test_setting_sent_date_field_causes_error(self):
@@ -147,14 +147,14 @@ class MessageSchemaTestCase(unittest.TestCase):
         message = {'urn_to': 'torrance', 'urn_from': 'someone', 'body': 'hello', 'subject': 'subject',
                    'sent_date': self.now}
         schema = MessageSchema()
-        data, errors = schema.load(message)
+        errors = schema.load(message)[1]
         self.assertTrue(errors == {'_schema': ['sent_date can not be set.']})
 
     def test_missing_survey_causes_error(self):
         """marshalling message with no survey field"""
         self.json_message['survey'] = ''
         schema = MessageSchema()
-        data, errors = schema.load(self.json_message)
+        errors = schema.load(self.json_message)[1]
         self.assertTrue(errors == {'survey': ['Survey field not populated.']})
 
 if __name__ == '__main__':

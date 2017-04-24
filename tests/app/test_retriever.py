@@ -71,7 +71,7 @@ class RetrieverTestCase(unittest.TestCase):
 
         with app.app_context():
             with current_app.test_request_context():
-                status, response = Retriever().retrieve_message_list(1, MESSAGE_QUERY_LIMIT)
+                response = Retriever().retrieve_message_list(1, MESSAGE_QUERY_LIMIT)[1]
                 msg = []
                 for message in response.items:
                     msg.append(message.serialize)
