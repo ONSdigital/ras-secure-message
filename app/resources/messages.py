@@ -1,9 +1,13 @@
 # from app.authentication.jwt import decode
 from flask_restful import Resource
 from flask import request, jsonify
+from werkzeug.exceptions import BadRequest
+
+from app.repository.modifier import Modifier
 from app.validation.domain import MessageSchema
 from app.repository.saver import Saver
 from app.repository.retriever import Retriever
+
 import logging
 from app.common.alerts import AlertUser
 from app import settings
@@ -11,7 +15,6 @@ from app.settings import MESSAGE_QUERY_LIMIT
 from app.validation.labels import Labels
 from app.validation.user import User
 from datetime import timezone, datetime
-
 
 logger = logging.getLogger(__name__)
 
@@ -123,43 +126,49 @@ class MessageById(Resource):
     def get(message_id):
         """Get message by id"""
         # res = authenticate(request)
-        user_urn = request.headers.get('user_urn')
+        user_urn = request.headers.get('user_urn')  # getting user urn from header request
         # check user is authorised to view message
         message_service = Retriever()
+        # pass msg_id and user urn
         resp = message_service.retrieve_message(message_id, user_urn)
         return jsonify(resp)
 
-    @staticmethod
-    def put():
-        pass
 
-# class MessageStatus(Resource):
-#     """Ability to add and delete labels for a message."""
-#
-#     @staticmethod
-#     def get(message_id):
-#         """Get message by id"""
-#         # res = authenticate(request)
-#         message_service = Retriever()
-#         resp = message_service.retrieve_message(message_id)
-#         return resp
-#
-#     @staticmethod
-#     def put(request):
-#         """Update message by status"""
-#
-#         # user_urn = str(uuid.uuid4())
-#
-#         if request.headersb.get('urn'):
-#             urn_token = request.headers.get('urn')
-#             return urn_token
-#
-#         msg_id = str(uuid.uuid4())
-#         query = 'INSERT INTO status VALUES ("1","INBOX,UNREAD","get.msg_id","user_urn")'.format(urn_token,msg_id)
-#         with engine.connect() as con:
-#             con.execute(query)
-#
-#         resp = jsonify({"status": "ok"})
-#
-#         resp.status_code = 200
-#         return resp
+class ModifyById(Resource):
+    """Update message status by id"""
+
+
+    @staticmethod
+    def put(message_id):
+        """Update message by status"""
+        user_urn = request.headers.get('user_urn')
+
+        request_data = request.get_json()
+        if request_data["label"] not in Labels.label_list.value:
+            raise BadRequest(description="Invalid label given")
+
+        if request_data["action"] != "add" and request_data["action"] != "remove":
+            raise BadRequest(description="Invalid action taken")
+
+        message_service = Retriever()
+        # pass msg_id and user urn
+        message = message_service.retrieve_message(message_id, user_urn)
+        modifier = Modifier()
+        resp = False
+
+        if request_data['action'] == 'add' and request_data['label'] == 'ARCHIVE':
+            resp = modifier.add_archived(message, message_id, user_urn)
+
+        elif request_data['action'] == 'remove' and request_data['label'] == 'ARCHIVE':
+            resp = modifier.del_archived(message, message_id, user_urn)
+
+        elif request_data['action'] == 'add' and request_data['label'] == 'UNREAD':
+            resp = modifier.add_unread(message, message_id, user_urn)
+
+        elif request_data['action'] == 'remove' and request_data['label'] == 'UNREAD':
+            resp = modifier.del_unread(message, message_id, user_urn)
+
+        if resp:
+            res = jsonify({'status':'ok'})
+            res.status_code = 200
+            return res
