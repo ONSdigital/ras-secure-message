@@ -123,12 +123,11 @@ class MessageById(Resource):
     def get(message_id):
         """Get message by id"""
         # res = authenticate(request)
-        user_urn = request.headers.get('user_urn')  # getting user urn from header request
+        user_urn = request.headers.get('user_urn')
         # check user is authorised to view message
         message_service = Retriever()
-        # pass msg_id and user urn
         resp = message_service.retrieve_message(message_id, user_urn)
-        return resp
+        return jsonify(resp)
 
     @staticmethod
     def put():

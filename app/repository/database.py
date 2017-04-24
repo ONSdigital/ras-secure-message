@@ -57,8 +57,8 @@ class SecureMessage(db.Model):
     def serialize(self, user_urn):
         """Return object data in easily serializeable format"""
         message = {
-            'msg_to': [],
-            'msg_from': '',
+            'urn_to': [],
+            'urn_from': '',
             'msg_id': self.msg_id,
             'subject': self.subject,
             'body': self.body,
@@ -82,9 +82,9 @@ class SecureMessage(db.Model):
                 message['labels'].append(row.label)
 
             if row.label == 'INBOX':
-                message['msg_to'].append(row.actor)
+                message['urn_to'].append(row.actor)
             elif row.label == 'SENT':
-                message['msg_from'] = row.actor
+                message['urn_from'] = row.actor
 
         return message
 

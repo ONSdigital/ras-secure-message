@@ -39,7 +39,7 @@ class Retriever:
 
         message = result.serialize(user_urn)
 
-        return jsonify(message)
+        return message
 
     @staticmethod
     def check_db_connection():

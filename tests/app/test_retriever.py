@@ -102,8 +102,7 @@ class RetrieverTestCase(unittest.TestCase):
                 with current_app.test_request_context():
                     msg_id = str(names[0])
                     response = Retriever().retrieve_message(msg_id, 'internal.21345')
-                    msg = json.loads(response.get_data())
-                    self.assertEqual(msg['msg_id'], str(names[0]))
+                    self.assertEqual(response['msg_id'], str(names[0]))
 
     def test_msg_returned_with_msg_id_returns_404(self):
         """retrieves message using id that doesn't exist"""
@@ -136,9 +135,8 @@ class RetrieverTestCase(unittest.TestCase):
                 with current_app.test_request_context():
                     msg_id = str(names[0])
                     response = Retriever().retrieve_message(msg_id, 'internal.21345')
-                    msg = json.loads(response.get_data())
                     labels = ['INBOX', 'UNREAD']
-                    self.assertEqual(msg['labels'], labels)
+                    self.assertEqual(response['labels'], labels)
 
     def test_correct_labels_returned_external(self):
         """retrieves message using id and checks the labels are correct"""
@@ -154,9 +152,8 @@ class RetrieverTestCase(unittest.TestCase):
                 with current_app.test_request_context():
                     msg_id = str(names[0])
                     response = Retriever().retrieve_message(msg_id, 'respondent.21345')
-                    msg = json.loads(response.get_data())
                     labels = ['SENT']
-                    self.assertEqual(msg['labels'], labels)
+                    self.assertEqual(response['labels'], labels)
 
     def test_correct_to_and_from_returned(self):
         """retrieves message using id and checks the to and from urns are correct"""
@@ -172,10 +169,9 @@ class RetrieverTestCase(unittest.TestCase):
                 with current_app.test_request_context():
                     msg_id = str(names[0])
                     response = Retriever().retrieve_message(msg_id, 'respondent.21345')
-                    msg = json.loads(response.get_data())
-                    msg_to = ['SurveyType']
-                    self.assertEqual(msg['msg_to'], msg_to)
-                    self.assertEqual(msg['msg_from'], 'respondent.21345')
+                    urn_to = ['SurveyType']
+                    self.assertEqual(response['urn_to'], urn_to)
+                    self.assertEqual(response['urn_from'], 'respondent.21345')
 
     def test_retrieve_message_raises_error(self):
         """retrieves message from when db does not exist"""
