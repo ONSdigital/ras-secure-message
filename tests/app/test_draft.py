@@ -56,49 +56,49 @@ class DraftTestCase(unittest.TestCase):
         saver.save_message.assert_called_with(draft.data)
         saver.save_msg_status.assert_called_with(draft.data.urn_from, draft.data.msg_id, Labels.DRAFT.value)
 
-    def test_Draft_return_201_with_empty_to_field(self):
+    def test_draft_empty_to_field_returns_201(self):
         """Test draft can be saved without To field"""
 
         self.test_message['urn_to'] = ''
         response = self.app.post(self.url, data=json.dumps(self.test_message), headers=self.headers)
         self.assertEqual(response.status_code, 201)
 
-    def test_Draft_return_201_with_empty_subject_field(self):
+    def test_draft_empty_subject_field_returns_201(self):
         """Test draft can be saved without Subject field"""
 
         self.test_message['subject'] = ''
         response = self.app.post(self.url, data=json.dumps(self.test_message), headers=self.headers)
         self.assertEqual(response.status_code, 201)
 
-    def test_Draft_return_201_with_empty_body_field(self):
+    def test_draft_empty_body_field_returns_201(self):
         """Test draft can be saved without Body field"""
 
         self.test_message['body'] = ''
         response = self.app.post(self.url, data=json.dumps(self.test_message), headers=self.headers)
         self.assertEqual(response.status_code, 201)
 
-    def test_Draft_return_201_with_empty_collection_case_field(self):
+    def test_draft_empty_collection_case_field_returns_201(self):
         """Test draft can be saved without Collection Case field"""
 
         self.test_message['collection_case'] = ''
         response = self.app.post(self.url, data=json.dumps(self.test_message), headers=self.headers)
         self.assertEqual(response.status_code, 201)
 
-    def test_Draft_return_201_with_empty_reporting_unit_field(self):
+    def test_draft_empty_reporting_unit_field_returns_201(self):
         """Test draft can be saved without Reporting Unit field"""
 
         self.test_message['reporting_unit'] = ''
         response = self.app.post(self.url, data=json.dumps(self.test_message), headers=self.headers)
         self.assertEqual(response.status_code, 201)
 
-    def test_Draft_return_201_with_empty_survey_field(self):
+    def test_draft_empty_survey_field_returns_201(self):
         """Test draft can be saved without Survey field"""
 
         self.test_message['reporting_unit'] = ''
         response = self.app.post(self.url, data=json.dumps(self.test_message), headers=self.headers)
         self.assertEqual(response.status_code, 201)
 
-    def test_Draft_return_400_with_empty_from_field(self):
+    def test_draft_empty_from_field_returns_400(self):
         """Test that From field is required"""
 
         self.test_message['urn_from'] = ''
