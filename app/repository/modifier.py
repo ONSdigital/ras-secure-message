@@ -2,12 +2,6 @@ import logging
 from app.repository.database import db
 
 from werkzeug.exceptions import InternalServerError
-
-from app.exception.exceptions import MessageSaveException
-from app.repository import database
-from app.repository.database import db, Status
-from app.repository.retriever import Retriever
-from datetime import datetime, timezone
 from app.repository.saver import Saver
 from app.validation.labels import Labels
 
