@@ -19,3 +19,4 @@ Feature: Checking correct labels for messages are added & deleted
     Given a valid message is sent
     When the unread label is removed
     Then check message does not have label "unread"
+    Then message read date should be set

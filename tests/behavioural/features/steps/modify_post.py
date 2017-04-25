@@ -137,3 +137,9 @@ def step_impl(context):
                                              data=flask.json.dumps(modify_data), headers=headers)
     response = flask.json.loads(context.response.data)
     nose.tools.assert_true('UNREAD' not in response['labels'])
+
+
+@then('message read date should be set')
+def step_impl(context):
+    response = flask.json.loads(context.response.data)
+    nose.tools.assert_is_not_none(response['read_date'])

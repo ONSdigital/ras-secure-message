@@ -9,6 +9,7 @@ from app.repository import database
 from app.repository.modifier import Modifier
 from app.repository.retriever import Retriever
 
+
 class ModifyTestCase(unittest.TestCase):
     """Test case for message retrieval"""
 
@@ -29,9 +30,9 @@ class ModifyTestCase(unittest.TestCase):
         with self.engine.connect() as con:
             for i in range(x):
                 msg_id = str(uuid.uuid4())
-                query = 'INSERT INTO secure_message(id, msg_id, subject, body, thread_id, sent_date, read_date,' \
+                query = 'INSERT INTO secure_message(id, msg_id, subject, body, thread_id, sent_date,' \
                         ' collection_case, reporting_unit, survey) VALUES ({0}, "{1}", "test","test","", ' \
-                        '"2017-02-03 00:00:00", "2017-02-03 00:00:00", "ACollectionCase", "AReportingUnit", ' \
+                        '"2017-02-03 00:00:00", "ACollectionCase", "AReportingUnit", ' \
                         '"SurveyType")'.format(i, msg_id)
                 con.execute(query)
                 query = 'INSERT INTO status(label, msg_id, actor) VALUES("SENT", "{0}", "respondent.21345")'.format(
@@ -144,3 +145,47 @@ class ModifyTestCase(unittest.TestCase):
                 Modifier.add_archived(message, 'internal.21345')
                 message = message_service.retrieve_message(msg_id, 'internal.21345')
                 self.assertCountEqual(message['labels'], ['UNREAD', 'INBOX', 'ARCHIVE'])
+
+    def test_read_date_is_set(self):
+        """testing message read_date is set when unread label is removed"""
+        self.populate_database(1)
+        with self.engine.connect() as con:
+            query = 'SELECT msg_id FROM secure_message LIMIT 1'
+            query_x = con.execute(query)
+            names = []
+            for row in query_x:
+                names.append(row[0])
+        with app.app_context():
+            with current_app.test_request_context():
+                msg_id = str(names[0])
+                message_service = Retriever()
+                modifier = Modifier()
+                # pass msg_id and user urn
+                message = message_service.retrieve_message(msg_id, 'internal.21345')
+                modifier.del_unread(message, 'internal.21345')
+                message = message_service.retrieve_message(msg_id, 'internal.21345')
+                self.assertIsNotNone(message['read_date'])
+
+    def test_read_date_is_not_reset(self):
+        """testing message read_date is not reset when unread label is removed again"""
+        self.populate_database(1)
+        with self.engine.connect() as con:
+            query = 'SELECT msg_id FROM secure_message LIMIT 1'
+            query_x = con.execute(query)
+            names = []
+            for row in query_x:
+                names.append(row[0])
+        with app.app_context():
+            with current_app.test_request_context():
+                msg_id = str(names[0])
+                message_service = Retriever()
+                modifier = Modifier()
+                # pass msg_id and user urn
+                message = message_service.retrieve_message(msg_id, 'internal.21345')
+                modifier.del_unread(message, 'internal.21345')
+                message = message_service.retrieve_message(msg_id, 'internal.21345')
+                read_date_set = message['read_date']
+                modifier.add_unread(message, 'internal.21345')
+                modifier.del_unread(message, 'internal.21345')
+                message = message_service.retrieve_message(msg_id, 'internal.21345')
+                self.assertEqual(message['read_date'], read_date_set)
