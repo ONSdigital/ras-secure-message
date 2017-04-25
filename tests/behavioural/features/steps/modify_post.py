@@ -41,7 +41,7 @@ def step_impl(context):
                                               data=flask.json.dumps(data), headers=headers)
 
 
-@when("an archived label is added")
+@when("the message is archived")
 def step_impl(context):
     modify_data['action'] = 'add'
     modify_data['label'] = 'ARCHIVE'
@@ -49,7 +49,7 @@ def step_impl(context):
                                              data=flask.json.dumps(modify_data), headers=headers)
 
 
-@then('check message has label "archived"')
+@then('check message is marked as archived')
 def step_impl(context):
     context.response = app.test_client().get("http://localhost:5050/message/{}".format(data['msg_id']),
                                              data=flask.json.dumps(modify_data), headers=headers)
@@ -58,7 +58,7 @@ def step_impl(context):
 
 
 # Scenario: deleting the "archived" label from a given message
-@given("an archived label is added")
+@given("the message is archived")
 def step_impl(context):
     reset_db()
     data['msg_id'] = str(uuid.uuid4())
@@ -73,7 +73,7 @@ def step_impl(context):
                                              data=flask.json.dumps(modify_data), headers=headers)
 
 
-@when("the archived label is removed")
+@when("the message is unarchived")
 def step_impl(context):
     modify_data['action'] = 'remove'
     modify_data['label'] = "ARCHIVE"
@@ -81,7 +81,7 @@ def step_impl(context):
                                              data=flask.json.dumps(modify_data), headers=headers)
 
 
-@then('check message does not have label "archived"')
+@then('check message is not marked as archived')
 def step_impl(context):
     context.response = app.test_client().get("http://localhost:5050/message/{}".format(data['msg_id']),
                                              data=flask.json.dumps(modify_data), headers=headers)
@@ -105,7 +105,7 @@ def step_impl(context):
                                              data=flask.json.dumps(modify_data), headers=headers)
 
 
-@when("the unread label is added")
+@when("the message is marked unread")
 def step_impl(context):
     modify_data['action'] = 'add'
     modify_data['label'] = "UNREAD"
@@ -113,7 +113,7 @@ def step_impl(context):
                                              data=flask.json.dumps(modify_data), headers=headers)
 
 
-@then('check message has label "unread"')
+@then('check message is marked unread')
 def step_impl(context):
     context.response = app.test_client().get("http://localhost:5050/message/{}".format(data['msg_id']),
                                              data=flask.json.dumps(modify_data), headers=headers)
@@ -123,7 +123,7 @@ def step_impl(context):
     # Scenario: deleting the "unread" level from a given message
 
 
-@when("the unread label is removed")
+@when("the message is marked read")
 def step_impl(context):
     modify_data['action'] = 'remove'
     modify_data['label'] = "UNREAD"
@@ -131,7 +131,7 @@ def step_impl(context):
                                              data=flask.json.dumps(modify_data), headers=headers)
 
 
-@then('check message does not have label "unread"')
+@then('check message is not marked unread')
 def step_impl(context):
     context.response = app.test_client().get("http://localhost:5050/message/{}".format(data['msg_id']),
                                              data=flask.json.dumps(modify_data), headers=headers)
