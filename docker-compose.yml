@@ -2,7 +2,7 @@ version: '2'
 
 services:
   db:
-    image: postgres:9.5
+    image: postgres:9.4
     environment:
       POSTGRES_PASSWORD: rasmessage
       POSTGRES_USER: rasmessage
@@ -10,18 +10,20 @@ services:
     ports:
       - "5433:5432"
     networks:
-      - api-env
+      - secure 
 
   secure-messaging-api:
     build: ./
-    restart: always
     environment:
-      SECURE_MESSAGING_DATABASE_URL: postgres://rasmessage:rasmessage@:5432/messages
+      SECURE_MESSAGING_DATABASE_URL: postgres://rasmessage:rasmessage@db:5432/messages
+    restart: always
+    depends_on:
+      - db
     networks:
-      - api-env
+      - secure 
     ports:
       - "5050:5050"
 
 networks:
-  api-env:
+  secure:
     driver: bridge
