@@ -19,6 +19,7 @@ class Modifier:
             query = "INSERT INTO status (label, msg_id, actor) VALUES ('{0}','{1}','{2}')". \
                 format(label, message['msg_id'], actor)
             db.get_engine(app=db.get_app()).execute(query)
+            return True
         except Exception as e:
             logger.error(e)
             raise (InternalServerError(description="Error retrieving messages from database"))
@@ -30,6 +31,7 @@ class Modifier:
             query = "DELETE FROM status WHERE label = '{0}' and msg_id = '{1}' and actor = '{2}'". \
                 format(label, message['msg_id'], actor)
             db.get_engine(app=db.get_app()).execute(query)
+            return True
         except Exception as e:
             logger.error(e)
             raise (InternalServerError(description="Error retrieving messages from database"))
@@ -44,9 +46,9 @@ class Modifier:
     @staticmethod
     def del_archived(message, user_urn, ):
         archive = Labels.ARCHIVE.value
-        if archive in message['labels']:
-            Modifier.remove_label(archive, message, user_urn)
-            return True
+       # if archive in message['labels']:
+        Modifier.remove_label(archive, message, user_urn)
+        return True
 
     @staticmethod
     def add_unread(message, user_urn):
