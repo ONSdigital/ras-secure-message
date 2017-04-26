@@ -16,7 +16,7 @@ class Drafts(Resource):
 
         if draft.errors == {}:
             self.save_draft(draft)
-            resp = jsonify({'status': 'OK'})
+            resp = jsonify({'status': 'OK', 'msg_id': draft.data.msg_id})
             resp.status_code = 201
             return resp
         else:

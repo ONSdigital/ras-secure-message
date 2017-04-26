@@ -114,7 +114,7 @@ class MessageSend(Resource):
         recipient_email = settings.NOTIFICATION_DEV_EMAIL  # TODO change this when know more about party service
         alert_user = AlertUser()
         alert_status, alert_detail = alert_user.send(recipient_email, reference)
-        resp = jsonify({'status': '{0}'.format(alert_detail)})
+        resp = jsonify({'status': '{0}'.format(alert_detail), 'msg_id': reference})
         resp.status_code = alert_status
         return resp
 
