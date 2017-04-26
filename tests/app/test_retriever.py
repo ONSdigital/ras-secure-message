@@ -1,11 +1,9 @@
 import unittest
 import uuid
-
 from flask import current_app
 from flask import json
 from sqlalchemy import create_engine
 from werkzeug.exceptions import NotFound, InternalServerError
-
 from app.application import app
 from app.repository import database
 from app.repository.retriever import Retriever

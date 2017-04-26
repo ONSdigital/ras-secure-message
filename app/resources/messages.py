@@ -87,12 +87,14 @@ class MessageSend(Resource):
         if 'msg_id' in post_data:
             self.is_draft = MessageSend().check_if_draft(post_data['msg_id'])
 
+        if self.is_draft is True:
+            self.draft_id = post_data['msg_id']
+            post_data['msg_id'] = ''
+
         message = MessageSchema().load(post_data)
 
-        if message.errors == {} and self.is_draft is False:
-            return MessageSend.message_save(message)
-        elif message.errors == {} and self.is_draft is True:
-            return MessageSend.change_labels_if_draft(message)
+        if message.errors == {}:
+            return self.message_save(message)
         else:
             res = jsonify(message.errors)
             res.status_code = 400
@@ -101,7 +103,6 @@ class MessageSend(Resource):
     @staticmethod
     def check_if_draft(message_id):
         """Checks if the message is in the message table with a DRAFT label"""
-
         db_model = Status()
         result = db_model.query.filter_by(msg_id=message_id, label=Labels.DRAFT.value).first()
         if result is None:
@@ -109,17 +110,11 @@ class MessageSend(Resource):
         else:
             return True
 
-    @staticmethod
-    def change_labels_if_draft(message):
+    def del_draft_labels(self):
         modifier = Modifier()
-        modifier.del_draft(message.data)
-        modifier.add_sent(message.data)
-        modifier.add_inbox_and_unread_for_draft_remove_inbox_draft(message.data)
+        modifier.del_draft(self.draft_id)
 
-        return MessageSend._alert_recipients(message.data.msg_id)
-
-    @staticmethod
-    def message_save(message):
+    def message_save(self, message):
         """Saves the message to the database along with the subsequent status and audit"""
         save = Saver()
         save.save_message(message.data, datetime.now(timezone.utc))
@@ -133,6 +128,8 @@ class MessageSend(Resource):
             save.save_msg_status(message.data.urn_to, message.data.msg_id, Labels.INBOX.value)
             save.save_msg_status(message.data.urn_to, message.data.msg_id, Labels.UNREAD.value)
 
+        if self.is_draft is True:
+            self.del_draft_labels()
         return MessageSend._alert_recipients(message.data.msg_id)
 
     @staticmethod

@@ -72,27 +72,15 @@ class Modifier:
             Modifier.remove_label(unread, message, user_urn)
         return True
 
-    def del_draft(self, message):
-        self.remove_label(Labels.DRAFT.value, message, message.urn_from)
-
-    @staticmethod
-    def add_sent(message):
-        query = "UPDATE secure_message SET sent_date = '{0}' WHERE msg_id = '{1}'".format(datetime.now(timezone.utc),
-                                                                                          message.msg_id)
-        update_label = "UPDATE status SET label = '{0}' WHERE msg_id = '{1}'".format(Labels.SENT.value, message.msg_id)
+    def del_draft(self, draft_id):
+        del_draft_msg = "DELETE FROM secure_message WHERE msg_id='{0}'".format(draft_id)
+        del_draft_status = "DELETE FROM status WHERE msg_id='{0}' AND label='{1}'".format(draft_id, Labels.DRAFT.value)
 
         try:
-            db.get_engine(app=db.get_app()).execute(query)
-            db.get_engine(app=db.get_app()).execute(update_label)
+            db.get_engine(app=db.get_app()).execute(del_draft_msg)
+            db.get_engine(app=db.get_app()).execute(del_draft_status)
         except Exception as e:
             logger.error(e)
-            raise (InternalServerError(description="Error updating sent_date and sent label"))
+            raise (InternalServerError(description="Error retrieving messages from database"))
 
-    @staticmethod
-    def add_inbox_and_unread_for_draft_remove_inbox_draft(message):
-        if User(message.urn_to).is_respondent:
-            Saver().save_msg_status(message.urn_to, message.msg_id, Labels.INBOX.value)
-            Saver().save_msg_status(message.urn_to, message.msg_id, Labels.UNREAD.value)
-        else:
-            Saver().save_msg_status(message.survey, message.msg_id, Labels.INBOX.value)
-            Saver().save_msg_status(message.survey, message.msg_id, Labels.UNREAD.value)
+
