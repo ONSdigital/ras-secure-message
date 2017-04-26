@@ -150,7 +150,7 @@ class ModifyById(Resource):
         message = Retriever().retrieve_message(message_id, user_urn)
         resp = False
 
-        if label == Labels.UNREAD:
+        if label == Labels.UNREAD.value:
             resp = ModifyById.modify_unread(action, message, user_urn)
         else:
             resp = ModifyById.modify_label(action, message, user_urn, label)
@@ -167,9 +167,13 @@ class ModifyById(Resource):
     @staticmethod
     def modify_label(action, message, user_urn, label):
         """Adds or deletes a label"""
-        if action == 'add':
+        label_exists = label in message
+        if action == 'add' and not label_exists:
             return Modifier.add_label(label, message, user_urn)
-        return Modifier.remove_label(label, message, user_urn)
+        if label_exists:
+            return Modifier.remove_label(label, message, user_urn)
+        else:
+            return False
 
     @staticmethod
     def modify_unread(action, message, user_urn):

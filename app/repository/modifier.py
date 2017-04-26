@@ -46,8 +46,8 @@ class Modifier:
     @staticmethod
     def del_archived(message, user_urn, ):
         archive = Labels.ARCHIVE.value
-       # if archive in message['labels']:
-        Modifier.remove_label(archive, message, user_urn)
+        if archive in message['labels']:
+            Modifier.remove_label(archive, message, user_urn)
         return True
 
     @staticmethod
