@@ -1,12 +1,13 @@
 # from app.authentication.jwt import decode
 from flask_restful import Resource
-from flask import request, jsonify
+from flask import request, jsonify, json
 from werkzeug.exceptions import BadRequest
-
+from json import load
 from app.repository.modifier import Modifier
 from app.validation.domain import MessageSchema
 from app.repository.saver import Saver
 from app.repository.retriever import Retriever
+from app.repository.database import Status
 
 import logging
 from app.common.alerts import AlertUser
@@ -79,17 +80,43 @@ class MessageList(Resource):
 class MessageSend(Resource):
     """Send message for a user"""
 
-    @staticmethod
-    def post():
+    def post(self):
         logger.info("Message send POST request.")
-        message = MessageSchema().load(request.get_json())
+        post_data = request.get_json()
 
-        if message.errors == {}:
+        if 'msg_id' in post_data:
+            self.is_draft = MessageSend().check_if_draft(post_data['msg_id'])
+
+        message = MessageSchema().load(post_data)
+
+        if message.errors == {} and self.is_draft is False:
             return MessageSend.message_save(message)
+        elif message.errors == {} and self.is_draft is True:
+            return MessageSend.change_labels_if_draft(message)
         else:
             res = jsonify(message.errors)
             res.status_code = 400
             return res
+
+    @staticmethod
+    def check_if_draft(message_id):
+        """Checks if the message is in the message table with a DRAFT label"""
+
+        db_model = Status()
+        result = db_model.query.filter_by(msg_id=message_id, label=Labels.DRAFT.value).first()
+        if result is None:
+            return False
+        else:
+            return True
+
+    @staticmethod
+    def change_labels_if_draft(message):
+        modifier = Modifier()
+        modifier.del_draft(message.data)
+        modifier.add_sent(message.data)
+        modifier.add_inbox_and_unread_for_draft_remove_inbox_draft(message.data)
+
+        return MessageSend._alert_recipients(message.data.msg_id)
 
     @staticmethod
     def message_save(message):

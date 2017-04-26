@@ -143,12 +143,15 @@ class DraftSchema(Schema):
 
     @pre_load
     def check_msg_id_not_set(self, data):
-        if 'msg_id' in data:
-            raise ValidationError("{0} can not be set.".format('msg_id'))
+
+        self.validate_not_present(data, 'sent_date')
+        self.validate_not_present(data, 'read_date')
+        self.validate_not_present(data, 'msg_id')
         if 'urn_from' not in data or len(data['urn_from']) == 0:
             raise ValidationError("{0} Missing".format('urn_from'))
         if 'survey' not in data or len(data['survey']) == 0:
             raise ValidationError("{0} Missing".format('survey'))
+        return data
 
     @validates("urn_to")
     def validate_to(self, urn_to):
@@ -180,6 +183,11 @@ class DraftSchema(Schema):
     @post_load
     def make_draft(self, data):
         return Message(**data)
+
+    @staticmethod
+    def validate_not_present(data, field_name):
+        if field_name in data.keys():
+            raise ValidationError("{0} can not be set.".format(field_name))
 
     @staticmethod
     def validate_field_length(field_name, length, max_field_len):

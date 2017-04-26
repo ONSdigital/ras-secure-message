@@ -1,13 +1,15 @@
 import unittest
 import uuid
-
+from app.validation.domain import MessageSchema
 from flask import current_app
 from sqlalchemy import create_engine
-
+from app.validation.labels import Labels
 from app.application import app
 from app.repository import database
 from app.repository.modifier import Modifier
 from app.repository.retriever import Retriever
+from app.repository.saver import Saver
+from unittest import mock
 
 
 class ModifyTestCase(unittest.TestCase):
@@ -192,3 +194,107 @@ class ModifyTestCase(unittest.TestCase):
                 modifier.del_unread(message, 'internal.21345')
                 message = message_service.retrieve_message(msg_id, 'internal.21345')
                 self.assertEqual(message['read_date'], read_date_set)
+
+    def test_draft_label_is_deleted(self):
+        """Check draft label is deleted for message"""
+
+        query_add_status = "INSERT INTO status (id, msg_id, actor, label) VALUES (1, 'test', 'test', '{0}')"\
+            .format(Labels.DRAFT.value)
+
+        with self.engine.connect() as con:
+            con.execute(query_add_status)
+
+        with app.app_context():
+            with current_app.test_request_context():
+
+                modifier = Modifier()
+                self.test_message = {
+                    'msg_id': 'test123',
+                    'urn_to': 'internal.richard',
+                    'urn_from': 'respondent.torrance',
+                    'subject': 'MyMessage',
+                    'body': 'hello',
+                    'thread_id': '',
+                    'collection_case': 'ACollectionCase',
+                    'reporting_unit': 'AReportingUnit',
+                    'survey': 'ACollectionInstrument'
+                }
+
+                message = MessageSchema().load(self.test_message)
+                modifier.del_draft(message.data)
+
+                query_check_for_draft = "SELECT * FROM status WHERE msg_id='{0}'"\
+                    .format(self.test_message['msg_id'])
+
+                with self.engine.connect() as con:
+                    response = con.execute(query_check_for_draft)
+                    for row in response:
+                        self.assertTrue(row is None)
+
+    def test_sent_label_is_added(self):
+        self.populate_database(1)
+        with self.engine.connect() as con:
+            query = 'SELECT msg_id FROM secure_message LIMIT 1'
+
+            query_x = con.execute(query)
+            msg_id = []
+            for row in query_x:
+                msg_id.append(row[0])
+
+        with app.app_context():
+            with current_app.test_request_context():
+                modifier = Modifier()
+                self.test_message = {
+                    'msg_id': msg_id[0],
+                    'urn_to': 'richard',
+                    'urn_from': 'torrance',
+                    'subject': 'MyMessage',
+                    'body': 'hello',
+                    'thread_id': '',
+                    'collection_case': 'ACollectionCase',
+                    'reporting_unit': 'AReportingUnit',
+                    'survey': 'ACollectionInstrument'
+                }
+                message = MessageSchema().load(self.test_message)
+                modifier.add_sent(message.data)
+                with self.engine.connect() as con:
+                    query_check_sent = con.execute("SELECT * FROM status WHERE msg_id='{0}' AND label='{1}'"
+                                                   .format(message.data.msg_id, Labels.SENT.value))
+
+                    for row in query_check_sent:
+                        self.assertTrue(row is not None)
+                    query_check_sent_date = con.execute("SELECT * FROM secure_message WHERE msg_id='{0}'"
+                                                        .format(message.data.msg_id))
+                    for row in query_check_sent_date:
+                        self.assertTrue(row['sent_date'] is not None)
+
+    def test_inbox_and_unread_added(self):
+
+        self.test_message = {
+            'msg_id': 'test',
+            'urn_to': 'richard',
+            'urn_from': 'torrance',
+            'subject': 'MyMessage',
+            'body': 'hello',
+            'thread_id': '',
+            'collection_case': 'ACollectionCase',
+            'reporting_unit': 'AReportingUnit',
+            'survey': 'ACollectionInstrument'
+        }
+        with app.app_context():
+            with current_app.test_request_context():
+                message = MessageSchema().load(self.test_message)
+
+                modifier = Modifier()
+
+                modifier.add_inbox_and_unread_for_draft_remove_inbox_draft(message.data)
+
+                with self.engine.connect() as con:
+                    request = con.execute("SELECT * FROM status WHERE msg_id='{0}' AND label='{1}'"
+                                          .format(self.test_message['msg_id'], Labels.INBOX.value))
+                    self.assertTrue(request.returns_rows)
+                    request_unread = con.execute("SELECT * FROM status WHERE msg_id='{0}' AND label='{1}'"
+                                                 .format(self.test_message['msg_id'], Labels.UNREAD.value))
+                    self.assertTrue(request_unread.returns_rows)
+
+
