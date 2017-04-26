@@ -31,7 +31,7 @@ def reset_db():
         database.db.create_all()
 
 
-# Scenario: add the "archived" label to the message
+# Scenario: modifying the status of the message to "archived"
 @given("a valid message is sent")
 def step_impl(context):
     data['msg_id'] = str(uuid.uuid4())
@@ -86,10 +86,10 @@ def step_impl(context):
     context.response = app.test_client().get("http://localhost:5050/message/{}".format(data['msg_id']),
                                              data=flask.json.dumps(modify_data), headers=headers)
     response = flask.json.loads(context.response.data)
-    nose.tools.assert_true('ARCHIVE' not in response['labels'])
+    nose.tools.assert_true('ARCHIVE' not in response)
 
 
-# Scenario: add the "unread" label to the message
+# Scenario: Modifying the status of the message to "unread"
 @given('a message has been read')
 def step_impl(context):
     reset_db()
@@ -120,7 +120,8 @@ def step_impl(context):
     response = flask.json.loads(context.response.data)
     nose.tools.assert_true('UNREAD' in response['labels'])
 
-    # Scenario: deleting the "unread" level from a given message
+
+# Scenario: modifying the status of the message so that "unread" is removed
 
 
 @when("the message is marked read")

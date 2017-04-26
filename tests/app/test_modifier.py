@@ -60,7 +60,8 @@ class ModifyTestCase(unittest.TestCase):
                 message_service = Retriever()
                 # pass msg_id and user urn
                 message = message_service.retrieve_message(msg_id, 'respondent.21345')
-                Modifier.add_archived(message, 'respondent.21345')
+                # Modifier.add_label(message,'respondent.21345')
+                Modifier.add_archived(message, 'respondent.21345', )
                 message = message_service.retrieve_message(msg_id, 'respondent.21345')
                 self.assertCountEqual(message['labels'], ['SENT', 'ARCHIVE'])
 
@@ -82,7 +83,7 @@ class ModifyTestCase(unittest.TestCase):
                 modifier = Modifier()
                 modifier.add_archived(message, 'respondent.21345')
                 message = message_service.retrieve_message(msg_id, 'respondent.21345')
-                modifier.del_archived(message, 'respondent.21345')
+                modifier.del_archived(message, 'respondent.21345', )
                 message = message_service.retrieve_message(msg_id, 'respondent.21345')
                 self.assertCountEqual(message['labels'], ['SENT'])
 
@@ -141,6 +142,8 @@ class ModifyTestCase(unittest.TestCase):
                 msg_id = str(names[0])
                 message_service = Retriever()
                 # pass msg_id and user urn
+                message = message_service.retrieve_message(msg_id, 'internal.21345')
+                Modifier.del_archived(message, 'internal.21345')
                 message = message_service.retrieve_message(msg_id, 'internal.21345')
                 Modifier.add_archived(message, 'internal.21345')
                 message = message_service.retrieve_message(msg_id, 'internal.21345')

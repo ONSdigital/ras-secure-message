@@ -12,5 +12,3 @@ class Labels(Enum):
     DRAFT_INBOX = "DRAFT_INBOX"
 
     label_list = [INBOX, UNREAD, SENT, ARCHIVE, DRAFT, DRAFT_INBOX]
-
-

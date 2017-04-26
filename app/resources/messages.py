@@ -137,7 +137,6 @@ class MessageById(Resource):
 class ModifyById(Resource):
     """Update message status by id"""
 
-
     @staticmethod
     def put(message_id):
         """Update message by status"""
@@ -169,6 +168,6 @@ class ModifyById(Resource):
             resp = modifier.del_unread(message, user_urn)
 
         if resp:
-            res = jsonify({'status':'ok'})
+            res = jsonify({'status': 'ok'})
             res.status_code = 200
             return res

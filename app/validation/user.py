@@ -14,5 +14,3 @@ class User:
     @property
     def is_respondent(self):
         return bool('respondent' in self.user_urn)
-
-

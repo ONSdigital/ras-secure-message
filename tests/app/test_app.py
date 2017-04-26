@@ -247,5 +247,6 @@ class FlaskTestCase(unittest.TestCase):
             for row in request:
                 self.assertTrue(row is not None)
 
+
 if __name__ == '__main__':
     unittest.main()
