@@ -148,7 +148,6 @@ class ModifyById(Resource):
 
         # pass msg_id and user urn
         message = Retriever().retrieve_message(message_id, user_urn)
-        resp = False
 
         if label == Labels.UNREAD.value:
             resp = ModifyById.modify_unread(action, message, user_urn)

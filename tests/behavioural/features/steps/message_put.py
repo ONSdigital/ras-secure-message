@@ -218,7 +218,7 @@ def step_impl(context):
 @when('an unmmodifiable label is provided')
 def step_impl(context):
     modify_data['action'] = ''
-    modify_data['label'] = 'MODIFY'
+    modify_data['label'] = 'UNREAD'
     context.response = app.test_client().put(url.format(data['msg_id']),
                                              data=flask.json.dumps(modify_data), headers=headers)
 

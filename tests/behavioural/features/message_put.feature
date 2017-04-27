@@ -27,7 +27,7 @@ Feature: Checking correct labels for messages are added & deleted
     Then a Bad Request error is returned
 
   Scenario: validating a request where there is no action provided
-    Given: a suitable message is sent
+    Given: a message is sent
     When the action is empty
     Then a Bad Request 400 error is returned
 
