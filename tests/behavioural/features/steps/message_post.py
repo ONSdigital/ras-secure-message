@@ -21,8 +21,7 @@ def before_scenario(context):
         database.db.drop_all()
         database.db.create_all()
 
-    data.update({'msg_id': '',
-                 'urn_to': 'test',
+    data.update({'urn_to': 'test',
                  'urn_from': 'test',
                  'subject': 'Hello World',
                  'body': 'Test',
@@ -66,6 +65,7 @@ def step_impl(context):
 @given("the 'Thread ID' field is empty")
 def step_impl(context):
     before_scenario(context)
+    data['thread_id'] = ''
 
 
 # Scenario 7: Message sent with a urn_to too long

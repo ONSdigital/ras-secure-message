@@ -2,12 +2,10 @@
 from flask_restful import Resource
 from flask import request, jsonify
 from werkzeug.exceptions import BadRequest
-
 from app.repository.modifier import Modifier
 from app.validation.domain import MessageSchema
 from app.repository.saver import Saver
 from app.repository.retriever import Retriever
-
 import logging
 from app.common.alerts import AlertUser
 from app import settings
@@ -82,7 +80,10 @@ class MessageSend(Resource):
     @staticmethod
     def post():
         logger.info("Message send POST request.")
-        message = MessageSchema().load(request.get_json())
+        post_data = request.get_json()
+        if 'msg_id' in post_data:
+            raise (BadRequest(description="Message can not include msg_id"))
+        message = MessageSchema().load(post_data)
 
         if message.errors == {}:
             return MessageSend.message_save(message)
