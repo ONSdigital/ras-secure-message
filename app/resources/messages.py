@@ -8,7 +8,6 @@ from app.validation.domain import MessageSchema
 from app.repository.saver import Saver
 from app.repository.retriever import Retriever
 from app.repository.database import Status
-
 import logging
 from app.common.alerts import AlertUser
 from app import settings
@@ -83,13 +82,15 @@ class MessageSend(Resource):
     def post(self):
         logger.info("Message send POST request.")
         post_data = request.get_json()
-
         if 'msg_id' in post_data:
             self.is_draft = MessageSend().check_if_draft(post_data['msg_id'])
-
-        if self.is_draft is True:
-            self.draft_id = post_data['msg_id']
-            post_data['msg_id'] = ''
+            if self.is_draft is True:
+                self.draft_id = post_data['msg_id']
+                post_data['msg_id'] = ''
+            else:
+                raise (BadRequest(description="Message can not include msg_id"))
+        else:
+            self.is_draft = False
 
         message = MessageSchema().load(post_data)
 
@@ -138,7 +139,7 @@ class MessageSend(Resource):
         recipient_email = settings.NOTIFICATION_DEV_EMAIL  # TODO change this when know more about party service
         alert_user = AlertUser()
         alert_status, alert_detail = alert_user.send(recipient_email, reference)
-        resp = jsonify({'status': '{0}'.format(alert_detail)})
+        resp = jsonify({'status': '{0}'.format(alert_detail), 'msg_id': reference})
         resp.status_code = alert_status
         return resp
 

@@ -1,4 +1,4 @@
-import flask
+from flask import json
 import nose.tools
 from behave import given, then, when
 from app import constants
@@ -7,8 +7,7 @@ from app.repository import database
 from flask import current_app
 from unittest import mock
 from app.common.alerts import AlertUser, AlertViaGovNotify
-from app.repository.saver import Saver
-from app.validation.labels import Labels
+
 
 url = "http://localhost:5050/message/send"
 headers = {'Content-Type': 'application/json', 'user-urn': '0000000000'}
@@ -23,7 +22,7 @@ def before_scenario(context):
         database.db.drop_all()
         database.db.create_all()
 
-    data.update({'msg_id': '',
+    data.update({
                  'urn_to': 'test',
                  'urn_from': 'respondent.test',
                  'subject': 'Hello World',
@@ -39,11 +38,28 @@ def before_scenario(context):
 def step_impl(context):
     before_scenario(context)
 
+
 # Scenario 2: Send a draft and receive a 201
 @given('a message is identified as a draft')
 def step_impl(context):
-    data['msg_id'] = 'test345'
-    Saver().save_msg_status(data['urn_from'], data['msg_id'], Labels.DRAFT.value)
+    context.post_draft = app.test_client().post("http://localhost:5050/draft/save", data=json.dumps(data),
+                                                headers=headers)
+    msg_resp = json.loads(context.post_draft.data)
+    context.msg_id = msg_resp['msg_id']
+    context.message = {'msg_id': context.msg_id,
+                       'urn_to': 'test',
+                       'urn_from': 'respondent.test',
+                       'subject': 'Hello World',
+                       'body': 'Test',
+                       'thread_id': '',
+                       'collection_case': 'collection case1',
+                       'reporting_unit': 'reporting case1',
+                       'survey': 'survey'}
+
+
+@when('the draft is sent')
+def step_impl(context):
+    context.response = app.test_client().post(url, data=json.dumps(context.message), headers=headers)
 
 
 # Scenario 3: Submit a message with a missing "To" field and receive a 400 error
@@ -74,6 +90,7 @@ def step_impl(context):
 @given("the 'Thread ID' field is empty")
 def step_impl(context):
     before_scenario(context)
+    data['thread_id'] = ''
 
 
 # Scenario 8: Message sent with a urn_to too long
@@ -93,13 +110,12 @@ def step_impl(context):
 def step_impl(context):
     data['survey'] = ''
 
-
 # Common Steps: used in multiple scenarios
 
 
 @when("the message is sent")
 def step_impl(context):
-    context.response = app.test_client().post(url, data=flask.json.dumps(data), headers=headers)
+    context.response = app.test_client().post(url, data=json.dumps(data), headers=headers)
 
 
 @then("a 400 error status is returned")

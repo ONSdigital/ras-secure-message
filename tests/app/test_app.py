@@ -22,8 +22,7 @@ class FlaskTestCase(unittest.TestCase):
 
         AlertUser.alert_method = mock.Mock(AlertViaGovNotify)
 
-        self.test_message = {'msg_id': 'AMsgId',
-                             'urn_to': 'richard',
+        self.test_message = {'urn_to': 'richard',
                              'urn_from': 'torrance',
                              'subject': 'MyMessage',
                              'body': 'hello',
@@ -67,21 +66,40 @@ class FlaskTestCase(unittest.TestCase):
                 data = {"subject": row['subject'], "body": row['body']}
                 self.assertEqual({'subject': 'MyMessage', 'body': 'hello'}, data)
 
-    def test_post_request_returns_201_on_success(self):
+    def test_message_post_request_returns_201_and_msg_id(self):
         """check messages from messageSend endpoint saved in database"""
         # post json message written up in the ui
         url = "http://localhost:5050/message/send"
         headers = {'Content-Type': 'application/json', 'user_urn': ''}
 
         response = self.app.post(url, data=json.dumps(self.test_message), headers=headers)
+        msg_resp = json.loads(response.data)
+        msg_id = msg_resp['msg_id']
+        self.assertTrue(msg_id is not None)
         self.assertEqual(response.status_code, 201)
+
+    def test_post_request_with_msg_id_returns_bad_request(self):
+        """Check message sent with msg_id returns bad request"""
+
+        url = "http://localhost:5050/message/send"
+        headers = {'Content-Type': 'application/json', 'user_urn': ''}
+        data = {'msg_id': '',
+                'urn_to': 'richard',
+                'urn_from': 'torrance',
+                'subject': 'MyMessage',
+                'body': 'hello',
+                'thread': "?",
+                'create_date': datetime.now(timezone.utc),
+                'read_date': datetime.now(timezone.utc)}
+
+        response = self.app.post(url, data=json.dumps(data), headers=headers)
+        self.assertEqual(response.status_code, 400)
 
     def test_post_request_stores_uuid_in_msg_id_if_message_post_called_with_no_msg_id_set(self):
         """check default_msg_id is stored when messageSend endpoint called with no msg_id"""
         # post json message written up in the ui
         url = "http://localhost:5050/message/send"
         headers = {'Content-Type': 'application/json', 'user_urn': ''}
-        self.test_message['msg_id'] = ''
         self.app.post(url, data=json.dumps(self.test_message), headers=headers)
         engine = create_engine(settings.SECURE_MESSAGING_DATABASE_URL, echo=True)
         with engine.connect() as con:
@@ -96,7 +114,6 @@ class FlaskTestCase(unittest.TestCase):
 
         url = "http://localhost:5050/message/send"
         headers = {'Content-Type': 'application/json', 'user_urn': ''}
-        self.test_message['msg_id'] = ''
         self.app.post(url, data=json.dumps(self.test_message), headers=headers)
 
         # Now read back the message to get the thread ID
@@ -108,13 +125,12 @@ class FlaskTestCase(unittest.TestCase):
                 self.test_message['thread_id'] = row['thread_id']
 
         # Now submit a new message as a reply , Message Id empty , thread id same as last one
-        self.test_message['msg_id'] = ''
         self.app.post(url, data=json.dumps(self.test_message), headers=headers)
 
         # Now read back the two messages
         original_msg_id = original_thread_id = reply_msg_id = reply_thread_id = ''
         with engine.connect() as con:
-            request = con.execute('SELECT * FROM secure_message ORDER BY id ASC')
+            request = con.execute('SELECT * FROM secure_message ORDER BY id DESC')
             for row in request:
                 if row[0] == 1:
                     original_msg_id = row['msg_id']
@@ -137,8 +153,7 @@ class FlaskTestCase(unittest.TestCase):
         url = "http://localhost:5050/message/send"
         headers = {'Content-Type': 'application/json', 'user_urn': ''}
         now = datetime.now(timezone.utc)
-        test_message = {'msg_id': 'AMsgId',
-                        'urn_to': 'richard',
+        test_message = {'urn_to': 'richard',
                         'urn_from': 'torrance',
                         'subject': 'MyMessage',
                         'body': 'hello',
@@ -198,11 +213,12 @@ class FlaskTestCase(unittest.TestCase):
         url = "http://localhost:5050/message/send"
         headers = {'Content-Type': 'application/json', 'user_urn': ''}
 
-        self.app.post(url, data=json.dumps(self.test_message), headers=headers)
+        response = self.app.post(url, data=json.dumps(self.test_message), headers=headers)
+        data = json.loads(response.data)
 
         with self.engine.connect() as con:
             request = con.execute("SELECT * FROM status WHERE label='SENT' AND msg_id='{0}' AND actor='{1}'"
-                                  .format(self.test_message['msg_id'], self.test_message['survey']))
+                                  .format(data['msg_id'], self.test_message['survey']))
             for row in request:
                 self.assertTrue(row is not None)
 
@@ -211,11 +227,12 @@ class FlaskTestCase(unittest.TestCase):
         url = "http://localhost:5050/message/send"
         headers = {'Content-Type': 'application/json', 'user_urn': ''}
 
-        self.app.post(url, data=json.dumps(self.test_message), headers=headers)
+        response = self.app.post(url, data=json.dumps(self.test_message), headers=headers)
+        data = json.loads(response.data)
 
         with self.engine.connect() as con:
             request = con.execute("SELECT * FROM status WHERE label='INBOX' OR label='UNREAD' AND msg_id='{0}'"
-                                  " AND actor='{1}'".format(self.test_message['msg_id'], self.test_message['urn_to']))
+                                  " AND actor='{1}'".format(data['msg_id'], self.test_message['urn_to']))
             for row in request:
                 self.assertTrue(row is not None)
 
@@ -224,11 +241,12 @@ class FlaskTestCase(unittest.TestCase):
         url = "http://localhost:5050/message/send"
         headers = {'Content-Type': 'application/json', 'user_urn': ''}
 
-        self.app.post(url, data=json.dumps(self.test_message), headers=headers)
+        response = self.app.post(url, data=json.dumps(self.test_message), headers=headers)
+        data = json.loads(response.data)
 
         with self.engine.connect() as con:
             request = con.execute("SELECT * FROM status WHERE msg_id='{0}' AND actor='{1}' AND label='SENT'"
-                                  .format(self.test_message['msg_id'], self.test_message['survey']))
+                                  .format(data['msg_id'], self.test_message['survey']))
             for row in request:
                 self.assertTrue(row is not None)
 
@@ -238,14 +256,40 @@ class FlaskTestCase(unittest.TestCase):
         url = "http://localhost:5050/message/send"
         headers = {'Content-Type': 'application/json', 'user_urn': ''}
 
-        self.app.post(url, data=json.dumps(self.test_message), headers=headers)
+        response = self.app.post(url, data=json.dumps(self.test_message), headers=headers)
+        data = json.loads(response.data)
 
         with self.engine.connect() as con:
             request = con.execute("SELECT * FROM internal_sent_audit WHERE msg_id='{0}' AND internal_user='{1}'"
-                                  .format(self.test_message['msg_id'], self.test_message['urn_from']))
+                                  .format(data['msg_id'], self.test_message['urn_from']))
 
             for row in request:
                 self.assertTrue(row is not None)
+
+    def test_draft_post_returns_201_and_msg_id(self):
+        url = "http://localhost:5050/draft/save"
+        headers = {'Content-Type': 'application/json', 'user_urn': ''}
+
+        response = self.app.post(url, data=json.dumps(self.test_message), headers=headers)
+        msg_resp = json.loads(response.data)
+        msg_id = msg_resp['msg_id']
+        self.assertTrue(msg_id is not None)
+        self.assertEqual(response.status_code, 201)
+
+    def test_draft_with_msg_id_post_returns_400(self):
+        url = "http://localhost:5050/draft/save"
+        headers = {'Content-Type': 'application/json', 'user_urn': ''}
+        data = {'msg_id': '',
+                'urn_to': 'richard',
+                'urn_from': 'torrance',
+                'subject': 'MyMessage',
+                'body': 'hello',
+                'thread': "?",
+                'create_date': datetime.now(timezone.utc),
+                'read_date': datetime.now(timezone.utc)}
+
+        response = self.app.post(url, data=json.dumps(data), headers=headers)
+        self.assertEqual(response.status_code, 400)
 
 
 if __name__ == '__main__':

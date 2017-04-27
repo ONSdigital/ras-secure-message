@@ -1,5 +1,5 @@
 import uuid
-
+from flask import json
 import flask
 import nose.tools
 from behave import given, then, when
@@ -10,8 +10,7 @@ from flask import current_app
 url = "http://localhost:5050/message/{}/modify"
 headers = {'Content-Type': 'application/json', 'user_urn': 'internal.12344'}
 
-data = {'msg_id': '',
-        'urn_to': 'test',
+data = {'urn_to': 'test',
         'urn_from': 'test',
         'subject': 'Hello World',
         'body': 'Test',
@@ -34,24 +33,25 @@ def reset_db():
 # Scenario: modifying the status of the message to "archived"
 @given("a valid message is sent")
 def step_impl(context):
-    data['msg_id'] = str(uuid.uuid4())
     data['urn_to'] = 'internal.12344'
     data['urn_from'] = 'respondent.122342'
     context.response = app.test_client().post("http://localhost:5050/message/send",
                                               data=flask.json.dumps(data), headers=headers)
+    msg_resp = json.loads(context.response.data)
+    context.msg_id = msg_resp['msg_id']
 
 
 @when("the message is archived")
 def step_impl(context):
     modify_data['action'] = 'add'
     modify_data['label'] = 'ARCHIVE'
-    context.response = app.test_client().put(url.format(data['msg_id']),
+    context.response = app.test_client().put(url.format(context.msg_id),
                                              data=flask.json.dumps(modify_data), headers=headers)
 
 
 @then('check message is marked as archived')
 def step_impl(context):
-    context.response = app.test_client().get("http://localhost:5050/message/{}".format(data['msg_id']),
+    context.response = app.test_client().get("http://localhost:5050/message/{}".format(context.msg_id),
                                              data=flask.json.dumps(modify_data), headers=headers)
     response = flask.json.loads(context.response.data)
     nose.tools.assert_true('ARCHIVE' in response['labels'])
@@ -61,15 +61,16 @@ def step_impl(context):
 @given("the message is archived")
 def step_impl(context):
     reset_db()
-    data['msg_id'] = str(uuid.uuid4())
     data['urn_to'] = 'internal.12344'
     data['urn_from'] = 'respondent.122342'
     context.response = app.test_client().post("http://localhost:5050/message/send",
                                               data=flask.json.dumps(data), headers=headers)
+    msg_resp = json.loads(context.response.data)
+    context.msg_id = msg_resp['msg_id']
 
     modify_data['action'] = 'add'
     modify_data['label'] = 'ARCHIVE'
-    context.response = app.test_client().put(url.format(data['msg_id']),
+    context.response = app.test_client().put(url.format(context.msg_id),
                                              data=flask.json.dumps(modify_data), headers=headers)
 
 
@@ -77,13 +78,13 @@ def step_impl(context):
 def step_impl(context):
     modify_data['action'] = 'remove'
     modify_data['label'] = "ARCHIVE"
-    context.response = app.test_client().put(url.format(data['msg_id']),
+    context.response = app.test_client().put(url.format(context.msg_id),
                                              data=flask.json.dumps(modify_data), headers=headers)
 
 
 @then('check message is not marked as archived')
 def step_impl(context):
-    context.response = app.test_client().get("http://localhost:5050/message/{}".format(data['msg_id']),
+    context.response = app.test_client().get("http://localhost:5050/message/{}".format(context.msg_id),
                                              data=flask.json.dumps(modify_data), headers=headers)
     response = flask.json.loads(context.response.data)
     nose.tools.assert_true('ARCHIVE' not in response)
@@ -93,15 +94,16 @@ def step_impl(context):
 @given('a message has been read')
 def step_impl(context):
     reset_db()
-    data['msg_id'] = str(uuid.uuid4())
     data['urn_to'] = 'internal.12344'
     data['urn_from'] = 'respondent.122342'
     context.response = app.test_client().post("http://localhost:5050/message/send",
                                               data=flask.json.dumps(data), headers=headers)
+    msg_resp = json.loads(context.response.data)
+    context.msg_id = msg_resp['msg_id']
 
     modify_data['action'] = 'remove'
     modify_data['label'] = 'UNREAD'
-    context.response = app.test_client().put(url.format(data['msg_id']),
+    context.response = app.test_client().put(url.format(context.msg_id),
                                              data=flask.json.dumps(modify_data), headers=headers)
 
 
@@ -109,13 +111,13 @@ def step_impl(context):
 def step_impl(context):
     modify_data['action'] = 'add'
     modify_data['label'] = "UNREAD"
-    context.response = app.test_client().put(url.format(data['msg_id']),
+    context.response = app.test_client().put(url.format(context.msg_id),
                                              data=flask.json.dumps(modify_data), headers=headers)
 
 
 @then('check message is marked unread')
 def step_impl(context):
-    context.response = app.test_client().get("http://localhost:5050/message/{}".format(data['msg_id']),
+    context.response = app.test_client().get("http://localhost:5050/message/{}".format(context.msg_id),
                                              data=flask.json.dumps(modify_data), headers=headers)
     response = flask.json.loads(context.response.data)
     nose.tools.assert_true('UNREAD' in response['labels'])
@@ -128,13 +130,13 @@ def step_impl(context):
 def step_impl(context):
     modify_data['action'] = 'remove'
     modify_data['label'] = "UNREAD"
-    context.response = app.test_client().put(url.format(data['msg_id']),
+    context.response = app.test_client().put(url.format(context.msg_id),
                                              data=flask.json.dumps(modify_data), headers=headers)
 
 
 @then('check message is not marked unread')
 def step_impl(context):
-    context.response = app.test_client().get("http://localhost:5050/message/{}".format(data['msg_id']),
+    context.response = app.test_client().get("http://localhost:5050/message/{}".format(context.msg_id),
                                              data=flask.json.dumps(modify_data), headers=headers)
     response = flask.json.loads(context.response.data)
     nose.tools.assert_true('UNREAD' not in response['labels'])
