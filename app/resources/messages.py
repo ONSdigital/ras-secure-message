@@ -190,7 +190,7 @@ class ModifyById(Resource):
         if label not in Labels.label_list.value:
             raise BadRequest(description="Invalid label provided: {0}".format(label))
 
-        if label not in [Labels.ARCHIVE.value , Labels.UNREAD.value]:
+        if label not in [Labels.ARCHIVE.value, Labels.UNREAD.value]:
             raise BadRequest(description="Non modifiable label provided: {0}".format(label))
 
         if 'action' not in request_data:
