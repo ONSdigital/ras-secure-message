@@ -1,5 +1,6 @@
 from app.authentication.authenticator import check_jwt
 from app.authentication.jwt import encode
+from app.authentication.jwe import Encrypter
 from flask import Response
 import unittest
 
@@ -14,7 +15,10 @@ class AuthenticationTestCase(unittest.TestCase):
                   "survey": "BRS",
                   "CC": "URN"
                 }
-        res = check_jwt(encode(data))
+        encrypter = Encrypter()
+        signed_jwt = encode(data)
+        encrypted_jwt = encrypter.encrypt_token(signed_jwt)
+        res = check_jwt(encrypted_jwt)
         self.assertEqual(res, expected_res)
 
     def test_authentication_jwt_invalid_fail(self):
