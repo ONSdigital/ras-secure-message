@@ -53,12 +53,13 @@ class Drafts(Resource):
 class DraftById(Resource):
     """All draft functionality with an id on request"""
 
-    def put(self):
+    def put(self, draft_id):
         """Handles modifying of drafts"""
         data = request.get_json()
         if 'msg_id' not in data:
             raise (BadRequest(description="Draft put requires msg_id"))
-        draft_id = data['msg_id']
+        if data['msg_id'] != draft_id:
+            raise (BadRequest(description="Conflicting msg_id's"))
         is_draft = self.check_valid_draft(draft_id)
         if is_draft is False:
             raise (BadRequest(description="Draft put requires valid draft"))

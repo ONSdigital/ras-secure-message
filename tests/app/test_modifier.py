@@ -7,6 +7,7 @@ from app.application import app
 from app.repository import database
 from app.repository.modifier import Modifier
 from app.repository.retriever import Retriever
+from app.validation.domain import DraftSchema
 
 
 class ModifyTestCase(unittest.TestCase):
@@ -240,7 +241,8 @@ class ModifyTestCase(unittest.TestCase):
                                 .format(self.test_message['msg_id'], self.test_message['body'], self.test_message['subject'], self.test_message['thread_id'],
                                         None, None, self.test_message['collection_case'], self.test_message['reporting_unit'], 'test')
                     con.execute(add_draft)
-                    modifier.replace_current_draft(self.test_message['msg_id'], self.test_message)
+                    draft = DraftSchema().load(self.test_message)
+                    modifier.replace_current_draft(self.test_message['msg_id'], draft.data)
                     replaced_draft = con.execute("SELECT * FROM secure_message WHERE msg_id='{0}'".format(self.test_message['msg_id']))
 
                     for row in replaced_draft:
