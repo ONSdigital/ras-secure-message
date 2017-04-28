@@ -286,13 +286,70 @@ class FlaskTestCase(unittest.TestCase):
                 'urn_from': 'torrance',
                 'subject': 'MyMessage',
                 'body': 'hello',
-                'thread': "?",
-                'create_date': datetime.now(timezone.utc),
-                'read_date': datetime.now(timezone.utc)}
+                'thread': "",
+                'survey': 'RSI'}
 
         response = self.app.post(url, data=json.dumps(data), headers=headers)
         self.assertEqual(response.status_code, 400)
 
+    def test_draft_put_returns_200_on_success(self):
+        """Test successful draft modify returns 200"""
+        url = "http://localhost:5050/draft/save"
+        headers = {'Content-Type': 'application/json', 'user_urn': ''}
+        data = {'urn_to': 'richard',
+                'urn_from': 'torrance',
+                'subject': 'MyMessage',
+                'body': 'hello',
+                'thread': "",
+                'survey': 'RSI'}
 
+        response = self.app.post(url, data=json.dumps(data), headers=headers)
+        msg_resp = json.loads(response.data)
+        msg_id = msg_resp['msg_id']
+        replace_data = {'msg_id': msg_id,
+                        'urn_to': 'richard',
+                        'urn_from': 'torrance',
+                        'subject': 'MyMessage',
+                        'body': 'hello',
+                        'thread': "",
+                        'survey': 'RSI'}
+        put = self.app.put('http://localhost:5050/draft/{0}'.format(msg_id), data=json.dumps(replace_data), headers=headers)
+        self.assertEqual(put.status_code, 200)
+
+    def test_draft_put_if_draft_does_not_exist_return_400(self):
+        """Test if draft doesn't exist bad request returned by modify endpoint"""
+        headers = {'Content-Type': 'application/json', 'user_urn': ''}
+        replace_data = {'msg_id': 'happy',
+                        'urn_to': 'richard',
+                        'urn_from': 'torrance',
+                        'subject': 'MyMessage',
+                        'body': 'hello',
+                        'thread': "",
+                        'survey': 'RSI'}
+        put = self.app.put('http://localhost:5050/draft/{0}'.format(replace_data['msg_id']), data=json.dumps(replace_data), headers=headers)
+        self.assertEqual(put.status_code, 400)
+
+    def test_draft_put_if_msg_id_do_not_match_return_400(self):
+        url = "http://localhost:5050/draft/save"
+        headers = {'Content-Type': 'application/json', 'user_urn': ''}
+        data = {'urn_to': 'richard',
+                'urn_from': 'torrance',
+                'subject': 'MyMessage',
+                'body': 'hello',
+                'thread': "",
+                'survey': 'RSI'}
+        response = self.app.post(url, data=json.dumps(data), headers=headers)
+        msg_resp = json.loads(response.data)
+        msg_id = msg_resp['msg_id']
+        replace_data = {'msg_id': '789',
+                        'urn_to': 'richard',
+                        'urn_from': 'torrance',
+                        'subject': 'MyMessage',
+                        'body': 'hello',
+                        'thread': "",
+                        'survey': 'RSI'}
+        put = self.app.put('http://localhost:5050/draft/{0}'.format(msg_id), data=json.dumps(replace_data), headers=headers)
+        self.assertEqual(put.status_code, 400)
+        
 if __name__ == '__main__':
     unittest.main()
