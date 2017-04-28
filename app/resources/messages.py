@@ -169,31 +169,60 @@ class ModifyById(Resource):
         user_urn = request.headers.get('user_urn')
 
         request_data = request.get_json()
-        if request_data["label"] not in Labels.label_list.value:
-            raise BadRequest(description="Invalid label given")
 
-        if request_data["action"] != "add" and request_data["action"] != "remove":
-            raise BadRequest(description="Invalid action taken")
+        action, label = ModifyById.validate_request(request_data)
 
-        message_service = Retriever()
         # pass msg_id and user urn
-        message = message_service.retrieve_message(message_id, user_urn)
-        modifier = Modifier()
-        resp = False
+        message = Retriever().retrieve_message(message_id, user_urn)
 
-        if request_data['action'] == 'add' and request_data['label'] == 'ARCHIVE':
-            resp = modifier.add_archived(message, user_urn)
-
-        elif request_data['action'] == 'remove' and request_data['label'] == 'ARCHIVE':
-            resp = modifier.del_archived(message, user_urn)
-
-        elif request_data['action'] == 'add' and request_data['label'] == 'UNREAD':
-            resp = modifier.add_unread(message, user_urn)
-
-        elif request_data['action'] == 'remove' and request_data['label'] == 'UNREAD':
-            resp = modifier.del_unread(message, user_urn)
+        if label == Labels.UNREAD.value:
+            resp = ModifyById.modify_unread(action, message, user_urn)
+        else:
+            resp = ModifyById.modify_label(action, message, user_urn, label)
 
         if resp:
             res = jsonify({'status': 'ok'})
             res.status_code = 200
-            return res
+
+        else:
+            res = jsonify({'status': 'error'})
+            res.status_code = 400
+        return res
+
+    @staticmethod
+    def modify_label(action, message, user_urn, label):
+        """Adds or deletes a label"""
+        label_exists = label in message
+        if action == 'add' and not label_exists:
+            return Modifier.add_label(label, message, user_urn)
+        if label_exists:
+            return Modifier.remove_label(label, message, user_urn)
+        else:
+            return False
+
+    @staticmethod
+    def modify_unread(action, message, user_urn):
+        if action == 'add':
+            return Modifier.add_unread(message, user_urn)
+        return Modifier.del_unread(message, user_urn)
+
+    @staticmethod
+    def validate_request(request_data):
+        if 'label' not in request_data:
+            raise BadRequest(description="No label provided")
+
+        label = request_data["label"]
+        if label not in Labels.label_list.value:
+            raise BadRequest(description="Invalid label provided: {0}".format(label))
+
+        if label not in [Labels.ARCHIVE.value, Labels.UNREAD.value]:
+            raise BadRequest(description="Non modifiable label provided: {0}".format(label))
+
+        if 'action' not in request_data:
+            raise BadRequest(description="No action provided")
+
+        action = request_data["action"]
+        if action not in ["add", "remove"]:
+            raise BadRequest(description="Invalid action requested: {0}".format(action))
+
+        return action, label
