@@ -1,13 +1,13 @@
 # from app.authentication.jwt import decode
 from flask_restful import Resource
-from flask import request, jsonify
+from flask import request, jsonify, json
 from werkzeug.exceptions import BadRequest
-
+from json import load
 from app.repository.modifier import Modifier
 from app.validation.domain import MessageSchema
 from app.repository.saver import Saver
 from app.repository.retriever import Retriever
-
+from app.repository.database import Status
 import logging
 from app.common.alerts import AlertUser
 from app import settings
@@ -79,20 +79,44 @@ class MessageList(Resource):
 class MessageSend(Resource):
     """Send message for a user"""
 
-    @staticmethod
-    def post():
+    def post(self):
         logger.info("Message send POST request.")
-        message = MessageSchema().load(request.get_json())
+        post_data = request.get_json()
+        is_draft = False
+        draft_id = None
+        if 'msg_id' in post_data:
+            is_draft = MessageSend().check_if_draft(post_data['msg_id'])
+            if is_draft is True:
+                draft_id = post_data['msg_id']
+                post_data['msg_id'] = ''
+            else:
+                raise (BadRequest(description="Message can not include msg_id"))
+
+        message = MessageSchema().load(post_data)
 
         if message.errors == {}:
-            return MessageSend.message_save(message)
+            return self.message_save(message, is_draft, draft_id)
         else:
             res = jsonify(message.errors)
             res.status_code = 400
             return res
 
     @staticmethod
-    def message_save(message):
+    def check_if_draft(message_id):
+        """Checks if the message is in the message table with a DRAFT label"""
+        db_model = Status()
+        result = db_model.query.filter_by(msg_id=message_id, label=Labels.DRAFT.value).first()
+        if result is None:
+            return False
+        else:
+            return True
+
+    @staticmethod
+    def del_draft_labels(draft_id):
+        modifier = Modifier()
+        modifier.del_draft(draft_id)
+
+    def message_save(self, message, is_draft, draft_id):
         """Saves the message to the database along with the subsequent status and audit"""
         save = Saver()
         save.save_message(message.data, datetime.now(timezone.utc))
@@ -106,6 +130,8 @@ class MessageSend(Resource):
             save.save_msg_status(message.data.urn_to, message.data.msg_id, Labels.INBOX.value)
             save.save_msg_status(message.data.urn_to, message.data.msg_id, Labels.UNREAD.value)
 
+        if is_draft is True:
+            self.del_draft_labels(draft_id)
         return MessageSend._alert_recipients(message.data.msg_id)
 
     @staticmethod
@@ -114,7 +140,7 @@ class MessageSend(Resource):
         recipient_email = settings.NOTIFICATION_DEV_EMAIL  # TODO change this when know more about party service
         alert_user = AlertUser()
         alert_status, alert_detail = alert_user.send(recipient_email, reference)
-        resp = jsonify({'status': '{0}'.format(alert_detail)})
+        resp = jsonify({'status': '{0}'.format(alert_detail), 'msg_id': reference})
         resp.status_code = alert_status
         return resp
 
@@ -143,31 +169,60 @@ class ModifyById(Resource):
         user_urn = request.headers.get('user_urn')
 
         request_data = request.get_json()
-        if request_data["label"] not in Labels.label_list.value:
-            raise BadRequest(description="Invalid label given")
 
-        if request_data["action"] != "add" and request_data["action"] != "remove":
-            raise BadRequest(description="Invalid action taken")
+        action, label = ModifyById.validate_request(request_data)
 
-        message_service = Retriever()
         # pass msg_id and user urn
-        message = message_service.retrieve_message(message_id, user_urn)
-        modifier = Modifier()
-        resp = False
+        message = Retriever().retrieve_message(message_id, user_urn)
 
-        if request_data['action'] == 'add' and request_data['label'] == 'ARCHIVE':
-            resp = modifier.add_archived(message, user_urn)
-
-        elif request_data['action'] == 'remove' and request_data['label'] == 'ARCHIVE':
-            resp = modifier.del_archived(message, user_urn)
-
-        elif request_data['action'] == 'add' and request_data['label'] == 'UNREAD':
-            resp = modifier.add_unread(message, user_urn)
-
-        elif request_data['action'] == 'remove' and request_data['label'] == 'UNREAD':
-            resp = modifier.del_unread(message, user_urn)
+        if label == Labels.UNREAD.value:
+            resp = ModifyById.modify_unread(action, message, user_urn)
+        else:
+            resp = ModifyById.modify_label(action, message, user_urn, label)
 
         if resp:
             res = jsonify({'status': 'ok'})
             res.status_code = 200
-            return res
+
+        else:
+            res = jsonify({'status': 'error'})
+            res.status_code = 400
+        return res
+
+    @staticmethod
+    def modify_label(action, message, user_urn, label):
+        """Adds or deletes a label"""
+        label_exists = label in message
+        if action == 'add' and not label_exists:
+            return Modifier.add_label(label, message, user_urn)
+        if label_exists:
+            return Modifier.remove_label(label, message, user_urn)
+        else:
+            return False
+
+    @staticmethod
+    def modify_unread(action, message, user_urn):
+        if action == 'add':
+            return Modifier.add_unread(message, user_urn)
+        return Modifier.del_unread(message, user_urn)
+
+    @staticmethod
+    def validate_request(request_data):
+        if 'label' not in request_data:
+            raise BadRequest(description="No label provided")
+
+        label = request_data["label"]
+        if label not in Labels.label_list.value:
+            raise BadRequest(description="Invalid label provided: {0}".format(label))
+
+        if label not in [Labels.ARCHIVE.value, Labels.UNREAD.value]:
+            raise BadRequest(description="Non modifiable label provided: {0}".format(label))
+
+        if 'action' not in request_data:
+            raise BadRequest(description="No action provided")
+
+        action = request_data["action"]
+        if action not in ["add", "remove"]:
+            raise BadRequest(description="Invalid action requested: {0}".format(action))
+
+        return action, label

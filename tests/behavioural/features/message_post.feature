@@ -5,6 +5,11 @@ Feature: Message Send Endpoint
     When the message is sent
     Then a 201 status code is the response
 
+  Scenario: Send a draft and receive a 201
+    Given a message is identified as a draft
+    When the draft is sent
+    Then a 201 status code is the response
+
   Scenario: Submit a message with a missing "To" field and receive a 400 error
     Given  the 'To' field is empty
     When the message is sent
@@ -42,6 +47,11 @@ Feature: Message Send Endpoint
 
   Scenario: Message sent with an empty survey field return 400
     Given the survey field is empty
+    When the message is sent
+    Then a 400 error status is returned
+
+  Scenario: Send a message with a msg_id not valid draft return 400
+    Given a message contains a msg_id and is not a valid draft
     When the message is sent
     Then a 400 error status is returned
 

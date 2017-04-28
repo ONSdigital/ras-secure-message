@@ -31,8 +31,6 @@ class DraftTestCase(unittest.TestCase):
                              'urn_from': 'torrance',
                              'subject': 'MyMessage',
                              'body': 'hello',
-                             'sent_date': None,
-                             'read_date': None,
                              'thread_id': '',
                              'collection_case': 'ACollectionCase',
                              'reporting_unit': 'AReportingUnit',
@@ -164,3 +162,32 @@ class DraftTestCase(unittest.TestCase):
         with self.engine.connect() as con:
             request = con.execute("SELECT * FROM secure_message LIMIT 1")
             self.assertTrue(request is not None)
+
+    def test_draft_sent_successfully_return_201(self):
+        """Send message that is a draft"""
+
+        self.app.post(self.url, data=json.dumps(self.test_message), headers=self.headers)
+
+        with self.engine.connect() as con:
+            request = con.execute("SELECT * FROM secure_message LIMIT 1")
+            for row in request:
+                self.msg_id = row['msg_id']
+
+        self.test_message.update(
+            {
+                'msg_id': self.msg_id,
+                'urn_to': 'richard',
+                'urn_from': 'torrance',
+                'subject': 'MyMessage',
+                'body': 'hello',
+                'thread_id': '',
+                'collection_case': 'ACollectionCase',
+                'reporting_unit': 'AReportingUnit',
+                'survey': 'ACollectionInstrument'
+            }
+        )
+
+        response = self.app.post('http://localhost:5050/message/send', data=json.dumps(self.test_message),
+                                 headers=self.headers)
+        self.assertEqual(response.status_code, 201)
+

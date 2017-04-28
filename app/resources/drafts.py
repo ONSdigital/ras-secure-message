@@ -4,6 +4,7 @@ from app.repository.saver import Saver
 from app.validation.labels import Labels
 from app.validation.domain import DraftSchema
 from app.validation.user import User
+from werkzeug.exceptions import BadRequest
 
 
 class Drafts(Resource):
@@ -12,11 +13,15 @@ class Drafts(Resource):
         pass
 
     def post(self):
-        draft = DraftSchema().load(request.get_json())
+        """Handles saving of new draft"""
+        post_data = request.get_json()
+        if 'msg_id' in post_data:
+            raise (BadRequest(description="Message can not include msg_id"))
+        draft = DraftSchema().load(post_data)
 
         if draft.errors == {}:
             self.save_draft(draft)
-            resp = jsonify({'status': 'OK'})
+            resp = jsonify({'status': 'OK', 'msg_id': draft.data.msg_id})
             resp.status_code = 201
             return resp
         else:

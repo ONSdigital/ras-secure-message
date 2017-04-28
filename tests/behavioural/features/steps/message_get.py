@@ -1,4 +1,5 @@
 import flask
+from flask import json
 import nose.tools
 from behave import given, then, when
 from app.application import app
@@ -7,8 +8,7 @@ import uuid
 url = "http://localhost:5050/message/"
 headers = {'Content-Type': 'application/json', 'user_urn': ''}
 
-data = {'msg_id': '',
-        'urn_to': 'test',
+data = {'urn_to': 'test',
         'urn_from': 'test',
         'subject': 'Hello World',
         'body': 'Test',
@@ -21,16 +21,17 @@ data = {'msg_id': '',
 # Scenario: Retrieve a message with correct message ID
 @given("there is a message to be retrieved")
 def step_impl(context):
-    data['msg_id'] = str(uuid.uuid4())
     data['urn_to'] = 'internal.12344'
     data['urn_from'] = 'respondent.122342'
     context.response = app.test_client().post("http://localhost:5050/message/send",
-                                                          data=flask.json.dumps(data), headers=headers)
+                                                data=flask.json.dumps(data), headers=headers)
+    msg_resp = json.loads(context.response.data)
+    context.msg_id = msg_resp['msg_id']
 
 
 @when("the get request is made with a correct message id")
 def step_impl(context):
-    new_url = url+data['msg_id']
+    new_url = url+context.msg_id
     context.response = app.test_client().get(new_url, headers=headers)
 
 
@@ -54,17 +55,18 @@ def step_impl(context):
 # Scenario: Respondent sends message and retrieves the same message with it's labels
 @given("a respondent sends a message")
 def step_impl(context):
-    data['msg_id'] = str(uuid.uuid4())
     data['urn_to'] = 'internal.12344'
     data['urn_from'] = 'respondent.122342'
     context.response = app.test_client().post("http://localhost:5050/message/send",
                                                           data=flask.json.dumps(data), headers=headers)
+    msg_resp = json.loads(context.response.data)
+    context.msg_id = msg_resp['msg_id']
 
 
 @when("the respondent wants to see the message")
 def step_impl(context):
     headers['user_urn'] = 'respondent.122342'
-    new_url = url+data['msg_id']
+    new_url = url+context.msg_id
     context.response = app.test_client().get(new_url, headers=headers)
 
 
@@ -77,17 +79,18 @@ def step_impl(context):
 # Scenario: Internal user sends message and retrieves the same message with it's labels
 @given("an internal user sends a message")
 def step_impl(context):
-    data['msg_id'] = str(uuid.uuid4())
     data['urn_to'] = 'respondent.122342'
     data['urn_from'] = 'internal.12344'
     context.response = app.test_client().post("http://localhost:5050/message/send",
                                                           data=flask.json.dumps(data), headers=headers)
+    msg_resp = json.loads(context.response.data)
+    context.msg_id = msg_resp['msg_id']
 
 
 @when("the internal user wants to see the message")
 def step_impl(context):
     headers['user_urn'] = 'internal.12344'
-    new_url = url+data['msg_id']
+    new_url = url+context.msg_id
     context.response = app.test_client().get(new_url, headers=headers)
 
 
