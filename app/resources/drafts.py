@@ -13,7 +13,7 @@ class Drafts(Resource):
         pass
 
     def post(self):
-
+        """Handles saving of new draft"""
         post_data = request.get_json()
         if 'msg_id' in post_data:
             raise (BadRequest(description="Message can not include msg_id"))

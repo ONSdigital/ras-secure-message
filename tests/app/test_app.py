@@ -267,6 +267,7 @@ class FlaskTestCase(unittest.TestCase):
                 self.assertTrue(row is not None)
 
     def test_draft_post_returns_201_and_msg_id(self):
+        """Check send draft successful"""
         url = "http://localhost:5050/draft/save"
         headers = {'Content-Type': 'application/json', 'user_urn': ''}
 
@@ -277,6 +278,7 @@ class FlaskTestCase(unittest.TestCase):
         self.assertEqual(response.status_code, 201)
 
     def test_draft_with_msg_id_post_returns_400(self):
+        """Check draft saved with message id fails"""
         url = "http://localhost:5050/draft/save"
         headers = {'Content-Type': 'application/json', 'user_urn': ''}
         data = {'msg_id': '',

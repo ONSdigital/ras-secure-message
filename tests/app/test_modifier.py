@@ -213,6 +213,7 @@ class ModifyTestCase(unittest.TestCase):
                                           .format('test123', 'respondent.richard'))
                     for row in request:
                         self.assertTrue(row is None)
+                        break
                     else:
                         pass
 
