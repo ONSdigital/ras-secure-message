@@ -1,8 +1,7 @@
 # from app.authentication.jwt import decode
 from flask_restful import Resource
-from flask import request, jsonify, json
+from flask import request, jsonify
 from werkzeug.exceptions import BadRequest
-from json import load
 from app.repository.modifier import Modifier
 from app.validation.domain import MessageSchema
 from app.repository.saver import Saver
@@ -15,6 +14,7 @@ from app.settings import MESSAGE_QUERY_LIMIT
 from app.validation.labels import Labels
 from app.validation.user import User
 from datetime import timezone, datetime
+from app.resources.drafts import DraftById
 
 logger = logging.getLogger(__name__)
 
@@ -85,7 +85,7 @@ class MessageSend(Resource):
         is_draft = False
         draft_id = None
         if 'msg_id' in post_data:
-            is_draft = MessageSend().check_if_draft(post_data['msg_id'])
+            is_draft = DraftById().check_valid_draft(post_data['msg_id'])
             if is_draft is True:
                 draft_id = post_data['msg_id']
                 post_data['msg_id'] = ''
@@ -100,16 +100,6 @@ class MessageSend(Resource):
             res = jsonify(message.errors)
             res.status_code = 400
             return res
-
-    @staticmethod
-    def check_if_draft(message_id):
-        """Checks if the message is in the message table with a DRAFT label"""
-        db_model = Status()
-        result = db_model.query.filter_by(msg_id=message_id, label=Labels.DRAFT.value).first()
-        if result is None:
-            return False
-        else:
-            return True
 
     @staticmethod
     def del_draft_labels(draft_id):

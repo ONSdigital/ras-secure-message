@@ -5,6 +5,8 @@ from app.validation.labels import Labels
 from app.validation.domain import DraftSchema
 from app.validation.user import User
 from werkzeug.exceptions import BadRequest
+from app.repository.database import Status
+from app.repository.modifier import Modifier
 
 
 class Drafts(Resource):
@@ -46,3 +48,42 @@ class Drafts(Resource):
         actor = survey if User(person).is_internal else person
         if person is not None and len(person) != 0:
             saver.save_msg_status(actor, msg_id, label)
+
+
+class DraftById(Resource):
+    """All draft functionality with an id on request"""
+
+    def put(self):
+        """Handles modifying of drafts"""
+        data = request.get_json()
+        if 'msg_id' not in data:
+            raise (BadRequest(description="Draft put requires msg_id"))
+        draft_id = data['msg_id']
+        is_draft = self.check_valid_draft(draft_id)
+        if is_draft is False:
+            raise (BadRequest(description="Draft put requires valid draft"))
+        draft = DraftSchema().load(data)
+        if draft.errors == {}:
+            self.replace_draft(draft_id, draft.data)
+            resp = jsonify({'status': 'OK', 'msg_id': draft_id})
+            resp.status_code = 200
+            return resp
+        else:
+            resp = jsonify(draft.errors)
+            resp.status_code = 400
+            return resp
+
+    @staticmethod
+    def check_valid_draft(draft_id):
+        """Check msg_id is that of a valid draft"""
+        db_model = Status()
+        result = db_model.query.filter_by(msg_id=draft_id, label=Labels.DRAFT.value).first()
+        if result is None:
+            return False
+        else:
+            return True
+
+    @staticmethod
+    def replace_draft(draft_id, draft):
+        modifier = Modifier()
+        modifier.replace_current_draft(draft_id, draft)
