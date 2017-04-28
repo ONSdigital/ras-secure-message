@@ -82,20 +82,20 @@ class MessageSend(Resource):
     def post(self):
         logger.info("Message send POST request.")
         post_data = request.get_json()
+        is_draft = False
+        draft_id = None
         if 'msg_id' in post_data:
-            self.is_draft = MessageSend().check_if_draft(post_data['msg_id'])
-            if self.is_draft is True:
-                self.draft_id = post_data['msg_id']
+            is_draft = MessageSend().check_if_draft(post_data['msg_id'])
+            if is_draft is True:
+                draft_id = post_data['msg_id']
                 post_data['msg_id'] = ''
             else:
                 raise (BadRequest(description="Message can not include msg_id"))
-        else:
-            self.is_draft = False
 
         message = MessageSchema().load(post_data)
 
         if message.errors == {}:
-            return self.message_save(message)
+            return self.message_save(message, is_draft, draft_id)
         else:
             res = jsonify(message.errors)
             res.status_code = 400
@@ -111,11 +111,12 @@ class MessageSend(Resource):
         else:
             return True
 
-    def del_draft_labels(self):
+    @staticmethod
+    def del_draft_labels(draft_id):
         modifier = Modifier()
-        modifier.del_draft(self.draft_id)
+        modifier.del_draft(draft_id)
 
-    def message_save(self, message):
+    def message_save(self, message, is_draft, draft_id):
         """Saves the message to the database along with the subsequent status and audit"""
         save = Saver()
         save.save_message(message.data, datetime.now(timezone.utc))
@@ -129,8 +130,8 @@ class MessageSend(Resource):
             save.save_msg_status(message.data.urn_to, message.data.msg_id, Labels.INBOX.value)
             save.save_msg_status(message.data.urn_to, message.data.msg_id, Labels.UNREAD.value)
 
-        if self.is_draft is True:
-            self.del_draft_labels()
+        if is_draft is True:
+            self.del_draft_labels(draft_id)
         return MessageSend._alert_recipients(message.data.msg_id)
 
     @staticmethod

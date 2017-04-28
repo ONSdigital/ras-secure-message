@@ -110,6 +110,21 @@ def step_impl(context):
 def step_impl(context):
     data['survey'] = ''
 
+
+# Scenario 11: Message sent with a msg_id not a valid draft returns 400
+@given('a message contains a msg_id and is not a valid draft')
+def step_impl(context):
+    data.update({'msg_id': 'test123',
+                 'urn_to': 'test',
+                 'urn_from': 'respondent.test',
+                 'subject': 'Hello World',
+                 'body': 'Test',
+                 'thread_id': '',
+                 'collection_case': 'collection case1',
+                 'reporting_unit': 'reporting case1',
+                 'survey': 'survey'})
+
+
 # Common Steps: used in multiple scenarios
 
 
