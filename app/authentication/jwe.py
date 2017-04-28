@@ -19,12 +19,12 @@ CEK_EXPECT_LENGTH = 32
 
 class Encrypter:
 
-    def __init__(self):
-        private_key = settings.EQ_SUBMISSION_SR_PRIVATE_SIGNING_KEY
-        private_key_password = settings.EQ_SUBMISSION_SR_PRIVATE_SIGNING_KEY_PASSWORD
-        public_key = settings.EQ_SUBMISSION_SDX_PUBLIC_KEY
+    def __init__(self, _private_key=settings.SM_USER_AUTHENTICATION_PRIVATE_KEY,
+                 _private_key_password=settings.SM_USER_AUTHENTICATION_PRIVATE_KEY_PASSWORD,
+                 _public_key=settings.SM_USER_AUTHENTICATION_PUBLIC_KEY):
+        """ initialise encrypter with correct keys, the ability to change default keys for tests"""
 
-        self._load_keys(private_key, private_key_password, public_key)
+        self._load_keys(_private_key, _private_key_password, _public_key)
 
         # first generate a random key
         self.cek = os.urandom(32)  # 256 bit random CEK
@@ -77,9 +77,9 @@ class Encrypter:
 class Decrypter:
 
     def __init__(self):
-        private_key = settings.EQ_USER_AUTHENTICATION_SR_PRIVATE_KEY
-        private_key_password = settings.EQ_USER_AUTHENTICATION_SR_PRIVATE_KEY_PASSWORD
-        public_key = settings.EQ_USER_AUTHENTICATION_RRM_PUBLIC_KEY
+        private_key = settings.SM_USER_AUTHENTICATION_PRIVATE_KEY
+        private_key_password = settings.SM_USER_AUTHENTICATION_PRIVATE_KEY_PASSWORD
+        public_key = settings.SM_USER_AUTHENTICATION_PUBLIC_KEY
 
         self._load_keys(private_key, private_key_password, public_key)
 
@@ -96,12 +96,14 @@ class Decrypter:
         """
         Function to decrypt encrypted jwt
         """
+        if not isinstance(encrypted_token, str):
+            encrypted_token = encrypted_token.decode()
 
-        tokens = encrypted_token.decode().split('.')
+        tokens = encrypted_token.split('.')
         if len(tokens) != 5:
             raise BadRequest(description="Token incorrect size")
         jwe_protected_header = tokens[0]
-        self.__check_jwe_protected_header(jwe_protected_header)
+        self._check_jwe_protected_header(jwe_protected_header)
         encrypted_key = tokens[1]
         encoded_iv = tokens[2]
         encoded_cipher_text = tokens[3]
@@ -124,7 +126,7 @@ class Decrypter:
 
         return decrypted_signed_token
 
-    def __check_jwe_protected_header(self, header):
+    def _check_jwe_protected_header(self, header):
         header = self._base64_decode(header).decode()
         header_data = json.loads(header)
         if not header_data.get("alg"):

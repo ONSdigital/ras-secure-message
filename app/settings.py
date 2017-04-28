@@ -32,12 +32,9 @@ SQLALCHEMY_POOL_SIZE = os.getenv('SQLALCHEMY_POOL_SIZE', None)
 JWT_SECRET = os.getenv('JWT_SECRET', 'vrwgLNWEffe45thh545yuby')
 
 #  Keys
-EQ_USER_AUTHENTICATION_RRM_PUBLIC_KEY = open("/Users/patelt/projects/secure-messaging/ras-secure-message/jwt-test-keys/sdc-user-authentication-signing-rrm-public-key.pem").read()
-EQ_USER_AUTHENTICATION_SR_PRIVATE_KEY = open("/Users/patelt/projects/secure-messaging/ras-secure-message/jwt-test-keys/sdc-user-authentication-encryption-sr-private-key.pem").read()
-EQ_SUBMISSION_SDX_PUBLIC_KEY = open("/Users/patelt/projects/secure-messaging/ras-secure-message/jwt-test-keys/sdc-submission-encryption-sdx-public-key.pem").read()
-EQ_SUBMISSION_SR_PRIVATE_SIGNING_KEY = open("/Users/patelt/projects/secure-messaging/ras-secure-message/jwt-test-keys/sdc-submission-signing-sr-private-key.pem").read()
+SM_USER_AUTHENTICATION_PRIVATE_KEY = open("/Users/patelt/projects/secure-messaging/ras-secure-message/jwt-test-keys/sm-user-authentication-encryption-private-key.pem").read()
+SM_USER_AUTHENTICATION_PUBLIC_KEY = open("/Users/patelt/projects/secure-messaging/ras-secure-message/jwt-test-keys/sm-user-authentication-encryption-public-key.pem").read()
 
 #  password
-EQ_SUBMISSION_SR_PRIVATE_SIGNING_KEY_PASSWORD = "digitaleq"
-EQ_USER_AUTHENTICATION_SR_PRIVATE_KEY_PASSWORD = "digitaleq"
+SM_USER_AUTHENTICATION_PRIVATE_KEY_PASSWORD = "digitaleq"
 
