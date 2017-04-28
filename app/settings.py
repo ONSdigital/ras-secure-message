@@ -32,8 +32,8 @@ SQLALCHEMY_POOL_SIZE = os.getenv('SQLALCHEMY_POOL_SIZE', None)
 JWT_SECRET = os.getenv('JWT_SECRET', 'vrwgLNWEffe45thh545yuby')
 
 #  Keys
-SM_USER_AUTHENTICATION_PRIVATE_KEY = open("/Users/patelt/projects/secure-messaging/ras-secure-message/jwt-test-keys/sm-user-authentication-encryption-private-key.pem").read()
-SM_USER_AUTHENTICATION_PUBLIC_KEY = open("/Users/patelt/projects/secure-messaging/ras-secure-message/jwt-test-keys/sm-user-authentication-encryption-public-key.pem").read()
+SM_USER_AUTHENTICATION_PRIVATE_KEY = open("../../jwt-test-keys/sm-user-authentication-encryption-private-key.pem").read()
+SM_USER_AUTHENTICATION_PUBLIC_KEY = open("../../jwt-test-keys/sm-user-authentication-encryption-public-key.pem").read()
 
 #  password
 SM_USER_AUTHENTICATION_PRIVATE_KEY_PASSWORD = "digitaleq"
