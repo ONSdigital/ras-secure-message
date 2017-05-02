@@ -1,7 +1,10 @@
 from app.authentication.authenticator import check_jwt
 from app.authentication.jwt import encode
+from app.authentication.jwe import Encrypter
+from werkzeug.exceptions import BadRequest
 from flask import Response
 import unittest
+from app import settings
 
 
 class AuthenticationTestCase(unittest.TestCase):
@@ -14,16 +17,27 @@ class AuthenticationTestCase(unittest.TestCase):
                   "survey": "BRS",
                   "CC": "URN"
                 }
-        res = check_jwt(encode(data))
+        encrypter = Encrypter(_private_key=settings.SM_USER_AUTHENTICATION_PRIVATE_KEY,
+                              _private_key_password=settings.SM_USER_AUTHENTICATION_PRIVATE_KEY_PASSWORD,
+                              _public_key=settings.SM_USER_AUTHENTICATION_PUBLIC_KEY)
+        signed_jwt = encode(data)
+        encrypted_jwt = encrypter.encrypt_token(signed_jwt)
+        res = check_jwt(encrypted_jwt)
         self.assertEqual(res, expected_res)
 
     def test_authentication_jwt_invalid_fail(self):
         """Authenticate request using incorrect JWT"""
         expected_res = Response(response="Invalid token to access this Microservice Resource",
                                 status=400, mimetype="text/html")
-        res = check_jwt('eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.'
-                        'eyJSVSI6IjEyMzQ1Njc4OTEwIiwic3VydmV5IjoiQlJTIiwiQ0MiOiIxMiJ9.'
-                        'uKn_qlmXLsYd_k1hNt2QfLabypLOXjO1_9cEuArJ-hE')
+
+        encrypter = Encrypter(_private_key=settings.SM_USER_AUTHENTICATION_PRIVATE_KEY,
+                              _private_key_password=settings.SM_USER_AUTHENTICATION_PRIVATE_KEY_PASSWORD,
+                              _public_key=settings.SM_USER_AUTHENTICATION_PUBLIC_KEY)
+
+        encrypted_jwt = encrypter.encrypt_token('eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.'
+                                                'eyJSVSI6IjEyMzQ1Njc4OTEwIiwic3VydmV5IjoiQlJTIiwiQ0MiOiIxMiJ9.'
+                                                'uKn_qlmXLsYd_k1hNt2QfLabypLOXjO1_9cEuArJ-hE')
+        res = check_jwt(encrypted_jwt)
         self.assertEqual(res.response, expected_res.response)
 
     def test_authentication_jwt_ru_invalid_fail(self):
@@ -35,7 +49,12 @@ class AuthenticationTestCase(unittest.TestCase):
             "survey": "BRS",
             "CC": "URN"
         }
-        res = check_jwt(encode(data))
+        encrypter = Encrypter(_private_key=settings.SM_USER_AUTHENTICATION_PRIVATE_KEY,
+                              _private_key_password=settings.SM_USER_AUTHENTICATION_PRIVATE_KEY_PASSWORD,
+                              _public_key=settings.SM_USER_AUTHENTICATION_PUBLIC_KEY)
+        signed_jwt = encode(data)
+        encrypted_jwt = encrypter.encrypt_token(signed_jwt)
+        res = check_jwt(encrypted_jwt)
         self.assertEqual(res.response, expected_res.response)
 
     def test_authentication_jwt_ru_missing_fail(self):
@@ -47,7 +66,12 @@ class AuthenticationTestCase(unittest.TestCase):
             "CC": "URN"
         }
 
-        res = check_jwt(encode(data))
+        encrypter = Encrypter(_private_key=settings.SM_USER_AUTHENTICATION_PRIVATE_KEY,
+                              _private_key_password=settings.SM_USER_AUTHENTICATION_PRIVATE_KEY_PASSWORD,
+                              _public_key=settings.SM_USER_AUTHENTICATION_PUBLIC_KEY)
+        signed_jwt = encode(data)
+        encrypted_jwt = encrypter.encrypt_token(signed_jwt)
+        res = check_jwt(encrypted_jwt)
         self.assertEqual(res.response, expected_res.response)
 
     def test_authentication_jwt_survey_invalid_fail(self):
@@ -59,7 +83,12 @@ class AuthenticationTestCase(unittest.TestCase):
             "survey": "",
             "CC": "URN"
         }
-        res = check_jwt(encode(data))
+        encrypter = Encrypter(_private_key=settings.SM_USER_AUTHENTICATION_PRIVATE_KEY,
+                              _private_key_password=settings.SM_USER_AUTHENTICATION_PRIVATE_KEY_PASSWORD,
+                              _public_key=settings.SM_USER_AUTHENTICATION_PUBLIC_KEY)
+        signed_jwt = encode(data)
+        encrypted_jwt = encrypter.encrypt_token(signed_jwt)
+        res = check_jwt(encrypted_jwt)
         self.assertEqual(res.response, expected_res.response)
 
     def test_authentication_jwt_survey_missing_fail(self):
@@ -71,7 +100,12 @@ class AuthenticationTestCase(unittest.TestCase):
             "CC": "URN"
         }
 
-        res = check_jwt(encode(data))
+        encrypter = Encrypter(_private_key=settings.SM_USER_AUTHENTICATION_PRIVATE_KEY,
+                              _private_key_password=settings.SM_USER_AUTHENTICATION_PRIVATE_KEY_PASSWORD,
+                              _public_key=settings.SM_USER_AUTHENTICATION_PUBLIC_KEY)
+        signed_jwt = encode(data)
+        encrypted_jwt = encrypter.encrypt_token(signed_jwt)
+        res = check_jwt(encrypted_jwt)
         self.assertEqual(res.response, expected_res.response)
 
     def test_authentication_jwt_cc_invalid_fail(self):
@@ -83,7 +117,12 @@ class AuthenticationTestCase(unittest.TestCase):
             "survey": "BRS",
             "CC": ""
         }
-        res = check_jwt(encode(data))
+        encrypter = Encrypter(_private_key=settings.SM_USER_AUTHENTICATION_PRIVATE_KEY,
+                              _private_key_password=settings.SM_USER_AUTHENTICATION_PRIVATE_KEY_PASSWORD,
+                              _public_key=settings.SM_USER_AUTHENTICATION_PUBLIC_KEY)
+        signed_jwt = encode(data)
+        encrypted_jwt = encrypter.encrypt_token(signed_jwt)
+        res = check_jwt(encrypted_jwt)
         self.assertEqual(res.response, expected_res.response)
 
     def test_authentication_jwt_cc_missing_fail(self):
@@ -95,5 +134,22 @@ class AuthenticationTestCase(unittest.TestCase):
             "survey": "BRS"
         }
 
-        res = check_jwt(encode(data))
+        encrypter = Encrypter(_private_key=settings.SM_USER_AUTHENTICATION_PRIVATE_KEY,
+                              _private_key_password=settings.SM_USER_AUTHENTICATION_PRIVATE_KEY_PASSWORD,
+                              _public_key=settings.SM_USER_AUTHENTICATION_PUBLIC_KEY)
+        signed_jwt = encode(data)
+        encrypted_jwt = encrypter.encrypt_token(signed_jwt)
+        res = check_jwt(encrypted_jwt)
         self.assertEqual(res.response, expected_res.response)
+
+    def test_authentication_jwt_not_encrypted_fail(self):
+        """Authenticate request using JWT without encryption"""
+
+        data = {
+            "RU": "12345678910",
+            "survey": "BRS"
+        }
+
+        with self.assertRaises(BadRequest):
+            res = check_jwt(encode(data))
+
