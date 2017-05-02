@@ -33,6 +33,7 @@ class Encrypter:
         self.iv = os.urandom(12)  # 96 bit random IV
 
     def _load_keys(self, private_key, private_key_password, public_key):
+        """ used to load keys"""
         private_key_bytes = private_key.encode()  # to bytes
         private_key_password_bytes = private_key_password.encode()
         public_key_bytes = public_key.encode()
@@ -84,6 +85,7 @@ class Decrypter:
         self._load_keys(private_key, private_key_password, public_key)
 
     def _load_keys(self, private_key, private_key_password, public_key):
+        """ used to load keys"""
         private_key_bytes = private_key.encode()  # to bytes
         private_key_password_bytes = private_key_password.encode()
         public_key_bytes = public_key.encode()
@@ -127,6 +129,7 @@ class Decrypter:
         return decrypted_signed_token
 
     def _check_jwe_protected_header(self, header):
+        """ used to validate jwe protected headers"""
         header = self._base64_decode(header).decode()
         header_data = json.loads(header)
         if not header_data.get("alg"):
@@ -140,6 +143,7 @@ class Decrypter:
 
     @staticmethod
     def _decrypt_cipher_text(cipher_text, iv, key, tag, jwe_protected_header):
+        """ used to decrypt cipher text """
         cipher = Cipher(algorithms.AES(key), modes.GCM(iv, tag), backend=backend)
         decryptor = cipher.decryptor()
         decryptor.authenticate_additional_data(jwe_protected_header.encode())

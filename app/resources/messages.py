@@ -80,6 +80,7 @@ class MessageSend(Resource):
     """Send message for a user"""
 
     def post(self):
+        """used to handle POST requests to send a message"""
         logger.info("Message send POST request.")
         post_data = request.get_json()
         is_draft = False
@@ -208,6 +209,7 @@ class ModifyById(Resource):
 
     @staticmethod
     def validate_request(request_data):
+        """Used to validate data within request body for ModifyById"""
         if 'label' not in request_data:
             raise BadRequest(description="No label provided")
 
