@@ -1,5 +1,6 @@
 import os
 
+
 ''' This file is the main configuration for the Secure Messaging Service.
     It contains a full default configuration
     All configuration may be overridden by setting the appropriate environment variable name. '''
@@ -32,8 +33,8 @@ SQLALCHEMY_POOL_SIZE = os.getenv('SQLALCHEMY_POOL_SIZE', None)
 JWT_SECRET = os.getenv('JWT_SECRET', 'vrwgLNWEffe45thh545yuby')
 
 #  Keys
-SM_USER_AUTHENTICATION_PRIVATE_KEY = open("../../jwt-test-keys/sm-user-authentication-encryption-private-key.pem").read()
-SM_USER_AUTHENTICATION_PUBLIC_KEY = open("../../jwt-test-keys/sm-user-authentication-encryption-public-key.pem").read()
+SM_USER_AUTHENTICATION_PRIVATE_KEY = open("{0}/jwt-test-keys/sm-user-authentication-encryption-private-key.pem".format(os.getenv('RAS_SM_PATH'))).read()
+SM_USER_AUTHENTICATION_PUBLIC_KEY = open("{0}/jwt-test-keys/sm-user-authentication-encryption-public-key.pem".format(os.getenv('RAS_SM_PATH'))).read()
 
 #  password
 SM_USER_AUTHENTICATION_PRIVATE_KEY_PASSWORD = "digitaleq"

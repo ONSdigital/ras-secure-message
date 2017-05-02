@@ -18,10 +18,16 @@ Install dependencies using pip
 pip install -r requirements.txt
 ```
 
+Set RAS_SM_PATH environment variable
+
+```
+export RAS_SM_PATH=/Users/user/projects/secure-messaging/ras-secure-message
+```
+
 Run the application
 -------------------
 ```
-$ python api.py
+$ python run.py
  * Running on http://127.0.0.1:5000/
  * Restarting with reloader
 ```

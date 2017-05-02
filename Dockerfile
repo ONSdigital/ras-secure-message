@@ -1,4 +1,4 @@
-FROM ubuntu:14.04
+FROM python:3.4
 ENV RUNTIME_PACKAGES="python3"
 ENV BUILD_PACKAGES="build-essential python3-dev python3-pip libpq-dev"
 WORKDIR /app
