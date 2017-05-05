@@ -51,7 +51,7 @@ Feature: Checking correct labels for messages are added & deleted
     When the internal user opens the message
     Then the status of the message changes to from 'unread' to 'read' for all internal users that have access to that work group
 
-  Scenario outline: internal - as an internal user I want to be able to change my message from read to unread
+  Scenario Outline: internal - as an internal user I want to be able to change my message from read to unread
     Given a message with the status <message status> is displayed to an internal user
     When the user chooses to edit the status from <message status> to (new status>
     Then the status of that message changes to <new status> for all internal users that have access to that work group
@@ -66,7 +66,7 @@ Feature: Checking correct labels for messages are added & deleted
     When the external user opens the message
     Then the status of the message changes to from 'unread' to 'read'
 
-  Scenario outline: external - as an external user I want to be able to change my message from read to unread
+  Scenario Outline: external - as an external user I want to be able to change my message from read to unread
     Given a message with the status <message status> is displayed to an external user
     When the user chooses to edit the status from <message status> to (new status>
     Then the status of that message changes to <new status>
