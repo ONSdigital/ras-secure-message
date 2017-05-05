@@ -1,5 +1,6 @@
 import os
 
+
 ''' This file is the main configuration for the Secure Messaging Service.
     It contains a full default configuration
     All configuration may be overridden by setting the appropriate environment variable name. '''
@@ -11,7 +12,6 @@ SECURE_MESSAGING_DATABASE_URL = os.getenv('SECURE_MESSAGING_DATABASE_URL', 'sqli
 SMS_LOG_LEVEL = os.getenv('SMS_LOG_LEVEL', 'INFO')
 APP_LOG_LEVEL = os.getenv('APP_LOG_LEVEL', 'INFO')
 SMS_WERKZEUG_LOG_LEVEL = os.getenv('SMS_WERKZEUG_LOG_LEVEL', 'INFO')
-JWT_SECRET = os.getenv('JWT_SECRET', 'vrwgLNWEffe45thh545yuby')
 
 
 # EMAIL NOTIFICATION SETTINGS
@@ -28,3 +28,14 @@ MESSAGE_QUERY_LIMIT = os.getenv('MESSAGE_QUERY_LIMIT', 15)
 # SQLAlchemy configuration
 
 SQLALCHEMY_POOL_SIZE = os.getenv('SQLALCHEMY_POOL_SIZE', None)
+
+
+JWT_SECRET = os.getenv('JWT_SECRET', 'vrwgLNWEffe45thh545yuby')
+
+#  Keys
+SM_USER_AUTHENTICATION_PRIVATE_KEY = open("{0}/jwt-test-keys/sm-user-authentication-encryption-private-key.pem".format(os.getenv('RAS_SM_PATH'))).read()
+SM_USER_AUTHENTICATION_PUBLIC_KEY = open("{0}/jwt-test-keys/sm-user-authentication-encryption-public-key.pem".format(os.getenv('RAS_SM_PATH'))).read()
+
+#  password
+SM_USER_AUTHENTICATION_PRIVATE_KEY_PASSWORD = "digitaleq"
+

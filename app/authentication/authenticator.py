@@ -1,4 +1,5 @@
 from app.authentication.jwt import decode
+from app.authentication.jwe import Decrypter
 from flask import Response
 from jose import JWTError
 import logging
@@ -22,14 +23,16 @@ def authenticate(request):
         return res
 
 
-def check_jwt(jwt_token):
+def check_jwt(token):
     try:
-        decrypted_jwt_token = decode(jwt_token)
+        decrypter = Decrypter()
+        decrypted_jwt_token = decrypter.decrypt_token(token)
+        decoded_jwt_token = decode(decrypted_jwt_token)
 
         request_authenticated = False
-        if 'RU' in decrypted_jwt_token and len(decrypted_jwt_token['RU']) == 11:
-            if 'survey' in decrypted_jwt_token and len(decrypted_jwt_token['survey']) > 0:
-                if 'CC' in decrypted_jwt_token and len(decrypted_jwt_token['CC']) > 0:
+        if 'RU' in decoded_jwt_token and len(decoded_jwt_token['RU']) == 11:
+            if 'survey' in decoded_jwt_token and len(decoded_jwt_token['survey']) > 0:
+                if 'CC' in decoded_jwt_token and len(decoded_jwt_token['CC']) > 0:
                     request_authenticated = True
                 else:
                     res = Response(response="Collection Case required to access this Microservice Resource",
@@ -47,10 +50,10 @@ def check_jwt(jwt_token):
         if request_authenticated:
             # create user model
             logger.debug("""The message has the correct claims and it can be decrypted properly. JWT value is: {},
-                            RU is: {}, survey is: {}, CC is: {}""".format(decrypted_jwt_token,
-                                                                          decrypted_jwt_token['RU'],
-                                                                          decrypted_jwt_token['survey'],
-                                                                          decrypted_jwt_token['CC']))
+                            RU is: {}, survey is: {}, CC is: {}""".format(decoded_jwt_token,
+                                                                          decoded_jwt_token['RU'],
+                                                                          decoded_jwt_token['survey'],
+                                                                          decoded_jwt_token['CC']))
             return {'status': "ok"}
 
     except JWTError:

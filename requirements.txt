@@ -6,4 +6,6 @@ psycopg2==2.6.2
 SQLAlchemy==1.1.5
 python-jose==1.2.0
 structlog==16.1.0
+cryptography==1.8.1
 notifications_python_client==4.2.0
+flake8==3.3.0

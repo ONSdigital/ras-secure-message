@@ -1,0 +1,3 @@
+[behave]
+paths = tests/behavioural/features
+show_timings = true
