@@ -53,11 +53,11 @@ Feature: Checking correct labels for messages are added & deleted
 
   Scenario Outline: internal - as an internal user I want to be able to change my message from read to unread
     Given a message with the status <message status> is displayed to an internal user
-    When the user chooses to edit the status from <message status> to (new status>
-    Then the status of that message changes to <new status> for all internal users that have access to that work group
+    When the user chooses to edit the status from <Message Status> to (New Status>
+    Then the status of that message changes to <New Status> for all internal users that have access to that work group
     
   Examples: Status
-    |message status | new status |
+    |Message Status | New Status |
     |read           | unread     |
     |unread         | read       |
 
