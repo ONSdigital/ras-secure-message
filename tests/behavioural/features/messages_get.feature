@@ -24,5 +24,9 @@ Feature: Message get by ID Endpoint
     Given multiple messages have been sent to an external user
     When the external user navigates to their messages
     Then messages are displayed
-    
+ 
+  Scenario: internal - message status automatically changes to read - on opening message
+    Given an internal user has recieved a new message from a respondent
+    When the internal user opens the message
+    Then the status of the message changes to from 'new' to 'read'
     
