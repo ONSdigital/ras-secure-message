@@ -350,6 +350,6 @@ class FlaskTestCase(unittest.TestCase):
                         'survey': 'RSI'}
         put = self.app.put('http://localhost:5050/draft/{0}'.format(msg_id), data=json.dumps(replace_data), headers=headers)
         self.assertEqual(put.status_code, 400)
-        
+
 if __name__ == '__main__':
     unittest.main()
