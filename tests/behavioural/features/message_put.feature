@@ -65,3 +65,13 @@ Feature: Checking correct labels for messages are added & deleted
     Given a message with the status 'read' is displayed to an external user
     When the external user chooses to edit the status from 'read' to 'unread'
     Then the status of that message changes to 'unread'
+
+  Scenario: As an internal user I want to be able to edit a message from my drafts
+    Given an internal user has opened a previously saved draft message
+    When the internal user edits the content of the message and saves it as a draft
+    Then the original draft message is replaced by the edited version
+
+  Scenario: As an External user I would like to be able to edit a message from drafts
+    Given an external user has opened a previously saved draft message
+    When the external user edits the content of the message and saves it as a draft
+    Then the original draft message is replaced by the edited version
