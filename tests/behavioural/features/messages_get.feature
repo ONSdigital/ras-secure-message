@@ -34,3 +34,8 @@ Feature: Message get by ID Endpoint
     Given a message with the status 'read' is displayed to an internal user
     When the user chooses to edit the status from 'read' to 'unread'
     Then the status of that message changes to 'unread' for all internal users
+
+  Scenario: As an external user - message status automatically changes to read - on opening message
+    Given a message with the status 'unread' is displayed to an external user
+    When the external user opens the message
+    Then the status of the message changes to from 'unread' to 'read'
