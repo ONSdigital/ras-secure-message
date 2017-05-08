@@ -91,6 +91,6 @@ Feature: Checking correct labels for messages are added & deleted
     Then the original draft message is replaced by the edited version
 
  Scenario: As an External user I would like to be able to save a new message as draft
-    Given an external user has created a secure message including 'subject' and selected 'save dreaft'
+    Given an external user has created a secure message including 'subject' and selected 'save'
     When the user navigates to the draft inbox
     Then the draft message is displayed there
