@@ -94,8 +94,4 @@ Feature: Checking correct labels for messages are added & deleted
     Given an external user has created a secure message including 'subject' and selected 'save'
     When the user navigates to the draft inbox
     Then the draft message is displayed in the draft inbox
-
-
- 
- 
     
