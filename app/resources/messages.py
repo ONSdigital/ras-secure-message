@@ -32,28 +32,70 @@ class MessageList(Resource):
         # res = authenticate(request)
         res = {'status': "ok"}
         if res == {'status': "ok"}:
-            page = 1
-            limit = MESSAGE_QUERY_LIMIT
-
-            if request.args.get('limit') and request.args.get('page'):
-                page = int(request.args.get('page'))
-                limit = int(request.args.get('limit'))
+            string_query_args, page, limit, ru, survey, cc, label, desc = MessageList._get_options(request.args)
 
             message_service = Retriever()
-            status, result = message_service.retrieve_message_list(page, limit)
+            status, result = message_service.retrieve_message_list(page, limit, request.headers.get('user_urn'),
+                                                                   ru=ru, survey=survey, cc=cc, label=label, desc=desc)
             if status:
                 resp = MessageList._paginated_list_to_json(result, page, limit, request.host_url,
-                                                           request.headers.get('user_urn'))
+                                                           request.headers.get('user_urn'), string_query_args)
                 resp.status_code = 200
                 return resp
         else:
             return res
 
     @staticmethod
-    def _paginated_list_to_json(paginated_list, page, limit, host_url, user_urn):
+    def _get_options(args):
+        string_query_args = '?'
+        page = 1
+        limit = MESSAGE_QUERY_LIMIT
+        ru = None
+        survey = None
+        cc = None
+        label = None
+        desc = True
+
+        if args.get('limit'):
+            limit = int(args.get('limit'))
+
+        if args.get('page'):
+            page = int(args.get('page'))
+
+        if args.get('ru'):
+            string_query_args = MessageList._add_string_query_args(string_query_args, 'ru', args.get('ru'))
+            ru = str(args.get('ru'))
+        if args.get('survey'):
+            survey = str(args.get('survey'))
+            string_query_args = MessageList._add_string_query_args(string_query_args, 'survey', args.get('survey'))
+        if args.get('cc'):
+            cc = str(args.get('cc'))
+            string_query_args = MessageList._add_string_query_args(string_query_args, 'cc', args.get('cc'))
+        if args.get('label'):
+            label = str(args.get('label'))
+            string_query_args = MessageList._add_string_query_args(string_query_args, 'label', args.get('label'))
+        if args.get('desc'):
+            desc = False if args.get('desc') == 'false' else True
+            string_query_args = MessageList._add_string_query_args(string_query_args, 'desc', args.get('desc'))
+
+        return string_query_args, page, limit, ru, survey, cc, label, desc
+
+    @staticmethod
+    def _add_string_query_args(string_query_args, arg, val):
+        if string_query_args == '?':
+            return '{0}{1}={2}'.format(string_query_args, arg, val)
+        else:
+            return '{0}&{1}={2}'.format(string_query_args, arg, val)
+
+    @staticmethod
+    def _paginated_list_to_json(paginated_list, page, limit, host_url, user_urn, string_query_args):
         """used to change a pagination object to json format with links"""
         messages = {}
         msg_count = 0
+        arg_joiner = ''
+        if string_query_args != '?':
+            arg_joiner = '&'
+
         for message in paginated_list.items:
             msg_count += 1
             msg = message.serialize(user_urn)
@@ -62,16 +104,19 @@ class MessageList(Resource):
 
         links = {
             'first': {"href": "{0}{1}".format(host_url, "messages")},
-            'self': {"href": "{0}{1}?page={2}&limit={3}".format(host_url, MESSAGE_LIST_ENDPOINT, page, limit)}
+            'self': {"href": "{0}{1}{2}{3}page={4}&limit={5}".format(host_url, MESSAGE_LIST_ENDPOINT, arg_joiner,
+                                                                     string_query_args, page, limit)}
         }
 
         if paginated_list.has_next:
             links['next'] = {
-                "href": "{0}{1}?page={2}&limit={3}".format(host_url, MESSAGE_LIST_ENDPOINT, (page + 1), limit)}
+                "href": "{0}{1}{2}{3}page={4}&limit={5}".format(host_url, MESSAGE_LIST_ENDPOINT, arg_joiner,
+                                                                string_query_args, (page + 1), limit)}
 
         if paginated_list.has_prev:
             links['prev'] = {
-                "href": "{0}{1}?page={2}&limit={3}".format(host_url, MESSAGE_LIST_ENDPOINT, (page - 1), limit)}
+                "href": "{0}{1}{2}{3}page={4}&limit={5}".format(host_url, MESSAGE_LIST_ENDPOINT, arg_joiner,
+                                                                string_query_args, (page - 1), limit)}
 
         return jsonify({"messages": messages, "_links": links})
 

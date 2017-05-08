@@ -23,8 +23,7 @@ data = {'urn_to': 'test',
 def step_impl(context):
     data['urn_to'] = 'internal.12344'
     data['urn_from'] = 'respondent.122342'
-    context.response = app.test_client().post("http://localhost:5050/message/send",
-                                                data=flask.json.dumps(data), headers=headers)
+    context.response = app.test_client().post("http://localhost:5050/message/send", data=flask.json.dumps(data), headers=headers)
     msg_resp = json.loads(context.response.data)
     context.msg_id = msg_resp['msg_id']
 
