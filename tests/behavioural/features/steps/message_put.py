@@ -252,58 +252,6 @@ def step_impl(context):
 def step_impl(context):
     nose.tools.assert_true('UNREAD' not in context.get_json['labels'])
 
-# Scenario: internal - as an internal user I want to be able to change my message from read to unread
-
-
-@given("a message with the status read is displayed to an internal user")
-def step_impl(context):
-    data['urn_to'] = 'internal.123'
-    response = app.test_client().post("http://localhost:5050/message/send", data=json.dumps(data), headers=headers)
-    post_resp = json.loads(response.data)
-    context.msg_id = post_resp['msg_id']
-    modify_data['action'] = 'remove'
-    modify_data['label'] = "UNREAD"
-    context.response = app.test_client().put(url.format(context.msg_id),
-                                             data=json.dumps(modify_data), headers=headers)
-    headers['user_urn'] = data['urn_from']
-    app.test_client().get("http://localhost:5050/message/{0}".format(context.msg_id), headers=headers)
-
-
-@when("the internal user chooses to edit the status from read to unread")
-def step_impl(context):
-    modify_data['action'] = 'add'
-    modify_data['label'] = "UNREAD"
-    app.test_client().put(url.format(context.msg_id),
-                          data=json.dumps(modify_data), headers=headers)
-
-
-@then("the status of that message changes to unread for all internal users that have access to that work group")
-def step_impl(context):
-    response_get = app.test_client().get("http://localhost:5050/message/{0}".format(context.msg_id), headers=headers)
-    data_get = json.loads(response_get.data)
-    nose.tools.assert_true("UNREAD" in data_get['labels'])
-
-
-@given("a message with the status unread is displayed to an internal user")
-def step_impl(context):
-    data['urn_to'] = 'internal.123'
-    resp = app.test_client().post("http://localhost:5050/message/send", data=json.dumps(data), headers=headers)
-    context.msg_id = json.loads(resp.data)
-
-
-@when("the internal user chooses to edit the status from unread to read")
-def step_impl(context):
-    modify_data['action'] = 'remove'
-    modify_data['label'] = 'UNREAD'
-    app.test_client().put(url.format(context.msg_id), data=json.dumps(modify_data), headers=headers)
-
-
-@then("the status of that message changes to read for all internal users that have access to that survey")
-def step_impl(context):
-    get_resp = app.test_client().get("http://localhost:5050/message/{0}".format(context.msg_id), headers=headers)
-    get_data = json.loads(get_resp.data)
-    nose.tools.assert_true("UNREAD" not in get_data['labels'])
-
 
 # Scenario: As an external user - message status automatically changes to read - on opening message
 @given("a message with the status 'unread' is shown to an external user")
@@ -415,6 +363,4 @@ def step_impl(context):
     data['body'] = 'edited'
     app.test_client().put("http://localhost:5050/draft/{0}".format(context.msg_id), data=json.dumps(data), headers=headers)
 
-# Scenario: As an internal user I want to be able to view a message from my drafts
-@given("an internal user has created and saved a draft message")
-def step_impl
+
