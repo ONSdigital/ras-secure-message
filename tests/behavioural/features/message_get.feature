@@ -41,3 +41,9 @@ Feature: Message get by ID Endpoint
     Given an external user has created and saved a draft message
     When the external user navigates to draft messages and opens the draft message
     Then the draft message should be displayed
+
+ Scenario: As an External user I want to be notified when I have a secure message waiting for my attention.
+    Given a message has been sent to a verified external user
+    and the external user has a valid in use email address
+    When the external user navigates to their email inbox
+    Then a notification email is present
