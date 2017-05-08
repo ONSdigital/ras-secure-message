@@ -9,6 +9,8 @@ from app.repository import database
 from app.repository.retriever import Retriever
 from app.resources.messages import MessageList
 from app.settings import MESSAGE_QUERY_LIMIT
+from datetime import datetime
+import random
 
 
 class RetrieverTestCase(unittest.TestCase):
@@ -26,14 +28,18 @@ class RetrieverTestCase(unittest.TestCase):
             database.db.create_all()
             self.db = database.db
 
-    def populate_database(self, x=0):
+    def populate_database(self, x=0, convo=False, draft=False, multiple_users=False):
         with self.engine.connect() as con:
             for i in range(x):
                 msg_id = str(uuid.uuid4())
-                query = 'INSERT INTO secure_message(id, msg_id, subject, body, thread_id, sent_date, read_date,' \
-                        ' collection_case, reporting_unit, survey) VALUES ({0}, "{1}", "test","test","", ' \
-                        '"2017-02-03 00:00:00", "2017-02-03 00:00:00", "ACollectionCase", "AReportingUnit", ' \
-                        '"SurveyType")'.format(i, msg_id)
+                year = 2016
+                month = random.choice(range(1, 13))
+                day = random.choice(range(1, 29))
+                sent_date = datetime(year, month, day)
+                query = 'INSERT INTO secure_message(msg_id, subject, body, thread_id, sent_date, read_date,' \
+                        ' collection_case, reporting_unit, survey) VALUES ("{0}", "test","test","", ' \
+                        '"{1}", "2017-02-03 00:00:00", "ACollectionCase", "AReportingUnit", ' \
+                        '"SurveyType")'.format(msg_id, sent_date)
                 con.execute(query)
                 query = 'INSERT INTO status(label, msg_id, actor) VALUES("SENT", "{0}", "respondent.21345")'.format(
                     msg_id)
@@ -44,12 +50,57 @@ class RetrieverTestCase(unittest.TestCase):
                 query = 'INSERT INTO status(label, msg_id, actor) VALUES("UNREAD", "{0}", "SurveyType")'.format(
                     msg_id)
                 con.execute(query)
+                if convo:
+                    msg_id = str(uuid.uuid4())
+                    query = 'INSERT INTO secure_message(msg_id, subject, body, thread_id, sent_date, read_date,' \
+                            ' collection_case, reporting_unit, survey) VALUES ("{0}", "test","test","", ' \
+                            '"2017-02-03 00:00:00", "2017-02-03 00:00:00", "ACollectionCase", "AReportingUnit", ' \
+                            '"SurveyType")'.format(msg_id)
+                    con.execute(query)
+                    query = 'INSERT INTO status(label, msg_id, actor) VALUES("SENT", "{0}", "SurveyType")'.format(
+                        msg_id)
+                    con.execute(query)
+                    query = 'INSERT INTO status(label, msg_id, actor) VALUES("INBOX", "{0}", "respondent.21345")'\
+                        .format(msg_id)
+                    con.execute(query)
+                    query = 'INSERT INTO status(label, msg_id, actor) VALUES("UNREAD", "{0}", "respondent.21345")'\
+                        .format(msg_id)
+                    con.execute(query)
+                if draft:
+                    msg_id = str(uuid.uuid4())
+                    query = 'INSERT INTO secure_message(msg_id, subject, body, thread_id, sent_date, read_date,' \
+                            ' collection_case, reporting_unit, survey) VALUES ("{0}", "test","test","", ' \
+                            '"2017-02-03 00:00:00", "2017-02-03 00:00:00", "ACollectionCase", "AReportingUnit", ' \
+                            '"SurveyType")'.format(msg_id)
+                    con.execute(query)
+                    query = 'INSERT INTO status(label, msg_id, actor) VALUES("DRAFT", "{0}", "SurveyType")'.format(
+                        msg_id)
+                    con.execute(query)
+                    query = 'INSERT INTO status(label, msg_id, actor) VALUES("DRAFT_INBOX", "{0}",' \
+                            ' "respondent.21345")'.format(msg_id)
+                    con.execute(query)
+                if multiple_users:
+                    msg_id = str(uuid.uuid4())
+                    query = 'INSERT INTO secure_message(msg_id, subject, body, thread_id, sent_date, read_date,' \
+                            ' collection_case, reporting_unit, survey) VALUES ("{0}", "test","test","", ' \
+                            '"2017-02-03 00:00:00", "2017-02-03 00:00:00", "AnotherCollectionCase", ' \
+                            '"AnotherReportingUnit", "AnotherSurveyType")'.format(msg_id)
+                    con.execute(query)
+                    query = 'INSERT INTO status(label, msg_id, actor) VALUES("SENT", "{0}", "respondent.0000")'\
+                        .format(msg_id)
+                    con.execute(query)
+                    query = 'INSERT INTO status(label, msg_id, actor) VALUES("INBOX", "{0}", "AnotherSurveyType")'\
+                        .format(msg_id)
+                    con.execute(query)
+                    query = 'INSERT INTO status(label, msg_id, actor) VALUES("UNREAD", "{0}", "AnotherSurveyType")'\
+                        .format(msg_id)
+                    con.execute(query)
 
     def test_0_msg_returned_when_db_empty_true(self):
         """retrieves messages from empty database"""
         with app.app_context():
             with current_app.test_request_context():
-                response = Retriever().retrieve_message_list(1, MESSAGE_QUERY_LIMIT)[1]
+                response = Retriever().retrieve_message_list(1, MESSAGE_QUERY_LIMIT, 'respondent.21345')[1]
                 msg = []
                 for message in response.items:
                     msg.append(message.serialize)
@@ -61,7 +112,7 @@ class RetrieverTestCase(unittest.TestCase):
             database.db.drop_all()
             with current_app.test_request_context():
                 with self.assertRaises(InternalServerError):
-                    Retriever().retrieve_message_list(1, MESSAGE_QUERY_LIMIT)
+                    Retriever().retrieve_message_list(1, MESSAGE_QUERY_LIMIT, 'respondent.21345')
 
     def test_all_msg_returned_when_db_less_than_limit(self):
         """retrieves messages from database with less entries than retrieval amount"""
@@ -69,18 +120,18 @@ class RetrieverTestCase(unittest.TestCase):
 
         with app.app_context():
             with current_app.test_request_context():
-                response = Retriever().retrieve_message_list(1, MESSAGE_QUERY_LIMIT)[1]
+                response = Retriever().retrieve_message_list(1, MESSAGE_QUERY_LIMIT, 'respondent.21345')[1]
                 msg = []
                 for message in response.items:
                     msg.append(message.serialize)
                 self.assertEqual(len(msg), 5)
 
-    def test_15_msg_returned_when_db_greater_than_limit(self):
+    def test_msg_limit_returned_when_db_greater_than_limit(self):
         """retrieves x messages when database has greater than x entries"""
         self.populate_database(MESSAGE_QUERY_LIMIT+5)
         with app.app_context():
             with current_app.test_request_context():
-                status, response = Retriever().retrieve_message_list(1, MESSAGE_QUERY_LIMIT)
+                status, response = Retriever().retrieve_message_list(1, MESSAGE_QUERY_LIMIT, 'respondent.21345')
                 msg = []
                 for message in response.items:
                     msg.append(message.serialize)
@@ -184,9 +235,10 @@ class RetrieverTestCase(unittest.TestCase):
         self.populate_database(MESSAGE_QUERY_LIMIT-1)
         with app.app_context():
             with current_app.test_request_context():
-                resp = Retriever().retrieve_message_list(1, MESSAGE_QUERY_LIMIT)[1]
+                resp = Retriever().retrieve_message_list(1, MESSAGE_QUERY_LIMIT, 'respondent.21345')[1]
                 json_data = MessageList()._paginated_list_to_json(resp, 1, MESSAGE_QUERY_LIMIT,
-                                                                  "http://localhost:5050/", 'respondent.21345')
+                                                                  "http://localhost:5050/", 'respondent.21345',
+                                                                  string_query_args='?')
                 data = json.loads(json_data.get_data())
                 self.assertEqual(len(data['messages']), (MESSAGE_QUERY_LIMIT-1))
 
@@ -195,9 +247,10 @@ class RetrieverTestCase(unittest.TestCase):
         self.populate_database(MESSAGE_QUERY_LIMIT-1)
         with app.app_context():
             with current_app.test_request_context():
-                resp = Retriever().retrieve_message_list(1, MESSAGE_QUERY_LIMIT)[1]
+                resp = Retriever().retrieve_message_list(1, MESSAGE_QUERY_LIMIT, 'respondent.21345')[1]
                 json_data = MessageList()._paginated_list_to_json(resp, 1, MESSAGE_QUERY_LIMIT,
-                                                                  "http://localhost:5050/", 'respondent.21345')
+                                                                  "http://localhost:5050/", 'respondent.21345',
+                                                                  string_query_args='?')
                 data = json.loads(json_data.get_data())
                 self.assertEqual(data['messages']['4']['_links']['self']['href'],
                                  "{0}{1}".format(self.MESSAGE_BY_ID_ENDPOINT, data["messages"]['4']['msg_id']))
@@ -207,9 +260,10 @@ class RetrieverTestCase(unittest.TestCase):
         self.populate_database(MESSAGE_QUERY_LIMIT*2)
         with app.app_context():
             with current_app.test_request_context():
-                resp = Retriever().retrieve_message_list(2, MESSAGE_QUERY_LIMIT)[1]
+                resp = Retriever().retrieve_message_list(2, MESSAGE_QUERY_LIMIT, 'respondent.21345')[1]
                 json_data = MessageList()._paginated_list_to_json(resp, 2, MESSAGE_QUERY_LIMIT,
-                                                                  "http://localhost:5050/", 'respondent.21345')
+                                                                  "http://localhost:5050/", 'respondent.21345',
+                                                                  string_query_args='?')
                 data = json.loads(json_data.get_data())
                 self.assertTrue('prev' in data['_links'])
 
@@ -218,9 +272,10 @@ class RetrieverTestCase(unittest.TestCase):
         self.populate_database(MESSAGE_QUERY_LIMIT-1)
         with app.app_context():
             with current_app.test_request_context():
-                resp = Retriever().retrieve_message_list(1, MESSAGE_QUERY_LIMIT)[1]
+                resp = Retriever().retrieve_message_list(1, MESSAGE_QUERY_LIMIT, 'respondent.21345')[1]
                 json_data = MessageList()._paginated_list_to_json(resp, 1, MESSAGE_QUERY_LIMIT,
-                                                                  "http://localhost:5050/", 'respondent.21345')
+                                                                  "http://localhost:5050/", 'respondent.21345',
+                                                                  string_query_args='?')
                 data = json.loads(json_data.get_data())
                 self.assertFalse('prev' in data['_links'])
 
@@ -229,9 +284,10 @@ class RetrieverTestCase(unittest.TestCase):
         self.populate_database(MESSAGE_QUERY_LIMIT*2)
         with app.app_context():
             with current_app.test_request_context():
-                resp = Retriever().retrieve_message_list(1, MESSAGE_QUERY_LIMIT)[1]
+                resp = Retriever().retrieve_message_list(1, MESSAGE_QUERY_LIMIT, 'respondent.21345')[1]
                 json_data = MessageList()._paginated_list_to_json(resp, 1, MESSAGE_QUERY_LIMIT,
-                                                                  "http://localhost:5050/", 'respondent.21345')
+                                                                  "http://localhost:5050/", 'respondent.21345',
+                                                                  string_query_args='?')
                 data = json.loads(json_data.get_data())
                 self.assertTrue('next' in data['_links'])
 
@@ -240,9 +296,10 @@ class RetrieverTestCase(unittest.TestCase):
         self.populate_database(MESSAGE_QUERY_LIMIT-1)
         with app.app_context():
             with current_app.test_request_context():
-                resp = Retriever().retrieve_message_list(1, MESSAGE_QUERY_LIMIT)[1]
+                resp = Retriever().retrieve_message_list(1, MESSAGE_QUERY_LIMIT, 'respondent.21345')[1]
                 json_data = MessageList()._paginated_list_to_json(resp, 1, MESSAGE_QUERY_LIMIT,
-                                                                  "http://localhost:5050/", 'respondent.21345')
+                                                                  "http://localhost:5050/", 'respondent.21345',
+                                                                  string_query_args='?')
                 data = json.loads(json_data.get_data())
                 self.assertFalse('next' in data['_links'])
 
@@ -251,9 +308,257 @@ class RetrieverTestCase(unittest.TestCase):
         self.populate_database(MESSAGE_QUERY_LIMIT - 1)
         with app.app_context():
             with current_app.test_request_context():
-                resp = Retriever().retrieve_message_list(1, MESSAGE_QUERY_LIMIT)[1]
+                resp = Retriever().retrieve_message_list(1, MESSAGE_QUERY_LIMIT, 'respondent.21345')[1]
                 json_data = MessageList()._paginated_list_to_json(resp, 1, MESSAGE_QUERY_LIMIT,
-                                                                  "http://localhost:5050/", 'respondent.21345')
+                                                                  "http://localhost:5050/", 'respondent.21345',
+                                                                  string_query_args='?')
                 data = json.loads(json_data.get_data())
                 self.assertEqual(data['_links']['self']['href'],
                                  "{0}?page={1}&limit={2}".format(self.MESSAGE_LIST_ENDPOINT, 1, MESSAGE_QUERY_LIMIT))
+
+    def test_all_draft_message_returned(self):
+        """retrieves messages from database with label DRAFT for user"""
+        self.populate_database(5, draft=True)
+
+        with app.app_context():
+            with current_app.test_request_context():
+                response = Retriever().retrieve_message_list(1, MESSAGE_QUERY_LIMIT,
+                                                             'internal.21345', survey='SurveyType', label='DRAFT')[1]
+                msg = []
+                for message in response.items:
+                    serialized_msg = message.serialize('internal.21345')
+                    msg.append(serialized_msg)
+                    self.assertTrue('DRAFT' in serialized_msg['labels'])
+                self.assertEqual(len(msg), 5)
+
+    def test_all_sent_message_returned(self):
+        """retrieves messages from database with label SENT for user"""
+        self.populate_database(5, convo=True)
+
+        with app.app_context():
+            with current_app.test_request_context():
+                response = Retriever().retrieve_message_list(1, MESSAGE_QUERY_LIMIT, 'respondent.21345',
+                                                             label="SENT")[1]
+                msg = []
+                for message in response.items:
+                    serialized_msg = message.serialize('respondent.21345')
+                    msg.append(serialized_msg)
+                    self.assertTrue('SENT' in serialized_msg['labels'])
+                self.assertEqual(len(msg), 5)
+
+    def test_all_inbox_message_returned(self):
+        """retrieves messages from database with label SENT for user"""
+        self.populate_database(5, convo=True)
+
+        with app.app_context():
+            with current_app.test_request_context():
+                response = Retriever().retrieve_message_list(1, MESSAGE_QUERY_LIMIT, 'internal.21345',
+                                                             label="INBOX", survey='SurveyType')[1]
+                msg = []
+                for message in response.items:
+                    serialized_msg = message.serialize('internal.21345')
+                    msg.append(serialized_msg)
+                    self.assertTrue('INBOX' in serialized_msg['labels'])
+                self.assertEqual(len(msg), 5)
+
+    def test_all_message_returned_no_label_option(self):
+        """retrieves all messages from database for user with no messages with label DRAFT_INBOX"""
+        self.populate_database(5, draft=True)
+
+        with app.app_context():
+            with current_app.test_request_context():
+                response = Retriever().retrieve_message_list(1, MESSAGE_QUERY_LIMIT, 'respondent.21345')[1]
+
+                msg = []
+                for message in response.items:
+                    serialized_msg = message.serialize('respondent.21345')
+                    msg.append(serialized_msg)
+                    self.assertFalse('DRAFT_INBOX' in serialized_msg['labels'])
+                self.assertEqual(len(msg), 5)
+
+    def test_all_message_returned_with_ru_option(self):
+        """retrieves all messages from database for user with ru option"""
+        self.populate_database(5, multiple_users=True)
+
+        with app.app_context():
+            with current_app.test_request_context():
+                response = Retriever().retrieve_message_list(1, MESSAGE_QUERY_LIMIT, 'respondent.21345',
+                                                             ru='AReportingUnit')[1]
+                msg = []
+                for message in response.items:
+                    serialized_msg = message.serialize('respondent.21345')
+                    msg.append(serialized_msg)
+                    self.assertTrue(serialized_msg['reporting_unit'] == 'AReportingUnit')
+                self.assertEqual(len(msg), 5)
+
+    def test_no_message_returned_with_ru_option(self):
+        """retrieves no messages from database for user with ru option"""
+        self.populate_database(5, multiple_users=True)
+
+        with app.app_context():
+            with current_app.test_request_context():
+                response = Retriever().retrieve_message_list(1, MESSAGE_QUERY_LIMIT, 'respondent.21345',
+                                                             ru='AnotherReportingUnit')[1]
+                msg = []
+                for message in response.items:
+                    serialized_msg = message.serialize('respondent.21345')
+                    msg.append(serialized_msg)
+                    self.assertTrue(serialized_msg['reporting_unit'] == 'AnotherReportingUnit')
+                self.assertEqual(len(msg), 0)
+
+    def test_all_message_returned_with_survey_option(self):
+        """retrieves all messages from database for user with survey option"""
+        self.populate_database(5)
+
+        with app.app_context():
+            with current_app.test_request_context():
+                response = Retriever().retrieve_message_list(1, MESSAGE_QUERY_LIMIT, 'respondent.21345',
+                                                             survey='SurveyType')[1]
+                msg = []
+                for message in response.items:
+                    serialized_msg = message.serialize('respondent.21345')
+                    msg.append(serialized_msg)
+                    self.assertTrue(serialized_msg['survey'] == 'SurveyType')
+                self.assertEqual(len(msg), 5)
+
+    def test_no_message_returned_with_survey_option(self):
+        """retrieves no messages from database for user with survey option"""
+        self.populate_database(5, multiple_users=True)
+
+        with app.app_context():
+            with current_app.test_request_context():
+                response = Retriever().retrieve_message_list(1, MESSAGE_QUERY_LIMIT, 'respondent.21345',
+                                                             survey='AnotherSurveyType')[1]
+                msg = []
+                for message in response.items:
+                    serialized_msg = message.serialize('respondent.21345')
+                    msg.append(serialized_msg)
+                    self.assertTrue(serialized_msg['survey'] == 'AnotherSurveyType')
+                self.assertEqual(len(msg), 0)
+
+    def test_all_message_returned_with_cc_option(self):
+        """retrieves all messages from database for user with cc option"""
+        self.populate_database(5)
+
+        with app.app_context():
+            with current_app.test_request_context():
+                response = Retriever().retrieve_message_list(1, MESSAGE_QUERY_LIMIT, 'respondent.21345',
+                                                             cc='ACollectionCase')[1]
+                msg = []
+                for message in response.items:
+                    serialized_msg = message.serialize('respondent.21345')
+                    msg.append(serialized_msg)
+                    self.assertTrue(serialized_msg['collection_case'] == 'ACollectionCase')
+                self.assertEqual(len(msg), 5)
+
+    def test_no_message_returned_with_cc_option(self):
+        """retrieves no messages from database for user with cc option"""
+        self.populate_database(5)
+
+        with app.app_context():
+            with current_app.test_request_context():
+                response = Retriever().retrieve_message_list(1, MESSAGE_QUERY_LIMIT, 'respondent.21345',
+                                                             cc='AnotherCollectionCase')[1]
+                msg = []
+                for message in response.items:
+                    serialized_msg = message.serialize('respondent.21345')
+                    msg.append(serialized_msg)
+                    self.assertTrue(serialized_msg['collection_case'] == 'AnotherCollectionCase')
+                self.assertEqual(len(msg), 0)
+
+    def test_message_list_returned_in_descending_order(self):
+        """retrieves messages from database in desc sent_date order"""
+        self.populate_database(5)
+
+        with app.app_context():
+            with current_app.test_request_context():
+                response = Retriever().retrieve_message_list(1, MESSAGE_QUERY_LIMIT, 'respondent.21345',
+                                                             desc=True)[1]
+                date = []
+                for message in response.items:
+                    serialized_msg = message.serialize('respondent.21345')
+                    date.append(serialized_msg['sent_date'])
+
+                desc_date = sorted(date, reverse=True)
+                self.assertEqual(len(date), 5)
+                self.assertListEqual(desc_date, date)
+
+    def test_message_list_returned_in_ascending_order(self):
+        """retrieves messages from database in asc sent_date order"""
+        self.populate_database(5)
+
+        with app.app_context():
+            with current_app.test_request_context():
+                response = Retriever().retrieve_message_list(1, MESSAGE_QUERY_LIMIT, 'respondent.21345',
+                                                             desc=False)[1]
+                date = []
+                for message in response.items:
+                    serialized_msg = message.serialize('respondent.21345')
+                    date.append(serialized_msg['sent_date'])
+
+                desc_date = sorted(date, reverse=False)
+                self.assertEqual(len(date), 5)
+                self.assertListEqual(desc_date, date)
+
+    def test_no_options(self):
+        args = {}
+
+        string_query_args, page, limit, ru, survey, cc, label, desc = MessageList._get_options(args)
+
+        self.assertEqual(string_query_args, '?')
+        self.assertEqual(page, 1)
+        self.assertEqual(limit, MESSAGE_QUERY_LIMIT)
+        self.assertEqual(ru, None)
+        self.assertEqual(survey, None)
+        self.assertEqual(cc, None)
+        self.assertEqual(label, None)
+        self.assertEqual(desc, True)
+
+    def test_three_options(self):
+        args = {
+            'page': 2,
+            'survey': 'Survey',
+            'ru': 'ReportingUnit'
+        }
+        string_query_args, page, limit, ru, survey, cc, label, desc = MessageList._get_options(args)
+
+        self.assertEqual(string_query_args, '?ru=ReportingUnit&survey=Survey')
+        self.assertEqual(page, 2)
+        self.assertEqual(limit, MESSAGE_QUERY_LIMIT)
+        self.assertEqual(ru, 'ReportingUnit')
+        self.assertEqual(survey, 'Survey')
+        self.assertEqual(cc, None)
+        self.assertEqual(label, None)
+        self.assertEqual(desc, True)
+
+    def test_all_options(self):
+        args = {
+            'page': 2,
+            'limit': 9,
+            'survey': 'Survey',
+            'ru': 'ReportingUnit',
+            'cc': 'CollectionCase',
+            'label': 'INBOX',
+            'desc': 'false'
+
+        }
+        string_query_args, page, limit, ru, survey, cc, label, desc = MessageList._get_options(args)
+
+        self.assertEqual(string_query_args, '?ru=ReportingUnit&survey=Survey&cc=CollectionCase&label=INBOX&desc=false')
+        self.assertEqual(page, 2)
+        self.assertEqual(limit, 9)
+        self.assertEqual(ru, 'ReportingUnit')
+        self.assertEqual(survey, 'Survey')
+        self.assertEqual(cc, 'CollectionCase')
+        self.assertEqual(label, 'INBOX')
+        self.assertEqual(desc, False)
+
+    def test_add_string_query_no_args(self):
+        string_query_args = '?'
+        string_query_args = MessageList._add_string_query_args(string_query_args, 'ru', 'ReportingUnit')
+        self.assertEqual(string_query_args, '?ru=ReportingUnit')
+
+    def test_add_string_query_with_args(self):
+        string_query_args = '?survey=Survey'
+        string_query_args = MessageList._add_string_query_args(string_query_args, 'ru', 'ReportingUnit')
+        self.assertEqual(string_query_args, '?survey=Survey&ru=ReportingUnit')

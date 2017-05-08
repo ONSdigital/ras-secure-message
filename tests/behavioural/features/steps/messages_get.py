@@ -9,14 +9,13 @@ from flask import current_app
 url = "http://localhost:5050/messages"
 headers = {'Content-Type': 'application/json', 'user_urn': ''}
 
-data = {'msg_id': '',
-        'urn_to': 'test',
+data = {'urn_to': 'test',
         'urn_from': 'test',
         'subject': 'Hello World',
         'body': 'Test',
         'thread_id': '',
-        'collection_case': 'collection case1',
-        'reporting_unit': 'reporting case1',
+        'collection_case': 'collectioncase',
+        'reporting_unit': 'AReportingUnit',
         'survey': 'survey'}
 
 
@@ -33,7 +32,6 @@ def reset_db():
 def step_impl(context):
     reset_db()
     for x in range(0, 2):
-        data['msg_id'] = str(uuid.uuid4())
         data['urn_to'] = 'internal.12344'
         data['urn_from'] = 'respondent.122342'
         context.response = app.test_client().post("http://localhost:5050/message/send",
@@ -60,7 +58,6 @@ def step_impl(context):
 def step_impl(context):
     reset_db()
     for x in range(0, 2):
-        data['msg_id'] = str(uuid.uuid4())
         data['urn_to'] = 'respondent.122342'
         data['urn_from'] = 'internal.12344'
         context.response = app.test_client().post("http://localhost:5050/message/send",
@@ -85,3 +82,217 @@ def step_impl(context):
         nose.tools.assert_true(len(response['messages'][str(num)]['labels']), 2)
         nose.tools.assert_true('INBOX' in response['messages'][str(num)]['labels'])
         nose.tools.assert_true('UNREAD' in response['messages'][str(num)]['labels'])
+
+# Scenario: Respondent and internal user sends multiple messages and Respondent retrieves the list of sent messages
+
+
+@given('a respondent and an Internal user sends multiple messages')
+def step_impl(context):
+    reset_db()
+    for x in range(0, 2):
+        data['urn_to'] = 'respondent.122342'
+        data['urn_from'] = 'internal.12344'
+        context.response = app.test_client().post("http://localhost:5050/message/send",
+                                                  data=flask.json.dumps(data), headers=headers)
+    for x in range(0, 2):
+        data['urn_to'] = 'internal.12344'
+        data['urn_from'] = 'respondent.122342'
+        context.response = app.test_client().post("http://localhost:5050/message/send",
+                                                  data=flask.json.dumps(data), headers=headers)
+
+
+@when('the Respondent gets their sent messages')
+def step_impl(context):
+    headers['user_urn'] = 'respondent.122342'
+    context.response = app.test_client().get('{0}{1}'.format(url, '?label=SENT'), headers=headers)
+
+
+@then('the retrieved messages should all have sent labels')
+def step_impl(context):
+    response = flask.json.loads(context.response.data)
+    for x in range(0, len(response['messages'])):
+        num = x + 1
+        nose.tools.assert_equal(response['messages'][str(num)]['labels'], ['SENT'])
+
+    nose.tools.assert_equal(len(response['messages']), 2)
+
+
+# Scenario: Respondent and internal user sends multiple messages and Respondent retrieves the list of messages with ru
+
+
+@given('a Internal user sends multiple messages with different reporting unit')
+def step_impl(context):
+    reset_db()
+
+    for x in range(0, 2):
+        data['urn_to'] = 'respondent.122342'
+        data['urn_from'] = 'internal.12344'
+        context.response = app.test_client().post("http://localhost:5050/message/send",
+                                                  data=flask.json.dumps(data), headers=headers)
+    for x in range(0, 2):
+        data['urn_to'] = 'respondent.122342'
+        data['urn_from'] = 'internal.12344'
+        data['reporting_unit'] = 'AnotherReportingUnit'
+        context.response = app.test_client().post("http://localhost:5050/message/send",
+                                                  data=flask.json.dumps(data), headers=headers)
+
+
+@when('the Respondent gets their messages with particular reporting unit')
+def step_impl(context):
+    headers['user_urn'] = 'respondent.122342'
+    context.response = app.test_client().get('{0}{1}'.format(url, '?ru=AnotherReportingUnit'), headers=headers)
+
+
+@then('the retrieved messages should have the correct reporting unit')
+def step_impl(context):
+    response = flask.json.loads(context.response.data)
+
+    for x in range(0, len(response['messages'])):
+        num = x + 1
+        nose.tools.assert_equal(response['messages'][str(num)]['reporting_unit'], 'AnotherReportingUnit')
+
+    nose.tools.assert_equal(len(response['messages']), 2)
+
+
+# Scenario: Internal user sends multiple messages and Respondent retrieves the list of messages with particular survey
+
+@given('a Internal user sends multiple messages with different survey')
+def step_impl(context):
+    reset_db()
+
+    for x in range(0, 2):
+        data['urn_to'] = 'respondent.122342'
+        data['urn_from'] = 'internal.12344'
+        context.response = app.test_client().post("http://localhost:5050/message/send",
+                                                  data=flask.json.dumps(data), headers=headers)
+    for x in range(0, 2):
+        data['urn_to'] = 'respondent.122342'
+        data['urn_from'] = 'internal.12344'
+        data['survey'] = 'AnotherSurvey'
+        context.response = app.test_client().post("http://localhost:5050/message/send",
+                                                  data=flask.json.dumps(data), headers=headers)
+
+
+@when('the Respondent gets their messages with particular survey')
+def step_impl(context):
+    headers['user_urn'] = 'respondent.122342'
+    context.response = app.test_client().get('{0}{1}'.format(url, '?survey=AnotherSurvey'), headers=headers)
+
+
+@then('the retrieved messages should have the correct survey')
+def step_impl(context):
+    response = flask.json.loads(context.response.data)
+
+    for x in range(0, len(response['messages'])):
+        num = x + 1
+        nose.tools.assert_equal(response['messages'][str(num)]['survey'], 'AnotherSurvey')
+
+    nose.tools.assert_equal(len(response['messages']), 2)
+
+
+# Scenario: Internal user sends multiple messages and Respondent retrieves the list of messages with particular cc
+
+
+@given('a Internal user sends multiple messages with different collection case')
+def step_impl(context):
+    reset_db()
+
+    for x in range(0, 2):
+        data['urn_to'] = 'respondent.122342'
+        data['urn_from'] = 'internal.12344'
+        context.response = app.test_client().post("http://localhost:5050/message/send",
+                                                  data=flask.json.dumps(data), headers=headers)
+    for x in range(0, 2):
+        data['urn_to'] = 'respondent.122342'
+        data['urn_from'] = 'internal.12344'
+        data['collection_case'] = 'AnotherCollectionCase'
+        context.response = app.test_client().post("http://localhost:5050/message/send",
+                                                  data=flask.json.dumps(data), headers=headers)
+
+
+@when('the Respondent gets their messages with particular collection case')
+def step_impl(context):
+    headers['user_urn'] = 'respondent.122342'
+    context.response = app.test_client().get('{0}{1}'.format(url, '?cc=AnotherCollectionCase'), headers=headers)
+
+
+@then('the retrieved messages should have the correct collection case')
+def step_impl(context):
+    response = flask.json.loads(context.response.data)
+
+    for x in range(0, len(response['messages'])):
+        num = x + 1
+        nose.tools.assert_equal(response['messages'][str(num)]['collection_case'], 'AnotherCollectionCase')
+
+    nose.tools.assert_equal(len(response['messages']), 2)
+
+
+# Scenario: Respondent creates multiple draft messages and Respondent retrieves the list of draft messages
+
+
+@given('a Respondent creates multiple draft messages')
+def step_impl(context):
+    reset_db()
+
+    for x in range(0, 2):
+        draft = {'urn_to': 'internal.12344',
+                 'urn_from': 'respondent.122342',
+                 'subject': 'test',
+                 'body': 'Test',
+                 'thread_id': '',
+                 'collection_case': 'collection case1',
+                 'reporting_unit': 'reporting case1',
+                 'survey': 'survey'}
+        context.response = app.test_client().post("http://localhost:5050/draft/save", data=flask.json.dumps(data), headers=headers)
+
+
+@when('the Respondent gets their draft messages')
+def step_impl(context):
+    headers['user_urn'] = 'respondent.122342'
+    context.response = app.test_client().get('{0}{1}'.format(url, '?label=DRAFT'), headers=headers)
+
+
+@then('the retrieved messages should all have draft labels')
+def step_impl(context):
+    response = flask.json.loads(context.response.data)
+
+    for x in range(0, len(response['messages'])):
+        num = x + 1
+        nose.tools.assert_equal(response['messages'][str(num)]['labels'], ['DRAFT'])
+
+    nose.tools.assert_equal(len(response['messages']), 2)
+
+# Scenario: Respondent creates multiple draft messages and Internal user retrieves a list of messages
+
+
+@then('the retrieved messages should not have DRAFT_INBOX labels')
+def step_impl(context):
+    response = flask.json.loads(context.response.data)
+
+    for x in range(0, len(response['messages'])):
+        num = x + 1
+        nose.tools.assert_equal(response['messages'][str(num)]['labels'], ['DRAFT'])
+        nose.tools.assert_not_equal(response['messages'][str(num)]['labels'], ['DRAFT_INBOX'])
+
+    # nose.tools.assert_equal(len(response['messages']), 2)
+
+# Respondent and internal user sends multiple messages and Respondent retrieves the list of inbox messages
+
+
+@when('the Respondent gets their inbox messages')
+def step_impl(context):
+    headers['user_urn'] = 'respondent.122342'
+    context.response = app.test_client().get('{0}{1}'.format(url, '?label=INBOX'), headers=headers)
+
+
+@then('the retrieved messages should all have inbox labels')
+def step_impl(context):
+    response = flask.json.loads(context.response.data)
+    for x in range(0, len(response['messages'])):
+        num = x + 1
+        nose.tools.assert_equal(response['messages'][str(num)]['labels'], ['INBOX', 'UNREAD'])
+
+    nose.tools.assert_equal(len(response['messages']), 2)
+
+
+
