@@ -229,3 +229,114 @@ def step_impl(context):
 @then('a Bad Request is displayed to the user')
 def step_impl(context):
     nose.tools.assert_equal(context.response.status_code, 400)
+
+# Scenario: internal - message status automatically changes to read - on opening message
+
+
+@given("a message with the status 'unread' is displayed to an internal user")
+def step_impl(context):
+    data['urn_to'] = 'internal.123'
+    context.response = app.test_client().post("http://localhost:5050/message/send", data=json.dumps(data), headers=headers)
+
+
+@when("the internal user opens the message")
+def step_impl(context):
+    response = json.loads(context.response.data)
+    msg_id = response['msg_id']
+    headers['user_urn'] = data['urn_from']
+    response_get = app.test_client().get("http://localhost:5050/message/{0}".format(msg_id), headers=headers)
+    context.get_json = json.loads(response_get.data)
+
+
+@then("the status of the message changes to from 'unread' to 'read' for all internal users")
+def step_impl(context):
+    nose.tools.assert_true('UNREAD' not in context.get_json['labels'])
+
+# Scenario: internal - as an internal user I want to be able to change my message from read to unread
+
+
+@given("a message with the status read is displayed to an internal user")
+def step_impl(context):
+    data['urn_to'] = 'internal.123'
+    response = app.test_client().post("http://localhost:5050/message/send", data=json.dumps(data), headers=headers)
+    post_resp = json.loads(response.data)
+    context.msg_id = post_resp['msg_id']
+    modify_data['action'] = 'remove'
+    modify_data['label'] = "UNREAD"
+    context.response = app.test_client().put(url.format(context.msg_id),
+                                             data=flask.json.dumps(modify_data), headers=headers)
+    headers['user_urn'] = data['urn_from']
+    app.test_client().get("http://localhost:5050/message/{0}".format(context.msg_id), headers=headers)
+
+
+@when("the user chooses to edit the status from read to unread")
+def step_impl(context):
+    modify_data['action'] = 'add'
+    modify_data['label'] = "UNREAD"
+    app.test_client().put(url.format(context.msg_id),
+                          data=flask.json.dumps(modify_data), headers=headers)
+
+
+@then("the status of that message changes to unread for all internal users that have access to that work group")
+def step_impl(context):
+    response_get = app.test_client().get("http://localhost:5050/message/{0}".format(context.msg_id), headers=headers)
+    data_get = json.loads(response_get.data)
+    nose.tools.assert_true("UNREAD" in data_get['labels'])
+
+
+# Scenario: As an external user - message status automatically changes to read - on opening message
+@given("a message with the status 'unread' is displayed to an external user")
+def step_impl(context):
+    data['urn_to'] = 'respondent.123'
+    context.response = app.test_client().post("http://localhost:5050/message/send", data=json.dumps(data), headers=headers)
+
+
+@when("the external user opens the message")
+def step_impl(context):
+    response = json.loads(context.response.data)
+    msg_id = response['msg_id']
+    headers['user_urn'] = data['urn_from']
+    response_get = app.test_client().get("http://localhost:5050/message/{0}".format(msg_id), headers=headers)
+    context.get_json = json.loads(response_get.data)
+
+
+@then("the status of the message changes to from 'unread' to 'read'")
+def step_impl(context):
+    nose.tools.assert_true('UNREAD' not in context.get_json['labels'])
+
+
+# Scenario: As an external user I want to be able to change the status of my message from read to unread
+@given("a message with the status 'read' is displayed to an external user")
+def step_impl(context):
+    data['urn_to'] = 'respondent.123'
+    response = app.test_client().post("http://localhost:5050/message/send", data=json.dumps(data), headers=headers)
+    post_resp = json.loads(response.data)
+    context.msg_id = post_resp['msg_id']
+    modify_data['action'] = 'remove'
+    modify_data['label'] = "UNREAD"
+    context.response = app.test_client().put(url.format(context.msg_id),
+                                             data=flask.json.dumps(modify_data), headers=headers)
+    headers['user_urn'] = data['urn_from']
+    app.test_client().get("http://localhost:5050/message/{0}".format(context.msg_id), headers=headers)
+
+
+@when("the external user chooses to edit the status from 'read' to 'unread'")
+def step_impl(context):
+    modify_data['action'] = 'add'
+    modify_data['label'] = "UNREAD"
+    app.test_client().put(url.format(context.msg_id),
+                          data=flask.json.dumps(modify_data), headers=headers)
+
+
+@then("the status of that message changes to 'unread'")
+def step_impl(context):
+    response_get = app.test_client().get("http://localhost:5050/message/{0}".format(context.msg_id), headers=headers)
+    data_get = json.loads(response_get.data)
+    nose.tools.assert_true("UNREAD" in data_get['labels'])
+
+# Scenario: As an internal user I want to be able to edit a message from my drafts
+
+
+@given("a message with the status read is displayed to an external user")
+def step_impl(context):
+    context.response = app.test_client().post("http://localhost:5050/draft/save", data=json.dumps(data), headers=headers)

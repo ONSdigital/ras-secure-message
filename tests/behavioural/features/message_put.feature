@@ -53,7 +53,7 @@ Feature: Checking correct labels for messages are added & deleted
 
   Scenario Outline: internal - as an internal user I want to be able to change my message from read to unread
     Given a message with the status <Message Status> is displayed to an internal user
-    When the user chooses to edit the status from <Message Status> to (New Status>
+    When the user chooses to edit the status from <Message Status> to <New Status>
     Then the status of that message changes to <New Status> for all internal users that have access to that survey
     
   Examples: Status
@@ -72,7 +72,7 @@ Feature: Checking correct labels for messages are added & deleted
     Then the status of that message changes to <New Status>
     
   Examples: Status
-    |Message status | New status |
+    |Message Status | New Status |
     |read           | unread     |
     |unread         | read       |
 
