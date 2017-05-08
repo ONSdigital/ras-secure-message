@@ -45,3 +45,47 @@ Feature: Checking correct labels for messages are added & deleted
     Given a message is sent
     When an unmmodifiable label is provided
     Then a Bad Request is displayed to the user
+
+ Scenario: internal - message status automatically changes to read - on opening message
+    Given a message with the status 'unread' is shown to an internal user
+    When the internal user opens the message
+    Then the status of the message changes to from 'unread' to 'read' for all internal users that have access to that survey
+
+   @ignore
+  Scenario Outline: internal - as an internal user I want to be able to change my message from read to unread
+    Given a message with the status <Message Status> is displayed to an internal user
+    When the internal user chooses to edit the status from <Message Status> to <New Status>
+    Then the status of that message changes to <New Status> for all internal users that have access to that survey
+    
+  Examples: Status
+    |Message Status | New Status |
+    |read           | unread     |
+    |unread         | read       |
+
+  Scenario: As an external user - message status automatically changes to read - on opening message
+    Given a message with the status 'unread' is shown to an external user
+    When the external user opens the message
+    Then the status of the message changes to from 'unread' to 'read'
+
+    @ignore
+  Scenario Outline: external - as an external user I want to be able to change my message from read to unread
+    Given a message with the status <Message Status> is displayed to an external user
+    When the external user chooses to edit the status from <Message Status> to <New Status>
+    Then the status of that message changes to <New Status>
+    
+  Examples: Status
+    |Message Status | New Status |
+    |read           | unread     |
+    |unread         | read       |
+
+  @ignore
+  Scenario: As an internal user I want to be able to edit a message from my drafts
+    Given an internal user has opened a previously saved draft message
+    When the internal user edits the content of the message and saves it as a draft
+    Then the original draft message is replaced by the edited version
+
+  @ignore
+  Scenario: As an External user I would like to be able to edit a message from drafts
+    Given an external user has opened a previously saved draft message
+    When the external user edits the content of the message and saves it as a draft
+    Then the original draft message is replaced by the edited version

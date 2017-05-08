@@ -25,6 +25,12 @@ def reset_db():
         database.db.drop_all()
         database.db.create_all()
 
+
+def before_scenario(context, scenario):
+    if "skip" in scenario.effective_tags:
+        scenario.skip("Marked with @skip")
+        return
+
 # Scenario: Respondent sends multiple messages and retrieves the list of messages with their labels
 
 
@@ -82,6 +88,27 @@ def step_impl(context):
         nose.tools.assert_true(len(response['messages'][str(num)]['labels']), 2)
         nose.tools.assert_true('INBOX' in response['messages'][str(num)]['labels'])
         nose.tools.assert_true('UNREAD' in response['messages'][str(num)]['labels'])
+
+# Scenario: As an external user I would like to be able to view a lst of messages
+
+
+@given("multiple messages have been sent to an external user")
+def step_impl(context):
+    for x in range(0, 2):
+        data['urn_to'] = 'respondent.123'
+        app.test_client().post("http://localhost:5050/message/send", headers=headers)
+
+
+@when("the external user navigates to their messages")
+def step_impl(context):
+    headers['user_urn'] = 'respondent.123'
+    context.response = app.test_client().get(url, headers=headers)
+
+
+@then("messages are displayed")
+def step_impl(context):
+    response = flask.json.loads(context.response.data)
+    nose.tools.assert_true(len(response['messages']), 2)
 
 # Scenario: Respondent and internal user sends multiple messages and Respondent retrieves the list of sent messages
 
@@ -293,6 +320,3 @@ def step_impl(context):
         nose.tools.assert_equal(response['messages'][str(num)]['labels'], ['INBOX', 'UNREAD'])
 
     nose.tools.assert_equal(len(response['messages']), 2)
-
-
-
