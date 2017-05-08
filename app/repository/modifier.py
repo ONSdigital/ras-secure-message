@@ -110,15 +110,18 @@ class Modifier:
             raise (InternalServerError(description="Error replacing message"))
 
         if draft.urn_to is not None and len(draft.urn_to) != 0:
-            del_current_status = "DELETE FROM status WHERE msg_id='{0}' AND label='{1}'"\
-                .format(draft_id, Labels.DRAFT_INBOX.value)
-            save_new_status = "INSERT INTO status (msg_id, actor, label) VALUES ('{0}', '{1}', '{2}')"\
-                .format(draft_id, draft.urn_to, Labels.DRAFT_INBOX.value)
+            Modifier.replace_current_recipient_status(draft_id, draft.urn_to)
 
-            try:
-                db.get_engine(app=db.get_app()).execute(del_current_status)
-                db.get_engine(app=db.get_app()).execute(save_new_status)
-            except Exception as e:
-                logger.error(e)
-                raise (InternalServerError(description="Error replacing DRAFT_INBOX label"))
+    @staticmethod
+    def replace_current_recipient_status(draft_id, draft_to):
+        del_current_status = "DELETE FROM status WHERE msg_id='{0}' AND label='{1}'" \
+            .format(draft_id, Labels.DRAFT_INBOX.value)
+        save_new_status = "INSERT INTO status (msg_id, actor, label) VALUES ('{0}', '{1}', '{2}')" \
+            .format(draft_id, draft_to, Labels.DRAFT_INBOX.value)
 
+        try:
+            db.get_engine(app=db.get_app()).execute(del_current_status)
+            db.get_engine(app=db.get_app()).execute(save_new_status)
+        except Exception as e:
+            logger.error(e)
+            raise (InternalServerError(description="Error replacing DRAFT_INBOX label"))
