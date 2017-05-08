@@ -61,3 +61,7 @@ Feature: Message get by ID Endpoint
     When the Internal user gets their messages
     Then the retrieved messages should not have DRAFT_INBOX labels
 
+  Scenario: As an internal user I want to be able to view/read all messages related to the survey I am working on
+    Given one or more messages have been sent to a survey
+    When the Internal user navigates to the message mailbox for that survey
+    Then the messages are displayed and can be opened by the internal user
