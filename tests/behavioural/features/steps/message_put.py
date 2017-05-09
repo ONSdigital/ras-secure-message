@@ -129,7 +129,7 @@ def step_impl(context):
     modify_data['label'] = "UNREAD"
     context.response = app.test_client().put(url.format(context.msg_id),
                                              data=flask.json.dumps(modify_data), headers=headers)
-
+    esfbhgjrnkgjnrbehjng
 
 @then('check message is marked unread')
 def step_impl(context):

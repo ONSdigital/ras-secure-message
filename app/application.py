@@ -71,8 +71,6 @@ def before_request():
         res = authenticate(request)
         if res != {'status': "ok"}:
             return res
-            # and 'user_urn' not in request.headers:
-            # raise (BadRequest(description="User URN required to access this Microservice Resource"))
 
 
 @app.errorhandler(MessageSaveException)
