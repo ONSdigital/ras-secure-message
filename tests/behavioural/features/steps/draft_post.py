@@ -136,6 +136,8 @@ def step_impl(context):
                  'reporting_unit': 'reporting case1',
                  'survey': ''})
 
+# Scenario 10:
+
 
 # Common
 @when('the draft is saved')

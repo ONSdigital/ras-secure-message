@@ -44,3 +44,9 @@ Feature: Draft Save Endpoint
     Given a draft with a survey field set as empty
     When the draft is saved
     Then a 400 error status is returned
+
+  @ignore
+  Scenario: As an External user I would like to be able to save a new message as draft
+    Given an external user has created a secure message including 'subject' and selected 'save'
+    When the user navigates to the draft inbox
+    Then the draft message is displayed in the draft inbox
