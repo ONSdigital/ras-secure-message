@@ -81,16 +81,47 @@ class Modifier:
         return True
 
     @staticmethod
-    def del_draft(draft_id):
+    def del_draft(draft_id, del_status=True):
         """Remove draft from status table and secure message table"""
         del_draft_msg = "DELETE FROM secure_message WHERE msg_id='{0}'".format(draft_id)
         del_draft_status = "DELETE FROM status WHERE msg_id='{0}' AND label='{1}'".format(draft_id, Labels.DRAFT.value)
 
         try:
             db.get_engine(app=db.get_app()).execute(del_draft_msg)
-            db.get_engine(app=db.get_app()).execute(del_draft_status)
+            if del_status is True:
+                db.get_engine(app=db.get_app()).execute(del_draft_status)
         except Exception as e:
             logger.error(e)
             raise (InternalServerError(description="Error retrieving messages from database"))
 
+    @staticmethod
+    def replace_current_draft(draft_id, draft):
+        Modifier.del_draft(draft_id, del_status=False)
+        save_new_draft = "INSERT INTO secure_message (msg_id, subject, body, thread_id, sent_date, read_date, " \
+                         "collection_case, reporting_unit, survey) VALUES ('{0}', '{1}', '{2}', '{3}'," \
+                         " '{4}', '{5}', '{6}', '{7}', '{8}')"\
+                         .format(draft_id, draft.subject, draft.body, draft.thread_id, None, None, draft.collection_case, draft.reporting_unit,
+                                 draft.survey)
 
+        try:
+            db.get_engine(app=db.get_app()).execute(save_new_draft)
+        except Exception as e:
+            logger.error(e)
+            raise (InternalServerError(description="Error replacing message"))
+
+        if draft.urn_to is not None and len(draft.urn_to) != 0:
+            Modifier.replace_current_recipient_status(draft_id, draft.urn_to)
+
+    @staticmethod
+    def replace_current_recipient_status(draft_id, draft_to):
+        del_current_status = "DELETE FROM status WHERE msg_id='{0}' AND label='{1}'" \
+            .format(draft_id, Labels.DRAFT_INBOX.value)
+        save_new_status = "INSERT INTO status (msg_id, actor, label) VALUES ('{0}', '{1}', '{2}')" \
+            .format(draft_id, draft_to, Labels.DRAFT_INBOX.value)
+
+        try:
+            db.get_engine(app=db.get_app()).execute(del_current_status)
+            db.get_engine(app=db.get_app()).execute(save_new_status)
+        except Exception as e:
+            logger.error(e)
+            raise (InternalServerError(description="Error replacing DRAFT_INBOX label"))
