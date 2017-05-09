@@ -5,9 +5,16 @@ from app.application import app
 import uuid
 from app.repository import database
 from flask import current_app
+from app.authentication.jwt import encode
+from app.authentication.jwe import Encrypter
+from app import settings
 
 url = "http://localhost:5050/messages"
-headers = {'Content-Type': 'application/json', 'user_urn': ''}
+token_data = {
+            "user_urn": "000000000"
+        }
+
+headers = {'Content-Type': 'application/json', 'authentication': ''}
 
 data = {'urn_to': 'test',
         'urn_from': 'test',
@@ -17,6 +24,16 @@ data = {'urn_to': 'test',
         'collection_case': 'collectioncase',
         'reporting_unit': 'AReportingUnit',
         'survey': 'survey'}
+
+
+def update_encrypted_jwt():
+    encrypter = Encrypter(_private_key=settings.SM_USER_AUTHENTICATION_PRIVATE_KEY,
+                          _private_key_password=settings.SM_USER_AUTHENTICATION_PRIVATE_KEY_PASSWORD,
+                          _public_key=settings.SM_USER_AUTHENTICATION_PUBLIC_KEY)
+    signed_jwt = encode(token_data)
+    return encrypter.encrypt_token(signed_jwt)
+
+headers['authentication'] = update_encrypted_jwt()
 
 
 def reset_db():
@@ -46,7 +63,8 @@ def step_impl(context):
 
 @when("the respondent gets their messages")
 def step_impl(context):
-    headers['user_urn'] = 'respondent.122342'
+    token_data['user_urn'] = 'respondent.122342'
+    headers['authentication'] = update_encrypted_jwt()
     context.response = app.test_client().get(url, headers=headers)
 
 
@@ -72,7 +90,8 @@ def step_impl(context):
 
 @when("the Internal user gets their messages")
 def step_impl(context):
-    headers['user_urn'] = 'internal.122342'
+    token_data['user_urn'] = 'internal.122342'
+    headers['authentication'] = update_encrypted_jwt()
     context.response = app.test_client().get(url, headers=headers)
 
 # Scenario: Respondent sends multiple messages and internal user retrieves the list of messages with their labels
@@ -101,7 +120,8 @@ def step_impl(context):
 
 @when("the external user navigates to their messages")
 def step_impl(context):
-    headers['user_urn'] = 'respondent.123'
+    token_data['user_urn'] = 'respondent.123'
+    headers['authentication'] = update_encrypted_jwt()
     context.response = app.test_client().get(url, headers=headers)
 
 
@@ -130,7 +150,8 @@ def step_impl(context):
 
 @when('the Respondent gets their sent messages')
 def step_impl(context):
-    headers['user_urn'] = 'respondent.122342'
+    token_data['user_urn'] = 'respondent.122342'
+    headers['authentication'] = update_encrypted_jwt()
     context.response = app.test_client().get('{0}{1}'.format(url, '?label=SENT'), headers=headers)
 
 
@@ -166,7 +187,8 @@ def step_impl(context):
 
 @when('the Respondent gets their messages with particular reporting unit')
 def step_impl(context):
-    headers['user_urn'] = 'respondent.122342'
+    token_data['user_urn'] = 'respondent.122342'
+    headers['authentication'] = update_encrypted_jwt()
     context.response = app.test_client().get('{0}{1}'.format(url, '?ru=AnotherReportingUnit'), headers=headers)
 
 
@@ -202,7 +224,8 @@ def step_impl(context):
 
 @when('the Respondent gets their messages with particular survey')
 def step_impl(context):
-    headers['user_urn'] = 'respondent.122342'
+    token_data['user_urn'] = 'respondent.122342'
+    headers['authentication'] = update_encrypted_jwt()
     context.response = app.test_client().get('{0}{1}'.format(url, '?survey=AnotherSurvey'), headers=headers)
 
 
@@ -239,7 +262,8 @@ def step_impl(context):
 
 @when('the Respondent gets their messages with particular collection case')
 def step_impl(context):
-    headers['user_urn'] = 'respondent.122342'
+    token_data['user_urn'] = 'respondent.122342'
+    headers['authentication'] = update_encrypted_jwt()
     context.response = app.test_client().get('{0}{1}'.format(url, '?cc=AnotherCollectionCase'), headers=headers)
 
 
@@ -308,7 +332,8 @@ def step_impl(context):
 
 @when('the Respondent gets their inbox messages')
 def step_impl(context):
-    headers['user_urn'] = 'respondent.122342'
+    token_data['user_urn'] = 'respondent.122342'
+    headers['authentication'] = update_encrypted_jwt()
     context.response = app.test_client().get('{0}{1}'.format(url, '?label=INBOX'), headers=headers)
 
 

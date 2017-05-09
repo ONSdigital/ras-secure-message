@@ -10,6 +10,9 @@ from app.common.alerts import AlertUser, AlertViaGovNotify
 from app.repository import database
 from flask import current_app, json
 from app.application import app
+from app.authentication.jwt import encode
+from app.authentication.jwe import Encrypter
+from app import settings
 
 
 class DraftTestCase(unittest.TestCase):
@@ -20,12 +23,19 @@ class DraftTestCase(unittest.TestCase):
         self.app = application.app.test_client()
         app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:////tmp/messages.db'
         self.engine = create_engine('sqlite:////tmp/messages.db', echo=True)
-
+        token_data = {
+            "user_urn": "12345678910"
+        }
+        encrypter = Encrypter(_private_key=settings.SM_USER_AUTHENTICATION_PRIVATE_KEY,
+                              _private_key_password=settings.SM_USER_AUTHENTICATION_PRIVATE_KEY_PASSWORD,
+                              _public_key=settings.SM_USER_AUTHENTICATION_PUBLIC_KEY)
+        signed_jwt = encode(token_data)
+        encrypted_jwt = encrypter.encrypt_token(signed_jwt)
         AlertUser.alert_method = mock.Mock(AlertViaGovNotify)
 
         self.url = "http://localhost:5050/draft/save"
 
-        self.headers = {'Content-Type': 'application/json', 'user_urn': ''}
+        self.headers = {'Content-Type': 'application/json', 'authentication': encrypted_jwt}
 
         self.test_message = {'urn_to': 'richard',
                              'urn_from': 'torrance',

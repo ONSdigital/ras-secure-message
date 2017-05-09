@@ -3,9 +3,13 @@ from app.application import app
 from app.repository import database
 from flask import current_app, json
 import nose.tools
+from app.authentication.jwt import encode
+from app.authentication.jwe import Encrypter
+from app import settings
 
 url = "http://localhost:5050/draft/{0}"
-headers = {'Content-Type': 'application/json', 'user_urn': '00000000000'}
+token_data = {'user_urn': '00000000000'}
+headers = {'Content-Type': 'application/json', 'authentication': ''}
 
 data = {'urn_to': 'test',
         'urn_from': 'test',
@@ -19,6 +23,16 @@ with app.app_context():
     database.db.init_app(current_app)
     database.db.drop_all()
     database.db.create_all()
+
+
+def update_encrypted_jwt():
+    encrypter = Encrypter(_private_key=settings.SM_USER_AUTHENTICATION_PRIVATE_KEY,
+                          _private_key_password=settings.SM_USER_AUTHENTICATION_PRIVATE_KEY_PASSWORD,
+                          _public_key=settings.SM_USER_AUTHENTICATION_PUBLIC_KEY)
+    signed_jwt = encode(token_data)
+    return encrypter.encrypt_token(signed_jwt)
+
+headers['authentication'] = update_encrypted_jwt()
 
 
 # Scenario 1: An existing draft is updated 200 is returned

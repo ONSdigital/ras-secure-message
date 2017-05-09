@@ -1,6 +1,5 @@
-# from app.authentication.jwt import decode
 from flask_restful import Resource
-from flask import request, jsonify
+from flask import request, jsonify, g
 from werkzeug.exceptions import BadRequest
 from app.repository.modifier import Modifier
 from app.validation.domain import MessageSchema
@@ -29,21 +28,17 @@ class MessageList(Resource):
 
     @staticmethod
     def get():
-        # res = authenticate(request)
-        res = {'status': "ok"}
-        if res == {'status': "ok"}:
-            string_query_args, page, limit, ru, survey, cc, label, desc = MessageList._get_options(request.args)
 
-            message_service = Retriever()
-            status, result = message_service.retrieve_message_list(page, limit, request.headers.get('user_urn'),
-                                                                   ru=ru, survey=survey, cc=cc, label=label, desc=desc)
-            if status:
-                resp = MessageList._paginated_list_to_json(result, page, limit, request.host_url,
-                                                           request.headers.get('user_urn'), string_query_args)
-                resp.status_code = 200
-                return resp
-        else:
-            return res
+        string_query_args, page, limit, ru, survey, cc, label, desc = MessageList._get_options(request.args)
+
+        message_service = Retriever()
+        status, result = message_service.retrieve_message_list(page, limit, g.user_urn,
+                                                               ru=ru, survey=survey, cc=cc, label=label, desc=desc)
+        if status:
+            resp = MessageList._paginated_list_to_json(result, page, limit, request.host_url,
+                                                       g.user_urn, string_query_args)
+            resp.status_code = 200
+            return resp
 
     @staticmethod
     def _get_options(args):
@@ -187,11 +182,9 @@ class MessageById(Resource):
     @staticmethod
     def get(message_id):
         """Get message by id"""
-        # res = authenticate(request)
-        user_urn = request.headers.get('user_urn')  # getting user urn from header request
+        user_urn = g.user_urn
         # check user is authorised to view message
         message_service = Retriever()
-        # pass msg_id and user urn
         resp = message_service.retrieve_message(message_id, user_urn)
         return jsonify(resp)
 
@@ -202,13 +195,12 @@ class ModifyById(Resource):
     @staticmethod
     def put(message_id):
         """Update message by status"""
-        user_urn = request.headers.get('user_urn')
+        user_urn = g.user_urn
 
         request_data = request.get_json()
 
         action, label = ModifyById.validate_request(request_data)
 
-        # pass msg_id and user urn
         message = Retriever().retrieve_message(message_id, user_urn)
 
         if label == Labels.UNREAD.value:

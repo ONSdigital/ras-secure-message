@@ -6,9 +6,16 @@ from behave import given, then, when
 from app.application import app
 from app.repository import database
 from flask import current_app
+from app.authentication.jwt import encode
+from app.authentication.jwe import Encrypter
+from app import settings
 
 url = "http://localhost:5050/message/{}/modify"
-headers = {'Content-Type': 'application/json', 'user_urn': 'internal.12344'}
+token_data = {
+            "user_urn": "000000000"
+        }
+
+headers = {'Content-Type': 'application/json', 'authentication': ''}
 
 data = {'urn_to': 'test',
         'urn_from': 'test',
@@ -21,6 +28,15 @@ data = {'urn_to': 'test',
 
 modify_data = {'action': '',
                'label': ''}
+
+def update_encrypted_jwt():
+    encrypter = Encrypter(_private_key=settings.SM_USER_AUTHENTICATION_PRIVATE_KEY,
+                          _private_key_password=settings.SM_USER_AUTHENTICATION_PRIVATE_KEY_PASSWORD,
+                          _public_key=settings.SM_USER_AUTHENTICATION_PUBLIC_KEY)
+    signed_jwt = encode(token_data)
+    return encrypter.encrypt_token(signed_jwt)
+
+headers['authentication'] = update_encrypted_jwt()
 
 
 def reset_db():
@@ -243,7 +259,8 @@ def step_impl(context):
 def step_impl(context):
     response = json.loads(context.response.data)
     msg_id = response['msg_id']
-    headers['user_urn'] = data['urn_from']
+    token_data['user_urn'] = data['urn_from']
+    headers['authentication'] = update_encrypted_jwt()
     response_get = app.test_client().get("http://localhost:5050/message/{0}".format(msg_id), headers=headers)
     context.get_json = json.loads(response_get.data)
 
@@ -264,7 +281,8 @@ def step_impl(context):
 def step_impl(context):
     response = json.loads(context.response.data)
     msg_id = response['msg_id']
-    headers['user_urn'] = data['urn_from']
+    token_data['user_urn'] = data['urn_from']
+    headers['authentication'] = update_encrypted_jwt()
     response_get = app.test_client().get("http://localhost:5050/message/{0}".format(msg_id), headers=headers)
     context.get_json = json.loads(response_get.data)
 

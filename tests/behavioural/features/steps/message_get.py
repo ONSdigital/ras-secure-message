@@ -4,9 +4,16 @@ import nose.tools
 from behave import given, then, when
 from app.application import app
 import uuid
+from app.authentication.jwt import encode
+from app.authentication.jwe import Encrypter
+from app import settings
 
 url = "http://localhost:5050/message/"
-headers = {'Content-Type': 'application/json', 'user_urn': ''}
+token_data = {
+            "user_urn": "000000000"
+        }
+
+headers = {'Content-Type': 'application/json', 'authentication': ''}
 
 data = {'urn_to': 'test',
         'urn_from': 'test',
@@ -18,12 +25,23 @@ data = {'urn_to': 'test',
         'survey': 'survey'}
 
 
+def update_encrypted_jwt():
+    encrypter = Encrypter(_private_key=settings.SM_USER_AUTHENTICATION_PRIVATE_KEY,
+                          _private_key_password=settings.SM_USER_AUTHENTICATION_PRIVATE_KEY_PASSWORD,
+                          _public_key=settings.SM_USER_AUTHENTICATION_PUBLIC_KEY)
+    signed_jwt = encode(token_data)
+    return encrypter.encrypt_token(signed_jwt)
+
+headers['authentication'] = update_encrypted_jwt()
+
+
 # Scenario: Retrieve a message with correct message ID
 @given("there is a message to be retrieved")
 def step_impl(context):
     data['urn_to'] = 'internal.12344'
     data['urn_from'] = 'respondent.122342'
-    context.response = app.test_client().post("http://localhost:5050/message/send", data=flask.json.dumps(data), headers=headers)
+    context.response = app.test_client().post("http://localhost:5050/message/send", data=flask.json.dumps(data),
+                                              headers=headers)
     msg_resp = json.loads(context.response.data)
     context.msg_id = msg_resp['msg_id']
 
@@ -64,7 +82,8 @@ def step_impl(context):
 
 @when("the respondent wants to see the message")
 def step_impl(context):
-    headers['user_urn'] = 'respondent.122342'
+    token_data['user_urn'] = 'respondent.122342'
+    headers['authentication'] = update_encrypted_jwt()
     new_url = url+context.msg_id
     context.response = app.test_client().get(new_url, headers=headers)
 
@@ -88,7 +107,8 @@ def step_impl(context):
 
 @when("the internal user wants to see the message")
 def step_impl(context):
-    headers['user_urn'] = 'internal.12344'
+    token_data['user_urn'] = 'internal.12344'
+    headers['authentication'] = update_encrypted_jwt()
     new_url = url+context.msg_id
     context.response = app.test_client().get(new_url, headers=headers)
 
