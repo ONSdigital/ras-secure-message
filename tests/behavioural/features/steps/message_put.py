@@ -29,6 +29,7 @@ data = {'urn_to': 'test',
 modify_data = {'action': '',
                'label': ''}
 
+
 def update_encrypted_jwt():
     encrypter = Encrypter(_private_key=settings.SM_USER_AUTHENTICATION_PRIVATE_KEY,
                           _private_key_password=settings.SM_USER_AUTHENTICATION_PRIVATE_KEY_PASSWORD,
@@ -129,7 +130,7 @@ def step_impl(context):
     modify_data['label'] = "UNREAD"
     context.response = app.test_client().put(url.format(context.msg_id),
                                              data=flask.json.dumps(modify_data), headers=headers)
-    esfbhgjrnkgjnrbehjng
+
 
 @then('check message is marked unread')
 def step_impl(context):
