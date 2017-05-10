@@ -339,10 +339,11 @@ def step_impl(context):
 
 
 @then("the status of that message changes to 'read'")
-def step_impl(context):
+def step_impl(context,step):
     response_get = app.test_client().get("http://localhost:5050/message/{0}".format(context.msg_id), headers=headers)
     data_get = json.loads(response_get.data)
-    nose.tools.assert_true("UNREAD" not in data_get['labels'])
+    nose.tools.assert_true("ARCHIVE" not in data_get['labels'])
+    return step.error_message
 
 
 # Scenario: As an internal user I want to be able to edit a message from my drafts
