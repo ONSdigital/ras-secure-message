@@ -100,3 +100,6 @@ def step_impl(context):
     nose.tools.assert_true(len(response['labels']), 2)
     nose.tools.assert_true('INBOX' in response['labels'])
     nose.tools.assert_true('UNREAD' in response['labels'])
+
+
+

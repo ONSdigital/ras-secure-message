@@ -51,7 +51,6 @@ Feature: Checking correct labels for messages are added & deleted
     When the internal user opens the message
     Then the status of the message changes from 'unread' to 'read' for all internal users that have access to that survey
 
-   @ignore
   Scenario Outline: internal - as an internal user I want to be able to change my message from read to unread
     Given a message with the status <Message Status> is displayed to an internal user
     When the internal user chooses to edit the status from <Message Status> to <New Status>
@@ -65,9 +64,8 @@ Feature: Checking correct labels for messages are added & deleted
   Scenario: As an external user - message status automatically changes to read - on opening message
     Given a message with the status 'unread' is shown to an external user
     When the external user opens the message
-    Then the status of the message changes to from 'unread' to 'read'
+    Then the status of the message changes to from unread to read
 
-    @ignore
   Scenario Outline: external - as an external user I want to be able to change my message from read to unread
     Given a message with the status <Message Status> is displayed to an external user
     When the external user chooses to edit the status from <Message Status> to <New Status>

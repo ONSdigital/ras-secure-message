@@ -1,10 +1,11 @@
-from behave import given, when
+from behave import given, when, then
 from flask import current_app, json
 from app.common.alerts import AlertUser, AlertViaGovNotify
 from unittest import mock
 from app.repository import database
 from app.application import app
 from app import constants
+import nose
 
 url = "http://localhost:5050/draft/save"
 headers = {'Content-Type': 'application/json', 'user-urn': '000000000'}
@@ -136,10 +137,63 @@ def step_impl(context):
                  'reporting_unit': 'reporting case1',
                  'survey': ''})
 
-# Scenario 10:
+
+# Scenario 10: As an External user I would like to be able to save a new message as draft
+@given("an external user has created a secure message including subject and selected save")
+def step_impl(context):
+    data.update({'urn_to': '',
+                 'urn_from': 'respondent.123',
+                 'subject': 'test1',
+                 'body': '234',
+                 'thread_id': '',
+                 'collection_case': 'collection_case1',
+                 'reporting_unit': 'reporting_unit1',
+                 'survey': 'RSI'})
+    response = app.test_client().post(url, data=json.dumps(data), headers=headers)
+    response_data = json.loads(response.data)
+    context.msg_id = response_data['msg_id']
+
+
+@when("the user navigates to the draft inbox")
+def step_impl(context):
+    request = app.test_client().get("http://localhost:5050/draft/{0}".format(context.msg_id))
+    context.request_data = json.loads(request.data)
+
+
+@then("the draft message is displayed in the draft inbox")
+def step_impl(context):
+    nose.tools.assert_equal(context.request_data, data)
 
 
 # Common
 @when('the draft is saved')
 def step_impl(context):
     context.response = app.test_client().post(url, data=json.dumps(data), headers=headers)
+
+
+# # Scenario: As an External user I would like to be able to save a new message as draft
+# @given("an external user has created a secure message including subject and selected save")
+# def step_impl(context):
+#     data.update({'urn_to': 'test',
+#                  'urn_from': 'test',
+#                  'subject': 'test',
+#                  'body': 'Test',
+#                  'thread_id': '',
+#                  'collection_case': 'collection case1',
+#                  'reporting_unit': 'reporting case1',
+#                  'survey': 'survey'})
+#
+#     response = app.test_client().post("http://localhost:5050/draft/save", data=json.dumps(data), headers=headers)
+#     resp_data = json.loads(response.data)
+#     context.msg_id = resp_data['msg_id']
+#
+#
+# @when("the user navigates to the draft inbox")
+# def step_impl(context):
+#     request = app.test_client().get("http://localhost:5050/message/{0}".format(context.msg_id), headers=headers)
+#     context.request_data = json.loads(request.data)
+#
+#
+# @then("the draft message is displayed in the draft inbox")
+# def step_impl(context):
+#     nose.tools.assert_equal(data, context.request_data)
