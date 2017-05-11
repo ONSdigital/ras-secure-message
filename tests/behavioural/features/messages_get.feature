@@ -62,7 +62,7 @@ Feature: Get Messages list Endpoint
     Then the retrieved messages should not have DRAFT_INBOX labels
 
   @ignore
-  Scenario Outline: User provides parameters that are too large or invalid
+  Scenario Outline: User provides parameters that are invalid
     Given parameter <param> has value <value>
     When user gets messages using the parameters
     Then a 400 HTTP bad syntax response is returned
@@ -71,10 +71,18 @@ Feature: Get Messages list Endpoint
     |param         | value |
     |limit         | string|
     |page          | string|
-    |reportingUnit | LongerThan11Chars |
     |survey        | NotASurvey |
-    |case          | ?|
     |labels        | NotALabel  |
+
+  @ignore
+  Scenario Outline: User provides parameters that are too large
+    Given parameter <param> has value <value>
+    When user gets messages using the parameters
+    Then a 400 HTTP bad syntax response is returned
+
+  Examples: Parameters
+    |param         | value |
+    |reportingUnit | LongerThan11Chars |
     |labels        | INBOX-SENT-ARCHIVED-DRAFT-INBOX-SENT-ARCHIVED-DRAFT |
 
   @ignore
@@ -85,7 +93,6 @@ Feature: Get Messages list Endpoint
 
   Examples: Parameters
     |labels  |
-    |empty   |
     |INBOX   |
     |SENT    |
     |ARCHIVED |
@@ -93,4 +100,10 @@ Feature: Get Messages list Endpoint
     |INBOX-SENT  |
     |INBOX-SENT-ARCHIVED |
     |INBOX-SENT-ARCHIVED-DRAFT |
+
+  @ignore
+  Scenario: User gets messages with no labels options
+    Given there are multiple messages to retrieve for all labels
+    When respondent gets messages with labels empty
+    Then all messages should be returned
 
