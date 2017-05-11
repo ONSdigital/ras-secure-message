@@ -41,3 +41,9 @@ Feature: Message get by ID Endpoint
     Given an external user has created and saved a draft message
     When the external user navigates to draft messages and opens the draft message
     Then the draft message should be displayed
+
+  @ignore
+  Scenario: As a user when I send a invalid message with bad syntax
+    Given a user is sending a message
+    When the message contains invalid parameters
+    Then a bad request is returned to the user

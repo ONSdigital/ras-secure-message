@@ -54,7 +54,3 @@ Feature: Message Send Endpoint
     Given a message contains a msg_id and is not a valid draft
     When the message is sent
     Then a 400 error status is returned
-
-
-
-

@@ -253,7 +253,8 @@ def step_impl(context):
 @given("a message with the status 'unread' is shown to an internal user")
 def step_impl(context):
     data['urn_to'] = 'internal.123'
-    context.response = app.test_client().post("http://localhost:5050/message/send", data=json.dumps(data), headers=headers)
+    context.response = app.test_client().post("http://localhost:5050/message/send",
+                                              data=json.dumps(data), headers=headers)
 
 
 @when("the internal user opens the message")
@@ -275,7 +276,8 @@ def step_impl(context):
 @given("a message with the status 'unread' is shown to an external user")
 def step_impl(context):
     data['urn_to'] = 'respondent.123'
-    context.response = app.test_client().post("http://localhost:5050/message/send", data=json.dumps(data), headers=headers)
+    context.response = app.test_client().post("http://localhost:5050/message/send",
+                                              data=json.dumps(data), headers=headers)
 
 
 @when("the external user opens the message")
@@ -339,11 +341,10 @@ def step_impl(context):
 
 
 @then("the status of that message changes to 'read'")
-def step_impl(context,step):
+def step_impl(context):
     response_get = app.test_client().get("http://localhost:5050/message/{0}".format(context.msg_id), headers=headers)
     data_get = json.loads(response_get.data)
     nose.tools.assert_true("ARCHIVE" not in data_get['labels'])
-    return step.error_message
 
 
 # Scenario: As an internal user I want to be able to edit a message from my drafts
@@ -358,7 +359,8 @@ def step_impl(context):
 @when("the internal user edits the content of the message and saves it as a draft")
 def step_impl(context):
     data['body'] = 'abcd'
-    app.test_client().put("http://localhost:5050/draft/{0}".format(context.msg_id), data=json.dumps(data), headers=headers)
+    app.test_client().put("http://localhost:5050/draft/{0}".format(context.msg_id),
+                          data=json.dumps(data), headers=headers)
 
 
 @then("the original draft message is replaced by the edited version")
@@ -373,7 +375,8 @@ def step_impl(context):
 def step_impl(context):
     headers['user_urn'] = 'respondent.123'
     data['urn_from'] = headers['user_urn']
-    response = app.test_client().post("http://localhost:5050/draft/save", data=json.dumps(data), headers=headers)
+    response = app.test_client().post("http://localhost:5050/draft/save",
+                                      data=json.dumps(data), headers=headers)
     post_resp = json.loads(response.data)
     context.msg_id = post_resp['msg_id']
 
@@ -381,6 +384,22 @@ def step_impl(context):
 @when("the external user edits the content of the message and saves it as a draft")
 def step_impl(context):
     data['body'] = 'edited'
-    app.test_client().put("http://localhost:5050/draft/{0}".format(context.msg_id), data=json.dumps(data), headers=headers)
+    app.test_client().put("http://localhost:5050/draft/{0}".format(context.msg_id),
+                          data=json.dumps(data), headers=headers)
 
 
+# If an incorrect message id is requested by the user return a 400 error
+@given("a user requests a message with a invalid message id")
+def step_impl(context):
+    context.msg_id = "MsgIdExceedsMsgIdLengthsdhkbgjksdlfknbsjdshbfjskgbhdhdghgdhdfsdhjghbskggdh"
+
+
+@when("it is searched for and not a valid message id")
+def step_impl(context):
+    context.response = app.test_client().put("http://localhost:5050/message/{0}".format(context.msg_id),
+                                             data=json.dumps(data), headers=headers)
+
+
+@then("a 400 error code is returned to the user")
+def step_impl(context):
+    nose.tools.assert_equal(context.response.status_code, 400)

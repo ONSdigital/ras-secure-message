@@ -56,7 +56,7 @@ Feature: Checking correct labels for messages are added & deleted
     Given a message with the status <Message Status> is displayed to an internal user
     When the internal user chooses to edit the status from <Message Status> to <New Status>
     Then the status of that message changes to <New Status> for all internal users that have access to that survey
-    
+
   Examples: Status
     |Message Status | New Status |
     |read           | unread     |
@@ -72,7 +72,7 @@ Feature: Checking correct labels for messages are added & deleted
     Given a message with the status <Message Status> is displayed to an external user
     When the external user chooses to edit the status from <Message Status> to <New Status>
     Then the status of that message changes to <New Status>
-    
+
   Examples: Status
     |Message Status | New Status |
     |read           | unread     |
@@ -89,3 +89,9 @@ Feature: Checking correct labels for messages are added & deleted
     Given an external user has opened a previously saved draft message
     When the external user edits the content of the message and saves it as a draft
     Then the original draft message is replaced by the edited version
+
+  @ignore
+  Scenario: If an incorrect message id is requested by the user return a 400 error
+    Given a message with a unknown message id
+    When it is searched for
+    Then a 400 error code is returned
