@@ -342,6 +342,7 @@ def step_impl(context):
     nose.tools.assert_true("UNREAD" not in context.request_data['labels'])
 
 
+
 # Scenario - external - as an external user I want to be able to change my message from read to unread
 @given("a message with the status read is displayed to an external user")
 def step_impl(context):

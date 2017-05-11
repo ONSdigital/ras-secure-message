@@ -4,7 +4,7 @@ import sys
 
 if __name__ == "__main__":
     from behave import __main__ as behave_executable
-    behave_executable.main(None)
+    behave = behave_executable.main()
 
     test_dirs = os.listdir('./tests')
     suites_list = []
@@ -16,5 +16,5 @@ if __name__ == "__main__":
             suites_list.append(suite)
             result = unittest.TextTestRunner(verbosity=2).run(suite)
             i = len(result.failures) + len(result.errors)
-            if i != 0:
+            if i != 0 or behave == 1:
                 sys.exit(1)

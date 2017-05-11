@@ -158,7 +158,6 @@ def step_impl(context):
 
     nose.tools.assert_equal(len(response['messages']), 2)
 
-
 # Scenario: Respondent and internal user sends multiple messages and Respondent retrieves the list of messages with ru
 
 
