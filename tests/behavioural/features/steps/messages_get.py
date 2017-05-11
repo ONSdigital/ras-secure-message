@@ -344,3 +344,214 @@ def step_impl(context):
         nose.tools.assert_equal(response['messages'][str(num)]['labels'], ['INBOX', 'UNREAD'])
 
     nose.tools.assert_equal(len(response['messages']), 2)
+
+#   Scenario Outline: User provides parameters that are invalid
+
+
+@given('parameter limit has value string')
+def step_impl(context):
+    context.parms = "?limit=string"
+
+
+@given('parameter page has value string')
+def step_impl(context):
+    context.parms = "?page=string"
+
+
+@given('parameter survey has value NotASurvey')
+def step_impl(context):
+    context.parms = "?survey=NotASurvey"
+
+
+@given('parameter labels has value NotALabel')
+def step_impl(context):
+    context.parms = "?labels=NotALabel"
+
+
+@given('parameter reportingUnit has value LongerThan11Chars')
+def step_impl(context):
+    context.parms = "?reportingUnit=LongerThan11Chars"
+
+
+@given('parameter labels has value INBOX-SENT-ARCHIVED-DRAFT-INBOX-SENT-ARCHIVED-DRAFT')
+def step_impl(context):
+    context.parms = "?labels=INBOX-SENT-ARCHIVED-DRAFT-INBOX-SENT-ARCHIVED-DRAFT"
+
+
+@when('user gets messages using the parameters')
+def step_impl(context):
+    token_data['user_urn'] = 'respondent.122342'
+    headers['authentication'] = update_encrypted_jwt()
+    url_with_param = "{0}{1}".format(url, context.parms)
+    context.response = app.test_client().get(url_with_param, headers=headers)
+
+
+@then("a 400 HTTP bad syntax response is returned")
+def step_impl(context):
+    nose.tools.assert_equal(context.response.status_code, 400)
+
+
+#   Scenario Outline: User gets messages with various labels options
+@given('there are multiple messages to retrieve for all labels')
+def step_impl(context):
+    reset_db()
+
+    for x in range(0, 2):
+        data['urn_to'] = 'respondent.122342'
+        data['urn_from'] = 'internal.12344'
+        context.response = app.test_client().post("http://localhost:5050/message/send",
+                                                  data=flask.json.dumps(data), headers=headers)
+    for x in range(0, 2):
+        data['urn_to'] = 'internal.12344'
+        data['urn_from'] = 'respondent.122342'
+        context.response = app.test_client().post("http://localhost:5050/message/send",
+                                                  data=flask.json.dumps(data), headers=headers)
+    # need to implement adding draft messages, archived messages and read messages for user respondent.122342
+
+
+@when('respondent gets messages with labels INBOX')
+def step_impl(context):
+    token_data['user_urn'] = 'respondent.122342'
+    headers['authentication'] = update_encrypted_jwt()
+    parms = "?labels=INBOX"
+    url_with_param = "{0}{1}".format(url, parms)
+    context.response = app.test_client().get(url_with_param, headers=headers)
+
+
+@when('respondent gets messages with labels SENT')
+def step_impl(context):
+    token_data['user_urn'] = 'respondent.122342'
+    headers['authentication'] = update_encrypted_jwt()
+    parms = "?labels=SENT"
+    url_with_param = "{0}{1}".format(url, parms)
+    context.response = app.test_client().get(url_with_param, headers=headers)
+
+
+@when('respondent gets messages with labels ARCHIVED')
+def step_impl(context):
+    token_data['user_urn'] = 'respondent.122342'
+    headers['authentication'] = update_encrypted_jwt()
+    parms = "?labels=ARCHIVED"
+    url_with_param = "{0}{1}".format(url, parms)
+    context.response = app.test_client().get(url_with_param, headers=headers)
+
+
+@when('respondent gets messages with labels DRAFT')
+def step_impl(context):
+    token_data['user_urn'] = 'respondent.122342'
+    headers['authentication'] = update_encrypted_jwt()
+    parms = "?labels=DRAFT"
+    url_with_param = "{0}{1}".format(url, parms)
+    context.response = app.test_client().get(url_with_param, headers=headers)
+
+
+@when('respondent gets messages with labels INBOX-SENT')
+def step_impl(context):
+    token_data['user_urn'] = 'respondent.122342'
+    headers['authentication'] = update_encrypted_jwt()
+    parms = "?labels=INBOX-SENT"
+    url_with_param = "{0}{1}".format(url, parms)
+    context.response = app.test_client().get(url_with_param, headers=headers)
+
+
+@when('respondent gets messages with labels INBOX-SENT-ARCHIVED')
+def step_impl(context):
+    token_data['user_urn'] = 'respondent.122342'
+    headers['authentication'] = update_encrypted_jwt()
+    parms = "?labels=INBOX-SENT-ARCHIVED"
+    url_with_param = "{0}{1}".format(url, parms)
+    context.response = app.test_client().get(url_with_param, headers=headers)
+
+
+@when('respondent gets messages with labels INBOX-SENT-ARCHIVED-DRAFT')
+def step_impl(context):
+    token_data['user_urn'] = 'respondent.122342'
+    headers['authentication'] = update_encrypted_jwt()
+    parms = "?labels=INBOX-SENT-ARCHIVED-DRAFT"
+    url_with_param = "{0}{1}".format(url, parms)
+    context.response = app.test_client().get(url_with_param, headers=headers)
+
+
+@then('messages returned should have one of the labels INBOX')
+def step_impl(context):
+    response = flask.json.loads(context.response.data)
+
+    for x in range(0, len(response['messages'])):
+        num = x + 1
+        nose.tools.assert_true('INBOX' in response['messages'][str(num)]['labels'])
+
+
+@then('messages returned should have one of the labels SENT')
+def step_impl(context):
+    response = flask.json.loads(context.response.data)
+
+    for x in range(0, len(response['messages'])):
+        num = x + 1
+        nose.tools.assert_true('SENT' in response['messages'][str(num)]['labels'])
+
+
+@then('messages returned should have one of the labels ARCHIVED')
+def step_impl(context):
+    response = flask.json.loads(context.response.data)
+
+    for x in range(0, len(response['messages'])):
+        num = x + 1
+        nose.tools.assert_true('ARCHIVED' in response['messages'][str(num)]['labels'])
+
+
+@then('messages returned should have one of the labels DRAFT')
+def step_impl(context):
+    response = flask.json.loads(context.response.data)
+
+    for x in range(0, len(response['messages'])):
+        num = x + 1
+        nose.tools.assert_true('DRAFT' in response['messages'][str(num)]['labels'])
+
+
+@then('messages returned should have one of the labels INBOX-SENT')
+def step_impl(context):
+    response = flask.json.loads(context.response.data)
+
+    for x in range(0, len(response['messages'])):
+        num = x + 1
+        nose.tools.assert_true('INBOX' in response['messages'][str(num)]['labels'] or
+                               'SENT' in response['messages'][str(num)]['labels'])
+
+
+@then('messages returned should have one of the labels INBOX-SENT-ARCHIVED')
+def step_impl(context):
+    response = flask.json.loads(context.response.data)
+
+    for x in range(0, len(response['messages'])):
+        num = x + 1
+        nose.tools.assert_true('INBOX' in response['messages'][str(num)]['labels'] or
+                               'SENT' in response['messages'][str(num)]['labels'] or
+                               'ARCHIVED' in response['messages'][str(num)]['labels'])
+
+
+@then('respondent gets messages with labels INBOX-SENT-ARCHIVED-DRAFT')
+def step_impl(context):
+    response = flask.json.loads(context.response.data)
+
+    for x in range(0, len(response['messages'])):
+        num = x + 1
+        nose.tools.assert_true('INBOX' in response['messages'][str(num)]['labels'] or
+                               'SENT' in response['messages'][str(num)]['labels'] or
+                               'ARCHIVED' in response['messages'][str(num)]['labels'] or
+                               'DRAFT' in response['messages'][str(num)]['labels'])
+
+
+@when('respondent gets messages with labels empty')
+def step_impl(context):
+    token_data['user_urn'] = 'respondent.122342'
+    headers['authentication'] = update_encrypted_jwt()
+    parms = "?labels="
+    url_with_param = "{0}{1}".format(url, parms)
+    context.response = app.test_client().get(url_with_param, headers=headers)
+
+
+@then('all messages should be returned')
+def step_impl(context):
+    response = flask.json.loads(context.response.data)
+    num = 3 # change number to expected number of messages depedning on the "there are multiple messages to retrieve for all labels" step
+    nose.tools.assert_equal(len(response['messages']), num)
