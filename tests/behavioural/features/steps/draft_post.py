@@ -156,41 +156,6 @@ def step_impl(context):
                  'survey': ''})
 
 
-# Scenario 10: As an External user I would like to be able to save a new message as draft
-@given("an external user has created a secure message including subject and selected save")
-def step_impl(context):
-    post_data = {'urn_to': '',
-                 'urn_from': 'respondent.123',
-                 'subject': 'test1',
-                 'body': '234',
-                 'thread_id': '',
-                 'collection_case': 'collection_case1',
-                 'reporting_unit': 'reporting_unit1',
-                 'survey': 'RSI'}
-
-    del data['msg_id']
-    response = app.test_client().post(url, data=json.dumps(post_data), headers=headers)
-    response_data = json.loads(response.data)
-    context.msg_id = response_data['msg_id']
-
-
-@when("the user navigates to the draft inbox")
-def step_impl(context):
-    request = app.test_client().get("http://localhost:5050/draft/{0}".format(context.msg_id))
-    context.request_data = json.loads(request.data)
-
-
-@then("the draft message is displayed in the draft inbox")
-def step_impl(context):
-    nose.tools.assert_equals(context.request_data['urn_to'], data['urn_to'])
-    nose.tools.assert_equals(context.request_data['urn_from'], data['urn_from'])
-    nose.tools.assert_equals(context.request_data['subject'], data['subject'])
-    nose.tools.assert_equals(context.request_data['body'], data['body'])
-    nose.tools.assert_equals(context.request_data['thread_id'], data['thread_id'])
-    nose.tools.assert_equals(context.request_data['collection_case'], data['collection_case'])
-    nose.tools.assert_equals(context.request_data['reporting_unit'], data['reporting_unit'])
-    nose.tools.assert_equals(context.request_data['survey'], data['survey'])
-
 
 # Common
 @when('the draft is saved')
