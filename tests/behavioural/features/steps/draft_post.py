@@ -182,7 +182,14 @@ def step_impl(context):
 
 @then("the draft message is displayed in the draft inbox")
 def step_impl(context):
-    nose.tools.assert_true(context.request_data is not None)
+    nose.tools.assert_equals(context.request_data['urn_to'], data['urn_to'])
+    nose.tools.assert_equals(context.request_data['urn_from'], data['urn_from'])
+    nose.tools.assert_equals(context.request_data['subject'], data['subject'])
+    nose.tools.assert_equals(context.request_data['body'], data['body'])
+    nose.tools.assert_equals(context.request_data['thread_id'], data['thread_id'])
+    nose.tools.assert_equals(context.request_data['collection_case'], data['collection_case'])
+    nose.tools.assert_equals(context.request_data['reporting_unit'], data['reporting_unit'])
+    nose.tools.assert_equals(context.request_data['survey'], data['survey'])
 
 
 # Common
