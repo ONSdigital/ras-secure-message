@@ -1,4 +1,4 @@
-Feature: Message get by ID Endpoint
+Feature: Get Messages list Endpoint
 
   Scenario: Respondent sends multiple messages and retrieves the list of messages with their labels
     Given a respondent sends multiple messages
@@ -60,4 +60,37 @@ Feature: Message get by ID Endpoint
     Given a Respondent creates multiple draft messages 
     When the Internal user gets their messages
     Then the retrieved messages should not have DRAFT_INBOX labels
+
+  @ignore
+  Scenario Outline: User provides parameters that are too large or invalid
+    Given parameter <param> has value <value>
+    When user gets messages using the parameters
+    Then a 400 HTTP bad syntax response is returned
+
+  Examples: Parameters
+    |param         | value |
+    |limit         | string|
+    |page          | string|
+    |reportingUnit | LongerThan11Chars |
+    |survey        | NotASurvey |
+    |case          | ?|
+    |labels        | NotALabel  |
+    |labels        | INBOX-SENT-ARCHIVED-DRAFT-INBOX-SENT-ARCHIVED-DRAFT |
+
+  @ignore
+  Scenario Outline: User gets messages with various labels options
+    Given there are multiple messages to retrieve for all labels
+    When respondent gets messages with labels <labels>
+    Then messages returned should have one of the labels <labels>
+
+  Examples: Parameters
+    |labels  |
+    |empty   |
+    |INBOX   |
+    |SENT    |
+    |ARCHIVED |
+    |DRAFT   |
+    |INBOX-SENT  |
+    |INBOX-SENT-ARCHIVED |
+    |INBOX-SENT-ARCHIVED-DRAFT |
 

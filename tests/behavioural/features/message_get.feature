@@ -1,9 +1,20 @@
 Feature: Message get by ID Endpoint
 
+   @ignore
   Scenario: Retrieve a message with correct message ID
     Given there is a message to be retrieved
     When the get request is made with a correct message id
     Then a 200 HTTP response is returned
+    And returned message is the message requested
+    And each field value is as expected
+
+   @ignore
+  Scenario: Retrieve a draft message
+    Given there is a draft message to be retrieved
+    When the get request is made with a draft message id
+    Then a 200 HTTP response is returned
+    And returned message is the message requested
+    And each field value is as expected
 
   Scenario: Retrieve a message with incorrect message ID
     Given there is a message to be retrieved
