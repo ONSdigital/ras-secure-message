@@ -1,7 +1,24 @@
 from behave import given, when
 from app.application import app
+from app.authentication.jwt import encode
+from app.authentication.jwe import Encrypter
+from app import settings
 
-headers = {'Content-Type': 'application/json', 'user_urn': ''}
+token_data = {
+            "user_urn": "000000000"
+        }
+
+headers = {'Content-Type': 'application/json', 'authentication': ''}
+
+
+def update_encrypted_jwt():
+    encrypter = Encrypter(_private_key=settings.SM_USER_AUTHENTICATION_PRIVATE_KEY,
+                          _private_key_password=settings.SM_USER_AUTHENTICATION_PRIVATE_KEY_PASSWORD,
+                          _public_key=settings.SM_USER_AUTHENTICATION_PUBLIC_KEY)
+    signed_jwt = encode(token_data)
+    return encrypter.encrypt_token(signed_jwt)
+
+headers['authentication'] = update_encrypted_jwt()
 
 
 # Scenario: Retrieve a message with correct missing ID
@@ -9,8 +26,9 @@ headers = {'Content-Type': 'application/json', 'user_urn': ''}
 
 @given("no user urn is in the header")
 def step_impl(context):
-    if 'user_urn' in headers:
-        del headers['user_urn']
+    if 'user_urn' in token_data:
+        del token_data['user_urn']
+        headers['authentication'] = update_encrypted_jwt()
 
 
 @when("a GET request is made")

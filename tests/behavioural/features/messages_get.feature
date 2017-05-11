@@ -20,56 +20,49 @@ Feature: Message get by ID Endpoint
     When the Respondent gets their messages
     Then the retrieved messages should have the correct INBOX and UNREAD labels
 
-  @ignore
  Scenario: As an external user I would like to be able to view a list of messages
-    Given multiple messages have been sent to an external user
-    When the external user navigates to their messages
-    Then messages are displayed
+    Given an external user has multiple messages
+    When the external user requests all messages
+    Then all external users messages are returned
 
-  @ignore
   Scenario: Respondent and internal user sends multiple messages and Respondent retrieves the list of sent messages 
     Given a respondent and an Internal user sends multiple messages 
     When the Respondent gets their sent messages 
     Then the retrieved messages should all have sent labels
 
-  @ignore
-  Scenario: Respondent and internal user sends multiple messages and Respondent retrieves the list of inbox messages 
-    Given a respondent and an Internal user sends multiple messages 
-    When the Respondent gets their inbox messages 
+  Scenario Outline: As a user I would like to be able to view a list of inbox messages
+    Given a <User> user receives multiple messages 
+    When the <User> user gets their inbox messages 
     Then the retrieved messages should all have inbox labels
 
-  @ignore
+    Examples: Users
+    |User       |
+    |internal   |
+    |respondent |
+
+
   Scenario: Internal user sends multiple messages and Respondent retrieves the list of messages with particular reporting unit
     Given a Internal user sends multiple messages with different reporting unit 
     When the Respondent gets their messages with particular reporting unit 
     Then the retrieved messages should have the correct reporting unit
 
-  @ignore
   Scenario: Internal user sends multiple messages and Respondent retrieves the list of messages with particular survey 
     Given a Internal user sends multiple messages with different survey 
     When the Respondent gets their messages with particular survey 
     Then the retrieved messages should have the correct survey
 
-  @ignore
   Scenario: Internal user sends multiple messages and Respondent retrieves the list of messages with particular collection case 
     Given a Internal user sends multiple messages with different collection case 
     When the Respondent gets their messages with particular collection case 
     Then the retrieved messages should have the correct collection case
 
-  @ignore
   Scenario: Respondent creates multiple draft messages and Respondent retrieves the list of draft messages 
     Given a Respondent creates multiple draft messages 
     When the Respondent gets their draft messages 
     Then the retrieved messages should all have draft labels
 
-  @ignore
   Scenario: Respondent creates multiple draft messages and Internal user retrieves a list of messages 
     Given a Respondent creates multiple draft messages 
     When the Internal user gets their messages
     Then the retrieved messages should not have DRAFT_INBOX labels
 
-  @ignore
-  Scenario: As an internal user I want to be able to view/read all messages related to the survey I am working on
-    Given one or more messages have been sent to a survey
-    When the Internal user navigates to the message mailbox for that survey
-    Then the messages are displayed and can be opened by the internal user

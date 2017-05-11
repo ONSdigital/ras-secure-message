@@ -6,9 +6,16 @@ from behave import given, then, when
 from app.application import app
 from app.repository import database
 from flask import current_app
+from app.authentication.jwt import encode
+from app.authentication.jwe import Encrypter
+from app import settings
 
 url = "http://localhost:5050/message/{}/modify"
-headers = {'Content-Type': 'application/json', 'user_urn': 'internal.12344'}
+token_data = {
+            "user_urn": "000000000"
+        }
+
+headers = {'Content-Type': 'application/json', 'authentication': ''}
 
 data = {'urn_to': 'test',
         'urn_from': 'test',
@@ -21,6 +28,16 @@ data = {'urn_to': 'test',
 
 modify_data = {'action': '',
                'label': ''}
+
+
+def update_encrypted_jwt():
+    encrypter = Encrypter(_private_key=settings.SM_USER_AUTHENTICATION_PRIVATE_KEY,
+                          _private_key_password=settings.SM_USER_AUTHENTICATION_PRIVATE_KEY_PASSWORD,
+                          _public_key=settings.SM_USER_AUTHENTICATION_PUBLIC_KEY)
+    signed_jwt = encode(token_data)
+    return encrypter.encrypt_token(signed_jwt)
+
+headers['authentication'] = update_encrypted_jwt()
 
 
 def reset_db():
@@ -241,38 +258,48 @@ def step_impl(context):
 
 @when("the internal user opens the message")
 def step_impl(context):
-    request = app.test_client().get("http://localhost:5050/message/{0}".format(context.msg_id), headers=headers)
-    context.request_data = json.loads(request.data)
+    token_data['user_urn'] = data['urn_from']
+    headers['authentication'] = update_encrypted_jwt()
+    response_get = app.test_client().get("http://localhost:5050/message/{0}".format(context.msg_id), headers=headers)
+    context.get_json = json.loads(response_get.data)
 
 
 @then("the status of the message changes from 'unread' to 'read' for all internal users that have access to that survey")
 def step_impl(context):
-    nose.tools.assert_true("UNREAD" not in context.request_data['labels'])
+    nose.tools.assert_true("UNREAD" not in context.get_json['labels'])
 
 
 # Scenario - internal - as an internal user I want to be able to change my message from read to unread
 @given("a message with the status read is displayed to an internal user")
 def step_impl(context):
-    response = app.test_client().post("http://localhost:5050/message/send", data=json.dumps(data), headers=headers)
-    resp_data = json.loads(response.data)
-    context.msg_id = resp_data['msg_id']
+    reset_db()
+    data['urn_to'] = 'internal.12344'
+    data['urn_from'] = 'respondent.122342'
+    context.response = app.test_client().post("http://localhost:5050/message/send",
+                                              data=flask.json.dumps(data), headers=headers)
+    msg_resp = json.loads(context.response.data)
+    context.msg_id = msg_resp['msg_id']
+
     modify_data['action'] = 'remove'
     modify_data['label'] = 'UNREAD'
-    app.test_client().put(url.format(context.msg_id), data=flask.json.dumps(modify_data), headers=headers)
+    context.response = app.test_client().put(url.format(context.msg_id),
+                                             data=flask.json.dumps(modify_data), headers=headers)
 
 
 @when("the internal user chooses to edit the status from read to unread")
 def step_impl(context):
     modify_data['action'] = 'add'
-    modify_data['label'] = 'UNREAD'
-    app.test_client().put(url.format(context.msg_id), data=flask.json.dumps(modify_data), headers=headers)
+    modify_data['label'] = "UNREAD"
+    context.response = app.test_client().put(url.format(context.msg_id),
+                                             data=flask.json.dumps(modify_data), headers=headers)
 
 
 @then("the status of that message changes to unread for all internal users that have access to that survey")
 def step_impl(context):
-    request = app.test_client().get("http://localhost:5050/message/{0}".format(context.msg_id), headers=headers)
-    request_data = json.loads(request.data)
-    nose.tools.assert_true("UNREAD" in request_data['labels'])
+    context.response = app.test_client().get("http://localhost:5050/message/{}".format(context.msg_id),
+                                             data=flask.json.dumps(modify_data), headers=headers)
+    response = flask.json.loads(context.response.data)
+    nose.tools.assert_true('UNREAD' in response['labels'])
 
 
 @given("a message with the status unread is displayed to an internal user")
@@ -359,7 +386,3 @@ def step_impl(context):
     request = app.test_client().get("http://localhost:5050/message/{0}".format(context.msg_id), headers=headers)
     request_data = json.loads(request.data)
     nose.tools.assert_true("UNREAD" not in request_data['labels'])
-
-
-
-

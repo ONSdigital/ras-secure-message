@@ -2,6 +2,7 @@ from app.authentication.authenticator import check_jwt
 from app.authentication.jwt import encode
 from app.authentication.jwe import Encrypter
 from werkzeug.exceptions import BadRequest
+from app.application import app
 from flask import Response
 import unittest
 from app import settings
@@ -13,16 +14,15 @@ class AuthenticationTestCase(unittest.TestCase):
         """Authenticate request using correct JWT"""
         expected_res = {'status': "ok"}
         data = {
-                  "RU": "12345678910",
-                  "survey": "BRS",
-                  "CC": "URN"
+                  "user_urn": "12345678910"
                 }
         encrypter = Encrypter(_private_key=settings.SM_USER_AUTHENTICATION_PRIVATE_KEY,
                               _private_key_password=settings.SM_USER_AUTHENTICATION_PRIVATE_KEY_PASSWORD,
                               _public_key=settings.SM_USER_AUTHENTICATION_PUBLIC_KEY)
         signed_jwt = encode(data)
         encrypted_jwt = encrypter.encrypt_token(signed_jwt)
-        res = check_jwt(encrypted_jwt)
+        with app.app_context():
+            res = check_jwt(encrypted_jwt)
         self.assertEqual(res, expected_res)
 
     def test_authentication_jwt_invalid_fail(self):
@@ -40,98 +40,11 @@ class AuthenticationTestCase(unittest.TestCase):
         res = check_jwt(encrypted_jwt)
         self.assertEqual(res.response, expected_res.response)
 
-    def test_authentication_jwt_ru_invalid_fail(self):
-        """Authenticate request using invalid RU claim"""
-        expected_res = Response(response="Missing RU or invalid RU supplied to access this Microservice Resource",
-                                status=400, mimetype="text/html")
+    def test_authentication_jwt_user_urn_missing_fail(self):
+        """Authenticate request with missing user_urn claim"""
+        expected_res = Response(response="Missing user_urn or invalid user_urn supplied to access this Microservice "
+                                         "Resource", status=400, mimetype="text/html")
         data = {
-            "RU": "123456789",
-            "survey": "BRS",
-            "CC": "URN"
-        }
-        encrypter = Encrypter(_private_key=settings.SM_USER_AUTHENTICATION_PRIVATE_KEY,
-                              _private_key_password=settings.SM_USER_AUTHENTICATION_PRIVATE_KEY_PASSWORD,
-                              _public_key=settings.SM_USER_AUTHENTICATION_PUBLIC_KEY)
-        signed_jwt = encode(data)
-        encrypted_jwt = encrypter.encrypt_token(signed_jwt)
-        res = check_jwt(encrypted_jwt)
-        self.assertEqual(res.response, expected_res.response)
-
-    def test_authentication_jwt_ru_missing_fail(self):
-        """Authenticate request with missing RU claim"""
-        expected_res = Response(response="Missing RU or invalid RU supplied to access this Microservice Resource",
-                                status=400, mimetype="text/html")
-        data = {
-            "survey": "BRS",
-            "CC": "URN"
-        }
-
-        encrypter = Encrypter(_private_key=settings.SM_USER_AUTHENTICATION_PRIVATE_KEY,
-                              _private_key_password=settings.SM_USER_AUTHENTICATION_PRIVATE_KEY_PASSWORD,
-                              _public_key=settings.SM_USER_AUTHENTICATION_PUBLIC_KEY)
-        signed_jwt = encode(data)
-        encrypted_jwt = encrypter.encrypt_token(signed_jwt)
-        res = check_jwt(encrypted_jwt)
-        self.assertEqual(res.response, expected_res.response)
-
-    def test_authentication_jwt_survey_invalid_fail(self):
-        """Authenticate request using invalid survey claim"""
-        expected_res = Response(response="Survey required to access this Microservice Resource",
-                                status=400, mimetype="text/html")
-        data = {
-            "RU": "12345678910",
-            "survey": "",
-            "CC": "URN"
-        }
-        encrypter = Encrypter(_private_key=settings.SM_USER_AUTHENTICATION_PRIVATE_KEY,
-                              _private_key_password=settings.SM_USER_AUTHENTICATION_PRIVATE_KEY_PASSWORD,
-                              _public_key=settings.SM_USER_AUTHENTICATION_PUBLIC_KEY)
-        signed_jwt = encode(data)
-        encrypted_jwt = encrypter.encrypt_token(signed_jwt)
-        res = check_jwt(encrypted_jwt)
-        self.assertEqual(res.response, expected_res.response)
-
-    def test_authentication_jwt_survey_missing_fail(self):
-        """Authenticate request with missing survey claim"""
-        expected_res = Response(response="Survey required to access this Microservice Resource",
-                                status=400, mimetype="text/html")
-        data = {
-            "RU": "12345678910",
-            "CC": "URN"
-        }
-
-        encrypter = Encrypter(_private_key=settings.SM_USER_AUTHENTICATION_PRIVATE_KEY,
-                              _private_key_password=settings.SM_USER_AUTHENTICATION_PRIVATE_KEY_PASSWORD,
-                              _public_key=settings.SM_USER_AUTHENTICATION_PUBLIC_KEY)
-        signed_jwt = encode(data)
-        encrypted_jwt = encrypter.encrypt_token(signed_jwt)
-        res = check_jwt(encrypted_jwt)
-        self.assertEqual(res.response, expected_res.response)
-
-    def test_authentication_jwt_cc_invalid_fail(self):
-        """Authenticate request using invalid CC claim"""
-        expected_res = Response(response="Collection Case required to access this Microservice Resource",
-                                status=400, mimetype="text/html")
-        data = {
-            "RU": "12345678910",
-            "survey": "BRS",
-            "CC": ""
-        }
-        encrypter = Encrypter(_private_key=settings.SM_USER_AUTHENTICATION_PRIVATE_KEY,
-                              _private_key_password=settings.SM_USER_AUTHENTICATION_PRIVATE_KEY_PASSWORD,
-                              _public_key=settings.SM_USER_AUTHENTICATION_PUBLIC_KEY)
-        signed_jwt = encode(data)
-        encrypted_jwt = encrypter.encrypt_token(signed_jwt)
-        res = check_jwt(encrypted_jwt)
-        self.assertEqual(res.response, expected_res.response)
-
-    def test_authentication_jwt_cc_missing_fail(self):
-        """Authenticate request with missing CC claim"""
-        expected_res = Response(response="Collection Case required to access this Microservice Resource",
-                                status=400, mimetype="text/html")
-        data = {
-            "RU": "12345678910",
-            "survey": "BRS"
         }
 
         encrypter = Encrypter(_private_key=settings.SM_USER_AUTHENTICATION_PRIVATE_KEY,
@@ -146,10 +59,8 @@ class AuthenticationTestCase(unittest.TestCase):
         """Authenticate request using JWT without encryption"""
 
         data = {
-            "RU": "12345678910",
-            "survey": "BRS"
+            "user_urn": "12345678910"
         }
 
         with self.assertRaises(BadRequest):
-            res = check_jwt(encode(data))
-
+            check_jwt(encode(data))

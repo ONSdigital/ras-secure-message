@@ -5,9 +5,16 @@ from app.application import app
 import uuid
 from app.repository import database
 from flask import current_app
+from app.authentication.jwt import encode
+from app.authentication.jwe import Encrypter
+from app import settings
 
 url = "http://localhost:5050/messages"
-headers = {'Content-Type': 'application/json', 'user_urn': ''}
+token_data = {
+            "user_urn": "000000000"
+        }
+
+headers = {'Content-Type': 'application/json', 'authentication': ''}
 
 data = {'urn_to': 'test',
         'urn_from': 'test',
@@ -19,17 +26,21 @@ data = {'urn_to': 'test',
         'survey': 'survey'}
 
 
+def update_encrypted_jwt():
+    encrypter = Encrypter(_private_key=settings.SM_USER_AUTHENTICATION_PRIVATE_KEY,
+                          _private_key_password=settings.SM_USER_AUTHENTICATION_PRIVATE_KEY_PASSWORD,
+                          _public_key=settings.SM_USER_AUTHENTICATION_PUBLIC_KEY)
+    signed_jwt = encode(token_data)
+    return encrypter.encrypt_token(signed_jwt)
+
+headers['authentication'] = update_encrypted_jwt()
+
+
 def reset_db():
     with app.app_context():
         database.db.init_app(current_app)
         database.db.drop_all()
         database.db.create_all()
-
-
-def before_scenario(context, scenario):
-    if "skip" in scenario.effective_tags:
-        scenario.skip("Marked with @skip")
-        return
 
 # Scenario: Respondent sends multiple messages and retrieves the list of messages with their labels
 
@@ -46,7 +57,8 @@ def step_impl(context):
 
 @when("the respondent gets their messages")
 def step_impl(context):
-    headers['user_urn'] = 'respondent.122342'
+    token_data['user_urn'] = 'respondent.122342'
+    headers['authentication'] = update_encrypted_jwt()
     context.response = app.test_client().get(url, headers=headers)
 
 
@@ -72,7 +84,8 @@ def step_impl(context):
 
 @when("the Internal user gets their messages")
 def step_impl(context):
-    headers['user_urn'] = 'internal.122342'
+    token_data['user_urn'] = 'internal.122342'
+    headers['authentication'] = update_encrypted_jwt()
     context.response = app.test_client().get(url, headers=headers)
 
 # Scenario: Respondent sends multiple messages and internal user retrieves the list of messages with their labels
@@ -101,7 +114,8 @@ def step_impl(context):
 
 @when("the external user navigates to their messages")
 def step_impl(context):
-    headers['user_urn'] = 'respondent.123'
+    token_data['user_urn'] = 'respondent.123'
+    headers['authentication'] = update_encrypted_jwt()
     context.response = app.test_client().get(url, headers=headers)
 
 
@@ -130,7 +144,8 @@ def step_impl(context):
 
 @when('the Respondent gets their sent messages')
 def step_impl(context):
-    headers['user_urn'] = 'respondent.122342'
+    token_data['user_urn'] = 'respondent.122342'
+    headers['authentication'] = update_encrypted_jwt()
     context.response = app.test_client().get('{0}{1}'.format(url, '?label=SENT'), headers=headers)
 
 
@@ -166,7 +181,8 @@ def step_impl(context):
 
 @when('the Respondent gets their messages with particular reporting unit')
 def step_impl(context):
-    headers['user_urn'] = 'respondent.122342'
+    token_data['user_urn'] = 'respondent.122342'
+    headers['authentication'] = update_encrypted_jwt()
     context.response = app.test_client().get('{0}{1}'.format(url, '?ru=AnotherReportingUnit'), headers=headers)
 
 
@@ -202,7 +218,8 @@ def step_impl(context):
 
 @when('the Respondent gets their messages with particular survey')
 def step_impl(context):
-    headers['user_urn'] = 'respondent.122342'
+    token_data['user_urn'] = 'respondent.122342'
+    headers['authentication'] = update_encrypted_jwt()
     context.response = app.test_client().get('{0}{1}'.format(url, '?survey=AnotherSurvey'), headers=headers)
 
 
@@ -239,7 +256,8 @@ def step_impl(context):
 
 @when('the Respondent gets their messages with particular collection case')
 def step_impl(context):
-    headers['user_urn'] = 'respondent.122342'
+    token_data['user_urn'] = 'respondent.122342'
+    headers['authentication'] = update_encrypted_jwt()
     context.response = app.test_client().get('{0}{1}'.format(url, '?cc=AnotherCollectionCase'), headers=headers)
 
 
@@ -303,16 +321,49 @@ def step_impl(context):
 
     # nose.tools.assert_equal(len(response['messages']), 2)
 
-# Respondent and internal user sends multiple messages and Respondent retrieves the list of inbox messages
 
-
-@when('the Respondent gets their inbox messages')
+# Scenario: As an external user I would like to be able to view a list of messages
+@given("an external user has multiple messages")
 def step_impl(context):
-    headers['user_urn'] = 'respondent.122342'
+    reset_db()
+    token_data['user_urn'] = 'respondent.123'
+    headers['authentication'] = update_encrypted_jwt()
+    data['urn_from'] = 'respondent.123'
+    for x in range(0,2):
+        app.test_client().post("http://localhost:5050/message/send", data=flask.json.dumps(data), headers=headers)
+        app.test_client().post("http://localhost:5050/draft/save", data=flask.json.dumps(data), headers=headers)
+
+
+@when("the external user requests all messages")
+def step_impl(context):
+    request = app.test_client().get(url, headers=headers)
+    context.response = flask.json.loads(request.data)
+
+
+@then("all external users messages are returned")
+def step_impl(context):
+    nose.tools.assert_equal(len(context.response['messages']), 4)
+
+
+# Scenario: As a user I would like to be able to view a list of inbox messages
+@given("a internal user receives multiple messages")
+def step_impl(context):
+    reset_db()
+    for x in range(0, 2):
+        data['urn_to'] = 'respondent.123'
+        data['urn_from'] = 'internal.123'
+        context.response = app.test_client().post("http://localhost:5050/message/send",
+                                                  data=flask.json.dumps(data), headers=headers)
+
+
+@when("the internal user gets their inbox messages")
+def step_impl(context):
+    token_data['user_urn'] = 'respondent.123'
+    headers['authentication'] = update_encrypted_jwt()
     context.response = app.test_client().get('{0}{1}'.format(url, '?label=INBOX'), headers=headers)
 
 
-@then('the retrieved messages should all have inbox labels')
+@then("the retrieved messages should all have inbox labels")
 def step_impl(context):
     response = flask.json.loads(context.response.data)
     for x in range(0, len(response['messages'])):
@@ -320,3 +371,20 @@ def step_impl(context):
         nose.tools.assert_equal(response['messages'][str(num)]['labels'], ['INBOX', 'UNREAD'])
 
     nose.tools.assert_equal(len(response['messages']), 2)
+
+
+@given("a respondent user receives multiple messages")
+def step_impl(context):
+    reset_db()
+    for x in range(0, 2):
+        data['urn_to'] = 'respondent.123'
+        data['urn_from'] = 'internal.123'
+        context.response = app.test_client().post("http://localhost:5050/message/send",
+                                                  data=flask.json.dumps(data), headers=headers)
+
+
+@when("the respondent user gets their inbox messages")
+def step_impl(context):
+    token_data['user_urn'] = 'respondent.123'
+    headers['authentication'] = update_encrypted_jwt()
+    context.response = app.test_client().get('{0}{1}'.format(url, '?label=INBOX'), headers=headers)

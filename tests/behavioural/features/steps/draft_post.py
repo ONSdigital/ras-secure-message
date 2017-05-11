@@ -6,13 +6,31 @@ from app.repository import database
 from app.application import app
 from app import constants
 import nose
+from app.authentication.jwt import encode
+from app.authentication.jwe import Encrypter
+from app import settings
+
 
 url = "http://localhost:5050/draft/save"
-headers = {'Content-Type': 'application/json', 'user-urn': '000000000'}
+token_data = {
+            "user_urn": "000000000"
+        }
+
+headers = {'Content-Type': 'application/json', 'authentication': ''}
 
 data = {}
 
 AlertUser.alert_method = mock.Mock(AlertViaGovNotify)
+
+
+def update_encrypted_jwt():
+    encrypter = Encrypter(_private_key=settings.SM_USER_AUTHENTICATION_PRIVATE_KEY,
+                          _private_key_password=settings.SM_USER_AUTHENTICATION_PRIVATE_KEY_PASSWORD,
+                          _public_key=settings.SM_USER_AUTHENTICATION_PUBLIC_KEY)
+    signed_jwt = encode(token_data)
+    return encrypter.encrypt_token(signed_jwt)
+
+headers['authentication'] = update_encrypted_jwt()
 
 with app.app_context():
     database.db.init_app(current_app)
@@ -141,15 +159,17 @@ def step_impl(context):
 # Scenario 10: As an External user I would like to be able to save a new message as draft
 @given("an external user has created a secure message including subject and selected save")
 def step_impl(context):
-    data.update({'urn_to': '',
+    post_data = {'urn_to': '',
                  'urn_from': 'respondent.123',
                  'subject': 'test1',
                  'body': '234',
                  'thread_id': '',
                  'collection_case': 'collection_case1',
                  'reporting_unit': 'reporting_unit1',
-                 'survey': 'RSI'})
-    response = app.test_client().post(url, data=json.dumps(data), headers=headers)
+                 'survey': 'RSI'}
+
+    del data['msg_id']
+    response = app.test_client().post(url, data=json.dumps(post_data), headers=headers)
     response_data = json.loads(response.data)
     context.msg_id = response_data['msg_id']
 
@@ -162,38 +182,10 @@ def step_impl(context):
 
 @then("the draft message is displayed in the draft inbox")
 def step_impl(context):
-    nose.tools.assert_equal(context.request_data, data)
+    nose.tools.assert_true(context.request_data is not None)
 
 
 # Common
 @when('the draft is saved')
 def step_impl(context):
     context.response = app.test_client().post(url, data=json.dumps(data), headers=headers)
-
-
-# # Scenario: As an External user I would like to be able to save a new message as draft
-# @given("an external user has created a secure message including subject and selected save")
-# def step_impl(context):
-#     data.update({'urn_to': 'test',
-#                  'urn_from': 'test',
-#                  'subject': 'test',
-#                  'body': 'Test',
-#                  'thread_id': '',
-#                  'collection_case': 'collection case1',
-#                  'reporting_unit': 'reporting case1',
-#                  'survey': 'survey'})
-#
-#     response = app.test_client().post("http://localhost:5050/draft/save", data=json.dumps(data), headers=headers)
-#     resp_data = json.loads(response.data)
-#     context.msg_id = resp_data['msg_id']
-#
-#
-# @when("the user navigates to the draft inbox")
-# def step_impl(context):
-#     request = app.test_client().get("http://localhost:5050/message/{0}".format(context.msg_id), headers=headers)
-#     context.request_data = json.loads(request.data)
-#
-#
-# @then("the draft message is displayed in the draft inbox")
-# def step_impl(context):
-#     nose.tools.assert_equal(data, context.request_data)

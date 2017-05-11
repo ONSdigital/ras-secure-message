@@ -7,12 +7,28 @@ from app.repository import database
 from flask import current_app
 from unittest import mock
 from app.common.alerts import AlertUser, AlertViaGovNotify
+from app.authentication.jwt import encode
+from app.authentication.jwe import Encrypter
+from app import settings
 
 
 url = "http://localhost:5050/message/send"
-headers = {'Content-Type': 'application/json', 'user-urn': '0000000000'}
+token_data = {
+            "user_urn": "000000000"
+        }
+
+headers = {'Content-Type': 'application/json', 'authentication': ''}
 data = {}
 
+
+def update_encrypted_jwt():
+    encrypter = Encrypter(_private_key=settings.SM_USER_AUTHENTICATION_PRIVATE_KEY,
+                          _private_key_password=settings.SM_USER_AUTHENTICATION_PRIVATE_KEY_PASSWORD,
+                          _public_key=settings.SM_USER_AUTHENTICATION_PUBLIC_KEY)
+    signed_jwt = encode(token_data)
+    return encrypter.encrypt_token(signed_jwt)
+
+headers['authentication'] = update_encrypted_jwt()
 
 def before_scenario(context):
     AlertUser.alert_method = mock.Mock(AlertViaGovNotify)

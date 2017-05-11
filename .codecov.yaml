@@ -9,4 +9,4 @@ coverage:
 comment: false
 
 ignore:
-  - "/tests/[Bb]ehavioural"
+  - "tests/"
