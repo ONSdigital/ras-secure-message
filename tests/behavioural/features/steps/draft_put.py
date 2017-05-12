@@ -27,6 +27,7 @@ data = {'urn_to': 'test',
         'collection_case': 'collection case1',
         'reporting_unit': 'reporting case1',
         'survey': 'survey'}
+
 with app.app_context():
     database.db.init_app(current_app)
     database.db.drop_all()
@@ -229,3 +230,4 @@ def step_impl(context):
                  'reporting_unit': 'reporting case1',
                  'survey': 'survey'})
     data['thread_id'] = ''
+
