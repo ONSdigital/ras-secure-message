@@ -1,0 +1,10 @@
+applications:
+- name: ras_secure_message
+  buildpack: https://github.com/cloudfoundry/python-buildpack.git
+  env:
+    DEBUG: False
+    TESTING: False
+    CSRF_ENABLED: True
+    SMS_LOG_LEVEL: DEBUG
+    APP_LOG_LEVEL: DEBUG
+    RAS_SM_PATH: /home/vcap/app

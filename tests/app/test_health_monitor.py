@@ -9,7 +9,7 @@ from app.repository import database
 from app.repository.retriever import Retriever
 
 
-class HelathTestCase(unittest.TestCase):
+class HealthTestCase(unittest.TestCase):
     """Test case for application health monitor"""
     def setUp(self):
         """setup test environment"""
