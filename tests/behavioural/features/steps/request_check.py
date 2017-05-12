@@ -1,8 +1,9 @@
-from behave import given, when
+from behave import given, when, then
 from app.application import app
 from app.authentication.jwt import encode
 from app.authentication.jwe import Encrypter
 from app import settings
+import nose.tools
 
 token_data = {
             "user_urn": "000000000"
@@ -21,7 +22,7 @@ def update_encrypted_jwt():
 headers['authentication'] = update_encrypted_jwt()
 
 
-# Scenario: Retrieve a message with correct missing ID
+# Scenario: GET request without a user urn in header
 
 
 @given("no user urn is in the header")
@@ -37,10 +38,80 @@ def step_impl(context):
     context.response = app.test_client().get(url, headers=headers)
 
 
-# Scenario: Retrieve a message with incorrect missing ID
+# Scenario: POST request without a user urn in header
 
 
 @when("a POST request is made")
 def step_impl(context):
     url = "http://localhost:5050/message/send"
     context.response = app.test_client().post(url, headers=headers)
+
+#   Scenario: PUT request without a user urn in header
+
+
+@when("a PUT request is made")
+def step_impl(context):
+    url = "http://localhost:5050/message/1/modify"
+    context.response = app.test_client().put(url, headers=headers)
+
+#   Scenario Outline: User tries to use endpoint with the wrong method
+
+
+@given("user wants to use /draft/save endpoint")
+def step_impl(context):
+    context.url = "http://localhost:5050/draft/save"
+
+
+@given("user wants to use /health endpoint")
+def step_impl(context):
+    context.url = "http://localhost:5050/health"
+
+
+@given("user wants to use /health/db endpoint")
+def step_impl(context):
+    context.url = "http://localhost:5050/health/db"
+
+
+@given("user wants to use /health/details endpoint")
+def step_impl(context):
+    context.url = "http://localhost:5050/health/details"
+
+
+@given("user wants to use /message/id endpoint")
+def step_impl(context):
+    context.url = "http://localhost:5050/message/1"
+
+
+@given("user wants to use /message/id/modify endpoint")
+def step_impl(context):
+    context.url = "http://localhost:5050/message/1/modify"
+
+
+@given("user wants to use /message/send endpoint")
+def step_impl(context):
+    context.url = "http://localhost:5050/message/send"
+
+
+@given("user wants to use /messages endpoint")
+def step_impl(context):
+    context.url = "http://localhost:5050/messages"
+
+
+@when("user tries to access that endpoint with the POST method")
+def step_impl(context):
+    context.response = app.test_client().post(context.url, headers=headers)
+
+
+@when("user tries to access that endpoint with the GET method")
+def step_impl(context):
+    context.response = app.test_client().get(context.url, headers=headers)
+
+
+@when("user tries to access that endpoint with the PUT method")
+def step_impl(context):
+    context.response = app.test_client().put(context.url, headers=headers)
+
+
+@then("a 405 error status is returned")
+def step_impl(context):
+    nose.tools.assert_equal(context.response.status_code, 405)
