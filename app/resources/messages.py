@@ -5,7 +5,6 @@ from app.repository.modifier import Modifier
 from app.validation.domain import MessageSchema
 from app.repository.saver import Saver
 from app.repository.retriever import Retriever
-from app.repository.database import Status
 import logging
 from app.common.alerts import AlertUser
 from app import settings
