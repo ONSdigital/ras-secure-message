@@ -44,3 +44,4 @@ Feature: Draft Save Endpoint
     Given a draft with a survey field set as empty
     When the draft is saved
     Then a 400 error status is returned
+

@@ -42,12 +42,6 @@ def reset_db():
         database.db.drop_all()
         database.db.create_all()
 
-
-def before_scenario(context, scenario):
-    if "skip" in scenario.effective_tags:
-        scenario.skip("Marked with @skip")
-        return
-
 # Scenario: Respondent sends multiple messages and retrieves the list of messages with their labels
 
 
@@ -58,7 +52,7 @@ def step_impl(context):
         data['urn_to'] = 'internal.12344'
         data['urn_from'] = 'respondent.122342'
         context.response = app.test_client().post("http://localhost:5050/message/send",
-                                                              data=flask.json.dumps(data), headers=headers)
+                                                  data=flask.json.dumps(data), headers=headers)
 
 
 @when("the respondent gets their messages")
@@ -85,7 +79,7 @@ def step_impl(context):
         data['urn_to'] = 'respondent.122342'
         data['urn_from'] = 'internal.12344'
         context.response = app.test_client().post("http://localhost:5050/message/send",
-                                                              data=flask.json.dumps(data), headers=headers)
+                                                  data=flask.json.dumps(data), headers=headers)
 
 
 @when("the Internal user gets their messages")
@@ -293,7 +287,8 @@ def step_impl(context):
                  'collection_case': 'collection case1',
                  'reporting_unit': 'reporting case1',
                  'survey': 'survey'}
-        context.response = app.test_client().post("http://localhost:5050/draft/save", data=flask.json.dumps(data), headers=headers)
+        context.response = app.test_client().post("http://localhost:5050/draft/save",
+                                                  data=flask.json.dumps(data), headers=headers)
 
 
 @when('the Respondent gets their draft messages')
@@ -326,17 +321,49 @@ def step_impl(context):
 
     # nose.tools.assert_equal(len(response['messages']), 2)
 
-# Respondent and internal user sends multiple messages and Respondent retrieves the list of inbox messages
 
-
-@when('the Respondent gets their inbox messages')
+# Scenario: As an external user I would like to be able to view a list of messages
+@given("an external user has multiple messages")
 def step_impl(context):
-    token_data['user_urn'] = 'respondent.122342'
+    reset_db()
+    token_data['user_urn'] = 'respondent.123'
+    headers['authentication'] = update_encrypted_jwt()
+    data['urn_from'] = 'respondent.123'
+    for x in range(0, 2):
+        app.test_client().post("http://localhost:5050/message/send", data=flask.json.dumps(data), headers=headers)
+        app.test_client().post("http://localhost:5050/draft/save", data=flask.json.dumps(data), headers=headers)
+
+
+@when("the external user requests all messages")
+def step_impl(context):
+    request = app.test_client().get(url, headers=headers)
+    context.response = flask.json.loads(request.data)
+
+
+@then("all external users messages are returned")
+def step_impl(context):
+    nose.tools.assert_equal(len(context.response['messages']), 4)
+
+
+# Scenario: As a user I would like to be able to view a list of inbox messages
+@given("a internal user receives multiple messages")
+def step_impl(context):
+    reset_db()
+    for x in range(0, 2):
+        data['urn_to'] = 'respondent.123'
+        data['urn_from'] = 'internal.123'
+        context.response = app.test_client().post("http://localhost:5050/message/send",
+                                                  data=flask.json.dumps(data), headers=headers)
+
+
+@when("the internal user gets their inbox messages")
+def step_impl(context):
+    token_data['user_urn'] = 'respondent.123'
     headers['authentication'] = update_encrypted_jwt()
     context.response = app.test_client().get('{0}{1}'.format(url, '?label=INBOX'), headers=headers)
 
 
-@then('the retrieved messages should all have inbox labels')
+@then("the retrieved messages should all have inbox labels")
 def step_impl(context):
     response = flask.json.loads(context.response.data)
     for x in range(0, len(response['messages'])):
@@ -553,5 +580,24 @@ def step_impl(context):
 @then('all messages should be returned')
 def step_impl(context):
     response = flask.json.loads(context.response.data)
-    num = 3 # change number to expected number of messages depedning on the "there are multiple messages to retrieve for all labels" step
+    num = 3   # change number to expected number of messages depedning on the "there are multiple messages to retrieve for all labels" step
     nose.tools.assert_equal(len(response['messages']), num)
+    num = 3  # change number to expected number of messages depending on the "there are multiple messages to retrieve for all labels" step
+    nose.tools.assert_equal(len(response['messages']), num)
+
+
+@given("a respondent user receives multiple messages")
+def step_impl(context):
+    reset_db()
+    for x in range(0, 2):
+        data['urn_to'] = 'respondent.123'
+        data['urn_from'] = 'internal.123'
+        context.response = app.test_client().post("http://localhost:5050/message/send",
+                                                  data=flask.json.dumps(data), headers=headers)
+
+
+@when("the respondent user gets their inbox messages")
+def step_impl(context):
+    token_data['user_urn'] = 'respondent.123'
+    headers['authentication'] = update_encrypted_jwt()
+    context.response = app.test_client().get('{0}{1}'.format(url, '?label=INBOX'), headers=headers)

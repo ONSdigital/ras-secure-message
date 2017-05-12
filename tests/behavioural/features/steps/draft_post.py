@@ -1,13 +1,15 @@
-from behave import given, when
+from behave import given, when, then
 from flask import current_app, json
 from app.common.alerts import AlertUser, AlertViaGovNotify
 from unittest import mock
 from app.repository import database
 from app.application import app
 from app import constants
+import nose
 from app.authentication.jwt import encode
 from app.authentication.jwe import Encrypter
 from app import settings
+
 
 url = "http://localhost:5050/draft/save"
 token_data = {
@@ -152,6 +154,7 @@ def step_impl(context):
                  'collection_case': 'collection case1',
                  'reporting_unit': 'reporting case1',
                  'survey': ''})
+
 
 
 # Common
