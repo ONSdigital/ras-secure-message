@@ -5,6 +5,7 @@ from datetime import datetime, timezone
 from app import constants
 import logging
 from app.validation.user import User
+from app.validation.labels import Labels
 
 logger = logging.getLogger(__name__)
 
@@ -81,10 +82,14 @@ class SecureMessage(db.Model):
             if row.actor == actor:
                 message['labels'].append(row.label)
 
-            if row.label == 'INBOX':
+            if row.label == Labels.INBOX.value:
                 message['urn_to'].append(row.actor)
-            elif row.label == 'SENT':
+            elif row.label == Labels.SENT.value:
                 message['urn_from'] = row.actor
+            elif row.label == Labels.DRAFT.value:
+                message['urn_from'] = row.actor
+            elif row.label == Labels.DRAFT_INBOX.value:
+                message['urn_to'].append(row.actor)
 
         return message
 

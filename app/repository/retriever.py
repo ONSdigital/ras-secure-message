@@ -78,7 +78,7 @@ class Retriever:
         """returns single draft from db"""
 
         try:
-            result = SecureMessage.query.filter(msg_id=message_id)\
+            result = SecureMessage.query.filter(SecureMessage.msg_id == message_id)\
                 .filter(SecureMessage.statuses.any(Status.label == Labels.DRAFT.value)).first()
             if result is None:
                 raise (NotFound(description="Draft with msg_id '{0}' does not exist".format(message_id)))
