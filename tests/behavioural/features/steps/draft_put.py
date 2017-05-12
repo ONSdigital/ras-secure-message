@@ -5,17 +5,25 @@ from flask import current_app, json
 import nose.tools
 from app.authentication.jwt import encode
 from app.authentication.jwe import Encrypter
-from app import settings
+from app import settings, constants
 
 url = "http://localhost:5050/draft/{0}"
 token_data = {'user_urn': '00000000000'}
 headers = {'Content-Type': 'application/json', 'authentication': ''}
 
+post_data = {'urn_to': 'test',
+             'urn_from': 'test',
+             'subject': 'test',
+             'body': 'Test',
+             'thread_id': '2',
+             'collection_case': 'collection case1',
+             'reporting_unit': 'reporting case1',
+             'survey': 'survey'}
 data = {'urn_to': 'test',
         'urn_from': 'test',
         'subject': 'test',
         'body': 'Test',
-        'thread_id': '',
+        'thread_id': '2',
         'collection_case': 'collection case1',
         'reporting_unit': 'reporting case1',
         'survey': 'survey'}
@@ -36,10 +44,10 @@ def update_encrypted_jwt():
 headers['authentication'] = update_encrypted_jwt()
 
 
-# Scenario 1: An existing draft is updated 200 is returned
-@given('a valid draft has been modified')
+# Scenario 1: A user edits a previously saved draft
+@given('a user edits a previously saved draft')
 def step_impl(context):
-    add_draft = app.test_client().post('http://localhost:5050/draft/save', data=json.dumps(data), headers=headers)
+    add_draft = app.test_client().post('http://localhost:5050/draft/save', data=json.dumps(post_data), headers=headers)
     post_resp = json.loads(add_draft.data)
     context.msg_id = post_resp['msg_id']
     data.update({'msg_id': context.msg_id,
@@ -47,36 +55,179 @@ def step_impl(context):
                  'urn_from': 'test',
                  'subject': 'test',
                  'body': 'Test',
-                 'thread_id': '',
+                 'thread_id': '2',
                  'collection_case': 'collection case1',
                  'reporting_unit': 'reporting case1',
                  'survey': 'survey'})
     data['body'] = 'replaced'
 
 
-@when('it is saved')
+@when('the user saves the draft')
 def step_impl(context):
     context.response = app.test_client().put(url.format(context.msg_id), data=json.dumps(data), headers=headers)
 
 
-@then('a 200 is returned')
+@then('a success response is given')
 def step_impl(context):
     nose.tools.assert_equal(context.response.status_code, 200)
 
 
-# Scenario 2: A new draft is updated
-@given('a non-existing draft is modified')
+# Scenario 2: A user edits a draft that has not been previously saved
+@given('a user edits a non-existing draft')
 def step_impl(context):
     data.update({'msg_id': '001',
                  'urn_to': 'test',
                  'urn_from': 'test',
                  'subject': 'test',
                  'body': 'Test',
-                 'thread_id': '',
+                 'thread_id': '2',
                  'collection_case': 'collection case1',
                  'reporting_unit': 'reporting case1',
                  'survey': 'survey'})
     data['body'] = 'replaced'
     context.msg_id = data['msg_id']
 
+
+# Scenario 3: A user edits a draft that has a too large to attribute
+@given("a user modifies a draft with a to attribute that is too big")
+def step_impl(context):
+    add_draft = app.test_client().post('http://localhost:5050/draft/save', data=json.dumps(post_data), headers=headers)
+    post_resp = json.loads(add_draft.data)
+    context.msg_id = post_resp['msg_id']
+    data.update({'msg_id': context.msg_id,
+                 'urn_to': 'test',
+                 'urn_from': 'test',
+                 'subject': 'test',
+                 'body': 'Test',
+                 'thread_id': '2',
+                 'collection_case': 'collection case1',
+                 'reporting_unit': 'reporting case1',
+                 'survey': 'survey'})
+    data['urn_to'] = 'x' * (constants.MAX_TO_LEN+1)
+
+
+# Scenario 4: A user edits a draft that has a too large from attribute
+@given("a user modifies a draft with a from attribute that is too big")
+def step_impl(context):
+    add_draft = app.test_client().post('http://localhost:5050/draft/save', data=json.dumps(post_data), headers=headers)
+    post_resp = json.loads(add_draft.data)
+    context.msg_id = post_resp['msg_id']
+    data.update({'msg_id': context.msg_id,
+                 'urn_to': 'test',
+                 'urn_from': 'test',
+                 'subject': 'test',
+                 'body': 'Test',
+                 'thread_id': '2',
+                 'collection_case': 'collection case1',
+                 'reporting_unit': 'reporting case1',
+                 'survey': 'survey'})
+    data['urn_from'] = 'x' * (constants.MAX_FROM_LEN+1)
+
+
+# Scenario 5: A user edits a draft that has a too large body attribute
+@given("a user modifies a draft with a body attribute that is too big")
+def step_impl(context):
+    add_draft = app.test_client().post('http://localhost:5050/draft/save', data=json.dumps(post_data), headers=headers)
+    post_resp = json.loads(add_draft.data)
+    context.msg_id = post_resp['msg_id']
+    data.update({'msg_id': context.msg_id,
+                 'urn_to': 'test',
+                 'urn_from': 'test',
+                 'subject': 'test',
+                 'body': 'Test',
+                 'thread_id': '2',
+                 'collection_case': 'collection case1',
+                 'reporting_unit': 'reporting case1',
+                 'survey': 'survey'})
+    data['body'] = 'x' * (constants.MAX_BODY_LEN+1)
+
+
+# Scenario 6: A user edits a draft that has a too large subject attribute
+@given("a user modifies a draft with a subject attribute that is too big")
+def step_impl(context):
+    add_draft = app.test_client().post('http://localhost:5050/draft/save', data=json.dumps(post_data), headers=headers)
+    post_resp = json.loads(add_draft.data)
+    context.msg_id = post_resp['msg_id']
+    data.update({'msg_id': context.msg_id,
+                 'urn_to': 'test',
+                 'urn_from': 'test',
+                 'subject': 'test',
+                 'body': 'Test',
+                 'thread_id': '2',
+                 'collection_case': 'collection case1',
+                 'reporting_unit': 'reporting case1',
+                 'survey': 'survey'})
+    data['subject'] = 'x' * (constants.MAX_SUBJECT_LEN+1)
+
+
+# Scenario 7: A user edits a draft not including a to attribute
+@given("a user modifies a draft not adding a to attribute")
+def step_impl(context):
+    add_draft = app.test_client().post('http://localhost:5050/draft/save', data=json.dumps(post_data), headers=headers)
+    post_resp = json.loads(add_draft.data)
+    context.msg_id = post_resp['msg_id']
+    data.update({'msg_id': context.msg_id,
+                 'urn_to': 'test',
+                 'urn_from': 'test',
+                 'subject': 'test',
+                 'body': 'Test',
+                 'thread_id': '2',
+                 'collection_case': 'collection case1',
+                 'reporting_unit': 'reporting case1',
+                 'survey': 'survey'})
+    data['urn_to'] = ''
+
+
+# Scenario 8: A user edits a draft not including a body attribute
+@given("a user modifies a draft not adding a body attribute")
+def step_impl(context):
+    add_draft = app.test_client().post('http://localhost:5050/draft/save', data=json.dumps(post_data), headers=headers)
+    post_resp = json.loads(add_draft.data)
+    context.msg_id = post_resp['msg_id']
+    data.update({'msg_id': context.msg_id,
+                 'urn_to': 'test',
+                 'urn_from': 'test',
+                 'subject': 'test',
+                 'body': 'Test',
+                 'thread_id': '2',
+                 'collection_case': 'collection case1',
+                 'reporting_unit': 'reporting case1',
+                 'survey': 'survey'})
+    data['body'] = ''
+
+
+# Scenario 9: A user edits a draft not including a subject attribute
+@given("a user modifies a draft not adding a subject attribute")
+def step_impl(context):
+    add_draft = app.test_client().post('http://localhost:5050/draft/save', data=json.dumps(post_data), headers=headers)
+    post_resp = json.loads(add_draft.data)
+    context.msg_id = post_resp['msg_id']
+    data.update({'msg_id': context.msg_id,
+                 'urn_to': 'test',
+                 'urn_from': 'test',
+                 'subject': 'test',
+                 'body': 'Test',
+                 'thread_id': '2',
+                 'collection_case': 'collection case1',
+                 'reporting_unit': 'reporting case1',
+                 'survey': 'survey'})
+    data['subject'] = ''
+
+
+# Scenario 10: A user edits a draft not including a subject attribute
+@given("a user modifies a draft not adding a thread id attribute")
+def step_impl(context):
+    add_draft = app.test_client().post('http://localhost:5050/draft/save', data=json.dumps(post_data), headers=headers)
+    post_resp = json.loads(add_draft.data)
+    context.msg_id = post_resp['msg_id']
+    data.update({'msg_id': context.msg_id,
+                 'urn_to': 'test',
+                 'urn_from': 'test',
+                 'subject': 'test',
+                 'body': 'Test',
+                 'thread_id': '2',
+                 'collection_case': 'collection case1',
+                 'reporting_unit': 'reporting case1',
+                 'survey': 'survey'})
+    data['thread_id'] = ''
 

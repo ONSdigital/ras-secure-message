@@ -401,5 +401,5 @@ def step_impl(context):
 
 
 @then("a 400 error code is returned to the user")
-def step_impl(context):a
+def step_impl(context):
     nose.tools.assert_equal(context.response.status_code, 400)
