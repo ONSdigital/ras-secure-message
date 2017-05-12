@@ -17,7 +17,7 @@ Feature: Message get by ID Endpoint
     |CollectionCase  |
 
   @ignore
-  Scenario Outline: Retrieve a draft message
+  Scenario: Retrieve a draft message
     Given there is a draft message to be retrieved
     When the get request is made with a draft message id
     Then a 200 HTTP response is returned

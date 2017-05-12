@@ -57,9 +57,3 @@ Feature: Checking correct labels for messages are added & deleted
     Given a message with the status 'unread' is shown to an external user
     When the external user opens the message
     Then the status of the message changes to from unread to read
-
-
-
-
-
-    
