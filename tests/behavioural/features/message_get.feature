@@ -1,9 +1,43 @@
 Feature: Message get by ID Endpoint
 
-  Scenario: Retrieve a message with correct message ID
+   @ignore
+  Scenario Outline: Retrieve a correct message with message ID
     Given there is a message to be retrieved
     When the get request is made with a correct message id
     Then a 200 HTTP response is returned
+    And returned message field <field> is correct
+
+   Examples: Fields
+    |field  |
+    |urn_to |
+    |urn_from |
+    |body    |
+    |subject |
+    |ReportingUnit   |
+    |CollectionCase  |
+
+  @ignore
+  Scenario Outline: Retrieve a draft message
+    Given there is a draft message to be retrieved
+    When the get request is made with a draft message id
+    Then a 200 HTTP response is returned
+    And message returned is a draft
+
+  @ignore
+  Scenario Outline: Retrieve the correct draft message
+    Given there is a draft message to be retrieved
+    When the get request is made with a draft message id
+    Then a 200 HTTP response is returned
+    And returned message field <field> is correct
+
+   Examples: Fields
+    |field  |
+    |urn_to |
+    |urn_from |
+    |body    |
+    |subject |
+    |ReportingUnit   |
+    |CollectionCase  |
 
   Scenario: Retrieve a message with incorrect message ID
     Given there is a message to be retrieved

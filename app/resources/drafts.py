@@ -11,8 +11,6 @@ from app.repository.modifier import Modifier
 
 class Drafts(Resource):
     """Rest endpoint for draft messages"""
-    def get(self):
-        pass
 
     def post(self):
         """Handles saving of new draft"""
