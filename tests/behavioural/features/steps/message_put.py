@@ -344,14 +344,15 @@ def step_impl(context):
 def step_impl(context):
     response_get = app.test_client().get("http://localhost:5050/message/{0}".format(context.msg_id), headers=headers)
     data_get = json.loads(response_get.data)
-    nose.tools.assert_true("ARCHIVE" not in data_get['labels'])
+    nose.tools.assert_true("READ" in data_get['labels'])
 
 
 # Scenario: As an internal user I want to be able to edit a message from my drafts
 @given("an internal user has opened a previously saved draft message")
 def step_impl(context):
     data['urn_from'] = 'internal.123'
-    context.response = app.test_client().post("http://localhost:5050/draft/save", data=json.dumps(data), headers=headers)
+    context.response = app.test_client().post("http://localhost:5050/draft/save",
+                                              data=json.dumps(data), headers=headers)
     post_resp = json.loads(context.response.data)
     context.msg_id = post_resp['msg_id']
 
