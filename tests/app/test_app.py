@@ -316,7 +316,8 @@ class FlaskTestCase(unittest.TestCase):
                         'body': 'hello',
                         'thread': "",
                         'survey': 'RSI'}
-        put = self.app.put('http://localhost:5050/draft/{0}'.format(msg_id), data=json.dumps(replace_data), headers=self.headers)
+        put = self.app.put('http://localhost:5050/draft/{0}/modify'.format(msg_id), data=json.dumps(replace_data),
+                           headers=self.headers)
         self.assertEqual(put.status_code, 200)
 
     def test_draft_put_if_draft_does_not_exist_return_400(self):
@@ -328,7 +329,8 @@ class FlaskTestCase(unittest.TestCase):
                         'body': 'hello',
                         'thread': "",
                         'survey': 'RSI'}
-        put = self.app.put('http://localhost:5050/draft/{0}'.format(replace_data['msg_id']), data=json.dumps(replace_data), headers=self.headers)
+        put = self.app.put('http://localhost:5050/draft/{0}/modify'.format(replace_data['msg_id']),
+                           data=json.dumps(replace_data), headers=self.headers)
         self.assertEqual(put.status_code, 400)
 
     def test_draft_put_if_msg_id_do_not_match_return_400(self):
@@ -349,7 +351,8 @@ class FlaskTestCase(unittest.TestCase):
                         'body': 'hello',
                         'thread': "",
                         'survey': 'RSI'}
-        put = self.app.put('http://localhost:5050/draft/{0}'.format(msg_id), data=json.dumps(replace_data), headers=self.headers)
+        put = self.app.put('http://localhost:5050/draft/{0}/modify'.format(msg_id), data=json.dumps(replace_data),
+                           headers=self.headers)
         self.assertEqual(put.status_code, 400)
 
 if __name__ == '__main__':

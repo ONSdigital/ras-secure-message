@@ -74,6 +74,23 @@ class Retriever:
         return message
 
     @staticmethod
+    def retrieve_draft(message_id, user_urn):
+        """returns single draft from db"""
+
+        try:
+            result = SecureMessage.query.filter(msg_id=message_id)\
+                .filter(SecureMessage.statuses.any(Status.label == Labels.DRAFT.value)).first()
+            if result is None:
+                raise (NotFound(description="Draft with msg_id '{0}' does not exist".format(message_id)))
+        except SQLAlchemyError as e:
+            logger.error(e)
+            raise (InternalServerError(description="Error retrieving message from database"))
+
+        message = result.serialize(user_urn)
+
+        return message
+
+    @staticmethod
     def check_db_connection():
         """checks if db connection is working"""
         database_status = {"status": "healthy", "errors": "none"}

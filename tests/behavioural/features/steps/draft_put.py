@@ -7,7 +7,7 @@ from app.authentication.jwt import encode
 from app.authentication.jwe import Encrypter
 from app import settings
 
-url = "http://localhost:5050/draft/{0}"
+url = "http://localhost:5050/draft/{0}/modify"
 token_data = {'user_urn': '00000000000'}
 headers = {'Content-Type': 'application/json', 'authentication': ''}
 

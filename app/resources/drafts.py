@@ -7,6 +7,7 @@ from app.validation.user import User
 from werkzeug.exceptions import BadRequest
 from app.repository.database import Status
 from app.repository.modifier import Modifier
+from app.repository.retriever import Retriever
 
 
 class Drafts(Resource):
@@ -49,7 +50,20 @@ class Drafts(Resource):
 
 
 class DraftById(Resource):
-    """All draft functionality with an id on request"""
+    """Get and update message by id"""
+
+    @staticmethod
+    def get(message_id):
+        """Get message by id"""
+        user_urn = g.user_urn
+        # check user is authorised to view message
+        message_service = Retriever()
+        resp = message_service.retrieve_draft(message_id, user_urn)
+        return jsonify(resp)
+
+
+class DraftModifyById(Resource):
+    """Update message status by id"""
 
     def put(self, draft_id):
         """Handles modifying of drafts"""
