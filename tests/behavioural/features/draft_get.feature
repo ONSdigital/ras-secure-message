@@ -1,13 +1,20 @@
-Feature: Get Draft By ID
+Feature: Get draft by id
 
   @ignore
-  Scenario: As an internal user I want to be able to view a message from my drafts
-    Given an internal user has created and saved a draft message
-    When the internal user navigates to draft messages and opens the draft message
-    Then the draft message should be displayed
+  Scenario: User requests draft
+    Given a user requests a valid draft
+    When the user requests a draft
+    Then the draft is returned
+    And a success response is returned
 
   @ignore
-  Scenario: As an External user I would like to be able to view a message from drafts
-    Given an external user has created and saved a draft message
-    When the external user navigates to draft messages and opens the draft message
-    Then the draft message should be displayed
+  Scenario: User requests draft not authorised to view
+    Given a user is not authorised
+    When draft is requested
+    Then the user is forbidden from viewing draft
+
+  @ignore
+  Scenario: User requests draft that does not exist
+    Given a user wants a draft that does not exist
+    When the user requests the draft
+    Then the user receives a bad request response

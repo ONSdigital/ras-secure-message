@@ -57,3 +57,9 @@ Feature: Checking correct labels for messages are added & deleted
     Given a message with the status 'unread' is shown to an external user
     When the external user opens the message
     Then the status of the message changes to from unread to read
+
+  @ignore
+   Scenario: If an incorrect message id is requested by the user return a 400 error
+    Given a message with a unknown message id
+    When it is searched for
+    Then a 400 error code is returned

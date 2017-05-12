@@ -342,7 +342,6 @@ def step_impl(context):
     nose.tools.assert_true("UNREAD" not in context.request_data['labels'])
 
 
-
 # Scenario - external - as an external user I want to be able to change my message from read to unread
 @given("a message with the status read is displayed to an external user")
 def step_impl(context):
@@ -387,3 +386,20 @@ def step_impl(context):
     request = app.test_client().get("http://localhost:5050/message/{0}".format(context.msg_id), headers=headers)
     request_data = json.loads(request.data)
     nose.tools.assert_true("UNREAD" not in request_data['labels'])
+
+
+# If an incorrect message id is requested by the user return a 400 error
+@given("a user requests a message with a invalid message id")
+def step_impl(context):
+    context.msg_id = "MsgIdExceedsMsgIdLengthsdhkbgjksdlfknbsjdshbfjskgbhdhdghgdhdfsdhjghbskggdh"
+
+
+@when("it is searched for and not a valid message id")
+def step_impl(context):
+    context.response = app.test_client().put("http://localhost:5050/message/{0}".format(context.msg_id),
+                                             data=json.dumps(data), headers=headers)
+
+
+@then("a 400 error code is returned to the user")
+def step_impl(context):
+    nose.tools.assert_equal(context.response.status_code, 400)
