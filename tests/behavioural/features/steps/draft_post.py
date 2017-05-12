@@ -5,7 +5,6 @@ from unittest import mock
 from app.repository import database
 from app.application import app
 from app import constants
-import nose
 from app.authentication.jwt import encode
 from app.authentication.jwe import Encrypter
 from app import settings
