@@ -1,4 +1,4 @@
-from behave import given, when
+from behave import given, when, then
 from flask import current_app, json
 from app.common.alerts import AlertUser, AlertViaGovNotify
 from unittest import mock
@@ -8,6 +8,7 @@ from app import constants
 from app.authentication.jwt import encode
 from app.authentication.jwe import Encrypter
 from app import settings
+import nose
 
 url = "http://localhost:5050/draft/save"
 token_data = {
@@ -152,6 +153,30 @@ def step_impl(context):
                  'collection_case': 'collection case1',
                  'reporting_unit': 'reporting case1',
                  'survey': ''})
+
+
+# Scenario: As a user the message id for my saved draft should be returned when saving a draft
+@given("a user creates a valid draft")
+def step_impl(context):
+    context.draft = {'urn_to': 'test',
+                     'urn_from': 'test',
+                     'subject': 'test',
+                     'body': 'Test',
+                     'thread_id': '',
+                     'collection_case': 'collection case1',
+                     'reporting_unit': 'reporting case1',
+                     'survey': 'RSI'}
+
+
+@when("the user saves this draft")
+def step_impl(context):
+    context.response = app.test_client().post(url, data=json.dumps(context.draft), headers=headers)
+
+
+@then("the message id should be returned in the response")
+def step_impl(context):
+    resp_data = json.loads(context.response.data)
+    nose.tools.assert_true(resp_data['msg_id'] is not None)
 
 
 # Common

@@ -2,7 +2,7 @@ Feature: Get Drafts
 
   @ignore
   Scenario: User requests list of drafts
-    Given the user has multiple drafts
+    Given the user has created and saved multiple drafts
     When the user requests drafts
     Then all the users drafts are returned
 

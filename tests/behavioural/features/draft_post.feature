@@ -51,9 +51,8 @@ Feature: Draft Save Endpoint
     When the draft is saved
     Then the thread id should be set to the message id
 
-  @ignore
   Scenario: As a user the message id for my saved draft should be returned when saving a draft
     Given a user creates a valid draft
-    When the draft is saved
+    When the user saves this draft
     Then the message id should be returned in the response
 
