@@ -52,4 +52,9 @@ Feature: Draft Put Endpoint
     When the user saves the draft
     Then a success response is given
 
+  Scenario: A user edits a draft where msg id in url and in the message body do not match
+    Given a user tries to modify a draft with mismatched msg ids
+    When the user saves the draft
+    Then a bad request error is returned
+
 
