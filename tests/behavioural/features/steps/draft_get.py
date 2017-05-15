@@ -4,7 +4,6 @@ from app.common.alerts import AlertUser, AlertViaGovNotify
 from unittest import mock
 from app.repository import database
 from app.application import app
-from app import constants
 from app.authentication.jwt import encode
 from app.authentication.jwe import Encrypter
 from app import settings
