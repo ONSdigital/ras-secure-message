@@ -10,6 +10,7 @@ from app.resources.health import Health, DatabaseHealth, HealthDetails
 from app.resources.messages import MessageList, MessageSend, MessageById, MessageModifyById
 from app.authentication.authenticator import authenticate
 from app.resources.drafts import Drafts, DraftById, DraftModifyById
+from app import connector
 
 
 # initialise logging defaults for project
@@ -37,7 +38,7 @@ werkzeug_logger.setLevel(level=settings.SMS_WERKZEUG_LOG_LEVEL)
 
 app = Flask(__name__)
 api = Api(app)
-app.config['SQLALCHEMY_DATABASE_URI'] = settings.SECURE_MESSAGING_DATABASE_URL
+app.config['SQLALCHEMY_DATABASE_URI'] = connector.getDatabaseUri()
 app.config['SQLALCHEMY_POOL_SIZE'] = settings.SQLALCHEMY_POOL_SIZE
 app.logger.addHandler(logging.StreamHandler())
 app.logger.setLevel(settings.APP_LOG_LEVEL)

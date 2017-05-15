@@ -71,7 +71,7 @@ def step_impl(context):
 
 @given('a user wants a draft that does not exist')
 def step_impl(context):
-    context.resp_data = {'msg_id': ''}
+    context.resp_data = dict(msg_id='')
     context.resp_data['msg_id'] = str(uuid.uuid4())
 
 

@@ -2,6 +2,7 @@ from flask_restful import Resource
 from flask import jsonify
 from app.repository.retriever import Retriever
 from app import settings
+from flask import current_app
 
 
 class Health(Resource):
@@ -37,7 +38,7 @@ class HealthDetails(Resource):
 
         details = {'SMS Log level': settings.SMS_LOG_LEVEL,
                    'APP Log Level': settings.APP_LOG_LEVEL,
-                   'Database URL': settings.SECURE_MESSAGING_DATABASE_URL,
+                   'Database URL' : current_app.config['SQLALCHEMY_DATABASE_URI'],
                    'API Functionality': func_list
                    }
 
