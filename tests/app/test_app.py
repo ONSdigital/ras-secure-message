@@ -75,23 +75,6 @@ class FlaskTestCase(unittest.TestCase):
                 data = {"subject": row['subject'], "body": row['body']}
                 self.assertEqual({'subject': 'MyMessage', 'body': 'hello'}, data)
 
-    def test_post_request_with_msg_id_returns_bad_request(self):
-        """Check message sent with msg_id returns bad request"""
-
-        url = "http://localhost:5050/message/send"
-
-        data = {'msg_id': '',
-                'urn_to': 'richard',
-                'urn_from': 'torrance',
-                'subject': 'MyMessage',
-                'body': 'hello',
-                'thread': "?",
-                'create_date': datetime.now(timezone.utc),
-                'read_date': datetime.now(timezone.utc)}
-
-        response = self.app.post(url, data=json.dumps(data), headers=self.headers)
-        self.assertEqual(response.status_code, 400)
-
     def test_post_request_stores_uuid_in_msg_id_if_message_post_called_with_no_msg_id_set(self):
         """check default_msg_id is stored when messageSend endpoint called with no msg_id"""
         # post json message written up in the ui
@@ -218,20 +201,6 @@ class FlaskTestCase(unittest.TestCase):
 
             for row in request:
                 self.assertTrue(row is not None)
-
-    def test_draft_with_msg_id_post_returns_400(self):
-        """Check draft saved with message id fails"""
-        url = "http://localhost:5050/draft/save"
-        data = {'msg_id': '',
-                'urn_to': 'richard',
-                'urn_from': 'torrance',
-                'subject': 'MyMessage',
-                'body': 'hello',
-                'thread': "",
-                'survey': 'RSI'}
-
-        response = self.app.post(url, data=json.dumps(data), headers=self.headers)
-        self.assertEqual(response.status_code, 400)
 
 if __name__ == '__main__':
     unittest.main()
