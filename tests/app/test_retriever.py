@@ -28,9 +28,9 @@ class RetrieverTestCase(unittest.TestCase):
             database.db.create_all()
             self.db = database.db
 
-    def populate_database(self, x=0, single=True, convo=False, draft=False, multiple_users=False):
+    def populate_database(self, no_of_messages=0, single=True, add_reply=False, add_draft=False, multiple_users=False):
         with self.engine.connect() as con:
-            for i in range(x):
+            for i in range(no_of_messages):
                 if single:
                     msg_id = str(uuid.uuid4())
                     year = 2016
@@ -51,7 +51,7 @@ class RetrieverTestCase(unittest.TestCase):
                     query = 'INSERT INTO status(label, msg_id, actor) VALUES("UNREAD", "{0}", "SurveyType")'.format(
                         msg_id)
                     con.execute(query)
-                if convo:
+                if add_reply:
                     msg_id = str(uuid.uuid4())
                     query = 'INSERT INTO secure_message(msg_id, subject, body, thread_id, sent_date, read_date,' \
                             ' collection_case, reporting_unit, survey) VALUES ("{0}", "test","test","", ' \
@@ -67,7 +67,7 @@ class RetrieverTestCase(unittest.TestCase):
                     query = 'INSERT INTO status(label, msg_id, actor) VALUES("UNREAD", "{0}", "respondent.21345")'\
                         .format(msg_id)
                     con.execute(query)
-                if draft:
+                if add_draft:
                     msg_id = str(uuid.uuid4())
                     query = 'INSERT INTO secure_message(msg_id, subject, body, thread_id, sent_date, read_date,' \
                             ' collection_case, reporting_unit, survey) VALUES ("{0}", "test","test","", ' \
@@ -319,7 +319,7 @@ class RetrieverTestCase(unittest.TestCase):
 
     def test_all_draft_message_returned(self):
         """retrieves messages from database with label DRAFT for user"""
-        self.populate_database(5, draft=True)
+        self.populate_database(5, add_draft=True)
 
         with app.app_context():
             with current_app.test_request_context():
@@ -334,7 +334,7 @@ class RetrieverTestCase(unittest.TestCase):
 
     def test_all_sent_message_returned(self):
         """retrieves messages from database with label SENT for user"""
-        self.populate_database(5, convo=True)
+        self.populate_database(5, add_reply=True)
 
         with app.app_context():
             with current_app.test_request_context():
@@ -349,7 +349,7 @@ class RetrieverTestCase(unittest.TestCase):
 
     def test_all_inbox_message_returned(self):
         """retrieves messages from database with label SENT for user"""
-        self.populate_database(5, convo=True)
+        self.populate_database(5, add_reply=True)
 
         with app.app_context():
             with current_app.test_request_context():
@@ -364,7 +364,7 @@ class RetrieverTestCase(unittest.TestCase):
 
     def test_all_message_returned_no_label_option(self):
         """retrieves all messages from database for user with no messages with label DRAFT_INBOX"""
-        self.populate_database(5, draft=True)
+        self.populate_database(5, add_draft=True)
 
         with app.app_context():
             with current_app.test_request_context():
@@ -567,7 +567,7 @@ class RetrieverTestCase(unittest.TestCase):
     def test_draft_returned_with_msg_id_true(self):
         """retrieves draft using id"""
 
-        self.populate_database(1, single=False, draft=True)
+        self.populate_database(1, single=False, add_draft=True)
         with self.engine.connect() as con:
             query = 'SELECT msg_id FROM secure_message LIMIT 1'
             query_x = con.execute(query)
@@ -598,7 +598,7 @@ class RetrieverTestCase(unittest.TestCase):
     def test_draft_returned_with_msg_id_draft_not_in_database(self):
         """retrieves draft using id where draft not in database"""
         message_id = str(uuid.uuid4())
-        self.populate_database(1, single=False, draft=True)
+        self.populate_database(1, single=False, add_draft=True)
         with app.app_context():
             with current_app.test_request_context():
                 with self.assertRaises(NotFound):
@@ -606,7 +606,7 @@ class RetrieverTestCase(unittest.TestCase):
 
     def test_correct_labels_returned_for_draft(self):
         """retrieves draft using id and checks the labels are correct"""
-        self.populate_database(1, single=False, draft=True)
+        self.populate_database(1, single=False, add_draft=True)
         with self.engine.connect() as con:
             query = 'SELECT msg_id FROM secure_message LIMIT 1'
             query_x = con.execute(query)
@@ -623,7 +623,7 @@ class RetrieverTestCase(unittest.TestCase):
 
     def test_correct_to_and_from_returned_for_draft(self):
         """retrieves draft using id and checks the to and from urns are correct"""
-        self.populate_database(1, single=False, draft=True)
+        self.populate_database(1, single=False, add_draft=True)
         with self.engine.connect() as con:
             query = 'SELECT msg_id FROM secure_message LIMIT 1'
             query_x = con.execute(query)
