@@ -12,7 +12,7 @@ from app.settings import MESSAGE_QUERY_LIMIT
 from app.validation.labels import Labels
 from app.validation.user import User
 from datetime import timezone, datetime
-from app.resources.drafts import DraftById
+from app.resources.drafts import DraftModifyById
 
 logger = logging.getLogger(__name__)
 
@@ -125,7 +125,7 @@ class MessageSend(Resource):
         is_draft = False
         draft_id = None
         if 'msg_id' in post_data:
-            is_draft = DraftById().check_valid_draft(post_data['msg_id'])
+            is_draft = DraftModifyById().check_valid_draft(post_data['msg_id'])
             if is_draft is True:
                 draft_id = post_data['msg_id']
                 post_data['msg_id'] = ''
@@ -188,7 +188,7 @@ class MessageById(Resource):
         return jsonify(resp)
 
 
-class ModifyById(Resource):
+class MessageModifyById(Resource):
     """Update message status by id"""
 
     @staticmethod
@@ -198,14 +198,14 @@ class ModifyById(Resource):
 
         request_data = request.get_json()
 
-        action, label = ModifyById.validate_request(request_data)
+        action, label = MessageModifyById.validate_request(request_data)
 
         message = Retriever().retrieve_message(message_id, user_urn)
 
         if label == Labels.UNREAD.value:
-            resp = ModifyById.modify_unread(action, message, user_urn)
+            resp = MessageModifyById.modify_unread(action, message, user_urn)
         else:
-            resp = ModifyById.modify_label(action, message, user_urn, label)
+            resp = MessageModifyById.modify_label(action, message, user_urn, label)
 
         if resp:
             res = jsonify({'status': 'ok'})
