@@ -56,7 +56,7 @@ class SaverTestCase(unittest.TestCase):
                     data = {"sent_date": row['sent_date']}
                     self.assertTrue(data['sent_date'] is None)
 
-    def test_save_message_rasies_message_save_exception_on_db_error(self):
+    def test_save_message_raises_message_save_exception_on_db_error(self):
         """Tests exception is logged if message save fails"""
         mock_session = mock.Mock(db.session)
         mock_session.commit.side_effect = Exception("Not Saved")
