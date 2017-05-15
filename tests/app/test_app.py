@@ -165,42 +165,6 @@ class FlaskTestCase(unittest.TestCase):
         except Exception as e:
             self.fail("post raised unexpected exception: {0}".format(e))
 
-    # def test_message_post_missing_msg_to_returns_error_to_caller(self):
-    #     """posts to message send end point without 'urn_to'"""
-    #     url = "http://localhost:5050/message/send"
-    #
-    #     self.test_message['urn_to'] = ''
-    #
-    #     response = self.app.post(url, data=json.dumps(self.test_message), headers=self.headers)
-    #     self.assertEqual(response.status_code, 400)
-    #
-    # def test_message_post_missing_urn_from_returns_error(self):
-    #     """posts to message send end point without 'urn_from'"""
-    #     url = "http://localhost:5050/message/send"
-    #
-    #     self.test_message['urn_from'] = ''
-    #
-    #     response = self.app.post(url, data=json.dumps(self.test_message), headers=self.headers)
-    #     self.assertEqual(response.status_code, 400)
-    #
-    # def test_message_post_too_large_urn_from_returns_error(self):
-    #     """posts to message send end point with too large 'urn_from'"""
-    #     url = "http://localhost:5050/message/send"
-    #
-    #     self.test_message['urn_from'] = 'x' * 101
-    #
-    #     response = self.app.post(url, data=json.dumps(self.test_message), headers=self.headers)
-    #     self.assertEqual(response.status_code, 400)
-    #
-    # def test_message_post_too_large_urn_to_returns_error(self):
-    #     """posts to message send end point with too large 'urn_from'"""
-    #     url = "http://localhost:5050/message/send"
-    #
-    #     self.test_message['urn_to'] = 'x' * 101
-    #
-    #     response = self.app.post(url, data=json.dumps(self.test_message), headers=self.headers)
-    #     self.assertEqual(response.status_code, 400)
-
     def test_message_post_stores_labels_correctly_for_sender_of_message(self):
         """posts to message send end point to ensure labels are saved as expected"""
         url = "http://localhost:5050/message/send"
