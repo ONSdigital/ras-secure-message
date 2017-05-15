@@ -1,5 +1,5 @@
 from app.authentication.authenticator import check_jwt, authenticate
-from app.authentication.jwt import encode
+from app.authentication.jwt import encode, decode
 from app.authentication.jwe import Encrypter
 from werkzeug.exceptions import BadRequest
 from app.application import app
@@ -92,3 +92,13 @@ class AuthenticationTestCase(unittest.TestCase):
         with app.app_context():
             res = authenticate(headers={})
         self.assertEqual(res._status, expected_res._status)
+
+    def test_encode_decode_jwt(self):
+        """decoding and encoding jwt"""
+        data = {
+            "user_urn": "12345678910"
+        }
+        signed_jwt = encode(data)
+        decoded_jwt = decode(signed_jwt)
+        self.assertEqual(data, decoded_jwt)
+
