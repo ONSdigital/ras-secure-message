@@ -4,14 +4,11 @@ from flask import current_app
 from sqlalchemy import create_engine
 from werkzeug.exceptions import InternalServerError
 
-from app import repository
 from app.validation.labels import Labels
 from app.application import app
 from app.repository import database
-from unittest import mock
 from app.repository.modifier import Modifier
 from app.repository.retriever import Retriever
-from app.repository.database import db
 from app.validation.domain import DraftSchema
 
 

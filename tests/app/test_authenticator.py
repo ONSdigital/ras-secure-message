@@ -85,10 +85,6 @@ class AuthenticationTestCase(unittest.TestCase):
         """Authenticate request using authenticate function and without header data"""
         expected_res = Response(response="Invalid token to access this Microservice Resource",
                                 status=400, mimetype="text/html")
-        data = {
-                  "user_urn": "12345678910"
-                }
-
         with app.app_context():
             res = authenticate(headers={})
         self.assertEqual(res._status, expected_res._status)
