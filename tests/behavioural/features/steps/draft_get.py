@@ -12,7 +12,7 @@ import nose
 import uuid
 
 
-url = "http://localhost:5050/draft/{0}/modify"
+url = "http://localhost:5050/draft/{0}"
 token_data = {
             "user_urn": "respondent.2134"
         }
@@ -51,14 +51,15 @@ def step_impl(context):
                  'collection_case': 'collection case1',
                  'reporting_unit': 'reporting case1',
                  'survey': 'survey'})
-    response = app.test_client().post("http://localhost:5050/draft/save", data=json.dumps(context.draft),
+    response = app.test_client().post("http://localhost:5050/draft/save", data=json.dumps(data),
                                       headers=headers)
     context.resp_data = json.loads(response.data)
 
 
 @then('the draft is returned')
 def step_impl(context):
-    nose.tools.assert_equal(context.response.data['msg_id'], context.resp_data['msg_id'])
+    response = json.loads(context.response.data)
+    nose.tools.assert_equal(response['msg_id'], context.resp_data['msg_id'])
 
 
 @then('a success response is returned')
@@ -70,6 +71,7 @@ def step_impl(context):
 
 @given('a user wants a draft that does not exist')
 def step_impl(context):
+    context.resp_data = {'msg_id': ''}
     context.resp_data['msg_id'] = str(uuid.uuid4())
 
 
@@ -105,5 +107,4 @@ def step_impl(context):
 
 @when('the user requests the draft')
 def step_impl(context):
-    context.response = app.test_client().post(url.format(context.resp_data['msg_id']), data=json.dumps(context.draft),
-                                              headers=headers)
+    context.response = app.test_client().get(url.format(context.resp_data['msg_id']), headers=headers)
