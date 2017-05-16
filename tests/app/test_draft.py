@@ -13,6 +13,8 @@ from app.application import app
 from app.authentication.jwt import encode
 from app.authentication.jwe import Encrypter
 from app import settings
+import uuid, hashlib
+from app.resources.drafts import DraftModifyById
 
 
 class DraftTestCase(unittest.TestCase):
@@ -200,3 +202,83 @@ class DraftTestCase(unittest.TestCase):
         response = self.app.post('http://localhost:5050/message/send', data=json.dumps(self.test_message),
                                  headers=self.headers)
         self.assertEqual(response.status_code, 201)
+
+    def test_check_valid_draft_true(self):
+        """Test check_valid_draft function returns true for valid draft id"""
+
+        with self.engine.connect() as con:
+            msg_id = str(uuid.uuid4())
+            query = 'INSERT INTO secure_message(msg_id, subject, body, thread_id, sent_date, read_date,' \
+                    ' collection_case, reporting_unit, survey) VALUES ("{0}", "test","test","", ' \
+                    '"2017-02-03 00:00:00", "2017-02-03 00:00:00", "ACollectionCase", "AReportingUnit", ' \
+                    '"SurveyType")'.format(msg_id)
+            con.execute(query)
+            query = 'INSERT INTO status(label, msg_id, actor) VALUES("DRAFT", "{0}", "respondent.21345")'.format(
+                msg_id)
+            con.execute(query)
+            query = 'INSERT INTO status(label, msg_id, actor) VALUES("DRAFT_INBOX", "{0}",' \
+                    ' "SurveyType")'.format(msg_id)
+            con.execute(query)
+
+        with app.app_context():
+            with current_app.test_request_context():
+                is_valid_draft = DraftModifyById.check_valid_draft(msg_id, 'respondent.21345')
+        self.assertTrue(is_valid_draft[0])
+
+    def test_check_valid_draft_false(self):
+        """Test check_valid_draft function returns false for valid draft id"""
+
+        with app.app_context():
+            with current_app.test_request_context():
+                is_valid_draft = DraftModifyById.check_valid_draft('000000-0000-00000', 'respondent.21345')
+        self.assertFalse(is_valid_draft[0])
+
+    def test_etag_check_returns_true(self):
+        """Test etag_check function returns true for unchanged draft etag"""
+
+        with self.engine.connect() as con:
+            msg_id = str(uuid.uuid4())
+            query = 'INSERT INTO secure_message(msg_id, subject, body, thread_id, sent_date, read_date,' \
+                    ' collection_case, reporting_unit, survey) VALUES ("{0}", "test","test","", ' \
+                    '"2017-02-03 00:00:00", "2017-02-03 00:00:00", "ACollectionCase", "AReportingUnit", ' \
+                    '"SurveyType")'.format(msg_id)
+            con.execute(query)
+            query = 'INSERT INTO status(label, msg_id, actor) VALUES("DRAFT", "{0}", "respondent.21345")'.format(
+                msg_id)
+            con.execute(query)
+            query = 'INSERT INTO status(label, msg_id, actor) VALUES("DRAFT_INBOX", "{0}",' \
+                    ' "SurveyType")'.format(msg_id)
+            con.execute(query)
+
+        with app.app_context():
+            with current_app.test_request_context():
+                is_valid_draft = DraftModifyById.check_valid_draft(msg_id, 'respondent.21345')
+        hash_object = hashlib.sha1(str(sorted(is_valid_draft[1].items())).encode())
+        etag = hash_object.hexdigest()
+
+        self.assertTrue(DraftModifyById.etag_check({'etag': etag}, is_valid_draft[1]))
+
+    def test_etag_check_returns_false(self):
+        """Test etag_check function returns false for changed draft etag"""
+
+        with self.engine.connect() as con:
+            msg_id = str(uuid.uuid4())
+            query = 'INSERT INTO secure_message(msg_id, subject, body, thread_id, sent_date, read_date,' \
+                    ' collection_case, reporting_unit, survey) VALUES ("{0}", "test","test","", ' \
+                    '"2017-02-03 00:00:00", "2017-02-03 00:00:00", "ACollectionCase", "AReportingUnit", ' \
+                    '"SurveyType")'.format(msg_id)
+            con.execute(query)
+            query = 'INSERT INTO status(label, msg_id, actor) VALUES("DRAFT", "{0}", "respondent.21345")'.format(
+                msg_id)
+            con.execute(query)
+            query = 'INSERT INTO status(label, msg_id, actor) VALUES("DRAFT_INBOX", "{0}",' \
+                    ' "SurveyType")'.format(msg_id)
+            con.execute(query)
+
+        with app.app_context():
+            with current_app.test_request_context():
+                is_valid_draft = DraftModifyById.check_valid_draft(msg_id, 'respondent.21345')
+
+        etag = '1234567sdfghj98765fgh'
+
+        self.assertFalse(DraftModifyById.etag_check({'etag': etag}, is_valid_draft[1]))

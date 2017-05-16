@@ -5,7 +5,7 @@ from app.validation.labels import Labels
 from app.validation.domain import DraftSchema
 from app.validation.user import User
 from werkzeug.exceptions import BadRequest
-from app.repository.database import Status
+from app.repository.database import SecureMessage, Status
 from app.repository.modifier import Modifier
 from app.repository.retriever import Retriever
 from flask import g, Response
@@ -79,12 +79,13 @@ class DraftModifyById(Resource):
             raise (BadRequest(description="Draft put requires msg_id"))
         if data['msg_id'] != draft_id:
             raise (BadRequest(description="Conflicting msg_id's"))
-        is_draft = self.check_valid_draft(draft_id)
+        is_draft = self.check_valid_draft(draft_id, g.user_urn)
         if is_draft[0] is False:
             raise (BadRequest(description="Draft put requires valid draft"))
 
         not_modified = self.etag_check(request.headers, is_draft[1])
-        if not_modified == False:
+
+        if not_modified is False:
             res = Response(response="Draft has been modified since last check", status=409,
                            mimetype="text/html")
             return res
@@ -101,22 +102,24 @@ class DraftModifyById(Resource):
             return resp
 
     @staticmethod
-    def check_valid_draft(draft_id):
+    def check_valid_draft(draft_id, user_urn):
         """Check msg_id is that of a valid draft"""
-        db_model = Status()
-        result = db_model.query.filter_by(msg_id=draft_id, label=Labels.DRAFT.value).first()
+        result = SecureMessage.query.filter(SecureMessage.msg_id == draft_id)\
+            .filter(SecureMessage.statuses.any(Status.label == Labels.DRAFT.value)).first()
         if result is None:
             return False, result
         else:
-            return True, result
+            return True, result.serialize(user_urn)
 
     @staticmethod
     def replace_draft(draft_id, draft):
+        """Function used to replace a draft"""
         modifier = Modifier()
         modifier.replace_current_draft(draft_id, draft)
 
     @staticmethod
     def etag_check(headers, current_draft):
+        """Check etag to make sure draft has not been modified since get request"""
         if headers.get('etag'):
             hash_object = hashlib.sha1(str(sorted(current_draft.items())).encode())
             current_etag = hash_object.hexdigest()
