@@ -9,7 +9,7 @@ from app.repository.database import Status
 from app.repository.modifier import Modifier
 from app.repository.retriever import Retriever
 from flask import g
-
+import hashlib
 
 class Drafts(Resource):
     """Rest endpoint for draft messages"""
@@ -59,8 +59,14 @@ class DraftById(Resource):
         user_urn = g.user_urn
         # check user is authorised to view message
         message_service = Retriever()
-        resp = message_service.retrieve_draft(draft_id, user_urn)
-        return jsonify(resp)
+        draft_data = message_service.retrieve_draft(draft_id, user_urn)
+
+        hash_object = hashlib.sha1(str(sorted(draft_data.items())).encode())
+        etag = hash_object.hexdigest()
+
+        resp = jsonify(draft_data)
+        resp.headers['ETag'] = etag
+        return resp
 
 
 class DraftModifyById(Resource):
