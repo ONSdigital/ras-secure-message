@@ -200,4 +200,3 @@ class DraftTestCase(unittest.TestCase):
         response = self.app.post('http://localhost:5050/message/send', data=json.dumps(self.test_message),
                                  headers=self.headers)
         self.assertEqual(response.status_code, 201)
-

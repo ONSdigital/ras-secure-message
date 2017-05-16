@@ -80,7 +80,7 @@ class DraftModifyById(Resource):
         if data['msg_id'] != draft_id:
             raise (BadRequest(description="Conflicting msg_id's"))
         is_draft = self.check_valid_draft(draft_id)
-        if is_draft is False:
+        if is_draft[0] is False:
             raise (BadRequest(description="Draft put requires valid draft"))
 
         not_modified = self.etag_check(request.headers, is_draft[1])
