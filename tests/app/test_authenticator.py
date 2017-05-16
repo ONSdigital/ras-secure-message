@@ -1,5 +1,5 @@
-from app.authentication.authenticator import check_jwt
-from app.authentication.jwt import encode
+from app.authentication.authenticator import check_jwt, authenticate
+from app.authentication.jwt import encode, decode
 from app.authentication.jwe import Encrypter
 from werkzeug.exceptions import BadRequest
 from app.application import app
@@ -64,3 +64,37 @@ class AuthenticationTestCase(unittest.TestCase):
 
         with self.assertRaises(BadRequest):
             check_jwt(encode(data))
+
+    def test_authenticate_request_with_correct_header_data(self):
+        """Authenticate request using authenticate function and with correct header data"""
+        expected_res = {'status': "ok"}
+        data = {
+                  "user_urn": "12345678910"
+                }
+        encrypter = Encrypter(_private_key=settings.SM_USER_AUTHENTICATION_PRIVATE_KEY,
+                              _private_key_password=settings.SM_USER_AUTHENTICATION_PRIVATE_KEY_PASSWORD,
+                              _public_key=settings.SM_USER_AUTHENTICATION_PUBLIC_KEY)
+        signed_jwt = encode(data)
+        encrypted_jwt = encrypter.encrypt_token(signed_jwt)
+
+        with app.app_context():
+            res = authenticate(headers={'authentication': encrypted_jwt})
+        self.assertEqual(res, expected_res)
+
+    def test_authenticate_request_with_incorrect_header_data(self):
+        """Authenticate request using authenticate function and without header data"""
+        expected_res = Response(response="Invalid token to access this Microservice Resource",
+                                status=400, mimetype="text/html")
+        with app.app_context():
+            res = authenticate(headers={})
+        self.assertEqual(res._status, expected_res._status)
+
+    def test_encode_decode_jwt(self):
+        """decoding and encoding jwt"""
+        data = {
+            "user_urn": "12345678910"
+        }
+        signed_jwt = encode(data)
+        decoded_jwt = decode(signed_jwt)
+        self.assertEqual(data, decoded_jwt)
+

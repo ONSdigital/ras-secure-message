@@ -2,6 +2,8 @@ import unittest
 import uuid
 from flask import current_app
 from sqlalchemy import create_engine
+from werkzeug.exceptions import InternalServerError
+
 from app.validation.labels import Labels
 from app.application import app
 from app.repository import database
@@ -274,3 +276,47 @@ class ModifyTestCase(unittest.TestCase):
                 self.assertCountEqual(message['labels'], ['UNREAD', 'INBOX'])
                 message = message_service.retrieve_message(msg_id, 'internal.21345')
                 self.assertCountEqual(message['labels'], ['UNREAD', 'INBOX'])
+
+    def test_exception_for_add_label_raises(self):
+        # mock_session = mock.Mock(db.session)
+        # mock_session.commit.side_effect = Exception("Error retrieving messages from database")
+        with app.app_context():
+            database.db.drop_all()
+            with current_app.test_request_context():
+                with self.assertRaises(InternalServerError):
+                    Modifier.add_label('UNREAD', {'survey':'survey'},'internal.12425')
+
+    def test_exception_for_remove_label_raises(self):
+        with app.app_context():
+            database.db.drop_all()
+            with current_app.test_request_context():
+                with self.assertRaises(InternalServerError):
+                    Modifier.remove_label('UNREAD', {'survey': 'survey'}, 'internal.12425')
+
+    def test_exception_for_del_unread_raises(self):
+        with app.app_context():
+            database.db.drop_all()
+            with current_app.test_request_context():
+                with self.assertRaises(InternalServerError):
+                    Modifier.del_unread({'labels':['INBOX','UNREAD'],'read_date': None, 'msg_id':1 }, 'internal.12425')
+
+    def test_exception_for_del_draft_raises(self):
+        with app.app_context():
+            database.db.drop_all()
+            with current_app.test_request_context():
+                with self.assertRaises(InternalServerError):
+                    Modifier.del_draft('0', 'TRUE')
+
+    def test_exception_for_replace_current_draft_raises(self):
+        with app.app_context():
+            database.db.drop_all()
+            with current_app.test_request_context():
+                with self.assertRaises(InternalServerError):
+                    Modifier.replace_current_draft('internal.1245','Richard')
+
+    def test_replace_current_recipient_status_raises(self):
+        with app.app_context():
+            database.db.drop_all()
+            with current_app.test_request_context():
+                with self.assertRaises(InternalServerError):
+                    Modifier.replace_current_recipient_status('internal.1245','Torrance')

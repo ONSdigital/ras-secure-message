@@ -105,27 +105,6 @@ class MessageSchema(Schema):
             logger.debug("{0} field is too large {1}  max size: {2}".format(field_name, length, max_field_len))
             raise ValidationError('{0} field length must not be greater than {1}.'.format(field_name, max_field_len))
 
-
-class MessageStatus:
-
-    """Class to hold message attributes"""
-    def __init__(self, label='', msg_id='', actor=''):
-
-        logger.debug("Message Class created {0}, {1}, {2}".format(label, msg_id, actor))
-        self.label = label
-        self.msg_id = msg_id
-        self.actor = actor
-
-    def __repr__(self):
-        return '<MessageStatus(label={self.label} msg_id={self.msg_id} msg_urn={self.actor})>'.format(self=self)
-
-    def __eq__(self, other):
-        if isinstance(other, MessageStatus):
-            return self.__dict__ == other.__dict__
-        else:
-            return False
-
-
 class DraftSchema(Schema):
     """Class to marshal JSON to Draft"""
 

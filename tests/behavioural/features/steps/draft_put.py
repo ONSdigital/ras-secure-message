@@ -231,3 +231,19 @@ def step_impl(context):
                  'survey': 'survey'})
     data['thread_id'] = ''
 
+
+# Scenario 11: A user edits a draft where msg id in url and in the message body do not match
+@given("a user tries to modify a draft with mismatched msg ids")
+def step_impl(context):
+    add_draft = app.test_client().post('http://localhost:5050/draft/save', data=json.dumps(post_data), headers=headers)
+    post_resp = json.loads(add_draft.data)
+    context.msg_id = post_resp['msg_id']
+    data.update({'msg_id': '0000-0000-0000-0000',
+                 'urn_to': 'test',
+                 'urn_from': 'test',
+                 'subject': 'test',
+                 'body': 'Test',
+                 'thread_id': '2',
+                 'collection_case': 'collection case1',
+                 'reporting_unit': 'reporting case1',
+                 'survey': 'survey'})

@@ -8,10 +8,10 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-def authenticate(request):
+def authenticate(headers):
 
-    if request.headers.get('authentication'):
-        jwt_token = request.headers.get('authentication')
+    if headers.get('authentication'):
+        jwt_token = headers.get('authentication')
 
         res = check_jwt(jwt_token)
 

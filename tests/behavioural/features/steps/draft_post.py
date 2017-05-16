@@ -179,7 +179,6 @@ def step_impl(context):
     resp_data = json.loads(context.response.data)
     nose.tools.assert_true(resp_data['msg_id'] is not None)
 
-
 # Common
 @when('the draft is saved')
 def step_impl(context):
