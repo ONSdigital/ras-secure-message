@@ -125,7 +125,7 @@ class MessageSend(Resource):
         is_draft = False
         draft_id = None
         if 'msg_id' in post_data:
-            is_draft = DraftModifyById().check_valid_draft(post_data['msg_id'])
+            is_draft = DraftModifyById().check_valid_draft(post_data['msg_id'])[0]
             if is_draft is True:
                 draft_id = post_data['msg_id']
                 post_data['msg_id'] = ''

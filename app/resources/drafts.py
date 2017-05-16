@@ -8,7 +8,7 @@ from werkzeug.exceptions import BadRequest
 from app.repository.database import Status
 from app.repository.modifier import Modifier
 from app.repository.retriever import Retriever
-from flask import g
+from flask import g, Response
 import hashlib
 
 class Drafts(Resource):
@@ -82,6 +82,13 @@ class DraftModifyById(Resource):
         is_draft = self.check_valid_draft(draft_id)
         if is_draft is False:
             raise (BadRequest(description="Draft put requires valid draft"))
+
+        not_modified = self.etag_check(request.headers, is_draft[1])
+        if not_modified == False:
+            res = Response(response="Draft has been modified since last check", status=409,
+                           mimetype="text/html")
+            return res
+
         draft = DraftSchema().load(data)
         if draft.errors == {}:
             self.replace_draft(draft_id, draft.data)
@@ -99,11 +106,21 @@ class DraftModifyById(Resource):
         db_model = Status()
         result = db_model.query.filter_by(msg_id=draft_id, label=Labels.DRAFT.value).first()
         if result is None:
-            return False
+            return False, result
         else:
-            return True
+            return True, result
 
     @staticmethod
     def replace_draft(draft_id, draft):
         modifier = Modifier()
         modifier.replace_current_draft(draft_id, draft)
+
+    @staticmethod
+    def etag_check(headers, current_draft):
+        if headers.get('etag'):
+            hash_object = hashlib.sha1(str(sorted(current_draft.items())).encode())
+            current_etag = hash_object.hexdigest()
+            if current_etag == headers.get('etag'):
+                return True
+            else:
+                return False
