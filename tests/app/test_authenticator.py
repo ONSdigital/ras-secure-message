@@ -65,7 +65,7 @@ class AuthenticationTestCase(unittest.TestCase):
         with self.assertRaises(BadRequest):
             check_jwt(encode(data))
 
-    def test_authenticate_pass(self):
+    def test_authenticate_request_with_correct_header_data(self):
         """Authenticate request using authenticate function and with correct header data"""
         expected_res = {'status': "ok"}
         data = {
@@ -81,7 +81,7 @@ class AuthenticationTestCase(unittest.TestCase):
             res = authenticate(headers={'authentication': encrypted_jwt})
         self.assertEqual(res, expected_res)
 
-    def test_authenticate_fail(self):
+    def test_authenticate_request_with_incorrect_header_data(self):
         """Authenticate request using authenticate function and without header data"""
         expected_res = Response(response="Invalid token to access this Microservice Resource",
                                 status=400, mimetype="text/html")
