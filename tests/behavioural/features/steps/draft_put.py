@@ -8,7 +8,7 @@ from app.authentication.jwe import Encrypter
 from app import settings, constants
 
 url = "http://localhost:5050/draft/{0}/modify"
-token_data = {'user_urn': '00000000000'}
+token_data = {'user_urn': 'internal.00000000000'}
 headers = {'Content-Type': 'application/json', 'authentication': ''}
 
 post_data = {'urn_to': 'test',
@@ -50,6 +50,8 @@ def step_impl(context):
     add_draft = app.test_client().post('http://localhost:5050/draft/save', data=json.dumps(post_data), headers=headers)
     post_resp = json.loads(add_draft.data)
     context.msg_id = post_resp['msg_id']
+    get_draft = app.test_client().get('http://localhost:5050/draft/{0}'.format(context.msg_id), headers=headers)
+    context.etag = get_draft.headers.get('ETag')
     data.update({'msg_id': context.msg_id,
                  'urn_to': 'test',
                  'urn_from': 'test',
@@ -64,6 +66,10 @@ def step_impl(context):
 
 @when('the user saves the draft')
 def step_impl(context):
+    if 'ETag' in headers:
+        del headers['ETag']
+    if hasattr(context, 'etag'):
+        headers['ETag'] = context.etag
     context.response = app.test_client().put(url.format(context.msg_id), data=json.dumps(data), headers=headers)
 
 
@@ -166,6 +172,8 @@ def step_impl(context):
     add_draft = app.test_client().post('http://localhost:5050/draft/save', data=json.dumps(post_data), headers=headers)
     post_resp = json.loads(add_draft.data)
     context.msg_id = post_resp['msg_id']
+    get_draft = app.test_client().get('http://localhost:5050/draft/{0}'.format(context.msg_id), headers=headers)
+    context.etag = get_draft.headers.get('ETag')
     data.update({'msg_id': context.msg_id,
                  'urn_to': 'test',
                  'urn_from': 'test',
@@ -184,6 +192,8 @@ def step_impl(context):
     add_draft = app.test_client().post('http://localhost:5050/draft/save', data=json.dumps(post_data), headers=headers)
     post_resp = json.loads(add_draft.data)
     context.msg_id = post_resp['msg_id']
+    get_draft = app.test_client().get('http://localhost:5050/draft/{0}'.format(context.msg_id), headers=headers)
+    context.etag = get_draft.headers.get('ETag')
     data.update({'msg_id': context.msg_id,
                  'urn_to': 'test',
                  'urn_from': 'test',
@@ -202,6 +212,8 @@ def step_impl(context):
     add_draft = app.test_client().post('http://localhost:5050/draft/save', data=json.dumps(post_data), headers=headers)
     post_resp = json.loads(add_draft.data)
     context.msg_id = post_resp['msg_id']
+    get_draft = app.test_client().get('http://localhost:5050/draft/{0}'.format(context.msg_id), headers=headers)
+    context.etag = get_draft.headers.get('ETag')
     data.update({'msg_id': context.msg_id,
                  'urn_to': 'test',
                  'urn_from': 'test',
@@ -220,6 +232,8 @@ def step_impl(context):
     add_draft = app.test_client().post('http://localhost:5050/draft/save', data=json.dumps(post_data), headers=headers)
     post_resp = json.loads(add_draft.data)
     context.msg_id = post_resp['msg_id']
+    get_draft = app.test_client().get('http://localhost:5050/draft/{0}'.format(context.msg_id), headers=headers)
+    context.etag = get_draft.headers.get('ETag')
     data.update({'msg_id': context.msg_id,
                  'urn_to': 'test',
                  'urn_from': 'test',
@@ -247,3 +261,52 @@ def step_impl(context):
                  'collection_case': 'collection case1',
                  'reporting_unit': 'reporting case1',
                  'survey': 'survey'})
+
+
+# Scenario 12: A user is editing a draft while another user tries to modify the same draft
+@given("a draft message is being edited")
+def step_impl(context):
+        add_draft = app.test_client().post('http://localhost:5050/draft/save', data=json.dumps(post_data),
+                                           headers=headers)
+        post_resp = json.loads(add_draft.data)
+        context.msg_id = post_resp['msg_id']
+        get_draft = app.test_client().get('http://localhost:5050/draft/{0}'.format(context.msg_id),
+                                          headers=headers)
+        context.etag = get_draft.headers.get('ETag')
+        data.update({'msg_id': context.msg_id,
+                     'urn_to': 'test',
+                     'urn_from': 'test',
+                     'subject': 'test',
+                     'body': 'test',
+                     'thread_id': '2',
+                     'collection_case': 'collection case1',
+                     'reporting_unit': 'reporting case1',
+                     'survey': 'survey'})
+        data['body'] = ''
+        headers['Etag'] = context.etag
+        context.response = app.test_client().put("http://localhost:5050/draft/{0}/modify".format(context.msg_id),
+                                                 data=json.dumps(data), headers=headers)
+        retrieved_draft = app.test_client().get('http://localhost:5050/draft/{0}'.format(context.msg_id), headers=headers)
+
+
+@when("another user tries to modify the same draft message")
+def step_impl(context):
+    data.update({'msg_id': context.msg_id,
+                 'urn_to': 'test',
+                 'urn_from': 'test',
+                 'subject': 'test',
+                 'body': 'test',
+                 'thread_id': '2',
+                 'collection_case': 'collection case1',
+                 'reporting_unit': 'reporting case1',
+                 'survey': 'survey'})
+
+    data['subject'] = 'edited'
+    headers['Etag'] = context.etag
+    context.response = app.test_client().get("http://localhost:5050/draft/{0}/modify".format(context.msg_id),
+                                             data=json.dumps(data), headers=headers)
+
+
+@then("a conflict error is returned")
+def step_impl(context):
+    nose.tools.assert_equal(context.response.status_code, 409)

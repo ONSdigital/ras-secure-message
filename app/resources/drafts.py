@@ -1,5 +1,7 @@
 from flask_restful import Resource
 from flask import request, jsonify
+from sqlalchemy import exc
+
 from app.repository.saver import Saver
 from app.validation.labels import Labels
 from app.validation.domain import DraftSchema
@@ -104,8 +106,11 @@ class DraftModifyById(Resource):
     @staticmethod
     def check_valid_draft(draft_id, user_urn):
         """Check msg_id is that of a valid draft"""
-        result = SecureMessage.query.filter(SecureMessage.msg_id == draft_id)\
-            .filter(SecureMessage.statuses.any(Status.label == Labels.DRAFT.value)).first()
+        try:
+            result = SecureMessage.query.filter(SecureMessage.msg_id == draft_id)\
+                .filter(SecureMessage.statuses.any(Status.label == Labels.DRAFT.value)).first()
+        except Exception as e:
+            var = e
         if result is None:
             return False, result
         else:
