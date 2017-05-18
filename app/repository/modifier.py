@@ -97,10 +97,10 @@ class Modifier:
     @staticmethod
     def replace_current_draft(draft_id, draft):
         Modifier.del_draft(draft_id, del_status=False)
-        save_new_draft = "INSERT INTO secure_message (msg_id, subject, body, thread_id, sent_date, read_date, " \
+        save_new_draft = "INSERT INTO secure_message (msg_id, subject, body, thread_id, " \
                          "collection_case, reporting_unit, survey) VALUES ('{0}', '{1}', '{2}', '{3}'," \
-                         " '{4}', '{5}', '{6}', '{7}', '{8}')"\
-                         .format(draft_id, draft.subject, draft.body, draft.thread_id, None, None, draft.collection_case, draft.reporting_unit,
+                         " '{4}', '{5}', '{6}')"\
+                         .format(draft_id, draft.subject, draft.body, draft.thread_id, draft.collection_case, draft.reporting_unit,
                                  draft.survey)
 
         try:

@@ -102,6 +102,21 @@ def step_impl(context):
     nose.tools.assert_equal(context.response.status_code, 403)
 
 
+#   Scenario: User is retrieving the etag from the header
+# @given("Given a user is requesting a draft")
+# def step_impl(context):
+#     context.response = app.test_client().get(url.format(context.resp_data['msg_id']), headers=headers)
+#
+#
+# @when("When the etag is within the header")
+# def step_impl(context):
+#     pass
+#
+#
+# @then("the user receives a success message")
+# def step_impl(context):
+#     nose.tools.assert_equal(context.response.status_code, 200)
+
 #   common
 
 @when('the user requests the draft')
