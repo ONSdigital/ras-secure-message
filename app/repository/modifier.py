@@ -5,7 +5,6 @@ from werkzeug.exceptions import InternalServerError
 from app.validation.labels import Labels
 from app.validation.user import User
 from datetime import timezone, datetime
-from app.repository.saver import Saver
 logger = logging.getLogger(__name__)
 
 
@@ -96,6 +95,7 @@ class Modifier:
 
     @staticmethod
     def replace_current_draft(draft_id, draft):
+        """used to replace draft content in message table"""
         Modifier.del_draft(draft_id, del_status=False)
         save_new_draft = "INSERT INTO secure_message (msg_id, subject, body, thread_id, sent_date, read_date, " \
                          "collection_case, reporting_unit, survey) VALUES ('{0}', '{1}', '{2}', '{3}'," \
@@ -114,6 +114,7 @@ class Modifier:
 
     @staticmethod
     def replace_current_recipient_status(draft_id, draft_to):
+        """used to replace the draft INBOX_DRAFT label"""
         del_current_status = "DELETE FROM status WHERE msg_id='{0}' AND label='{1}'" \
             .format(draft_id, Labels.DRAFT_INBOX.value)
         save_new_status = "INSERT INTO status (msg_id, actor, label) VALUES ('{0}', '{1}', '{2}')" \

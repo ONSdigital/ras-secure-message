@@ -30,7 +30,7 @@ class RetrieverTestCase(unittest.TestCase):
 
     def populate_database(self, no_of_messages=0, single=True, add_reply=False, add_draft=False, multiple_users=False):
         with self.engine.connect() as con:
-            for i in range(no_of_messages):
+            for _ in range(no_of_messages):
                 if single:
                     msg_id = str(uuid.uuid4())
                     year = 2016
@@ -132,9 +132,9 @@ class RetrieverTestCase(unittest.TestCase):
         self.populate_database(MESSAGE_QUERY_LIMIT+5)
         with app.app_context():
             with current_app.test_request_context():
-                status, response = Retriever().retrieve_message_list(1, MESSAGE_QUERY_LIMIT, 'respondent.21345')
+                result = Retriever().retrieve_message_list(1, MESSAGE_QUERY_LIMIT, 'respondent.21345')[1]
                 msg = []
-                for message in response.items:
+                for message in result.items:
                     msg.append(message.serialize)
                 self.assertEqual(len(msg), MESSAGE_QUERY_LIMIT)
 
@@ -502,6 +502,7 @@ class RetrieverTestCase(unittest.TestCase):
                 self.assertListEqual(desc_date, date)
 
     def test_no_options(self):
+        """Tests get messages list with no options provided"""
         args = {}
 
         string_query_args, page, limit, ru, survey, cc, label, desc = MessageList._get_options(args)
@@ -516,6 +517,7 @@ class RetrieverTestCase(unittest.TestCase):
         self.assertEqual(desc, True)
 
     def test_three_options(self):
+        """Tests get messages list with few options provided"""
         args = {
             'page': 2,
             'survey': 'Survey',
@@ -533,6 +535,7 @@ class RetrieverTestCase(unittest.TestCase):
         self.assertEqual(desc, True)
 
     def test_all_options(self):
+        """Tests get messages list with all options provided"""
         args = {
             'page': 2,
             'limit': 9,

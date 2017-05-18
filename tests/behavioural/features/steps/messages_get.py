@@ -2,7 +2,6 @@ import flask
 import nose.tools
 from behave import given, then, when
 from app.application import app
-import uuid
 from app.repository import database
 from flask import current_app
 from app.authentication.jwt import encode
@@ -64,9 +63,8 @@ def step_impl(context):
 @then("the retrieved messages should have the correct SENT labels")
 def step_impl(context):
     response = flask.json.loads(context.response.data)
-    for x in range(0, len(response['messages'])):
-        num = x+1
-        nose.tools.assert_equal(response['messages'][str(num)]['labels'], ['SENT'])
+    for x in range(1, len(response['messages'])):
+        nose.tools.assert_equal(response['messages'][str(x)]['labels'], ['SENT'])
 
 
 # Scenario: Internal user sends multiple messages and retrieves the list of messages with their labels
@@ -93,12 +91,11 @@ def step_impl(context):
 @then("the retrieved messages should have the correct INBOX and UNREAD labels")
 def step_impl(context):
     response = flask.json.loads(context.response.data)
-    for x in range(0, len(response['messages'])):
-        num = x+1
-        nose.tools.assert_equal(response['messages'][str(num)]['labels'], ['INBOX', 'UNREAD'])
-        nose.tools.assert_true(len(response['messages'][str(num)]['labels']), 2)
-        nose.tools.assert_true('INBOX' in response['messages'][str(num)]['labels'])
-        nose.tools.assert_true('UNREAD' in response['messages'][str(num)]['labels'])
+    for x in range(1, len(response['messages'])):
+        nose.tools.assert_equal(response['messages'][str(x)]['labels'], ['INBOX', 'UNREAD'])
+        nose.tools.assert_true(len(response['messages'][str(x)]['labels']), 2)
+        nose.tools.assert_true('INBOX' in response['messages'][str(x)]['labels'])
+        nose.tools.assert_true('UNREAD' in response['messages'][str(x)]['labels'])
 
 # Scenario: As an external user I would like to be able to view a lst of messages
 
@@ -413,12 +410,12 @@ def step_impl(context):
 def step_impl(context):
     reset_db()
 
-    for x in range(0, 2):
+    for _ in range(0, 2):
         data['urn_to'] = 'respondent.122342'
         data['urn_from'] = 'internal.12344'
         context.response = app.test_client().post("http://localhost:5050/message/send",
                                                   data=flask.json.dumps(data), headers=headers)
-    for x in range(0, 2):
+    for _ in range(0, 2):
         data['urn_to'] = 'internal.12344'
         data['urn_from'] = 'respondent.122342'
         context.response = app.test_client().post("http://localhost:5050/message/send",

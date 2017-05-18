@@ -33,7 +33,7 @@ class Encrypter:
         self.iv = os.urandom(12)  # 96 bit random IV
 
     def _load_keys(self, private_key, private_key_password, public_key):
-        """ used to load keys"""
+        """used to load keys"""
         private_key_bytes = private_key.encode()  # to bytes
         private_key_password_bytes = private_key_password.encode()
         public_key_bytes = public_key.encode()
@@ -43,9 +43,8 @@ class Encrypter:
         self.public_key = backend.load_pem_public_key(public_key_bytes)
 
     def encrypt_token(self, token):
-        """
-        Function to encrypt jwt
-        """
+        """Function to encrypt jwt"""
+
         jwe_protected_header = self._base_64_encode(b'{"alg":"RSA-OAEP","enc":"A256GCM"}')
 
         encrypted_key = self._base_64_encode(self.public_key.encrypt(self.cek, padding.OAEP(
