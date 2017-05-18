@@ -13,8 +13,10 @@ from app.application import app
 from app.authentication.jwt import encode
 from app.authentication.jwe import Encrypter
 from app import settings
-import uuid, hashlib
+import uuid
+import hashlib
 from app.resources.drafts import DraftModifyById
+from werkzeug.exceptions import InternalServerError
 
 
 class DraftTestCase(unittest.TestCase):
@@ -282,3 +284,12 @@ class DraftTestCase(unittest.TestCase):
         etag = '1234567sdfghj98765fgh'
 
         self.assertFalse(DraftModifyById.etag_check({'etag': etag}, is_valid_draft[1]))
+
+    def test_check_valid_draft_t_raises_error(self):
+        """Test check_valid_draft function raises internal server error"""
+        msg_id = str(uuid.uuid4())
+        with app.app_context():
+            database.db.drop_all()
+            with current_app.test_request_context():
+                with self.assertRaises(InternalServerError):
+                    DraftModifyById.check_valid_draft(msg_id, 'respondent.21345')

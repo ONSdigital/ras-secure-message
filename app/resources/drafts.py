@@ -1,7 +1,6 @@
 from flask_restful import Resource
 from flask import request, jsonify
-from sqlalchemy import exc
-
+import logging
 from app.repository.saver import Saver
 from app.validation.labels import Labels
 from app.validation.domain import DraftSchema
@@ -10,8 +9,12 @@ from werkzeug.exceptions import BadRequest
 from app.repository.database import SecureMessage, Status
 from app.repository.modifier import Modifier
 from app.repository.retriever import Retriever
+from werkzeug.exceptions import InternalServerError
 from flask import g, Response
 import hashlib
+
+logger = logging.getLogger(__name__)
+
 
 class Drafts(Resource):
     """Rest endpoint for draft messages"""
@@ -110,7 +113,9 @@ class DraftModifyById(Resource):
             result = SecureMessage.query.filter(SecureMessage.msg_id == draft_id)\
                 .filter(SecureMessage.statuses.any(Status.label == Labels.DRAFT.value)).first()
         except Exception as e:
-            var = e
+            logger.error(e)
+            raise (InternalServerError(description="Error retrieving message from database"))
+
         if result is None:
             return False, result
         else:

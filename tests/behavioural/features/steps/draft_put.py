@@ -287,7 +287,6 @@ def step_impl(context):
         headers['Etag'] = context.etag
         context.response = app.test_client().put("http://localhost:5050/draft/{0}/modify".format(context.msg_id),
                                                  data=json.dumps(data), headers=headers)
-        retrieved_draft = app.test_client().get('http://localhost:5050/draft/{0}'.format(context.msg_id), headers=headers)
 
 
 @when("another user tries to modify the same draft message")
