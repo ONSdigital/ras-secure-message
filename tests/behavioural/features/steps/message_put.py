@@ -1,4 +1,3 @@
-import uuid
 from flask import json
 import flask
 import nose.tools

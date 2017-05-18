@@ -105,6 +105,7 @@ class MessageSchema(Schema):
             logger.debug("{0} field is too large {1}  max size: {2}".format(field_name, length, max_field_len))
             raise ValidationError('{0} field length must not be greater than {1}.'.format(field_name, max_field_len))
 
+
 class DraftSchema(Schema):
     """Class to marshal JSON to Draft"""
 

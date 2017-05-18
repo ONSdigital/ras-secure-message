@@ -27,7 +27,7 @@ class MessageList(Resource):
 
     @staticmethod
     def get():
-
+        """Get message list with options"""
         string_query_args, page, limit, ru, survey, cc, label, desc = MessageList._get_options(request.args)
 
         message_service = Retriever()
@@ -41,6 +41,7 @@ class MessageList(Resource):
 
     @staticmethod
     def _get_options(args):
+        """extract options"""
         string_query_args = '?'
         page = 1
         limit = MESSAGE_QUERY_LIMIT
@@ -76,6 +77,7 @@ class MessageList(Resource):
 
     @staticmethod
     def _add_string_query_args(string_query_args, arg, val):
+        """Create query string for get messages options"""
         if string_query_args == '?':
             return '{0}{1}={2}'.format(string_query_args, arg, val)
         else:
