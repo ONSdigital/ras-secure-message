@@ -42,7 +42,7 @@ class Drafts(Resource):
 
         if draft.data.urn_to is not None and len(draft.data.urn_to) != 0:
             Drafts._save_draft_status(saver, draft.data.msg_id, draft.data.urn_to, draft.data.survey,
-                                      Labels.DRAFT.value)
+                                      Labels.DRAFT_INBOX.value)
 
         Drafts._save_draft_status(saver, draft.data.msg_id, draft.data.urn_from, draft.data.survey, Labels.DRAFT.value)
 
