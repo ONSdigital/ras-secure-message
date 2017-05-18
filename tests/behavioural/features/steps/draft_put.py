@@ -1,4 +1,4 @@
-from behave import given, when,then
+from behave import given, when, then
 from app.application import app
 from app.repository import database
 from flask import current_app, json

@@ -103,22 +103,28 @@ def step_impl(context):
 
 
 #   Scenario: User is retrieving the etag from the header
-# @given("Given a user is requesting a draft")
-# def step_impl(context):
-#     context.response = app.test_client().get(url.format(context.resp_data['msg_id']), headers=headers)
-#
-#
-# @when("When the etag is within the header")
-# def step_impl(context):
-#     pass
-#
-#
-# @then("the user receives a success message")
-# def step_impl(context):
-#     nose.tools.assert_equal(context.response.status_code, 200)
+@given("there is a draft")
+def step_impl(context):
+    data.update({'urn_to': 'test',
+                 'urn_from': 'test',
+                 'subject': 'test',
+                 'body': 'Test',
+                 'thread_id': '',
+                 'collection_case': 'collection case1',
+                 'reporting_unit': 'reporting case1',
+                 'survey': 'survey'})
+    response = app.test_client().post("http://localhost:5050/draft/save", data=json.dumps(data),
+                                      headers=headers)
+    context.resp_data = json.loads(response.data)
+
+
+@then("a etag should be sent with the draft")
+def step_impl(context):
+    etag = context.response.headers.get('ETag')
+    nose.tools.assert_is_not_none(etag)
+
 
 #   common
-
 @when('the user requests the draft')
 def step_impl(context):
     context.response = app.test_client().get(url.format(context.resp_data['msg_id']), headers=headers)
