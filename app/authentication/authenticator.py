@@ -10,8 +10,8 @@ logger = logging.getLogger(__name__)
 
 def authenticate(headers):
 
-    if headers.get('authentication'):
-        jwt_token = headers.get('authentication')
+    if headers.get('Authorization'):
+        jwt_token = headers.get('Authorization')
 
         res = check_jwt(jwt_token)
 
@@ -19,7 +19,7 @@ def authenticate(headers):
 
     else:
         res = Response(response="Invalid token to access this Microservice Resource", status=400, mimetype="text/html")
-        logger.debug("""The message does not have any JWT needed for authentication.""")
+        logger.debug("""The message does not have any JWT needed for .""")
         return res
 
 

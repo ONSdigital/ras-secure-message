@@ -15,7 +15,7 @@ token_data = {
             "user_urn": "000000000"
         }
 
-headers = {'Content-Type': 'application/json', 'authentication': ''}
+headers = {'Content-Type': 'application/json', 'Authorization': ''}
 
 data = {'urn_to': 'test',
         'urn_from': 'test',
@@ -37,7 +37,7 @@ def update_encrypted_jwt():
     signed_jwt = encode(token_data)
     return encrypter.encrypt_token(signed_jwt)
 
-headers['authentication'] = update_encrypted_jwt()
+headers['Authorization'] = update_encrypted_jwt()
 
 
 def reset_db():
@@ -259,7 +259,7 @@ def step_impl(context):
 @when("the internal user opens the message")
 def step_impl(context):
     token_data['user_urn'] = data['urn_from']
-    headers['authentication'] = update_encrypted_jwt()
+    headers['Authorization'] = update_encrypted_jwt()
     response_get = app.test_client().get("http://localhost:5050/message/{0}".format(context.msg_id), headers=headers)
     context.get_json = json.loads(response_get.data)
 

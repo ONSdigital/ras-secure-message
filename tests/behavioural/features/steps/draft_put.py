@@ -9,7 +9,7 @@ from app import settings, constants
 
 url = "http://localhost:5050/draft/{0}/modify"
 token_data = {'user_urn': '00000000000'}
-headers = {'Content-Type': 'application/json', 'authentication': ''}
+headers = {'Content-Type': 'application/json', 'Authorization': ''}
 
 post_data = {'urn_to': 'test',
              'urn_from': 'test',
@@ -41,7 +41,7 @@ def update_encrypted_jwt():
     signed_jwt = encode(token_data)
     return encrypter.encrypt_token(signed_jwt)
 
-headers['authentication'] = update_encrypted_jwt()
+headers['Authorization'] = update_encrypted_jwt()
 
 
 # Scenario 1: A user edits a previously saved draft

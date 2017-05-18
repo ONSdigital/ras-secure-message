@@ -78,7 +78,7 @@ class AuthenticationTestCase(unittest.TestCase):
         encrypted_jwt = encrypter.encrypt_token(signed_jwt)
 
         with app.app_context():
-            res = authenticate(headers={'authentication': encrypted_jwt})
+            res = authenticate(headers={'Authorization': encrypted_jwt})
         self.assertEqual(res, expected_res)
 
     def test_authenticate_request_with_incorrect_header_data(self):

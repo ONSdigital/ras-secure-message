@@ -36,7 +36,7 @@ class FlaskTestCase(unittest.TestCase):
 
         self.url = "http://localhost:5050/draft/save"
 
-        self.headers = {'Content-Type': 'application/json', 'authentication': encrypted_jwt}
+        self.headers = {'Content-Type': 'application/json', 'Authorization': encrypted_jwt}
 
         self.test_message = {'urn_to': 'richard',
                              'urn_from': 'torrance',
