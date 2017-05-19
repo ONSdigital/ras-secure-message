@@ -313,6 +313,7 @@ def step_impl(context):
 
 
 #  Scenario: User retrieves etag from the header when modifying a draft
+@given('there is a draft to be modified')
 def step_impl(context):
     add_draft = app.test_client().post('http://localhost:5050/draft/save', data=json.dumps(post_data),
                                        headers=headers)
@@ -325,7 +326,8 @@ def step_impl(context):
 
 @when('the user modifies the draft')
 def step_impl(context):
-    data.update({'urn_to': 'internal.000000',
+    data.update({'msg_id':context.msg_id,
+                 'urn_to': 'internal.000000',
                  'urn_from': 'respondent.000000',
                  'subject': 'test',
                  'body': 'Edited',
@@ -333,8 +335,11 @@ def step_impl(context):
                  'collection_case': 'collection case1',
                  'reporting_unit': 'reporting case1',
                  'survey': 'survey'})
-    context.response = app.test_client().post("http://localhost:5050/draft/save", data=json.dumps(data),
-                                      headers=headers)
+
+    if 'ETag' in headers:
+        del headers['ETag']
+    context.response = app.test_client().put(url.format(context.msg_id),
+                                             data=json.dumps(data), headers=headers)
 
 
 @then("a new etag should be returned to the user")

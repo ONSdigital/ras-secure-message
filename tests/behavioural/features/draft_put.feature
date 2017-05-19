@@ -62,13 +62,13 @@ Feature: Draft Put Endpoint
     When the user modifies the draft
     Then a new etag should be returned to the user
 
+  Scenario: A user is editing a draft while another user tries to modify the same draft
+    Given a draft message is being edited
+    When another user tries to modify the same draft message
+    Then a conflict error is returned
+
   @ignore
   Scenario: A etag is not present within the header
     Given a message is retrieved
     When there is no etag in the header
     Then a bad request error is returned
-
-  Scenario: A user is editing a draft while another user tries to modify the same draft
-    Given a draft message is being edited
-    When another user tries to modify the same draft message
-    Then a conflict error is returned

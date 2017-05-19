@@ -17,18 +17,24 @@ logger = logging.getLogger(__name__)
 
 
 class Drafts(Resource):
-    """Rest endpoint for draft messages"""
-
     def post(self):
         """Handles saving of new draft"""
         post_data = request.get_json()
+        draft = DraftSchema().load(post_data)
+
         if 'msg_id' in post_data:
             raise (BadRequest(description="Message can not include msg_id"))
-        draft = DraftSchema().load(post_data)
 
         if draft.errors == {}:
             self.save_draft(draft)
+            user_urn = g.user_urn
+            message_service = Retriever()
+            saved_draft = message_service.retrieve_draft(draft.data.msg_id, user_urn)
+
+            hash_object = hashlib.sha1(str(sorted(saved_draft.items())).encode())
+            etag = hash_object.hexdigest()
             resp = jsonify({'status': 'OK', 'msg_id': draft.data.msg_id})
+            resp.headers['ETag'] = etag
             resp.status_code = 201
             return resp
         else:
@@ -98,7 +104,15 @@ class DraftModifyById(Resource):
         draft = DraftSchema().load(data)
         if draft.errors == {}:
             self.replace_draft(draft_id, draft.data)
+
+            user_urn = g.user_urn
+            message_service = Retriever()
+            modified_draft = message_service.retrieve_draft(draft_id, user_urn)
+
+            hash_object = hashlib.sha1(str(sorted(modified_draft.items())).encode())
+            etag = hash_object.hexdigest()
             resp = jsonify({'status': 'OK', 'msg_id': draft_id})
+            resp.headers['ETag'] = etag
             resp.status_code = 200
             return resp
         else:
