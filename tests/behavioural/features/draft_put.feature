@@ -57,6 +57,11 @@ Feature: Draft Put Endpoint
     When the user saves the draft
     Then a bad request error is returned
 
+  Scenario: User retrieves etag from the header when modifying a draft
+    Given there is a draft to be modified
+    When the user modifies the draft
+    Then a new etag should be returned to the user
+
   @ignore
   Scenario: A etag is not present within the header
     Given a message is retrieved

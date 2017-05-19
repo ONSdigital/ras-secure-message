@@ -310,3 +310,36 @@ def step_impl(context):
 @then("a conflict error is returned")
 def step_impl(context):
     nose.tools.assert_equal(context.response.status_code, 409)
+
+
+#  Scenario: User retrieves etag from the header when modifying a draft
+def step_impl(context):
+    add_draft = app.test_client().post('http://localhost:5050/draft/save', data=json.dumps(post_data),
+                                       headers=headers)
+    post_resp = json.loads(add_draft.data)
+    context.msg_id = post_resp['msg_id']
+    get_draft = app.test_client().get('http://localhost:5050/draft/{0}'.format(context.msg_id),
+                                      headers=headers)
+    context.etag = get_draft.headers.get('ETag')
+
+
+@when('the user modifies the draft')
+def step_impl(context):
+    data.update({'urn_to': 'internal.000000',
+                 'urn_from': 'respondent.000000',
+                 'subject': 'test',
+                 'body': 'Edited',
+                 'thread_id': '',
+                 'collection_case': 'collection case1',
+                 'reporting_unit': 'reporting case1',
+                 'survey': 'survey'})
+    context.response = app.test_client().post("http://localhost:5050/draft/save", data=json.dumps(data),
+                                      headers=headers)
+
+
+@then("a new etag should be returned to the user")
+def step_impl(context):
+    etag = context.response.headers.get('ETag')
+    nose.tools.assert_is_not_none(etag)
+    nose.tools.assert_true(len(etag) == 40)
+    nose.tools.assert_true(etag != context.etag)

@@ -118,10 +118,11 @@ def step_impl(context):
     context.resp_data = json.loads(response.data)
 
 
-@then("a etag should be sent with the draft")
+@then("an etag should be sent with the draft")
 def step_impl(context):
     etag = context.response.headers.get('ETag')
     nose.tools.assert_is_not_none(etag)
+    nose.tools.assert_true(len(etag) == 40)
 
 
 #   common

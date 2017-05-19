@@ -20,4 +20,4 @@ Feature: Get draft by id
   Scenario: User is retrieving the etag from the header
     Given there is a draft
     When the user requests the draft
-    Then a etag should be sent with the draft
+    Then an etag should be sent with the draft
