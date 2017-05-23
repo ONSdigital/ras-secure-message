@@ -36,6 +36,7 @@ class Drafts(Resource):
             resp = jsonify({'status': 'OK', 'msg_id': draft.data.msg_id})
             resp.headers['ETag'] = etag
             resp.status_code = 201
+
             return resp
         else:
             res = jsonify(draft.errors)
@@ -71,14 +72,26 @@ class DraftById(Resource):
         # check user is authorised to view message
         message_service = Retriever()
         draft_data = message_service.retrieve_draft(draft_id, user_urn)
+        # message_service = Retriever()
+        # draft_data = message_service.retrieve_draft(draft_id, user_urn)
+        #
+        # hash_object = hashlib.sha1(str(sorted(draft_data.items())).encode())
+        # etag = hash_object.hexdigest()
+        #
+        # resp = jsonify(draft_data)
+        # resp.headers['ETag'] = etag
+        etag = DraftById.generate_etag(draft_id, user_urn, draft_data)
+        resp = jsonify(draft_data)
+        resp.headers['ETag'] = etag
 
+        return resp
+
+    @staticmethod
+    def generate_etag(draft_id, user_urn, draft_data):
         hash_object = hashlib.sha1(str(sorted(draft_data.items())).encode())
         etag = hash_object.hexdigest()
 
-        resp = jsonify(draft_data)
-        resp.headers['ETag'] = etag
-        return resp
-
+        return etag
 
 class DraftModifyById(Resource):
     """Update message status by id"""
@@ -90,7 +103,7 @@ class DraftModifyById(Resource):
             raise (BadRequest(description="Draft put requires msg_id"))
         if data['msg_id'] != draft_id:
             raise (BadRequest(description="Conflicting msg_id's"))
-        is_draft = self.check_valid_draft(draft_id, g.user_urn)
+        is_draft = self.check_and_return_valid_draft(draft_id, g.user_urn)
         if is_draft[0] is False:
             raise (BadRequest(description="Draft put requires valid draft"))
 
@@ -121,8 +134,8 @@ class DraftModifyById(Resource):
             return resp
 
     @staticmethod
-    def check_valid_draft(draft_id, user_urn):
-        """Check msg_id is that of a valid draft"""
+    def check_and_return_valid_draft(draft_id, user_urn):
+        """Check msg_id is that of a valid draft and return true/false if no ID is present"""
         try:
             result = SecureMessage.query.filter(SecureMessage.msg_id == draft_id)\
                 .filter(SecureMessage.statuses.any(Status.label == Labels.DRAFT.value)).first()
@@ -134,6 +147,7 @@ class DraftModifyById(Resource):
             return False, result
         else:
             return True, result.serialize(user_urn)
+
 
     @staticmethod
     def replace_draft(draft_id, draft):

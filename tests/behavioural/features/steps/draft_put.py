@@ -285,7 +285,7 @@ def step_impl(context):
                      'survey': 'survey'})
         data['body'] = ''
         headers['Etag'] = context.etag
-        context.response = app.test_client().put("http://localhost:5050/draft/{0}/modify".format(context.msg_id),
+        context.response = app.test_client().put(url.format(context.msg_id),
                                                  data=json.dumps(data), headers=headers)
 
 
@@ -303,7 +303,7 @@ def step_impl(context):
 
     data['subject'] = 'edited'
     headers['Etag'] = context.etag
-    context.response = app.test_client().put("http://localhost:5050/draft/{0}/modify".format(context.msg_id),
+    context.response = app.test_client().put(url.format(context.msg_id),
                                              data=json.dumps(data), headers=headers)
 
 

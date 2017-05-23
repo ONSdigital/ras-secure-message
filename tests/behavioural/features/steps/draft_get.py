@@ -82,7 +82,7 @@ def step_impl(context):
 #   Scenario: User requests draft not authorised to view
 
 @given('a user is not authorised')
-def step_impl(context):
+def step_impl(self, context):
     #   waiting for  authorisation to be implemented
     data.update({'urn_to': 'test',
                  'urn_from': 'test',
