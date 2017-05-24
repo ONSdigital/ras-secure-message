@@ -186,7 +186,7 @@ def step_impl(context):
                                              data=json.dumps(data), headers=headers)
 
 
-@then('the other use who tries to send the same message is shown a 409 error status')
+@then('is shown a 409 error status')
 def step_impl(context):
     nose.tools.assert_equal(context.response.status_code, 409)
 

@@ -58,4 +58,4 @@ Feature: Message Send Endpoint
   Scenario: When a message with the label of "Draft" is sent and another user is trying to send the same message return a 409
     Given a draft message is posted
     When another user tries to send the same message
-    Then the other use who tries to send the same message is shown a 409 error status
+    Then is shown a 409 error status
