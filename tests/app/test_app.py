@@ -25,7 +25,7 @@ class FlaskTestCase(unittest.TestCase):
         AlertUser.alert_method = mock.Mock(AlertViaGovNotify)
 
         token_data = {
-            "user_urn": "12345678910"
+            "user_urn": "respondent.12345678910"
         }
         encrypter = Encrypter(_private_key=settings.SM_USER_AUTHENTICATION_PRIVATE_KEY,
                               _private_key_password=settings.SM_USER_AUTHENTICATION_PRIVATE_KEY_PASSWORD,
@@ -202,8 +202,6 @@ class FlaskTestCase(unittest.TestCase):
             for row in request:
                 self.assertTrue(row is not None)
 
-
-
     def test_draft_inbox_labels_removed_on_draft_send(self):
         """Test that draft inbox labels are removed on draft send"""
 
@@ -222,13 +220,27 @@ class FlaskTestCase(unittest.TestCase):
             'survey': 'ACollectionInstrument'
         })
 
-        resp = self.app.post("http://localhost:5050/message/send", data=json.dumps(self.test_message), headers=self.headers)
+        self.app.post("http://localhost:5050/message/send", data=json.dumps(self.test_message), headers=self.headers)
 
         with self.engine.connect() as con:
             request = con.execute("SELECT * FROM status WHERE msg_id='{0}'".format(msg_id))
 
             for row in request:
                 self.assertFalse(row['label'], 'DRAFT_INBOX')
+
+    def test_draft_created_by_respondent_does_not_show_for_internal(self):
+
+        self.test_message.update({
+            'urn_to': 'internal.richard',
+            'urn_from': 'respondent.torrance',
+            'subject': 'MyMessage',
+            'body': 'hello',
+            'collection_case': 'ACollectionCase',
+            'reporting_unit': 'AReportingUnit',
+            'survey': 'ACollectionInstrument'
+        })
+
+        self.app.post("http://localhost:5050/draft/save", data=)
 
 
 if __name__ == '__main__':
