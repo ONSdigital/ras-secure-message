@@ -1,10 +1,10 @@
 import logging
 from app.repository.database import db
-
 from werkzeug.exceptions import InternalServerError
 from app.validation.labels import Labels
 from app.validation.user import User
 from datetime import timezone, datetime
+
 logger = logging.getLogger(__name__)
 
 

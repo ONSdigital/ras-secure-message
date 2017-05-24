@@ -212,8 +212,8 @@ class ModifyTestCase(unittest.TestCase):
                 modifier.del_draft(self.test_message['msg_id'])
 
                 with self.engine.connect() as con:
-                    request = con.execute("SELECT * FROM status WHERE msg_id='{0}' AND actor='{1}'"
-                                          .format('test123', 'respondent.richard'))
+                    request = con.execute("SELECT * FROM status WHERE msg_id='{0}' AND label='DRAFT' "
+                                          .format('test123'))
                     for row in request:
                         self.assertTrue(row is None)
                         break

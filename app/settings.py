@@ -23,7 +23,7 @@ NOTIFICATION_TEMPLATE_ID = 'a1995c3d-68ce-42be-bddf-287b0870544b'
 NOTIFICATION_DEV_EMAIL = os.getenv('NOTIFICATION_DEV_EMAIL', 'gemma.irving@ons.gov.uk')
 
 
-MESSAGE_QUERY_LIMIT = os.getenv('MESSAGE_QUERY_LIMIT', 15)
+MESSAGE_QUERY_LIMIT = os.getenv('MESSAGE_QUERY_LIMIT', 10)
 
 # SQLAlchemy configuration
 

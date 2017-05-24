@@ -38,8 +38,8 @@ class FlaskTestCase(unittest.TestCase):
 
         self.headers = {'Content-Type': 'application/json', 'Authorization': encrypted_jwt}
 
-        self.test_message = {'urn_to': 'richard',
-                             'urn_from': 'torrance',
+        self.test_message = {'urn_to': 'respondent.richard',
+                             'urn_from': 'internal.torrance',
                              'subject': 'MyMessage',
                              'body': 'hello',
                              'thread_id': "",
@@ -201,6 +201,35 @@ class FlaskTestCase(unittest.TestCase):
 
             for row in request:
                 self.assertTrue(row is not None)
+
+
+
+    def test_draft_inbox_labels_removed_on_draft_send(self):
+        """Test that draft inbox labels are removed on draft send"""
+
+        response = self.app.post("http://localhost:5050/draft/save", data=json.dumps(self.test_message), headers=self.headers)
+        resp_data = json.loads(response.data)
+        msg_id = resp_data['msg_id']
+
+        self.test_message.update({
+            'msg_id': msg_id,
+            'urn_to': 'respondent.richard',
+            'urn_from': 'internal.torrance',
+            'subject': 'MyMessage',
+            'body': 'hello',
+            'collection_case': 'ACollectionCase',
+            'reporting_unit': 'AReportingUnit',
+            'survey': 'ACollectionInstrument'
+        })
+
+        resp = self.app.post("http://localhost:5050/message/send", data=json.dumps(self.test_message), headers=self.headers)
+
+        with self.engine.connect() as con:
+            request = con.execute("SELECT * FROM status WHERE msg_id='{0}'".format(msg_id))
+
+            for row in request:
+                self.assertFalse(row['label'], 'DRAFT_INBOX')
+
 
 if __name__ == '__main__':
     unittest.main()
