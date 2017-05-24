@@ -3,6 +3,7 @@ from logging.config import dictConfig
 from flask import Flask, request
 from flask import jsonify
 from flask_restful import Api
+from flask_cors import CORS
 from app import settings
 from app.exception.exceptions import MessageSaveException
 from app.repository import database
@@ -38,6 +39,7 @@ werkzeug_logger.setLevel(level=settings.SMS_WERKZEUG_LOG_LEVEL)
 
 app = Flask(__name__)
 api = Api(app)
+CORS(app)
 app.config['SQLALCHEMY_DATABASE_URI'] = connector.getDatabaseUri()
 app.config['SQLALCHEMY_POOL_SIZE'] = settings.SQLALCHEMY_POOL_SIZE
 app.logger.addHandler(logging.StreamHandler())
@@ -73,14 +75,6 @@ def before_request():
         res = authenticate(request.headers)
         if res != {'status': "ok"}:
             return res
-
-''' Add CORS headers to be compatible with Angular2 user interface'''
-@app.after_request
-def after_request(response):
-    response.headers.add('Access-Control-Allow-Origin', settings.ACCESS_CONTROL_ALLOW_ORIGIN)
-    response.headers.add('Access-Control-Allow-Headers', 'Content-Type, Authorization')
-    response.headers.add('Access-Control-Allow-Methods', 'GET, PUT, POST, DELETE, OPTIONS')
-    return response
 
 @app.errorhandler(MessageSaveException)
 def handle_save_exception(error):
