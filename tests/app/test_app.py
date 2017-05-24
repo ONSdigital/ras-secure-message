@@ -228,20 +228,6 @@ class FlaskTestCase(unittest.TestCase):
             for row in request:
                 self.assertFalse(row['label'], 'DRAFT_INBOX')
 
-    def test_draft_created_by_respondent_does_not_show_for_internal(self):
-
-        self.test_message.update({
-            'urn_to': 'internal.richard',
-            'urn_from': 'respondent.torrance',
-            'subject': 'MyMessage',
-            'body': 'hello',
-            'collection_case': 'ACollectionCase',
-            'reporting_unit': 'AReportingUnit',
-            'survey': 'ACollectionInstrument'
-        })
-
-        self.app.post("http://localhost:5050/draft/save", data=)
-
 
 if __name__ == '__main__':
     unittest.main()
