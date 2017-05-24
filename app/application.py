@@ -71,7 +71,7 @@ api.add_resource(DraftById, '/draft/<draft_id>')
 
 @app.before_request
 def before_request():
-    if request.endpoint is not None and 'health' not in request.endpoint:
+    if request.endpoint is not None and 'health' not in request.endpoint and request.method != 'OPTIONS':
         res = authenticate(request.headers)
         if res != {'status': "ok"}:
             return res
