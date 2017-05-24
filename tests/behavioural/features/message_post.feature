@@ -59,3 +59,9 @@ Feature: Message Send Endpoint
     Given a draft message is posted
     When another user tries to send the same message
     Then is shown a 409 error status
+
+
+  Scenario: A Etag is not present within the header
+    Given a message is created
+    When the message is sent with no Etag
+    Then a 201 status code is the response

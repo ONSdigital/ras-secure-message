@@ -130,7 +130,7 @@ class MessageSend(Resource):
         returned_draft = None
         draft_id = None
         if 'msg_id' in post_data:
-            is_draft, returned_draft = DraftModifyById().check_and_return_valid_draft(post_data['msg_id'], g.user_urn)
+            is_draft, returned_draft = DraftModifyById().draft_modified_since_last_read(post_data['msg_id'], g.user_urn)
             if is_draft is True:
                 draft_id = post_data['msg_id']
                 post_data['msg_id'] = ''

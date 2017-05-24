@@ -191,6 +191,32 @@ def step_impl(context):
     nose.tools.assert_equal(context.response.status_code, 409)
 
 
+# Scenario 13:  Scenario: A Etag is not present within the header
+@given('a message is created')
+def step_impl(context):
+    context.msg = {  'urn_to': 'test',
+                     'urn_from': 'test',
+                     'subject': 'test',
+                     'body': 'Test',
+                     'thread_id': '',
+                     'collection_case': 'collection case1',
+                     'reporting_unit': 'reporting case1',
+                     'survey': 'RSI'}
+
+
+@when('the message is sent with no Etag')
+def step_impl(context):
+    if 'ETag' in headers:
+        del headers['ETag']
+
+    context.response = app.test_client().post(url, data=json.dumps(context.msg), headers=headers)
+
+
+# @then('with no Etag a 200 status code is the response')
+# def step_impl(context):
+#     nose.tools.assert_equal(context.response.status_code, 200)
+
+
 # Common Steps: used in multiple scenarios
 
 

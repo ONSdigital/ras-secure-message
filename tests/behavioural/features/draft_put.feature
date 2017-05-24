@@ -69,6 +69,6 @@ Feature: Draft Put Endpoint
 
   @ignore
   Scenario: A etag is not present within the header
-    Given a message is retrieved
+    Given a message is posted and retrieved
     When there is no etag in the header
-    Then a bad request error is returned
+    Then a success response is given
