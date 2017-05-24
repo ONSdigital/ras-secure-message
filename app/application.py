@@ -73,13 +73,13 @@ def before_request():
         res = authenticate(request.headers)
         if res != {'status': "ok"}:
             return res
-        
+
 ''' Add CORS headers to be compatible with Angular2 user interface'''
 @app.after_request
 def after_request(response):
     response.headers.add('Access-Control-Allow-Origin', settings.ACCESS_CONTROL_ALLOW_ORIGIN)
     response.headers.add('Access-Control-Allow-Headers', 'Content-Type, Authorization')
-    response.headers.add('Access-Control-Allow-Methods', 'GET, PUT, POST, DELETE')
+    response.headers.add('Access-Control-Allow-Methods', 'GET, PUT, POST, DELETE, OPTIONS')
     return response
 
 @app.errorhandler(MessageSaveException)
