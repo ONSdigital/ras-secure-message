@@ -39,6 +39,8 @@ class Drafts(Resource):
             Drafts._save_draft_status(saver, draft.data.msg_id, draft.data.urn_to, draft.data.survey,
                                       Labels.DRAFT.value)
 
+        saver.save_msg_event(draft.data.msg_id, 'Draft_Saved')
+
         Drafts._save_draft_status(saver, draft.data.msg_id, draft.data.urn_from, draft.data.survey, Labels.DRAFT.value)
 
     @staticmethod

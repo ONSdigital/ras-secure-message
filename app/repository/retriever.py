@@ -2,12 +2,13 @@ import logging
 
 from flask import jsonify
 from sqlalchemy.exc import SQLAlchemyError
-from sqlalchemy import and_
+from sqlalchemy import and_, or_, case, func, desc, asc
 from app.validation.labels import Labels
 from werkzeug.exceptions import InternalServerError, NotFound
 
-from app.repository.database import SecureMessage, Status
+from app.repository.database import SecureMessage, Status, Events
 from app.validation.user import User
+
 
 logger = logging.getLogger(__name__)
 
@@ -15,10 +16,9 @@ logger = logging.getLogger(__name__)
 class Retriever:
     """Created when retrieving messages"""
     @staticmethod
-    def retrieve_message_list(page, limit, user_urn, ru=None, survey=None, cc=None, label=None, desc=True):
+    def retrieve_message_list(page, limit, user_urn, ru=None, survey=None, cc=None, label=None, descend=True):
         """returns list of messages from db"""
         user = User(user_urn)
-        date_sort = 'sent_date desc'
         conditions = []
         status_conditions = []
 
@@ -26,7 +26,10 @@ class Retriever:
             status_conditions.append(Status.actor == str(user_urn))
         else:
             #  default survey given this will change once integrated with party service which will provide survey types for internal user
-            status_conditions.append(Status.actor == str(survey))
+            if survey is not None:
+                status_conditions.append(Status.actor == str(survey))
+            else:
+                status_conditions.append(Status.actor == 'bres')
 
         if label is not None:
             status_conditions.append(Status.label == str(label))
@@ -42,13 +45,17 @@ class Retriever:
         if cc is not None:
             conditions.append(SecureMessage.collection_case == str(cc))
 
-        if not desc:
-            date_sort = 'sent_date asc'
-
         try:
-            result = SecureMessage.query.filter(and_(*conditions))\
-                .filter(SecureMessage.statuses.any(and_(*status_conditions)))\
-                .order_by(date_sort).paginate(page, limit, False)
+            if descend:
+                result = SecureMessage.query.join(Events)\
+                    .filter(and_(*conditions)) \
+                    .filter(SecureMessage.statuses.any(and_(*status_conditions))) \
+                    .order_by(desc(Events.date_time)).paginate(page, limit, False)
+            else:
+                result = SecureMessage.query.join(Events)\
+                    .filter(and_(*conditions)) \
+                    .filter(SecureMessage.statuses.any(and_(*status_conditions))) \
+                    .order_by(asc(Events.date_time)).paginate(page, limit, False)
 
         except Exception as e:
             logger.error(e)

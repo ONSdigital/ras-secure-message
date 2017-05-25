@@ -26,21 +26,22 @@ class RetrieverTestCase(unittest.TestCase):
             database.db.init_app(current_app)
             database.db.drop_all()
             database.db.create_all()
+            database.db.engine.execute('pragma foreign_keys=ON')
             self.db = database.db
 
     def populate_database(self, no_of_messages=0, single=True, add_reply=False, add_draft=False, multiple_users=False):
         with self.engine.connect() as con:
             for _ in range(no_of_messages):
+                year = 2016
+                month = random.choice(range(1, 13))
+                day = random.choice(range(1, 29))
+                sent_date = datetime(year, month, day)
                 if single:
                     msg_id = str(uuid.uuid4())
-                    year = 2016
-                    month = random.choice(range(1, 13))
-                    day = random.choice(range(1, 29))
-                    sent_date = datetime(year, month, day)
-                    query = 'INSERT INTO secure_message(msg_id, subject, body, thread_id, sent_date, read_date,' \
+                    query = 'INSERT INTO secure_message(msg_id, subject, body, thread_id,' \
                             ' collection_case, reporting_unit, survey) VALUES ("{0}", "test","test","", ' \
-                            '"{1}", "2017-02-03 00:00:00", "ACollectionCase", "AReportingUnit", ' \
-                            '"SurveyType")'.format(msg_id, sent_date)
+                            '"ACollectionCase", "AReportingUnit", ' \
+                            '"SurveyType")'.format(msg_id)
                     con.execute(query)
                     query = 'INSERT INTO status(label, msg_id, actor) VALUES("SENT", "{0}", "respondent.21345")'.format(
                         msg_id)
@@ -51,11 +52,17 @@ class RetrieverTestCase(unittest.TestCase):
                     query = 'INSERT INTO status(label, msg_id, actor) VALUES("UNREAD", "{0}", "SurveyType")'.format(
                         msg_id)
                     con.execute(query)
+                    query = 'INSERT INTO events(event, msg_id, date_time) VALUES("Sent", "{0}", "{1}")'.format(
+                        msg_id, sent_date)
+                    con.execute(query)
+                    # query = 'INSERT INTO events(event, msg_id, date_time) VALUES("Read", "{0}", "{1}")'.format(
+                    #     msg_id, str(datetime(random.choice(range(2017, 2025)), month, day)))
+                    # con.execute(query)
                 if add_reply:
                     msg_id = str(uuid.uuid4())
-                    query = 'INSERT INTO secure_message(msg_id, subject, body, thread_id, sent_date, read_date,' \
+                    query = 'INSERT INTO secure_message(msg_id, subject, body, thread_id, ' \
                             ' collection_case, reporting_unit, survey) VALUES ("{0}", "test","test","", ' \
-                            '"2017-02-03 00:00:00", "2017-02-03 00:00:00", "ACollectionCase", "AReportingUnit", ' \
+                            ' "ACollectionCase", "AReportingUnit", ' \
                             '"SurveyType")'.format(msg_id)
                     con.execute(query)
                     query = 'INSERT INTO status(label, msg_id, actor) VALUES("SENT", "{0}", "SurveyType")'.format(
@@ -67,11 +74,17 @@ class RetrieverTestCase(unittest.TestCase):
                     query = 'INSERT INTO status(label, msg_id, actor) VALUES("UNREAD", "{0}", "respondent.21345")'\
                         .format(msg_id)
                     con.execute(query)
+                    query = 'INSERT INTO events(event, msg_id, date_time) VALUES("Sent", "{0}", "{1}")'.format(
+                        msg_id, sent_date)
+                    con.execute(query)
+                    # query = 'INSERT INTO events(event, msg_id, date_time) VALUES("Read", "{0}", "{1}")'.format(
+                    #     msg_id, "2017-02-03 00:00:00")
+                    # con.execute(query)
                 if add_draft:
                     msg_id = str(uuid.uuid4())
-                    query = 'INSERT INTO secure_message(msg_id, subject, body, thread_id, sent_date, read_date,' \
+                    query = 'INSERT INTO secure_message(msg_id, subject, body, thread_id, ' \
                             ' collection_case, reporting_unit, survey) VALUES ("{0}", "test","test","", ' \
-                            '"2017-02-03 00:00:00", "2017-02-03 00:00:00", "ACollectionCase", "AReportingUnit", ' \
+                            ' "ACollectionCase", "AReportingUnit", ' \
                             '"SurveyType")'.format(msg_id)
                     con.execute(query)
                     query = 'INSERT INTO status(label, msg_id, actor) VALUES("DRAFT", "{0}", "SurveyType")'.format(
@@ -80,11 +93,14 @@ class RetrieverTestCase(unittest.TestCase):
                     query = 'INSERT INTO status(label, msg_id, actor) VALUES("DRAFT_INBOX", "{0}",' \
                             ' "respondent.21345")'.format(msg_id)
                     con.execute(query)
+                    query = 'INSERT INTO events(event, msg_id, date_time) VALUES("Draft_Saved", "{0}", "{1}")'.format(
+                        msg_id, "2017-02-03 00:00:00")
+                    con.execute(query)
                 if multiple_users:
                     msg_id = str(uuid.uuid4())
-                    query = 'INSERT INTO secure_message(msg_id, subject, body, thread_id, sent_date, read_date,' \
+                    query = 'INSERT INTO secure_message(msg_id, subject, body, thread_id, ' \
                             ' collection_case, reporting_unit, survey) VALUES ("{0}", "test","test","", ' \
-                            '"2017-02-03 00:00:00", "2017-02-03 00:00:00", "AnotherCollectionCase", ' \
+                            ' "AnotherCollectionCase", ' \
                             '"AnotherReportingUnit", "AnotherSurveyType")'.format(msg_id)
                     con.execute(query)
                     query = 'INSERT INTO status(label, msg_id, actor) VALUES("SENT", "{0}", "respondent.0000")'\
@@ -96,6 +112,12 @@ class RetrieverTestCase(unittest.TestCase):
                     query = 'INSERT INTO status(label, msg_id, actor) VALUES("UNREAD", "{0}", "AnotherSurveyType")'\
                         .format(msg_id)
                     con.execute(query)
+                    query = 'INSERT INTO events(event, msg_id, date_time) VALUES("Sent", "{0}", "{1}")'.format(
+                        msg_id, sent_date)
+                    con.execute(query)
+                    # query = 'INSERT INTO events(event, msg_id, date_time) VALUES("Read", "{0}", "{1}")'.format(
+                    #     msg_id, "2017-02-03 00:00:00")
+                    # con.execute(query)
 
     def test_0_msg_returned_when_db_empty_true(self):
         """retrieves messages from empty database"""
@@ -474,11 +496,13 @@ class RetrieverTestCase(unittest.TestCase):
         with app.app_context():
             with current_app.test_request_context():
                 response = Retriever().retrieve_message_list(1, MESSAGE_QUERY_LIMIT, 'respondent.21345',
-                                                             desc=True)[1]
+                                                             descend=True)[1]
                 date = []
+                read = []
                 for message in response.items:
                     serialized_msg = message.serialize('respondent.21345')
                     date.append(serialized_msg['sent_date'])
+                    read.append(serialized_msg['read_date'])
 
                 desc_date = sorted(date, reverse=True)
                 self.assertEqual(len(date), 5)
@@ -491,15 +515,17 @@ class RetrieverTestCase(unittest.TestCase):
         with app.app_context():
             with current_app.test_request_context():
                 response = Retriever().retrieve_message_list(1, MESSAGE_QUERY_LIMIT, 'respondent.21345',
-                                                             desc=False)[1]
+                                                             descend=False)[1]
                 date = []
+                read = []
                 for message in response.items:
                     serialized_msg = message.serialize('respondent.21345')
                     date.append(serialized_msg['sent_date'])
+                    read.append(serialized_msg['read_date'])
 
-                desc_date = sorted(date, reverse=False)
+                asc_date = sorted(date, reverse=False)
                 self.assertEqual(len(date), 5)
-                self.assertListEqual(desc_date, date)
+                self.assertListEqual(asc_date, date)
 
     def test_no_options(self):
         """Tests get messages list with no options provided"""
@@ -582,6 +608,55 @@ class RetrieverTestCase(unittest.TestCase):
                     msg_id = str(names[0])
                     response = Retriever().retrieve_draft(msg_id, 'internal.21345')
                     self.assertEqual(response['msg_id'], str(names[0]))
+
+    def test_modified_date_returned_for_draft(self):
+        """retrieves draft using id and checks the modified dates returned"""
+        self.populate_database(1, single=False, add_draft=True)
+        with self.engine.connect() as con:
+            query = 'SELECT msg_id FROM secure_message LIMIT 1'
+            query_x = con.execute(query)
+            names = []
+            for row in query_x:
+                names.append(row[0])
+            with app.app_context():
+                with current_app.test_request_context():
+                    msg_id = str(names[0])
+                    response = Retriever().retrieve_draft(msg_id, 'internal.21345')
+                    self.assertTrue(response['modified_date'] != "N/A")
+                    self.assertEqual(response['read_date'], None)
+                    self.assertEqual(response['sent_date'], "N/A")
+
+    def test_sent_date_returned_for_message(self):
+        """retrieves message using id and checks the sent date returned"""
+        self.populate_database(1)
+        with self.engine.connect() as con:
+            query = 'SELECT msg_id FROM secure_message LIMIT 1'
+            query_x = con.execute(query)
+            names = []
+            for row in query_x:
+                names.append(row[0])
+            with app.app_context():
+                with current_app.test_request_context():
+                    msg_id = str(names[0])
+                    response = Retriever().retrieve_message(msg_id, 'internal.21345')
+                    self.assertEqual(response['modified_date'], "N/A")
+                    self.assertTrue(response['sent_date'] != "N/A")
+
+    def test_read_date_returned_for_message(self):
+        """retrieves message using id and checks the read date returned"""
+        self.populate_database(1)
+        with self.engine.connect() as con:
+            query = 'SELECT msg_id FROM secure_message LIMIT 1'
+            query_x = con.execute(query)
+            names = []
+            for row in query_x:
+                names.append(row[0])
+            with app.app_context():
+                with current_app.test_request_context():
+                    msg_id = str(names[0])
+                    response = Retriever().retrieve_message(msg_id, 'internal.21345')
+                    self.assertEqual(response['modified_date'], "N/A")
+                    self.assertTrue(response['read_date'] != "N/A")
 
     def test_retrieve_draft_with_a_message_msg_id_returns_404(self):
         """retrieves draft using id of an existing message"""

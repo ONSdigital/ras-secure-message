@@ -17,28 +17,31 @@ class SecureMessage(db.Model):
 
     __tablename__ = "secure_message"
 
-    id = Column("id", Integer, primary_key=True)
+    id = Column("id", Integer(), primary_key=True)
     msg_id = Column("msg_id", String(constants.MAX_MSG_ID_LEN), unique=True)
     subject = Column("subject", String(constants.MAX_SUBJECT_LEN+1))
     body = Column("body", String(constants.MAX_BODY_LEN+1))
     thread_id = Column("thread_id", String(constants.MAX_THREAD_LEN + 1))
-    sent_date = Column("sent_date", DateTime)
-    read_date = Column("read_date", DateTime)
     collection_case = Column("collection_case", String(constants.MAX_COLLECTION_CASE_LEN+1))
     reporting_unit = Column("reporting_unit", String(constants.MAX_REPORTING_UNIT_LEN+1))
     survey = Column("survey", String(constants.MAX_SURVEY_LEN+1))
+    read_date = Column("read_date", DateTime)
     statuses = relationship('Status', backref='secure_message')
+    events = relationship('Events', backref='secure_message', order_by='Events.date_time')
+    # read_date = relationship('Events', primaryjoin="and_(SecureMessage.msg_id==Events.msg_id, "
+    #                                                "Events.event=='Read')")
+    # sent_date = relationship('Events', primaryjoin="and_(SecureMessage.msg_id==Events.msg_id, "
+    #                                                "Events.event=='Sent')")
+    # modified_date = relationship('Events', primaryjoin="and_(SecureMessage.msg_id==Events.msg_id, "
+    #                                                    "Events.event=='Draft_Saved')")
 
-    def __init__(self, msg_id="", subject="", body="", thread_id="",
-                 sent_date=datetime.now(timezone.utc), read_date=None, collection_case='',
+    def __init__(self, msg_id="", subject="", body="", thread_id="", collection_case='',
                  reporting_unit='', survey=''):
         logger.debug("Initialised Secure Message entity: msg_id: {}".format(id))
         self.msg_id = msg_id
         self.subject = subject
         self.body = body
         self.thread_id = thread_id
-        self.sent_date = sent_date
-        self.read_date = read_date
         self.collection_case = collection_case
         self.reporting_unit = reporting_unit
         self.survey = survey
@@ -49,8 +52,6 @@ class SecureMessage(db.Model):
         self.subject = domain_model.subject
         self.body = domain_model.body
         self.thread_id = domain_model.thread_id
-        self.sent_date = domain_model.sent_date
-        self.read_date = domain_model.read_date
         self.collection_case = domain_model.collection_case
         self.reporting_unit = domain_model.reporting_unit
         self.survey = domain_model.survey
@@ -64,8 +65,9 @@ class SecureMessage(db.Model):
             'subject': self.subject,
             'body': self.body,
             'thread_id': self.thread_id,
-            'sent_date': self.sent_date,
+            'sent_date': 'N/A',
             'read_date': self.read_date,
+            'modified_date': 'N/A',
             'collection_case': self.collection_case,
             'reporting_unit': self.reporting_unit,
             'survey': self.survey,
@@ -91,6 +93,26 @@ class SecureMessage(db.Model):
             elif row.label == Labels.DRAFT_INBOX.value:
                 message['urn_to'].append(row.actor)
 
+        # if self.modified_date is not None:
+        #     for row in self.modified_date:
+        #         message['modified_date'] = str(row.date_time)
+        #
+        # if self.sent_date is not None:
+        #     for row in self.sent_date:
+        #         message['sent_date'] = str(row.date_time)
+        #
+        # if self.read_date is not None:
+        #     for row in self.read_date:
+        #         message['read_date'] = str(row.date_time)
+
+        for row in self.events:
+            if row.event == 'Sent':
+                message['sent_date'] = str(row.date_time)
+            elif row.event == 'Draft_Saved':
+                message['modified_date'] = str(row.date_time)
+            # elif row.event == 'Read':
+            #     message['read_date'] = str(row.date_time)
+
         return message
 
 
@@ -98,7 +120,7 @@ class Status(db.Model):
     """Label Assignment table model"""
     __tablename__ = "status"
 
-    id = Column('id', Integer, primary_key=True)
+    id = Column('id', Integer(), primary_key=True)
     label = Column('label', String(constants.MAX_STATUS_LABEL_LEN + 1))
     msg_id = Column('msg_id', String(constants.MAX_MSG_ID_LEN + 1), ForeignKey('secure_message.msg_id'))
     actor = Column('actor', String(constants.MAX_STATUS_ACTOR_LEN + 1))
@@ -128,7 +150,7 @@ class InternalSentAudit(db.Model):
     """Label Assignment table model"""
     __tablename__ = "internal_sent_audit"
 
-    id = Column("id", Integer, primary_key=True)
+    id = Column("id", Integer(), primary_key=True)
     msg_id = Column('msg_id', String(constants.MAX_MSG_ID_LEN + 1), ForeignKey('secure_message.msg_id'))
     internal_user = Column('internal_user', String(constants.MAX_STATUS_ACTOR_LEN + 1))
 
@@ -149,3 +171,18 @@ class InternalSentAudit(db.Model):
             'internal_user': self.internal_user
         }
         return data
+
+
+class Events(db.Model):
+    """Events table model"""
+    __tablename__ = "events"
+
+    id = Column('id', Integer(), primary_key=True)
+    event = Column('event', String(constants.MAX_EVENT_LEN + 1))
+    msg_id = Column('msg_id', String(constants.MAX_MSG_ID_LEN + 1), ForeignKey('secure_message.msg_id'))
+    date_time = Column('date_time', DateTime())
+
+    def __init__(self, date_time=datetime.now(timezone.utc), msg_id='', event=''):
+        self.msg_id = msg_id
+        self.event = event
+        self.date_time = date_time

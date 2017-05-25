@@ -1,5 +1,6 @@
 import logging
 from app.repository.database import db
+from app.repository.saver import Saver
 
 from werkzeug.exceptions import InternalServerError
 from app.validation.labels import Labels
@@ -67,28 +68,31 @@ class Modifier:
         """Remove unread label from status"""
         inbox = Labels.INBOX.value
         unread = Labels.UNREAD.value
-        if inbox in message['labels'] and unread in message['labels'] and message['read_date'] is None:
-
+        if inbox in message['labels'] and unread in message['labels'] and message['read_date'] == None:
+            # Saver().save_msg_event(message['msg_id'], 'Read')
             query = "UPDATE secure_message SET read_date = '{0}' WHERE msg_id = '{1}'".format(datetime.now(
-                    timezone.utc), message['msg_id'])
+                timezone.utc), message['msg_id'])
             try:
                 db.get_engine(app=db.get_app()).execute(query)
             except Exception as e:
                 logger.error(e)
                 raise (InternalServerError(description="Error retrieving messages from database"))
-            Modifier.remove_label(unread, message, user_urn)
+        Modifier.remove_label(unread, message, user_urn)
         return True
 
     @staticmethod
-    def del_draft(draft_id, del_status=True):
+    def del_draft(draft_id, del_status=True, del_event=True):
         """Remove draft from status table and secure message table"""
         del_draft_msg = "DELETE FROM secure_message WHERE msg_id='{0}'".format(draft_id)
         del_draft_status = "DELETE FROM status WHERE msg_id='{0}' AND label='{1}'".format(draft_id, Labels.DRAFT.value)
+        del_draft_event = "DELETE FROM events WHERE msg_id='{0}'".format(draft_id)
 
         try:
             db.get_engine(app=db.get_app()).execute(del_draft_msg)
             if del_status is True:
                 db.get_engine(app=db.get_app()).execute(del_draft_status)
+            if del_event is True:
+                db.get_engine(app=db.get_app()).execute(del_draft_event)
         except Exception as e:
             logger.error(e)
             raise (InternalServerError(description="Error retrieving messages from database"))
@@ -97,10 +101,10 @@ class Modifier:
     def replace_current_draft(draft_id, draft):
         """used to replace draft content in message table"""
         Modifier.del_draft(draft_id, del_status=False)
-        save_new_draft = "INSERT INTO secure_message (msg_id, subject, body, thread_id, sent_date, read_date, " \
+        save_new_draft = "INSERT INTO secure_message (msg_id, subject, body, thread_id, " \
                          "collection_case, reporting_unit, survey) VALUES ('{0}', '{1}', '{2}', '{3}'," \
-                         " '{4}', '{5}', '{6}', '{7}', '{8}')"\
-                         .format(draft_id, draft.subject, draft.body, draft.thread_id, None, None, draft.collection_case, draft.reporting_unit,
+                         " '{4}', '{5}', '{6}')"\
+                         .format(draft_id, draft.subject, draft.body, draft.thread_id, draft.collection_case, draft.reporting_unit,
                                  draft.survey)
 
         try:
@@ -108,6 +112,8 @@ class Modifier:
         except Exception as e:
             logger.error(e)
             raise (InternalServerError(description="Error replacing message"))
+
+        Saver().save_msg_event(draft_id, 'Draft_Saved')
 
         if draft.urn_to is not None and len(draft.urn_to) != 0:
             Modifier.replace_current_recipient_status(draft_id, draft.urn_to)

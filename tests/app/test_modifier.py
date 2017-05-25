@@ -1,3 +1,4 @@
+from datetime import datetime, timezone
 import unittest
 import uuid
 from flask import current_app
@@ -32,9 +33,9 @@ class ModifyTestCase(unittest.TestCase):
         with self.engine.connect() as con:
             for i in range(x):
                 msg_id = str(uuid.uuid4())
-                query = 'INSERT INTO secure_message(id, msg_id, subject, body, thread_id, sent_date,' \
+                query = 'INSERT INTO secure_message(id, msg_id, subject, body, thread_id,' \
                         ' collection_case, reporting_unit, survey) VALUES ({0}, "{1}", "test","test","", ' \
-                        '"2017-02-03 00:00:00", "ACollectionCase", "AReportingUnit", ' \
+                        ' "ACollectionCase", "AReportingUnit", ' \
                         '"SurveyType")'.format(i, msg_id)
                 con.execute(query)
                 query = 'INSERT INTO status(label, msg_id, actor) VALUES("SENT", "{0}", "respondent.21345")'.format(
@@ -45,6 +46,12 @@ class ModifyTestCase(unittest.TestCase):
                 con.execute(query)
                 query = 'INSERT INTO status(label, msg_id, actor) VALUES("UNREAD", "{0}", "SurveyType")'.format(
                     msg_id)
+                con.execute(query)
+                query = 'INSERT INTO events(event, msg_id, date_time) VALUES("Sent", "{0}", "{1}")'.format(
+                    msg_id, "2017-02-03 00:00:00")
+                con.execute(query)
+                query = 'INSERT INTO events(event, msg_id, date_time) VALUES("Read", "{0}", "{1}")'.format(
+                    msg_id, "2017-02-03 00:00:00")
                 con.execute(query)
 
     def test_archived_label_is_added_to_message(self):
@@ -220,6 +227,43 @@ class ModifyTestCase(unittest.TestCase):
                     else:
                         pass
 
+    def test_draft_event_is_deleted(self):
+        """Check draft event is deleted for message"""
+        with app.app_context():
+            with current_app.test_request_context():
+                self.test_message = {
+                    'msg_id': 'test123',
+                    'urn_to': 'richard',
+                    'urn_from': 'respondent.richard',
+                    'subject': 'MyMessage',
+                    'body': 'hello',
+                    'thread_id': '',
+                    'collection_case': 'ACollectionCase',
+                    'reporting_unit': 'AReportingUnit',
+                    'survey': 'ACollectionInstrument'
+                }
+
+                modifier = Modifier()
+                with self.engine.connect() as con:
+                    add_draft_event = ("INSERT INTO events (event, msg_id, date_time) "
+                                 "VALUES ('{0}', 'test123', '{1}')").format('Draft_Saved',
+                                                                          datetime.now(timezone.utc))
+                    add_draft = "INSERT INTO secure_message (msg_id, body, subject, thread_id, collection_case, reporting_unit, " \
+                               "survey) VALUES ('{0}', '{1}', '{2}', '{3}', '{4}', '{5}', '{6}')" \
+                        .format(self.test_message['msg_id'], self.test_message['body'], self.test_message['subject'],
+                                self.test_message['thread_id'],
+                                self.test_message['collection_case'], self.test_message['reporting_unit'],
+                                'test')
+                    con.execute(add_draft)
+                    con.execute(add_draft_event)
+                modifier.del_draft(self.test_message['msg_id'])
+
+                with self.engine.connect() as con:
+                    request = con.execute("SELECT * FROM events WHERE msg_id='{0}'"
+                                          .format('test123'))
+                    for row in request:
+                        self.assertTrue(row is None)
+
     def test_replace_current_draft(self):
         """Check current draft is replaced when modified"""
         with app.app_context():
@@ -238,10 +282,10 @@ class ModifyTestCase(unittest.TestCase):
 
                 modifier = Modifier()
                 with self.engine.connect() as con:
-                    add_draft = "INSERT INTO secure_message (msg_id, body, subject, thread_id, sent_date, read_date, collection_case, reporting_unit, " \
-                                "survey) VALUES ('{0}', '{1}', '{2}', '{3}', '{4}', '{5}', '{6}', '{7}', '{8}')"\
+                    add_draft = "INSERT INTO secure_message (msg_id, body, subject, thread_id, collection_case, reporting_unit, " \
+                                "survey) VALUES ('{0}', '{1}', '{2}', '{3}', '{4}', '{5}', '{6}')"\
                                 .format(self.test_message['msg_id'], self.test_message['body'], self.test_message['subject'], self.test_message['thread_id'],
-                                        None, None, self.test_message['collection_case'], self.test_message['reporting_unit'], 'test')
+                                        self.test_message['collection_case'], self.test_message['reporting_unit'], 'test')
                     con.execute(add_draft)
                     draft = DraftSchema().load(self.test_message)
                     modifier.replace_current_draft(self.test_message['msg_id'], draft.data)
@@ -277,6 +321,14 @@ class ModifyTestCase(unittest.TestCase):
                 message = message_service.retrieve_message(msg_id, 'internal.21345')
                 self.assertCountEqual(message['labels'], ['UNREAD', 'INBOX'])
 
+    def test_exception_for_del_unread_raises(self):
+        with app.app_context():
+            database.db.drop_all()
+            with current_app.test_request_context():
+                with self.assertRaises(InternalServerError):
+                    Modifier.del_unread({'labels': ['INBOX', 'UNREAD'], 'read_date': None, 'msg_id': 1},
+                                        'internal.12425')
+
     def test_exception_for_add_label_raises(self):
         # mock_session = mock.Mock(db.session)
         # mock_session.commit.side_effect = Exception("Error retrieving messages from database")
@@ -292,13 +344,6 @@ class ModifyTestCase(unittest.TestCase):
             with current_app.test_request_context():
                 with self.assertRaises(InternalServerError):
                     Modifier.remove_label('UNREAD', {'survey': 'survey'}, 'internal.12425')
-
-    def test_exception_for_del_unread_raises(self):
-        with app.app_context():
-            database.db.drop_all()
-            with current_app.test_request_context():
-                with self.assertRaises(InternalServerError):
-                    Modifier.del_unread({'labels':['INBOX','UNREAD'],'read_date': None, 'msg_id':1 }, 'internal.12425')
 
     def test_exception_for_del_draft_raises(self):
         with app.app_context():

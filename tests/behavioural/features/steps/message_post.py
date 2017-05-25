@@ -30,6 +30,7 @@ def update_encrypted_jwt():
 
 headers['Authorization'] = update_encrypted_jwt()
 
+
 def before_scenario(context):
     AlertUser.alert_method = mock.Mock(AlertViaGovNotify)
 
