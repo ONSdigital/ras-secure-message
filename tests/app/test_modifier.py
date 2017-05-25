@@ -12,25 +12,13 @@ from app.repository.retriever import Retriever
 from app.validation.domain import DraftSchema
 
 
-class ModifyTestCase(unittest.TestCase):
-    """Test case for message retrieval"""
+class ModifyTestCaseHelper:
+    """Helper class for Modify Tests"""
 
-    def setUp(self):
-        """setup test environment"""
-        app.testing = True
-        app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:////tmp/messages.db'
-        self.engine = create_engine('sqlite:////tmp/messages.db', echo=True)
-        self.MESSAGE_LIST_ENDPOINT = "http://localhost:5050/messages"
-        self.MESSAGE_BY_ID_ENDPOINT = "http://localhost:5050/message/"
-        with app.app_context():
-            database.db.init_app(current_app)
-            database.db.drop_all()
-            database.db.create_all()
-            self.db = database.db
-
-    def populate_database(self, x=0):
+    def populate_database(self, record_count=0):
+        """Adds a sppecified number of Messages to the db"""
         with self.engine.connect() as con:
-            for i in range(x):
+            for i in range(record_count):
                 msg_id = str(uuid.uuid4())
                 query = 'INSERT INTO secure_message(id, msg_id, subject, body, thread_id, sent_date,' \
                         ' collection_case, reporting_unit, survey) VALUES ({0}, "{1}", "test","test","", ' \
@@ -46,6 +34,23 @@ class ModifyTestCase(unittest.TestCase):
                 query = 'INSERT INTO status(label, msg_id, actor) VALUES("UNREAD", "{0}", "SurveyType")'.format(
                     msg_id)
                 con.execute(query)
+
+
+class ModifyTestCase(unittest.TestCase, ModifyTestCaseHelper):
+    """Test case for message retrieval"""
+
+    def setUp(self):
+        """setup test environment"""
+        app.testing = True
+        app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:////tmp/messages.db'
+        self.engine = create_engine('sqlite:////tmp/messages.db', echo=True)
+        self.MESSAGE_LIST_ENDPOINT = "http://localhost:5050/messages"
+        self.MESSAGE_BY_ID_ENDPOINT = "http://localhost:5050/message/"
+        with app.app_context():
+            database.db.init_app(current_app)
+            database.db.drop_all()
+            database.db.create_all()
+            self.db = database.db
 
     def test_archived_label_is_added_to_message(self):
         """testing message is added to database with archived label attached"""
@@ -284,7 +289,7 @@ class ModifyTestCase(unittest.TestCase):
             database.db.drop_all()
             with current_app.test_request_context():
                 with self.assertRaises(InternalServerError):
-                    Modifier.add_label('UNREAD', {'survey':'survey'},'internal.12425')
+                    Modifier.add_label('UNREAD', {'survey': 'survey'}, 'internal.12425')
 
     def test_exception_for_remove_label_raises(self):
         with app.app_context():
@@ -320,3 +325,4 @@ class ModifyTestCase(unittest.TestCase):
             with current_app.test_request_context():
                 with self.assertRaises(InternalServerError):
                     Modifier.replace_current_recipient_status('internal.1245','Torrance')
+
