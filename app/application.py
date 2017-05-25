@@ -76,6 +76,7 @@ def before_request():
         if res != {'status': "ok"}:
             return res
 
+
 @app.errorhandler(MessageSaveException)
 def handle_save_exception(error):
     response = jsonify(error.to_dict())
