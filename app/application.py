@@ -3,6 +3,7 @@ from logging.config import dictConfig
 from flask import Flask, request
 from flask import jsonify
 from flask_restful import Api
+from flask_cors import CORS
 from app import settings
 from app.exception.exceptions import MessageSaveException
 from app.repository import database
@@ -38,6 +39,7 @@ werkzeug_logger.setLevel(level=settings.SMS_WERKZEUG_LOG_LEVEL)
 
 app = Flask(__name__)
 api = Api(app)
+CORS(app)
 app.config['SQLALCHEMY_DATABASE_URI'] = connector.getDatabaseUri()
 app.config['SQLALCHEMY_POOL_SIZE'] = settings.SQLALCHEMY_POOL_SIZE
 app.logger.addHandler(logging.StreamHandler())
@@ -69,11 +71,10 @@ api.add_resource(DraftById, '/draft/<draft_id>')
 
 @app.before_request
 def before_request():
-    if request.endpoint is not None and 'health' not in request.endpoint:
+    if request.endpoint is not None and 'health' not in request.endpoint and request.method != 'OPTIONS':
         res = authenticate(request.headers)
         if res != {'status': "ok"}:
             return res
-
 
 @app.errorhandler(MessageSaveException)
 def handle_save_exception(error):
