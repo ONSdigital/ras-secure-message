@@ -13,9 +13,9 @@ from app.validation.domain import DraftSchema
 
 
 class ModifyTestCaseHelper:
-    @staticmethod
-    def populate_database(engine, record_count=0):
-        with engine.connect() as con:
+
+    def populate_database(self, record_count=0):
+        with self.engine.connect() as con:
             for i in range(record_count):
                 msg_id = str(uuid.uuid4())
                 query = 'INSERT INTO secure_message(id, msg_id, subject, body, thread_id, sent_date,' \
@@ -52,7 +52,7 @@ class ModifyTestCase(unittest.TestCase, ModifyTestCaseHelper):
 
     def test_archived_label_is_added_to_message(self):
         """testing message is added to database with archived label attached"""
-        self.populate_database(self.engine, 1)
+        self.populate_database(1)
         with self.engine.connect() as con:
             query = 'SELECT msg_id FROM secure_message LIMIT 1'
             query_x = con.execute(query)
@@ -71,7 +71,7 @@ class ModifyTestCase(unittest.TestCase, ModifyTestCaseHelper):
 
     def test_archived_label_is_removed_from_message(self):
         """testing message is added to database with archived label removed and inbox and read is added instead"""
-        self.populate_database(self.engine, 1)
+        self.populate_database(1)
         with self.engine.connect() as con:
             query = 'SELECT msg_id FROM secure_message LIMIT 1'
             query_x = con.execute(query)
@@ -92,7 +92,7 @@ class ModifyTestCase(unittest.TestCase, ModifyTestCaseHelper):
 
     def test_unread_label_is_removed_from_message(self):
         """testing message is added to database with archived label removed and inbox and read is added instead"""
-        self.populate_database(self.engine, 1)
+        self.populate_database(1)
         with self.engine.connect() as con:
             query = 'SELECT msg_id FROM secure_message LIMIT 1'
             query_x = con.execute(query)
@@ -111,7 +111,7 @@ class ModifyTestCase(unittest.TestCase, ModifyTestCaseHelper):
 
     def test_unread_label_is_added_to_message(self):
         """testing message is added to database with archived label removed and inbox and read is added instead"""
-        self.populate_database(self.engine, 1)
+        self.populate_database(1)
         with self.engine.connect() as con:
             query = 'SELECT msg_id FROM secure_message LIMIT 1'
             query_x = con.execute(query)
@@ -131,7 +131,7 @@ class ModifyTestCase(unittest.TestCase, ModifyTestCaseHelper):
 
     def test_add_archive_is_added_to_internal(self):
         """testing message is added to database with archived label attached"""
-        self.populate_database(self.engine, 1)
+        self.populate_database(1)
         with self.engine.connect() as con:
             query = 'SELECT msg_id FROM secure_message LIMIT 1'
             query_x = con.execute(query)
@@ -151,7 +151,7 @@ class ModifyTestCase(unittest.TestCase, ModifyTestCaseHelper):
 
     def test_read_date_is_set(self):
         """testing message read_date is set when unread label is removed"""
-        self.populate_database(self.engine, 1)
+        self.populate_database(1)
         with self.engine.connect() as con:
             query = 'SELECT msg_id FROM secure_message LIMIT 1'
             query_x = con.execute(query)
@@ -170,7 +170,7 @@ class ModifyTestCase(unittest.TestCase, ModifyTestCaseHelper):
 
     def test_read_date_is_not_reset(self):
         """testing message read_date is not reset when unread label is removed again"""
-        self.populate_database(self.engine, 1)
+        self.populate_database(1)
         with self.engine.connect() as con:
             query = 'SELECT msg_id FROM secure_message LIMIT 1'
             query_x = con.execute(query)
@@ -255,7 +255,7 @@ class ModifyTestCase(unittest.TestCase, ModifyTestCaseHelper):
 
     def test_archive_is_removed_for_both_respondent_and_internal(self):
         """testing archive label is removed after being added to both respondent and internal"""
-        self.populate_database(self.engine,2)
+        self.populate_database(2)
         with self.engine.connect() as con:
             query = 'SELECT msg_id FROM secure_message LIMIT 1'
             query_x = con.execute(query)
@@ -287,7 +287,7 @@ class ModifyTestCase(unittest.TestCase, ModifyTestCaseHelper):
             database.db.drop_all()
             with current_app.test_request_context():
                 with self.assertRaises(InternalServerError):
-                    Modifier.add_label('UNREAD', {'survey':'survey'},'internal.12425')
+                    Modifier.add_label('UNREAD', {'survey': 'survey'}, 'internal.12425')
 
     def test_exception_for_remove_label_raises(self):
         with app.app_context():
