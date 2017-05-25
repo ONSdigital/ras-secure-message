@@ -13,8 +13,10 @@ from app.validation.domain import DraftSchema
 
 
 class ModifyTestCaseHelper:
+    """Helper class for Modify Tests"""
 
     def populate_database(self, record_count=0):
+        """Adds a sppecified number of Messages to the db"""
         with self.engine.connect() as con:
             for i in range(record_count):
                 msg_id = str(uuid.uuid4())

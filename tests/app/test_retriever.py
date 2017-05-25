@@ -14,7 +14,10 @@ import random
 
 
 class RetrieverTestCaseHelper:
+    """Helper class for Retriever Tests"""
+
     def populate_database(self, no_of_messages=0, single=True, add_reply=False, add_draft=False, multiple_users=False):
+        """ Populate the db with a specified number of messages and optionally replies , multiple users"""
         with self.engine.connect() as con:
             for _ in range(no_of_messages):
                 if single:
