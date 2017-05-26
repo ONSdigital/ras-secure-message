@@ -22,7 +22,7 @@ class RetrieverTestCaseHelper:
             for _ in range(no_of_messages):
                 year = 2016
                 month = random.choice(range(1, 13))
-                draft_month = month = random.choice(range(1, 13))
+                draft_month = random.choice(range(1, 13))
                 day = random.choice(range(1, 25))
                 sent_date = datetime(year, month, day)
                 if single:
