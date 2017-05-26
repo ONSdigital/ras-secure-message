@@ -17,7 +17,7 @@ class MessageTestCase(unittest.TestCase):
         sut = Message('to', 'from', 'subject', 'body', '5', 'AMsgId', 'ACollectionCase',
                       'AReportingUnit', 'ASurveyType')
         sut_str = repr(sut)
-        expected = '<Message(msg_id=AMsgId urn_to=to urn_from=from subject=subject body=body thread_id=5 collection_case=ACollectionCase reporting_unit=AReportingUnit survey=ASurveyType)>'.format(now_string)
+        expected = '<Message(msg_id=AMsgId urn_to=to urn_from=from subject=subject body=body thread_id=5 collection_case=ACollectionCase reporting_unit=AReportingUnit survey=ASurveyType)>'
         self.assertEquals(sut_str, expected)
 
     def test_message_with_different_collection_case_not_equal(self):
@@ -71,16 +71,13 @@ class MessageSchemaTestCase(unittest.TestCase):
         result = schema.load(self.json_message)
         self.assertTrue(result.errors == {})
 
-    # def test_valid_domain_message_passes_deserialization(self):
-    #     """checking marshaling message object to json does not raise errors"""
-    #     schema = MessageSchema()
-    #     message_object = Message(**{'urn_to': 'Tej', 'urn_from': 'Gemma', 'subject': 'MyMessage', 'body': 'hello',
-    #                                 'thread_id': "", 'sent_date': datetime.now(timezone.utc),
-    #                                 'read_date': datetime.now(timezone.utc)})
-    #     message_json = schema.dumps(message_object)
-    #     self.assertTrue(message_json.errors == {})
-    #     self.assertTrue('sent_date' in message_json.data)
-    #     self.assertTrue('read_date' in message_json.data)
+    def test_valid_domain_message_passes_deserialization(self):
+        """checking marshaling message object to json does not raise errors"""
+        schema = MessageSchema()
+        message_object = Message(**{'urn_to': 'Tej', 'urn_from': 'Gemma', 'subject': 'MyMessage', 'body': 'hello',
+                                    'thread_id': ""})
+        message_json = schema.dumps(message_object)
+        self.assertTrue(message_json.errors == {})
 
     def test_body_too_big_fails_validation(self):
         """marshalling message with body field too long """

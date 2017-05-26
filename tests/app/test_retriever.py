@@ -22,6 +22,7 @@ class RetrieverTestCaseHelper:
             for _ in range(no_of_messages):
                 year = 2016
                 month = random.choice(range(1, 13))
+                draft_month = month = random.choice(range(1, 13))
                 day = random.choice(range(1, 25))
                 sent_date = datetime(year, month, day)
                 if single:
@@ -30,22 +31,22 @@ class RetrieverTestCaseHelper:
                             ' collection_case, reporting_unit, survey) VALUES ("{0}", "test","test","", ' \
                             '"ACollectionCase", "AReportingUnit", ' \
                             '"SurveyType")'.format(msg_id)
-                    res = con.execute(query)
+                    con.execute(query)
                     query = 'INSERT INTO status(label, msg_id, actor) VALUES("SENT", "{0}", "respondent.21345")'.format(
                         msg_id)
-                    res = con.execute(query)
+                    con.execute(query)
                     query = 'INSERT INTO status(label, msg_id, actor) VALUES("INBOX", "{0}", "SurveyType")'.format(
                         msg_id)
-                    res = con.execute(query)
+                    con.execute(query)
                     query = 'INSERT INTO status(label, msg_id, actor) VALUES("UNREAD", "{0}", "SurveyType")'.format(
                         msg_id)
-                    res = con.execute(query)
+                    con.execute(query)
                     query = 'INSERT INTO events(event, msg_id, date_time) VALUES("Sent", "{0}", "{1}")'.format(
                         msg_id, sent_date)
-                    res = con.execute(query)
+                    con.execute(query)
                     query = 'INSERT INTO events(event, msg_id, date_time) VALUES("Read", "{0}", "{1}")'.format(
                         msg_id, str(datetime(year, month, day+1)))
-                    res = con.execute(query)
+                    con.execute(query)
                 if add_reply:
                     msg_id = str(uuid.uuid4())
                     query = 'INSERT INTO secure_message(msg_id, subject, body, thread_id, ' \
@@ -74,16 +75,16 @@ class RetrieverTestCaseHelper:
                             ' collection_case, reporting_unit, survey) VALUES ("{0}", "test","test","", ' \
                             ' "ACollectionCase", "AReportingUnit", ' \
                             '"SurveyType")'.format(msg_id)
-                    res = con.execute(query)
+                    con.execute(query)
                     query = 'INSERT INTO status(label, msg_id, actor) VALUES("DRAFT_INBOX", "{0}", "respondent.21345")'.format(
                         msg_id)
-                    res = con.execute(query)
+                    con.execute(query)
                     query = 'INSERT INTO status(label, msg_id, actor) VALUES("DRAFT", "{0}",' \
                             ' "SurveyType")'.format(msg_id)
-                    res = con.execute(query)
+                    con.execute(query)
                     query = 'INSERT INTO events(event, msg_id, date_time) VALUES("Draft_Saved", "{0}", "{1}")'.format(
-                        msg_id, datetime(year, random.choice(range(1, 13)), day))
-                    res = con.execute(query)
+                        msg_id, datetime(year, draft_month, day))
+                    con.execute(query)
                 if multiple_users:
                     msg_id = str(uuid.uuid4())
                     query = 'INSERT INTO secure_message(msg_id, subject, body, thread_id, ' \
@@ -114,7 +115,7 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
         """setup test environment"""
         app.testing = True
         app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:////tmp/messages.db'
-        self.engine = create_engine('sqlite:////tmp/messages.db', echo=True)
+        self.engine = create_engine('sqlite:////tmp/messages.db')
         self.MESSAGE_LIST_ENDPOINT = "http://localhost:5050/messages"
         self.MESSAGE_BY_ID_ENDPOINT = "http://localhost:5050/message/"
         with app.app_context():

@@ -50,7 +50,7 @@ class ModifyTestCase(unittest.TestCase, ModifyTestCaseHelper):
         """setup test environment"""
         app.testing = True
         app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:////tmp/messages.db'
-        self.engine = create_engine('sqlite:////tmp/messages.db', echo=True)
+        self.engine = create_engine('sqlite:////tmp/messages.db')
         self.MESSAGE_LIST_ENDPOINT = "http://localhost:5050/messages"
         self.MESSAGE_BY_ID_ENDPOINT = "http://localhost:5050/message/"
         with app.app_context():
