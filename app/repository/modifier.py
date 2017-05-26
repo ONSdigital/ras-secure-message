@@ -69,14 +69,7 @@ class Modifier:
         inbox = Labels.INBOX.value
         unread = Labels.UNREAD.value
         if inbox in message['labels'] and unread in message['labels'] and message['read_date'] == None:
-            # Saver().save_msg_event(message['msg_id'], 'Read')
-            query = "UPDATE secure_message SET read_date = '{0}' WHERE msg_id = '{1}'".format(datetime.now(
-                timezone.utc), message['msg_id'])
-            try:
-                db.get_engine(app=db.get_app()).execute(query)
-            except Exception as e:
-                logger.error(e)
-                raise (InternalServerError(description="Error retrieving messages from database"))
+            Saver().save_msg_event(message['msg_id'], 'Read')
         Modifier.remove_label(unread, message, user_urn)
         return True
 

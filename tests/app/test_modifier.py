@@ -321,14 +321,6 @@ class ModifyTestCase(unittest.TestCase):
                 message = message_service.retrieve_message(msg_id, 'internal.21345')
                 self.assertCountEqual(message['labels'], ['UNREAD', 'INBOX'])
 
-    def test_exception_for_del_unread_raises(self):
-        with app.app_context():
-            database.db.drop_all()
-            with current_app.test_request_context():
-                with self.assertRaises(InternalServerError):
-                    Modifier.del_unread({'labels': ['INBOX', 'UNREAD'], 'read_date': None, 'msg_id': 1},
-                                        'internal.12425')
-
     def test_exception_for_add_label_raises(self):
         # mock_session = mock.Mock(db.session)
         # mock_session.commit.side_effect = Exception("Error retrieving messages from database")

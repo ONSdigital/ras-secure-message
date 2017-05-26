@@ -47,15 +47,19 @@ class Retriever:
 
         try:
             if descend:
-                result = SecureMessage.query.join(Events)\
-                    .filter(and_(*conditions)) \
-                    .filter(SecureMessage.statuses.any(and_(*status_conditions))) \
-                    .order_by(desc(Events.date_time)).paginate(page, limit, False)
+                result = SecureMessage.query.join(Events).join(Status)\
+                    .filter(and_(*conditions))\
+                    .filter(and_(*status_conditions))\
+                    .order_by(case([(Events.event == 'Sent', Events.date_time),
+                                    (Events.event == 'Draft_Saved', Events.date_time)],
+                                   else_=0).desc()).paginate(page, limit, False)
             else:
-                result = SecureMessage.query.join(Events)\
+                result = SecureMessage.query.join(Events).join(Status)\
                     .filter(and_(*conditions)) \
-                    .filter(SecureMessage.statuses.any(and_(*status_conditions))) \
-                    .order_by(asc(Events.date_time)).paginate(page, limit, False)
+                    .filter(and_(*status_conditions)) \
+                    .order_by(case([(Events.event == 'Sent', Events.date_time),
+                                    (Events.event == 'Draft_Saved', Events.date_time)],
+                                   else_='z').asc()).paginate(page, limit, False)
 
         except Exception as e:
             logger.error(e)

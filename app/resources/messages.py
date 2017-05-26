@@ -32,7 +32,7 @@ class MessageList(Resource):
 
         message_service = Retriever()
         status, result = message_service.retrieve_message_list(page, limit, g.user_urn,
-                                                               ru=ru, survey=survey, cc=cc, label=label, desc=desc)
+                                                               ru=ru, survey=survey, cc=cc, label=label, descend=desc)
         if status:
             resp = MessageList._paginated_list_to_json(result, page, limit, request.host_url,
                                                        g.user_urn, string_query_args)
