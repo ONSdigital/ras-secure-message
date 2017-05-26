@@ -72,14 +72,6 @@ class DraftById(Resource):
         # check user is authorised to view message
         message_service = Retriever()
         draft_data = message_service.retrieve_draft(draft_id, user_urn)
-        # message_service = Retriever()
-        # draft_data = message_service.retrieve_draft(draft_id, user_urn)
-        #
-        # hash_object = hashlib.sha1(str(sorted(draft_data.items())).encode())
-        # etag = hash_object.hexdigest()
-        #
-        # resp = jsonify(draft_data)
-        # resp.headers['ETag'] = etag
         etag = DraftById.generate_etag(draft_id, user_urn, draft_data)
         resp = jsonify(draft_data)
         resp.headers['ETag'] = etag
@@ -163,5 +155,6 @@ class DraftModifyById(Resource):
             current_etag = hash_object.hexdigest()
             if current_etag == headers.get('etag'):
                 return True
-            else:
-                return False
+            return False
+        else:
+            return True

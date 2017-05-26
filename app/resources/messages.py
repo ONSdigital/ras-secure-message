@@ -1,5 +1,3 @@
-import hashlib
-
 from flask_restful import Resource
 from flask import request, jsonify, g, Response
 from werkzeug.exceptions import BadRequest
@@ -137,8 +135,8 @@ class MessageSend(Resource):
             else:
                 raise (BadRequest(description="Message can not include msg_id"))
 
-            not_modified = DraftModifyById.etag_check(request.headers, returned_draft)
-            if not_modified is False:
+            last_modified = DraftModifyById.etag_check(request.headers, returned_draft)
+            if last_modified is False:
 
                 res = Response(response="Draft has been modified since last check", status=409,
                            mimetype="text/html")
