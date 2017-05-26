@@ -2,7 +2,7 @@ import logging
 
 from flask import jsonify
 from sqlalchemy.exc import SQLAlchemyError
-from sqlalchemy import and_, or_, case, func, desc, asc
+from sqlalchemy import and_, case
 from app.validation.labels import Labels
 from werkzeug.exceptions import InternalServerError, NotFound
 
@@ -52,14 +52,14 @@ class Retriever:
                     .filter(and_(*status_conditions))\
                     .order_by(case([(Events.event == 'Sent', Events.date_time),
                                     (Events.event == 'Draft_Saved', Events.date_time)],
-                                   else_=0).desc()).paginate(page, limit, False)
+                                   else_=0).desc(), Events.event.desc()).paginate(page, limit, False)
             else:
                 result = SecureMessage.query.join(Events).join(Status)\
                     .filter(and_(*conditions)) \
                     .filter(and_(*status_conditions)) \
                     .order_by(case([(Events.event == 'Sent', Events.date_time),
                                     (Events.event == 'Draft_Saved', Events.date_time)],
-                                   else_='z').asc()).paginate(page, limit, False)
+                                   else_='z').asc(), Events.event.desc()).paginate(page, limit, False)
 
         except Exception as e:
             logger.error(e)

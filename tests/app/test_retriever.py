@@ -13,23 +13,11 @@ from datetime import datetime
 import random
 
 
-class RetrieverTestCase(unittest.TestCase):
-    """Test case for message retrieval"""
-    def setUp(self):
-        """setup test environment"""
-        app.testing = True
-        app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:////tmp/messages.db'
-        self.engine = create_engine('sqlite:////tmp/messages.db', echo=True)
-        self.MESSAGE_LIST_ENDPOINT = "http://localhost:5050/messages"
-        self.MESSAGE_BY_ID_ENDPOINT = "http://localhost:5050/message/"
-        with app.app_context():
-            database.db.init_app(current_app)
-            database.db.drop_all()
-            database.db.create_all()
-            database.db.engine.execute('pragma foreign_keys=ON')
-            self.db = database.db
+class RetrieverTestCaseHelper:
+    """Helper class for Retriever Tests"""
 
     def populate_database(self, no_of_messages=0, single=True, add_reply=False, add_draft=False, multiple_users=False):
+        """ Populate the db with a specified number of messages and optionally replies , multiple users"""
         with self.engine.connect() as con:
             for _ in range(no_of_messages):
                 year = 2016
@@ -118,6 +106,22 @@ class RetrieverTestCase(unittest.TestCase):
                     query = 'INSERT INTO events(event, msg_id, date_time) VALUES("Read", "{0}", "{1}")'.format(
                         msg_id, "2017-02-03 00:00:00")
                     con.execute(query)
+
+
+class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
+    """Test case for message retrieval"""
+    def setUp(self):
+        """setup test environment"""
+        app.testing = True
+        app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:////tmp/messages.db'
+        self.engine = create_engine('sqlite:////tmp/messages.db', echo=True)
+        self.MESSAGE_LIST_ENDPOINT = "http://localhost:5050/messages"
+        self.MESSAGE_BY_ID_ENDPOINT = "http://localhost:5050/message/"
+        with app.app_context():
+            database.db.init_app(current_app)
+            database.db.drop_all()
+            database.db.create_all()
+            self.db = database.db
 
     def test_0_msg_returned_when_db_empty_true(self):
         """retrieves messages from empty database"""

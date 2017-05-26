@@ -1,11 +1,11 @@
 import logging
 from app.repository.database import db
 from app.repository.saver import Saver
-
 from werkzeug.exceptions import InternalServerError
 from app.validation.labels import Labels
 from app.validation.user import User
-from datetime import timezone, datetime
+
+
 logger = logging.getLogger(__name__)
 
 
@@ -79,13 +79,17 @@ class Modifier:
         del_draft_msg = "DELETE FROM secure_message WHERE msg_id='{0}'".format(draft_id)
         del_draft_status = "DELETE FROM status WHERE msg_id='{0}' AND label='{1}'".format(draft_id, Labels.DRAFT.value)
         del_draft_event = "DELETE FROM events WHERE msg_id='{0}'".format(draft_id)
+        del_draft_inbox_status = "DELETE FROM status WHERE msg_id='{0}' AND label='{1}'".format(draft_id, Labels.DRAFT_INBOX.value)
 
         try:
             db.get_engine(app=db.get_app()).execute(del_draft_msg)
             if del_status is True:
                 db.get_engine(app=db.get_app()).execute(del_draft_status)
+                db.get_engine(app=db.get_app()).execute(del_draft_inbox_status)
+
             if del_event is True:
                 db.get_engine(app=db.get_app()).execute(del_draft_event)
+
         except Exception as e:
             logger.error(e)
             raise (InternalServerError(description="Error retrieving messages from database"))
