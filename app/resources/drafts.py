@@ -1,30 +1,42 @@
 from flask_restful import Resource
 from flask import request, jsonify
+import logging
 from app.repository.saver import Saver
 from app.validation.labels import Labels
 from app.validation.domain import DraftSchema
 from app.validation.user import User
 from werkzeug.exceptions import BadRequest
-from app.repository.database import Status
+from app.repository.database import SecureMessage, Status
 from app.repository.modifier import Modifier
 from app.repository.retriever import Retriever
-from flask import g
+from werkzeug.exceptions import InternalServerError
+from flask import g, Response
+import hashlib
+
+logger = logging.getLogger(__name__)
 
 
 class Drafts(Resource):
-    """Rest endpoint for draft messages"""
-
     def post(self):
         """Handles saving of new draft"""
         post_data = request.get_json()
+        draft = DraftSchema().load(post_data)
+
         if 'msg_id' in post_data:
             raise (BadRequest(description="Message can not include msg_id"))
-        draft = DraftSchema().load(post_data)
 
         if draft.errors == {}:
             self.save_draft(draft)
+            user_urn = g.user_urn
+            message_service = Retriever()
+            saved_draft = message_service.retrieve_draft(draft.data.msg_id, user_urn)
+
+            hash_object = hashlib.sha1(str(sorted(saved_draft.items())).encode())
+            etag = hash_object.hexdigest()
             resp = jsonify({'status': 'OK', 'msg_id': draft.data.msg_id})
+            resp.headers['ETag'] = etag
             resp.status_code = 201
+
             return resp
         else:
             res = jsonify(draft.errors)
@@ -59,9 +71,19 @@ class DraftById(Resource):
         user_urn = g.user_urn
         # check user is authorised to view message
         message_service = Retriever()
-        resp = message_service.retrieve_draft(draft_id, user_urn)
-        return jsonify(resp)
+        draft_data = message_service.retrieve_draft(draft_id, user_urn)
+        etag = DraftById.generate_etag(draft_id, user_urn, draft_data)
+        resp = jsonify(draft_data)
+        resp.headers['ETag'] = etag
 
+        return resp
+
+    @staticmethod
+    def generate_etag(draft_id, user_urn, draft_data):
+        hash_object = hashlib.sha1(str(sorted(draft_data.items())).encode())
+        etag = hash_object.hexdigest()
+
+        return etag
 
 class DraftModifyById(Resource):
     """Update message status by id"""
@@ -73,13 +95,29 @@ class DraftModifyById(Resource):
             raise (BadRequest(description="Draft put requires msg_id"))
         if data['msg_id'] != draft_id:
             raise (BadRequest(description="Conflicting msg_id's"))
-        is_draft = self.check_valid_draft(draft_id)
-        if is_draft is False:
+        is_draft = self.check_msg_id_is_a_draft(draft_id, g.user_urn)
+        if is_draft[0] is False:
             raise (BadRequest(description="Draft put requires valid draft"))
+
+        not_modified = self.etag_check(request.headers, is_draft[1])
+
+        if not_modified is False:
+            res = Response(response="Draft has been modified since last check", status=409,
+                           mimetype="text/html")
+            return res
+
         draft = DraftSchema().load(data)
         if draft.errors == {}:
             self.replace_draft(draft_id, draft.data)
+
+            user_urn = g.user_urn
+            message_service = Retriever()
+            modified_draft = message_service.retrieve_draft(draft_id, user_urn)
+
+            hash_object = hashlib.sha1(str(sorted(modified_draft.items())).encode())
+            etag = hash_object.hexdigest()
             resp = jsonify({'status': 'OK', 'msg_id': draft_id})
+            resp.headers['ETag'] = etag
             resp.status_code = 200
             return resp
         else:
@@ -88,16 +126,35 @@ class DraftModifyById(Resource):
             return resp
 
     @staticmethod
-    def check_valid_draft(draft_id):
-        """Check msg_id is that of a valid draft"""
-        db_model = Status()
-        result = db_model.query.filter_by(msg_id=draft_id, label=Labels.DRAFT.value).first()
+    def check_msg_id_is_a_draft(draft_id, user_urn):
+        """Check msg_id is that of a valid draft and return true/false if no ID is present"""
+        try:
+            result = SecureMessage.query.filter(SecureMessage.msg_id == draft_id)\
+                .filter(SecureMessage.statuses.any(Status.label == Labels.DRAFT.value)).first()
+        except Exception as e:
+            logger.error(e)
+            raise (InternalServerError(description="Error retrieving message from database"))
+
         if result is None:
-            return False
+            return False, result
         else:
-            return True
+            return True, result.serialize(user_urn)
+
 
     @staticmethod
     def replace_draft(draft_id, draft):
+        """Function used to replace a draft"""
         modifier = Modifier()
         modifier.replace_current_draft(draft_id, draft)
+
+    @staticmethod
+    def etag_check(headers, current_draft):
+        """Check etag to make sure draft has not been modified since get request"""
+        if headers.get('etag'):
+            hash_object = hashlib.sha1(str(sorted(current_draft.items())).encode())
+            current_etag = hash_object.hexdigest()
+            if current_etag == headers.get('etag'):
+                return True
+            return False
+        else:
+            return True

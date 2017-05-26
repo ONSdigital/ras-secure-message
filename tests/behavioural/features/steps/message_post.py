@@ -38,6 +38,7 @@ def before_scenario(context):
         database.db.drop_all()
         database.db.create_all()
 
+
     data.update({
                  'urn_to': 'test',
                  'urn_from': 'respondent.test',
@@ -139,6 +140,81 @@ def step_impl(context):
                  'collection_case': 'collection case1',
                  'reporting_unit': 'reporting case1',
                  'survey': 'survey'})
+
+
+# Scenario 12: When a message with the label of "Draft" is sent and another user is trying to send the same message return a 409
+@given('a draft message is posted')
+def step_impl(context):
+    if 'msg_id' in data:
+        del data['msg_id']
+
+    context.post_draft = app.test_client().post("http://localhost:5050/draft/save", data=json.dumps(data),
+                                                headers=headers)
+    #get etag from response using context
+    context.etag =  json.loads(context.post_draft.data)
+    headers['Etag'] = context.etag
+
+    msg_resp = json.loads(context.post_draft.data)
+    context.msg_id = msg_resp['msg_id']
+    context.message = {'msg_id': context.msg_id,
+                       'urn_to': 'test',
+                       'urn_from': 'respondent.test',
+                       'subject': 'Hello World',
+                       'body': 'Test',
+                       'thread_id': '',
+                       'collection_case': 'collection case1',
+                       'reporting_unit': 'reporting case1',
+                       'survey': 'survey'}
+    context.response = app.test_client().post(url, data=json.dumps(context.message), headers=headers)
+
+
+@when('another user tries to send the same message')
+def step_impl(context):
+    data.update({'msg_id': context.msg_id,
+                 'urn_to': 'internal.000000',
+                 'urn_from': 'respondent.000000',
+                 'subject': 'test',
+                 'body': 'test',
+                 'thread_id': '2',
+                 'collection_case': 'collection case1',
+                 'reporting_unit': 'reporting case1',
+                 'survey': 'survey'})
+
+    data['subject'] = 'edited'
+    headers['Etag'] = context.etag
+    context.response = app.test_client().post(url.format(context.msg_id),
+                                             data=json.dumps(data), headers=headers)
+
+
+@then('is shown a 409 error status')
+def step_impl(context):
+    nose.tools.assert_equal(context.response.status_code, 409)
+
+
+# Scenario 13:  Scenario: A Etag is not present within the header
+@given('a message is created')
+def step_impl(context):
+    context.msg = {  'urn_to': 'test',
+                     'urn_from': 'test',
+                     'subject': 'test',
+                     'body': 'Test',
+                     'thread_id': '',
+                     'collection_case': 'collection case1',
+                     'reporting_unit': 'reporting case1',
+                     'survey': 'RSI'}
+
+
+@when('the message is sent with no Etag')
+def step_impl(context):
+    if 'ETag' in headers:
+        del headers['ETag']
+
+    context.response = app.test_client().post(url, data=json.dumps(context.msg), headers=headers)
+
+
+# @then('with no Etag a 200 status code is the response')
+# def step_impl(context):
+#     nose.tools.assert_equal(context.response.status_code, 200)
 
 
 # Common Steps: used in multiple scenarios

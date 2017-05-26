@@ -1,5 +1,5 @@
 from flask_restful import Resource
-from flask import request, jsonify, g
+from flask import request, jsonify, g, Response
 from werkzeug.exceptions import BadRequest
 from app.repository.modifier import Modifier
 from app.validation.domain import MessageSchema
@@ -125,28 +125,36 @@ class MessageSend(Resource):
         logger.info("Message send POST request.")
         post_data = request.get_json()
         is_draft = False
+        returned_draft = None
         draft_id = None
         if 'msg_id' in post_data:
-            is_draft = DraftModifyById().check_valid_draft(post_data['msg_id'])
+            is_draft, returned_draft = DraftModifyById().check_msg_id_is_a_draft(post_data['msg_id'], g.user_urn)
             if is_draft is True:
                 draft_id = post_data['msg_id']
                 post_data['msg_id'] = ''
             else:
                 raise (BadRequest(description="Message can not include msg_id"))
 
-        message = MessageSchema().load(post_data)
+            last_modified = DraftModifyById.etag_check(request.headers, returned_draft)
+            if last_modified is False:
 
+                res = Response(response="Draft has been modified since last check", status=409,
+                           mimetype="text/html")
+                return res
+
+        message = MessageSchema().load(post_data)
         if message.errors == {}:
             return self.message_save(message, is_draft, draft_id)
         else:
-            res = jsonify(message.errors)
-            res.status_code = 400
-            return res
+            resp = jsonify(message.errors)
+            resp.status_code = 400
+            return resp
 
     @staticmethod
     def del_draft_labels(draft_id):
         modifier = Modifier()
         modifier.del_draft(draft_id)
+
 
     def message_save(self, message, is_draft, draft_id):
         """Saves the message to the database along with the subsequent status and audit"""

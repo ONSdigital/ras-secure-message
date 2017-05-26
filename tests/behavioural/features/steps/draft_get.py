@@ -82,7 +82,7 @@ def step_impl(context):
 #   Scenario: User requests draft not authorised to view
 
 @given('a user is not authorised')
-def step_impl(context):
+def step_impl(self, context):
     #   waiting for  authorisation to be implemented
     data.update({'urn_to': 'test',
                  'urn_from': 'test',
@@ -102,8 +102,30 @@ def step_impl(context):
     nose.tools.assert_equal(context.response.status_code, 403)
 
 
-#   common
+#   Scenario: User is retrieving the etag from the header
+@given("there is a draft")
+def step_impl(context):
+    data.update({'urn_to': 'test',
+                 'urn_from': 'test',
+                 'subject': 'test',
+                 'body': 'Test',
+                 'thread_id': '',
+                 'collection_case': 'collection case1',
+                 'reporting_unit': 'reporting case1',
+                 'survey': 'survey'})
+    response = app.test_client().post("http://localhost:5050/draft/save", data=json.dumps(data),
+                                      headers=headers)
+    context.resp_data = json.loads(response.data)
 
+
+@then("an etag should be sent with the draft")
+def step_impl(context):
+    etag = context.response.headers.get('ETag')
+    nose.tools.assert_is_not_none(etag)
+    nose.tools.assert_true(len(etag) == 40)
+
+
+#   common
 @when('the user requests the draft')
 def step_impl(context):
     context.response = app.test_client().get(url.format(context.resp_data['msg_id']), headers=headers)
