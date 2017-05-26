@@ -224,7 +224,7 @@ class DraftTestCase(unittest.TestCase):
 
         with app.app_context():
             with current_app.test_request_context():
-                is_valid_draft = DraftModifyById.draft_modified_since_last_read(msg_id, 'respondent.21345')
+                is_valid_draft = DraftModifyById.check_msg_id_is_a_draft(msg_id, 'respondent.21345')
         self.assertTrue(is_valid_draft[0])
 
     def test_draft_modified_since_last_read_false(self):
@@ -232,7 +232,7 @@ class DraftTestCase(unittest.TestCase):
 
         with app.app_context():
             with current_app.test_request_context():
-                is_valid_draft = DraftModifyById.draft_modified_since_last_read('000000-0000-00000', 'respondent.21345')
+                is_valid_draft = DraftModifyById.check_msg_id_is_a_draft('000000-0000-00000', 'respondent.21345')
         self.assertFalse(is_valid_draft[0])
 
     def test_etag_check_returns_true(self):
@@ -254,7 +254,7 @@ class DraftTestCase(unittest.TestCase):
 
         with app.app_context():
             with current_app.test_request_context():
-                is_valid_draft = DraftModifyById.draft_modified_since_last_read(msg_id, 'respondent.21345')
+                is_valid_draft = DraftModifyById.check_msg_id_is_a_draft(msg_id, 'respondent.21345')
         hash_object = hashlib.sha1(str(sorted(is_valid_draft[1].items())).encode())
         etag = hash_object.hexdigest()
 
@@ -279,7 +279,7 @@ class DraftTestCase(unittest.TestCase):
 
         with app.app_context():
             with current_app.test_request_context():
-                is_valid_draft = DraftModifyById.draft_modified_since_last_read(msg_id, 'respondent.21345')
+                is_valid_draft = DraftModifyById.check_msg_id_is_a_draft(msg_id, 'respondent.21345')
 
         etag = '1234567sdfghj98765fgh'
 
@@ -292,4 +292,4 @@ class DraftTestCase(unittest.TestCase):
             database.db.drop_all()
             with current_app.test_request_context():
                 with self.assertRaises(InternalServerError):
-                    DraftModifyById.draft_modified_since_last_read(msg_id, 'respondent.21345')
+                    DraftModifyById.check_msg_id_is_a_draft(msg_id, 'respondent.21345')

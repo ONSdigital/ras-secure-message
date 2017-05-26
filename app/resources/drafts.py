@@ -95,7 +95,7 @@ class DraftModifyById(Resource):
             raise (BadRequest(description="Draft put requires msg_id"))
         if data['msg_id'] != draft_id:
             raise (BadRequest(description="Conflicting msg_id's"))
-        is_draft = self.draft_modified_since_last_read(draft_id, g.user_urn)
+        is_draft = self.check_msg_id_is_a_draft(draft_id, g.user_urn)
         if is_draft[0] is False:
             raise (BadRequest(description="Draft put requires valid draft"))
 
@@ -126,7 +126,7 @@ class DraftModifyById(Resource):
             return resp
 
     @staticmethod
-    def draft_modified_since_last_read(draft_id, user_urn):
+    def check_msg_id_is_a_draft(draft_id, user_urn):
         """Check msg_id is that of a valid draft and return true/false if no ID is present"""
         try:
             result = SecureMessage.query.filter(SecureMessage.msg_id == draft_id)\
