@@ -11,7 +11,6 @@ from app import settings
 from app.settings import MESSAGE_QUERY_LIMIT
 from app.validation.labels import Labels
 from app.validation.user import User
-from datetime import timezone, datetime
 from app.resources.drafts import DraftModifyById
 
 logger = logging.getLogger(__name__)
@@ -128,7 +127,7 @@ class MessageSend(Resource):
         returned_draft = None
         draft_id = None
         if 'msg_id' in post_data:
-            is_draft, returned_draft = DraftModifyById().check_msg_id_is_a_draft(post_data['msg_id'], g.user_urn)
+            is_draft, returned_draft = Retriever().check_msg_id_is_a_draft(post_data['msg_id'], g.user_urn)
             if is_draft is True:
                 draft_id = post_data['msg_id']
                 post_data['msg_id'] = ''
@@ -154,7 +153,6 @@ class MessageSend(Resource):
     def del_draft_labels(draft_id):
         modifier = Modifier()
         modifier.del_draft(draft_id)
-
 
     def message_save(self, message, is_draft, draft_id):
         """Saves the message to the database along with the subsequent status and audit"""
