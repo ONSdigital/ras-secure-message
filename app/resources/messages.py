@@ -84,7 +84,7 @@ class MessageList(Resource):
     @staticmethod
     def _paginated_list_to_json(paginated_list, page, limit, host_url, user_urn, string_query_args):
         """used to change a pagination object to json format with links"""
-        messages = {}
+        messages = []
         msg_count = 0
         arg_joiner = ''
         if string_query_args != '?':
@@ -94,7 +94,8 @@ class MessageList(Resource):
             msg_count += 1
             msg = message.serialize(user_urn)
             msg['_links'] = {"self": {"href": "{0}{1}/{2}".format(host_url, MESSAGE_BY_ID_ENDPOINT, msg['msg_id'])}}
-            messages["{0}".format(msg_count)] = msg
+            # messages["{0}".format(msg_count)] = msg
+            messages.append(msg)
 
         links = {
             'first': {"href": "{0}{1}".format(host_url, "messages")},

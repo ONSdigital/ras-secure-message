@@ -51,7 +51,8 @@ def step_impl(context):
     for x in range(0, 2):
         data['urn_to'] = 'internal.12344'
         data['urn_from'] = 'respondent.122342'
-        context.response = app.test_client().post("http://localhost:5050/message/send", data=flask.json.dumps(data), headers=headers)
+        context.response = app.test_client().post("http://localhost:5050/message/send", data=flask.json.dumps(data),
+                                                  headers=headers)
 
 
 @when("the respondent gets their messages")
@@ -65,8 +66,8 @@ def step_impl(context):
 def step_impl(context):
     response = flask.json.loads(context.response.data)
     for x in range(0, len(response['messages'])):
-        num = x+1
-        nose.tools.assert_equal(response['messages'][str(num)]['labels'], ['SENT'])
+        # num = x+1
+        nose.tools.assert_equal(response['messages'][1]['labels'], ['SENT'])
 
 
 # Scenario: Internal user sends multiple messages and retrieves the list of messages with their labels
@@ -77,7 +78,8 @@ def step_impl(context):
     for x in range(0, 2):
         data['urn_to'] = 'respondent.122342'
         data['urn_from'] = 'internal.12344'
-        context.response = app.test_client().post("http://localhost:5050/message/send", data=flask.json.dumps(data), headers=headers)
+        context.response = app.test_client().post("http://localhost:5050/message/send", data=flask.json.dumps(data),
+                                                  headers=headers)
 
 
 @when("the Internal user gets their messages")
@@ -94,11 +96,11 @@ def step_impl(context):
 def step_impl(context):
     response = flask.json.loads(context.response.data)
     for x in range(0, len(response['messages'])):
-        num = x+1
-        nose.tools.assert_equal(response['messages'][str(num)]['labels'], ['INBOX', 'UNREAD'])
-        nose.tools.assert_true(len(response['messages'][str(num)]['labels']), 2)
-        nose.tools.assert_true('INBOX' in response['messages'][str(num)]['labels'])
-        nose.tools.assert_true('UNREAD' in response['messages'][str(num)]['labels'])
+        # num = x+1
+        nose.tools.assert_equal(response['messages'][1]['labels'], ['INBOX', 'UNREAD'])
+        nose.tools.assert_true(len(response['messages'][1]['labels']), 2)
+        nose.tools.assert_true('INBOX' in response['messages'][1]['labels'])
+        nose.tools.assert_true('UNREAD' in response['messages'][1]['labels'])
 
 # Scenario: As an external user I would like to be able to view a lst of messages
 
@@ -151,7 +153,7 @@ def step_impl(context):
 def step_impl(context):
     response = flask.json.loads(context.response.data)
     for x in range(1, len(response['messages'])):
-        nose.tools.assert_equal(response['messages'][str(x)]['labels'], ['SENT'])
+        nose.tools.assert_equal(response['messages'][1]['labels'], ['SENT'])
 
     nose.tools.assert_equal(len(response['messages']), 2)
 
@@ -186,8 +188,8 @@ def step_impl(context):
 def step_impl(context):
     response = flask.json.loads(context.response.data)
 
-    for x in range(1, len(response['messages'])):
-        nose.tools.assert_equal(response['messages'][str(x)]['reporting_unit'], 'AnotherReportingUnit')
+    # for x in range(1, len(response['messages'])):
+    nose.tools.assert_equal(response['messages'][1]['reporting_unit'], 'AnotherReportingUnit')
 
     nose.tools.assert_equal(len(response['messages']), 2)
 
@@ -222,8 +224,8 @@ def step_impl(context):
 def step_impl(context):
     response = flask.json.loads(context.response.data)
 
-    for x in range(1, len(response['messages'])):
-        nose.tools.assert_equal(response['messages'][str(x)]['survey'], 'AnotherSurvey')
+    # for x in range(1, len(response['messages'])):
+    nose.tools.assert_equal(response['messages'][1]['survey'], 'AnotherSurvey')
 
     nose.tools.assert_equal(len(response['messages']), 2)
 
@@ -259,8 +261,8 @@ def step_impl(context):
 def step_impl(context):
     response = flask.json.loads(context.response.data)
 
-    for x in range(1, len(response['messages'])):
-        nose.tools.assert_equal(response['messages'][str(x)]['collection_case'], 'AnotherCollectionCase')
+    # for x in range(1, len(response['messages'])):
+    nose.tools.assert_equal(response['messages'][1]['collection_case'], 'AnotherCollectionCase')
 
     nose.tools.assert_equal(len(response['messages']), 2)
 
@@ -281,7 +283,8 @@ def step_impl(context):
                  'collection_case': 'collection case1',
                  'reporting_unit': 'reporting case1',
                  'survey': 'survey'}
-        context.response = app.test_client().post("http://localhost:5050/draft/save", data=flask.json.dumps(draft), headers=headers)
+        context.response = app.test_client().post("http://localhost:5050/draft/save", data=flask.json.dumps(draft),
+                                                  headers=headers)
 
 
 @when('the Respondent gets their draft messages')
@@ -294,8 +297,8 @@ def step_impl(context):
 def step_impl(context):
     response = flask.json.loads(context.response.data)
 
-    for x in range(1, len(response['messages'])):
-        nose.tools.assert_equal(response['messages'][str(x)]['labels'], ['DRAFT'])
+    # for x in range(1, len(response['messages'])):
+    nose.tools.assert_equal(response['messages'][1]['labels'], ['DRAFT'])
 
     nose.tools.assert_equal(len(response['messages']), 2)
 
@@ -357,8 +360,8 @@ def step_impl(context):
 @then("the retrieved messages should all have inbox labels")
 def step_impl(context):
     response = flask.json.loads(context.response.data)
-    for x in range(1, len(response['messages'])):
-        nose.tools.assert_equal(response['messages'][str(x)]['labels'], ['INBOX', 'UNREAD'])
+    # for x in range(1, len(response['messages'])):
+    nose.tools.assert_equal(response['messages'][1]['labels'], ['INBOX', 'UNREAD'])
 
     nose.tools.assert_equal(len(response['messages']), 2)
 
@@ -563,7 +566,9 @@ def step_impl(context):
 @then('all messages should be returned')
 def step_impl(context):
     response = flask.json.loads(context.response.data)
-    num = 3  # change number to expected number of messages depending on the "there are multiple messages to retrieve for all labels" step
+    # change number to expected number of messages depending on the
+    # "there are multiple messages to retrieve for all labels" step
+    num = 3
     nose.tools.assert_equal(len(response['messages']), num)
 
 
