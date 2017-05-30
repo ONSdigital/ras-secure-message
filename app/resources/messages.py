@@ -132,7 +132,7 @@ class MessageSend(Resource):
         returned_draft = None
         draft_id = None
         if 'msg_id' in post_data:
-            is_draft, returned_draft = DraftModifyById().check_msg_id_is_a_draft(post_data['msg_id'], g.user_urn)
+            is_draft, returned_draft = Retriever().check_msg_id_is_a_draft(post_data['msg_id'], g.user_urn)
             if is_draft is True:
                 draft_id = post_data['msg_id']
                 post_data['msg_id'] = ''
