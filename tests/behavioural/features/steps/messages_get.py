@@ -65,7 +65,7 @@ def step_impl(context):
 def step_impl(context):
     response = flask.json.loads(context.response.data)
     for x in range(0, len(response['messages'])):
-        nose.tools.assert_equal(response['messages'][1]['labels'], ['SENT'])
+        nose.tools.assert_equal(response['messages'][x]['labels'], ['SENT'])
 
 
 # Scenario: Internal user sends multiple messages and retrieves the list of messages with their labels
