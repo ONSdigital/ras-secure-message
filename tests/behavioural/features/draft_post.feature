@@ -4,6 +4,7 @@ Feature: Draft Save Endpoint
     Given a valid draft
     When the draft is saved
     Then a 201 status code is the response
+    And an etag should be sent with the draft
 
   Scenario: Save a draft with body field empty return 201
     Given a draft has an body field set to empty

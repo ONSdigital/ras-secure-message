@@ -9,8 +9,7 @@ logger = logging.getLogger(__name__)
 class Message:
 
     """Class to hold message attributes"""
-    def __init__(self, urn_to, urn_from, subject, body, thread_id=None, sent_date=None,
-                 read_date=None, msg_id='', collection_case='', reporting_unit='', survey=''):
+    def __init__(self, urn_to, urn_from, subject, body, thread_id=None, msg_id='', collection_case='', reporting_unit='', survey=''):
 
         logger.debug("Message Class created {0}, {1}".format(subject, body))
         self.msg_id = str(uuid.uuid4()) if len(msg_id) == 0 else msg_id  # If empty msg_id assign to a uuid
@@ -19,14 +18,12 @@ class Message:
         self.subject = subject
         self.body = body
         self.thread_id = self.msg_id if not thread_id else thread_id  # If empty thread_id then set to message id
-        self.sent_date = sent_date
-        self.read_date = read_date
         self.collection_case = collection_case
         self.reporting_unit = reporting_unit
         self.survey = survey
 
     def __repr__(self):
-        return '<Message(msg_id={self.msg_id} urn_to={self.urn_to} urn_from={self.urn_from} subject={self.subject} body={self.body} thread_id={self.thread_id} sent_date={self.sent_date} read_date={self.read_date} collection_case={self.collection_case} reporting_unit={self.reporting_unit} survey={self.survey})>'.format(self=self)
+        return '<Message(msg_id={self.msg_id} urn_to={self.urn_to} urn_from={self.urn_from} subject={self.subject} body={self.body} thread_id={self.thread_id} collection_case={self.collection_case} reporting_unit={self.reporting_unit} survey={self.survey})>'.format(self=self)
 
     def __eq__(self, other):
         if isinstance(other, Message):
@@ -44,8 +41,6 @@ class MessageSchema(Schema):
     body = fields.Str(required=True)
     subject = fields.Str(allow_none=True)
     thread_id = fields.Str(allow_none=True)
-    sent_date = fields.DateTime(allow_none=True)
-    read_date = fields.DateTime(allow_none=True)
     collection_case = fields.Str(allow_none=True)
     reporting_unit = fields.Str(allow_none=True)
     survey = fields.Str(required=True)
@@ -105,6 +100,7 @@ class MessageSchema(Schema):
             logger.debug("{0} field is too large {1}  max size: {2}".format(field_name, length, max_field_len))
             raise ValidationError('{0} field length must not be greater than {1}.'.format(field_name, max_field_len))
 
+
 class DraftSchema(Schema):
     """Class to marshal JSON to Draft"""
 
@@ -114,8 +110,6 @@ class DraftSchema(Schema):
     body = fields.Str(allow_none=True)
     subject = fields.Str(allow_none=True)
     thread_id = fields.Str(allow_none=True)
-    sent_date = fields.DateTime(allow_none=True)
-    read_date = fields.DateTime(allow_none=True)
     collection_case = fields.Str(allow_none=True)
     reporting_unit = fields.Str(allow_none=True)
     survey = fields.Str(required=True)

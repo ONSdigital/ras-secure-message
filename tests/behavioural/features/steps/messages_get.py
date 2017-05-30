@@ -2,7 +2,6 @@ import flask
 import nose.tools
 from behave import given, then, when
 from app.application import app
-import uuid
 from app.repository import database
 from flask import current_app
 from app.authentication.jwt import encode
@@ -68,7 +67,6 @@ def step_impl(context):
     for x in range(0, len(response['messages'])):
         # num = x+1
         nose.tools.assert_equal(response['messages'][1]['labels'], ['SENT'])
-
 
 # Scenario: Internal user sends multiple messages and retrieves the list of messages with their labels
 
@@ -416,12 +414,12 @@ def step_impl(context):
 def step_impl(context):
     reset_db()
 
-    for x in range(0, 2):
+    for _ in range(0, 2):
         data['urn_to'] = 'respondent.122342'
         data['urn_from'] = 'internal.12344'
         context.response = app.test_client().post("http://localhost:5050/message/send",
                                                   data=flask.json.dumps(data), headers=headers)
-    for x in range(0, 2):
+    for _ in range(0, 2):
         data['urn_to'] = 'internal.12344'
         data['urn_from'] = 'respondent.122342'
         context.response = app.test_client().post("http://localhost:5050/message/send",
