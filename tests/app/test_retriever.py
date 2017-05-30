@@ -280,8 +280,8 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
                                                                   "http://localhost:5050/", 'respondent.21345',
                                                                   string_query_args='?')
                 data = json.loads(json_data.get_data())
-                self.assertEqual(data['messages']['4']['_links']['self']['href'],
-                                 "{0}{1}".format(self.MESSAGE_BY_ID_ENDPOINT, data["messages"]['4']['msg_id']))
+                self.assertEqual(data['messages'][4]['_links']['self']['href'],
+                                 "{0}{1}".format(self.MESSAGE_BY_ID_ENDPOINT, data["messages"][4]['msg_id']))
 
     def test_paginated_to_json_returns_prev_page(self):
         """turns paginated result list to json checking prev page is returned if needed"""
