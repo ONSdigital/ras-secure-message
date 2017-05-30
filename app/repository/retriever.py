@@ -117,3 +117,18 @@ class Retriever:
             resp.status_code = 500
 
         return resp
+
+    @staticmethod
+    def check_msg_id_is_a_draft(draft_id, user_urn):
+        """Check msg_id is that of a valid draft and return true/false if no ID is present"""
+        try:
+            result = SecureMessage.query.filter(SecureMessage.msg_id == draft_id)\
+                .filter(SecureMessage.statuses.any(Status.label == Labels.DRAFT.value)).first()
+        except Exception as e:
+            logger.error(e)
+            raise (InternalServerError(description="Error retrieving message from database"))
+
+        if result is None:
+            return False, result
+        else:
+            return True, result.serialize(user_urn)
