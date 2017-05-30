@@ -95,10 +95,10 @@ def step_impl(context):
     response = flask.json.loads(context.response.data)
     for x in range(0, len(response['messages'])):
         # num = x+1
-        nose.tools.assert_equal(response['messages'][1]['labels'], ['INBOX', 'UNREAD'])
-        nose.tools.assert_true(len(response['messages'][1]['labels']), 2)
-        nose.tools.assert_true('INBOX' in response['messages'][1]['labels'])
-        nose.tools.assert_true('UNREAD' in response['messages'][1]['labels'])
+        nose.tools.assert_equal(response['messages'][x]['labels'], ['INBOX', 'UNREAD'])
+        nose.tools.assert_true(len(response['messages'][x]['labels']), 2)
+        nose.tools.assert_true('INBOX' in response['messages'][x]['labels'])
+        nose.tools.assert_true('UNREAD' in response['messages'][x]['labels'])
 
 
 # Scenario: As an external user I would like to be able to view a lst of messages
@@ -152,7 +152,7 @@ def step_impl(context):
 def step_impl(context):
     response = flask.json.loads(context.response.data)
     for x in range(1, len(response['messages'])):
-        nose.tools.assert_equal(response['messages'][1]['labels'], ['SENT'])
+        nose.tools.assert_equal(response['messages'][x]['labels'], ['SENT'])
 
     nose.tools.assert_equal(len(response['messages']), 2)
 
@@ -493,7 +493,7 @@ def step_impl(context):
     response = flask.json.loads(context.response.data)
 
     for x in range(1, len(response['messages'])):
-        nose.tools.assert_true('SENT' in response['messages'][str(x)]['labels'])
+        nose.tools.assert_true('SENT' in response['messages'][x]['labels'])
 
 
 @then('messages returned should have one of the labels ARCHIVED')
@@ -501,7 +501,7 @@ def step_impl(context):
     response = flask.json.loads(context.response.data)
 
     for x in range(1, len(response['messages'])):
-        nose.tools.assert_true('ARCHIVED' in response['messages'][str(x)]['labels'])
+        nose.tools.assert_true('ARCHIVED' in response['messages'][x]['labels'])
 
 
 @then('messages returned should have one of the labels DRAFT')
@@ -509,7 +509,7 @@ def step_impl(context):
     response = flask.json.loads(context.response.data)
 
     for x in range(1, len(response['messages'])):
-        nose.tools.assert_true('DRAFT' in response['messages'][str(x)]['labels'])
+        nose.tools.assert_true('DRAFT' in response['messages'][x]['labels'])
 
 
 @then('messages returned should have one of the labels INBOX-SENT')
@@ -517,8 +517,8 @@ def step_impl(context):
     response = flask.json.loads(context.response.data)
 
     for x in range(1, len(response['messages'])):
-        nose.tools.assert_true('INBOX' in response['messages'][1]['labels'] or
-                               'SENT' in response['messages'][1]['labels'])
+        nose.tools.assert_true('INBOX' in response['messages'][x]['labels'] or
+                               'SENT' in response['messages'][x]['labels'])
 
 
 @then('messages returned should have one of the labels INBOX-SENT-ARCHIVED')
@@ -526,9 +526,9 @@ def step_impl(context):
     response = flask.json.loads(context.response.data)
 
     for x in range(1, len(response['messages'])):
-        nose.tools.assert_true('INBOX' in response['messages'][1]['labels'] or
-                               'SENT' in response['messages'][1]['labels'] or
-                               'ARCHIVED' in response['messages'][1]['labels'])
+        nose.tools.assert_true('INBOX' in response['messages'][x]['labels'] or
+                               'SENT' in response['messages'][x]['labels'] or
+                               'ARCHIVED' in response['messages'][x]['labels'])
 
 
 @then('respondent gets messages with labels INBOX-SENT-ARCHIVED-DRAFT')
