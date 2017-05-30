@@ -65,8 +65,8 @@ def step_impl(context):
 def step_impl(context):
     response = flask.json.loads(context.response.data)
     for x in range(0, len(response['messages'])):
-        # num = x+1
         nose.tools.assert_equal(response['messages'][1]['labels'], ['SENT'])
+
 
 # Scenario: Internal user sends multiple messages and retrieves the list of messages with their labels
 
@@ -99,6 +99,7 @@ def step_impl(context):
         nose.tools.assert_true(len(response['messages'][1]['labels']), 2)
         nose.tools.assert_true('INBOX' in response['messages'][1]['labels'])
         nose.tools.assert_true('UNREAD' in response['messages'][1]['labels'])
+
 
 # Scenario: As an external user I would like to be able to view a lst of messages
 
@@ -185,8 +186,6 @@ def step_impl(context):
 @then('the retrieved messages should have the correct reporting unit')
 def step_impl(context):
     response = flask.json.loads(context.response.data)
-
-    # for x in range(1, len(response['messages'])):
     nose.tools.assert_equal(response['messages'][1]['reporting_unit'], 'AnotherReportingUnit')
 
     nose.tools.assert_equal(len(response['messages']), 2)
@@ -221,8 +220,6 @@ def step_impl(context):
 @then('the retrieved messages should have the correct survey')
 def step_impl(context):
     response = flask.json.loads(context.response.data)
-
-    # for x in range(1, len(response['messages'])):
     nose.tools.assert_equal(response['messages'][1]['survey'], 'AnotherSurvey')
 
     nose.tools.assert_equal(len(response['messages']), 2)
@@ -258,8 +255,6 @@ def step_impl(context):
 @then('the retrieved messages should have the correct collection case')
 def step_impl(context):
     response = flask.json.loads(context.response.data)
-
-    # for x in range(1, len(response['messages'])):
     nose.tools.assert_equal(response['messages'][1]['collection_case'], 'AnotherCollectionCase')
 
     nose.tools.assert_equal(len(response['messages']), 2)
@@ -294,8 +289,6 @@ def step_impl(context):
 @then('the retrieved messages should all have draft labels')
 def step_impl(context):
     response = flask.json.loads(context.response.data)
-
-    # for x in range(1, len(response['messages'])):
     nose.tools.assert_equal(response['messages'][1]['labels'], ['DRAFT'])
 
     nose.tools.assert_equal(len(response['messages']), 2)
@@ -310,8 +303,6 @@ def step_impl(context):
     for x in range(1, len(response['messages'])):
         nose.tools.assert_equal(response['messages'][str(x)]['labels'], ['DRAFT'])
         nose.tools.assert_not_equal(response['messages'][str(x)]['labels'], ['DRAFT_INBOX'])
-
-    # nose.tools.assert_equal(len(response['messages']), 2)
 
 
 # Scenario: As an external user I would like to be able to view a list of messages
@@ -358,7 +349,6 @@ def step_impl(context):
 @then("the retrieved messages should all have inbox labels")
 def step_impl(context):
     response = flask.json.loads(context.response.data)
-    # for x in range(1, len(response['messages'])):
     nose.tools.assert_equal(response['messages'][1]['labels'], ['INBOX', 'UNREAD'])
 
     nose.tools.assert_equal(len(response['messages']), 2)
