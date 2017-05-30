@@ -48,6 +48,7 @@ def before_scenario(context):
                  'thread_id': '',
                  'collection_case': 'collection case1',
                  'reporting_unit': 'reporting case1',
+                 'business_name': 'ABusiness',
                  'survey': 'survey'})
 
 
@@ -72,6 +73,7 @@ def step_impl(context):
                        'thread_id': '',
                        'collection_case': 'collection case1',
                        'reporting_unit': 'reporting case1',
+                       'business_name': 'ABusiness',
                        'survey': 'survey'}
 
 
@@ -140,6 +142,7 @@ def step_impl(context):
                  'thread_id': '',
                  'collection_case': 'collection case1',
                  'reporting_unit': 'reporting case1',
+                 'business_name': 'ABusiness',
                  'survey': 'survey'})
 
 
@@ -165,6 +168,7 @@ def step_impl(context):
                        'thread_id': '',
                        'collection_case': 'collection case1',
                        'reporting_unit': 'reporting case1',
+                       'business_name': 'ABusiness',
                        'survey': 'survey'}
     context.response = app.test_client().post(url, data=json.dumps(context.message), headers=headers)
 
@@ -179,6 +183,7 @@ def step_impl(context):
                  'thread_id': '2',
                  'collection_case': 'collection case1',
                  'reporting_unit': 'reporting case1',
+                 'business_name': 'ABusiness',
                  'survey': 'survey'})
 
     data['subject'] = 'edited'
@@ -202,6 +207,7 @@ def step_impl(context):
                      'thread_id': '',
                      'collection_case': 'collection case1',
                      'reporting_unit': 'reporting case1',
+                     'business_name': 'ABusiness',
                      'survey': 'RSI'}
 
 
@@ -211,11 +217,6 @@ def step_impl(context):
         del headers['ETag']
 
     context.response = app.test_client().post(url, data=json.dumps(context.msg), headers=headers)
-
-
-# @then('with no Etag a 200 status code is the response')
-# def step_impl(context):
-#     nose.tools.assert_equal(context.response.status_code, 200)
 
 
 # Common Steps: used in multiple scenarios

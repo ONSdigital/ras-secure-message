@@ -24,12 +24,13 @@ class SecureMessage(db.Model):
     thread_id = Column("thread_id", String(constants.MAX_THREAD_LEN + 1))
     collection_case = Column("collection_case", String(constants.MAX_COLLECTION_CASE_LEN+1))
     reporting_unit = Column("reporting_unit", String(constants.MAX_REPORTING_UNIT_LEN+1))
+    business_name = Column("business_name", String(constants.MAX_BUSINESS_NAME_LEN + 1))
     survey = Column("survey", String(constants.MAX_SURVEY_LEN+1))
     statuses = relationship('Status', backref='secure_message')
     events = relationship('Events', backref='secure_message', order_by='Events.date_time')
 
     def __init__(self, msg_id="", subject="", body="", thread_id="", collection_case='',
-                 reporting_unit='', survey=''):
+                 reporting_unit='', survey='', business_name=''):
         logger.debug("Initialised Secure Message entity: msg_id: {}".format(id))
         self.msg_id = msg_id
         self.subject = subject
@@ -37,6 +38,7 @@ class SecureMessage(db.Model):
         self.thread_id = thread_id
         self.collection_case = collection_case
         self.reporting_unit = reporting_unit
+        self.business_name = business_name
         self.survey = survey
 
     def set_from_domain_model(self, domain_model):
@@ -47,6 +49,7 @@ class SecureMessage(db.Model):
         self.thread_id = domain_model.thread_id
         self.collection_case = domain_model.collection_case
         self.reporting_unit = domain_model.reporting_unit
+        self.business_name = domain_model.business_name
         self.survey = domain_model.survey
 
     def serialize(self, user_urn):
@@ -63,6 +66,7 @@ class SecureMessage(db.Model):
             'modified_date': 'N/A',
             'collection_case': self.collection_case,
             'reporting_unit': self.reporting_unit,
+            'business_name': self.business_name,
             'survey': self.survey,
             '_links': '',
             'labels': []

@@ -15,33 +15,33 @@ class MessageTestCase(unittest.TestCase):
         """creating Message object"""
         now_string = self.now.__str__()
         sut = Message('to', 'from', 'subject', 'body', '5', 'AMsgId', 'ACollectionCase',
-                      'AReportingUnit', 'ASurveyType')
+                      'AReportingUnit', 'ASurveyType', 'ABusiness')
         sut_str = repr(sut)
-        expected = '<Message(msg_id=AMsgId urn_to=to urn_from=from subject=subject body=body thread_id=5 collection_case=ACollectionCase reporting_unit=AReportingUnit survey=ASurveyType)>'
+        expected = '<Message(msg_id=AMsgId urn_to=to urn_from=from subject=subject body=body thread_id=5 collection_case=ACollectionCase reporting_unit=AReportingUnit business_name=ABusiness survey=ASurveyType)>'
         self.assertEquals(sut_str, expected)
 
     def test_message_with_different_collection_case_not_equal(self):
         """testing two different Message objects are not equal"""
         message1 = Message('1', '2', '3', '4', '5', 'ACollectionCase',
-                           'AReportingUnit', 'ASurveyType')
+                           'AReportingUnit', 'ASurveyType', 'ABusiness')
         message2 = Message('1', '2', '3', '4', '5', 'AnotherCollectionCase',
-                           'AReportingUnit', 'ASurveyType')
+                           'AReportingUnit', 'ASurveyType', 'ABusiness')
         self.assertTrue(message1 != message2)
 
     def test_message_with_different_reporting_unit_not_equal(self):
         """testing two different Message objects are not equal"""
         message1 = Message('1', '2', '3', '4', '5', 'ACollectionCase',
-                           'AReportingUnit', 'ASurveyType')
+                           'AReportingUnit', 'ASurveyType', 'ABusiness')
         message2 = Message('1', '2', '3', '4', '5', 'ACollectionCase',
-                           'AnotherReportingUnit', 'ASurveyType')
+                           'AnotherReportingUnit', 'ASurveyType', 'ABusiness')
         self.assertTrue(message1 != message2)
 
     def test_message_with_different_survey_not_equal(self):
         """testing two different Message objects are not equal"""
         message1 = Message('1', '2', '3', '4', '5', 'ACollectionCase',
-                           'AReportingUnit', 'ASurveyType')
+                           'AReportingUnit', 'ASurveyType', 'ABusiness')
         message2 = Message('1', '2', '3', '4', '5', 'ACollectionCase',
-                           'AReportingUnit', 'AnotherSurveyType')
+                           'AReportingUnit', 'AnotherSurveyType', 'ABusiness')
         self.assertTrue(message1 != message2)
 
     def test_message_equal(self):
@@ -138,14 +138,6 @@ class MessageSchemaTestCase(unittest.TestCase):
         schema = MessageSchema()
         errors = schema.load(message)[1]
         self.assertTrue(errors == {'_schema': ['read_date can not be set.']})
-
-    # def test_setting_sent_date_field_causes_error(self):
-    #     """marshalling message with no thread_id field"""
-    #     message = {'urn_to': 'torrance', 'urn_from': 'someone', 'body': 'hello', 'subject': 'subject',
-    #                'sent_date': self.now}
-    #     schema = MessageSchema()
-    #     errors = schema.load(message)[1]
-    #     self.assertTrue(errors == {'_schema': ['sent_date can not be set.']})
 
     def test_missing_survey_causes_error(self):
         """marshalling message with no survey field"""

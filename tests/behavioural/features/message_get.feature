@@ -15,6 +15,7 @@ Feature: Message get by ID Endpoint
     |subject |
     |ReportingUnit   |
     |CollectionCase  |
+    |BusinessName  |
 
   @ignore
   Scenario: Retrieve a draft message
@@ -38,6 +39,7 @@ Feature: Message get by ID Endpoint
     |subject |
     |ReportingUnit   |
     |CollectionCase  |
+    |BusinessName  |
 
   Scenario: Retrieve a message with incorrect message ID
     Given there is a message to be retrieved
