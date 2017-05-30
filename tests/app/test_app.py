@@ -20,7 +20,7 @@ class FlaskTestCase(unittest.TestCase):
         """setup test environment"""
         self.app = application.app.test_client()
         app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:////tmp/messages.db'
-        self.engine = create_engine('sqlite:////tmp/messages.db', echo=True)
+        self.engine = create_engine('sqlite:////tmp/messages.db')
 
         AlertUser.alert_method = mock.Mock(AlertViaGovNotify)
 
@@ -132,13 +132,10 @@ class FlaskTestCase(unittest.TestCase):
         """posts to message send end point without 'thread_id'"""
         url = "http://localhost:5050/message/send"
 
-        now = datetime.now(timezone.utc)
         test_message = {'urn_to': 'richard',
                         'urn_from': 'torrance',
                         'subject': 'MyMessage',
                         'body': 'hello',
-                        'sent_date': now,
-                        'read_date': now,
                         'collection_case': 'ACollectionCase',
                         'reporting_unit': 'AReportingUnit',
                         'survey': 'ACollectionInstrument'}
@@ -160,6 +157,59 @@ class FlaskTestCase(unittest.TestCase):
                                   .format(data['msg_id'], self.test_message['survey']))
             for row in request:
                 self.assertTrue(row is not None)
+    #
+    def test_message_post_stores_events_correctly_for_message(self):
+        """posts to message send end point to ensure events are saved as expected"""
+        url = "http://localhost:5050/message/send"
+
+        response = self.app.post(url, data=json.dumps(self.test_message), headers=self.headers)
+        data = json.loads(response.data)
+
+        with self.engine.connect() as con:
+            request = con.execute("SELECT * FROM events WHERE event='Sent' AND msg_id='{0}'"
+                                  .format(data['msg_id']))
+            for row in request:
+                self.assertTrue(row is not None)
+
+    def test_message_post_stores_events_correctly_for_draft(self):
+        """posts to message send end point to ensure events are saved as expected for draft"""
+
+        self.app.post("http://localhost:5050/draft/save", data=json.dumps(self.test_message), headers=self.headers)
+
+        with self.engine.connect() as con:
+            request = con.execute("SELECT * FROM secure_message LIMIT 1")
+            for row in request:
+                self.msg_id = row['msg_id']
+
+        draft = (
+            {
+                'msg_id': self.msg_id,
+                'urn_to': 'richard',
+                'urn_from': 'torrance',
+                'subject': 'MyMessage',
+                'body': 'hello',
+                'thread_id': '',
+                'collection_case': 'ACollectionCase',
+                'reporting_unit': 'AReportingUnit',
+                'survey': 'ACollectionInstrument'
+            }
+        )
+
+        response = self.app.post('http://localhost:5050/message/send', data=json.dumps(draft),
+                                 headers=self.headers)
+
+        data = json.loads(response.data)
+
+        with self.engine.connect() as con:
+            request = con.execute("SELECT * FROM events WHERE event='Sent' AND msg_id='{0}'"
+                                  .format(data['msg_id']))
+            for row in request:
+                self.assertTrue(row is not None)
+
+            request = con.execute("SELECT * FROM events WHERE event='Draft_Saved' AND msg_id='{0}'"
+                                  .format(data['msg_id']))
+            for row in request:
+                self.assertTrue(row is None)
 
     def test_message_post_stores_labels_correctly_for_recipient_of_message(self):
         """posts to message send end point to ensure labels are saved as expected"""

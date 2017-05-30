@@ -11,11 +11,10 @@ class Saver:
     """Created when saving a message"""
 
     @staticmethod
-    def save_message(domain_message, sent_date=None, session=db.session):
+    def save_message(domain_message, session=db.session):
         """save message to database"""
 
         db_message = database.SecureMessage()
-        domain_message.sent_date = sent_date  # LOGIC NEEDED: set sent_date only for sent message
         db_message.set_from_domain_model(domain_message)
         try:
             session.add(db_message)
@@ -35,6 +34,19 @@ class Saver:
             session.commit()
         except Exception as e:
             logger.error("Message status save failed {}".format(e))
+            raise MessageSaveException(e)
+
+    @staticmethod
+    def save_msg_event(msg_id, event, session=db.session):
+        """save message events to events database"""
+
+        event = database.Events(msg_id=msg_id, event=event)
+
+        try:
+            session.add(event)
+            session.commit()
+        except Exception as e:
+            logger.error("Message event save failed {}".format(e))
             raise MessageSaveException(e)
 
     @staticmethod

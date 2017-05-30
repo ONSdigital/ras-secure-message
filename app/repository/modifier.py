@@ -1,9 +1,10 @@
 import logging
 from app.repository.database import db
+from app.repository.saver import Saver
 from werkzeug.exceptions import InternalServerError
 from app.validation.labels import Labels
 from app.validation.user import User
-from datetime import timezone, datetime
+
 
 logger = logging.getLogger(__name__)
 
@@ -67,23 +68,17 @@ class Modifier:
         """Remove unread label from status"""
         inbox = Labels.INBOX.value
         unread = Labels.UNREAD.value
-        if inbox in message['labels'] and unread in message['labels'] and message['read_date'] is None:
-
-            query = "UPDATE secure_message SET read_date = '{0}' WHERE msg_id = '{1}'".format(datetime.now(
-                    timezone.utc), message['msg_id'])
-            try:
-                db.get_engine(app=db.get_app()).execute(query)
-            except Exception as e:
-                logger.error(e)
-                raise (InternalServerError(description="Error retrieving messages from database"))
-            Modifier.remove_label(unread, message, user_urn)
+        if inbox in message['labels'] and unread in message['labels'] and message['read_date'] == None:
+            Saver().save_msg_event(message['msg_id'], 'Read')
+        Modifier.remove_label(unread, message, user_urn)
         return True
 
     @staticmethod
-    def del_draft(draft_id, del_status=True):
+    def del_draft(draft_id, del_status=True, del_event=True):
         """Remove draft from status table and secure message table"""
         del_draft_msg = "DELETE FROM secure_message WHERE msg_id='{0}'".format(draft_id)
         del_draft_status = "DELETE FROM status WHERE msg_id='{0}' AND label='{1}'".format(draft_id, Labels.DRAFT.value)
+        del_draft_event = "DELETE FROM events WHERE msg_id='{0}'".format(draft_id)
         del_draft_inbox_status = "DELETE FROM status WHERE msg_id='{0}' AND label='{1}'".format(draft_id, Labels.DRAFT_INBOX.value)
 
         try:
@@ -91,6 +86,10 @@ class Modifier:
             if del_status is True:
                 db.get_engine(app=db.get_app()).execute(del_draft_status)
                 db.get_engine(app=db.get_app()).execute(del_draft_inbox_status)
+
+            if del_event is True:
+                db.get_engine(app=db.get_app()).execute(del_draft_event)
+
         except Exception as e:
             logger.error(e)
             raise (InternalServerError(description="Error retrieving messages from database"))
@@ -110,6 +109,8 @@ class Modifier:
         except Exception as e:
             logger.error(e)
             raise (InternalServerError(description="Error replacing message"))
+
+        Saver().save_msg_event(draft_id, 'Draft_Saved')
 
         if draft.urn_to is not None and len(draft.urn_to) != 0:
             Modifier.replace_current_recipient_status(draft_id, draft.urn_to)

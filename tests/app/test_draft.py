@@ -26,7 +26,7 @@ class DraftTestCase(unittest.TestCase):
         """setup test environment"""
         self.app = application.app.test_client()
         app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:////tmp/messages.db'
-        self.engine = create_engine('sqlite:////tmp/messages.db', echo=True)
+        self.engine = create_engine('sqlite:////tmp/messages.db')
         token_data = {
             "user_urn": "12345678910"
         }
@@ -210,9 +210,9 @@ class DraftTestCase(unittest.TestCase):
 
         with self.engine.connect() as con:
             msg_id = str(uuid.uuid4())
-            query = 'INSERT INTO secure_message(msg_id, subject, body, thread_id, sent_date, read_date,' \
+            query = 'INSERT INTO secure_message(msg_id, subject, body, thread_id,' \
                     ' collection_case, reporting_unit, survey) VALUES ("{0}", "test","test","", ' \
-                    '"2017-02-03 00:00:00", "2017-02-03 00:00:00", "ACollectionCase", "AReportingUnit", ' \
+                    ' "ACollectionCase", "AReportingUnit", ' \
                     '"SurveyType")'.format(msg_id)
             con.execute(query)
             query = 'INSERT INTO status(label, msg_id, actor) VALUES("DRAFT", "{0}", "respondent.21345")'.format(
@@ -240,9 +240,9 @@ class DraftTestCase(unittest.TestCase):
 
         with self.engine.connect() as con:
             msg_id = str(uuid.uuid4())
-            query = 'INSERT INTO secure_message(msg_id, subject, body, thread_id, sent_date, read_date,' \
+            query = 'INSERT INTO secure_message(msg_id, subject, body, thread_id,' \
                     ' collection_case, reporting_unit, survey) VALUES ("{0}", "test","test","", ' \
-                    '"2017-02-03 00:00:00", "2017-02-03 00:00:00", "ACollectionCase", "AReportingUnit", ' \
+                    ' "ACollectionCase", "AReportingUnit", ' \
                     '"SurveyType")'.format(msg_id)
             con.execute(query)
             query = 'INSERT INTO status(label, msg_id, actor) VALUES("DRAFT", "{0}", "respondent.21345")'.format(
@@ -265,9 +265,9 @@ class DraftTestCase(unittest.TestCase):
 
         with self.engine.connect() as con:
             msg_id = str(uuid.uuid4())
-            query = 'INSERT INTO secure_message(msg_id, subject, body, thread_id, sent_date, read_date,' \
+            query = 'INSERT INTO secure_message(msg_id, subject, body, thread_id,' \
                     ' collection_case, reporting_unit, survey) VALUES ("{0}", "test","test","", ' \
-                    '"2017-02-03 00:00:00", "2017-02-03 00:00:00", "ACollectionCase", "AReportingUnit", ' \
+                    ' "ACollectionCase", "AReportingUnit", ' \
                     '"SurveyType")'.format(msg_id)
             con.execute(query)
             query = 'INSERT INTO status(label, msg_id, actor) VALUES("DRAFT", "{0}", "respondent.21345")'.format(

@@ -32,7 +32,7 @@ class MessageList(Resource):
 
         message_service = Retriever()
         status, result = message_service.retrieve_message_list(page, limit, g.user_urn,
-                                                               ru=ru, survey=survey, cc=cc, label=label, desc=desc)
+                                                               ru=ru, survey=survey, cc=cc, label=label, descend=desc)
         if status:
             resp = MessageList._paginated_list_to_json(result, page, limit, request.host_url,
                                                        g.user_urn, string_query_args)
@@ -159,7 +159,8 @@ class MessageSend(Resource):
     def message_save(self, message, is_draft, draft_id):
         """Saves the message to the database along with the subsequent status and audit"""
         save = Saver()
-        save.save_message(message.data, datetime.now(timezone.utc))
+        save.save_message(message.data)
+        save.save_msg_event(message.data.msg_id, 'Sent')
         if User(message.data.urn_from).is_respondent:
             save.save_msg_status(message.data.urn_from, message.data.msg_id, Labels.SENT.value)
             save.save_msg_status(message.data.survey, message.data.msg_id, Labels.INBOX.value)
