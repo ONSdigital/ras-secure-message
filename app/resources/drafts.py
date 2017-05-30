@@ -6,10 +6,8 @@ from app.validation.labels import Labels
 from app.validation.domain import DraftSchema
 from app.validation.user import User
 from werkzeug.exceptions import BadRequest
-from app.repository.database import SecureMessage, Status
 from app.repository.modifier import Modifier
 from app.repository.retriever import Retriever
-from werkzeug.exceptions import InternalServerError
 from flask import g, Response
 import hashlib
 
@@ -26,7 +24,7 @@ class Drafts(Resource):
             raise (BadRequest(description="Message can not include msg_id"))
 
         if draft.errors == {}:
-            self.save_draft(draft)
+            self._save_draft(draft)
             user_urn = g.user_urn
             message_service = Retriever()
             saved_draft = message_service.retrieve_draft(draft.data.msg_id, user_urn)
@@ -44,7 +42,7 @@ class Drafts(Resource):
             return res
 
     @staticmethod
-    def save_draft(draft, saver=Saver()):
+    def _save_draft(draft, saver=Saver()):
         saver.save_message(draft.data)
 
         if draft.data.urn_to is not None and len(draft.data.urn_to) != 0:
@@ -87,6 +85,7 @@ class DraftById(Resource):
 
         return etag
 
+
 class DraftModifyById(Resource):
     """Update message status by id"""
 
@@ -97,7 +96,7 @@ class DraftModifyById(Resource):
             raise (BadRequest(description="Draft put requires msg_id"))
         if data['msg_id'] != draft_id:
             raise (BadRequest(description="Conflicting msg_id's"))
-        is_draft = self.check_msg_id_is_a_draft(draft_id, g.user_urn)
+        is_draft = Retriever().check_msg_id_is_a_draft(draft_id, g.user_urn)
         if is_draft[0] is False:
             raise (BadRequest(description="Draft put requires valid draft"))
 
@@ -110,7 +109,7 @@ class DraftModifyById(Resource):
 
         draft = DraftSchema().load(data)
         if draft.errors == {}:
-            self.replace_draft(draft_id, draft.data)
+            Modifier().replace_current_draft(draft_id, draft.data)
 
             user_urn = g.user_urn
             message_service = Retriever()
@@ -126,28 +125,6 @@ class DraftModifyById(Resource):
             resp = jsonify(draft.errors)
             resp.status_code = 400
             return resp
-
-    @staticmethod
-    def check_msg_id_is_a_draft(draft_id, user_urn):
-        """Check msg_id is that of a valid draft and return true/false if no ID is present"""
-        try:
-            result = SecureMessage.query.filter(SecureMessage.msg_id == draft_id)\
-                .filter(SecureMessage.statuses.any(Status.label == Labels.DRAFT.value)).first()
-        except Exception as e:
-            logger.error(e)
-            raise (InternalServerError(description="Error retrieving message from database"))
-
-        if result is None:
-            return False, result
-        else:
-            return True, result.serialize(user_urn)
-
-
-    @staticmethod
-    def replace_draft(draft_id, draft):
-        """Function used to replace a draft"""
-        modifier = Modifier()
-        modifier.replace_current_draft(draft_id, draft)
 
     @staticmethod
     def etag_check(headers, current_draft):
