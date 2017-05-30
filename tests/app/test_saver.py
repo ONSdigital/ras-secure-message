@@ -17,7 +17,7 @@ class SaverTestCase(unittest.TestCase):
         """setup test environment"""
         app.testing = True
         app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:////tmp/messages.db'
-        self.engine = create_engine('sqlite:////tmp/messages.db', echo=True)
+        self.engine = create_engine('sqlite:////tmp/messages.db')
         self.test_message = Message(**{'urn_to': 'tej', 'urn_from': 'gemma', 'subject': 'MyMessage',
                                     'body': 'hello', 'thread_id': ""})
         with app.app_context():
@@ -25,36 +25,6 @@ class SaverTestCase(unittest.TestCase):
             database.db.drop_all()
             database.db.create_all()
             self.db = database.db
-
-    def test_saved_message_has_saved_sent_date(self):
-
-        message = Message(**{'msg_id': 'Amsgid','urn_to': 'tej', 'urn_from': 'gemma', 'subject': 'MyMessage',
-                          'body': 'hello', 'thread_id': ""})
-
-        with app.app_context():
-            with current_app.test_request_context():
-                Saver().save_message(message, datetime.now(timezone.utc))
-
-            with self.engine.connect() as con:
-                request = con.execute("SELECT * FROM secure_message WHERE msg_id='Amsgid'")
-                for row in request:
-                    data = {"sent_date": row['sent_date']}
-                    self.assertTrue(data['sent_date'] is not None)
-
-    def test_saved_message_has_not_saved_sent_date(self):
-
-        message = Message(**{'msg_id': 'Amsgid','urn_to': 'tej', 'urn_from': 'gemma', 'subject': 'MyMessage',
-                          'body': 'hello', 'thread_id': ""})
-
-        with app.app_context():
-            with current_app.test_request_context():
-                Saver().save_message(message)
-
-            with self.engine.connect() as con:
-                request = con.execute("SELECT * FROM secure_message WHERE msg_id='Amsgid'")
-                for row in request:
-                    data = {"sent_date": row['sent_date']}
-                    self.assertTrue(data['sent_date'] is None)
 
     def test_save_message_raises_message_save_exception_on_db_error(self):
         """Tests exception is logged if message save fails"""
@@ -108,3 +78,18 @@ class SaverTestCase(unittest.TestCase):
             with current_app.test_request_context():
                 with self.assertRaises(MessageSaveException):
                     Saver().save_msg_audit(message_audit['msg_id'], message_audit['msg_urn'], mock_session)
+
+    def test_saved_msg_event_has_been_saved(self):
+        """retrieves message event from database"""
+        message_event = {'msg_id': 'AMsgId', 'event': 'Draft_Saved', 'date_time': ''}
+        with app.app_context():
+            with current_app.test_request_context():
+                Saver().save_msg_event(message_event['msg_id'], message_event['event'])
+
+        with self.engine.connect() as con:
+            request = con.execute('SELECT * FROM events')
+            for row in request:
+                self.assertTrue(row is not None)
+                self.assertTrue(row[1] == message_event['event'])
+                self.assertTrue(row[2] == message_event['msg_id'])
+                self.assertTrue(row[3] is not None)

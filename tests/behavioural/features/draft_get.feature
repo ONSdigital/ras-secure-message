@@ -16,3 +16,8 @@ Feature: Get draft by id
     Given a user is not authorised
     When the user requests the draft
     Then the user is forbidden from viewing draft
+
+  Scenario: User is retrieving the etag from the header
+    Given there is a draft
+    When the user requests the draft
+    Then an etag should be sent with the draft

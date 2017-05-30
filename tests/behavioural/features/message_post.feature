@@ -55,6 +55,13 @@ Feature: Message Send Endpoint
     When the message is sent
     Then a 400 error status is returned
 
+  Scenario: When a message with the label of "Draft" is sent and another user is trying to send the same message return a 409
+    Given a draft message is posted
+    When another user tries to send the same message
+    Then is shown a 409 error status
 
 
-
+  Scenario: A Etag is not present within the header
+    Given a message is created
+    When the message is sent with no Etag
+    Then a 201 status code is the response
