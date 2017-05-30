@@ -59,8 +59,8 @@ class FlaskTestCase(unittest.TestCase):
 
         url = "http://localhost:5050/message/send"
 
-        data = {'urn_to': 'richard',
-                'urn_from': 'torrance',
+        data = {'urn_to': 'respondent.richard',
+                'urn_from': 'internal.torrance',
                 'subject': 'MyMessage',
                 'body': 'hello',
                 'thread': "?",
@@ -132,8 +132,8 @@ class FlaskTestCase(unittest.TestCase):
         """posts to message send end point without 'thread_id'"""
         url = "http://localhost:5050/message/send"
 
-        test_message = {'urn_to': 'richard',
-                        'urn_from': 'torrance',
+        test_message = {'urn_to': 'respondent.richard',
+                        'urn_from': 'internal.torrance',
                         'subject': 'MyMessage',
                         'body': 'hello',
                         'collection_case': 'ACollectionCase',
@@ -157,7 +157,7 @@ class FlaskTestCase(unittest.TestCase):
                                   .format(data['msg_id'], self.test_message['survey']))
             for row in request:
                 self.assertTrue(row is not None)
-    #
+
     def test_message_post_stores_events_correctly_for_message(self):
         """posts to message send end point to ensure events are saved as expected"""
         url = "http://localhost:5050/message/send"
@@ -279,6 +279,7 @@ class FlaskTestCase(unittest.TestCase):
                 self.assertFalse(row['label'], 'DRAFT_INBOX')
 
     def test_draft_created_by_respondent_does_not_show_for_internal(self):
+        """Test whether a draft created by a respondent is returned to an internal user"""
 
         self.test_message.update({
             'urn_to': 'internal.richard',
@@ -310,6 +311,17 @@ class FlaskTestCase(unittest.TestCase):
         for x in range(1, len(resp_data['messages'])):
             self.assertNotEqual(resp_data['messages'][str(x)]['msg_id'], msg_id)
 
+    def test_draft_get_returns_urn_to(self):
+        """Test that draft get returns draft's urn_to if applicable"""
+
+        draft_save = self.app.post("http://localhost:5050/draft/save", data=json.dumps(self.test_message), headers=self.headers)
+        draft_save_data = json.loads(draft_save.data)
+        draft_id = draft_save_data['msg_id']
+
+        draft_get = self.app.get("http://localhost:5050/draft/{0}".format(draft_id), headers=self.headers)
+        draft_get_data = json.loads(draft_get.data)
+
+        self.assertEqual(draft_get_data['urn_to'], [self.test_message['urn_to']])
 
 if __name__ == '__main__':
     unittest.main()
