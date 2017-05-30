@@ -517,8 +517,8 @@ def step_impl(context):
     response = flask.json.loads(context.response.data)
 
     for x in range(1, len(response['messages'])):
-        nose.tools.assert_true('INBOX' in response['messages'][str(x)]['labels'] or
-                               'SENT' in response['messages'][str(x)]['labels'])
+        nose.tools.assert_true('INBOX' in response['messages'][1]['labels'] or
+                               'SENT' in response['messages'][1]['labels'])
 
 
 @then('messages returned should have one of the labels INBOX-SENT-ARCHIVED')
@@ -526,9 +526,9 @@ def step_impl(context):
     response = flask.json.loads(context.response.data)
 
     for x in range(1, len(response['messages'])):
-        nose.tools.assert_true('INBOX' in response['messages'][str(x)]['labels'] or
-                               'SENT' in response['messages'][str(x)]['labels'] or
-                               'ARCHIVED' in response['messages'][str(x)]['labels'])
+        nose.tools.assert_true('INBOX' in response['messages'][1]['labels'] or
+                               'SENT' in response['messages'][1]['labels'] or
+                               'ARCHIVED' in response['messages'][1]['labels'])
 
 
 @then('respondent gets messages with labels INBOX-SENT-ARCHIVED-DRAFT')
@@ -536,10 +536,10 @@ def step_impl(context):
     response = flask.json.loads(context.response.data)
 
     for x in range(1, len(response['messages'])):
-        nose.tools.assert_true('INBOX' in response['messages'][str(x)]['labels'] or
-                               'SENT' in response['messages'][str(x)]['labels'] or
-                               'ARCHIVED' in response['messages'][str(x)]['labels'] or
-                               'DRAFT' in response['messages'][str(x)]['labels'])
+        nose.tools.assert_true('INBOX' in response['messages'][1]['labels'] or
+                               'SENT' in response['messages'][1]['labels'] or
+                               'ARCHIVED' in response['messages'][1]['labels'] or
+                               'DRAFT' in response['messages'][1]['labels'])
 
 
 @when('respondent gets messages with labels empty')
