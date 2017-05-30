@@ -132,7 +132,6 @@ class FlaskTestCase(unittest.TestCase):
         """posts to message send end point without 'thread_id'"""
         url = "http://localhost:5050/message/send"
 
-        now = datetime.now(timezone.utc)
         test_message = {'urn_to': 'respondent.richard',
                         'urn_from': 'internal.torrance',
                         'subject': 'MyMessage',
@@ -158,7 +157,7 @@ class FlaskTestCase(unittest.TestCase):
                                   .format(data['msg_id'], self.test_message['survey']))
             for row in request:
                 self.assertTrue(row is not None)
-    #
+
     def test_message_post_stores_events_correctly_for_message(self):
         """posts to message send end point to ensure events are saved as expected"""
         url = "http://localhost:5050/message/send"
