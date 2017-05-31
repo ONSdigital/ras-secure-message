@@ -1,18 +1,19 @@
-from flask_restful import Resource
-from flask import request, jsonify, g, Response
-from werkzeug.exceptions import BadRequest
-from app.repository.modifier import Modifier
-from app.validation.domain import MessageSchema
-from app.repository.saver import Saver
-from app.repository.retriever import Retriever
 import logging
-from app.common.alerts import AlertUser
+
+from flask import request, jsonify, g, Response
+from flask_restful import Resource
+from werkzeug.exceptions import BadRequest
+
 from app import settings
-from app.settings import MESSAGE_QUERY_LIMIT
-from app.validation.labels import Labels
-from app.validation.user import User
-from datetime import timezone, datetime
+from app.common.alerts import AlertUser
+from app.common.labels import Labels
+from app.repository.modifier import Modifier
+from app.repository.retriever import Retriever
+from app.repository.saver import Saver
 from app.resources.drafts import DraftModifyById
+from app.settings import MESSAGE_QUERY_LIMIT
+from app.validation.domain import MessageSchema
+from app.validation.user import User
 
 logger = logging.getLogger(__name__)
 

@@ -1,12 +1,13 @@
-from datetime import datetime, timezone
 import unittest
 import uuid
+from datetime import datetime, timezone
+
 from flask import current_app
 from sqlalchemy import create_engine
 from werkzeug.exceptions import InternalServerError
 
-from app.validation.labels import Labels
 from app.application import app
+from app.common.labels import Labels
 from app.repository import database
 from app.repository.modifier import Modifier
 from app.repository.retriever import Retriever

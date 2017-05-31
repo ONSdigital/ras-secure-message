@@ -1,22 +1,24 @@
-from app.resources.drafts import Drafts
-import unittest
-from app.repository.saver import Saver
-from unittest import mock
-from app.validation.domain import DraftSchema
-from app.validation.labels import Labels
-from app import application
-from sqlalchemy import create_engine
-from app.common.alerts import AlertUser, AlertViaGovNotify
-from app.repository import database
-from flask import current_app, json
-from app.application import app
-from app.authentication.jwt import encode
-from app.authentication.jwe import Encrypter
-from app import settings
-import uuid
 import hashlib
-from app.resources.drafts import DraftModifyById
+import unittest
+import uuid
+from unittest import mock
+
+from flask import current_app, json
+from sqlalchemy import create_engine
 from werkzeug.exceptions import InternalServerError
+
+from app import application
+from app import settings
+from app.application import app
+from app.authentication.jwe import Encrypter
+from app.authentication.jwt import encode
+from app.common.alerts import AlertUser, AlertViaGovNotify
+from app.common.labels import Labels
+from app.repository import database
+from app.repository.saver import Saver
+from app.resources.drafts import DraftModifyById
+from app.resources.drafts import Drafts
+from app.validation.domain import DraftSchema
 
 
 class DraftTestCase(unittest.TestCase):

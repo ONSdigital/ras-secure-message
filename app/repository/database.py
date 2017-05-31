@@ -1,11 +1,13 @@
+import logging
+from datetime import datetime, timezone
+
+from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import Column, String, Integer, DateTime, ForeignKey
 from sqlalchemy.orm import relationship
-from flask_sqlalchemy import SQLAlchemy
-from datetime import datetime, timezone
+
 from app import constants
-import logging
+from app.common.labels import Labels
 from app.validation.user import User
-from app.validation.labels import Labels
 
 logger = logging.getLogger(__name__)
 

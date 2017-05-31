@@ -1,17 +1,19 @@
-from flask_restful import Resource
-from flask import request, jsonify
+import hashlib
 import logging
-from app.repository.saver import Saver
-from app.validation.labels import Labels
-from app.validation.domain import DraftSchema
-from app.validation.user import User
+
+from flask import g, Response
+from flask import request, jsonify
+from flask_restful import Resource
 from werkzeug.exceptions import BadRequest
+from werkzeug.exceptions import InternalServerError
+
+from app.common.labels import Labels
 from app.repository.database import SecureMessage, Status
 from app.repository.modifier import Modifier
 from app.repository.retriever import Retriever
-from werkzeug.exceptions import InternalServerError
-from flask import g, Response
-import hashlib
+from app.repository.saver import Saver
+from app.validation.domain import DraftSchema
+from app.validation.user import User
 
 logger = logging.getLogger(__name__)
 
