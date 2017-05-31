@@ -8,7 +8,6 @@ from app.application import app
 from unittest import mock
 from app.exception.exceptions import MessageSaveException
 from app.validation.domain import Message
-from datetime import datetime, timezone
 
 
 class SaverTestCase(unittest.TestCase):
@@ -93,3 +92,20 @@ class SaverTestCase(unittest.TestCase):
                 self.assertTrue(row[1] == message_event['event'])
                 self.assertTrue(row[2] == message_event['msg_id'])
                 self.assertTrue(row[3] is not None)
+
+    def test_commit_exception_does_a_rollback(self):
+        """check status commit exception clears the session"""
+        message_status = {'msg_id': 'AMsgId', 'actor': 'Tej'}
+        with app.app_context():
+            self.db.drop_all()
+            with current_app.test_request_context():
+                with self.assertRaises(MessageSaveException):
+                    Saver().save_msg_status(message_status['msg_id'], message_status['actor'], 'INBOX, UNREAD')
+
+                self.db.create_all()
+                Saver().save_msg_status(message_status['msg_id'], message_status['actor'], 'INBOX, UNREAD')
+
+        with self.engine.connect() as con:
+            request = con.execute('SELECT COUNT(status.id) FROM status')
+            for row in request:
+                self.assertTrue(row._row[0] == 1)
