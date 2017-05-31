@@ -30,11 +30,12 @@ class MessageList(Resource):
     @staticmethod
     def get():
         """Get message list with options"""
-        string_query_args, page, limit, ru, survey, cc, label, desc = MessageList._get_options(request.args)
+        string_query_args, page, limit, ru, survey, cc, label, business, desc = MessageList._get_options(request.args)
 
         message_service = Retriever()
         status, result = message_service.retrieve_message_list(page, limit, g.user_urn,
-                                                               ru=ru, survey=survey, cc=cc, label=label, descend=desc)
+                                                               ru=ru, survey=survey, cc=cc, label=label,
+                                                               business=business, descend=desc)
         if status:
             resp = MessageList._paginated_list_to_json(result, page, limit, request.host_url,
                                                        g.user_urn, string_query_args)
@@ -51,6 +52,7 @@ class MessageList(Resource):
         survey = None
         cc = None
         label = None
+        business = None
         desc = True
 
         if args.get('limit'):
@@ -62,6 +64,9 @@ class MessageList(Resource):
         if args.get('ru'):
             string_query_args = MessageList._add_string_query_args(string_query_args, 'ru', args.get('ru'))
             ru = str(args.get('ru'))
+        if args.get('business'):
+            string_query_args = MessageList._add_string_query_args(string_query_args, 'business', args.get('business'))
+            business = str(args.get('business'))
         if args.get('survey'):
             survey = str(args.get('survey'))
             string_query_args = MessageList._add_string_query_args(string_query_args, 'survey', args.get('survey'))
@@ -75,7 +80,7 @@ class MessageList(Resource):
             desc = False if args.get('desc') == 'false' else True
             string_query_args = MessageList._add_string_query_args(string_query_args, 'desc', args.get('desc'))
 
-        return string_query_args, page, limit, ru, survey, cc, label, desc
+        return string_query_args, page, limit, ru, survey, cc, label, business, desc
 
     @staticmethod
     def _add_string_query_args(string_query_args, arg, val):

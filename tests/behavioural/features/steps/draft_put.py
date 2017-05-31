@@ -19,6 +19,7 @@ post_data = {'urn_to': 'internal.000000',
              'thread_id': '2',
              'collection_case': 'collection case1',
              'reporting_unit': 'reporting case1',
+             'business_name': 'ABusiness',
              'survey': 'survey'}
 data = {'urn_to': 'internal.000000',
         'urn_from': 'respondent.000000',
@@ -27,6 +28,7 @@ data = {'urn_to': 'internal.000000',
         'thread_id': '2',
         'collection_case': 'collection case1',
         'reporting_unit': 'reporting case1',
+        'business_name': 'ABusiness',
         'survey': 'survey'}
 
 with app.app_context():
@@ -61,6 +63,7 @@ def step_impl(context):
                  'thread_id': '2',
                  'collection_case': 'collection case1',
                  'reporting_unit': 'reporting case1',
+                 'business_name': 'ABusiness',
                  'survey': 'survey'})
     data['body'] = 'replaced'
 
@@ -90,6 +93,7 @@ def step_impl(context):
                  'thread_id': '2',
                  'collection_case': 'collection case1',
                  'reporting_unit': 'reporting case1',
+                 'business_name': 'ABusiness',
                  'survey': 'survey'})
     data['body'] = 'replaced'
     context.msg_id = data['msg_id']
@@ -109,6 +113,7 @@ def step_impl(context):
                  'thread_id': '2',
                  'collection_case': 'collection case1',
                  'reporting_unit': 'reporting case1',
+                 'business_name': 'ABusiness',
                  'survey': 'survey'})
     data['urn_to'] = 'x' * (constants.MAX_TO_LEN+1)
 
@@ -127,6 +132,7 @@ def step_impl(context):
                  'thread_id': '2',
                  'collection_case': 'collection case1',
                  'reporting_unit': 'reporting case1',
+                 'business_name': 'ABusiness',
                  'survey': 'survey'})
     data['urn_from'] = 'x' * (constants.MAX_FROM_LEN+1)
 
@@ -145,6 +151,7 @@ def step_impl(context):
                  'thread_id': '2',
                  'collection_case': 'collection case1',
                  'reporting_unit': 'reporting case1',
+                 'business_name': 'ABusiness',
                  'survey': 'survey'})
     data['body'] = 'x' * (constants.MAX_BODY_LEN+1)
 
@@ -163,6 +170,7 @@ def step_impl(context):
                  'thread_id': '2',
                  'collection_case': 'collection case1',
                  'reporting_unit': 'reporting case1',
+                 'business_name': 'ABusiness',
                  'survey': 'survey'})
     data['subject'] = 'x' * (constants.MAX_SUBJECT_LEN+1)
 
@@ -183,6 +191,7 @@ def step_impl(context):
                  'thread_id': '2',
                  'collection_case': 'collection case1',
                  'reporting_unit': 'reporting case1',
+                 'business_name': 'ABusiness',
                  'survey': 'survey'})
     data['urn_to'] = ''
 
@@ -203,6 +212,7 @@ def step_impl(context):
                  'thread_id': '2',
                  'collection_case': 'collection case1',
                  'reporting_unit': 'reporting case1',
+                 'business_name': 'ABusiness',
                  'survey': 'survey'})
     data['body'] = ''
 
@@ -223,6 +233,7 @@ def step_impl(context):
                  'thread_id': '2',
                  'collection_case': 'collection case1',
                  'reporting_unit': 'reporting case1',
+                 'business_name': 'ABusiness',
                  'survey': 'survey'})
     data['subject'] = ''
 
@@ -243,6 +254,7 @@ def step_impl(context):
                  'thread_id': '2',
                  'collection_case': 'collection case1',
                  'reporting_unit': 'reporting case1',
+                 'business_name': 'ABusiness',
                  'survey': 'survey'})
     data['thread_id'] = ''
 
@@ -261,6 +273,7 @@ def step_impl(context):
                  'thread_id': '2',
                  'collection_case': 'collection case1',
                  'reporting_unit': 'reporting case1',
+                 'business_name': 'ABusiness',
                  'survey': 'survey'})
 
 
@@ -282,6 +295,7 @@ def step_impl(context):
                      'thread_id': '2',
                      'collection_case': 'collection case1',
                      'reporting_unit': 'reporting case1',
+                     'business_name': 'ABusiness',
                      'survey': 'survey'})
         data['body'] = ''
         headers['Etag'] = context.etag
@@ -299,6 +313,7 @@ def step_impl(context):
                  'thread_id': '2',
                  'collection_case': 'collection case1',
                  'reporting_unit': 'reporting case1',
+                 'business_name': 'ABusiness',
                  'survey': 'survey'})
 
     data['subject'] = 'edited'
@@ -334,6 +349,7 @@ def step_impl(context):
                  'thread_id': '',
                  'collection_case': 'collection case1',
                  'reporting_unit': 'reporting case1',
+                 'business_name': 'ABusiness',
                  'survey': 'survey'})
 
     if 'ETag' in headers:

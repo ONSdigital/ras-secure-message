@@ -28,9 +28,8 @@ class RetrieverTestCaseHelper:
                 if single:
                     msg_id = str(uuid.uuid4())
                     query = 'INSERT INTO secure_message(msg_id, subject, body, thread_id,' \
-                            ' collection_case, reporting_unit, survey) VALUES ("{0}", "test","test","", ' \
-                            '"ACollectionCase", "AReportingUnit", ' \
-                            '"SurveyType")'.format(msg_id)
+                            ' collection_case, reporting_unit, survey, business_name) VALUES ("{0}", "test","test",' \
+                            '"", "ACollectionCase", "AReportingUnit", "SurveyType", "ABusiness")'.format(msg_id)
                     con.execute(query)
                     query = 'INSERT INTO status(label, msg_id, actor) VALUES("SENT", "{0}", "respondent.21345")'.format(
                         msg_id)
@@ -49,10 +48,9 @@ class RetrieverTestCaseHelper:
                     con.execute(query)
                 if add_reply:
                     msg_id = str(uuid.uuid4())
-                    query = 'INSERT INTO secure_message(msg_id, subject, body, thread_id, ' \
-                            ' collection_case, reporting_unit, survey) VALUES ("{0}", "test","test","", ' \
-                            ' "ACollectionCase", "AReportingUnit", ' \
-                            '"SurveyType")'.format(msg_id)
+                    query = 'INSERT INTO secure_message(msg_id, subject, body, thread_id,' \
+                            ' collection_case, reporting_unit, survey, business_name) VALUES ("{0}", "test","test",' \
+                            '"", "ACollectionCase", "AReportingUnit", "SurveyType", "ABusiness")'.format(msg_id)
                     con.execute(query)
                     query = 'INSERT INTO status(label, msg_id, actor) VALUES("SENT", "{0}", "SurveyType")'.format(
                         msg_id)
@@ -71,10 +69,9 @@ class RetrieverTestCaseHelper:
                     con.execute(query)
                 if add_draft:
                     msg_id = str(uuid.uuid4())
-                    query = 'INSERT INTO secure_message(msg_id, subject, body, thread_id, ' \
-                            ' collection_case, reporting_unit, survey) VALUES ("{0}", "test","test","", ' \
-                            ' "ACollectionCase", "AReportingUnit", ' \
-                            '"SurveyType")'.format(msg_id)
+                    query = 'INSERT INTO secure_message(msg_id, subject, body, thread_id,' \
+                            ' collection_case, reporting_unit, survey, business_name) VALUES ("{0}", "test","test",' \
+                            '"", "ACollectionCase", "AReportingUnit", "SurveyType", "ABusiness")'.format(msg_id)
                     con.execute(query)
                     query = 'INSERT INTO status(label, msg_id, actor) VALUES("DRAFT_INBOX", "{0}", "respondent.21345")'.format(
                         msg_id)
@@ -87,10 +84,10 @@ class RetrieverTestCaseHelper:
                     con.execute(query)
                 if multiple_users:
                     msg_id = str(uuid.uuid4())
-                    query = 'INSERT INTO secure_message(msg_id, subject, body, thread_id, ' \
-                            ' collection_case, reporting_unit, survey) VALUES ("{0}", "test","test","", ' \
-                            ' "AnotherCollectionCase", ' \
-                            '"AnotherReportingUnit", "AnotherSurveyType")'.format(msg_id)
+                    query = 'INSERT INTO secure_message(msg_id, subject, body, thread_id,' \
+                            ' collection_case, reporting_unit, survey, business_name) VALUES ("{0}", "test","test",' \
+                            '"", "AnotherCollectionCase", "AnotherReportingUnit", "AnotherSurveyType", ' \
+                            '"AnotherBusiness")'.format(msg_id)
                     con.execute(query)
                     query = 'INSERT INTO status(label, msg_id, actor) VALUES("SENT", "{0}", "respondent.0000")'\
                         .format(msg_id)
@@ -434,6 +431,36 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
                     self.assertTrue(serialized_msg['reporting_unit'] == 'AnotherReportingUnit')
                 self.assertEqual(len(msg), 0)
 
+    def test_all_message_returned_with_business_option(self):
+        """retrieves all messages from database for user with business option"""
+        self.populate_database(5, multiple_users=True)
+
+        with app.app_context():
+            with current_app.test_request_context():
+                response = Retriever().retrieve_message_list(1, MESSAGE_QUERY_LIMIT, 'respondent.21345',
+                                                             business='ABusiness')[1]
+                msg = []
+                for message in response.items:
+                    serialized_msg = message.serialize('respondent.21345')
+                    msg.append(serialized_msg)
+                    self.assertTrue(serialized_msg['business_name'] == 'ABusiness')
+                self.assertEqual(len(msg), 5)
+
+    def test_no_message_returned_with_business_option(self):
+        """retrieves no messages from database for user with business option"""
+        self.populate_database(5, multiple_users=True)
+
+        with app.app_context():
+            with current_app.test_request_context():
+                response = Retriever().retrieve_message_list(1, MESSAGE_QUERY_LIMIT, 'respondent.21345',
+                                                             business='AnotherBusiness')[1]
+                msg = []
+                for message in response.items:
+                    serialized_msg = message.serialize('respondent.21345')
+                    msg.append(serialized_msg)
+                    self.assertTrue(serialized_msg['business_name'] == 'AnotherBusiness')
+                self.assertEqual(len(msg), 0)
+
     def test_all_message_returned_with_survey_option(self):
         """retrieves all messages from database for user with survey option"""
         self.populate_database(5)
@@ -598,7 +625,7 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
         """Tests get messages list with no options provided"""
         args = {}
 
-        string_query_args, page, limit, ru, survey, cc, label, desc = MessageList._get_options(args)
+        string_query_args, page, limit, ru, survey, cc, label, business, desc = MessageList._get_options(args)
 
         self.assertEqual(string_query_args, '?')
         self.assertEqual(page, 1)
@@ -607,6 +634,7 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
         self.assertEqual(survey, None)
         self.assertEqual(cc, None)
         self.assertEqual(label, None)
+        self.assertEqual(business, None)
         self.assertEqual(desc, True)
 
     def test_three_options(self):
@@ -616,7 +644,7 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
             'survey': 'Survey',
             'ru': 'ReportingUnit'
         }
-        string_query_args, page, limit, ru, survey, cc, label, desc = MessageList._get_options(args)
+        string_query_args, page, limit, ru, survey, cc, label, business, desc = MessageList._get_options(args)
 
         self.assertEqual(string_query_args, '?ru=ReportingUnit&survey=Survey')
         self.assertEqual(page, 2)
@@ -625,6 +653,7 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
         self.assertEqual(survey, 'Survey')
         self.assertEqual(cc, None)
         self.assertEqual(label, None)
+        self.assertEqual(business, None)
         self.assertEqual(desc, True)
 
     def test_all_options(self):
@@ -636,12 +665,13 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
             'ru': 'ReportingUnit',
             'cc': 'CollectionCase',
             'label': 'INBOX',
-            'desc': 'false'
-
+            'desc': 'false',
+            'business': 'ABusiness',
         }
-        string_query_args, page, limit, ru, survey, cc, label, desc = MessageList._get_options(args)
+        string_query_args, page, limit, ru, survey, cc, label, business, desc = MessageList._get_options(args)
 
-        self.assertEqual(string_query_args, '?ru=ReportingUnit&survey=Survey&cc=CollectionCase&label=INBOX&desc=false')
+        self.assertEqual(string_query_args,
+                         '?ru=ReportingUnit&business=ABusiness&survey=Survey&cc=CollectionCase&label=INBOX&desc=false')
         self.assertEqual(page, 2)
         self.assertEqual(limit, 9)
         self.assertEqual(ru, 'ReportingUnit')
@@ -649,13 +679,16 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
         self.assertEqual(cc, 'CollectionCase')
         self.assertEqual(label, 'INBOX')
         self.assertEqual(desc, False)
+        self.assertEqual(business, 'ABusiness')
 
     def test_add_string_query_no_args(self):
+        """Adding args to empty string query"""
         string_query_args = '?'
         string_query_args = MessageList._add_string_query_args(string_query_args, 'ru', 'ReportingUnit')
         self.assertEqual(string_query_args, '?ru=ReportingUnit')
 
     def test_add_string_query_with_args(self):
+        """Adding args to string query with arg"""
         string_query_args = '?survey=Survey'
         string_query_args = MessageList._add_string_query_args(string_query_args, 'ru', 'ReportingUnit')
         self.assertEqual(string_query_args, '?survey=Survey&ru=ReportingUnit')

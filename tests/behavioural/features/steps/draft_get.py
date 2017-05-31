@@ -49,6 +49,7 @@ def step_impl(context):
                  'thread_id': '',
                  'collection_case': 'collection case1',
                  'reporting_unit': 'reporting case1',
+                 'business_name': 'ABusiness',
                  'survey': 'survey'})
     response = app.test_client().post("http://localhost:5050/draft/save", data=json.dumps(data),
                                       headers=headers)
@@ -91,6 +92,7 @@ def step_impl(self, context):
                  'thread_id': '',
                  'collection_case': 'collection case1',
                  'reporting_unit': 'reporting case1',
+                 'business_name': 'ABusiness',
                  'survey': 'survey'})
     response = app.test_client().post("http://localhost:5050/draft/save", data=json.dumps(context.draft),
                                       headers=headers)
@@ -112,6 +114,7 @@ def step_impl(context):
                  'thread_id': '',
                  'collection_case': 'collection case1',
                  'reporting_unit': 'reporting case1',
+                 'business_name': 'ABusiness',
                  'survey': 'survey'})
     response = app.test_client().post("http://localhost:5050/draft/save", data=json.dumps(data),
                                       headers=headers)

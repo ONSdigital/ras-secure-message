@@ -22,6 +22,7 @@ data = {'urn_to': 'test',
         'thread_id': '',
         'collection_case': 'collection case1',
         'reporting_unit': 'reporting case1',
+        'business_name': 'ABusiness',
         'survey': 'survey'}
 
 
