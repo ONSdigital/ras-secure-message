@@ -11,8 +11,6 @@ from app.validation.domain import DraftSchema
 from app.validation.user import User
 from app.repository.modifier import Modifier
 from app.repository.retriever import Retriever
-from flask import g, Response
-
 
 logger = logging.getLogger(__name__)
 
