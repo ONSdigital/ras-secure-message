@@ -12,7 +12,6 @@ from app.validation.user import User
 from app.repository.modifier import Modifier
 from app.repository.retriever import Retriever
 from flask import g, Response
-import hashlib
 
 
 logger = logging.getLogger(__name__)

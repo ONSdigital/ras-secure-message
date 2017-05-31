@@ -10,7 +10,6 @@ from app.common.labels import Labels
 from app.repository.modifier import Modifier
 from app.repository.retriever import Retriever
 from app.repository.saver import Saver
-from app.resources.drafts import DraftModifyById
 from app.settings import MESSAGE_QUERY_LIMIT
 from app.validation.domain import MessageSchema
 from app.validation.user import User
