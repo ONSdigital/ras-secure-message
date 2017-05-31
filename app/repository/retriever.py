@@ -16,7 +16,8 @@ logger = logging.getLogger(__name__)
 class Retriever:
     """Created when retrieving messages"""
     @staticmethod
-    def retrieve_message_list(page, limit, user_urn, ru=None, survey=None, cc=None, label=None, descend=True):
+    def retrieve_message_list(page, limit, user_urn, ru=None, survey=None, cc=None, label=None,
+                              business=None, descend=True):
         """returns list of messages from db"""
         user = User(user_urn)
         conditions = []
@@ -38,6 +39,9 @@ class Retriever:
 
         if ru is not None:
             conditions.append(SecureMessage.reporting_unit == str(ru))
+
+        if business is not None:
+            conditions.append(SecureMessage.business_name == str(business))
 
         if survey is not None:
             conditions.append(SecureMessage.survey == str(survey))

@@ -22,6 +22,7 @@ data = {'urn_to': 'test',
         'thread_id': '',
         'collection_case': 'collectioncase',
         'reporting_unit': 'AReportingUnit',
+        'business_name': 'ABusiness',
         'survey': 'survey'}
 
 
@@ -187,6 +188,42 @@ def step_impl(context):
 def step_impl(context):
     response = flask.json.loads(context.response.data)
     nose.tools.assert_equal(response['messages'][1]['reporting_unit'], 'AnotherReportingUnit')
+
+    nose.tools.assert_equal(len(response['messages']), 2)
+
+
+# Scenario: Respondent and internal user sends multiple messages and Respondent retrieves the list of messages with business name
+
+@given('an Internal user sends multiple messages with different business names')
+def step_impl(context):
+    reset_db()
+
+    for x in range(0, 2):
+        data['urn_to'] = 'respondent.122342'
+        data['urn_from'] = 'internal.12344'
+        context.response = app.test_client().post("http://localhost:5050/message/send",
+                                                  data=flask.json.dumps(data), headers=headers)
+    for x in range(0, 2):
+        data['urn_to'] = 'respondent.122342'
+        data['urn_from'] = 'internal.12344'
+        data['business_name'] = 'AnotherBusiness'
+        context.response = app.test_client().post("http://localhost:5050/message/send",
+                                                  data=flask.json.dumps(data), headers=headers)
+
+
+@when('the Respondent gets their messages with particular business name')
+def step_impl(context):
+    token_data['user_urn'] = 'respondent.122342'
+    headers['Authorization'] = update_encrypted_jwt()
+    context.response = app.test_client().get('{0}{1}'.format(url, '?business=AnotherBusiness'), headers=headers)
+
+
+@then('the retrieved messages should have the correct business name')
+def step_impl(context):
+    response = flask.json.loads(context.response.data)
+
+    for x in range(1, len(response['messages'])):
+        nose.tools.assert_equal(response['messages'][x]['business_name'], 'AnotherBusiness')
 
     nose.tools.assert_equal(len(response['messages']), 2)
 
