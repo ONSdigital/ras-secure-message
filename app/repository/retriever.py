@@ -1,14 +1,13 @@
 import logging
 
 from flask import jsonify
-from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy import and_, case
-from app.validation.labels import Labels
+from sqlalchemy.exc import SQLAlchemyError
 from werkzeug.exceptions import InternalServerError, NotFound
 
+from app.common.labels import Labels
 from app.repository.database import SecureMessage, Status, Events
 from app.validation.user import User
-
 
 logger = logging.getLogger(__name__)
 

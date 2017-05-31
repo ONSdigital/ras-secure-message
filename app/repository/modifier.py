@@ -1,10 +1,11 @@
 import logging
+
+from werkzeug.exceptions import InternalServerError
+
+from app.common.labels import Labels
 from app.repository.database import db
 from app.repository.saver import Saver
-from werkzeug.exceptions import InternalServerError
-from app.validation.labels import Labels
 from app.validation.user import User
-
 
 logger = logging.getLogger(__name__)
 

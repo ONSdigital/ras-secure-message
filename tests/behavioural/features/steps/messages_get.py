@@ -188,7 +188,6 @@ def step_impl(context):
 def step_impl(context):
     response = flask.json.loads(context.response.data)
     nose.tools.assert_equal(response['messages'][1]['reporting_unit'], 'AnotherReportingUnit')
-
     nose.tools.assert_equal(len(response['messages']), 2)
 
 
@@ -224,7 +223,6 @@ def step_impl(context):
 
     for x in range(1, len(response['messages'])):
         nose.tools.assert_equal(response['messages'][x]['business_name'], 'AnotherBusiness')
-
     nose.tools.assert_equal(len(response['messages']), 2)
 
 
