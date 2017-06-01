@@ -178,15 +178,15 @@ class MessageSend(Resource):
 
         if is_draft is True:
             self._del_draft_labels(draft_id)
-        return MessageSend._alert_recipients(message.data.msg_id)
+        return MessageSend._alert_recipients(message.data.msg_id, message.data.thread_id)
 
     @staticmethod
-    def _alert_recipients(reference):
+    def _alert_recipients(msg_id, thread_id):
         """used to alert user once messages have been saved"""
         recipient_email = settings.NOTIFICATION_DEV_EMAIL  # TODO change this when know more about party service
         alert_user = AlertUser()
-        alert_status, alert_detail = alert_user.send(recipient_email, reference)
-        resp = jsonify({'status': '{0}'.format(alert_detail), 'msg_id': reference})
+        alert_status, alert_detail = alert_user.send(recipient_email, msg_id)
+        resp = jsonify({'status': '{0}'.format(alert_detail), 'msg_id': msg_id, 'thread_id': thread_id})
         resp.status_code = alert_status
         return resp
 
