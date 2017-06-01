@@ -227,6 +227,18 @@ def step_impl(context):
     context.response = app.test_client().post(url, data=json.dumps(data), headers=headers)
 
 
+@then('a msg_id in the response')
+def step_impl(context):
+    resp = json.loads(context.response.data)
+    nose.tools.assert_true(resp['msg_id'] is not None)
+
+
+@then('a thread_id in the response')
+def step_impl(context):
+    resp = json.loads(context.response.data)
+    nose.tools.assert_true(resp['thread_id'] is not None)
+
+
 @then("a 400 error status is returned")
 def step_impl(context):
     nose.tools.assert_equal(context.response.status_code, 400)
