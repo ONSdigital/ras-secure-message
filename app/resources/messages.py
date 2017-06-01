@@ -1,15 +1,17 @@
-from flask_restful import Resource
-from flask import request, jsonify, g, Response
-from werkzeug.exceptions import BadRequest
-from app.repository.modifier import Modifier
-from app.validation.domain import MessageSchema
-from app.repository.saver import Saver
-from app.repository.retriever import Retriever
 import logging
-from app.common.alerts import AlertUser
+
+from flask import request, jsonify, g, Response
+from flask_restful import Resource
+from werkzeug.exceptions import BadRequest
+
 from app import settings
+from app.common.alerts import AlertUser
+from app.common.labels import Labels
+from app.repository.modifier import Modifier
+from app.repository.retriever import Retriever
+from app.repository.saver import Saver
 from app.settings import MESSAGE_QUERY_LIMIT
-from app.validation.labels import Labels
+from app.validation.domain import MessageSchema
 from app.validation.user import User
 from app.resources.drafts import DraftModifyById
 
@@ -148,18 +150,18 @@ class MessageSend(Resource):
 
         message = MessageSchema().load(post_data)
         if message.errors == {}:
-            return self.message_save(message, is_draft, draft_id)
+            return self._message_save(message, is_draft, draft_id)
         else:
             resp = jsonify(message.errors)
             resp.status_code = 400
             return resp
 
     @staticmethod
-    def del_draft_labels(draft_id):
+    def _del_draft_labels(draft_id):
         modifier = Modifier()
         modifier.del_draft(draft_id)
 
-    def message_save(self, message, is_draft, draft_id):
+    def _message_save(self, message, is_draft, draft_id):
         """Saves the message to the database along with the subsequent status and audit"""
         save = Saver()
         save.save_message(message.data)
@@ -175,7 +177,7 @@ class MessageSend(Resource):
             save.save_msg_status(message.data.urn_to, message.data.msg_id, Labels.UNREAD.value)
 
         if is_draft is True:
-            self.del_draft_labels(draft_id)
+            self._del_draft_labels(draft_id)
         return MessageSend._alert_recipients(message.data.msg_id)
 
     @staticmethod
@@ -212,14 +214,14 @@ class MessageModifyById(Resource):
 
         request_data = request.get_json()
 
-        action, label = MessageModifyById.validate_request(request_data)
+        action, label = MessageModifyById._validate_request(request_data)
 
         message = Retriever().retrieve_message(message_id, user_urn)
 
         if label == Labels.UNREAD.value:
-            resp = MessageModifyById.modify_unread(action, message, user_urn)
+            resp = MessageModifyById._modify_unread(action, message, user_urn)
         else:
-            resp = MessageModifyById.modify_label(action, message, user_urn, label)
+            resp = MessageModifyById._modify_label(action, message, user_urn, label)
 
         if resp:
             res = jsonify({'status': 'ok'})
@@ -231,7 +233,7 @@ class MessageModifyById(Resource):
         return res
 
     @staticmethod
-    def modify_label(action, message, user_urn, label):
+    def _modify_label(action, message, user_urn, label):
         """Adds or deletes a label"""
         label_exists = label in message
         if action == 'add' and not label_exists:
@@ -242,13 +244,13 @@ class MessageModifyById(Resource):
             return False
 
     @staticmethod
-    def modify_unread(action, message, user_urn):
+    def _modify_unread(action, message, user_urn):
         if action == 'add':
             return Modifier.add_unread(message, user_urn)
         return Modifier.del_unread(message, user_urn)
 
     @staticmethod
-    def validate_request(request_data):
+    def _validate_request(request_data):
         """Used to validate data within request body for ModifyById"""
         if 'label' not in request_data:
             raise BadRequest(description="No label provided")
