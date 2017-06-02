@@ -16,7 +16,7 @@ from app.common.labels import Labels
 from app.repository import database
 from app.repository.saver import Saver
 from app.resources.drafts import DraftModifyById
-from app.resources.drafts import Drafts
+from app.resources.drafts import DraftSave
 from app.validation.domain import DraftSchema
 
 
@@ -64,7 +64,9 @@ class DraftTestCase(unittest.TestCase):
 
         draft = DraftSchema().load(self.test_message)
 
-        Drafts._save_draft(draft, saver)
+        draft_save = DraftSave()
+
+        draft_save._save_draft(draft, saver)
 
         saver.save_message.assert_called_with(draft.data)
         saver.save_msg_status.assert_called_with(draft.data.urn_from, draft.data.msg_id, Labels.DRAFT.value)

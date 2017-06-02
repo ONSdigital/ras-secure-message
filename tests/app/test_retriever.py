@@ -8,7 +8,7 @@ from app.application import app
 from app.repository import database
 from app.repository.retriever import Retriever
 from app.resources.messages import MessageList
-from app.settings import MESSAGE_QUERY_LIMIT
+from app.constants import MESSAGE_QUERY_LIMIT
 from datetime import datetime
 import random
 
@@ -254,92 +254,6 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
             with current_app.test_request_context():
                 with self.assertRaises(InternalServerError):
                     Retriever().retrieve_message(1, 'internal.21345')
-
-    def test_paginated_to_json_returns_correct_messages_len(self):
-        """turns paginated result list to json checking correct amount of messages are given"""
-        self.populate_database(MESSAGE_QUERY_LIMIT-1)
-        with app.app_context():
-            with current_app.test_request_context():
-                resp = Retriever().retrieve_message_list(1, MESSAGE_QUERY_LIMIT, 'respondent.21345')[1]
-                json_data = MessageList()._paginated_list_to_json(resp, 1, MESSAGE_QUERY_LIMIT,
-                                                                  "http://localhost:5050/", 'respondent.21345',
-                                                                  string_query_args='?')
-                data = json.loads(json_data.get_data())
-                self.assertEqual(len(data['messages']), (MESSAGE_QUERY_LIMIT-1))
-
-    def test_paginated_to_json_returns_correct_message_self_link(self):
-        """turns paginated result list to json checking correct self link has been added for message"""
-        self.populate_database(MESSAGE_QUERY_LIMIT-1)
-        with app.app_context():
-            with current_app.test_request_context():
-                resp = Retriever().retrieve_message_list(1, MESSAGE_QUERY_LIMIT, 'respondent.21345')[1]
-                json_data = MessageList()._paginated_list_to_json(resp, 1, MESSAGE_QUERY_LIMIT,
-                                                                  "http://localhost:5050/", 'respondent.21345',
-                                                                  string_query_args='?')
-                data = json.loads(json_data.get_data())
-                self.assertEqual(data['messages'][4]['_links']['self']['href'],
-                                 "{0}{1}".format(self.MESSAGE_BY_ID_ENDPOINT, data["messages"][4]['msg_id']))
-
-    def test_paginated_to_json_returns_prev_page(self):
-        """turns paginated result list to json checking prev page is returned if needed"""
-        self.populate_database(MESSAGE_QUERY_LIMIT*2)
-        with app.app_context():
-            with current_app.test_request_context():
-                resp = Retriever().retrieve_message_list(2, MESSAGE_QUERY_LIMIT, 'respondent.21345')[1]
-                json_data = MessageList()._paginated_list_to_json(resp, 2, MESSAGE_QUERY_LIMIT,
-                                                                  "http://localhost:5050/", 'respondent.21345',
-                                                                  string_query_args='?')
-                data = json.loads(json_data.get_data())
-                self.assertTrue('prev' in data['_links'])
-
-    def test_paginated_to_json_does_not_return_prev_page(self):
-        """turns paginated result list to json checking prev page is not returned if not needed"""
-        self.populate_database(MESSAGE_QUERY_LIMIT-1)
-        with app.app_context():
-            with current_app.test_request_context():
-                resp = Retriever().retrieve_message_list(1, MESSAGE_QUERY_LIMIT, 'respondent.21345')[1]
-                json_data = MessageList()._paginated_list_to_json(resp, 1, MESSAGE_QUERY_LIMIT,
-                                                                  "http://localhost:5050/", 'respondent.21345',
-                                                                  string_query_args='?')
-                data = json.loads(json_data.get_data())
-                self.assertFalse('prev' in data['_links'])
-
-    def test_paginated_to_json_returns_next_page(self):
-        """turns paginated result list to json checking next page is returned if needed"""
-        self.populate_database(MESSAGE_QUERY_LIMIT*2)
-        with app.app_context():
-            with current_app.test_request_context():
-                resp = Retriever().retrieve_message_list(1, MESSAGE_QUERY_LIMIT, 'respondent.21345')[1]
-                json_data = MessageList()._paginated_list_to_json(resp, 1, MESSAGE_QUERY_LIMIT,
-                                                                  "http://localhost:5050/", 'respondent.21345',
-                                                                  string_query_args='?')
-                data = json.loads(json_data.get_data())
-                self.assertTrue('next' in data['_links'])
-
-    def test_paginated_to_json_does_not_return_next_page(self):
-        """turns paginated result list to json checking next page is not returned if not needed"""
-        self.populate_database(MESSAGE_QUERY_LIMIT-1)
-        with app.app_context():
-            with current_app.test_request_context():
-                resp = Retriever().retrieve_message_list(1, MESSAGE_QUERY_LIMIT, 'respondent.21345')[1]
-                json_data = MessageList()._paginated_list_to_json(resp, 1, MESSAGE_QUERY_LIMIT,
-                                                                  "http://localhost:5050/", 'respondent.21345',
-                                                                  string_query_args='?')
-                data = json.loads(json_data.get_data())
-                self.assertFalse('next' in data['_links'])
-
-    def test_paginated_to_json_has_correct_self_link(self):
-        """turns paginated result list to json checking correct self link has been added for list"""
-        self.populate_database(MESSAGE_QUERY_LIMIT - 1)
-        with app.app_context():
-            with current_app.test_request_context():
-                resp = Retriever().retrieve_message_list(1, MESSAGE_QUERY_LIMIT, 'respondent.21345')[1]
-                json_data = MessageList()._paginated_list_to_json(resp, 1, MESSAGE_QUERY_LIMIT,
-                                                                  "http://localhost:5050/", 'respondent.21345',
-                                                                  string_query_args='?')
-                data = json.loads(json_data.get_data())
-                self.assertEqual(data['_links']['self']['href'],
-                                 "{0}?page={1}&limit={2}".format(self.MESSAGE_LIST_ENDPOINT, 1, MESSAGE_QUERY_LIMIT))
 
     def test_all_draft_message_returned(self):
         """retrieves messages from database with label DRAFT for user"""
@@ -620,78 +534,6 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
                 desc_date = sorted(date, reverse=True)
                 self.assertEqual(len(date), 10)
                 self.assertListEqual(desc_date, date)
-
-    def test_no_options(self):
-        """Tests get messages list with no options provided"""
-        args = {}
-
-        string_query_args, page, limit, ru, survey, cc, label, business, desc = MessageList._get_options(args)
-
-        self.assertEqual(string_query_args, '?')
-        self.assertEqual(page, 1)
-        self.assertEqual(limit, MESSAGE_QUERY_LIMIT)
-        self.assertEqual(ru, None)
-        self.assertEqual(survey, None)
-        self.assertEqual(cc, None)
-        self.assertEqual(label, None)
-        self.assertEqual(business, None)
-        self.assertEqual(desc, True)
-
-    def test_three_options(self):
-        """Tests get messages list with few options provided"""
-        args = {
-            'page': 2,
-            'survey': 'Survey',
-            'ru': 'ReportingUnit'
-        }
-        string_query_args, page, limit, ru, survey, cc, label, business, desc = MessageList._get_options(args)
-
-        self.assertEqual(string_query_args, '?ru=ReportingUnit&survey=Survey')
-        self.assertEqual(page, 2)
-        self.assertEqual(limit, MESSAGE_QUERY_LIMIT)
-        self.assertEqual(ru, 'ReportingUnit')
-        self.assertEqual(survey, 'Survey')
-        self.assertEqual(cc, None)
-        self.assertEqual(label, None)
-        self.assertEqual(business, None)
-        self.assertEqual(desc, True)
-
-    def test_all_options(self):
-        """Tests get messages list with all options provided"""
-        args = {
-            'page': 2,
-            'limit': 9,
-            'survey': 'Survey',
-            'ru': 'ReportingUnit',
-            'cc': 'CollectionCase',
-            'label': 'INBOX',
-            'desc': 'false',
-            'business': 'ABusiness',
-        }
-        string_query_args, page, limit, ru, survey, cc, label, business, desc = MessageList._get_options(args)
-
-        self.assertEqual(string_query_args,
-                         '?ru=ReportingUnit&business=ABusiness&survey=Survey&cc=CollectionCase&label=INBOX&desc=false')
-        self.assertEqual(page, 2)
-        self.assertEqual(limit, 9)
-        self.assertEqual(ru, 'ReportingUnit')
-        self.assertEqual(survey, 'Survey')
-        self.assertEqual(cc, 'CollectionCase')
-        self.assertEqual(label, 'INBOX')
-        self.assertEqual(desc, False)
-        self.assertEqual(business, 'ABusiness')
-
-    def test_add_string_query_no_args(self):
-        """Adding args to empty string query"""
-        string_query_args = '?'
-        string_query_args = MessageList._add_string_query_args(string_query_args, 'ru', 'ReportingUnit')
-        self.assertEqual(string_query_args, '?ru=ReportingUnit')
-
-    def test_add_string_query_with_args(self):
-        """Adding args to string query with arg"""
-        string_query_args = '?survey=Survey'
-        string_query_args = MessageList._add_string_query_args(string_query_args, 'ru', 'ReportingUnit')
-        self.assertEqual(string_query_args, '?survey=Survey&ru=ReportingUnit')
 
     def test_draft_returned_with_msg_id_true(self):
         """retrieves draft using id"""

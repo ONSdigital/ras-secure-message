@@ -10,7 +10,7 @@ from app.repository import database
 from app.resources.health import Health, DatabaseHealth, HealthDetails
 from app.resources.messages import MessageList, MessageSend, MessageById, MessageModifyById
 from app.authentication.authenticator import authenticate
-from app.resources.drafts import Drafts, DraftById, DraftModifyById
+from app.resources.drafts import DraftSave, DraftById, DraftModifyById, DraftList
 from app import connector
 
 
@@ -64,9 +64,10 @@ api.add_resource(MessageList, '/messages')
 api.add_resource(MessageSend, '/message/send')
 api.add_resource(MessageById, '/message/<message_id>')
 api.add_resource(MessageModifyById, '/message/<message_id>/modify')
-api.add_resource(Drafts, '/draft/save')
+api.add_resource(DraftSave, '/draft/save')
 api.add_resource(DraftModifyById, '/draft/<draft_id>/modify')
 api.add_resource(DraftById, '/draft/<draft_id>')
+api.add_resource(DraftList, '/drafts')
 
 
 @app.before_request
