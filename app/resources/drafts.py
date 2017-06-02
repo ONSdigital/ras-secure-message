@@ -11,11 +11,12 @@ from app.validation.domain import DraftSchema
 from app.validation.user import User
 from app.repository.modifier import Modifier
 from app.repository.retriever import Retriever
+from app.common.utilities import get_options, paginated_list_to_json
 
 logger = logging.getLogger(__name__)
 
 
-class Drafts(Resource):
+class DraftSave(Resource):
     def post(self):
         """Handles saving of new draft"""
         post_data = request.get_json()
@@ -42,17 +43,16 @@ class Drafts(Resource):
             res.status_code = 400
             return res
 
-    @staticmethod
-    def _save_draft(draft, saver=Saver()):
+    def _save_draft(self, draft, saver=Saver()):
         saver.save_message(draft.data)
 
         if draft.data.urn_to is not None and len(draft.data.urn_to) != 0:
-            Drafts._save_draft_status(saver, draft.data.msg_id, draft.data.urn_to, draft.data.survey,
+            self._save_draft_status(saver, draft.data.msg_id, draft.data.urn_to, draft.data.survey,
                                       Labels.DRAFT_INBOX.value)
 
         saver.save_msg_event(draft.data.msg_id, 'Draft_Saved')
 
-        Drafts._save_draft_status(saver, draft.data.msg_id, draft.data.urn_from, draft.data.survey, Labels.DRAFT.value)
+        self._save_draft_status(saver, draft.data.msg_id, draft.data.urn_from, draft.data.survey, Labels.DRAFT.value)
 
     @staticmethod
     def _save_draft_status(saver, msg_id, person, survey, label):
@@ -85,6 +85,24 @@ class DraftById(Resource):
         etag = hash_object.hexdigest()
 
         return etag
+
+
+class DraftList(Resource):
+    """Return a list of drafts for the user"""
+
+    @staticmethod
+    def get():
+        """Get message list with options"""
+        string_query_args, page, limit, ru, survey, cc, label, business, desc = get_options(request.args)
+
+        message_service = Retriever()
+        status, result = message_service.retrieve_message_list(page, limit, g.user_urn, label=Labels.DRAFT.value)
+
+        if status:
+            resp = paginated_list_to_json(result, page, limit, request.host_url,
+                                                       g.user_urn, string_query_args)
+            resp.status_code = 200
+            return resp
 
 
 class DraftModifyById(Resource):

@@ -1,10 +1,14 @@
 Feature: Get Drafts
 
-  @ignore
   Scenario: User requests list of drafts
     Given the user has created and saved multiple drafts
     When the user requests drafts
-    Then all the users drafts are returned
+    Then only the users drafts are returned
+
+  Scenario: User requests second page of list of drafts
+    Given the user has created and saved multiple drafts
+    When the user requests second page of drafts
+    Then user will get drafts from second page of pagination
 
   @ignore
   Scenario: User not authorised to view drafts
