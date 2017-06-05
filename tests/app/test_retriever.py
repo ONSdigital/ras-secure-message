@@ -725,3 +725,11 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
             with current_app.test_request_context():
                 with self.assertRaises(NotFound):
                     Retriever().retrieve_thread('anotherThreadId', 'respondent.21345')
+
+    def test_retrieve_draft_raises_server_error(self):
+        """retrieves draft when db does not exist"""
+        with app.app_context():
+            database.db.drop_all()
+            with current_app.test_request_context():
+                with self.assertRaises(InternalServerError):
+                    Retriever().retrieve_draft('draftId', 'respondent.21345')
