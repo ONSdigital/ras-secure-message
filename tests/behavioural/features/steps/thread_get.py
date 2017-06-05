@@ -25,6 +25,7 @@ data = {'urn_to': 'test',
         'business_name': 'ABusiness',
         'survey': 'BRES'}
 
+
 def update_encrypted_jwt():
     encrypter = Encrypter(_private_key=settings.SM_USER_AUTHENTICATION_PRIVATE_KEY,
                           _private_key_password=settings.SM_USER_AUTHENTICATION_PRIVATE_KEY_PASSWORD,
@@ -47,7 +48,7 @@ def reset_db():
 @given("a respondent and internal user have a conversation")
 def step_impl(context):
     reset_db()
-    for x in range(0, 2):
+    for _ in range(0, 2):
         data['urn_to'] = 'internal.12344'
         data['urn_from'] = 'respondent.122342'
         context.response = app.test_client().post("http://localhost:5050/message/send", data=flask.json.dumps(data),
