@@ -29,7 +29,7 @@ class Retriever:
             if survey is not None:
                 status_conditions.append(Status.actor == str(survey))
             else:
-                status_conditions.append(Status.actor == 'bres')
+                status_conditions.append(Status.actor == 'BRES')
 
         if label is not None:
             status_conditions.append(Status.label == str(label))
@@ -88,6 +88,42 @@ class Retriever:
         return message
 
     @staticmethod
+    def retrieve_thread(thread_id, user_urn, _survey='BRES'):
+        """returns list of messages for thread id"""
+
+        user = User(user_urn)
+        status_conditions = []
+
+        if user.is_respondent:
+            status_conditions.append(Status.actor == str(user_urn))
+        else:
+            status_conditions.append(Status.actor == str(_survey))
+
+        status_conditions.append(Status.label != Labels.DRAFT_INBOX.value)
+
+        try:
+            result = SecureMessage.query.join(Events).join(Status)\
+                .filter(SecureMessage.thread_id == thread_id)\
+                .filter(and_(*status_conditions))\
+                .order_by(case([(Events.event == 'Sent', Events.date_time),
+                                (Events.event == 'Draft_Saved', Events.date_time)],
+                               else_=0).desc(), Events.event.desc())
+
+            if result.count() == 0:
+                raise (NotFound(description="Conversation with thread_id '{0}' does not exist".format(thread_id)))
+
+        except SQLAlchemyError as e:
+            logger.error(e)
+            raise(InternalServerError(description="Error retrieving conversation from database"))
+
+        conversation = []
+
+        for msg in result:
+            conversation.append(msg.serialize(user_urn))
+
+        return conversation
+
+    @staticmethod
     def retrieve_draft(message_id, user_urn):
         """returns single draft from db"""
 
@@ -98,7 +134,7 @@ class Retriever:
                 raise (NotFound(description="Draft with msg_id '{0}' does not exist".format(message_id)))
         except SQLAlchemyError as e:
             logger.error(e)
-            raise (InternalServerError(description="Error retrieving message from database"))
+            raise (InternalServerError(description="Error retrieving draft from database"))
 
         message = result.serialize(user_urn)
 
