@@ -106,7 +106,7 @@ def step_impl(context):
 
 #   Scenario: User is retrieving the etag from the header
 @given("there is a draft")
-def step_impl(context):
+def step_impl_there_is_a_draft(context):
     data.update({'urn_to': 'test',
                  'urn_from': 'test',
                  'subject': 'test',
@@ -122,7 +122,7 @@ def step_impl(context):
 
 
 @then("an etag should be sent with the draft")
-def step_impl(context):
+def step_impl_etag_should_be_sent_with_draft(context):
     etag = context.response.headers.get('ETag')
     nose.tools.assert_is_not_none(etag)
     nose.tools.assert_true(len(etag) == 40)
@@ -130,5 +130,5 @@ def step_impl(context):
 
 #   common
 @when('the user requests the draft')
-def step_impl(context):
+def step_impl_the_user_requests_draft(context):
     context.response = app.test_client().get(url.format(context.resp_data['msg_id']), headers=headers)
