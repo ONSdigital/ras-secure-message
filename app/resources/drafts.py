@@ -64,11 +64,11 @@ class DraftSave(Resource):
 
 
 class DraftById(Resource):
-    """Get and update message by id"""
+    """Return a draft for user"""
 
     @staticmethod
     def get(draft_id):
-        """Get message by id"""
+        """Get draft by id"""
         user_urn = g.user_urn
         # check user is authorised to view message
         message_service = Retriever()
