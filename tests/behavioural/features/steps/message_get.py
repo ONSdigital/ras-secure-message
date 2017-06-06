@@ -38,7 +38,7 @@ headers['Authorization'] = update_encrypted_jwt()
 
 # Scenario: Retrieve a message with correct message ID
 @given("there is a message to be retrieved")
-def step_impl(context):
+def step_impl_there_is_a_message_to_be_retrieved(context):
     data['urn_to'] = 'internal.12344'
     data['urn_from'] = 'respondent.122342'
     context.response = app.test_client().post("http://localhost:5050/message/send", data=flask.json.dumps(data),
@@ -48,31 +48,31 @@ def step_impl(context):
 
 
 @when("the get request is made with a correct message id")
-def step_impl(context):
+def step_impl_the_get_request_is_made_with_a_correct_message_id(context):
     new_url = url+context.msg_id
     context.response = app.test_client().get(new_url, headers=headers)
 
 
 @then("a 200 HTTP response is returned")
-def step_impl(context):
+def step_impl_a_200_http_response_is_returned(context):
     nose.tools.assert_equal(context.response.status_code, 200)
 
 
 # Scenario: Retrieve a message with incorrect message ID
 @when("the get request has been made with an incorrect message id")
-def step_impl(context):
+def step_impl_the_get_request_has_been_made_with_incorrect_message_id(context):
     new_url = url+str(uuid.uuid4())
     context.response = app.test_client().get(new_url, headers=headers)
 
 
 @then("a 404 HTTP response is returned")
-def step_impl(context):
+def step_impl_a_404_http_response_is_returned(context):
     nose.tools.assert_equal(context.response.status_code, 404)
 
 
 # Scenario: Respondent sends message and retrieves the same message with it's labels
 @given("a respondent sends a message")
-def step_impl(context):
+def step_impl_a_respondent_sends_a_message(context):
     data['urn_to'] = 'internal.12344'
     data['urn_from'] = 'respondent.122342'
     context.response = app.test_client().post("http://localhost:5050/message/send",
@@ -82,7 +82,7 @@ def step_impl(context):
 
 
 @when("the respondent wants to see the message")
-def step_impl(context):
+def step_impl_the_respondent_wants_to_see_the_message(context):
     token_data['user_urn'] = 'respondent.122342'
     headers['Authorization'] = update_encrypted_jwt()
     new_url = url+context.msg_id
@@ -90,14 +90,14 @@ def step_impl(context):
 
 
 @then("the retrieved message should have the label SENT")
-def step_impl(context):
+def step_impl_the_retrieved_message_should_have_label_sent(context):
     response = flask.json.loads(context.response.data)
     nose.tools.assert_equal(response['labels'], ['SENT'])
 
 
 # Scenario: Internal user sends message and retrieves the same message with it's labels
 @given("an internal user sends a message")
-def step_impl(context):
+def step_impl_an_internal_user_sends_a_message(context):
     data['urn_to'] = 'respondent.122342'
     data['urn_from'] = 'internal.12344'
     context.response = app.test_client().post("http://localhost:5050/message/send",
@@ -107,7 +107,7 @@ def step_impl(context):
 
 
 @when("the internal user wants to see the message")
-def step_impl(context):
+def step_impl_the_internal_user_wants_to_see_the_message(context):
     token_data['user_urn'] = 'internal.12344'
     headers['Authorization'] = update_encrypted_jwt()
     new_url = url+context.msg_id
@@ -116,7 +116,7 @@ def step_impl(context):
 
 #  Scenario: Internal user sends message and respondent retrieves the same message with it's labels
 @then("the retrieved message should have the labels INBOX and UNREAD")
-def step_impl(context):
+def step_impl_the_retrieved_message_should_havethe_labels_inbox_and_unread(context):
     response = flask.json.loads(context.response.data)
     nose.tools.assert_true(len(response['labels']), 2)
     nose.tools.assert_true('INBOX' in response['labels'])

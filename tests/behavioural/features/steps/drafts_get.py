@@ -47,7 +47,7 @@ def reset_db():
 
 
 @given('the user has created and saved multiple drafts')
-def step_impl(context):
+def step_impl_user_has_created__and_saved_multiple_drafts(context):
     reset_db()
     data.update({'urn_to': 'test',
                  'urn_from': 'respondent.2134',
@@ -63,14 +63,14 @@ def step_impl(context):
 
 
 @when("the user requests drafts")
-def step_impl(context):
+def step_impl_user_requests_drafts(context):
     token_data['user_urn'] = 'respondent.2134'
     headers['Authorization'] = update_encrypted_jwt()
     context.response = app.test_client().get('{0}?limit={1}&page={2}'.format(url, 7, 1), headers=headers)
 
 
 @then("only the users drafts are returned")
-def step_impl(context):
+def step_impl_only_the_users_drafts_are_returned(context):
     response = flask.json.loads(context.response.data)
     for x in range(0, len(response['messages'])):
         nose.tools.assert_equal(response['messages'][x]['labels'], ['DRAFT'])
@@ -82,14 +82,14 @@ def step_impl(context):
 #   Scenario: User requests second page of list of drafts
 
 @when("the user requests second page of drafts")
-def step_impl(context):
+def step_impl_the_user_requests_second_page_of_drafts(context):
     token_data['user_urn'] = 'respondent.2134'
     headers['Authorization'] = update_encrypted_jwt()
     context.response = app.test_client().get('{0}?limit={1}&page={2}'.format(url, 7, 2), headers=headers)
 
 
 @then("user will get drafts from second page of pagination")
-def step_impl(context):
+def step_impl_user_will_get_drafts_from_second_page_of_pagination(context):
     response = flask.json.loads(context.response.data)
     for x in range(0, len(response['messages'])):
         nose.tools.assert_equal(response['messages'][x]['labels'], ['DRAFT'])

@@ -49,7 +49,7 @@ headers['Authorization'] = update_encrypted_jwt()
 
 # Scenario 1: A user edits a previously saved draft
 @given('a user edits a previously saved draft')
-def step_impl(context):
+def step_impl_user_edits_saved_draft(context):
     add_draft = app.test_client().post('http://localhost:5050/draft/save', data=json.dumps(post_data), headers=headers)
     post_resp = json.loads(add_draft.data)
     context.msg_id = post_resp['msg_id']
@@ -69,7 +69,7 @@ def step_impl(context):
 
 
 @when('the user saves the draft')
-def step_impl(context):
+def step_impl_user_saves_the_draft(context):
     if 'ETag' in headers:
         del headers['ETag']
     if hasattr(context, 'etag'):
@@ -78,13 +78,13 @@ def step_impl(context):
 
 
 @then('a success response is given')
-def step_impl(context):
+def step_impl_success_returned(context):
     nose.tools.assert_equal(context.response.status_code, 200)
 
 
 # Scenario 2: A user edits a draft that has not been previously saved
 @given('a user edits a non-existing draft')
-def step_impl(context):
+def step_impl_user_edits_non_existant_draft(context):
     data.update({'msg_id': '001',
                  'urn_to': 'internal.000000',
                  'urn_from': 'respondent.000000',
@@ -101,7 +101,7 @@ def step_impl(context):
 
 # Scenario 3: A user edits a draft that has a too large to attribute
 @given("a user modifies a draft with a to attribute that is too big")
-def step_impl(context):
+def step_impl_modifies_draft_to_attribute_too_big(context):
     add_draft = app.test_client().post('http://localhost:5050/draft/save', data=json.dumps(post_data), headers=headers)
     post_resp = json.loads(add_draft.data)
     context.msg_id = post_resp['msg_id']
@@ -120,7 +120,7 @@ def step_impl(context):
 
 # Scenario 4: A user edits a draft that has a too large from attribute
 @given("a user modifies a draft with a from attribute that is too big")
-def step_impl(context):
+def step_impl_user_modifies_draft_from_attribute_too_big(context):
     add_draft = app.test_client().post('http://localhost:5050/draft/save', data=json.dumps(post_data), headers=headers)
     post_resp = json.loads(add_draft.data)
     context.msg_id = post_resp['msg_id']
@@ -139,7 +139,7 @@ def step_impl(context):
 
 # Scenario 5: A user edits a draft that has a too large body attribute
 @given("a user modifies a draft with a body attribute that is too big")
-def step_impl(context):
+def step_impl_user_modifies_draft_body_attribute_too_big(context):
     add_draft = app.test_client().post('http://localhost:5050/draft/save', data=json.dumps(post_data), headers=headers)
     post_resp = json.loads(add_draft.data)
     context.msg_id = post_resp['msg_id']
@@ -158,7 +158,7 @@ def step_impl(context):
 
 # Scenario 6: A user edits a draft that has a too large subject attribute
 @given("a user modifies a draft with a subject attribute that is too big")
-def step_impl(context):
+def step_impl_user_modifies_draft_subject_attribute_too_big(context):
     add_draft = app.test_client().post('http://localhost:5050/draft/save', data=json.dumps(post_data), headers=headers)
     post_resp = json.loads(add_draft.data)
     context.msg_id = post_resp['msg_id']
@@ -177,7 +177,7 @@ def step_impl(context):
 
 # Scenario 7: A user edits a draft not including a to attribute
 @given("a user modifies a draft not adding a to attribute")
-def step_impl(context):
+def step_impl_user_modifies_draft_no_to_attribute(context):
     add_draft = app.test_client().post('http://localhost:5050/draft/save', data=json.dumps(post_data), headers=headers)
     post_resp = json.loads(add_draft.data)
     context.msg_id = post_resp['msg_id']
@@ -198,7 +198,7 @@ def step_impl(context):
 
 # Scenario 8: A user edits a draft not including a body attribute
 @given("a user modifies a draft not adding a body attribute")
-def step_impl(context):
+def step_impl_user_modifies_draft_no_body(context):
     add_draft = app.test_client().post('http://localhost:5050/draft/save', data=json.dumps(post_data), headers=headers)
     post_resp = json.loads(add_draft.data)
     context.msg_id = post_resp['msg_id']
@@ -219,7 +219,7 @@ def step_impl(context):
 
 # Scenario 9: A user edits a draft not including a subject attribute
 @given("a user modifies a draft not adding a subject attribute")
-def step_impl(context):
+def step_impl_user_modifies_draft_no_subject(context):
     add_draft = app.test_client().post('http://localhost:5050/draft/save', data=json.dumps(post_data), headers=headers)
     post_resp = json.loads(add_draft.data)
     context.msg_id = post_resp['msg_id']
@@ -240,7 +240,7 @@ def step_impl(context):
 
 # Scenario 10: A user edits a draft not including a subject attribute
 @given("a user modifies a draft not adding a thread id attribute")
-def step_impl(context):
+def step_impluser_modifies_draft_no_thread_id(context):
     add_draft = app.test_client().post('http://localhost:5050/draft/save', data=json.dumps(post_data), headers=headers)
     post_resp = json.loads(add_draft.data)
     context.msg_id = post_resp['msg_id']
@@ -261,7 +261,7 @@ def step_impl(context):
 
 # Scenario 11: A user edits a draft where msg id in url and in the message body do not match
 @given("a user tries to modify a draft with mismatched msg ids")
-def step_impl(context):
+def step_impl_user_modifies_draft_with_mismatched_msg_id(context):
     add_draft = app.test_client().post('http://localhost:5050/draft/save', data=json.dumps(post_data), headers=headers)
     post_resp = json.loads(add_draft.data)
     context.msg_id = post_resp['msg_id']
@@ -279,7 +279,7 @@ def step_impl(context):
 
 # Scenario 12: A user is editing a draft while another user tries to modify the same draft
 @given("a draft message is being edited")
-def step_impl(context):
+def step_impl_draft_message_is_being_edited(context):
         add_draft = app.test_client().post('http://localhost:5050/draft/save', data=json.dumps(post_data),
                                            headers=headers)
         post_resp = json.loads(add_draft.data)
@@ -304,7 +304,7 @@ def step_impl(context):
 
 
 @when("another user tries to modify the same draft message")
-def step_impl(context):
+def step_impl_another_user_tries_to_modify_same_draft(context):
     data.update({'msg_id': context.msg_id,
                  'urn_to': 'internal.000000',
                  'urn_from': 'respondent.000000',
@@ -323,13 +323,13 @@ def step_impl(context):
 
 
 @then("a conflict error is returned")
-def step_impl(context):
+def step_impl_conflict_returned(context):
     nose.tools.assert_equal(context.response.status_code, 409)
 
 
 #  Scenario: User retrieves etag from the header when modifying a draft
 @given('there is a draft to be modified')
-def step_impl(context):
+def step_impl_there_is_a_draft_to_be_modified(context):
     add_draft = app.test_client().post('http://localhost:5050/draft/save', data=json.dumps(post_data),
                                        headers=headers)
     post_resp = json.loads(add_draft.data)
@@ -340,7 +340,7 @@ def step_impl(context):
 
 
 @when('the user modifies the draft')
-def step_impl(context):
+def step_impl_the_user_modifies_the_draft(context):
     data.update({'msg_id':context.msg_id,
                  'urn_to': 'internal.000000',
                  'urn_from': 'respondent.000000',
@@ -359,7 +359,7 @@ def step_impl(context):
 
 
 @then("a new etag should be returned to the user")
-def step_impl(context):
+def step_impl_new_etag_should_be_returned(context):
     etag = context.response.headers.get('ETag')
     nose.tools.assert_is_not_none(etag)
     nose.tools.assert_true(len(etag) == 40)
