@@ -7,6 +7,7 @@ from flask import current_app
 from app.authentication.jwt import encode
 from app.authentication.jwe import Encrypter
 from app import settings
+import uuid
 
 url = "http://localhost:5050/thread/{0}"
 token_data = {
@@ -48,6 +49,8 @@ def reset_db():
 @given("a respondent and internal user have a conversation")
 def step_impl(context):
     reset_db()
+
+    data['thread_id'] = 'AConversation'
     for _ in range(0, 2):
         data['urn_to'] = 'internal.12344'
         data['urn_from'] = 'respondent.122342'
@@ -79,3 +82,46 @@ def step_impl(context):
     token_data['user_urn'] = 'internal.12344'
     headers['Authorization'] = update_encrypted_jwt()
     context.response = app.test_client().get(url.format(data['thread_id']), headers=headers)
+
+#   Scenario: Respondent and internal user have a conversation, including a draft, and respondent retrieves the conversation
+
+
+@given("internal user creates a draft")
+def step_impl(context):
+        data['urn_to'] = 'respondent.122342'
+        data['urn_from'] = 'internal.12344'
+        data['thread_id'] = 'AConversation'
+        context.response = app.test_client().post("http://localhost:5050/draft/save", data=flask.json.dumps(data),
+                                                  headers=headers)
+
+#   Scenario: Respondent and internal user have a conversation, including a draft, and internal user retrieves the conversation
+
+
+@then("all messages from that conversation should be received including draft")
+def step_impl(context):
+    response = flask.json.loads(context.response.data)
+    nose.tools.assert_equal(len(response), 5)
+
+
+#   Scenario: Respondent and internal user have a conversation and internal user retrieves that conversation from multiple conversations
+@given("internal user has multiple conversations")
+def step_impl(context):
+
+    for _ in range(0, 2):
+        data['thread_id'] = str(uuid.uuid4())
+        data['urn_to'] = 'internal.12344'
+        data['urn_from'] = 'respondent.122342'
+        context.response = app.test_client().post("http://localhost:5050/message/send", data=flask.json.dumps(data),
+                                                  headers=headers)
+        data['urn_to'] = 'respondent.122342'
+        data['urn_from'] = 'internal.12344'
+        context.response = app.test_client().post("http://localhost:5050/message/send", data=flask.json.dumps(data),
+                                                  headers=headers)
+    data['thread_id'] = 'AConversation'
+
+
+#   Scenario: User tries to retrieve a conversation that does not exist
+@given("a respondent picks a conversation that does not exist")
+def step_impl(context):
+    reset_db()
+    data['thread_id'] = str(uuid.uuid4())
