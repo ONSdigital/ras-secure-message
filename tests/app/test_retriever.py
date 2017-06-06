@@ -29,7 +29,7 @@ class RetrieverTestCaseHelper:
                     msg_id = str(uuid.uuid4())
                     query = 'INSERT INTO secure_message(msg_id, subject, body, thread_id,' \
                             ' collection_case, reporting_unit, survey, business_name) VALUES ("{0}", "test","test",' \
-                            '"", "ACollectionCase", "AReportingUnit", "SurveyType", "ABusiness")'.format(msg_id)
+                            '"ThreadId", "ACollectionCase", "AReportingUnit", "SurveyType", "ABusiness")'.format(msg_id)
                     con.execute(query)
                     query = 'INSERT INTO status(label, msg_id, actor) VALUES("SENT", "{0}", "respondent.21345")'.format(
                         msg_id)
@@ -50,7 +50,7 @@ class RetrieverTestCaseHelper:
                     msg_id = str(uuid.uuid4())
                     query = 'INSERT INTO secure_message(msg_id, subject, body, thread_id,' \
                             ' collection_case, reporting_unit, survey, business_name) VALUES ("{0}", "test","test",' \
-                            '"", "ACollectionCase", "AReportingUnit", "SurveyType", "ABusiness")'.format(msg_id)
+                            '"ThreadId", "ACollectionCase", "AReportingUnit", "SurveyType", "ABusiness")'.format(msg_id)
                     con.execute(query)
                     query = 'INSERT INTO status(label, msg_id, actor) VALUES("SENT", "{0}", "SurveyType")'.format(
                         msg_id)
@@ -65,13 +65,13 @@ class RetrieverTestCaseHelper:
                         msg_id, sent_date)
                     con.execute(query)
                     query = 'INSERT INTO events(event, msg_id, date_time) VALUES("Read", "{0}", "{1}")'.format(
-                        msg_id, "2017-02-03 00:00:00")
+                        msg_id, str(datetime(year, month, day+2)))
                     con.execute(query)
                 if add_draft:
                     msg_id = str(uuid.uuid4())
                     query = 'INSERT INTO secure_message(msg_id, subject, body, thread_id,' \
                             ' collection_case, reporting_unit, survey, business_name) VALUES ("{0}", "test","test",' \
-                            '"", "ACollectionCase", "AReportingUnit", "SurveyType", "ABusiness")'.format(msg_id)
+                            '"ThreadId", "ACollectionCase", "AReportingUnit", "SurveyType", "ABusiness")'.format(msg_id)
                     con.execute(query)
                     query = 'INSERT INTO status(label, msg_id, actor) VALUES("DRAFT_INBOX", "{0}", "respondent.21345")'.format(
                         msg_id)
@@ -665,3 +665,71 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
             with current_app.test_request_context():
                 with self.assertRaises(InternalServerError):
                     Retriever().retrieve_message(1, 'internal.21345')
+
+    ####################################################
+    def test_all_msg_returned_for_thread_id_with_draft(self):
+        """retrieves messages for thread_id from database with draft """
+        self.populate_database(3, add_reply=True, add_draft=True)
+
+        with app.app_context():
+            with current_app.test_request_context():
+                response = Retriever().retrieve_thread('ThreadId', 'internal.21345', _survey='SurveyType')
+                self.assertEqual(len(response), 9)
+
+    def test_all_msg_returned_for_thread_id_without_draft(self):
+        """retrieves messages for thread_id from database without draft"""
+        self.populate_database(3, add_reply=True)
+
+        with app.app_context():
+            with current_app.test_request_context():
+                response = Retriever().retrieve_thread('ThreadId', 'respondent.21345')
+                self.assertEqual(len(response), 6)
+
+    def test_all_msg_returned_for_thread_id_with_draft_inbox(self):
+        """retrieves messages for thread_id from database with draft inbox"""
+        self.populate_database(3, add_reply=True, add_draft=True)
+
+        with app.app_context():
+            with current_app.test_request_context():
+                response = Retriever().retrieve_thread('ThreadId', 'respondent.21345')
+                self.assertEqual(len(response), 6)
+
+    def test_thread_returned_in_desc_order(self):
+        """check thread returned in correct order"""
+        self.populate_database(3, add_reply=True)
+
+        with app.app_context():
+            with current_app.test_request_context():
+                response = Retriever().retrieve_thread('ThreadId', 'respondent.21345')
+                self.assertEqual(len(response), 6)
+
+                sent = []
+                for message in response:
+                    sent.append(message['sent_date'])
+
+                desc_date = sorted(sent, reverse=True)
+                self.assertEqual(len(sent), 6)
+                self.assertListEqual(desc_date, sent)
+
+    def test_retrieve_thread_raises_server_error(self):
+        """retrieves messages when db does not exist"""
+        with app.app_context():
+            database.db.drop_all()
+            with current_app.test_request_context():
+                with self.assertRaises(InternalServerError):
+                    Retriever().retrieve_thread('ThreadId', 'respondent.21345')
+
+    def test_thread_returned_with_thread_id_returns_404(self):
+        """retrieves thread using id that doesn't exist"""
+        with app.app_context():
+            with current_app.test_request_context():
+                with self.assertRaises(NotFound):
+                    Retriever().retrieve_thread('anotherThreadId', 'respondent.21345')
+
+    def test_retrieve_draft_raises_server_error(self):
+        """retrieves draft when db does not exist"""
+        with app.app_context():
+            database.db.drop_all()
+            with current_app.test_request_context():
+                with self.assertRaises(InternalServerError):
+                    Retriever().retrieve_draft('draftId', 'respondent.21345')
