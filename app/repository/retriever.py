@@ -85,13 +85,13 @@ class Retriever:
 
         try:
             t = db.session.query(SecureMessage.msg_id, SecureMessage.thread_id, func.max(Events.date_time).label('max_date'))\
-                .join(Events)\
+                .join(Events).join(Status) \
+                .filter(and_(*status_conditions))\
                 .filter(or_(Events.event == 'Sent', Events.event == 'Draft_Saved'))\
                 .group_by(SecureMessage.thread_id).subquery('t')
 
             result = SecureMessage.query.join(Events).join(Status) \
                 .filter(and_(SecureMessage.msg_id == t.c.msg_id, Events.date_time == t.c.max_date)) \
-                .filter(and_(*status_conditions))\
                 .order_by(t.c.max_date.desc()).paginate(page, limit, False)
 
         except Exception as e:

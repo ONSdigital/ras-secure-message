@@ -161,7 +161,7 @@ class RetrieverTestCaseHelper:
                     msg_id, str(datetime(year, month, day + 2)))
                 con.execute(query)
 
-                if random.choice(range(0, no_of_threads)) == 1:
+                if random.choice(range(0, no_of_threads)) == 1:  # adds draft from internal randomly
                     msg_id = str(uuid.uuid4())
                     query = 'INSERT INTO secure_message(msg_id, subject, body, thread_id,' \
                             ' collection_case, reporting_unit, survey, business_name) VALUES ("{0}", "test","test",' \
@@ -172,7 +172,24 @@ class RetrieverTestCaseHelper:
                         msg_id)
                     con.execute(query)
                     query = 'INSERT INTO status(label, msg_id, actor) VALUES("DRAFT", "{0}",' \
-                            ' "SurveyType")'.format(msg_id)
+                            ' "BRES")'.format(msg_id)
+                    con.execute(query)
+                    query = 'INSERT INTO events(event, msg_id, date_time) VALUES("Draft_Saved", "{0}", "{1}")'.format(
+                        msg_id, str(datetime(year, month, day + 3)))
+                    con.execute(query)
+
+                if random.choice(range(0, no_of_threads)) == 1:  # adds draft from respondent randomly
+                    msg_id = str(uuid.uuid4())
+                    query = 'INSERT INTO secure_message(msg_id, subject, body, thread_id,' \
+                            ' collection_case, reporting_unit, survey, business_name) VALUES ("{0}", "test","test",' \
+                            '"{1}", "ACollectionCase", "AReportingUnit", "BRES", "ABusiness")'.format(
+                        msg_id, thread_id)
+                    con.execute(query)
+                    query = 'INSERT INTO status(label, msg_id, actor) VALUES("DRAFT_INBOX", "{0}", "BRES")'.format(
+                        msg_id)
+                    con.execute(query)
+                    query = 'INSERT INTO status(label, msg_id, actor) VALUES("DRAFT", "{0}",' \
+                            ' "respondent.21345")'.format(msg_id)
                     con.execute(query)
                     query = 'INSERT INTO events(event, msg_id, date_time) VALUES("Draft_Saved", "{0}", "{1}")'.format(
                         msg_id, str(datetime(year, month, day + 3)))
@@ -881,7 +898,7 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
 
         with app.app_context():
             with current_app.test_request_context():
-                response = Retriever().retrieve_thread_list(1, MESSAGE_QUERY_LIMIT, 'respondent.21345')[1]
+                response = Retriever().retrieve_thread_list(1, MESSAGE_QUERY_LIMIT, 'internal.21345')[1]
 
                 sent = []
                 read = []
@@ -898,7 +915,7 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
 
                 self.assertEqual(len(msg_ids), 5)
 
-                for x in range(0,len(thread_ids)):
-                    thread = Retriever().retrieve_thread(thread_ids[x], user_urn='respondent.21345')
+                for x in range(0, len(thread_ids)):
+                    thread = Retriever().retrieve_thread(thread_ids[x], user_urn='internal.21345')
                     self.assertEqual(sent[x], thread[0]['sent_date'])
                     self.assertEqual(msg_ids[x], thread[0]['msg_id'])

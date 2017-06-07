@@ -169,7 +169,7 @@ class Events(db.Model):
     msg_id = Column('msg_id', String(constants.MAX_MSG_ID_LEN + 1), ForeignKey('secure_message.msg_id'))
     date_time = Column('date_time', DateTime())
 
-    def __init__(self, date_time=datetime.now(timezone.utc), msg_id='', event=''):
+    def __init__(self, msg_id='', event=''):
         self.msg_id = msg_id
         self.event = event
-        self.date_time = date_time
+        self.date_time = datetime.now(timezone.utc)
