@@ -6,6 +6,7 @@ from flask import request, jsonify
 from flask_restful import Resource
 from werkzeug.exceptions import BadRequest
 from app.common.labels import Labels
+from app.constants import DRAFT_LIST_ENDPOINT
 from app.repository.saver import Saver
 from app.validation.domain import DraftSchema
 from app.validation.user import User
@@ -100,7 +101,7 @@ class DraftList(Resource):
 
         if status:
             resp = paginated_list_to_json(result, page, limit, request.host_url,
-                                                       g.user_urn, string_query_args)
+                                                       g.user_urn, string_query_args, DRAFT_LIST_ENDPOINT)
             resp.status_code = 200
             return resp
 

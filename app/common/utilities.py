@@ -50,7 +50,8 @@ def add_string_query_args(string_query_args, arg, val):
         return '{0}&{1}={2}'.format(string_query_args, arg, val)
 
 
-def paginated_list_to_json(paginated_list, page, limit, host_url, user_urn, string_query_args):
+def paginated_list_to_json(paginated_list, page, limit, host_url, user_urn, string_query_args,
+                           endpoint=MESSAGE_LIST_ENDPOINT):
     """used to change a pagination object to json format with links"""
     messages = []
     msg_count = 0
@@ -65,19 +66,19 @@ def paginated_list_to_json(paginated_list, page, limit, host_url, user_urn, stri
         messages.append(msg)
 
     links = {
-        'first': {"href": "{0}{1}".format(host_url, "messages")},
-        'self': {"href": "{0}{1}{2}{3}page={4}&limit={5}".format(host_url, MESSAGE_LIST_ENDPOINT, arg_joiner,
+        'first': {"href": "{0}{1}".format(host_url, endpoint)},
+        'self': {"href": "{0}{1}{2}{3}page={4}&limit={5}".format(host_url, endpoint, arg_joiner,
                                                                  string_query_args, page, limit)}
     }
 
     if paginated_list.has_next:
         links['next'] = {
-            "href": "{0}{1}{2}{3}page={4}&limit={5}".format(host_url, MESSAGE_LIST_ENDPOINT, arg_joiner,
+            "href": "{0}{1}{2}{3}page={4}&limit={5}".format(host_url, endpoint, arg_joiner,
                                                             string_query_args, (page + 1), limit)}
 
     if paginated_list.has_prev:
         links['prev'] = {
-            "href": "{0}{1}{2}{3}page={4}&limit={5}".format(host_url, MESSAGE_LIST_ENDPOINT, arg_joiner,
+            "href": "{0}{1}{2}{3}page={4}&limit={5}".format(host_url, endpoint, arg_joiner,
                                                             string_query_args, (page - 1), limit)}
 
     return jsonify({"messages": messages, "_links": links})
