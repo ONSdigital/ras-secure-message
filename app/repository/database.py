@@ -2,7 +2,7 @@ import logging
 from datetime import datetime, timezone
 
 from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy import Column, String, Integer, DateTime, ForeignKey
+from sqlalchemy import Column, String, Integer, DateTime, ForeignKey, Index
 from sqlalchemy.orm import relationship
 
 from app import constants
@@ -20,16 +20,17 @@ class SecureMessage(db.Model):
     __tablename__ = "secure_message"
 
     id = Column("id", Integer(), primary_key=True)
-    msg_id = Column("msg_id", String(constants.MAX_MSG_ID_LEN), unique=True)
+    msg_id = Column("msg_id", String(constants.MAX_MSG_ID_LEN), unique=True, index=True)
     subject = Column("subject", String(constants.MAX_SUBJECT_LEN+1))
     body = Column("body", String(constants.MAX_BODY_LEN+1))
-    thread_id = Column("thread_id", String(constants.MAX_THREAD_LEN + 1))
+    thread_id = Column("thread_id", String(constants.MAX_THREAD_LEN + 1), index=True)
     collection_case = Column("collection_case", String(constants.MAX_COLLECTION_CASE_LEN+1))
     reporting_unit = Column("reporting_unit", String(constants.MAX_REPORTING_UNIT_LEN+1))
     business_name = Column("business_name", String(constants.MAX_BUSINESS_NAME_LEN + 1))
     survey = Column("survey", String(constants.MAX_SURVEY_LEN+1))
     statuses = relationship('Status', backref='secure_message')
     events = relationship('Events', backref='secure_message', order_by='Events.date_time')
+    __table_args__ = (Index("idx_ru_survey_cc", "reporting_unit", "survey", "collection_case"), )
 
     def __init__(self, msg_id="", subject="", body="", thread_id="", collection_case='',
                  reporting_unit='', survey='', business_name=''):
@@ -111,6 +112,7 @@ class Status(db.Model):
     label = Column('label', String(constants.MAX_STATUS_LABEL_LEN + 1))
     msg_id = Column('msg_id', String(constants.MAX_MSG_ID_LEN + 1), ForeignKey('secure_message.msg_id'))
     actor = Column('actor', String(constants.MAX_STATUS_ACTOR_LEN + 1))
+    __table_args__ = (Index("idx_msg_id_label", "msg_id", "label"),)
 
     def __init__(self, label='', msg_id='', actor=''):
         self.msg_id = msg_id
@@ -138,7 +140,7 @@ class InternalSentAudit(db.Model):
     __tablename__ = "internal_sent_audit"
 
     id = Column("id", Integer(), primary_key=True)
-    msg_id = Column('msg_id', String(constants.MAX_MSG_ID_LEN + 1), ForeignKey('secure_message.msg_id'))
+    msg_id = Column('msg_id', String(constants.MAX_MSG_ID_LEN + 1), ForeignKey('secure_message.msg_id'), index=True)
     internal_user = Column('internal_user', String(constants.MAX_STATUS_ACTOR_LEN + 1))
 
     def __init__(self, msg_id='', internal_user=''):
@@ -166,8 +168,9 @@ class Events(db.Model):
 
     id = Column('id', Integer(), primary_key=True)
     event = Column('event', String(constants.MAX_EVENT_LEN + 1))
-    msg_id = Column('msg_id', String(constants.MAX_MSG_ID_LEN + 1), ForeignKey('secure_message.msg_id'))
+    msg_id = Column('msg_id', String(constants.MAX_MSG_ID_LEN + 1), ForeignKey('secure_message.msg_id'), index=True)
     date_time = Column('date_time', DateTime())
+    __table_args__ = (Index("idx_msg_id_event", "msg_id", "event"),)
 
     def __init__(self, msg_id='', event=''):
         self.msg_id = msg_id
