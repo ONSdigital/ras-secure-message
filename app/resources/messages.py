@@ -7,6 +7,7 @@ from werkzeug.exceptions import BadRequest
 from app import settings
 from app.common.alerts import AlertUser
 from app.common.labels import Labels
+from app.constants import MESSAGE_LIST_ENDPOINT
 from app.repository.modifier import Modifier
 from app.repository.retriever import Retriever
 from app.repository.saver import Saver
@@ -35,7 +36,7 @@ class MessageList(Resource):
                                                                business=business, descend=desc)
         if status:
             resp = paginated_list_to_json(result, page, limit, request.host_url,
-                                                       g.user_urn, string_query_args)
+                                                       g.user_urn, string_query_args, MESSAGE_LIST_ENDPOINT)
             resp.status_code = 200
             return resp
 

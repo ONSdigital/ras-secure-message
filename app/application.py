@@ -11,7 +11,7 @@ from app.resources.health import Health, DatabaseHealth, HealthDetails
 from app.resources.messages import MessageList, MessageSend, MessageById, MessageModifyById
 from app.authentication.authenticator import authenticate
 from app.resources.drafts import DraftSave, DraftById, DraftModifyById, DraftList
-from app.resources.threads import ThreadById
+from app.resources.threads import ThreadById, ThreadList
 from app import connector
 
 
@@ -70,6 +70,7 @@ api.add_resource(DraftModifyById, '/draft/<draft_id>/modify')
 api.add_resource(DraftById, '/draft/<draft_id>')
 api.add_resource(ThreadById, '/thread/<thread_id>')
 api.add_resource(DraftList, '/drafts')
+api.add_resource(ThreadList, '/threads')
 
 
 @app.before_request

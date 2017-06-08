@@ -1,12 +1,12 @@
 import logging
 
 from flask import jsonify
-from sqlalchemy import and_, case
+from sqlalchemy import and_, case, func, or_
 from sqlalchemy.exc import SQLAlchemyError
 from werkzeug.exceptions import InternalServerError, NotFound
 
 from app.common.labels import Labels
-from app.repository.database import SecureMessage, Status, Events
+from app.repository.database import SecureMessage, Status, Events, db
 from app.validation.user import User
 
 logger = logging.getLogger(__name__)
@@ -67,6 +67,42 @@ class Retriever:
         except Exception as e:
             logger.error(e)
             raise(InternalServerError(description="Error retrieving messages from database"))
+
+        return True, result
+
+    @staticmethod
+    def retrieve_thread_list(page, limit, user_urn):
+        """returns list of threads from db"""
+        user = User(user_urn)
+        status_conditions = []
+        conditions = []
+
+        if user.is_respondent:
+            status_conditions.append(Status.actor == str(user_urn))
+        else:
+            status_conditions.append(Status.actor == 'BRES')
+
+        status_conditions.append(Status.label != Labels.DRAFT_INBOX.value)
+
+
+        try:
+            t = db.session.query(SecureMessage.msg_id, SecureMessage.thread_id, func.max(Events.date_time).label('max_date'))\
+                .join(Events).join(Status) \
+                .filter(and_(*status_conditions))\
+                .filter(or_(Events.event == 'Sent', Events.event == 'Draft_Saved'))\
+                .group_by(SecureMessage.thread_id).subquery('t')
+
+            conditions.append(SecureMessage.msg_id == t.c.msg_id)
+            conditions.append(Events.date_time == t.c.max_date)
+            conditions.append(Events.event != "Read")
+
+            result = SecureMessage.query.join(Events).join(Status) \
+                .filter(and_(*conditions)) \
+                .order_by(t.c.max_date.desc()).paginate(page, limit, False)
+
+        except Exception as e:
+            logger.error(e)
+            raise (InternalServerError(description="Error retrieving messages from database"))
 
         return True, result
 
