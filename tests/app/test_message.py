@@ -89,17 +89,17 @@ class MessageSchemaTestCase(unittest.TestCase):
 
     def test_missing_body_fails_validation(self):
         """marshalling message with no body field """
-        message = {'urn_to': 'richard', 'urn_from': 'torrance', 'body': '', 'survey': 'RSI'}
+        message = {'urn_to': 'richard', 'urn_from': 'torrance', 'body': '', 'survey': 'RSI', 'subject': 'MyMessage'}
         schema = MessageSchema()
         errors = schema.load(message)[1]
         self.assertTrue(errors == {'body': ['Body field not populated.']})
 
-    def test_missing_subject_field_does_not_cause_error(self):
+    def test_missing_subject_fails_validation(self):
         """marshalling message with no subject field """
-        message = {'msg_to': 'torrance', 'msg_from': 'someone'}
+        self.json_message.pop('subject', 'MyMessage')
         schema = MessageSchema()
-        errors = schema.load(message)[1]
-        self.assertTrue(errors != {'subject': ['Missing data for required field.']})
+        errors = schema.load(self.json_message)[1]
+        self.assertTrue(errors == {'subject': ['Missing data for required field.']})
 
     def test_subject_field_too_long_causes_error(self):
         """marshalling message with subject field too long"""
@@ -111,10 +111,10 @@ class MessageSchemaTestCase(unittest.TestCase):
 
     def test_missing_thread_field_does_not_cause_error(self):
         """marshalling message with no thread_id field"""
-        message = {'msg_to': 'torrance', 'msg_from': 'someone'}
+        self.json_message.pop('thread_id', "")
         schema = MessageSchema()
-        errors = schema.load(message)[1]
-        self.assertTrue(errors != {'thread_id': ['Missing data for required field.']})
+        errors = schema.load(self.json_message)[1]
+        self.assertTrue(errors == {})
 
     def test_thread_field_too_long_causes_error(self):
         """marshalling message with thread_id field too long"""
@@ -145,6 +145,14 @@ class MessageSchemaTestCase(unittest.TestCase):
         schema = MessageSchema()
         errors = schema.load(self.json_message)[1]
         self.assertTrue(errors == {'survey': ['Survey field not populated.']})
+
+    def test_same_to_from_causes_error(self):
+        """marshalling message with same to and from field"""
+        self.json_message['urn_to'] = self.json_message['urn_from']
+        schema = MessageSchema()
+        errors = schema.load(self.json_message)[1]
+        self.assertTrue(errors == {'_schema': ['urn_to and urn_from fields can not be the same.']})
+
 
 if __name__ == '__main__':
     unittest.main()
