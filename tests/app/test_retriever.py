@@ -1,13 +1,11 @@
 import unittest
 import uuid
 from flask import current_app
-from flask import json
 from sqlalchemy import create_engine
 from werkzeug.exceptions import NotFound, InternalServerError
 from app.application import app
 from app.repository import database
 from app.repository.retriever import Retriever
-from app.resources.messages import MessageList
 from app.constants import MESSAGE_QUERY_LIMIT
 from datetime import datetime
 import random
@@ -15,185 +13,150 @@ import random
 
 class RetrieverTestCaseHelper:
     """Helper class for Retriever Tests"""
+    def add_secure_message(self, msg_id, subject="test", body="test", thread_id="ThreadId",
+                           collection_case="ACollectionCase", reporting_unit="AReportingUnit",
+                           survey="SurveyType", business_name="ABusiness"):
+        """ Populate the secure_message table"""
+
+        with self.engine.connect() as con:
+            query = 'INSERT INTO secure_message(msg_id, subject, body, thread_id,' \
+                    ' collection_case, reporting_unit, survey, business_name) VALUES ("{0}", "{1}","{2}",' \
+                    '"{3}", "{4}", "{5}", "{6}", "{7}")'.format(msg_id, subject, body, thread_id, collection_case,
+                                                                reporting_unit, survey, business_name)
+            con.execute(query)
+
+    def add_status(self, label, msg_id, actor):
+        """ Populate the status table"""
+
+        with self.engine.connect() as con:
+            query = 'INSERT INTO status(label, msg_id, actor) VALUES("{0}", "{1}", "{2}")'.format(
+                label, msg_id, actor)
+            con.execute(query)
+
+    def add_event(self,event, msg_id, date_time):
+        """ Populate the event table"""
+
+        with self.engine.connect() as con:
+            query = 'INSERT INTO events(event, msg_id, date_time) VALUES("{0}", "{1}", "{2}")'.format(
+                event, msg_id, date_time)
+            con.execute(query)
+
+    def del_status(self, label, msg_id, actor):
+        """ Delete a specific row from status table"""
+
+        with self.engine.connect() as con:
+            query = 'DELETE FROM status WHERE label = "{0}" AND msg_id = "{1}" AND actor = "{2}"'.format(
+                label, msg_id, actor)
+            con.execute(query)
 
     def populate_database(self, no_of_messages=0, single=True, add_reply=False, add_draft=False, multiple_users=False):
         """ Populate the db with a specified number of messages and optionally replies , multiple users"""
-        with self.engine.connect() as con:
-            for _ in range(no_of_messages):
-                year = 2016
-                month = random.choice(range(1, 13))
-                draft_month = random.choice(range(1, 13))
-                day = random.choice(range(1, 25))
-                sent_date = datetime(year, month, day)
-                if single:
-                    msg_id = str(uuid.uuid4())
-                    query = 'INSERT INTO secure_message(msg_id, subject, body, thread_id,' \
-                            ' collection_case, reporting_unit, survey, business_name) VALUES ("{0}", "test","test",' \
-                            '"ThreadId", "ACollectionCase", "AReportingUnit", "SurveyType", "ABusiness")'.format(msg_id)
-                    con.execute(query)
-                    query = 'INSERT INTO status(label, msg_id, actor) VALUES("SENT", "{0}", "respondent.21345")'.format(
-                        msg_id)
-                    con.execute(query)
-                    query = 'INSERT INTO status(label, msg_id, actor) VALUES("INBOX", "{0}", "SurveyType")'.format(
-                        msg_id)
-                    con.execute(query)
-                    query = 'INSERT INTO status(label, msg_id, actor) VALUES("UNREAD", "{0}", "SurveyType")'.format(
-                        msg_id)
-                    con.execute(query)
-                    query = 'INSERT INTO events(event, msg_id, date_time) VALUES("Sent", "{0}", "{1}")'.format(
-                        msg_id, sent_date)
-                    con.execute(query)
-                    query = 'INSERT INTO events(event, msg_id, date_time) VALUES("Read", "{0}", "{1}")'.format(
-                        msg_id, str(datetime(year, month, day+1)))
-                    con.execute(query)
-                if add_reply:
-                    msg_id = str(uuid.uuid4())
-                    query = 'INSERT INTO secure_message(msg_id, subject, body, thread_id,' \
-                            ' collection_case, reporting_unit, survey, business_name) VALUES ("{0}", "test","test",' \
-                            '"ThreadId", "ACollectionCase", "AReportingUnit", "SurveyType", "ABusiness")'.format(msg_id)
-                    con.execute(query)
-                    query = 'INSERT INTO status(label, msg_id, actor) VALUES("SENT", "{0}", "SurveyType")'.format(
-                        msg_id)
-                    con.execute(query)
-                    query = 'INSERT INTO status(label, msg_id, actor) VALUES("INBOX", "{0}", "respondent.21345")'\
-                        .format(msg_id)
-                    con.execute(query)
-                    query = 'INSERT INTO status(label, msg_id, actor) VALUES("UNREAD", "{0}", "respondent.21345")'\
-                        .format(msg_id)
-                    con.execute(query)
-                    query = 'INSERT INTO events(event, msg_id, date_time) VALUES("Sent", "{0}", "{1}")'.format(
-                        msg_id, sent_date)
-                    con.execute(query)
-                    query = 'INSERT INTO events(event, msg_id, date_time) VALUES("Read", "{0}", "{1}")'.format(
-                        msg_id, str(datetime(year, month, day+2)))
-                    con.execute(query)
-                if add_draft:
-                    msg_id = str(uuid.uuid4())
-                    query = 'INSERT INTO secure_message(msg_id, subject, body, thread_id,' \
-                            ' collection_case, reporting_unit, survey, business_name) VALUES ("{0}", "test","test",' \
-                            '"ThreadId", "ACollectionCase", "AReportingUnit", "SurveyType", "ABusiness")'.format(msg_id)
-                    con.execute(query)
-                    query = 'INSERT INTO status(label, msg_id, actor) VALUES("DRAFT_INBOX", "{0}", "respondent.21345")'.format(
-                        msg_id)
-                    con.execute(query)
-                    query = 'INSERT INTO status(label, msg_id, actor) VALUES("DRAFT", "{0}",' \
-                            ' "SurveyType")'.format(msg_id)
-                    con.execute(query)
-                    query = 'INSERT INTO events(event, msg_id, date_time) VALUES("Draft_Saved", "{0}", "{1}")'.format(
-                        msg_id, datetime(year, draft_month, day))
-                    con.execute(query)
-                if multiple_users:
-                    msg_id = str(uuid.uuid4())
-                    query = 'INSERT INTO secure_message(msg_id, subject, body, thread_id,' \
-                            ' collection_case, reporting_unit, survey, business_name) VALUES ("{0}", "test","test",' \
-                            '"", "AnotherCollectionCase", "AnotherReportingUnit", "AnotherSurveyType", ' \
-                            '"AnotherBusiness")'.format(msg_id)
-                    con.execute(query)
-                    query = 'INSERT INTO status(label, msg_id, actor) VALUES("SENT", "{0}", "respondent.0000")'\
-                        .format(msg_id)
-                    con.execute(query)
-                    query = 'INSERT INTO status(label, msg_id, actor) VALUES("INBOX", "{0}", "AnotherSurveyType")'\
-                        .format(msg_id)
-                    con.execute(query)
-                    query = 'INSERT INTO status(label, msg_id, actor) VALUES("UNREAD", "{0}", "AnotherSurveyType")'\
-                        .format(msg_id)
-                    con.execute(query)
-                    query = 'INSERT INTO events(event, msg_id, date_time) VALUES("Sent", "{0}", "{1}")'.format(
-                        msg_id, sent_date)
-                    con.execute(query)
-                    query = 'INSERT INTO events(event, msg_id, date_time) VALUES("Read", "{0}", "{1}")'.format(
-                        msg_id, "2017-02-03 00:00:00")
-                    con.execute(query)
 
-    def create_threads(self, no_of_threads=1):
+        year = 2016
+        month = 1
+        day = 1
+
+        for _ in range(no_of_messages):
+            if day < 22:
+                day += 1
+            elif month < 12:
+                day = 1
+                month += 1
+            else:
+                day = 1
+                month = 1
+                year += 1
+
+            if single:
+                msg_id = str(uuid.uuid4())
+                self.add_secure_message(msg_id=msg_id)
+                self.add_status(label="SENT", msg_id=msg_id, actor="respondent.21345")
+                self.add_status(label="INBOX", msg_id=msg_id, actor="SurveyType")
+                self.add_status(label="UNREAD", msg_id=msg_id, actor="SurveyType")
+                self.add_event(event="Sent", msg_id=msg_id, date_time=datetime(year, month, day))
+
+            if add_reply:
+                self.del_status(label="UNREAD", msg_id=msg_id, actor="SurveyType")
+                self.add_event(event="Read", msg_id=msg_id, date_time=datetime(year, month, day + 1))
+
+                msg_id = str(uuid.uuid4())
+                self.add_secure_message(msg_id=msg_id)
+                self.add_status(label="SENT", msg_id=msg_id, actor="SurveyType")
+                self.add_status(label="INBOX", msg_id=msg_id, actor="respondent.21345")
+                self.add_status(label="UNREAD", msg_id=msg_id, actor="respondent.21345")
+                self.add_event(event="Sent", msg_id=msg_id, date_time=datetime(year, month, day+1))
+
+            if add_draft:
+                msg_id = str(uuid.uuid4())
+                self.add_secure_message(msg_id=msg_id)
+                self.add_status(label="DRAFT_INBOX", msg_id=msg_id, actor="respondent.21345")
+                self.add_status(label="DRAFT", msg_id=msg_id, actor="SurveyType")
+                self.add_event(event="Draft_Saved", msg_id=msg_id, date_time=datetime(year, month, day))
+
+            if multiple_users:
+                msg_id = str(uuid.uuid4())
+                self.add_secure_message(msg_id=msg_id, thread_id="AnotherThreadId",
+                                        collection_case="AnotherCollectionCase",
+                                        reporting_unit="AnotherReportingUnit", survey="AnotherSurveyType",
+                                        business_name="AnotherBusiness")
+                self.add_status(label="SENT", msg_id=msg_id, actor="respondent.0000")
+                self.add_status(label="INBOX", msg_id=msg_id, actor="AnotherSurveyType")
+                self.add_status(label="UNREAD", msg_id=msg_id, actor="AnotherSurveyType")
+                self.add_event(event="Sent", msg_id=msg_id, date_time=datetime(year, month, day))
+
+    def create_threads(self, no_of_threads=1, add_internal_draft=False, add_respondent_draft=False):
         """ Populate the db with a specified number of messages and optionally replies , multiple users"""
         threads = []
-        with self.engine.connect() as con:
-            for _ in range(no_of_threads):
-                year = 2016
-                month = random.choice(range(1, 13))
-                day = random.choice(range(1, 22))
-                sent_date = datetime(year, month, day)
+        year = 2016
+        month = 1
+        day = 1
+
+        for _ in range(no_of_threads):
+            if day < 22:
+                day += 1
+            elif month < 12:
+                day = 1
+                month += 1
+            else:
+                day = 1
+                month = 1
+                year += 1
+
+            msg_id = str(uuid.uuid4())
+            thread_id = msg_id
+            threads.append(thread_id)
+            self.add_secure_message(msg_id=msg_id, thread_id=thread_id, survey="BRES")
+            self.add_status(label="SENT", msg_id=msg_id, actor="respondent.21345")
+            self.add_status(label="INBOX", msg_id=msg_id, actor="BRES")
+            self.add_event(event="Sent", msg_id=msg_id, date_time=datetime(year, month, day))
+            self.add_event(event="Read", msg_id=msg_id, date_time=datetime(year, month, day + 1))
+
+            msg_id = str(uuid.uuid4())
+            self.add_secure_message(msg_id=msg_id, thread_id=thread_id, survey="BRES")
+            self.add_status(label="SENT", msg_id=msg_id, actor="BRES")
+            self.add_status(label="UNREAD", msg_id=msg_id, actor="respondent.21345")
+            self.add_status(label="INBOX", msg_id=msg_id, actor="respondent.21345")
+            self.add_event(event="Sent", msg_id=msg_id, date_time=datetime(year, month, day + 1))
+
+            last_msg_id = msg_id
+
+            if add_internal_draft:  # adds draft from internal
+                msg_id = str(uuid.uuid4())
+                self.add_secure_message(msg_id=msg_id, thread_id=thread_id, survey="BRES")
+                self.add_status(label="DRAFT_INBOX", msg_id=msg_id, actor="respondent.21345")
+                self.add_status(label="DRAFT", msg_id=msg_id, actor="BRES")
+                self.add_event(event="Draft_Saved", msg_id=msg_id, date_time=datetime(year, month, day+2))
+
+            if add_respondent_draft:  # adds draft from respondent
+
+                self.del_status(label="UNREAD", msg_id=last_msg_id, actor="respondent.21345")
+                self.add_event(event="Read", msg_id=last_msg_id, date_time=datetime(year, month, day + 1))
 
                 msg_id = str(uuid.uuid4())
-                thread_id = msg_id
-                threads.append(thread_id)
-                query = 'INSERT INTO secure_message(msg_id, subject, body, thread_id,' \
-                        ' collection_case, reporting_unit, survey, business_name) VALUES ("{0}", "test","test",' \
-                        '"{1}", "ACollectionCase", "AReportingUnit", "BRES", "ABusiness")'.format(
-                    msg_id, thread_id)
-                con.execute(query)
-                query = 'INSERT INTO status(label, msg_id, actor) VALUES("SENT", "{0}", "respondent.21345")'.format(
-                    msg_id)
-                con.execute(query)
-                query = 'INSERT INTO status(label, msg_id, actor) VALUES("INBOX", "{0}", "BRES")'.format(
-                    msg_id)
-                con.execute(query)
-                query = 'INSERT INTO status(label, msg_id, actor) VALUES("UNREAD", "{0}", "BRES")'.format(
-                    msg_id)
-                con.execute(query)
-                query = 'INSERT INTO events(event, msg_id, date_time) VALUES("Sent", "{0}", "{1}")'.format(
-                    msg_id, sent_date)
-                con.execute(query)
-                query = 'INSERT INTO events(event, msg_id, date_time) VALUES("Read", "{0}", "{1}")'.format(
-                    msg_id, str(datetime(year, month, day + 1)))
-                con.execute(query)
-
-                msg_id = str(uuid.uuid4())
-                query = 'INSERT INTO secure_message(msg_id, subject, body, thread_id,' \
-                        ' collection_case, reporting_unit, survey, business_name) VALUES ("{0}", "test","test",' \
-                        '"{1}", "ACollectionCase", "AReportingUnit", "BRES", "ABusiness")'.format(
-                    msg_id, thread_id)
-                con.execute(query)
-                query = 'INSERT INTO status(label, msg_id, actor) VALUES("SENT", "{0}", "BRES")'.format(
-                    msg_id)
-                con.execute(query)
-                query = 'INSERT INTO status(label, msg_id, actor) VALUES("INBOX", "{0}", "respondent.21345")' \
-                    .format(msg_id)
-                con.execute(query)
-                query = 'INSERT INTO status(label, msg_id, actor) VALUES("UNREAD", "{0}", "respondent.21345")' \
-                    .format(msg_id)
-                con.execute(query)
-                query = 'INSERT INTO events(event, msg_id, date_time) VALUES("Sent", "{0}", "{1}")'.format(
-                    msg_id, str(datetime(year, month, day + 1)))
-                con.execute(query)
-                query = 'INSERT INTO events(event, msg_id, date_time) VALUES("Read", "{0}", "{1}")'.format(
-                    msg_id, str(datetime(year, month, day + 2)))
-                con.execute(query)
-
-                if random.choice(range(0, no_of_threads)) == 1:  # adds draft from internal randomly
-                    msg_id = str(uuid.uuid4())
-                    query = 'INSERT INTO secure_message(msg_id, subject, body, thread_id,' \
-                            ' collection_case, reporting_unit, survey, business_name) VALUES ("{0}", "test","test",' \
-                            '"{1}", "ACollectionCase", "AReportingUnit", "BRES", "ABusiness")'.format(
-                        msg_id, thread_id)
-                    con.execute(query)
-                    query = 'INSERT INTO status(label, msg_id, actor) VALUES("DRAFT_INBOX", "{0}", "respondent.21345")'.format(
-                        msg_id)
-                    con.execute(query)
-                    query = 'INSERT INTO status(label, msg_id, actor) VALUES("DRAFT", "{0}",' \
-                            ' "BRES")'.format(msg_id)
-                    con.execute(query)
-                    query = 'INSERT INTO events(event, msg_id, date_time) VALUES("Draft_Saved", "{0}", "{1}")'.format(
-                        msg_id, str(datetime(year, month, day + 3)))
-                    con.execute(query)
-
-                if random.choice(range(0, no_of_threads)) == 1:  # adds draft from respondent randomly
-                    msg_id = str(uuid.uuid4())
-                    query = 'INSERT INTO secure_message(msg_id, subject, body, thread_id,' \
-                            ' collection_case, reporting_unit, survey, business_name) VALUES ("{0}", "test","test",' \
-                            '"{1}", "ACollectionCase", "AReportingUnit", "BRES", "ABusiness")'.format(
-                        msg_id, thread_id)
-                    con.execute(query)
-                    query = 'INSERT INTO status(label, msg_id, actor) VALUES("DRAFT_INBOX", "{0}", "BRES")'.format(
-                        msg_id)
-                    con.execute(query)
-                    query = 'INSERT INTO status(label, msg_id, actor) VALUES("DRAFT", "{0}",' \
-                            ' "respondent.21345")'.format(msg_id)
-                    con.execute(query)
-                    query = 'INSERT INTO events(event, msg_id, date_time) VALUES("Draft_Saved", "{0}", "{1}")'.format(
-                        msg_id, str(datetime(year, month, day + 3)))
-                    con.execute(query)
+                self.add_secure_message(msg_id=msg_id, thread_id=thread_id, survey="BRES")
+                self.add_status(label="DRAFT_INBOX", msg_id=msg_id, actor="BRES")
+                self.add_status(label="DRAFT", msg_id=msg_id, actor="respondent.21345")
+                self.add_event(event="Draft_Saved", msg_id=msg_id, date_time=datetime(year, month, day + 2))
 
         return threads
 
@@ -256,7 +219,6 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
 
     def test_msg_returned_with_msg_id_true(self):
         """retrieves message using id"""
-        # message_id = ""
         self.populate_database(20)
         with self.engine.connect() as con:
             query = 'SELECT msg_id FROM secure_message LIMIT 1'
@@ -678,9 +640,10 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
 
     def test_read_date_returned_for_message(self):
         """retrieves message using id and checks the read date returned"""
-        self.populate_database(1)
+        self.populate_database(1, add_reply=True)
         with self.engine.connect() as con:
-            query = 'SELECT msg_id FROM secure_message LIMIT 1'
+            query = 'SELECT secure_message.msg_id FROM secure_message ' \
+                    'JOIN events ON secure_message.msg_id = events.msg_id WHERE events.event = "Read" LIMIT 1'
             query_x = con.execute(query)
             names = []
             for row in query_x:
@@ -860,8 +823,8 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
                 with self.assertRaises(InternalServerError):
                     Retriever().retrieve_thread_list(1, MESSAGE_QUERY_LIMIT, 'respondent.21345')
 
-    def test_thread_list_returned_in_descending_order(self):
-        """retrieves threads from database in desc sent_date order"""
+    def test_thread_list_returned_in_descending_order_respondent(self):
+        """retrieves threads from database in desc sent_date order for respondent"""
         self.create_threads(5)
         self.populate_database(5, single=False, multiple_users=True)
 
@@ -876,6 +839,99 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
                 date = []
                 for message in response.items:
                     serialized_msg = message.serialize('respondent.21345')
+                    sent.append(serialized_msg['sent_date'])
+                    read.append(serialized_msg['read_date'])
+                    thread_ids.append(serialized_msg['thread_id'])
+                    modified.append(serialized_msg['modified_date'])
+
+                for x in range(0, len(sent)):
+                    if sent[x] != 'N/A':
+                        date.append(sent[x])
+                    else:
+                        date.append(modified[x])
+
+                desc_date = sorted(date, reverse=True)
+                self.assertEqual(len(date), 5)
+                self.assertListEqual(desc_date, date)
+
+    def test_thread_list_returned_in_descending_order_internal(self):
+        """retrieves threads from database in desc sent_date order for internal user"""
+        self.create_threads(5)
+        self.populate_database(5, single=False, multiple_users=True)
+
+        with app.app_context():
+            with current_app.test_request_context():
+                response = Retriever().retrieve_thread_list(1, MESSAGE_QUERY_LIMIT, 'internal.21345')[1]
+
+                sent = []
+                read = []
+                modified = []
+                thread_ids = []
+                date = []
+                for message in response.items:
+                    serialized_msg = message.serialize('internal.21345')
+                    sent.append(serialized_msg['sent_date'])
+                    read.append(serialized_msg['read_date'])
+                    thread_ids.append(serialized_msg['thread_id'])
+                    modified.append(serialized_msg['modified_date'])
+
+                for x in range(0, len(sent)):
+                    if sent[x] != 'N/A':
+                        date.append(sent[x])
+                    else:
+                        date.append(modified[x])
+
+                desc_date = sorted(date, reverse=True)
+                self.assertEqual(len(date), 5)
+                self.assertListEqual(desc_date, date)
+
+    def test_thread_list_returned_in_descending_order_respondent_with_draft(self):
+        """retrieves threads from database in desc sent_date order for respondent with draft"""
+        self.create_threads(5, add_respondent_draft=True)
+        self.populate_database(5, single=False, multiple_users=True)
+
+        with app.app_context():
+            with current_app.test_request_context():
+                response = Retriever().retrieve_thread_list(1, MESSAGE_QUERY_LIMIT, 'respondent.21345')[1]
+
+                sent = []
+                read = []
+                modified = []
+                thread_ids = []
+                date = []
+                for message in response.items:
+                    serialized_msg = message.serialize('respondent.21345')
+                    sent.append(serialized_msg['sent_date'])
+                    read.append(serialized_msg['read_date'])
+                    thread_ids.append(serialized_msg['thread_id'])
+                    modified.append(serialized_msg['modified_date'])
+
+                for x in range(0, len(sent)):
+                    if sent[x] != 'N/A':
+                        date.append(sent[x])
+                    else:
+                        date.append(modified[x])
+
+                desc_date = sorted(date, reverse=True)
+                self.assertEqual(len(date), 5)
+                self.assertListEqual(desc_date, date)
+
+    def test_thread_list_returned_in_descending_order_internal_with_draft(self):
+        """retrieves threads from database in desc sent_date order for internal user with draft"""
+        self.create_threads(5, add_internal_draft=True)
+        self.populate_database(5, single=False, multiple_users=True)
+
+        with app.app_context():
+            with current_app.test_request_context():
+                response = Retriever().retrieve_thread_list(1, MESSAGE_QUERY_LIMIT, 'internal.21345')[1]
+
+                sent = []
+                read = []
+                modified = []
+                thread_ids = []
+                date = []
+                for message in response.items:
+                    serialized_msg = message.serialize('internal.21345')
                     sent.append(serialized_msg['sent_date'])
                     read.append(serialized_msg['read_date'])
                     thread_ids.append(serialized_msg['thread_id'])
@@ -906,7 +962,187 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
                 thread_ids = []
                 msg_ids = []
                 for message in response.items:
+                    serialized_msg = message.serialize('internal.21345')
+                    sent.append(serialized_msg['sent_date'])
+                    read.append(serialized_msg['read_date'])
+                    thread_ids.append(serialized_msg['thread_id'])
+                    modified.append(serialized_msg['modified_date'])
+                    msg_ids.append(serialized_msg['msg_id'])
+
+                self.assertEqual(len(msg_ids), 5)
+
+                for x in range(0, len(thread_ids)):
+                    thread = Retriever().retrieve_thread(thread_ids[x], user_urn='internal.21345')
+                    self.assertEqual(sent[x], thread[0]['sent_date'])
+                    self.assertEqual(msg_ids[x], thread[0]['msg_id'])
+
+    def test_latest_message_from_each_thread_chosen_desc_respondent_with_respondent_draft(self):
+        """checks the message chosen for each thread is the latest message within that thread
+         for respondent with respondent drafts"""
+        self.create_threads(5, add_respondent_draft=True)
+        self.populate_database(5, single=False, multiple_users=True)
+
+        with app.app_context():
+            with current_app.test_request_context():
+                response = Retriever().retrieve_thread_list(1, MESSAGE_QUERY_LIMIT, 'respondent.21345')[1]
+
+                sent = []
+                read = []
+                modified = []
+                thread_ids = []
+                msg_ids = []
+                for message in response.items:
                     serialized_msg = message.serialize('respondent.21345')
+                    sent.append(serialized_msg['sent_date'])
+                    read.append(serialized_msg['read_date'])
+                    thread_ids.append(serialized_msg['thread_id'])
+                    modified.append(serialized_msg['modified_date'])
+                    msg_ids.append(serialized_msg['msg_id'])
+
+                self.assertEqual(len(msg_ids), 5)
+
+                for x in range(0, len(thread_ids)):
+                    thread = Retriever().retrieve_thread(thread_ids[x], user_urn='respondent.21345')
+                    self.assertEqual(sent[x], thread[0]['sent_date'])
+                    self.assertEqual(msg_ids[x], thread[0]['msg_id'])
+
+    def test_latest_message_from_each_thread_chosen_desc_internal_with_respondent_draft(self):
+        """checks the message chosen for each thread is the latest message within that thread
+        for internal user with respondent drafts"""
+        self.create_threads(5, add_respondent_draft=True)
+        self.populate_database(5, single=False, multiple_users=True)
+
+        with app.app_context():
+            with current_app.test_request_context():
+                response = Retriever().retrieve_thread_list(1, MESSAGE_QUERY_LIMIT, 'internal.21345')[1]
+
+                sent = []
+                read = []
+                modified = []
+                thread_ids = []
+                msg_ids = []
+                for message in response.items:
+                    serialized_msg = message.serialize('internal.21345')
+                    sent.append(serialized_msg['sent_date'])
+                    read.append(serialized_msg['read_date'])
+                    thread_ids.append(serialized_msg['thread_id'])
+                    modified.append(serialized_msg['modified_date'])
+                    msg_ids.append(serialized_msg['msg_id'])
+
+                self.assertEqual(len(msg_ids), 5)
+
+                for x in range(0, len(thread_ids)):
+                    thread = Retriever().retrieve_thread(thread_ids[x], user_urn='internal.21345')
+                    self.assertEqual(sent[x], thread[0]['sent_date'])
+                    self.assertEqual(msg_ids[x], thread[0]['msg_id'])
+
+    def test_latest_message_from_each_thread_chosen_desc_respondent_with_internal_draft(self):
+        """checks the message chosen for each thread is the latest message within that thread
+         for respondent with internal drafts"""
+        self.create_threads(5, add_internal_draft=True)
+        self.populate_database(5, single=False, multiple_users=True)
+
+        with app.app_context():
+            with current_app.test_request_context():
+                response = Retriever().retrieve_thread_list(1, MESSAGE_QUERY_LIMIT, 'respondent.21345')[1]
+
+                sent = []
+                read = []
+                modified = []
+                thread_ids = []
+                msg_ids = []
+                for message in response.items:
+                    serialized_msg = message.serialize('respondent.21345')
+                    sent.append(serialized_msg['sent_date'])
+                    read.append(serialized_msg['read_date'])
+                    thread_ids.append(serialized_msg['thread_id'])
+                    modified.append(serialized_msg['modified_date'])
+                    msg_ids.append(serialized_msg['msg_id'])
+
+                self.assertEqual(len(msg_ids), 5)
+
+                for x in range(0, len(thread_ids)):
+                    thread = Retriever().retrieve_thread(thread_ids[x], user_urn='respondent.21345')
+                    self.assertEqual(sent[x], thread[0]['sent_date'])
+                    self.assertEqual(msg_ids[x], thread[0]['msg_id'])
+
+    def test_latest_message_from_each_thread_chosen_desc_internal_with_internal_draft(self):
+        """checks the message chosen for each thread is the latest message within that thread
+        for internal user with internal drafts"""
+        self.create_threads(5, add_internal_draft=True)
+        self.populate_database(5, single=False, multiple_users=True)
+
+        with app.app_context():
+            with current_app.test_request_context():
+                response = Retriever().retrieve_thread_list(1, MESSAGE_QUERY_LIMIT, 'internal.21345')[1]
+
+                sent = []
+                read = []
+                modified = []
+                thread_ids = []
+                msg_ids = []
+                for message in response.items:
+                    serialized_msg = message.serialize('internal.21345')
+                    sent.append(serialized_msg['sent_date'])
+                    read.append(serialized_msg['read_date'])
+                    thread_ids.append(serialized_msg['thread_id'])
+                    modified.append(serialized_msg['modified_date'])
+                    msg_ids.append(serialized_msg['msg_id'])
+
+                self.assertEqual(len(msg_ids), 5)
+
+                for x in range(0, len(thread_ids)):
+                    thread = Retriever().retrieve_thread(thread_ids[x], user_urn='internal.21345')
+                    self.assertEqual(sent[x], thread[0]['sent_date'])
+                    self.assertEqual(msg_ids[x], thread[0]['msg_id'])
+
+    def test_latest_message_from_each_thread_chosen_desc_respondent_with_both_users_drafts(self):
+        """checks the message chosen for each thread is the latest message within that thread
+         for respondent with drafts from both users"""
+        self.create_threads(5, add_internal_draft=True, add_respondent_draft=True)
+        self.populate_database(5, single=False, multiple_users=True)
+
+        with app.app_context():
+            with current_app.test_request_context():
+                response = Retriever().retrieve_thread_list(1, MESSAGE_QUERY_LIMIT, 'respondent.21345')[1]
+
+                sent = []
+                read = []
+                modified = []
+                thread_ids = []
+                msg_ids = []
+                for message in response.items:
+                    serialized_msg = message.serialize('respondent.21345')
+                    sent.append(serialized_msg['sent_date'])
+                    read.append(serialized_msg['read_date'])
+                    thread_ids.append(serialized_msg['thread_id'])
+                    modified.append(serialized_msg['modified_date'])
+                    msg_ids.append(serialized_msg['msg_id'])
+
+                self.assertEqual(len(msg_ids), 5)
+
+                for x in range(0, len(thread_ids)):
+                    thread = Retriever().retrieve_thread(thread_ids[x], user_urn='respondent.21345')
+                    self.assertEqual(sent[x], thread[0]['sent_date'])
+                    self.assertEqual(msg_ids[x], thread[0]['msg_id'])
+
+    def test_latest_message_from_each_thread_chosen_desc_internal_with_both_users_drafts(self):
+        """checks the message chosen for each thread is the latest message within that thread
+        for internal user with drafts from both users"""
+        self.create_threads(5, add_internal_draft=True, add_respondent_draft=True)
+        self.populate_database(5, single=False, multiple_users=True)
+
+        with app.app_context():
+            with current_app.test_request_context():
+                response = Retriever().retrieve_thread_list(1, MESSAGE_QUERY_LIMIT, 'internal.21345')[1]
+
+                sent = []
+                read = []
+                modified = []
+                thread_ids = []
+                msg_ids = []
+                for message in response.items:
+                    serialized_msg = message.serialize('internal.21345')
                     sent.append(serialized_msg['sent_date'])
                     read.append(serialized_msg['read_date'])
                     thread_ids.append(serialized_msg['thread_id'])

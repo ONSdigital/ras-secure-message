@@ -75,6 +75,7 @@ class Retriever:
         """returns list of threads from db"""
         user = User(user_urn)
         status_conditions = []
+        conditions = []
 
         if user.is_respondent:
             status_conditions.append(Status.actor == str(user_urn))
@@ -83,6 +84,7 @@ class Retriever:
 
         status_conditions.append(Status.label != Labels.DRAFT_INBOX.value)
 
+
         try:
             t = db.session.query(SecureMessage.msg_id, SecureMessage.thread_id, func.max(Events.date_time).label('max_date'))\
                 .join(Events).join(Status) \
@@ -90,8 +92,12 @@ class Retriever:
                 .filter(or_(Events.event == 'Sent', Events.event == 'Draft_Saved'))\
                 .group_by(SecureMessage.thread_id).subquery('t')
 
+            conditions.append(SecureMessage.msg_id == t.c.msg_id)
+            conditions.append(Events.date_time == t.c.max_date)
+            conditions.append(Events.event != "Read")
+
             result = SecureMessage.query.join(Events).join(Status) \
-                .filter(and_(SecureMessage.msg_id == t.c.msg_id, Events.date_time == t.c.max_date)) \
+                .filter(and_(*conditions)) \
                 .order_by(t.c.max_date.desc()).paginate(page, limit, False)
 
         except Exception as e:
