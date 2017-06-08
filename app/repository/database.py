@@ -172,7 +172,7 @@ class Events(db.Model):
     date_time = Column('date_time', DateTime())
     __table_args__ = (Index("idx_msg_id_event", "msg_id", "event"),)
 
-    def __init__(self, date_time=datetime.now(timezone.utc), msg_id='', event=''):
+    def __init__(self, msg_id='', event=''):
         self.msg_id = msg_id
         self.event = event
-        self.date_time = date_time
+        self.date_time = datetime.now(timezone.utc)
