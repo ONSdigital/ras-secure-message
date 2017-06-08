@@ -24,7 +24,7 @@ def getDatabaseUri():
 
     for key, value in decoded_config.items():
         logger.info('Inspecting key: "' + str(key) + '" with value: ' + str(value))
-        if decoded_config[key][0]['name'] == 'db_ras_sm':
+        if decoded_config[key][0]['name'] == 'secure-message-db':
             creds = decoded_config[key][0]['credentials']
             uri = creds['uri']
             logger.info('Postgres DATABASE URI: ' + uri)
