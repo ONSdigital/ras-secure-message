@@ -30,7 +30,7 @@ class SecureMessage(db.Model):
     survey = Column("survey", String(constants.MAX_SURVEY_LEN+1))
     statuses = relationship('Status', backref='secure_message')
     events = relationship('Events', backref='secure_message', order_by='Events.date_time')
-    Index("idx_ru_survey_cc", "reporting_unit", "survey", "collection_case")
+    __table_args__ = (Index("idx_ru_survey_cc", "reporting_unit", "survey", "collection_case"), )
 
     def __init__(self, msg_id="", subject="", body="", thread_id="", collection_case='',
                  reporting_unit='', survey='', business_name=''):
@@ -112,7 +112,7 @@ class Status(db.Model):
     label = Column('label', String(constants.MAX_STATUS_LABEL_LEN + 1))
     msg_id = Column('msg_id', String(constants.MAX_MSG_ID_LEN + 1), ForeignKey('secure_message.msg_id'))
     actor = Column('actor', String(constants.MAX_STATUS_ACTOR_LEN + 1))
-    Index("idx_msg_id_label", "msg_id", "label")
+    __table_args__ = (Index("idx_msg_id_label", "msg_id", "label"),)
 
     def __init__(self, label='', msg_id='', actor=''):
         self.msg_id = msg_id
@@ -170,7 +170,7 @@ class Events(db.Model):
     event = Column('event', String(constants.MAX_EVENT_LEN + 1))
     msg_id = Column('msg_id', String(constants.MAX_MSG_ID_LEN + 1), ForeignKey('secure_message.msg_id'), index=True)
     date_time = Column('date_time', DateTime())
-    Index("idx_msg_id_event", "msg_id", "event")
+    __table_args__ = (Index("idx_msg_id_event", "msg_id", "event"),)
 
     def __init__(self, date_time=datetime.now(timezone.utc), msg_id='', event=''):
         self.msg_id = msg_id
