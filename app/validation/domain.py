@@ -1,4 +1,4 @@
-from marshmallow import Schema, fields, post_load, validates, ValidationError, pre_load
+from marshmallow import Schema, fields, post_load, validates, ValidationError, pre_load, validates_schema
 import logging
 from app import constants
 import uuid
@@ -41,7 +41,7 @@ class MessageSchema(Schema):
     urn_to = fields.Str(required=True)
     urn_from = fields.Str(required=True)
     body = fields.Str(required=True)
-    subject = fields.Str(allow_none=True)
+    subject = fields.Str(required=True)
     thread_id = fields.Str(allow_none=True)
     collection_case = fields.Str(allow_none=True)
     reporting_unit = fields.Str(allow_none=True)
@@ -53,6 +53,11 @@ class MessageSchema(Schema):
         self.validate_not_present(data, 'sent_date')
         self.validate_not_present(data, 'read_date')
         return data
+
+    @validates_schema
+    def validate_to_from_not_equal(self, data):
+        if 'urn_to' in data.keys() and 'urn_from' in data.keys() and data['urn_to'] == data['urn_from']:
+            raise ValidationError("urn_to and urn_from fields can not be the same.")
 
     @validates('urn_to')
     def validate_to(self, urn_to):
@@ -68,8 +73,7 @@ class MessageSchema(Schema):
 
     @validates('subject')
     def validate_subject(self, subject):
-        if subject is not None:
-            self.validate_field_length("Subject", len(subject), constants.MAX_SUBJECT_LEN)
+        self.validate_field_length("Subject", len(subject), constants.MAX_SUBJECT_LEN)
 
     @validates("thread_id")
     def validate_thread(self, thread_id):

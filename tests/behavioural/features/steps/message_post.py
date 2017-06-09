@@ -201,7 +201,7 @@ def step_impl_is_shown_404(context):
 @given('a message is created')
 def step_impl_message_is_created(context):
     context.msg = {  'urn_to': 'test',
-                     'urn_from': 'test',
+                     'urn_from': 'test2',
                      'subject': 'test',
                      'body': 'Test',
                      'thread_id': '',
