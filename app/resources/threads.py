@@ -1,11 +1,14 @@
 from flask import g, request
 from flask import jsonify
 from flask_restful import Resource
-
+from structlog import wrap_logger
+import logging
 from app.common.utilities import get_options, paginated_list_to_json
 from app.constants import THREAD_LIST_ENDPOINT
 from app.repository.retriever import Retriever
 
+
+logger = wrap_logger(logging.getLogger(__name__))
 
 class ThreadById(Resource):
     """Return list of messages for user"""

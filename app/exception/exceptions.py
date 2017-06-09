@@ -1,6 +1,9 @@
+import logging
+from structlog import wrap_logger
 
 """Specialised exceptions for secure messages"""
 
+logger = wrap_logger(logging.getLogger(__name__))
 
 class MessageSaveException(Exception):
 

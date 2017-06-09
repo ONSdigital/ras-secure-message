@@ -3,7 +3,7 @@ import logging
 from flask import request, jsonify, g, Response
 from flask_restful import Resource
 from werkzeug.exceptions import BadRequest
-
+from structlog import wrap_logger
 from app import settings
 from app.common.alerts import AlertUser
 from app.common.labels import Labels
@@ -16,7 +16,7 @@ from app.validation.user import User
 from app.resources.drafts import DraftModifyById
 from app.common.utilities import get_options, paginated_list_to_json
 
-logger = logging.getLogger(__name__)
+logger = wrap_logger(logging.getLogger(__name__))
 
 
 """Rest endpoint for message resources. Messages are immutable, they can only be created."""

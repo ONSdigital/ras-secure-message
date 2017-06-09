@@ -1,10 +1,10 @@
 from app import settings
 from notifications_python_client import NotificationsAPIClient
-
+from structlog import wrap_logger
 import logging
 
 
-logger = logging.getLogger(__name__)
+logger = wrap_logger(logging.getLogger(__name__))
 
 
 class AlertViaGovNotify:
