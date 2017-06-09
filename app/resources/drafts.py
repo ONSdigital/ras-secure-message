@@ -34,7 +34,7 @@ class DraftSave(Resource):
 
             hash_object = hashlib.sha1(str(sorted(saved_draft.items())).encode())
             etag = hash_object.hexdigest()
-            resp = jsonify({'status': 'OK', 'msg_id': draft.data.msg_id})
+            resp = jsonify({'status': 'OK', 'msg_id': draft.data.msg_id, 'thread_id': draft.data.thread_id})
             resp.headers['ETag'] = etag
             resp.status_code = 201
 

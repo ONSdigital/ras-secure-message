@@ -58,8 +58,7 @@ Feature: Checking correct labels for messages are added & deleted
     When the external user opens the message
     Then the status of the message changes to from unread to read
 
-  @ignore
-   Scenario: If an incorrect message id is requested by the user return a 400 error
-    Given a message with a unknown message id
+   Scenario: If an incorrect message id is requested by the user return a 404 error
+    Given a user requests a message with a invalid message id
     When it is searched for
-    Then a 400 error code is returned
+    Then a 404 error code is returned

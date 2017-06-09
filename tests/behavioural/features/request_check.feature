@@ -16,7 +16,6 @@ Feature: Checking all request pass authorisation
     When a PUT request is made
     Then a 400 error status is returned
 
-  @ignore
   Scenario Outline: User tries to use endpoint with the wrong method
     Given user wants to use <endpoint> endpoint
     When user tries to access that endpoint with the <wrong method> method
@@ -24,7 +23,6 @@ Feature: Checking all request pass authorisation
 
   Examples: endpoint wrong methods
     |       endpoint        |   wrong method    |
-    |       /draft/save     |       GET         |
     |       /draft/save     |       PUT         |
     |       /health         |       POST        |
     |       /health         |       PUT         |
@@ -37,6 +35,9 @@ Feature: Checking all request pass authorisation
     |   /message/id/modify  |       GET         |
     |   /message/id/modify  |       POST        |
     |     /message/send     |       PUT         |
-    |     /message/send     |       GET         |
     |       /messages       |       PUT         |
     |       /messages       |       POST        |
+
+
+##    |       /draft/save     |       GET         |
+##    |     /message/send     |       GET         |
