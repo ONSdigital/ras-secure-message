@@ -1,5 +1,9 @@
 from app.constants import MESSAGE_BY_ID_ENDPOINT, MESSAGE_LIST_ENDPOINT, MESSAGE_QUERY_LIMIT
 from flask import jsonify
+from structlog import wrap_logger
+import logging
+
+logger = wrap_logger(logging.getLogger(__name__))
 
 
 def get_options(args):

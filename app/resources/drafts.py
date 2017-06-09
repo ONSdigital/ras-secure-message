@@ -1,6 +1,6 @@
 import hashlib
 import logging
-
+from structlog import wrap_logger
 from flask import g, Response
 from flask import request, jsonify
 from flask_restful import Resource
@@ -14,7 +14,7 @@ from app.repository.modifier import Modifier
 from app.repository.retriever import Retriever
 from app.common.utilities import get_options, paginated_list_to_json
 
-logger = logging.getLogger(__name__)
+logger = wrap_logger(logging.getLogger(__name__))
 
 
 class DraftSave(Resource):

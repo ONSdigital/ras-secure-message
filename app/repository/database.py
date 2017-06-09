@@ -1,15 +1,14 @@
 import logging
+from structlog import wrap_logger
 from datetime import datetime, timezone
-
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import Column, String, Integer, DateTime, ForeignKey, Index
 from sqlalchemy.orm import relationship
-
 from app import constants
 from app.common.labels import Labels
 from app.validation.user import User
 
-logger = logging.getLogger(__name__)
+logger = wrap_logger(logging.getLogger(__name__))
 
 db = SQLAlchemy()
 

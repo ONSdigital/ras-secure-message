@@ -13,41 +13,19 @@ from app.authentication.authenticator import authenticate
 from app.resources.drafts import DraftSave, DraftById, DraftModifyById, DraftList
 from app.resources.threads import ThreadById, ThreadList
 from app import connector
+from app.logger_config import logger_initial_config
 
+logger_initial_config(service_name='ras-secure-message')
 
-# initialise logging defaults for project
-logging_config = dict(
-        version=1,
-        disable_existing_loggers=False,
-        formatters={
-            'f': {'format': '%(asctime)s %(levelname)s %(name)s %(message)s'}
-        },
-        handlers={
-            'h': {'class': 'logging.StreamHandler',
-                  'formatter': 'f',
-                  'level': settings.SMS_LOG_LEVEL}
-        },
-        root={
-            'handlers': ['h'],
-            'level': settings.SMS_LOG_LEVEL,
-        },
-    )
-
-dictConfig(logging_config)
-# set werkzeug logging level
-werkzeug_logger = logging.getLogger('werkzeug')
-werkzeug_logger.setLevel(level=settings.SMS_WERKZEUG_LOG_LEVEL)
+logger = logging.getLogger(__name__)
 
 app = Flask(__name__)
 api = Api(app)
 CORS(app)
 app.config['SQLALCHEMY_DATABASE_URI'] = connector.getDatabaseUri()
 app.config['SQLALCHEMY_POOL_SIZE'] = settings.SQLALCHEMY_POOL_SIZE
-app.logger.addHandler(logging.StreamHandler())
-app.logger.setLevel(settings.APP_LOG_LEVEL)
 database.db.init_app(app)
 
-logger = logging.getLogger(__name__)
 logger.info('Starting application')
 
 
