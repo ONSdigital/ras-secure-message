@@ -69,7 +69,6 @@ class RetrieverTestCaseHelper:
 
             if single:
                 msg_id = str(uuid.uuid4())
-                thread_id = msg_id
                 self.add_secure_message(msg_id=msg_id)
                 self.add_status(label="SENT", msg_id=msg_id, actor="respondent.21345")
                 self.add_status(label="INBOX", msg_id=msg_id, actor="SurveyType")
