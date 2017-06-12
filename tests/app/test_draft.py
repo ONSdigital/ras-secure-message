@@ -286,7 +286,7 @@ class DraftTestCase(unittest.TestCase):
 
         etag = '1234567sdfghj98765fgh'
 
-        self.assertFalse(DraftModifyById.etag_check({'etag': etag}, is_valid_draft[1]))
+        self.assertFalse(DraftModifyById.etag_check({'ETag': etag}, is_valid_draft[1]))
 
     def test_draft_modified_since_last_read_t_raises_error(self):
         """Test draft_modified_since_last_read function raises internal server error"""

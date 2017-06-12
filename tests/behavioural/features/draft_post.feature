@@ -46,7 +46,6 @@ Feature: Draft Save Endpoint
     When the draft is saved
     Then a 400 error status is returned
 
-  @ignore
   Scenario: As a user I would like a new draft message not related to a thread to be given the message id as a thread id
     Given A user creates a draft that is not associated with a thread
     When the draft is saved

@@ -62,6 +62,8 @@ def step_impl(context):
 def step_impl_message_is_archived(context):
     modify_data['action'] = 'add'
     modify_data['label'] = 'ARCHIVE'
+    token_data['user_urn'] = data['urn_from']
+    headers['Authorization'] = update_encrypted_jwt()
     context.response = app.test_client().put(url.format(context.msg_id),
                                              data=flask.json.dumps(modify_data), headers=headers)
 
@@ -120,6 +122,8 @@ def step_impl_message_has_been_read(context):
 
     modify_data['action'] = 'remove'
     modify_data['label'] = 'UNREAD'
+    token_data['user_urn'] = data['urn_to']
+    headers['Authorization'] = update_encrypted_jwt()
     context.response = app.test_client().put(url.format(context.msg_id),
                                              data=flask.json.dumps(modify_data), headers=headers)
 
@@ -388,18 +392,20 @@ def step_impl_assert_message_status_changes_to_read(context):
     nose.tools.assert_true("UNREAD" not in request_data['labels'])
 
 
-# If an incorrect message id is requested by the user return a 400 error
+# If an incorrect message id is requested by the user return a 404 error
 @given("a user requests a message with a invalid message id")
 def step_impl_return_message_with_invalid_msg_id(context):
-    context.msg_id = "MsgIdExceedsMsgIdLengthsdhkbgjksdlfknbsjdshbfjskgbhdhdghgdhdfsdhjghbskggdh"
+    context.msg_id = "RandomMsgIDsdhkbgjksdlfknbsjdshbfjskgbhdhdghgdhdfsdhjghbskggdh"
 
 
-@when("it is searched for and not a valid message id")
-def step_impl_searched_for_and_not_valid_message_id(context):
-    context.response = app.test_client().put("http://localhost:5050/message/{0}".format(context.msg_id),
-                                             data=json.dumps(data), headers=headers)
+@when("it is searched for")
+def step_impl_searched_for(context):
+    modify_data['action'] = 'remove'
+    modify_data['label'] = 'UNREAD'
+    context.response = app.test_client().put(url.format(context.msg_id),
+                                             data=json.dumps(modify_data), headers=headers)
 
 
-@then("a 400 error code is returned to the user")
-def step_impl_400_returned(context):
-    nose.tools.assert_equal(context.response.status_code, 400)
+@then("a 404 error code is returned")
+def step_impl_404_returned(context):
+    nose.tools.assert_equal(context.response.status_code, 404)

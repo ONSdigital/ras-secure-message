@@ -60,7 +60,6 @@ def step_impl_user_edits_saved_draft(context):
                  'urn_from': 'respondent.000000',
                  'subject': 'test',
                  'body': 'Test',
-                 'thread_id': '2',
                  'collection_case': 'collection case1',
                  'reporting_unit': 'reporting case1',
                  'business_name': 'ABusiness',
@@ -75,6 +74,13 @@ def step_impl_user_saves_the_draft(context):
     if hasattr(context, 'etag'):
         headers['ETag'] = context.etag
     context.response = app.test_client().put(url.format(context.msg_id), data=json.dumps(data), headers=headers)
+
+
+@then('the draft stored includes the new changes')
+def step_impl_success_returned(context):
+    get_draft = app.test_client().get('http://localhost:5050/draft/{0}'.format(context.msg_id), headers=headers)
+    changed_draft = json.loads(get_draft.data)
+    nose.tools.assert_equal(changed_draft['body'], data['body'])
 
 
 @then('a success response is given')
@@ -298,7 +304,7 @@ def step_impl_draft_message_is_being_edited(context):
                      'business_name': 'ABusiness',
                      'survey': 'survey'})
         data['body'] = ''
-        headers['Etag'] = context.etag
+        headers['ETag'] = context.etag
         context.response = app.test_client().put(url.format(context.msg_id),
                                                  data=json.dumps(data), headers=headers)
 
@@ -317,7 +323,7 @@ def step_impl_another_user_tries_to_modify_same_draft(context):
                  'survey': 'survey'})
 
     data['subject'] = 'edited'
-    headers['Etag'] = context.etag
+    headers['ETag'] = context.etag
     context.response = app.test_client().put(url.format(context.msg_id),
                                              data=json.dumps(data), headers=headers)
 
@@ -364,3 +370,24 @@ def step_impl_new_etag_should_be_returned(context):
     nose.tools.assert_is_not_none(etag)
     nose.tools.assert_true(len(etag) == 40)
     nose.tools.assert_true(etag != context.etag)
+
+#   Scenario: Edit draft without an etag present within the header
+
+
+@when('the user edits the draft without etag')
+def step_impl_user_saves_the_draft_without_etag(context):
+    data.update({'msg_id': context.msg_id,
+                 'urn_to': 'internal.000000',
+                 'urn_from': 'respondent.000000',
+                 'subject': 'test',
+                 'body': 'Test',
+                 'collection_case': 'collection case1',
+                 'reporting_unit': 'reporting case1',
+                 'business_name': 'ABusiness',
+                 'survey': 'survey'})
+    data['body'] = 'different'
+
+    if 'ETag' in headers:
+        del headers['ETag']
+    context.response = app.test_client().put(url.format(context.msg_id), data=json.dumps(data), headers=headers)
+

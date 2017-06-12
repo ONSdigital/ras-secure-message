@@ -8,7 +8,7 @@ from app.authentication.jwt import encode
 from app.authentication.jwe import Encrypter
 from app import settings
 
-url = "http://localhost:5050/message/"
+url = "http://localhost:5050/message/{0}"
 token_data = {
             "user_urn": "000000000"
         }
@@ -23,7 +23,7 @@ data = {'urn_to': 'test',
         'collection_case': 'collection case1',
         'reporting_unit': 'reporting case1',
         'business_name': 'ABusiness',
-        'survey': 'survey'}
+        'survey': 'BRES'}
 
 
 def update_encrypted_jwt():
@@ -39,7 +39,7 @@ headers['Authorization'] = update_encrypted_jwt()
 # Scenario: Retrieve a message with correct message ID
 @given("there is a message to be retrieved")
 def step_impl_there_is_a_message_to_be_retrieved(context):
-    data['urn_to'] = 'internal.12344'
+    data['urn_to'] = 'BRES'
     data['urn_from'] = 'respondent.122342'
     context.response = app.test_client().post("http://localhost:5050/message/send", data=flask.json.dumps(data),
                                               headers=headers)
@@ -49,8 +49,9 @@ def step_impl_there_is_a_message_to_be_retrieved(context):
 
 @when("the get request is made with a correct message id")
 def step_impl_the_get_request_is_made_with_a_correct_message_id(context):
-    new_url = url+context.msg_id
-    context.response = app.test_client().get(new_url, headers=headers)
+    token_data['user_urn'] = 'respondent.122342'
+    headers['Authorization'] = update_encrypted_jwt()
+    context.response = app.test_client().get(url.format(context.msg_id), headers=headers)
 
 
 @then("a 200 HTTP response is returned")
@@ -58,11 +59,52 @@ def step_impl_a_200_http_response_is_returned(context):
     nose.tools.assert_equal(context.response.status_code, 200)
 
 
+@then("returned message field urn_to is correct")
+def step_impl_correct_urn_to_returned(context):
+    msg_resp = json.loads(context.response.data)
+    nose.tools.assert_equal(msg_resp['urn_to'], [data['urn_to']])
+
+
+@then("returned message field urn_from is correct")
+def step_impl_correct_urn_from_returned(context):
+    msg_resp = json.loads(context.response.data)
+    nose.tools.assert_equal(msg_resp['urn_from'], data['urn_from'])
+
+
+@then("returned message field body is correct")
+def step_impl_correct_body_returned(context):
+    msg_resp = json.loads(context.response.data)
+    nose.tools.assert_equal(msg_resp['body'], data['body'])
+
+
+@then("returned message field subject is correct")
+def step_impl_correct_subject_returned(context):
+    msg_resp = json.loads(context.response.data)
+    nose.tools.assert_equal(msg_resp['subject'], data['subject'])
+
+
+@then("returned message field ReportingUnit is correct")
+def step_impl_correct_reporting_unit_returned(context):
+    msg_resp = json.loads(context.response.data)
+    nose.tools.assert_equal(msg_resp['reporting_unit'], data['reporting_unit'])
+
+
+@then("returned message field CollectionCase is correct")
+def step_impl_correct_collection_case_returned(context):
+    msg_resp = json.loads(context.response.data)
+    nose.tools.assert_equal(msg_resp['collection_case'], data['collection_case'])
+
+
+@then("returned message field BusinessName is correct")
+def step_impl_correct_business_name_returned(context):
+    msg_resp = json.loads(context.response.data)
+    nose.tools.assert_equal(msg_resp['business_name'], data['business_name'])
+
+
 # Scenario: Retrieve a message with incorrect message ID
 @when("the get request has been made with an incorrect message id")
 def step_impl_the_get_request_has_been_made_with_incorrect_message_id(context):
-    new_url = url+str(uuid.uuid4())
-    context.response = app.test_client().get(new_url, headers=headers)
+    context.response = app.test_client().get(url.format(str(uuid.uuid4())), headers=headers)
 
 
 @then("a 404 HTTP response is returned")
@@ -85,8 +127,7 @@ def step_impl_a_respondent_sends_a_message(context):
 def step_impl_the_respondent_wants_to_see_the_message(context):
     token_data['user_urn'] = 'respondent.122342'
     headers['Authorization'] = update_encrypted_jwt()
-    new_url = url+context.msg_id
-    context.response = app.test_client().get(new_url, headers=headers)
+    context.response = app.test_client().get(url.format(context.msg_id), headers=headers)
 
 
 @then("the retrieved message should have the label SENT")
@@ -110,8 +151,7 @@ def step_impl_an_internal_user_sends_a_message(context):
 def step_impl_the_internal_user_wants_to_see_the_message(context):
     token_data['user_urn'] = 'internal.12344'
     headers['Authorization'] = update_encrypted_jwt()
-    new_url = url+context.msg_id
-    context.response = app.test_client().get(new_url, headers=headers)
+    context.response = app.test_client().get(url.format(context.msg_id), headers=headers)
 
 
 #  Scenario: Internal user sends message and respondent retrieves the same message with it's labels
@@ -121,6 +161,37 @@ def step_impl_the_retrieved_message_should_havethe_labels_inbox_and_unread(conte
     nose.tools.assert_true(len(response['labels']), 2)
     nose.tools.assert_true('INBOX' in response['labels'])
     nose.tools.assert_true('UNREAD' in response['labels'])
+
+
+#   Scenario: Retrieve a draft message
+
+@given('there is a draft message to be retrieved')
+def step_impl_draft_message_can_be_retrieved(context):
+    data.update({'urn_from': '9976a558-c529-4652-806e-fac1b8d4fdcb',
+                 'subject': 'test',
+                 'body': 'Test',
+                 'thread_id': '',
+                 'collection_case': 'collection case1',
+                 'reporting_unit': 'reporting case1',
+                 'business_name': 'ABusiness',
+                 'survey': 'survey'})
+    response = app.test_client().post("http://localhost:5050/draft/save", data=json.dumps(data),
+                                      headers=headers)
+    context.resp_data = json.loads(response.data)
+
+
+@when('the get request is made with a draft message id')
+def step_impl_the_draft_is_requested(context):
+    token_data['user_urn'] = '9976a558-c529-4652-806e-fac1b8d4fdcb'
+    headers['Authorization'] = update_encrypted_jwt()
+    context.response = app.test_client().get(url.format(context.resp_data['msg_id']), headers=headers)
+
+
+@then('message returned is a draft')
+def step_impl_assert_returned_is_draft(context):
+    response = json.loads(context.response.data)
+    nose.tools.assert_equal(response['msg_id'], context.resp_data['msg_id'])
+    nose.tools.assert_in("DRAFT", response['labels'])
 
 
 

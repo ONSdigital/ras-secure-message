@@ -99,16 +99,28 @@ def step_impl_use_messages_endpoint(context):
 
 @when("user tries to access that endpoint with the POST method")
 def step_impl_access_endpoint_withpost(context):
+    token_data.update({
+        "user_urn": "000000000"
+    })
+    headers['Authorization'] = update_encrypted_jwt()
     context.response = app.test_client().post(context.url, headers=headers)
 
 
 @when("user tries to access that endpoint with the GET method")
-def step_impl_aaacess_endpoint_with_get(context):
+def step_impl_access_endpoint_with_get(context):
+    token_data.update({
+        "user_urn": "000000000"
+    })
+    headers['Authorization'] = update_encrypted_jwt()
     context.response = app.test_client().get(context.url, headers=headers)
 
 
 @when("user tries to access that endpoint with the PUT method")
 def step_impl_access_endpoint_with_put(context):
+    token_data.update({
+        "user_urn": "000000000"
+    })
+    headers['Authorization'] = update_encrypted_jwt()
     context.response = app.test_client().put(context.url, headers=headers)
 
 

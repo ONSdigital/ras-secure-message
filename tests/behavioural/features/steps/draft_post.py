@@ -190,7 +190,28 @@ def step_implmsg_id_returned(context):
     nose.tools.assert_true(resp_data['msg_id'] is not None)
 
 
+# Scenario: As a user I would like a new draft message not related to a thread to be given the message id as a thread id
+
+@given('A user creates a draft that is not associated with a thread')
+def step_impl_draft_message_withour_thread_id(context):
+    data.pop('msg_id', 'Amsgid')
+    data.update({'urn_from': '9976a558-c529-4652-806e-fac1b8d4fdcb',
+                 'subject': 'test',
+                 'body': 'Test',
+                 'collection_case': 'collection case1',
+                 'reporting_unit': 'reporting case1',
+                 'business_name': 'ABusiness',
+                 'survey': 'survey'})
+
+
+@then('the thread id should be set to the message id')
+def step_impl_thread_id_set_as_msg_id(context):
+    response = json.loads(context.response.data)
+    nose.tools.assert_equal(response['msg_id'], response['thread_id'])
+
+
 # Common
 @when('the draft is saved')
 def step_impl_draft_is_saved(context):
     context.response = app.test_client().post(url, data=json.dumps(data), headers=headers)
+
