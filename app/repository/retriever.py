@@ -48,20 +48,22 @@ class Retriever:
             conditions.append(SecureMessage.collection_case == str(cc))
 
         try:
+            t = db.session.query(SecureMessage.msg_id, func.max(Events.date_time).label('max_date')) \
+                .join(Events).join(Status) \
+                .filter(and_(*conditions)) \
+                .filter(and_(*status_conditions)) \
+                .filter(or_(Events.event == 'Sent', Events.event == 'Draft_Saved')) \
+                .group_by(SecureMessage.msg_id).subquery('t')
+
             if descend:
-                result = SecureMessage.query.join(Events).join(Status)\
-                    .filter(and_(*conditions))\
-                    .filter(and_(*status_conditions))\
-                    .order_by(case([(Events.event == 'Sent', Events.date_time),
-                                    (Events.event == 'Draft_Saved', Events.date_time)],
-                                   else_=0).desc(), Events.event.desc()).paginate(page, limit, False)
+                result = SecureMessage.query\
+                    .filter(SecureMessage.msg_id == t.c.msg_id) \
+                    .order_by(t.c.max_date.desc()).paginate(page, limit, False)
+
             else:
-                result = SecureMessage.query.join(Events).join(Status)\
-                    .filter(and_(*conditions)) \
-                    .filter(and_(*status_conditions)) \
-                    .order_by(case([(Events.event == 'Sent', Events.date_time),
-                                    (Events.event == 'Draft_Saved', Events.date_time)],
-                                   else_='z').asc(), Events.event.desc()).paginate(page, limit, False)
+                result = SecureMessage.query \
+                    .filter(SecureMessage.msg_id == t.c.msg_id) \
+                    .order_by(t.c.max_date.asc()).paginate(page, limit, False)
 
         except Exception as e:
             logger.error(e)

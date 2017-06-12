@@ -214,7 +214,32 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
                 result = Retriever().retrieve_message_list(1, MESSAGE_QUERY_LIMIT, 'respondent.21345')[1]
                 msg = []
                 for message in result.items:
-                    msg.append(message.serialize)
+                    serialized_message = message.serialize('respondent.21345')
+                    msg.append(serialized_message)
+                self.assertEqual(len(msg), MESSAGE_QUERY_LIMIT)
+
+    def test_msg_limit_returned_when_db_greater_than_limit_with_replies(self):
+        """retrieves x messages when database has greater than x entries and database has reply messages"""
+        self.populate_database(MESSAGE_QUERY_LIMIT+5, multiple_users=True, add_reply=True)
+        with app.app_context():
+            with current_app.test_request_context():
+                result = Retriever().retrieve_message_list(1, MESSAGE_QUERY_LIMIT, 'respondent.21345')[1]
+                msg = []
+                for message in result.items:
+                    serialized_message = message.serialize('respondent.21345')
+                    msg.append(serialized_message)
+                self.assertEqual(len(msg), MESSAGE_QUERY_LIMIT)
+
+    def test_msg_limit_returned_when_db_greater_than_limit_with_replies_drafts(self):
+        """retrieves x messages when database has greater than x entries and database has reply messages and drafts"""
+        self.populate_database(MESSAGE_QUERY_LIMIT+5, multiple_users=True, add_reply=True, add_draft=True)
+        with app.app_context():
+            with current_app.test_request_context():
+                result = Retriever().retrieve_message_list(1, MESSAGE_QUERY_LIMIT, 'respondent.21345')[1]
+                msg = []
+                for message in result.items:
+                    serialized_message = message.serialize('respondent.21345')
+                    msg.append(serialized_message)
                 self.assertEqual(len(msg), MESSAGE_QUERY_LIMIT)
 
     def test_msg_returned_with_msg_id_true(self):
