@@ -1,6 +1,5 @@
 Feature: Draft Put Endpoint
 
-  @ignore
   Scenario: A user edits a previously saved draft
     Given a user edits a previously saved draft
     When the user saves the draft
@@ -67,8 +66,7 @@ Feature: Draft Put Endpoint
     When another user tries to modify the same draft message
     Then a conflict error is returned
 
-  @ignore
-  Scenario: A etag is not present within the header
-    Given a message is posted and retrieved
-    When there is no etag in the header
+  Scenario: Edit draft without an etag present within the header
+    Given there is a draft to be modified
+    When the user edits the draft without etag
     Then a success response is given

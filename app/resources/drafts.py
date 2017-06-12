@@ -149,10 +149,10 @@ class DraftModifyById(Resource):
     @staticmethod
     def etag_check(headers, current_draft):
         """Check etag to make sure draft has not been modified since get request"""
-        if headers.get('etag'):
+        if headers.get('ETag'):
             hash_object = hashlib.sha1(str(sorted(current_draft.items())).encode())
             current_etag = hash_object.hexdigest()
-            if current_etag == headers.get('etag'):
+            if current_etag == headers.get('ETag'):
                 return True
             return False
         else:
