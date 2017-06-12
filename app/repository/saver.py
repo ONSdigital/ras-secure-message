@@ -1,10 +1,10 @@
 import logging
-
+from structlog import wrap_logger
 from app.exception.exceptions import MessageSaveException
 from app.repository import database
 from app.repository.database import db
 
-logger = logging.getLogger(__name__)
+logger = wrap_logger(logging.getLogger(__name__))
 
 
 class Saver:

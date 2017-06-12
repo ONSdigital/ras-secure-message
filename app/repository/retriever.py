@@ -1,15 +1,14 @@
 import logging
-
+from structlog import wrap_logger
 from flask import jsonify
 from sqlalchemy import and_, case, func, or_
 from sqlalchemy.exc import SQLAlchemyError
 from werkzeug.exceptions import InternalServerError, NotFound
-
 from app.common.labels import Labels
 from app.repository.database import SecureMessage, Status, Events, db
 from app.validation.user import User
 
-logger = logging.getLogger(__name__)
+logger = wrap_logger(logging.getLogger(__name__))
 
 
 class Retriever:

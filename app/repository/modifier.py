@@ -1,5 +1,5 @@
 import logging
-
+from structlog import wrap_logger
 from werkzeug.exceptions import InternalServerError
 
 from app.common.labels import Labels
@@ -7,7 +7,7 @@ from app.repository.database import db
 from app.repository.saver import Saver
 from app.validation.user import User
 
-logger = logging.getLogger(__name__)
+logger = wrap_logger(logging.getLogger(__name__))
 
 
 class Modifier:

@@ -3,6 +3,10 @@ from flask import jsonify
 from app.repository.retriever import Retriever
 from app import settings
 from flask import current_app
+from structlog import wrap_logger
+import logging
+
+logger = wrap_logger(logging.getLogger(__name__))
 
 
 class Health(Resource):
