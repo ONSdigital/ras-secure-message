@@ -16,7 +16,6 @@ install:
 script:
     - export RAS_SM_PATH=./
     - coverage run run_tests.py
-    - coverage report
 
 after_success:
     - codecov

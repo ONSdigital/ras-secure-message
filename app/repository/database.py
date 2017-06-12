@@ -74,10 +74,10 @@ class SecureMessage(db.Model):
             'labels': []
         }
 
-        if User(user_urn).is_respondent:
-            actor = user_urn
-        else:
+        if User(user_urn).is_internal:
             actor = self.survey
+        else:
+            actor = user_urn
 
         for row in self.statuses:
             if row.actor == actor:

@@ -1,6 +1,5 @@
 Feature: Message get by ID Endpoint
 
-   @ignore
   Scenario Outline: Retrieve a correct message with message ID
     Given there is a message to be retrieved
     When the get request is made with a correct message id
@@ -17,14 +16,12 @@ Feature: Message get by ID Endpoint
     |CollectionCase  |
     |BusinessName  |
 
-  @ignore
   Scenario: Retrieve a draft message
     Given there is a draft message to be retrieved
     When the get request is made with a draft message id
     Then a 200 HTTP response is returned
     And message returned is a draft
 
-  @ignore
   Scenario Outline: Retrieve the correct draft message
     Given there is a draft message to be retrieved
     When the get request is made with a draft message id

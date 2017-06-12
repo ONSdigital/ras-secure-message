@@ -34,7 +34,7 @@ class DraftSave(Resource):
 
             hash_object = hashlib.sha1(str(sorted(saved_draft.items())).encode())
             etag = hash_object.hexdigest()
-            resp = jsonify({'status': 'OK', 'msg_id': draft.data.msg_id})
+            resp = jsonify({'status': 'OK', 'msg_id': draft.data.msg_id, 'thread_id': draft.data.thread_id})
             resp.headers['ETag'] = etag
             resp.status_code = 201
 
@@ -149,10 +149,10 @@ class DraftModifyById(Resource):
     @staticmethod
     def etag_check(headers, current_draft):
         """Check etag to make sure draft has not been modified since get request"""
-        if headers.get('etag'):
+        if headers.get('ETag'):
             hash_object = hashlib.sha1(str(sorted(current_draft.items())).encode())
             current_etag = hash_object.hexdigest()
-            if current_etag == headers.get('etag'):
+            if current_etag == headers.get('ETag'):
                 return True
             return False
         else:
