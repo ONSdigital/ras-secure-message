@@ -375,7 +375,7 @@ def step_impl_new_etag_should_be_returned(context):
 
 
 @when('the user edits the draft without etag')
-def step_impl_user_saves_the_draft(context):
+def step_impl_user_saves_the_draft_without_etag(context):
     data.update({'msg_id': context.msg_id,
                  'urn_to': 'internal.000000',
                  'urn_from': 'respondent.000000',
