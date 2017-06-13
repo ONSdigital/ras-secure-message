@@ -365,7 +365,7 @@ def step_impl_assert_correct_number_of_messages_returned(context):
 
 # Scenario: As an external user I would like to be able to view a list of messages
 @given("an internal user has multiple messages")
-def step_impl_external_user_has_multiple_messages(context):
+def step_impl_internal_user_has_multiple_messages(context):
     reset_db()
     token_data['user_urn'] = 'internal.123'
     headers['Authorization'] = update_encrypted_jwt()
