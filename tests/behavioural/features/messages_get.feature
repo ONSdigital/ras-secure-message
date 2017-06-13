@@ -22,8 +22,13 @@ Feature: Get Messages list Endpoint
 
  Scenario: As an external user I would like to be able to view a list of messages
     Given an external user has multiple messages
-    When the external user requests all messages
-    Then all external users messages are returned
+    When the user requests all messages
+    Then all of that users messages are returned
+
+ Scenario: As an internal user I would like to be able to view a list of messages
+    Given an internal user has multiple messages
+    When the user requests all messages
+    Then all of that users messages are returned
 
   Scenario: Respondent and internal user sends multiple messages and Respondent retrieves the list of sent messages 
     Given a respondent and an Internal user sends multiple messages 
