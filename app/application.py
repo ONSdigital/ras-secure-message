@@ -14,10 +14,11 @@ from app.resources.drafts import DraftSave, DraftById, DraftModifyById, DraftLis
 from app.resources.threads import ThreadById, ThreadList
 from app import connector
 from app.logger_config import logger_initial_config
+from structlog import wrap_logger
 
 logger_initial_config(service_name='ras-secure-message')
 
-logger = logging.getLogger(__name__)
+logger = wrap_logger(logging.getLogger(__name__))
 
 app = Flask(__name__)
 api = Api(app)
