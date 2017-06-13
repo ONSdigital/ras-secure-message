@@ -218,6 +218,19 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
                     msg.append(serialized_message)
                 self.assertEqual(len(msg), MESSAGE_QUERY_LIMIT)
 
+    def test_msg_and_drafts_returned(self):
+        """retrieves messages and drafts"""
+        self.populate_database(5, add_draft=True)
+        with app.app_context():
+            with current_app.test_request_context():
+                result = Retriever().retrieve_message_list(1, MESSAGE_QUERY_LIMIT, 'internal.21345',
+                                                           survey='SurveyType')[1]
+                msg = []
+                for message in result.items:
+                    serialized_message = message.serialize('internal.21345')
+                    msg.append(serialized_message)
+                self.assertEqual(len(msg), 10)
+
     def test_msg_limit_returned_when_db_greater_than_limit_with_replies(self):
         """retrieves x messages when database has greater than x entries and database has reply messages"""
         self.populate_database(MESSAGE_QUERY_LIMIT+5, multiple_users=True, add_reply=True)

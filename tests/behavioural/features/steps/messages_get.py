@@ -23,7 +23,7 @@ data = {'urn_to': 'test',
         'collection_case': 'collectioncase',
         'reporting_unit': 'AReportingUnit',
         'business_name': 'ABusiness',
-        'survey': 'survey'}
+        'survey': 'BRES'}
 
 
 def update_encrypted_jwt():
@@ -352,15 +352,27 @@ def step_impl_external_user_has_multiple_messages(context):
         app.test_client().post("http://localhost:5050/draft/save", data=flask.json.dumps(data), headers=headers)
 
 
-@when("the external user requests all messages")
+@when("the user requests all messages")
 def step_impl_external_user_requests_all_messages(context):
     request = app.test_client().get(url, headers=headers)
     context.response = flask.json.loads(request.data)
 
 
-@then("all external users messages are returned")
+@then("all of that users messages are returned")
 def step_impl_assert_correct_number_of_messages_returned(context):
     nose.tools.assert_equal(len(context.response['messages']), 4)
+
+
+# Scenario: As an external user I would like to be able to view a list of messages
+@given("an internal user has multiple messages")
+def step_impl_external_user_has_multiple_messages(context):
+    reset_db()
+    token_data['user_urn'] = 'internal.123'
+    headers['Authorization'] = update_encrypted_jwt()
+    data['urn_from'] = 'BRES'
+    for x in range(0, 2):
+        app.test_client().post("http://localhost:5050/message/send", data=flask.json.dumps(data), headers=headers)
+        app.test_client().post("http://localhost:5050/draft/save", data=flask.json.dumps(data), headers=headers)
 
 
 # Scenario: As a user I would like to be able to view a list of inbox messages
