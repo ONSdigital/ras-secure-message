@@ -34,7 +34,7 @@ def step_impl_no_user_urn_in_the_header(context):
 
 
 @given("no role is in the header")
-def step_impl_no_user_urn_in_the_header(context):
+def step_impl_no_role_in_the_header(context):
     if 'user_uuid' not in token_data:
         token_data['user_uuid'] = "000000000"
 
