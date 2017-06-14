@@ -1,5 +1,8 @@
 Feature: Get Messages list Endpoint
 
+  Background: Reset database
+    Given database is reset
+
   Scenario: Respondent sends multiple messages and retrieves the list of messages with their labels
     Given a respondent sends multiple messages
     When the respondent gets their messages

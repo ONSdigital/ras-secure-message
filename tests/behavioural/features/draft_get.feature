@@ -1,5 +1,8 @@
 Feature: Get draft by id
 
+  Background: Reset database
+    Given database is reset
+
   Scenario: User requests draft
     Given a user requests a valid draft
     When the user requests the draft

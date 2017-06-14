@@ -1,5 +1,8 @@
 Feature: Get threads list Endpoint
 
+  Background: Reset database
+    Given database is reset
+
   Scenario: Respondent and internal user have multiple conversations and respondent retrieves all conversation
     Given a respondent and internal user have multiple conversations
     When the respondent gets all conversations

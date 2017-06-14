@@ -2,8 +2,6 @@ import flask
 import nose.tools
 from behave import given, then, when
 from app.application import app
-from app.repository import database
-from flask import current_app
 from app.authentication.jwt import encode
 from app.authentication.jwe import Encrypter
 from app import settings
@@ -36,19 +34,11 @@ def update_encrypted_jwt():
 
 headers['Authorization'] = update_encrypted_jwt()
 
-
-def reset_db():
-    with app.app_context():
-        database.db.init_app(current_app)
-        database.db.drop_all()
-        database.db.create_all()
-
 # Scenario: Respondent and internal user have a conversation and respondent retrieves the conversation
 
 
 @given("a respondent and internal user have a conversation")
 def step_impl_respondent_and_internal_user_hav_a_conversation(context):
-    reset_db()
 
     data['thread_id'] = 'AConversation'
     for _ in range(0, 2):
@@ -123,5 +113,4 @@ def step_impl_internal_user_has_multiple_conversations(context):
 #   Scenario: User tries to retrieve a conversation that does not exist
 @given("a respondent picks a conversation that does not exist")
 def step_impl_pick_conversation_that_does_not_exist(context):
-    reset_db()
     data['thread_id'] = str(uuid.uuid4())

@@ -2,8 +2,7 @@ import flask
 import nose.tools
 from behave import given, then, when
 from app.application import app
-from app.repository import database
-from flask import current_app, json
+from flask import json
 from app.authentication.jwt import encode
 from app.authentication.jwe import Encrypter
 from app import settings
@@ -36,19 +35,11 @@ def update_encrypted_jwt():
 
 headers['Authorization'] = update_encrypted_jwt()
 
-
-def reset_db():
-    with app.app_context():
-        database.db.init_app(current_app)
-        database.db.drop_all()
-        database.db.create_all()
-
 #  Scenario: User requests list of drafts
 
 
 @given('the user has created and saved multiple drafts')
 def step_impl_user_has_created__and_saved_multiple_drafts(context):
-    reset_db()
     data.update({'urn_to': 'test',
                  'urn_from': 'respondent.2134',
                  'subject': 'test',
