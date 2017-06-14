@@ -13,7 +13,8 @@ import uuid
 
 url = "http://localhost:5050/draft/{0}"
 token_data = {
-            "user_urn": "respondent.2134"
+            "user_uuid": "respondent.2134",
+            "role": "respondent"
         }
 
 headers = {'Content-Type': 'application/json', 'Authorization': ''}

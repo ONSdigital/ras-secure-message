@@ -54,7 +54,7 @@ class SecureMessage(db.Model):
         self.business_name = domain_model.business_name
         self.survey = domain_model.survey
 
-    def serialize(self, user_urn):
+    def serialize(self, user):
         """Return object data in easily serializeable format"""
         message = {
             'urn_to': [],
@@ -74,10 +74,10 @@ class SecureMessage(db.Model):
             'labels': []
         }
 
-        if User(user_urn).is_internal:
+        if user.is_internal:
             actor = self.survey
         else:
-            actor = user_urn
+            actor = user.user_uuid
 
         for row in self.statuses:
             if row.actor == actor:

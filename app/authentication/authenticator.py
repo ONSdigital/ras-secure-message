@@ -2,6 +2,8 @@ from app.authentication.jwt import decode
 from app.authentication.jwe import Decrypter
 from flask import Response, g
 from jose import JWTError
+from app.validation.user import User
+from werkzeug.exceptions import BadRequest
 
 import logging
 
@@ -29,13 +31,15 @@ def check_jwt(token):
         decrypted_jwt_token = decrypter.decrypt_token(token)
         decoded_jwt_token = decode(decrypted_jwt_token)
 
-        if 'user_urn' in decoded_jwt_token:
-            g.user_urn = decoded_jwt_token['user_urn']
-            return {'status': "ok"}
-        else:
-            res = Response(response="Missing user_urn or invalid user_urn supplied to access this Microservice Resource"
-                           , status=400, mimetype="text/html")
-            return res
+        if not decoded_jwt_token.get('user_uuid'):
+            raise BadRequest(description="Missing user_uuid claim,"
+                                         "user_uuid is required to access this Microservice Resource")
+        if not decoded_jwt_token.get('role'):
+            raise BadRequest(description="Missing role claim, role is required to access this Microservice Resource")
+
+        g.user = User(decoded_jwt_token.get('user_uuid'), decoded_jwt_token.get('role'))
+
+        return {'status': "ok"}
 
     except JWTError:
         res = Response(response="Invalid token to access this Microservice Resource", status=400, mimetype="text/html")

@@ -12,6 +12,7 @@ from app.repository import database
 from app.repository.modifier import Modifier
 from app.repository.retriever import Retriever
 from app.validation.domain import DraftSchema
+from app.validation.user import User
 
 
 class ModifyTestCaseHelper:
@@ -60,6 +61,9 @@ class ModifyTestCase(unittest.TestCase, ModifyTestCaseHelper):
             database.db.create_all()
             self.db = database.db
 
+        self.user_internal = User('internal.21345', 'internal')
+        self.user_respondent = User('respondent.21345', 'respondent')
+
     def test_archived_label_is_added_to_message(self):
         """testing message is added to database with archived label attached"""
         self.populate_database(1)
@@ -74,9 +78,9 @@ class ModifyTestCase(unittest.TestCase, ModifyTestCaseHelper):
                 msg_id = str(names[0])
                 message_service = Retriever()
                 # pass msg_id and user urn
-                message = message_service.retrieve_message(msg_id, 'respondent.21345')
-                Modifier.add_archived(message, 'respondent.21345', )
-                message = message_service.retrieve_message(msg_id, 'respondent.21345')
+                message = message_service.retrieve_message(msg_id, self.user_respondent)
+                Modifier.add_archived(message, self.user_respondent, )
+                message = message_service.retrieve_message(msg_id, self.user_respondent)
                 self.assertCountEqual(message['labels'], ['SENT', 'ARCHIVE'])
 
     def test_archived_label_is_removed_from_message(self):
@@ -92,12 +96,12 @@ class ModifyTestCase(unittest.TestCase, ModifyTestCaseHelper):
             with current_app.test_request_context():
                 msg_id = str(names[0])
                 message_service = Retriever()
-                message = message_service.retrieve_message(msg_id, 'respondent.21345')
+                message = message_service.retrieve_message(msg_id, self.user_respondent)
                 modifier = Modifier()
-                modifier.add_archived(message, 'respondent.21345')
-                message = message_service.retrieve_message(msg_id, 'respondent.21345')
-                modifier.del_archived(message, 'respondent.21345', )
-                message = message_service.retrieve_message(msg_id, 'respondent.21345')
+                modifier.add_archived(message, self.user_respondent)
+                message = message_service.retrieve_message(msg_id, self.user_respondent)
+                modifier.del_archived(message, self.user_respondent, )
+                message = message_service.retrieve_message(msg_id, self.user_respondent)
                 self.assertCountEqual(message['labels'], ['SENT'])
 
     def test_unread_label_is_removed_from_message(self):
@@ -113,10 +117,10 @@ class ModifyTestCase(unittest.TestCase, ModifyTestCaseHelper):
             with current_app.test_request_context():
                 msg_id = str(names[0])
                 message_service = Retriever()
-                message = message_service.retrieve_message(msg_id, 'internal.21345')
+                message = message_service.retrieve_message(msg_id, self.user_internal)
                 modifier = Modifier()
-                modifier.del_unread(message, 'internal.21345')
-                message = message_service.retrieve_message(msg_id, 'internal.21345')
+                modifier.del_unread(message, self.user_internal)
+                message = message_service.retrieve_message(msg_id, self.user_internal)
                 self.assertCountEqual(message['labels'], ['INBOX'])
 
     def test_unread_label_is_added_to_message(self):
@@ -132,11 +136,11 @@ class ModifyTestCase(unittest.TestCase, ModifyTestCaseHelper):
             with current_app.test_request_context():
                 msg_id = str(names[0])
                 message_service = Retriever()
-                message = message_service.retrieve_message(msg_id, 'internal.21345')
+                message = message_service.retrieve_message(msg_id, self.user_internal)
                 modifier = Modifier()
-                modifier.del_unread(message, 'internal.21345')
-                modifier.add_unread(message, 'internal.21345')
-                message = message_service.retrieve_message(msg_id, 'internal.21345')
+                modifier.del_unread(message, self.user_internal)
+                modifier.add_unread(message, self.user_internal)
+                message = message_service.retrieve_message(msg_id, self.user_internal)
                 self.assertCountEqual(message['labels'], ['UNREAD', 'INBOX'])
 
     def test_add_archive_is_added_to_internal(self):
@@ -152,11 +156,11 @@ class ModifyTestCase(unittest.TestCase, ModifyTestCaseHelper):
             with current_app.test_request_context():
                 msg_id = str(names[0])
                 message_service = Retriever()
-                message = message_service.retrieve_message(msg_id, 'internal.21345')
-                Modifier.del_archived(message, 'internal.21345')
-                message = message_service.retrieve_message(msg_id, 'internal.21345')
-                Modifier.add_archived(message, 'internal.21345')
-                message = message_service.retrieve_message(msg_id, 'internal.21345')
+                message = message_service.retrieve_message(msg_id, self.user_internal)
+                Modifier.del_archived(message, self.user_internal)
+                message = message_service.retrieve_message(msg_id, self.user_internal)
+                Modifier.add_archived(message, self.user_internal)
+                message = message_service.retrieve_message(msg_id, self.user_internal)
                 self.assertCountEqual(message['labels'], ['UNREAD', 'INBOX', 'ARCHIVE'])
 
     def test_read_date_is_set(self):
@@ -173,9 +177,9 @@ class ModifyTestCase(unittest.TestCase, ModifyTestCaseHelper):
                 msg_id = str(names[0])
                 message_service = Retriever()
                 modifier = Modifier()
-                message = message_service.retrieve_message(msg_id, 'internal.21345')
-                modifier.del_unread(message, 'internal.21345')
-                message = message_service.retrieve_message(msg_id, 'internal.21345')
+                message = message_service.retrieve_message(msg_id, self.user_internal)
+                modifier.del_unread(message, self.user_internal)
+                message = message_service.retrieve_message(msg_id, self.user_internal)
                 self.assertIsNotNone(message['read_date'])
 
     def test_read_date_is_not_reset(self):
@@ -192,13 +196,13 @@ class ModifyTestCase(unittest.TestCase, ModifyTestCaseHelper):
                 msg_id = str(names[0])
                 message_service = Retriever()
                 modifier = Modifier()
-                message = message_service.retrieve_message(msg_id, 'internal.21345')
-                modifier.del_unread(message, 'internal.21345')
-                message = message_service.retrieve_message(msg_id, 'internal.21345')
+                message = message_service.retrieve_message(msg_id, self.user_internal)
+                modifier.del_unread(message, self.user_internal)
+                message = message_service.retrieve_message(msg_id, self.user_internal)
                 read_date_set = message['read_date']
-                modifier.add_unread(message, 'internal.21345')
-                modifier.del_unread(message, 'internal.21345')
-                message = message_service.retrieve_message(msg_id, 'internal.21345')
+                modifier.add_unread(message, self.user_internal)
+                modifier.del_unread(message, self.user_internal)
+                message = message_service.retrieve_message(msg_id, self.user_internal)
                 self.assertEqual(message['read_date'], read_date_set)
 
     def test_draft_label_is_deleted(self):
@@ -321,17 +325,17 @@ class ModifyTestCase(unittest.TestCase, ModifyTestCaseHelper):
                 msg_id = str(names[0])
                 message_service = Retriever()
                 modifier = Modifier()
-                message = message_service.retrieve_message(msg_id, 'respondent.21345')
-                modifier.add_archived(message, 'respondent.21345')
-                message = message_service.retrieve_message(msg_id, 'internal.21345')
-                modifier.add_archived(message, 'internal.21345')
-                message = message_service.retrieve_message(msg_id, 'respondent.21345')
-                modifier.del_archived(message, 'respondent.21345')
-                message = message_service.retrieve_message(msg_id, 'internal.21345')
-                modifier.del_archived(message, 'internal.21345')
-                message = message_service.retrieve_message(msg_id, 'internal.21345')
+                message = message_service.retrieve_message(msg_id, self.user_respondent)
+                modifier.add_archived(message, self.user_respondent)
+                message = message_service.retrieve_message(msg_id, self.user_internal)
+                modifier.add_archived(message, self.user_internal)
+                message = message_service.retrieve_message(msg_id, self.user_respondent)
+                modifier.del_archived(message, self.user_respondent)
+                message = message_service.retrieve_message(msg_id, self.user_internal)
+                modifier.del_archived(message, self.user_internal)
+                message = message_service.retrieve_message(msg_id, self.user_internal)
                 self.assertCountEqual(message['labels'], ['UNREAD', 'INBOX'])
-                message = message_service.retrieve_message(msg_id, 'internal.21345')
+                message = message_service.retrieve_message(msg_id, self.user_internal)
                 self.assertCountEqual(message['labels'], ['UNREAD', 'INBOX'])
 
     def test_exception_for_add_label_raises(self):
@@ -341,14 +345,14 @@ class ModifyTestCase(unittest.TestCase, ModifyTestCaseHelper):
             database.db.drop_all()
             with current_app.test_request_context():
                 with self.assertRaises(InternalServerError):
-                    Modifier.add_label('UNREAD', {'survey': 'survey'}, 'internal.12425')
+                    Modifier.add_label('UNREAD', {'survey': 'survey'}, self.user_internal)
 
     def test_exception_for_remove_label_raises(self):
         with app.app_context():
             database.db.drop_all()
             with current_app.test_request_context():
                 with self.assertRaises(InternalServerError):
-                    Modifier.remove_label('UNREAD', {'survey': 'survey'}, 'internal.12425')
+                    Modifier.remove_label('UNREAD', {'survey': 'survey'}, self.user_internal)
 
     def test_exception_for_del_draft_raises(self):
         with app.app_context():
@@ -362,12 +366,12 @@ class ModifyTestCase(unittest.TestCase, ModifyTestCaseHelper):
             database.db.drop_all()
             with current_app.test_request_context():
                 with self.assertRaises(InternalServerError):
-                    Modifier.replace_current_draft('internal.1245','Richard')
+                    Modifier.replace_current_draft(self.user_internal,'Richard')
 
     def test_replace_current_recipient_status_raises(self):
         with app.app_context():
             database.db.drop_all()
             with current_app.test_request_context():
                 with self.assertRaises(InternalServerError):
-                    Modifier.replace_current_recipient_status('internal.1245','Torrance')
+                    Modifier.replace_current_recipient_status(self.user_internal, 'Torrance')
 

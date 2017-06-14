@@ -28,9 +28,8 @@ class DraftSave(Resource):
 
         if draft.errors == {}:
             self._save_draft(draft)
-            user_urn = g.user_urn
             message_service = Retriever()
-            saved_draft = message_service.retrieve_draft(draft.data.msg_id, user_urn)
+            saved_draft = message_service.retrieve_draft(draft.data.msg_id, g.user)
 
             hash_object = hashlib.sha1(str(sorted(saved_draft.items())).encode())
             etag = hash_object.hexdigest()
@@ -48,20 +47,22 @@ class DraftSave(Resource):
         saver.save_message(draft.data)
 
         if draft.data.urn_to is not None and len(draft.data.urn_to) != 0:
-            self._save_draft_status(saver, draft.data.msg_id, draft.data.urn_to, draft.data.survey,
+            uuid_to = draft.data.urn_to if g.user.is_internal else draft.data.survey
+            self._save_draft_status(saver, draft.data.msg_id, uuid_to, draft.data.survey,
                                       Labels.DRAFT_INBOX.value)
 
-        saver.save_msg_event(draft.data.msg_id, 'Draft_Saved')
+        uuid_from = draft.data.urn_from if g.user.is_respondent else draft.data.survey
 
-        self._save_draft_status(saver, draft.data.msg_id, draft.data.urn_from, draft.data.survey, Labels.DRAFT.value)
+        self._save_draft_status(saver, draft.data.msg_id, uuid_from, draft.data.survey, Labels.DRAFT.value)
+
+        saver.save_msg_event(draft.data.msg_id, 'Draft_Saved')
 
     @staticmethod
     def _save_draft_status(saver, msg_id, person, survey, label):
         """Save labels with correct actor for internal and respondent"""
 
-        actor = survey if User(person).is_internal else person
         if person is not None and len(person) != 0:
-            saver.save_msg_status(actor, msg_id, label)
+            saver.save_msg_status(person, msg_id, label)
 
 
 class DraftById(Resource):
@@ -70,18 +71,17 @@ class DraftById(Resource):
     @staticmethod
     def get(draft_id):
         """Get draft by id"""
-        user_urn = g.user_urn
         # check user is authorised to view message
         message_service = Retriever()
-        draft_data = message_service.retrieve_draft(draft_id, user_urn)
-        etag = DraftById.generate_etag(draft_id, user_urn, draft_data)
+        draft_data = message_service.retrieve_draft(draft_id, g.user)
+        etag = DraftById.generate_etag(draft_data)
         resp = jsonify(draft_data)
         resp.headers['ETag'] = etag
 
         return resp
 
     @staticmethod
-    def generate_etag(draft_id, user_urn, draft_data):
+    def generate_etag(draft_data):
         hash_object = hashlib.sha1(str(sorted(draft_data.items())).encode())
         etag = hash_object.hexdigest()
 
@@ -97,11 +97,11 @@ class DraftList(Resource):
         string_query_args, page, limit, ru, survey, cc, label, business, desc = get_options(request.args)
 
         message_service = Retriever()
-        status, result = message_service.retrieve_message_list(page, limit, g.user_urn, label=Labels.DRAFT.value)
+        status, result = message_service.retrieve_message_list(page, limit, g.user, label=Labels.DRAFT.value)
 
         if status:
             resp = paginated_list_to_json(result, page, limit, request.host_url,
-                                                       g.user_urn, string_query_args, DRAFT_LIST_ENDPOINT)
+                                                       g.user, string_query_args, DRAFT_LIST_ENDPOINT)
             resp.status_code = 200
             return resp
 
@@ -116,7 +116,7 @@ class DraftModifyById(Resource):
             raise (BadRequest(description="Draft put requires msg_id"))
         if data['msg_id'] != draft_id:
             raise (BadRequest(description="Conflicting msg_id's"))
-        is_draft = Retriever().check_msg_id_is_a_draft(draft_id, g.user_urn)
+        is_draft = Retriever().check_msg_id_is_a_draft(draft_id, g.user)
         if is_draft[0] is False:
             raise (BadRequest(description="Draft put requires valid draft"))
 
@@ -131,9 +131,8 @@ class DraftModifyById(Resource):
         if draft.errors == {}:
             Modifier().replace_current_draft(draft_id, draft.data)
 
-            user_urn = g.user_urn
             message_service = Retriever()
-            modified_draft = message_service.retrieve_draft(draft_id, user_urn)
+            modified_draft = message_service.retrieve_draft(draft_id, g.user)
 
             hash_object = hashlib.sha1(str(sorted(modified_draft.items())).encode())
             etag = hash_object.hexdigest()

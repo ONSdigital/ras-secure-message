@@ -14,7 +14,8 @@ class AuthenticationTestCase(unittest.TestCase):
         """Authenticate request using correct JWT"""
         expected_res = {'status': "ok"}
         data = {
-                  "user_urn": "12345678910"
+                  "user_uuid": "12345678910",
+                  "role": "internal"
                 }
         encrypter = Encrypter(_private_key=settings.SM_USER_AUTHENTICATION_PRIVATE_KEY,
                               _private_key_password=settings.SM_USER_AUTHENTICATION_PRIVATE_KEY_PASSWORD,
@@ -42,8 +43,7 @@ class AuthenticationTestCase(unittest.TestCase):
 
     def test_authentication_jwt_user_urn_missing_fail(self):
         """Authenticate request with missing user_urn claim"""
-        expected_res = Response(response="Missing user_urn or invalid user_urn supplied to access this Microservice "
-                                         "Resource", status=400, mimetype="text/html")
+
         data = {
         }
 
@@ -52,8 +52,8 @@ class AuthenticationTestCase(unittest.TestCase):
                               _public_key=settings.SM_USER_AUTHENTICATION_PUBLIC_KEY)
         signed_jwt = encode(data)
         encrypted_jwt = encrypter.encrypt_token(signed_jwt)
-        res = check_jwt(encrypted_jwt)
-        self.assertEqual(res.response, expected_res.response)
+        with self.assertRaises(BadRequest):
+            check_jwt(encrypted_jwt)
 
     def test_authentication_jwt_not_encrypted_fail(self):
         """Authenticate request using JWT without encryption"""
@@ -69,7 +69,8 @@ class AuthenticationTestCase(unittest.TestCase):
         """Authenticate request using authenticate function and with correct header data"""
         expected_res = {'status': "ok"}
         data = {
-                  "user_urn": "12345678910"
+                  "user_uuid": "12345678910",
+                  "role": "internal"
                 }
         encrypter = Encrypter(_private_key=settings.SM_USER_AUTHENTICATION_PRIVATE_KEY,
                               _private_key_password=settings.SM_USER_AUTHENTICATION_PRIVATE_KEY_PASSWORD,

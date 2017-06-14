@@ -16,10 +16,9 @@ class ThreadById(Resource):
     @staticmethod
     def get(thread_id):
         """Get messages by thread id"""
-        user_urn = g.user_urn
         # check user is authorised to view message
         message_service = Retriever()
-        conversation = message_service.retrieve_thread(thread_id, user_urn)
+        conversation = message_service.retrieve_thread(thread_id, g.user)
         resp = jsonify(conversation)
 
         return resp
@@ -34,10 +33,10 @@ class ThreadList(Resource):
         string_query_args, page, limit, ru, survey, cc, label, business, desc = get_options(request.args)
 
         message_service = Retriever()
-        status, result = message_service.retrieve_thread_list(page, limit, g.user_urn)
+        status, result = message_service.retrieve_thread_list(page, limit, g.user)
 
         if status:
             resp = paginated_list_to_json(result, page, limit, request.host_url,
-                                                       g.user_urn, string_query_args, THREAD_LIST_ENDPOINT)
+                                                       g.user, string_query_args, THREAD_LIST_ENDPOINT)
             resp.status_code = 200
             return resp
