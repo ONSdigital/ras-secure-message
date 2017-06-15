@@ -25,7 +25,8 @@ class FlaskTestCase(unittest.TestCase):
         AlertUser.alert_method = mock.Mock(AlertViaGovNotify)
 
         token_data = {
-            "user_urn": "respondent.12345678910"
+            "user_uuid": "internal.12345678910",
+            "role": "internal"
         }
         encrypter = Encrypter(_private_key=settings.SM_USER_AUTHENTICATION_PRIVATE_KEY,
                               _private_key_password=settings.SM_USER_AUTHENTICATION_PRIVATE_KEY_PASSWORD,
@@ -296,7 +297,8 @@ class FlaskTestCase(unittest.TestCase):
         msg_id = save_data['msg_id']
 
         token_data = {
-            "user_urn": "internal.12345678910"
+            "user_uuid": "internal.12345678910",
+            "role": "internal"
         }
         encrypter = Encrypter(_private_key=settings.SM_USER_AUTHENTICATION_PRIVATE_KEY,
                               _private_key_password=settings.SM_USER_AUTHENTICATION_PRIVATE_KEY_PASSWORD,

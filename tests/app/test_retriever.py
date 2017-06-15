@@ -10,6 +10,8 @@ from app.constants import MESSAGE_QUERY_LIMIT
 from datetime import datetime
 import random
 
+from app.validation.user import User
+
 
 class RetrieverTestCaseHelper:
     """Helper class for Retriever Tests"""
@@ -176,11 +178,14 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
             database.db.create_all()
             self.db = database.db
 
+        self.user_internal = User('internal.21345', 'internal')
+        self.user_respondent = User('respondent.21345', 'respondent')
+
     def test_0_msg_returned_when_db_empty_true(self):
         """retrieves messages from empty database"""
         with app.app_context():
             with current_app.test_request_context():
-                response = Retriever().retrieve_message_list(1, MESSAGE_QUERY_LIMIT, 'respondent.21345')[1]
+                response = Retriever().retrieve_message_list(1, MESSAGE_QUERY_LIMIT, self.user_respondent)[1]
                 msg = []
                 for message in response.items:
                     msg.append(message.serialize)
@@ -192,7 +197,7 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
             database.db.drop_all()
             with current_app.test_request_context():
                 with self.assertRaises(InternalServerError):
-                    Retriever().retrieve_message_list(1, MESSAGE_QUERY_LIMIT, 'respondent.21345')
+                    Retriever().retrieve_message_list(1, MESSAGE_QUERY_LIMIT, self.user_respondent)
 
     def test_all_msg_returned_when_db_less_than_limit(self):
         """retrieves messages from database with less entries than retrieval amount"""
@@ -200,7 +205,7 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
 
         with app.app_context():
             with current_app.test_request_context():
-                response = Retriever().retrieve_message_list(1, MESSAGE_QUERY_LIMIT, 'respondent.21345')[1]
+                response = Retriever().retrieve_message_list(1, MESSAGE_QUERY_LIMIT, self.user_respondent)[1]
                 msg = []
                 for message in response.items:
                     msg.append(message.serialize)
@@ -211,10 +216,10 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
         self.populate_database(MESSAGE_QUERY_LIMIT+5)
         with app.app_context():
             with current_app.test_request_context():
-                result = Retriever().retrieve_message_list(1, MESSAGE_QUERY_LIMIT, 'respondent.21345')[1]
+                result = Retriever().retrieve_message_list(1, MESSAGE_QUERY_LIMIT, self.user_respondent)[1]
                 msg = []
                 for message in result.items:
-                    serialized_message = message.serialize('respondent.21345')
+                    serialized_message = message.serialize(self.user_respondent)
                     msg.append(serialized_message)
                 self.assertEqual(len(msg), MESSAGE_QUERY_LIMIT)
 
@@ -223,11 +228,11 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
         self.populate_database(5, add_draft=True)
         with app.app_context():
             with current_app.test_request_context():
-                result = Retriever().retrieve_message_list(1, MESSAGE_QUERY_LIMIT, 'internal.21345',
+                result = Retriever().retrieve_message_list(1, MESSAGE_QUERY_LIMIT, self.user_internal,
                                                            survey='SurveyType')[1]
                 msg = []
                 for message in result.items:
-                    serialized_message = message.serialize('internal.21345')
+                    serialized_message = message.serialize(self.user_internal)
                     msg.append(serialized_message)
                 self.assertEqual(len(msg), 10)
 
@@ -236,10 +241,10 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
         self.populate_database(MESSAGE_QUERY_LIMIT+5, multiple_users=True, add_reply=True)
         with app.app_context():
             with current_app.test_request_context():
-                result = Retriever().retrieve_message_list(1, MESSAGE_QUERY_LIMIT, 'respondent.21345')[1]
+                result = Retriever().retrieve_message_list(1, MESSAGE_QUERY_LIMIT, self.user_respondent)[1]
                 msg = []
                 for message in result.items:
-                    serialized_message = message.serialize('respondent.21345')
+                    serialized_message = message.serialize(self.user_respondent)
                     msg.append(serialized_message)
                 self.assertEqual(len(msg), MESSAGE_QUERY_LIMIT)
 
@@ -248,10 +253,10 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
         self.populate_database(MESSAGE_QUERY_LIMIT+5, multiple_users=True, add_reply=True, add_draft=True)
         with app.app_context():
             with current_app.test_request_context():
-                result = Retriever().retrieve_message_list(1, MESSAGE_QUERY_LIMIT, 'respondent.21345')[1]
+                result = Retriever().retrieve_message_list(1, MESSAGE_QUERY_LIMIT, self.user_respondent)[1]
                 msg = []
                 for message in result.items:
-                    serialized_message = message.serialize('respondent.21345')
+                    serialized_message = message.serialize(self.user_respondent)
                     msg.append(serialized_message)
                 self.assertEqual(len(msg), MESSAGE_QUERY_LIMIT)
 
@@ -267,7 +272,7 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
             with app.app_context():
                 with current_app.test_request_context():
                     msg_id = str(names[0])
-                    response = Retriever().retrieve_message(msg_id, 'internal.21345')
+                    response = Retriever().retrieve_message(msg_id, self.user_internal)
                     self.assertEqual(response['msg_id'], str(names[0]))
 
     def test_msg_returned_with_msg_id_returns_404(self):
@@ -276,7 +281,7 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
         with app.app_context():
             with current_app.test_request_context():
                 with self.assertRaises(NotFound):
-                    Retriever().retrieve_message(message_id, 'internal.21345')
+                    Retriever().retrieve_message(message_id, self.user_internal)
 
     def test_msg_returned_with_msg_id_msg_not_in_database(self):
         """retrieves message using id"""
@@ -285,7 +290,7 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
         with app.app_context():
             with current_app.test_request_context():
                 with self.assertRaises(NotFound):
-                    Retriever().retrieve_message(message_id, 'internal.21345')
+                    Retriever().retrieve_message(message_id, self.user_internal)
 
     def test_correct_labels_returned_internal(self):
         """retrieves message using id and checks the labels are correct"""
@@ -300,7 +305,7 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
             with app.app_context():
                 with current_app.test_request_context():
                     msg_id = str(names[0])
-                    response = Retriever().retrieve_message(msg_id, 'internal.21345')
+                    response = Retriever().retrieve_message(msg_id, self.user_internal)
                     labels = ['INBOX', 'UNREAD']
                     self.assertCountEqual(response['labels'], labels)
 
@@ -317,7 +322,7 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
             with app.app_context():
                 with current_app.test_request_context():
                     msg_id = str(names[0])
-                    response = Retriever().retrieve_message(msg_id, 'respondent.21345')
+                    response = Retriever().retrieve_message(msg_id, self.user_respondent)
                     labels = ['SENT']
                     self.assertCountEqual(response['labels'], labels)
 
@@ -334,10 +339,10 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
             with app.app_context():
                 with current_app.test_request_context():
                     msg_id = str(names[0])
-                    response = Retriever().retrieve_message(msg_id, 'respondent.21345')
+                    response = Retriever().retrieve_message(msg_id, self.user_respondent)
                     urn_to = ['SurveyType']
                     self.assertEqual(response['urn_to'], urn_to)
-                    self.assertEqual(response['urn_from'], 'respondent.21345')
+                    self.assertEqual(response['urn_from'], self.user_respondent.user_uuid)
 
     def test_retrieve_message_raises_error(self):
         """retrieves message from when db does not exist"""
@@ -345,7 +350,7 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
             database.db.drop_all()
             with current_app.test_request_context():
                 with self.assertRaises(InternalServerError):
-                    Retriever().retrieve_message(1, 'internal.21345')
+                    Retriever().retrieve_message(1, self.user_internal)
 
     def test_all_draft_message_returned(self):
         """retrieves messages from database with label DRAFT for user"""
@@ -354,10 +359,10 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
         with app.app_context():
             with current_app.test_request_context():
                 response = Retriever().retrieve_message_list(1, MESSAGE_QUERY_LIMIT,
-                                                             'internal.21345', survey='SurveyType', label='DRAFT')[1]
+                                                             self.user_internal, survey='SurveyType', label='DRAFT')[1]
                 msg = []
                 for message in response.items:
-                    serialized_msg = message.serialize('internal.21345')
+                    serialized_msg = message.serialize(self.user_internal)
                     msg.append(serialized_msg)
                     self.assertTrue('DRAFT' in serialized_msg['labels'])
                 self.assertEqual(len(msg), 5)
@@ -368,11 +373,11 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
 
         with app.app_context():
             with current_app.test_request_context():
-                response = Retriever().retrieve_message_list(1, MESSAGE_QUERY_LIMIT, 'respondent.21345',
+                response = Retriever().retrieve_message_list(1, MESSAGE_QUERY_LIMIT, self.user_respondent,
                                                              label="SENT")[1]
                 msg = []
                 for message in response.items:
-                    serialized_msg = message.serialize('respondent.21345')
+                    serialized_msg = message.serialize(self.user_respondent)
                     msg.append(serialized_msg)
                     self.assertTrue('SENT' in serialized_msg['labels'])
                 self.assertEqual(len(msg), 5)
@@ -383,11 +388,11 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
 
         with app.app_context():
             with current_app.test_request_context():
-                response = Retriever().retrieve_message_list(1, MESSAGE_QUERY_LIMIT, 'internal.21345',
+                response = Retriever().retrieve_message_list(1, MESSAGE_QUERY_LIMIT, self.user_internal,
                                                              label="INBOX", survey='SurveyType')[1]
                 msg = []
                 for message in response.items:
-                    serialized_msg = message.serialize('internal.21345')
+                    serialized_msg = message.serialize(self.user_internal)
                     msg.append(serialized_msg)
                     self.assertTrue('INBOX' in serialized_msg['labels'])
                 self.assertEqual(len(msg), 5)
@@ -398,11 +403,11 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
 
         with app.app_context():
             with current_app.test_request_context():
-                response = Retriever().retrieve_message_list(1, MESSAGE_QUERY_LIMIT, 'respondent.21345')[1]
+                response = Retriever().retrieve_message_list(1, MESSAGE_QUERY_LIMIT, self.user_respondent)[1]
 
                 msg = []
                 for message in response.items:
-                    serialized_msg = message.serialize('respondent.21345')
+                    serialized_msg = message.serialize(self.user_respondent)
                     msg.append(serialized_msg)
                     self.assertFalse('DRAFT_INBOX' in serialized_msg['labels'])
                 self.assertEqual(len(msg), 5)
@@ -413,11 +418,11 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
 
         with app.app_context():
             with current_app.test_request_context():
-                response = Retriever().retrieve_message_list(1, MESSAGE_QUERY_LIMIT, 'respondent.21345',
+                response = Retriever().retrieve_message_list(1, MESSAGE_QUERY_LIMIT, self.user_respondent,
                                                              ru='AReportingUnit')[1]
                 msg = []
                 for message in response.items:
-                    serialized_msg = message.serialize('respondent.21345')
+                    serialized_msg = message.serialize(self.user_respondent)
                     msg.append(serialized_msg)
                     self.assertTrue(serialized_msg['reporting_unit'] == 'AReportingUnit')
                 self.assertEqual(len(msg), 5)
@@ -428,11 +433,11 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
 
         with app.app_context():
             with current_app.test_request_context():
-                response = Retriever().retrieve_message_list(1, MESSAGE_QUERY_LIMIT, 'respondent.21345',
+                response = Retriever().retrieve_message_list(1, MESSAGE_QUERY_LIMIT, self.user_respondent,
                                                              ru='AnotherReportingUnit')[1]
                 msg = []
                 for message in response.items:
-                    serialized_msg = message.serialize('respondent.21345')
+                    serialized_msg = message.serialize(self.user_respondent)
                     msg.append(serialized_msg)
                     self.assertTrue(serialized_msg['reporting_unit'] == 'AnotherReportingUnit')
                 self.assertEqual(len(msg), 0)
@@ -443,11 +448,11 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
 
         with app.app_context():
             with current_app.test_request_context():
-                response = Retriever().retrieve_message_list(1, MESSAGE_QUERY_LIMIT, 'respondent.21345',
+                response = Retriever().retrieve_message_list(1, MESSAGE_QUERY_LIMIT, self.user_respondent,
                                                              business='ABusiness')[1]
                 msg = []
                 for message in response.items:
-                    serialized_msg = message.serialize('respondent.21345')
+                    serialized_msg = message.serialize(self.user_respondent)
                     msg.append(serialized_msg)
                     self.assertTrue(serialized_msg['business_name'] == 'ABusiness')
                 self.assertEqual(len(msg), 5)
@@ -458,11 +463,11 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
 
         with app.app_context():
             with current_app.test_request_context():
-                response = Retriever().retrieve_message_list(1, MESSAGE_QUERY_LIMIT, 'respondent.21345',
+                response = Retriever().retrieve_message_list(1, MESSAGE_QUERY_LIMIT, self.user_respondent,
                                                              business='AnotherBusiness')[1]
                 msg = []
                 for message in response.items:
-                    serialized_msg = message.serialize('respondent.21345')
+                    serialized_msg = message.serialize(self.user_respondent)
                     msg.append(serialized_msg)
                     self.assertTrue(serialized_msg['business_name'] == 'AnotherBusiness')
                 self.assertEqual(len(msg), 0)
@@ -473,11 +478,11 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
 
         with app.app_context():
             with current_app.test_request_context():
-                response = Retriever().retrieve_message_list(1, MESSAGE_QUERY_LIMIT, 'respondent.21345',
+                response = Retriever().retrieve_message_list(1, MESSAGE_QUERY_LIMIT, self.user_respondent,
                                                              survey='SurveyType')[1]
                 msg = []
                 for message in response.items:
-                    serialized_msg = message.serialize('respondent.21345')
+                    serialized_msg = message.serialize(self.user_respondent)
                     msg.append(serialized_msg)
                     self.assertTrue(serialized_msg['survey'] == 'SurveyType')
                 self.assertEqual(len(msg), 5)
@@ -488,11 +493,11 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
 
         with app.app_context():
             with current_app.test_request_context():
-                response = Retriever().retrieve_message_list(1, MESSAGE_QUERY_LIMIT, 'respondent.21345',
+                response = Retriever().retrieve_message_list(1, MESSAGE_QUERY_LIMIT, self.user_respondent,
                                                              survey='AnotherSurveyType')[1]
                 msg = []
                 for message in response.items:
-                    serialized_msg = message.serialize('respondent.21345')
+                    serialized_msg = message.serialize(self.user_respondent)
                     msg.append(serialized_msg)
                     self.assertTrue(serialized_msg['survey'] == 'AnotherSurveyType')
                 self.assertEqual(len(msg), 0)
@@ -503,11 +508,11 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
 
         with app.app_context():
             with current_app.test_request_context():
-                response = Retriever().retrieve_message_list(1, MESSAGE_QUERY_LIMIT, 'respondent.21345',
+                response = Retriever().retrieve_message_list(1, MESSAGE_QUERY_LIMIT, self.user_respondent,
                                                              cc='ACollectionCase')[1]
                 msg = []
                 for message in response.items:
-                    serialized_msg = message.serialize('respondent.21345')
+                    serialized_msg = message.serialize(self.user_respondent)
                     msg.append(serialized_msg)
                     self.assertTrue(serialized_msg['collection_case'] == 'ACollectionCase')
                 self.assertEqual(len(msg), 5)
@@ -518,11 +523,11 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
 
         with app.app_context():
             with current_app.test_request_context():
-                response = Retriever().retrieve_message_list(1, MESSAGE_QUERY_LIMIT, 'respondent.21345',
+                response = Retriever().retrieve_message_list(1, MESSAGE_QUERY_LIMIT, self.user_respondent,
                                                              cc='AnotherCollectionCase')[1]
                 msg = []
                 for message in response.items:
-                    serialized_msg = message.serialize('respondent.21345')
+                    serialized_msg = message.serialize(self.user_respondent)
                     msg.append(serialized_msg)
                     self.assertTrue(serialized_msg['collection_case'] == 'AnotherCollectionCase')
                 self.assertEqual(len(msg), 0)
@@ -533,13 +538,13 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
 
         with app.app_context():
             with current_app.test_request_context():
-                response = Retriever().retrieve_message_list(1, MESSAGE_QUERY_LIMIT, 'respondent.21345',
+                response = Retriever().retrieve_message_list(1, MESSAGE_QUERY_LIMIT, self.user_respondent,
                                                              descend=True)[1]
                 sent = []
                 read = []
                 modified = []
                 for message in response.items:
-                    serialized_msg = message.serialize('respondent.21345')
+                    serialized_msg = message.serialize(self.user_respondent)
                     sent.append(serialized_msg['sent_date'])
                     read.append(serialized_msg['read_date'])
                     modified.append(serialized_msg['modified_date'])
@@ -554,13 +559,13 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
 
         with app.app_context():
             with current_app.test_request_context():
-                response = Retriever().retrieve_message_list(1, MESSAGE_QUERY_LIMIT, 'respondent.21345',
+                response = Retriever().retrieve_message_list(1, MESSAGE_QUERY_LIMIT, self.user_respondent,
                                                              descend=False)[1]
                 sent = []
                 read = []
                 modified = []
                 for message in response.items:
-                    serialized_msg = message.serialize('respondent.21345')
+                    serialized_msg = message.serialize(self.user_respondent)
                     sent.append(serialized_msg['sent_date'])
                     read.append(serialized_msg['read_date'])
                     modified.append(serialized_msg['modified_date'])
@@ -575,7 +580,7 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
 
         with app.app_context():
             with current_app.test_request_context():
-                response = Retriever().retrieve_message_list(1, MESSAGE_QUERY_LIMIT, 'internal.21345',
+                response = Retriever().retrieve_message_list(1, MESSAGE_QUERY_LIMIT, self.user_internal,
                                                              survey='SurveyType',
                                                              descend=False)[1]
                 sent = []
@@ -583,7 +588,7 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
                 modified = []
                 date = []
                 for message in response.items:
-                    serialized_msg = message.serialize('internal.21345')
+                    serialized_msg = message.serialize(self.user_internal)
                     sent.append(serialized_msg['sent_date'])
                     read.append(serialized_msg['read_date'])
                     modified.append(serialized_msg['modified_date'])
@@ -604,7 +609,7 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
 
         with app.app_context():
             with current_app.test_request_context():
-                response = Retriever().retrieve_message_list(1, MESSAGE_QUERY_LIMIT, 'internal.21345',
+                response = Retriever().retrieve_message_list(1, MESSAGE_QUERY_LIMIT, self.user_internal,
                                                              survey='SurveyType',
                                                              descend=True)[1]
                 sent = []
@@ -612,7 +617,7 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
                 modified = []
                 date = []
                 for message in response.items:
-                    serialized_msg = message.serialize('internal.21345')
+                    serialized_msg = message.serialize(self.user_internal)
                     sent.append(serialized_msg['sent_date'])
                     read.append(serialized_msg['read_date'])
                     modified.append(serialized_msg['modified_date'])
@@ -640,7 +645,7 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
             with app.app_context():
                 with current_app.test_request_context():
                     msg_id = str(names[0])
-                    response = Retriever().retrieve_draft(msg_id, 'internal.21345')
+                    response = Retriever().retrieve_draft(msg_id, self.user_internal)
                     self.assertEqual(response['msg_id'], str(names[0]))
 
     def test_modified_date_returned_for_draft(self):
@@ -655,7 +660,7 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
             with app.app_context():
                 with current_app.test_request_context():
                     msg_id = str(names[0])
-                    response = Retriever().retrieve_draft(msg_id, 'internal.21345')
+                    response = Retriever().retrieve_draft(msg_id, self.user_internal)
                     self.assertTrue(response['modified_date'] != "N/A")
                     self.assertEqual(response['read_date'], 'N/A')
                     self.assertEqual(response['sent_date'], "N/A")
@@ -672,7 +677,7 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
             with app.app_context():
                 with current_app.test_request_context():
                     msg_id = str(names[0])
-                    response = Retriever().retrieve_message(msg_id, 'internal.21345')
+                    response = Retriever().retrieve_message(msg_id, self.user_internal)
                     self.assertEqual(response['modified_date'], "N/A")
                     self.assertTrue(response['sent_date'] != "N/A")
 
@@ -689,7 +694,7 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
             with app.app_context():
                 with current_app.test_request_context():
                     msg_id = str(names[0])
-                    response = Retriever().retrieve_message(msg_id, 'internal.21345')
+                    response = Retriever().retrieve_message(msg_id, self.user_internal)
                     self.assertEqual(response['modified_date'], "N/A")
                     self.assertTrue(response['read_date'] != "N/A")
 
@@ -706,7 +711,7 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
                 with current_app.test_request_context():
                     message_id = str(names[0])
                     with self.assertRaises(NotFound):
-                        Retriever().retrieve_draft(message_id, 'internal.21345')
+                        Retriever().retrieve_draft(message_id, self.user_internal)
 
     def test_draft_returned_with_msg_id_draft_not_in_database(self):
         """retrieves draft using id where draft not in database"""
@@ -715,7 +720,7 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
         with app.app_context():
             with current_app.test_request_context():
                 with self.assertRaises(NotFound):
-                    Retriever().retrieve_message(message_id, 'internal.21345')
+                    Retriever().retrieve_message(message_id, self.user_internal)
 
     def test_correct_labels_returned_for_draft(self):
         """retrieves draft using id and checks the labels are correct"""
@@ -730,7 +735,7 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
             with app.app_context():
                 with current_app.test_request_context():
                     msg_id = str(names[0])
-                    response = Retriever().retrieve_message(msg_id, 'internal.21345')
+                    response = Retriever().retrieve_message(msg_id, self.user_internal)
                     labels = ['DRAFT']
                     self.assertCountEqual(response['labels'], labels)
 
@@ -747,8 +752,8 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
             with app.app_context():
                 with current_app.test_request_context():
                     msg_id = str(names[0])
-                    response = Retriever().retrieve_message(msg_id, 'internal.21345')
-                    self.assertEqual(response['urn_to'], ['respondent.21345'])
+                    response = Retriever().retrieve_message(msg_id, self.user_internal)
+                    self.assertEqual(response['urn_to'], [self.user_respondent.user_uuid])
                     self.assertEqual(response['urn_from'], 'SurveyType')
 
     def test_retrieve_draft_raises_error(self):
@@ -757,7 +762,7 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
             database.db.drop_all()
             with current_app.test_request_context():
                 with self.assertRaises(InternalServerError):
-                    Retriever().retrieve_message(1, 'internal.21345')
+                    Retriever().retrieve_message(1, self.user_internal)
 
     def test_all_msg_returned_for_thread_id_with_draft(self):
         """retrieves messages for thread_id from database with draft """
@@ -765,7 +770,7 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
 
         with app.app_context():
             with current_app.test_request_context():
-                response = Retriever().retrieve_thread('ThreadId', 'internal.21345', _survey='SurveyType')
+                response = Retriever().retrieve_thread('ThreadId', self.user_internal, _survey='SurveyType')
                 self.assertEqual(len(response), 9)
 
     def test_all_msg_returned_for_thread_id_without_draft(self):
@@ -774,7 +779,7 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
 
         with app.app_context():
             with current_app.test_request_context():
-                response = Retriever().retrieve_thread('ThreadId', 'respondent.21345')
+                response = Retriever().retrieve_thread('ThreadId', self.user_respondent)
                 self.assertEqual(len(response), 6)
 
     def test_all_msg_returned_for_thread_id_with_draft_inbox(self):
@@ -783,7 +788,7 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
 
         with app.app_context():
             with current_app.test_request_context():
-                response = Retriever().retrieve_thread('ThreadId', 'respondent.21345')
+                response = Retriever().retrieve_thread('ThreadId', self.user_respondent)
                 self.assertEqual(len(response), 6)
 
     def test_thread_returned_in_desc_order(self):
@@ -792,7 +797,7 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
 
         with app.app_context():
             with current_app.test_request_context():
-                response = Retriever().retrieve_thread('ThreadId', 'respondent.21345')
+                response = Retriever().retrieve_thread('ThreadId', self.user_respondent)
                 self.assertEqual(len(response), 6)
 
                 sent = []
@@ -809,7 +814,7 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
 
         with app.app_context():
             with current_app.test_request_context():
-                response = Retriever().retrieve_thread('ThreadId', 'internal.21345', _survey='SurveyType')
+                response = Retriever().retrieve_thread('ThreadId', self.user_internal, _survey='SurveyType')
                 self.assertEqual(len(response), 9)
 
                 sent = []
@@ -836,14 +841,14 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
             database.db.drop_all()
             with current_app.test_request_context():
                 with self.assertRaises(InternalServerError):
-                    Retriever().retrieve_thread('ThreadId', 'respondent.21345')
+                    Retriever().retrieve_thread('ThreadId', self.user_respondent)
 
     def test_thread_returned_with_thread_id_returns_404(self):
         """retrieves thread using id that doesn't exist"""
         with app.app_context():
             with current_app.test_request_context():
                 with self.assertRaises(NotFound):
-                    Retriever().retrieve_thread('anotherThreadId', 'respondent.21345')
+                    Retriever().retrieve_thread('anotherThreadId', self.user_respondent)
 
     def test_retrieve_draft_raises_server_error(self):
         """retrieves draft when db does not exist"""
@@ -851,7 +856,7 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
             database.db.drop_all()
             with current_app.test_request_context():
                 with self.assertRaises(InternalServerError):
-                    Retriever().retrieve_draft('draftId', 'respondent.21345')
+                    Retriever().retrieve_draft('draftId', self.user_respondent)
 
     def test_retrieve_thread_list_raises_server_error(self):
         """retrieves threads when db does not exist"""
@@ -859,7 +864,7 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
             database.db.drop_all()
             with current_app.test_request_context():
                 with self.assertRaises(InternalServerError):
-                    Retriever().retrieve_thread_list(1, MESSAGE_QUERY_LIMIT, 'respondent.21345')
+                    Retriever().retrieve_thread_list(1, MESSAGE_QUERY_LIMIT, self.user_respondent)
 
     def test_thread_list_returned_in_descending_order_respondent(self):
         """retrieves threads from database in desc sent_date order for respondent"""
@@ -868,7 +873,7 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
 
         with app.app_context():
             with current_app.test_request_context():
-                response = Retriever().retrieve_thread_list(1, MESSAGE_QUERY_LIMIT, 'respondent.21345')[1]
+                response = Retriever().retrieve_thread_list(1, MESSAGE_QUERY_LIMIT, self.user_respondent)[1]
 
                 sent = []
                 read = []
@@ -876,7 +881,7 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
                 thread_ids = []
                 date = []
                 for message in response.items:
-                    serialized_msg = message.serialize('respondent.21345')
+                    serialized_msg = message.serialize(self.user_respondent)
                     sent.append(serialized_msg['sent_date'])
                     read.append(serialized_msg['read_date'])
                     thread_ids.append(serialized_msg['thread_id'])
@@ -899,7 +904,7 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
 
         with app.app_context():
             with current_app.test_request_context():
-                response = Retriever().retrieve_thread_list(1, MESSAGE_QUERY_LIMIT, 'internal.21345')[1]
+                response = Retriever().retrieve_thread_list(1, MESSAGE_QUERY_LIMIT, self.user_internal)[1]
 
                 sent = []
                 read = []
@@ -907,7 +912,7 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
                 thread_ids = []
                 date = []
                 for message in response.items:
-                    serialized_msg = message.serialize('internal.21345')
+                    serialized_msg = message.serialize(self.user_internal)
                     sent.append(serialized_msg['sent_date'])
                     read.append(serialized_msg['read_date'])
                     thread_ids.append(serialized_msg['thread_id'])
@@ -930,7 +935,7 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
 
         with app.app_context():
             with current_app.test_request_context():
-                response = Retriever().retrieve_thread_list(1, MESSAGE_QUERY_LIMIT, 'respondent.21345')[1]
+                response = Retriever().retrieve_thread_list(1, MESSAGE_QUERY_LIMIT, self.user_respondent)[1]
 
                 sent = []
                 read = []
@@ -938,7 +943,7 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
                 thread_ids = []
                 date = []
                 for message in response.items:
-                    serialized_msg = message.serialize('respondent.21345')
+                    serialized_msg = message.serialize(self.user_respondent)
                     sent.append(serialized_msg['sent_date'])
                     read.append(serialized_msg['read_date'])
                     thread_ids.append(serialized_msg['thread_id'])
@@ -961,7 +966,7 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
 
         with app.app_context():
             with current_app.test_request_context():
-                response = Retriever().retrieve_thread_list(1, MESSAGE_QUERY_LIMIT, 'internal.21345')[1]
+                response = Retriever().retrieve_thread_list(1, MESSAGE_QUERY_LIMIT, self.user_internal)[1]
 
                 sent = []
                 read = []
@@ -969,7 +974,7 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
                 thread_ids = []
                 date = []
                 for message in response.items:
-                    serialized_msg = message.serialize('internal.21345')
+                    serialized_msg = message.serialize(self.user_internal)
                     sent.append(serialized_msg['sent_date'])
                     read.append(serialized_msg['read_date'])
                     thread_ids.append(serialized_msg['thread_id'])
@@ -992,7 +997,7 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
 
         with app.app_context():
             with current_app.test_request_context():
-                response = Retriever().retrieve_thread_list(1, MESSAGE_QUERY_LIMIT, 'internal.21345')[1]
+                response = Retriever().retrieve_thread_list(1, MESSAGE_QUERY_LIMIT, self.user_internal)[1]
 
                 sent = []
                 read = []
@@ -1000,7 +1005,7 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
                 thread_ids = []
                 msg_ids = []
                 for message in response.items:
-                    serialized_msg = message.serialize('internal.21345')
+                    serialized_msg = message.serialize(self.user_internal)
                     sent.append(serialized_msg['sent_date'])
                     read.append(serialized_msg['read_date'])
                     thread_ids.append(serialized_msg['thread_id'])
@@ -1010,7 +1015,7 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
                 self.assertEqual(len(msg_ids), 5)
 
                 for x in range(0, len(thread_ids)):
-                    thread = Retriever().retrieve_thread(thread_ids[x], user_urn='internal.21345')
+                    thread = Retriever().retrieve_thread(thread_ids[x], user=self.user_internal)
                     self.assertEqual(sent[x], thread[0]['sent_date'])
                     self.assertEqual(msg_ids[x], thread[0]['msg_id'])
 
@@ -1022,7 +1027,7 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
 
         with app.app_context():
             with current_app.test_request_context():
-                response = Retriever().retrieve_thread_list(1, MESSAGE_QUERY_LIMIT, 'respondent.21345')[1]
+                response = Retriever().retrieve_thread_list(1, MESSAGE_QUERY_LIMIT, self.user_respondent)[1]
 
                 sent = []
                 read = []
@@ -1030,7 +1035,7 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
                 thread_ids = []
                 msg_ids = []
                 for message in response.items:
-                    serialized_msg = message.serialize('respondent.21345')
+                    serialized_msg = message.serialize(self.user_respondent)
                     sent.append(serialized_msg['sent_date'])
                     read.append(serialized_msg['read_date'])
                     thread_ids.append(serialized_msg['thread_id'])
@@ -1040,7 +1045,7 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
                 self.assertEqual(len(msg_ids), 5)
 
                 for x in range(0, len(thread_ids)):
-                    thread = Retriever().retrieve_thread(thread_ids[x], user_urn='respondent.21345')
+                    thread = Retriever().retrieve_thread(thread_ids[x], user=self.user_respondent)
                     self.assertEqual(sent[x], thread[0]['sent_date'])
                     self.assertEqual(msg_ids[x], thread[0]['msg_id'])
 
@@ -1052,7 +1057,7 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
 
         with app.app_context():
             with current_app.test_request_context():
-                response = Retriever().retrieve_thread_list(1, MESSAGE_QUERY_LIMIT, 'internal.21345')[1]
+                response = Retriever().retrieve_thread_list(1, MESSAGE_QUERY_LIMIT, self.user_internal)[1]
 
                 sent = []
                 read = []
@@ -1060,7 +1065,7 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
                 thread_ids = []
                 msg_ids = []
                 for message in response.items:
-                    serialized_msg = message.serialize('internal.21345')
+                    serialized_msg = message.serialize(self.user_internal)
                     sent.append(serialized_msg['sent_date'])
                     read.append(serialized_msg['read_date'])
                     thread_ids.append(serialized_msg['thread_id'])
@@ -1070,7 +1075,7 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
                 self.assertEqual(len(msg_ids), 5)
 
                 for x in range(0, len(thread_ids)):
-                    thread = Retriever().retrieve_thread(thread_ids[x], user_urn='internal.21345')
+                    thread = Retriever().retrieve_thread(thread_ids[x], user=self.user_internal)
                     self.assertEqual(sent[x], thread[0]['sent_date'])
                     self.assertEqual(msg_ids[x], thread[0]['msg_id'])
 
@@ -1082,7 +1087,7 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
 
         with app.app_context():
             with current_app.test_request_context():
-                response = Retriever().retrieve_thread_list(1, MESSAGE_QUERY_LIMIT, 'respondent.21345')[1]
+                response = Retriever().retrieve_thread_list(1, MESSAGE_QUERY_LIMIT, self.user_respondent)[1]
 
                 sent = []
                 read = []
@@ -1090,7 +1095,7 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
                 thread_ids = []
                 msg_ids = []
                 for message in response.items:
-                    serialized_msg = message.serialize('respondent.21345')
+                    serialized_msg = message.serialize(self.user_respondent)
                     sent.append(serialized_msg['sent_date'])
                     read.append(serialized_msg['read_date'])
                     thread_ids.append(serialized_msg['thread_id'])
@@ -1100,7 +1105,7 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
                 self.assertEqual(len(msg_ids), 5)
 
                 for x in range(0, len(thread_ids)):
-                    thread = Retriever().retrieve_thread(thread_ids[x], user_urn='respondent.21345')
+                    thread = Retriever().retrieve_thread(thread_ids[x], user=self.user_respondent)
                     self.assertEqual(sent[x], thread[0]['sent_date'])
                     self.assertEqual(msg_ids[x], thread[0]['msg_id'])
 
@@ -1112,7 +1117,7 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
 
         with app.app_context():
             with current_app.test_request_context():
-                response = Retriever().retrieve_thread_list(1, MESSAGE_QUERY_LIMIT, 'internal.21345')[1]
+                response = Retriever().retrieve_thread_list(1, MESSAGE_QUERY_LIMIT, self.user_internal)[1]
 
                 sent = []
                 read = []
@@ -1120,7 +1125,7 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
                 thread_ids = []
                 msg_ids = []
                 for message in response.items:
-                    serialized_msg = message.serialize('internal.21345')
+                    serialized_msg = message.serialize(self.user_internal)
                     sent.append(serialized_msg['sent_date'])
                     read.append(serialized_msg['read_date'])
                     thread_ids.append(serialized_msg['thread_id'])
@@ -1130,7 +1135,7 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
                 self.assertEqual(len(msg_ids), 5)
 
                 for x in range(0, len(thread_ids)):
-                    thread = Retriever().retrieve_thread(thread_ids[x], user_urn='internal.21345')
+                    thread = Retriever().retrieve_thread(thread_ids[x], user=self.user_internal)
                     self.assertEqual(sent[x], thread[0]['sent_date'])
                     self.assertEqual(msg_ids[x], thread[0]['msg_id'])
 
@@ -1142,7 +1147,7 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
 
         with app.app_context():
             with current_app.test_request_context():
-                response = Retriever().retrieve_thread_list(1, MESSAGE_QUERY_LIMIT, 'respondent.21345')[1]
+                response = Retriever().retrieve_thread_list(1, MESSAGE_QUERY_LIMIT, self.user_respondent)[1]
 
                 sent = []
                 read = []
@@ -1150,7 +1155,7 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
                 thread_ids = []
                 msg_ids = []
                 for message in response.items:
-                    serialized_msg = message.serialize('respondent.21345')
+                    serialized_msg = message.serialize(self.user_respondent)
                     sent.append(serialized_msg['sent_date'])
                     read.append(serialized_msg['read_date'])
                     thread_ids.append(serialized_msg['thread_id'])
@@ -1160,7 +1165,7 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
                 self.assertEqual(len(msg_ids), 5)
 
                 for x in range(0, len(thread_ids)):
-                    thread = Retriever().retrieve_thread(thread_ids[x], user_urn='respondent.21345')
+                    thread = Retriever().retrieve_thread(thread_ids[x], user=self.user_respondent)
                     self.assertEqual(sent[x], thread[0]['sent_date'])
                     self.assertEqual(msg_ids[x], thread[0]['msg_id'])
 
@@ -1172,7 +1177,7 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
 
         with app.app_context():
             with current_app.test_request_context():
-                response = Retriever().retrieve_thread_list(1, MESSAGE_QUERY_LIMIT, 'internal.21345')[1]
+                response = Retriever().retrieve_thread_list(1, MESSAGE_QUERY_LIMIT, self.user_internal)[1]
 
                 sent = []
                 read = []
@@ -1180,7 +1185,7 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
                 thread_ids = []
                 msg_ids = []
                 for message in response.items:
-                    serialized_msg = message.serialize('internal.21345')
+                    serialized_msg = message.serialize(self.user_internal)
                     sent.append(serialized_msg['sent_date'])
                     read.append(serialized_msg['read_date'])
                     thread_ids.append(serialized_msg['thread_id'])
@@ -1190,6 +1195,6 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
                 self.assertEqual(len(msg_ids), 5)
 
                 for x in range(0, len(thread_ids)):
-                    thread = Retriever().retrieve_thread(thread_ids[x], user_urn='internal.21345')
+                    thread = Retriever().retrieve_thread(thread_ids[x], user=self.user_internal)
                     self.assertEqual(sent[x], thread[0]['sent_date'])
                     self.assertEqual(msg_ids[x], thread[0]['msg_id'])

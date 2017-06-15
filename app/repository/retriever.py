@@ -14,17 +14,15 @@ logger = wrap_logger(logging.getLogger(__name__))
 class Retriever:
     """Created when retrieving messages"""
     @staticmethod
-    def retrieve_message_list(page, limit, user_urn, ru=None, survey=None, cc=None, label=None,
+    def retrieve_message_list(page, limit, user, ru=None, survey=None, cc=None, label=None,
                               business=None, descend=True):
         """returns list of messages from db"""
-        user = User(user_urn)
         conditions = []
         status_conditions = []
 
         if user.is_respondent:
-            status_conditions.append(Status.actor == str(user_urn))
+            status_conditions.append(Status.actor == str(user.user_uuid))
         else:
-            #  default survey given this will change once integrated with party service which will provide survey types for internal user
             if survey is not None:
                 status_conditions.append(Status.actor == str(survey))
             else:
@@ -72,14 +70,13 @@ class Retriever:
         return True, result
 
     @staticmethod
-    def retrieve_thread_list(page, limit, user_urn):
+    def retrieve_thread_list(page, limit, user):
         """returns list of threads from db"""
-        user = User(user_urn)
         status_conditions = []
         conditions = []
 
         if user.is_respondent:
-            status_conditions.append(Status.actor == str(user_urn))
+            status_conditions.append(Status.actor == str(user.user_uuid))
         else:
             status_conditions.append(Status.actor == 'BRES')
 
@@ -108,7 +105,7 @@ class Retriever:
         return True, result
 
     @staticmethod
-    def retrieve_message(message_id, user_urn):
+    def retrieve_message(message_id, user):
         """returns single message from db"""
         db_model = SecureMessage()
 
@@ -120,19 +117,18 @@ class Retriever:
             logger.error(e)
             raise(InternalServerError(description="Error retrieving message from database"))
 
-        message = result.serialize(user_urn)
+        message = result.serialize(user)
 
         return message
 
     @staticmethod
-    def retrieve_thread(thread_id, user_urn, _survey='BRES'):
+    def retrieve_thread(thread_id, user, _survey='BRES'):
         """returns list of messages for thread id"""
 
-        user = User(user_urn)
         status_conditions = []
 
         if user.is_respondent:
-            status_conditions.append(Status.actor == str(user_urn))
+            status_conditions.append(Status.actor == str(user.user_uuid))
         else:
             status_conditions.append(Status.actor == str(_survey))
 
@@ -156,12 +152,12 @@ class Retriever:
         conversation = []
 
         for msg in result:
-            conversation.append(msg.serialize(user_urn))
+            conversation.append(msg.serialize(user))
 
         return conversation
 
     @staticmethod
-    def retrieve_draft(message_id, user_urn):
+    def retrieve_draft(message_id, user):
         """returns single draft from db"""
 
         try:
@@ -173,7 +169,7 @@ class Retriever:
             logger.error(e)
             raise (InternalServerError(description="Error retrieving draft from database"))
 
-        message = result.serialize(user_urn)
+        message = result.serialize(user)
 
         return message
 
@@ -195,7 +191,7 @@ class Retriever:
         return resp
 
     @staticmethod
-    def check_msg_id_is_a_draft(draft_id, user_urn):
+    def check_msg_id_is_a_draft(draft_id, user):
         """Check msg_id is that of a valid draft and return true/false if no ID is present"""
         try:
             result = SecureMessage.query.filter(SecureMessage.msg_id == draft_id)\
@@ -207,4 +203,4 @@ class Retriever:
         if result is None:
             return False, result
         else:
-            return True, result.serialize(user_urn)
+            return True, result.serialize(user)

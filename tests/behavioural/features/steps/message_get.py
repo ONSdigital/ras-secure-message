@@ -10,7 +10,8 @@ from app import settings
 
 url = "http://localhost:5050/message/{0}"
 token_data = {
-            "user_urn": "000000000"
+            "user_uuid": "000000000",
+            "role": "internal"
         }
 
 headers = {'Content-Type': 'application/json', 'Authorization': ''}
@@ -41,6 +42,8 @@ headers['Authorization'] = update_encrypted_jwt()
 def step_impl_there_is_a_message_to_be_retrieved(context):
     data['urn_to'] = 'BRES'
     data['urn_from'] = 'respondent.122342'
+    token_data['user_uuid'] = 'respondent.122342'
+    token_data['role'] = 'respondent'
     context.response = app.test_client().post("http://localhost:5050/message/send", data=flask.json.dumps(data),
                                               headers=headers)
     msg_resp = json.loads(context.response.data)
@@ -49,7 +52,8 @@ def step_impl_there_is_a_message_to_be_retrieved(context):
 
 @when("the get request is made with a correct message id")
 def step_impl_the_get_request_is_made_with_a_correct_message_id(context):
-    token_data['user_urn'] = 'respondent.122342'
+    token_data['user_uuid'] = 'respondent.122342'
+    token_data['role'] = 'respondent'
     headers['Authorization'] = update_encrypted_jwt()
     context.response = app.test_client().get(url.format(context.msg_id), headers=headers)
 
@@ -125,7 +129,8 @@ def step_impl_a_respondent_sends_a_message(context):
 
 @when("the respondent wants to see the message")
 def step_impl_the_respondent_wants_to_see_the_message(context):
-    token_data['user_urn'] = 'respondent.122342'
+    token_data['user_uuid'] = 'respondent.122342'
+    token_data['role'] = 'respondent'
     headers['Authorization'] = update_encrypted_jwt()
     context.response = app.test_client().get(url.format(context.msg_id), headers=headers)
 
@@ -141,6 +146,9 @@ def step_impl_the_retrieved_message_should_have_label_sent(context):
 def step_impl_an_internal_user_sends_a_message(context):
     data['urn_to'] = 'respondent.122342'
     data['urn_from'] = 'internal.12344'
+    token_data['user_uuid'] = 'internal.12344'
+    token_data['role'] = 'internal'
+    headers['Authorization'] = update_encrypted_jwt()
     context.response = app.test_client().post("http://localhost:5050/message/send",
                                                           data=flask.json.dumps(data), headers=headers)
     msg_resp = json.loads(context.response.data)
@@ -149,7 +157,8 @@ def step_impl_an_internal_user_sends_a_message(context):
 
 @when("the internal user wants to see the message")
 def step_impl_the_internal_user_wants_to_see_the_message(context):
-    token_data['user_urn'] = 'internal.12344'
+    token_data['user_uuid'] = 'internal.12344'
+    token_data['role'] = 'internal'
     headers['Authorization'] = update_encrypted_jwt()
     context.response = app.test_client().get(url.format(context.msg_id), headers=headers)
 
@@ -167,6 +176,9 @@ def step_impl_the_retrieved_message_should_havethe_labels_inbox_and_unread(conte
 
 @given('there is a draft message to be retrieved')
 def step_impl_draft_message_can_be_retrieved(context):
+    token_data['user_uuid'] = '9976a558-c529-4652-806e-fac1b8d4fdcb'
+    token_data['role'] = 'respondent'
+    headers['Authorization'] = update_encrypted_jwt()
     data.update({'urn_from': '9976a558-c529-4652-806e-fac1b8d4fdcb',
                  'subject': 'test',
                  'body': 'Test',
@@ -174,7 +186,7 @@ def step_impl_draft_message_can_be_retrieved(context):
                  'collection_case': 'collection case1',
                  'reporting_unit': 'reporting case1',
                  'business_name': 'ABusiness',
-                 'survey': 'survey'})
+                 'survey': 'BRES'})
     response = app.test_client().post("http://localhost:5050/draft/save", data=json.dumps(data),
                                       headers=headers)
     context.resp_data = json.loads(response.data)
@@ -182,7 +194,8 @@ def step_impl_draft_message_can_be_retrieved(context):
 
 @when('the get request is made with a draft message id')
 def step_impl_the_draft_is_requested(context):
-    token_data['user_urn'] = '9976a558-c529-4652-806e-fac1b8d4fdcb'
+    token_data['user_uuid'] = '9976a558-c529-4652-806e-fac1b8d4fdcb'
+    token_data['role'] = 'respondent'
     headers['Authorization'] = update_encrypted_jwt()
     context.response = app.test_client().get(url.format(context.resp_data['msg_id']), headers=headers)
 

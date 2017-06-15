@@ -8,7 +8,10 @@ from app.authentication.jwe import Encrypter
 from app import settings, constants
 
 url = "http://localhost:5050/draft/{0}/modify"
-token_data = {'user_urn': '00000000000'}
+token_data = {
+            "user_uuid": "000000000",
+            "role": "internal"
+        }
 headers = {'Content-Type': 'application/json', 'Authorization': ''}
 
 

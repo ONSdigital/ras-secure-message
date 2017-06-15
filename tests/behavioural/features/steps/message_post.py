@@ -14,7 +14,8 @@ from app import settings
 
 url = "http://localhost:5050/message/send"
 token_data = {
-            "user_urn": "000000000"
+            "user_uuid": "000000000",
+            "role": "internal"
         }
 
 headers = {'Content-Type': 'application/json', 'Authorization': ''}

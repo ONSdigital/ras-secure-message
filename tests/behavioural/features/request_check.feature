@@ -2,17 +2,32 @@ Feature: Checking all request pass authorisation
    """ requests to any endpoint all hit the same authorisation point before being passed to the specific endpoint """
 
   Scenario: GET request without a user urn in header
-    Given no user urn is in the header
+    Given no user uuid is in the header
     When a GET request is made
     Then a 400 error status is returned
 
   Scenario: POST request without a user urn in header
-    Given no user urn is in the header
+    Given no user uuid is in the header
     When a POST request is made
     Then a 400 error status is returned
 
   Scenario: PUT request without a user urn in header
-    Given no user urn is in the header
+    Given no user uuid is in the header
+    When a PUT request is made
+    Then a 400 error status is returned
+
+  Scenario: GET request without a user urn in header
+    Given no role is in the header
+    When a GET request is made
+    Then a 400 error status is returned
+
+  Scenario: POST request without a user urn in header
+    Given no role is in the header
+    When a POST request is made
+    Then a 400 error status is returned
+
+  Scenario: PUT request without a user urn in header
+    Given no role is in the header
     When a PUT request is made
     Then a 400 error status is returned
 
