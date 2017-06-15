@@ -31,12 +31,12 @@ class MessageList(Resource):
         string_query_args, page, limit, ru, survey, cc, label, business, desc = get_options(request.args)
 
         message_service = Retriever()
-        status, result = message_service.retrieve_message_list(page, limit, g.user_urn,
+        status, result = message_service.retrieve_message_list(page, limit, g.user,
                                                                ru=ru, survey=survey, cc=cc, label=label,
                                                                business=business, descend=desc)
         if status:
             resp = paginated_list_to_json(result, page, limit, request.host_url,
-                                                       g.user_urn, string_query_args, MESSAGE_LIST_ENDPOINT)
+                                                       g.user, string_query_args, MESSAGE_LIST_ENDPOINT)
             resp.status_code = 200
             return resp
 
@@ -52,7 +52,7 @@ class MessageSend(Resource):
         returned_draft = None
         draft_id = None
         if 'msg_id' in post_data:
-            is_draft, returned_draft = Retriever().check_msg_id_is_a_draft(post_data['msg_id'], g.user_urn)
+            is_draft, returned_draft = Retriever().check_msg_id_is_a_draft(post_data['msg_id'], g.user)
             if is_draft is True:
                 draft_id = post_data['msg_id']
                 post_data['msg_id'] = ''
@@ -84,7 +84,7 @@ class MessageSend(Resource):
         save = Saver()
         save.save_message(message.data)
         save.save_msg_event(message.data.msg_id, 'Sent')
-        if User(message.data.urn_from).is_respondent:
+        if g.user.is_respondent:
             save.save_msg_status(message.data.urn_from, message.data.msg_id, Labels.SENT.value)
             save.save_msg_status(message.data.survey, message.data.msg_id, Labels.INBOX.value)
             save.save_msg_status(message.data.survey, message.data.msg_id, Labels.UNREAD.value)
@@ -115,10 +115,10 @@ class MessageById(Resource):
     @staticmethod
     def get(message_id):
         """Get message by id"""
-        user_urn = g.user_urn
+
         # check user is authorised to view message
         message_service = Retriever()
-        resp = message_service.retrieve_message(message_id, user_urn)
+        resp = message_service.retrieve_message(message_id, g.user)
         return jsonify(resp)
 
 
@@ -128,18 +128,17 @@ class MessageModifyById(Resource):
     @staticmethod
     def put(message_id):
         """Update message by status"""
-        user_urn = g.user_urn
 
         request_data = request.get_json()
 
         action, label = MessageModifyById._validate_request(request_data)
 
-        message = Retriever().retrieve_message(message_id, user_urn)
+        message = Retriever().retrieve_message(message_id, g.user)
 
         if label == Labels.UNREAD.value:
-            resp = MessageModifyById._modify_unread(action, message, user_urn)
+            resp = MessageModifyById._modify_unread(action, message, g.user)
         else:
-            resp = MessageModifyById._modify_label(action, message, user_urn, label)
+            resp = MessageModifyById._modify_label(action, message, g.user, label)
 
         if resp:
             res = jsonify({'status': 'ok'})
@@ -151,21 +150,21 @@ class MessageModifyById(Resource):
         return res
 
     @staticmethod
-    def _modify_label(action, message, user_urn, label):
+    def _modify_label(action, message, user, label):
         """Adds or deletes a label"""
         label_exists = label in message
         if action == 'add' and not label_exists:
-            return Modifier.add_label(label, message, user_urn)
+            return Modifier.add_label(label, message, user)
         if label_exists:
-            return Modifier.remove_label(label, message, user_urn)
+            return Modifier.remove_label(label, message, user)
         else:
             return False
 
     @staticmethod
-    def _modify_unread(action, message, user_urn):
+    def _modify_unread(action, message, user):
         if action == 'add':
-            return Modifier.add_unread(message, user_urn)
-        return Modifier.del_unread(message, user_urn)
+            return Modifier.add_unread(message, user)
+        return Modifier.del_unread(message, user)
 
     @staticmethod
     def _validate_request(request_data):

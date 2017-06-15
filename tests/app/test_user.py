@@ -7,19 +7,19 @@ class UserTestCase(unittest.TestCase):
 
     def test_is_respondent_true(self):
         """test uses is_respondent property of User with respondent urn"""
-        self.assertTrue(User('respondent.00000.00000').is_respondent)
+        self.assertTrue(User('respondent.00000.00000', 'respondent').is_respondent)
 
     def test_is_respondent_false(self):
         """test uses is_respondent property of User with internal urn"""
-        self.assertFalse(User('internal.00000.00000').is_respondent)
+        self.assertFalse(User('internal.00000.00000', 'internal').is_respondent)
 
     def test_is_internal_true(self):
         """test uses is_internal property of User with internal urn"""
-        self.assertTrue(User('internal.00000.00000').is_internal)
+        self.assertTrue(User('internal.00000.00000', 'internal').is_internal)
 
     def test_is_internal_false(self):
         """test uses is_internal property of User with respondent urn"""
-        self.assertFalse(User('respondent.00000.00000').is_internal)
+        self.assertFalse(User('respondent.00000.00000', 'respondent').is_internal)
 
 
 if __name__ == '__main__':

@@ -2,15 +2,17 @@
 class User:
     """Determines whether the user is internal or external"""
 
-    user_urn = None
+    user_uuid = None
+    role = None
 
-    def __init__(self, user_urn):
-        self.user_urn = user_urn
+    def __init__(self, user_uuid, role):
+        self.user_uuid = user_uuid
+        self.role = role
 
     @property
     def is_internal(self):
-        return bool('internal' in self.user_urn)
+        return bool(self.role == 'internal')
 
     @property
     def is_respondent(self):
-        return bool('respondent' in self.user_urn)
+        return bool(self.role == 'respondent')

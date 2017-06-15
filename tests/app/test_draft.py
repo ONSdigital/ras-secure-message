@@ -1,6 +1,9 @@
 import hashlib
 import unittest
 import uuid
+
+from flask import g
+
 from app.repository.retriever import Retriever
 from unittest import mock
 from flask import current_app, json
@@ -18,6 +21,7 @@ from app.repository.saver import Saver
 from app.resources.drafts import DraftModifyById
 from app.resources.drafts import DraftSave
 from app.validation.domain import DraftSchema
+from app.validation.user import User
 
 
 class DraftTestCase(unittest.TestCase):
@@ -29,7 +33,8 @@ class DraftTestCase(unittest.TestCase):
         app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:////tmp/messages.db'
         self.engine = create_engine('sqlite:////tmp/messages.db')
         token_data = {
-            "user_urn": "12345678910"
+            "user_uuid": "12345678910",
+            "role": "internal"
         }
         encrypter = Encrypter(_private_key=settings.SM_USER_AUTHENTICATION_PRIVATE_KEY,
                               _private_key_password=settings.SM_USER_AUTHENTICATION_PRIVATE_KEY_PASSWORD,
@@ -57,6 +62,9 @@ class DraftTestCase(unittest.TestCase):
             database.db.create_all()
             self.db = database.db
 
+        self.user_internal = User('internal.21345', 'internal')
+        self.user_respondent = User('respondent.21345', 'respondent')
+
     def test_draft_call_saver(self):
         """Test saver called as expected to save draft"""
 
@@ -65,8 +73,9 @@ class DraftTestCase(unittest.TestCase):
         draft = DraftSchema().load(self.test_message)
 
         draft_save = DraftSave()
-
-        draft_save._save_draft(draft, saver)
+        with app.app_context():
+            g.user = User('richard', 'respondent')
+            draft_save._save_draft(draft, saver)
 
         saver.save_message.assert_called_with(draft.data)
         saver.save_msg_status.assert_called_with(draft.data.urn_from, draft.data.msg_id, Labels.DRAFT.value)
@@ -148,7 +157,7 @@ class DraftTestCase(unittest.TestCase):
 
             for row in label_request:
                 self.assertEqual(row['msg_id'], self.msg_id)
-                self.assertEqual(row['actor'], self.test_message['urn_from'])
+                self.assertEqual(row['actor'], self.test_message['survey'])
                 self.assertEqual(row['label'], Labels.DRAFT.value)
 
     def test_draft_correct_labels_saved_to_status_with_to(self):
@@ -227,7 +236,7 @@ class DraftTestCase(unittest.TestCase):
 
         with app.app_context():
             with current_app.test_request_context():
-                is_valid_draft = Retriever().check_msg_id_is_a_draft(msg_id, 'respondent.21345')
+                is_valid_draft = Retriever().check_msg_id_is_a_draft(msg_id, self.user_respondent)
         self.assertTrue(is_valid_draft[0])
 
     def test_draft_modified_since_last_read_false(self):
@@ -235,7 +244,7 @@ class DraftTestCase(unittest.TestCase):
 
         with app.app_context():
             with current_app.test_request_context():
-                is_valid_draft = Retriever().check_msg_id_is_a_draft('000000-0000-00000', 'respondent.21345')
+                is_valid_draft = Retriever().check_msg_id_is_a_draft('000000-0000-00000', self.user_respondent)
         self.assertFalse(is_valid_draft[0])
 
     def test_etag_check_returns_true(self):
@@ -257,7 +266,7 @@ class DraftTestCase(unittest.TestCase):
 
         with app.app_context():
             with current_app.test_request_context():
-                is_valid_draft = Retriever().check_msg_id_is_a_draft(msg_id, 'respondent.21345')
+                is_valid_draft = Retriever().check_msg_id_is_a_draft(msg_id, self.user_respondent)
         hash_object = hashlib.sha1(str(sorted(is_valid_draft[1].items())).encode())
         etag = hash_object.hexdigest()
 
@@ -282,7 +291,7 @@ class DraftTestCase(unittest.TestCase):
 
         with app.app_context():
             with current_app.test_request_context():
-                is_valid_draft = Retriever().check_msg_id_is_a_draft(msg_id, 'respondent.21345')
+                is_valid_draft = Retriever().check_msg_id_is_a_draft(msg_id, self.user_respondent)
 
         etag = '1234567sdfghj98765fgh'
 
@@ -295,4 +304,4 @@ class DraftTestCase(unittest.TestCase):
             database.db.drop_all()
             with current_app.test_request_context():
                 with self.assertRaises(InternalServerError):
-                    Retriever().check_msg_id_is_a_draft(msg_id, 'respondent.21345')
+                    Retriever().check_msg_id_is_a_draft(msg_id, self.user_respondent)

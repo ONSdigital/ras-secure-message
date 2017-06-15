@@ -14,9 +14,9 @@ class Modifier:
     """Modifies message to add / remove statuses"""
 
     @staticmethod
-    def add_label(label, message, user_urn):
+    def add_label(label, message, user):
         """add a label to status table"""
-        actor = user_urn if User(user_urn).is_respondent else message['survey']
+        actor = user.user_uuid if user.is_respondent else message['survey']
         try:
             query = "INSERT INTO status (label, msg_id, actor) VALUES ('{0}','{1}','{2}')". \
                 format(label, message['msg_id'], actor)
@@ -27,9 +27,9 @@ class Modifier:
             raise (InternalServerError(description="Error retrieving messages from database"))
 
     @staticmethod
-    def remove_label(label, message, user_urn):
+    def remove_label(label, message, user):
         """delete a label from status table"""
-        actor = user_urn if User(user_urn).is_respondent else message['survey']
+        actor = user.user_uuid if user.is_respondent else message['survey']
         try:
             query = "DELETE FROM status WHERE label = '{0}' and msg_id = '{1}' and actor = '{2}'". \
                 format(label, message['msg_id'], actor)
@@ -40,38 +40,38 @@ class Modifier:
             raise (InternalServerError(description="Error retrieving messages from database"))
 
     @staticmethod
-    def add_archived(message, user_urn):
+    def add_archived(message, user):
         """Add archived label"""
         archive = Labels.ARCHIVE.value
         if archive not in message['labels']:
-            Modifier.add_label(archive, message, user_urn)
+            Modifier.add_label(archive, message, user)
             return True
 
     @staticmethod
-    def del_archived(message, user_urn):
+    def del_archived(message, user):
         """Remove archive label from status"""
         archive = Labels.ARCHIVE.value
         if archive in message['labels']:
-            Modifier.remove_label(archive, message, user_urn)
+            Modifier.remove_label(archive, message, user)
         return True
 
     @staticmethod
-    def add_unread(message, user_urn):
+    def add_unread(message, user):
         """Add unread label to status"""
         unread = Labels.UNREAD.value
         inbox = Labels.INBOX.value
         if inbox in message['labels']:
-            Modifier.add_label(unread, message, user_urn)
+            Modifier.add_label(unread, message, user)
             return True
 
     @staticmethod
-    def del_unread(message, user_urn):
+    def del_unread(message, user):
         """Remove unread label from status"""
         inbox = Labels.INBOX.value
         unread = Labels.UNREAD.value
         if inbox in message['labels'] and unread in message['labels'] and message['read_date'] == None:
             Saver().save_msg_event(message['msg_id'], 'Read')
-        Modifier.remove_label(unread, message, user_urn)
+        Modifier.remove_label(unread, message, user)
         return True
 
     @staticmethod

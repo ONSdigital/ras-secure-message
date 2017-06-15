@@ -10,7 +10,8 @@ from app import settings
 
 url = "http://localhost:5050/drafts"
 token_data = {
-            "user_urn": "respondent.2134"
+            "user_uuid": "respondent.2134",
+            "role": "respondent"
         }
 
 headers = {'Content-Type': 'application/json', 'Authorization': ''}

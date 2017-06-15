@@ -54,7 +54,7 @@ def add_string_query_args(string_query_args, arg, val):
         return '{0}&{1}={2}'.format(string_query_args, arg, val)
 
 
-def paginated_list_to_json(paginated_list, page, limit, host_url, user_urn, string_query_args,
+def paginated_list_to_json(paginated_list, page, limit, host_url, user, string_query_args,
                            endpoint=MESSAGE_LIST_ENDPOINT):
     """used to change a pagination object to json format with links"""
     messages = []
@@ -65,7 +65,7 @@ def paginated_list_to_json(paginated_list, page, limit, host_url, user_urn, stri
 
     for message in paginated_list.items:
         msg_count += 1
-        msg = message.serialize(user_urn)
+        msg = message.serialize(user)
         msg['_links'] = {"self": {"href": "{0}{1}/{2}".format(host_url, MESSAGE_BY_ID_ENDPOINT, msg['msg_id'])}}
         messages.append(msg)
 

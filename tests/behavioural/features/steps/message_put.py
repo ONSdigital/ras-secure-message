@@ -9,7 +9,8 @@ from app import settings
 
 url = "http://localhost:5050/message/{}/modify"
 token_data = {
-            "user_urn": "000000000"
+            "user_uuid": "000000000",
+            "role": "internal"
         }
 
 headers = {'Content-Type': 'application/json', 'Authorization': ''}
@@ -104,6 +105,9 @@ def step_impl_message_not_marked_archived(context):
 def step_impl_message_has_been_read(context):
     data['urn_to'] = 'internal.12344'
     data['urn_from'] = 'respondent.122342'
+    token_data['user_uuid'] = 'respondent.122342'
+    token_data['role'] = 'respondent'
+    headers['Authorization'] = update_encrypted_jwt()
     context.response = app.test_client().post("http://localhost:5050/message/send",
                                               data=flask.json.dumps(data), headers=headers)
     msg_resp = json.loads(context.response.data)
@@ -111,7 +115,8 @@ def step_impl_message_has_been_read(context):
 
     modify_data['action'] = 'remove'
     modify_data['label'] = 'UNREAD'
-    token_data['user_urn'] = data['urn_to']
+    token_data['user_uuid'] = 'internal.12344'
+    token_data['role'] = 'internal'
     headers['Authorization'] = update_encrypted_jwt()
     context.response = app.test_client().put(url.format(context.msg_id),
                                              data=flask.json.dumps(modify_data), headers=headers)
