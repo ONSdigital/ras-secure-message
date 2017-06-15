@@ -1,5 +1,8 @@
 Feature: Get Drafts
 
+  Background: Reset database
+    Given database is reset
+
   Scenario: User requests list of drafts
     Given the user has created and saved multiple drafts
     When the user requests drafts

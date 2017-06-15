@@ -2,8 +2,6 @@ import flask
 import nose.tools
 from behave import given, then, when
 from app.application import app
-from app.repository import database
-from flask import current_app
 from app.authentication.jwt import encode
 from app.authentication.jwe import Encrypter
 from app import settings
@@ -36,23 +34,17 @@ def update_encrypted_jwt():
 
 headers['Authorization'] = update_encrypted_jwt()
 
-
-def reset_db():
-    with app.app_context():
-        database.db.init_app(current_app)
-        database.db.drop_all()
-        database.db.create_all()
-
 # Scenario: Respondent sends multiple messages and retrieves the list of messages with their labels
 
 
 @given("a respondent sends multiple messages")
 def step_impl_respondent_sends_multiple_messages(context):
-    reset_db()
+
 
     token_data['user_uuid'] = 'respondent.122342'
     token_data['role'] = 'respondent'
     headers['Authorization'] = update_encrypted_jwt()
+
     for x in range(0, 2):
         data['urn_to'] = 'internal.12344'
         data['urn_from'] = 'respondent.122342'
@@ -79,7 +71,6 @@ def step_impl_retrieved_messages_should_have_sent_labels(context):
 
 @given("a Internal user sends multiple messages")
 def step_impl_internal_user_sends_multiple_messages(context):
-    reset_db()
 
     token_data['user_uuid'] = 'internal.12344'
     token_data['role'] = 'internal'
@@ -142,11 +133,11 @@ def step_impl_messages_are_displayed(context):
 
 @given('a respondent and an Internal user sends multiple messages')
 def step_impl_respondant_and_internal_user_send_multiple_messages(context):
-    reset_db()
 
     token_data['user_uuid'] = 'internal.12344'
     token_data['role'] = 'internal'
     headers['Authorization'] = update_encrypted_jwt()
+
 
     for x in range(0, 2):
         data['urn_to'] = 'respondent.122342'
@@ -186,7 +177,6 @@ def step_impl_the_retrieved_messaages_all_have_sent_labels(context):
 
 @given('a Internal user sends multiple messages with different reporting unit')
 def step_impl_internal_user_sends_multiple_messages_with_different_ru(context):
-    reset_db()
 
     token_data['user_uuid'] = 'internal.12344'
     token_data['role'] = 'internal'
@@ -225,7 +215,6 @@ def step_impl_assert_correct_ru(context):
 
 @given('an Internal user sends multiple messages with different business names')
 def step_impl_respondent_retrieves_list_of_messages_with_busines_name(context):
-    reset_db()
 
     token_data['user_uuid'] = 'internal.12344'
     token_data['role'] = 'internal'
@@ -265,7 +254,6 @@ def step_impl_assert_messages_have_correct_business_name(context):
 
 @given('a Internal user sends multiple messages with different survey')
 def step_impl_internal_user_sends_multiple_messages_with_different_survey(context):
-    reset_db()
 
     token_data['user_uuid'] = 'internal.12344'
     token_data['role'] = 'internal'
@@ -304,7 +292,6 @@ def step_impl_retrieved_messages_shoud_have_correct_survey(context):
 
 @given('a Internal user sends multiple messages with different collection case')
 def step_impl_internal_user_sends_multiple_messages_with_different_collection_case(context):
-    reset_db()
 
     token_data['user_uuid'] = 'internal.12344'
     token_data['role'] = 'internal'
@@ -344,7 +331,6 @@ def step_impl_assert_messages_have_correct_collection_case(context):
 
 @given('a Respondent creates multiple draft messages')
 def step_impl_respondent_creates_multiple_draft_messages(context):
-    reset_db()
 
     for x in range(0, 2):
         draft = {'urn_to': 'internal.12344',
@@ -387,9 +373,10 @@ def step_impl_assert_no_message_has_draft_inbox_label(context):
 # Scenario: As an external user I would like to be able to view a list of messages
 @given("an external user has multiple messages")
 def step_impl_external_user_has_multiple_messages(context):
-    reset_db()
+    token_data['user_urn'] = 'respondent.123'
     token_data['user_uuid'] = 'internal.123'
     token_data['role'] = 'internal'
+
     headers['Authorization'] = update_encrypted_jwt()
     data['urn_from'] = 'internal.123'
     for x in range(0, 2):
@@ -414,7 +401,6 @@ def step_impl_assert_correct_number_of_messages_returned(context):
 # Scenario: As an internal user I would like to be able to view a list of messages
 @given("an internal user has multiple messages")
 def step_impl_internal_user_has_multiple_messages(context):
-    reset_db()
     token_data['user_urn'] = 'internal.123'
     headers['Authorization'] = update_encrypted_jwt()
     data['urn_from'] = 'BRES'
@@ -435,7 +421,6 @@ def step_impl_internal_user_requests_all_messages(context):
 # Scenario: As a user I would like to be able to view a list of inbox messages
 @given("a internal user receives multiple messages")
 def step_impl_internal_user_receives_multiple_messages(context):
-    reset_db()
 
     token_data['user_uuid'] = 'respondent.123'
     token_data['role'] = 'respondent'
@@ -512,7 +497,6 @@ def step_impl_return_400(context):
 #   Scenario Outline: User gets messages with various labels options
 @given('there are multiple messages to retrieve for all labels')
 def step_impl_multiple_messages_for_all_labels(context):
-    reset_db()
 
     for _ in range(0, 2):
         data['urn_to'] = 'respondent.122342'
@@ -672,7 +656,7 @@ def step_impl_assert_all_messages_returned(context):
 
 @given("a respondent user receives multiple messages")
 def step_impl_respondent_recieves_multiple_messages(context):
-    reset_db()
+
     token_data['user_uuid'] = 'internal.123'
     token_data['role'] = 'internal'
     headers['Authorization'] = update_encrypted_jwt()

@@ -1,5 +1,8 @@
 Feature: Get thread by id Endpoint
 
+  Background: Reset database
+    Given database is reset
+
   Scenario: Respondent and internal user have a conversation and respondent retrieves the conversation
     Given a respondent and internal user have a conversation
     When the respondent gets this conversation

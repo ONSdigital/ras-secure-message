@@ -1,5 +1,8 @@
 Feature: Checking correct labels for messages are added & deleted
 
+  Background: Reset database
+    Given database is reset
+
   Scenario: modifying the status of the message to "archived"
     Given a valid message is sent
     When the message is archived

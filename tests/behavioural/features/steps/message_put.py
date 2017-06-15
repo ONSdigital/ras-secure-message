@@ -3,8 +3,6 @@ import flask
 import nose.tools
 from behave import given, then, when
 from app.application import app
-from app.repository import database
-from flask import current_app
 from app.authentication.jwt import encode
 from app.authentication.jwe import Encrypter
 from app import settings
@@ -41,13 +39,6 @@ def update_encrypted_jwt():
 headers['Authorization'] = update_encrypted_jwt()
 
 
-def reset_db():
-    with app.app_context():
-        database.db.init_app(current_app)
-        database.db.drop_all()
-        database.db.create_all()
-
-
 # Scenario: modifying the status of the message to "archived"
 @given("a valid message is sent")
 def step_impl(context):
@@ -80,7 +71,6 @@ def step_impl_assert_message_is_marked_as_archived(context):
 # Scenario: deleting the "archived" label from a given message
 @given("the message is archived")
 def step_impl_the_message_is_archived(context):
-    reset_db()
     data['urn_to'] = 'internal.12344'
     data['urn_from'] = 'respondent.122342'
     context.response = app.test_client().post("http://localhost:5050/message/send",
@@ -113,7 +103,6 @@ def step_impl_message_not_marked_archived(context):
 # Scenario: Modifying the status of the message to "unread"
 @given('a message has been read')
 def step_impl_message_has_been_read(context):
-    reset_db()
     data['urn_to'] = 'internal.12344'
     data['urn_from'] = 'respondent.122342'
     token_data['user_uuid'] = 'respondent.122342'
@@ -177,7 +166,6 @@ def step_impl_message_read_date_should_be_set(context):
 # Scenario: validating a request where there is no label provided
 @given('a message is sent')
 def step_impl_a_message_is_sent(context):
-    reset_db()
     data['urn_to'] = 'internal.12344'
     data['urn_from'] = 'respondent.122342'
     context.response = app.test_client().post("http://localhost:5050/message/send",
@@ -281,7 +269,6 @@ def step_impl_no_unread_messages_returned(context):
 # Scenario - internal - as an internal user I want to be able to change my message from read to unread
 @given("a message with the status read is displayed to an internal user")
 def step_impl_message_with_status_read_returned(context):
-    reset_db()
     data['urn_to'] = 'internal.12344'
     data['urn_from'] = 'respondent.122342'
     context.response = app.test_client().post("http://localhost:5050/message/send",

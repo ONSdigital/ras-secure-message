@@ -2,8 +2,6 @@ import flask
 import nose.tools
 from behave import given, then, when
 from app.application import app
-from app.repository import database
-from flask import current_app
 from app.authentication.jwt import encode
 from app.authentication.jwe import Encrypter
 from app import settings
@@ -36,19 +34,11 @@ def update_encrypted_jwt():
 
 headers['Authorization'] = update_encrypted_jwt()
 
-
-def reset_db():
-    with app.app_context():
-        database.db.init_app(current_app)
-        database.db.drop_all()
-        database.db.create_all()
-
 # Scenario: Respondent and internal user have multiple conversations and respondent retrieves all conversation
 
 
 @given("a respondent and internal user have multiple conversations")
 def step_impl_respondent_and_internal_user_hav_multiple_conversations(context):
-    reset_db()
     context.most_recent_messages = []
 
     for x in range(0,3):
