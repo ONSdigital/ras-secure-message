@@ -15,10 +15,26 @@ Feature: Message Send Endpoint
     When the draft is sent
     Then a msg_id in the response
 
+  Scenario: Send a draft and receive a msg_id
+    Given a message is identified as a draft
+    When the draft is sent
+    Then a msg_id in the response
+
   Scenario: Send a draft and receive a thread_id
     Given a message is identified as a draft
     When the draft is sent
     Then a thread_id in the response
+    And thread_id is the same as msg_id
+
+  Scenario: Send a draft and receive a msg_id
+    Given a message is identified as a draft
+    When the draft is sent
+    Then a msg_id in the response
+
+  Scenario: Send a draft which is a reply to another message
+      Given a message is identified as a draft which is a reply to another message
+      When the draft is sent
+      Then thread_id is not the same as msg_id
 
   Scenario: Submit a message with a missing "To" field and receive a 400 error
     Given  the 'To' field is empty

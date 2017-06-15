@@ -43,26 +43,18 @@ class DraftSave(Resource):
             res.status_code = 400
             return res
 
-    def _save_draft(self, draft, saver=Saver()):
+    @staticmethod
+    def _save_draft(draft, saver=Saver()):
         saver.save_message(draft.data)
 
         if draft.data.urn_to is not None and len(draft.data.urn_to) != 0:
             uuid_to = draft.data.urn_to if g.user.is_internal else draft.data.survey
-            self._save_draft_status(saver, draft.data.msg_id, uuid_to, draft.data.survey,
-                                      Labels.DRAFT_INBOX.value)
+            saver.save_msg_status(uuid_to, draft.data.msg_id, Labels.DRAFT_INBOX.value)
 
         uuid_from = draft.data.urn_from if g.user.is_respondent else draft.data.survey
-
-        self._save_draft_status(saver, draft.data.msg_id, uuid_from, draft.data.survey, Labels.DRAFT.value)
+        saver.save_msg_status(uuid_from, draft.data.msg_id, Labels.DRAFT.value)
 
         saver.save_msg_event(draft.data.msg_id, 'Draft_Saved')
-
-    @staticmethod
-    def _save_draft_status(saver, msg_id, person, survey, label):
-        """Save labels with correct actor for internal and respondent"""
-
-        if person is not None and len(person) != 0:
-            saver.save_msg_status(person, msg_id, label)
 
 
 class DraftById(Resource):
