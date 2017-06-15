@@ -114,7 +114,7 @@ def step_impl_a_message_is_a_draft_reply(context):
 
 
 @then('thread_id is not the same as msg_id')
-def step_impl_thread_id_and_msg_id_are_equal(context):
+def step_impl_thread_id_and_msg_id_are_not_equal(context):
     resp = json.loads(context.response.data)
     nose.tools.assert_not_equals(resp['thread_id'], resp['msg_id'])
     nose.tools.assert_equal(resp['thread_id'], '25e9172c-62d9-4ff7-98ac-661300ae9446')
