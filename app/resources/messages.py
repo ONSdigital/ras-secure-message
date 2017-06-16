@@ -56,6 +56,10 @@ class MessageSend(Resource):
             if is_draft is True:
                 draft_id = post_data['msg_id']
                 post_data['msg_id'] = ''
+
+                if post_data['thread_id'] == draft_id:
+                    post_data['thread_id'] = ''
+
             else:
                 raise (BadRequest(description="Message can not include msg_id"))
 

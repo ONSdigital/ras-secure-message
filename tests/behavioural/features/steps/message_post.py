@@ -71,7 +71,7 @@ def step_impl_a_message_is_a_draft(context):
                        'msg_from': 'respondent.test',
                        'subject': 'Hello World',
                        'body': 'Test',
-                       'thread_id': '',
+                       'thread_id': context.msg_id,
                        'collection_case': 'collection case1',
                        'reporting_unit': 'reporting case1',
                        'business_name': 'ABusiness',
@@ -81,6 +81,43 @@ def step_impl_a_message_is_a_draft(context):
 @when('the draft is sent')
 def step_impl_draft_is_sent(context):
     context.response = app.test_client().post(url, data=json.dumps(context.message), headers=headers)
+
+
+#  Scenario: Send a draft which is a reply to another message
+
+@given('a message is identified as a draft which is a reply to another message')
+def step_impl_a_message_is_a_draft_reply(context):
+    data.update({'msg_to': 'test',
+                 'msg_from': 'respondent.test',
+                 'subject': 'Hello World',
+                 'body': 'Test',
+                 'thread_id': '25e9172c-62d9-4ff7-98ac-661300ae9446',
+                 'collection_case': 'collection case1',
+                 'reporting_unit': 'reporting case1',
+                 'business_name': 'ABusiness',
+                 'survey': 'survey'})
+
+    context.post_draft = app.test_client().post("http://localhost:5050/draft/save", data=json.dumps(data),
+                                                headers=headers)
+    msg_resp = json.loads(context.post_draft.data)
+    context.msg_id = msg_resp['msg_id']
+    context.message = {'msg_id': context.msg_id,
+                       'msg_to': 'test',
+                       'msg_from': 'respondent.test',
+                       'subject': 'Hello World',
+                       'body': 'Test',
+                       'thread_id': '25e9172c-62d9-4ff7-98ac-661300ae9446',
+                       'collection_case': 'collection case1',
+                       'reporting_unit': 'reporting case1',
+                       'business_name': 'ABusiness',
+                       'survey': 'survey'}
+
+
+@then('thread_id is not the same as msg_id')
+def step_impl_thread_id_and_msg_id_are_not_equal(context):
+    resp = json.loads(context.response.data)
+    nose.tools.assert_not_equals(resp['thread_id'], resp['msg_id'])
+    nose.tools.assert_equal(resp['thread_id'], '25e9172c-62d9-4ff7-98ac-661300ae9446')
 
 
 # Scenario 3: Submit a message with a missing "To" field and receive a 400 error
@@ -238,6 +275,12 @@ def step_impl_msg_id_in_response(context):
 def step_impl_thread_id_in_response(context):
     resp = json.loads(context.response.data)
     nose.tools.assert_true(resp['thread_id'] is not None)
+
+
+@then('thread_id is the same as msg_id')
+def step_impl_thread_id_and_msg_id_are_equal(context):
+    resp = json.loads(context.response.data)
+    nose.tools.assert_equal(resp['thread_id'], resp['msg_id'])
 
 
 @then("a 400 error status is returned")
