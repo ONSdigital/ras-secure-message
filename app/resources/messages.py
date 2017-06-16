@@ -85,14 +85,14 @@ class MessageSend(Resource):
         save.save_message(message.data)
         save.save_msg_event(message.data.msg_id, 'Sent')
         if g.user.is_respondent:
-            save.save_msg_status(message.data.urn_from, message.data.msg_id, Labels.SENT.value)
+            save.save_msg_status(message.data.msg_from, message.data.msg_id, Labels.SENT.value)
             save.save_msg_status(message.data.survey, message.data.msg_id, Labels.INBOX.value)
             save.save_msg_status(message.data.survey, message.data.msg_id, Labels.UNREAD.value)
         else:
             save.save_msg_status(message.data.survey, message.data.msg_id, Labels.SENT.value)
-            save.save_msg_audit(message.data.msg_id, message.data.urn_from)
-            save.save_msg_status(message.data.urn_to, message.data.msg_id, Labels.INBOX.value)
-            save.save_msg_status(message.data.urn_to, message.data.msg_id, Labels.UNREAD.value)
+            save.save_msg_audit(message.data.msg_id, message.data.msg_from)
+            save.save_msg_status(message.data.msg_to, message.data.msg_id, Labels.INBOX.value)
+            save.save_msg_status(message.data.msg_to, message.data.msg_id, Labels.UNREAD.value)
 
         if is_draft is True:
             self._del_draft_labels(draft_id)

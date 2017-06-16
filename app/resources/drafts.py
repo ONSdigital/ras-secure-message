@@ -46,12 +46,12 @@ class DraftSave(Resource):
     def _save_draft(self, draft, saver=Saver()):
         saver.save_message(draft.data)
 
-        if draft.data.urn_to is not None and len(draft.data.urn_to) != 0:
-            uuid_to = draft.data.urn_to if g.user.is_internal else draft.data.survey
+        if draft.data.msg_to is not None and len(draft.data.msg_to) != 0:
+            uuid_to = draft.data.msg_to if g.user.is_internal else draft.data.survey
             self._save_draft_status(saver, draft.data.msg_id, uuid_to, draft.data.survey,
                                       Labels.DRAFT_INBOX.value)
 
-        uuid_from = draft.data.urn_from if g.user.is_respondent else draft.data.survey
+        uuid_from = draft.data.msg_from if g.user.is_respondent else draft.data.survey
 
         self._save_draft_status(saver, draft.data.msg_id, uuid_from, draft.data.survey, Labels.DRAFT.value)
 

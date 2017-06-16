@@ -42,8 +42,8 @@ def before_scenario(context):
 
 
     data.update({
-                 'urn_to': 'test',
-                 'urn_from': 'respondent.test',
+                 'msg_to': 'test',
+                 'msg_from': 'respondent.test',
                  'subject': 'Hello World',
                  'body': 'Test',
                  'thread_id': '',
@@ -67,8 +67,8 @@ def step_impl_a_message_is_a_draft(context):
     msg_resp = json.loads(context.post_draft.data)
     context.msg_id = msg_resp['msg_id']
     context.message = {'msg_id': context.msg_id,
-                       'urn_to': 'test',
-                       'urn_from': 'respondent.test',
+                       'msg_to': 'test',
+                       'msg_from': 'respondent.test',
                        'subject': 'Hello World',
                        'body': 'Test',
                        'thread_id': '',
@@ -86,13 +86,13 @@ def step_impl_draft_is_sent(context):
 # Scenario 3: Submit a message with a missing "To" field and receive a 400 error
 @given("the 'To' field is empty")
 def step_impl_to_field_empty(context):
-    data['urn_to'] = ''
+    data['msg_to'] = ''
 
 
 # Scenario 4: Submit a message with a missing "From" field and receive a 400 error
 @given("the 'From' field is empty")
 def step_impl_from_field_empty(context):
-    data['urn_from'] = ''
+    data['msg_from'] = ''
 
 
 # Scenario 5: Submit a message with a missing "Body" field and receive a 400 error
@@ -114,16 +114,16 @@ def step_impl_thread_id_field_empty(context):
     data['thread_id'] = ''
 
 
-# Scenario 8: Message sent with a urn_to too long
+# Scenario 8: Message sent with a msg_to too long
 @given("the 'To' field exceeds max limit in size")
 def step_impl_to_field_exceeds_max_limit(context):
-    data['urn_to'] = "x" * (constants.MAX_TO_LEN+1)
+    data['msg_to'] = "x" * (constants.MAX_TO_LEN+1)
 
 
-# Scenario 9: Message sent with a urn_from too long
+# Scenario 9: Message sent with a msg_from too long
 @given("the 'From' field exceeds max limit in size")
 def step_impl_from_field_exceeds_max_limit(context):
-    data['urn_from'] = "y" * (constants.MAX_FROM_LEN+1)
+    data['msg_from'] = "y" * (constants.MAX_FROM_LEN+1)
 
 
 # Scenario 10: Message sent with an empty survey field return 400
@@ -136,8 +136,8 @@ def step_impl_survey_field_empty(context):
 @given('a message contains a msg_id and is not a valid draft')
 def step_impl_message_contains_msg_id_and_is_not_valid_draft(context):
     data.update({'msg_id': 'test123',
-                 'urn_to': 'test',
-                 'urn_from': 'respondent.test',
+                 'msg_to': 'test',
+                 'msg_from': 'respondent.test',
                  'subject': 'Hello World',
                  'body': 'Test',
                  'thread_id': '',
@@ -162,8 +162,8 @@ def step_impl_draft_message_posted(context):
     msg_resp = json.loads(context.post_draft.data)
     context.msg_id = msg_resp['msg_id']
     context.message = {'msg_id': context.msg_id,
-                       'urn_to': 'test',
-                       'urn_from': 'respondent.test',
+                       'msg_to': 'test',
+                       'msg_from': 'respondent.test',
                        'subject': 'Hello World',
                        'body': 'Test',
                        'thread_id': '',
@@ -177,8 +177,8 @@ def step_impl_draft_message_posted(context):
 @when('another user tries to send the same message')
 def step_impl_another_user_sends_same_message(context):
     data.update({'msg_id': context.msg_id,
-                 'urn_to': 'internal.000000',
-                 'urn_from': 'respondent.000000',
+                 'msg_to': 'internal.000000',
+                 'msg_from': 'respondent.000000',
                  'subject': 'test',
                  'body': 'test',
                  'thread_id': '2',
@@ -201,8 +201,8 @@ def step_impl_is_shown_404(context):
 # Scenario 13:  Scenario: A Etag is not present within the header
 @given('a message is created')
 def step_impl_message_is_created(context):
-    context.msg = {  'urn_to': 'test',
-                     'urn_from': 'test2',
+    context.msg = {  'msg_to': 'test',
+                     'msg_from': 'test2',
                      'subject': 'test',
                      'body': 'Test',
                      'thread_id': '',

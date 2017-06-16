@@ -26,7 +26,7 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
             database.db.create_all()
             self.db = database.db
 
-        self.user = User('respondent.21345', 'respondent')
+        self.user = User('0a7ad740-10d5-4ecb-b7ca-3c0384afb882', 'respondent')
 
     def test_paginated_to_json_returns_correct_messages_len(self):
         """turns paginated result list to json checking correct amount of messages are given"""

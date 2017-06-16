@@ -33,7 +33,7 @@ class DraftTestCase(unittest.TestCase):
         app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:////tmp/messages.db'
         self.engine = create_engine('sqlite:////tmp/messages.db')
         token_data = {
-            "user_uuid": "12345678910",
+            "user_uuid": "ce12b958-2a5f-44f4-a6da-861e59070a31",
             "role": "internal"
         }
         encrypter = Encrypter(_private_key=settings.SM_USER_AUTHENTICATION_PRIVATE_KEY,
@@ -47,8 +47,8 @@ class DraftTestCase(unittest.TestCase):
 
         self.headers = {'Content-Type': 'application/json', 'Authorization': encrypted_jwt}
 
-        self.test_message = {'urn_to': 'richard',
-                             'urn_from': 'torrance',
+        self.test_message = {'msg_to': 'richard',
+                             'msg_from': 'torrance',
                              'subject': 'MyMessage',
                              'body': 'hello',
                              'thread_id': '',
@@ -62,8 +62,8 @@ class DraftTestCase(unittest.TestCase):
             database.db.create_all()
             self.db = database.db
 
-        self.user_internal = User('internal.21345', 'internal')
-        self.user_respondent = User('respondent.21345', 'respondent')
+        self.user_internal = User('ce12b958-2a5f-44f4-a6da-861e59070a31', 'internal')
+        self.user_respondent = User('0a7ad740-10d5-4ecb-b7ca-3c0384afb882', 'respondent')
 
     def test_draft_call_saver(self):
         """Test saver called as expected to save draft"""
@@ -78,12 +78,12 @@ class DraftTestCase(unittest.TestCase):
             draft_save._save_draft(draft, saver)
 
         saver.save_message.assert_called_with(draft.data)
-        saver.save_msg_status.assert_called_with(draft.data.urn_from, draft.data.msg_id, Labels.DRAFT.value)
+        saver.save_msg_status.assert_called_with(draft.data.msg_from, draft.data.msg_id, Labels.DRAFT.value)
 
     def test_draft_empty_to_field_returns_201(self):
         """Test draft can be saved without To field"""
 
-        self.test_message['urn_to'] = ''
+        self.test_message['msg_to'] = ''
         response = self.app.post(self.url, data=json.dumps(self.test_message), headers=self.headers)
         self.assertEqual(response.status_code, 201)
 
@@ -125,7 +125,7 @@ class DraftTestCase(unittest.TestCase):
     def test_draft_empty_from_field_returns_400(self):
         """Test that From field is required"""
 
-        self.test_message['urn_from'] = ''
+        self.test_message['msg_from'] = ''
 
         response = self.app.post(self.url, data=json.dumps(self.test_message), headers=self.headers)
         self.assertEqual(response.status_code, 400)
@@ -141,7 +141,7 @@ class DraftTestCase(unittest.TestCase):
     def test_draft_correct_labels_saved_to_status_without_to(self):
         """Check correct labels are saved to status table for draft saved without a to"""
 
-        self.test_message['urn_to'] = ''
+        self.test_message['msg_to'] = ''
 
         self.app.post(self.url, data=json.dumps(self.test_message), headers=self.headers)
 
@@ -177,7 +177,7 @@ class DraftTestCase(unittest.TestCase):
 
             for row in label_request:
                 self.assertTrue(row['msg_id'], self.msg_id)
-                self.assertTrue(row['actor'], self.test_message['urn_to'])
+                self.assertTrue(row['actor'], self.test_message['msg_to'])
                 self.assertTrue(row['label'], Labels.DRAFT_INBOX.value)
 
     def test_draft_inserted_into_msg_table(self):
@@ -202,8 +202,8 @@ class DraftTestCase(unittest.TestCase):
         self.test_message.update(
             {
                 'msg_id': self.msg_id,
-                'urn_to': 'richard',
-                'urn_from': 'torrance',
+                'msg_to': 'richard',
+                'msg_from': 'torrance',
                 'subject': 'MyMessage',
                 'body': 'hello',
                 'thread_id': '',
@@ -227,8 +227,8 @@ class DraftTestCase(unittest.TestCase):
                     ' "ACollectionCase", "AReportingUnit", ' \
                     '"SurveyType")'.format(msg_id)
             con.execute(query)
-            query = 'INSERT INTO status(label, msg_id, actor) VALUES("DRAFT", "{0}", "respondent.21345")'.format(
-                msg_id)
+            query = 'INSERT INTO status(label, msg_id, actor) VALUES("DRAFT", "{0}", ' \
+                    '"0a7ad740-10d5-4ecb-b7ca-3c0384afb882")'.format(msg_id)
             con.execute(query)
             query = 'INSERT INTO status(label, msg_id, actor) VALUES("DRAFT_INBOX", "{0}",' \
                     ' "SurveyType")'.format(msg_id)
@@ -257,8 +257,8 @@ class DraftTestCase(unittest.TestCase):
                     ' "ACollectionCase", "AReportingUnit", ' \
                     '"SurveyType")'.format(msg_id)
             con.execute(query)
-            query = 'INSERT INTO status(label, msg_id, actor) VALUES("DRAFT", "{0}", "respondent.21345")'.format(
-                msg_id)
+            query = 'INSERT INTO status(label, msg_id, actor) VALUES("DRAFT", "{0}",' \
+                    ' "0a7ad740-10d5-4ecb-b7ca-3c0384afb882")'.format(msg_id)
             con.execute(query)
             query = 'INSERT INTO status(label, msg_id, actor) VALUES("DRAFT_INBOX", "{0}",' \
                     ' "SurveyType")'.format(msg_id)
@@ -282,8 +282,8 @@ class DraftTestCase(unittest.TestCase):
                     ' "ACollectionCase", "AReportingUnit", ' \
                     '"SurveyType")'.format(msg_id)
             con.execute(query)
-            query = 'INSERT INTO status(label, msg_id, actor) VALUES("DRAFT", "{0}", "respondent.21345")'.format(
-                msg_id)
+            query = 'INSERT INTO status(label, msg_id, actor) VALUES("DRAFT", "{0}", ' \
+                    '"0a7ad740-10d5-4ecb-b7ca-3c0384afb882")'.format(msg_id)
             con.execute(query)
             query = 'INSERT INTO status(label, msg_id, actor) VALUES("DRAFT_INBOX", "{0}",' \
                     ' "SurveyType")'.format(msg_id)

@@ -14,7 +14,7 @@ class AuthenticationTestCase(unittest.TestCase):
         """Authenticate request using correct JWT"""
         expected_res = {'status': "ok"}
         data = {
-                  "user_uuid": "12345678910",
+                  "user_uuid": "ce12b958-2a5f-44f4-a6da-861e59070a31",
                   "role": "internal"
                 }
         encrypter = Encrypter(_private_key=settings.SM_USER_AUTHENTICATION_PRIVATE_KEY,
@@ -59,7 +59,7 @@ class AuthenticationTestCase(unittest.TestCase):
         """Authenticate request using JWT without encryption"""
 
         data = {
-            "user_urn": "12345678910"
+            "user_uuid": "12345678910"
         }
 
         with self.assertRaises(BadRequest):
@@ -93,7 +93,7 @@ class AuthenticationTestCase(unittest.TestCase):
     def test_encode_decode_jwt(self):
         """decoding and encoding jwt"""
         data = {
-            "user_urn": "12345678910"
+            "user_uuid": "12345678910"
         }
         signed_jwt = encode(data)
         decoded_jwt = decode(signed_jwt)

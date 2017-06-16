@@ -9,13 +9,13 @@ logger = logging.getLogger(__name__)
 class Message:
 
     """Class to hold message attributes"""
-    def __init__(self, urn_to, urn_from, subject, body, thread_id=None, msg_id='', collection_case='',
+    def __init__(self, msg_to, msg_from, subject, body, thread_id=None, msg_id='', collection_case='',
                  reporting_unit='', survey='', business_name=''):
 
         logger.debug("Message Class created {0}, {1}".format(subject, body))
         self.msg_id = str(uuid.uuid4()) if len(msg_id) == 0 else msg_id  # If empty msg_id assign to a uuid
-        self.urn_to = urn_to
-        self.urn_from = urn_from
+        self.msg_to = msg_to
+        self.msg_from = msg_from
         self.subject = subject
         self.body = body
         self.thread_id = self.msg_id if not thread_id else thread_id  # If empty thread_id then set to message id
@@ -25,7 +25,7 @@ class Message:
         self.survey = survey
 
     def __repr__(self):
-        return '<Message(msg_id={self.msg_id} urn_to={self.urn_to} urn_from={self.urn_from} subject={self.subject} body={self.body} thread_id={self.thread_id} collection_case={self.collection_case} reporting_unit={self.reporting_unit} business_name={self.business_name} survey={self.survey})>'.format(self=self)
+        return '<Message(msg_id={self.msg_id} msg_to={self.msg_to} msg_from={self.msg_from} subject={self.subject} body={self.body} thread_id={self.thread_id} collection_case={self.collection_case} reporting_unit={self.reporting_unit} business_name={self.business_name} survey={self.survey})>'.format(self=self)
 
     def __eq__(self, other):
         if isinstance(other, Message):
@@ -38,8 +38,8 @@ class MessageSchema(Schema):
 
     """ Class to marshal JSON to Message"""
     msg_id = fields.Str(allow_none=True)
-    urn_to = fields.Str(required=True)
-    urn_from = fields.Str(required=True)
+    msg_to = fields.Str(required=True)
+    msg_from = fields.Str(required=True)
     body = fields.Str(required=True)
     subject = fields.Str(required=True)
     thread_id = fields.Str(allow_none=True)
@@ -56,16 +56,16 @@ class MessageSchema(Schema):
 
     @validates_schema
     def validate_to_from_not_equal(self, data):
-        if 'urn_to' in data.keys() and 'urn_from' in data.keys() and data['urn_to'] == data['urn_from']:
-            raise ValidationError("urn_to and urn_from fields can not be the same.")
+        if 'msg_to' in data.keys() and 'msg_from' in data.keys() and data['msg_to'] == data['msg_from']:
+            raise ValidationError("msg_to and msg_from fields can not be the same.")
 
-    @validates('urn_to')
-    def validate_to(self, urn_to):
-        self.validate_non_zero_field_length("urn_to", len(urn_to), constants.MAX_TO_LEN)
+    @validates('msg_to')
+    def validate_to(self, msg_to):
+        self.validate_non_zero_field_length("msg_to", len(msg_to), constants.MAX_TO_LEN)
 
-    @validates('urn_from')
-    def validate_from(self, urn_from):
-        self.validate_non_zero_field_length("urn_from", len(urn_from), constants.MAX_FROM_LEN)
+    @validates('msg_from')
+    def validate_from(self, msg_from):
+        self.validate_non_zero_field_length("msg_from", len(msg_from), constants.MAX_FROM_LEN)
 
     @validates('body')
     def validate_body(self, body):
@@ -112,8 +112,8 @@ class DraftSchema(Schema):
     """Class to marshal JSON to Draft"""
 
     msg_id = fields.Str(allow_none=True)
-    urn_to = fields.Str(allow_none=True)
-    urn_from = fields.Str(required=True)
+    msg_to = fields.Str(allow_none=True)
+    msg_from = fields.Str(required=True)
     body = fields.Str(allow_none=True)
     subject = fields.Str(allow_none=True)
     thread_id = fields.Str(allow_none=True)
@@ -127,20 +127,20 @@ class DraftSchema(Schema):
         """Check sent and read date not set and that from and survey are set"""
         self.validate_not_present(data, 'sent_date')
         self.validate_not_present(data, 'read_date')
-        if 'urn_from' not in data or len(data['urn_from']) == 0:
-            raise ValidationError("{0} Missing".format('urn_from'))
+        if 'msg_from' not in data or len(data['msg_from']) == 0:
+            raise ValidationError("{0} Missing".format('msg_from'))
         if 'survey' not in data or len(data['survey']) == 0:
             raise ValidationError("{0} Missing".format('survey'))
         return data
 
-    @validates("urn_to")
-    def validate_to(self, urn_to):
-        if urn_to is not None:
-            self.validate_field_length(urn_to, len(urn_to), constants.MAX_TO_LEN)
+    @validates("msg_to")
+    def validate_to(self, msg_to):
+        if msg_to is not None:
+            self.validate_field_length(msg_to, len(msg_to), constants.MAX_TO_LEN)
 
-    @validates("urn_from")
-    def validate_from(self, urn_from):
-        self.validate_field_length(urn_from, len(urn_from), constants.MAX_FROM_LEN)
+    @validates("msg_from")
+    def validate_from(self, msg_from):
+        self.validate_field_length(msg_from, len(msg_from), constants.MAX_FROM_LEN)
 
     @validates("body")
     def validate_body(self, body):

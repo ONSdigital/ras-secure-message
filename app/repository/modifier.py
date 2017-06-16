@@ -113,8 +113,8 @@ class Modifier:
 
         Saver().save_msg_event(draft_id, 'Draft_Saved')
 
-        if draft.urn_to is not None and len(draft.urn_to) != 0:
-            Modifier.replace_current_recipient_status(draft_id, draft.urn_to)
+        if draft.msg_to is not None and len(draft.msg_to) != 0:
+            Modifier.replace_current_recipient_status(draft_id, draft.msg_to)
 
     @staticmethod
     def replace_current_recipient_status(draft_id, draft_to):

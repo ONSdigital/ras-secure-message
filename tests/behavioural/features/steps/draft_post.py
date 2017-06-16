@@ -42,8 +42,8 @@ with app.app_context():
 # Scenario 1: Save a valid draft get a 201 return
 @given('a valid draft')
 def step_impl_valid_draft(context):
-    data.update({'urn_to': 'test',
-                 'urn_from': 'test',
+    data.update({'msg_to': 'test',
+                 'msg_from': 'test',
                  'subject': 'test',
                  'body': 'Test',
                  'thread_id': '',
@@ -56,8 +56,8 @@ def step_impl_valid_draft(context):
 # Scenario 2: Save a draft with body field empty return 201
 @given('a draft has an body field set to empty')
 def step_impl_draft_with_empty_body(context):
-    data.update({'urn_to': 'test',
-                 'urn_from': 'test',
+    data.update({'msg_to': 'test',
+                 'msg_from': 'test',
                  'subject': 'test',
                  'body': '',
                  'thread_id': '',
@@ -71,8 +71,8 @@ def step_impl_draft_with_empty_body(context):
 @given('a draft including a msg_id')
 def step_impl_draft_with_msg_id(context):
     data.update({'msg_id': 'Amsgid',
-                 'urn_to': 'test',
-                 'urn_from': 'test',
+                 'msg_to': 'test',
+                 'msg_from': 'test',
                  'subject': 'test',
                  'body': 'Test',
                  'thread_id': '',
@@ -85,8 +85,8 @@ def step_impl_draft_with_msg_id(context):
 # Scenario 4: Save a draft with a to field too large return 400
 @given('a draft with to field too large in size')
 def step_impl_draft_with_to_field_too_large(context):
-    data.update({'urn_to': 'x' * (constants.MAX_TO_LEN+1),
-                 'urn_from': 'test',
+    data.update({'msg_to': 'x' * (constants.MAX_TO_LEN+1),
+                 'msg_from': 'test',
                  'subject': 'test',
                  'body': 'Test',
                  'thread_id': '',
@@ -99,8 +99,8 @@ def step_impl_draft_with_to_field_too_large(context):
 # Scenario 5: Save a draft with a from field too large return 400
 @given('a draft with from field too large in size')
 def step_impl_draft_with_from_field_too_large(context):
-    data.update({'urn_to': 'test',
-                 'urn_from': 'x' * (constants.MAX_FROM_LEN+1),
+    data.update({'msg_to': 'test',
+                 'msg_from': 'x' * (constants.MAX_FROM_LEN+1),
                  'subject': 'test',
                  'body': 'Test',
                  'thread_id': '',
@@ -113,8 +113,8 @@ def step_impl_draft_with_from_field_too_large(context):
 # Scenario 6: Save a draft with a body field too large return 400
 @given('a draft with body field too large in size')
 def step_impl_draft_with_body_field_too_large(context):
-    data.update({'urn_to': 'test',
-                 'urn_from': 'test',
+    data.update({'msg_to': 'test',
+                 'msg_from': 'test',
                  'subject': 'test',
                  'body': 'x' * (constants.MAX_BODY_LEN+1),
                  'thread_id': '',
@@ -127,8 +127,8 @@ def step_impl_draft_with_body_field_too_large(context):
 # Scenario 7: Save a draft with a subject field too large return 400
 @given('a draft with subject field too large in size')
 def step_impl_draft_with_subject_field_too_large(context):
-    data.update({'urn_to': 'test',
-                 'urn_from': 'test',
+    data.update({'msg_to': 'test',
+                 'msg_from': 'test',
                  'subject': 'x' * (constants.MAX_SUBJECT_LEN+1),
                  'body': 'Test',
                  'thread_id': '',
@@ -141,8 +141,8 @@ def step_impl_draft_with_subject_field_too_large(context):
 # Scenario 8: Save a draft with an empty from field return 400
 @given('a draft with a from field set as empty')
 def step_impl_draft_with_empty_from_field(context):
-    data.update({'urn_to': 'test',
-                 'urn_from': '',
+    data.update({'msg_to': 'test',
+                 'msg_from': '',
                  'subject': 'test',
                  'body': 'Test',
                  'thread_id': '',
@@ -155,8 +155,8 @@ def step_impl_draft_with_empty_from_field(context):
 # Scenario 9: Save a draft with an empty survey field return 400
 @given('a draft with a survey field set as empty')
 def step_impl_draft_with_empty_survey_field(context):
-    data.update({'urn_to': 'test',
-                 'urn_from': 'test',
+    data.update({'msg_to': 'test',
+                 'msg_from': 'test',
                  'subject': 'test',
                  'body': 'Test',
                  'thread_id': '',
@@ -169,8 +169,8 @@ def step_impl_draft_with_empty_survey_field(context):
 # Scenario: As a user the message id for my saved draft should be returned when saving a draft
 @given("a user creates a valid draft")
 def step_impl_user_creates_valid_draft(context):
-    context.draft = {'urn_to': 'test',
-                     'urn_from': 'test',
+    context.draft = {'msg_to': 'test',
+                     'msg_from': 'test',
                      'subject': 'test',
                      'body': 'Test',
                      'thread_id': '',
@@ -196,7 +196,7 @@ def step_implmsg_id_returned(context):
 @given('A user creates a draft that is not associated with a thread')
 def step_impl_draft_message_withour_thread_id(context):
     data.pop('msg_id', 'Amsgid')
-    data.update({'urn_from': '9976a558-c529-4652-806e-fac1b8d4fdcb',
+    data.update({'msg_from': '9976a558-c529-4652-806e-fac1b8d4fdcb',
                  'subject': 'test',
                  'body': 'Test',
                  'collection_case': 'collection case1',

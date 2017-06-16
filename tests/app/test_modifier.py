@@ -28,8 +28,8 @@ class ModifyTestCaseHelper:
                         ' "ACollectionCase", "AReportingUnit", ' \
                         '"SurveyType")'.format(i, msg_id)
                 con.execute(query)
-                query = 'INSERT INTO status(label, msg_id, actor) VALUES("SENT", "{0}", "respondent.21345")'.format(
-                    msg_id)
+                query = 'INSERT INTO status(label, msg_id, actor) VALUES("SENT", "{0}", ' \
+                        '"0a7ad740-10d5-4ecb-b7ca-3c0384afb882")'.format(msg_id)
                 con.execute(query)
                 query = 'INSERT INTO status(label, msg_id, actor) VALUES("INBOX", "{0}", "SurveyType")'.format(
                     msg_id)
@@ -61,8 +61,8 @@ class ModifyTestCase(unittest.TestCase, ModifyTestCaseHelper):
             database.db.create_all()
             self.db = database.db
 
-        self.user_internal = User('internal.21345', 'internal')
-        self.user_respondent = User('respondent.21345', 'respondent')
+        self.user_internal = User('ce12b958-2a5f-44f4-a6da-861e59070a31', 'internal')
+        self.user_respondent = User('0a7ad740-10d5-4ecb-b7ca-3c0384afb882', 'respondent')
 
     def test_archived_label_is_added_to_message(self):
         """testing message is added to database with archived label attached"""
@@ -211,8 +211,8 @@ class ModifyTestCase(unittest.TestCase, ModifyTestCaseHelper):
             with current_app.test_request_context():
                 self.test_message = {
                     'msg_id': 'test123',
-                    'urn_to': 'richard',
-                    'urn_from': 'respondent.richard',
+                    'msg_to': 'richard',
+                    'msg_from': '0a7ad740-10d5-4ecb-b7ca-3c0384afb882',
                     'subject': 'MyMessage',
                     'body': 'hello',
                     'thread_id': '',
@@ -225,13 +225,14 @@ class ModifyTestCase(unittest.TestCase, ModifyTestCaseHelper):
                 modifier = Modifier()
                 with self.engine.connect() as con:
                     add_draft = ("INSERT INTO status (label, msg_id, actor) "
-                                 "VALUES ('{0}', 'test123', 'respondent.richard')").format(Labels.DRAFT.value)
+                                 "VALUES ('{0}', 'test123', '0a7ad740-10d5-4ecb-b7ca-3c0384afb882')")\
+                        .format(Labels.DRAFT.value)
                     con.execute(add_draft)
                 modifier.del_draft(self.test_message['msg_id'])
 
                 with self.engine.connect() as con:
                     request = con.execute("SELECT * FROM status WHERE msg_id='{0}' AND actor='{1}'"
-                                          .format('test123', 'respondent.richard'))
+                                          .format('test123', '0a7ad740-10d5-4ecb-b7ca-3c0384afb882'))
                     for row in request:
                         self.assertTrue(row is None)
                         break
@@ -244,8 +245,8 @@ class ModifyTestCase(unittest.TestCase, ModifyTestCaseHelper):
             with current_app.test_request_context():
                 self.test_message = {
                     'msg_id': 'test123',
-                    'urn_to': 'richard',
-                    'urn_from': 'respondent.richard',
+                    'msg_to': 'richard',
+                    'msg_from': '0a7ad740-10d5-4ecb-b7ca-3c0384afb882',
                     'subject': 'MyMessage',
                     'body': 'hello',
                     'thread_id': '',
@@ -282,8 +283,8 @@ class ModifyTestCase(unittest.TestCase, ModifyTestCaseHelper):
             with current_app.test_request_context():
                 self.test_message = {
                     'msg_id': 'test123',
-                    'urn_to': 'richard',
-                    'urn_from': 'respondent.richard',
+                    'msg_to': 'richard',
+                    'msg_from': '0a7ad740-10d5-4ecb-b7ca-3c0384afb882',
                     'subject': 'MyMessage',
                     'body': 'hello',
                     'thread_id': '',

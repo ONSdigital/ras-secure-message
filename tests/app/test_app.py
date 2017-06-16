@@ -25,7 +25,7 @@ class FlaskTestCase(unittest.TestCase):
         AlertUser.alert_method = mock.Mock(AlertViaGovNotify)
 
         token_data = {
-            "user_uuid": "internal.12345678910",
+            "user_uuid": "ce12b958-2a5f-44f4-a6da-861e59070a31",
             "role": "internal"
         }
         encrypter = Encrypter(_private_key=settings.SM_USER_AUTHENTICATION_PRIVATE_KEY,
@@ -39,8 +39,8 @@ class FlaskTestCase(unittest.TestCase):
 
         self.headers = {'Content-Type': 'application/json', 'Authorization': encrypted_jwt}
 
-        self.test_message = {'urn_to': 'respondent.richard',
-                             'urn_from': 'internal.torrance',
+        self.test_message = {'msg_to': '0a7ad740-10d5-4ecb-b7ca-3c0384afb882',
+                             'msg_from': 'ce12b958-2a5f-44f4-a6da-861e59070a31',
                              'subject': 'MyMessage',
                              'body': 'hello',
                              'thread_id': "",
@@ -60,8 +60,8 @@ class FlaskTestCase(unittest.TestCase):
 
         url = "http://localhost:5050/message/send"
 
-        data = {'urn_to': 'respondent.richard',
-                'urn_from': 'internal.torrance',
+        data = {'msg_to': '0a7ad740-10d5-4ecb-b7ca-3c0384afb882',
+                'msg_from': 'ce12b958-2a5f-44f4-a6da-861e59070a31',
                 'subject': 'MyMessage',
                 'body': 'hello',
                 'thread': "?",
@@ -133,8 +133,8 @@ class FlaskTestCase(unittest.TestCase):
         """posts to message send end point without 'thread_id'"""
         url = "http://localhost:5050/message/send"
 
-        test_message = {'urn_to': 'respondent.richard',
-                        'urn_from': 'internal.torrance',
+        test_message = {'msg_to': '0a7ad740-10d5-4ecb-b7ca-3c0384afb882',
+                        'msg_from': 'ce12b958-2a5f-44f4-a6da-861e59070a31',
                         'subject': 'MyMessage',
                         'body': 'hello',
                         'collection_case': 'ACollectionCase',
@@ -185,8 +185,8 @@ class FlaskTestCase(unittest.TestCase):
         draft = (
             {
                 'msg_id': self.msg_id,
-                'urn_to': 'richard',
-                'urn_from': 'torrance',
+                'msg_to': 'richard',
+                'msg_from': 'torrance',
                 'subject': 'MyMessage',
                 'body': 'hello',
                 'thread_id': '',
@@ -221,7 +221,7 @@ class FlaskTestCase(unittest.TestCase):
 
         with self.engine.connect() as con:
             request = con.execute("SELECT * FROM status WHERE label='INBOX' OR label='UNREAD' AND msg_id='{0}'"
-                                  " AND actor='{1}'".format(data['msg_id'], self.test_message['urn_to']))
+                                  " AND actor='{1}'".format(data['msg_id'], self.test_message['msg_to']))
             for row in request:
                 self.assertTrue(row is not None)
 
@@ -248,7 +248,7 @@ class FlaskTestCase(unittest.TestCase):
 
         with self.engine.connect() as con:
             request = con.execute("SELECT * FROM internal_sent_audit WHERE msg_id='{0}' AND internal_user='{1}'"
-                                  .format(data['msg_id'], self.test_message['urn_from']))
+                                  .format(data['msg_id'], self.test_message['msg_from']))
 
             for row in request:
                 self.assertTrue(row is not None)
@@ -262,8 +262,8 @@ class FlaskTestCase(unittest.TestCase):
 
         self.test_message.update({
             'msg_id': msg_id,
-            'urn_to': 'respondent.richard',
-            'urn_from': 'internal.torrance',
+            'msg_to': '0a7ad740-10d5-4ecb-b7ca-3c0384afb882',
+            'msg_from': 'ce12b958-2a5f-44f4-a6da-861e59070a31',
             'subject': 'MyMessage',
             'body': 'hello',
             'collection_case': 'ACollectionCase',
@@ -283,8 +283,8 @@ class FlaskTestCase(unittest.TestCase):
         """Test whether a draft created by a respondent is returned to an internal user"""
 
         self.test_message.update({
-            'urn_to': 'internal.richard',
-            'urn_from': 'respondent.torrance',
+            'msg_to': 'ce12b958-2a5f-44f4-a6da-861e59070a31',
+            'msg_from': '0a7ad740-10d5-4ecb-b7ca-3c0384afb882',
             'subject': 'MyMessage',
             'body': 'hello',
             'collection_case': 'ACollectionCase',
@@ -297,7 +297,7 @@ class FlaskTestCase(unittest.TestCase):
         msg_id = save_data['msg_id']
 
         token_data = {
-            "user_uuid": "internal.12345678910",
+            "user_uuid": "ce12b958-2a5f-44f4-a6da-861e59070a31",
             "role": "internal"
         }
         encrypter = Encrypter(_private_key=settings.SM_USER_AUTHENTICATION_PRIVATE_KEY,
@@ -313,8 +313,8 @@ class FlaskTestCase(unittest.TestCase):
         for x in range(1, len(resp_data['messages'])):
             self.assertNotEqual(resp_data['messages'][str(x)]['msg_id'], msg_id)
 
-    def test_draft_get_returns_urn_to(self):
-        """Test that draft get returns draft's urn_to if applicable"""
+    def test_draft_get_returns_msg_to(self):
+        """Test that draft get returns draft's msg_to if applicable"""
 
         draft_save = self.app.post("http://localhost:5050/draft/save", data=json.dumps(self.test_message), headers=self.headers)
         draft_save_data = json.loads(draft_save.data)
@@ -323,7 +323,7 @@ class FlaskTestCase(unittest.TestCase):
         draft_get = self.app.get("http://localhost:5050/draft/{0}".format(draft_id), headers=self.headers)
         draft_get_data = json.loads(draft_get.data)
 
-        self.assertEqual(draft_get_data['urn_to'], [self.test_message['urn_to']])
+        self.assertEqual(draft_get_data['msg_to'], [self.test_message['msg_to']])
 
 if __name__ == '__main__':
     unittest.main()

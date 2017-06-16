@@ -16,8 +16,8 @@ token_data = {
 
 headers = {'Content-Type': 'application/json', 'Authorization': ''}
 
-data = {'urn_to': 'test',
-        'urn_from': 'test',
+data = {'msg_to': 'test',
+        'msg_from': 'test',
         'subject': 'Hello World',
         'body': 'Test',
         'thread_id': '',
@@ -41,8 +41,8 @@ headers['Authorization'] = update_encrypted_jwt()
 
 @given('the user has created and saved multiple drafts')
 def step_impl_user_has_created__and_saved_multiple_drafts(context):
-    data.update({'urn_to': 'test',
-                 'urn_from': 'respondent.2134',
+    data.update({'msg_to': 'test',
+                 'msg_from': 'respondent.2134',
                  'subject': 'test',
                  'body': 'Test',
                  'thread_id': '',
@@ -66,7 +66,7 @@ def step_impl_only_the_users_drafts_are_returned(context):
     response = flask.json.loads(context.response.data)
     for x in range(0, len(response['messages'])):
         nose.tools.assert_equal(response['messages'][x]['labels'], ['DRAFT'])
-        nose.tools.assert_equal(response['messages'][x]['urn_from'], data['urn_from'])
+        nose.tools.assert_equal(response['messages'][x]['msg_from'], data['msg_from'])
 
     nose.tools.assert_equal(len(response['messages']), 7)
 
@@ -85,7 +85,7 @@ def step_impl_user_will_get_drafts_from_second_page_of_pagination(context):
     response = flask.json.loads(context.response.data)
     for x in range(0, len(response['messages'])):
         nose.tools.assert_equal(response['messages'][x]['labels'], ['DRAFT'])
-        nose.tools.assert_equal(response['messages'][x]['urn_from'], data['urn_from'])
+        nose.tools.assert_equal(response['messages'][x]['msg_from'], data['msg_from'])
 
     nose.tools.assert_equal(len(response['messages']), 3)
 

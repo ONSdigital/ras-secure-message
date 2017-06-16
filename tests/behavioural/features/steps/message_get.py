@@ -16,8 +16,8 @@ token_data = {
 
 headers = {'Content-Type': 'application/json', 'Authorization': ''}
 
-data = {'urn_to': 'test',
-        'urn_from': 'test',
+data = {'msg_to': 'test',
+        'msg_from': 'test',
         'subject': 'Hello World',
         'body': 'Test',
         'thread_id': '',
@@ -40,8 +40,8 @@ headers['Authorization'] = update_encrypted_jwt()
 # Scenario: Retrieve a message with correct message ID
 @given("there is a message to be retrieved")
 def step_impl_there_is_a_message_to_be_retrieved(context):
-    data['urn_to'] = 'BRES'
-    data['urn_from'] = 'respondent.122342'
+    data['msg_to'] = 'BRES'
+    data['msg_from'] = 'respondent.122342'
     token_data['user_uuid'] = 'respondent.122342'
     token_data['role'] = 'respondent'
     context.response = app.test_client().post("http://localhost:5050/message/send", data=flask.json.dumps(data),
@@ -63,16 +63,16 @@ def step_impl_a_200_http_response_is_returned(context):
     nose.tools.assert_equal(context.response.status_code, 200)
 
 
-@then("returned message field urn_to is correct")
-def step_impl_correct_urn_to_returned(context):
+@then("returned message field msg_to is correct")
+def step_impl_correct_msg_to_returned(context):
     msg_resp = json.loads(context.response.data)
-    nose.tools.assert_equal(msg_resp['urn_to'], [data['urn_to']])
+    nose.tools.assert_equal(msg_resp['msg_to'], [data['msg_to']])
 
 
-@then("returned message field urn_from is correct")
-def step_impl_correct_urn_from_returned(context):
+@then("returned message field msg_from is correct")
+def step_impl_correct_msg_from_returned(context):
     msg_resp = json.loads(context.response.data)
-    nose.tools.assert_equal(msg_resp['urn_from'], data['urn_from'])
+    nose.tools.assert_equal(msg_resp['msg_from'], data['msg_from'])
 
 
 @then("returned message field body is correct")
@@ -119,8 +119,8 @@ def step_impl_a_404_http_response_is_returned(context):
 # Scenario: Respondent sends message and retrieves the same message with it's labels
 @given("a respondent sends a message")
 def step_impl_a_respondent_sends_a_message(context):
-    data['urn_to'] = 'internal.12344'
-    data['urn_from'] = 'respondent.122342'
+    data['msg_to'] = 'internal.12344'
+    data['msg_from'] = 'respondent.122342'
     context.response = app.test_client().post("http://localhost:5050/message/send",
                                                           data=flask.json.dumps(data), headers=headers)
     msg_resp = json.loads(context.response.data)
@@ -144,8 +144,8 @@ def step_impl_the_retrieved_message_should_have_label_sent(context):
 # Scenario: Internal user sends message and retrieves the same message with it's labels
 @given("an internal user sends a message")
 def step_impl_an_internal_user_sends_a_message(context):
-    data['urn_to'] = 'respondent.122342'
-    data['urn_from'] = 'internal.12344'
+    data['msg_to'] = 'respondent.122342'
+    data['msg_from'] = 'internal.12344'
     token_data['user_uuid'] = 'internal.12344'
     token_data['role'] = 'internal'
     headers['Authorization'] = update_encrypted_jwt()
@@ -179,7 +179,7 @@ def step_impl_draft_message_can_be_retrieved(context):
     token_data['user_uuid'] = '9976a558-c529-4652-806e-fac1b8d4fdcb'
     token_data['role'] = 'respondent'
     headers['Authorization'] = update_encrypted_jwt()
-    data.update({'urn_from': '9976a558-c529-4652-806e-fac1b8d4fdcb',
+    data.update({'msg_from': '9976a558-c529-4652-806e-fac1b8d4fdcb',
                  'subject': 'test',
                  'body': 'Test',
                  'thread_id': '',
