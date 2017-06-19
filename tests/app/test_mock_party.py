@@ -11,7 +11,10 @@ class PartyTestCase(unittest.TestCase):
 
         user_details = user_by_uuid.get_details_by_uuid(list_uuids)
 
-        self.assertEqual(user_details[list_uuids[0]], '{"firstname": "Bhavana", "surname": "Lincoln", "telephone": "+443069990888", "status": "ACTIVE"}')
+        self.assertEqual(user_details[list_uuids[0]]['firstname'], "Bhavana")
+        self.assertEqual(user_details[list_uuids[0]]['surname'], "Lincoln")
+        self.assertEqual(user_details[list_uuids[0]]['telephone'], "+443069990888")
+        self.assertEqual(user_details[list_uuids[0]]['status'], "ACTIVE")
 
     def test_get_user_details_by_uuids(self):
         """Test that user details are returned using uuids"""
@@ -20,9 +23,8 @@ class PartyTestCase(unittest.TestCase):
 
         user_details = user_by_uuid.get_details_by_uuid(list_uuids)
 
-        self.assertEqual(user_details[list_uuids[0]], '{"firstname": "Bhavana", "surname": "Lincoln", "telephone": "+443069990888", "status": "ACTIVE"}')
-        self.assertEqual(user_details[list_uuids[1]], '{"firstname": "Chandana", "surname": "Blanchet", "telephone": "+443069990854", "status": "ACTIVE"}')
-        self.assertEqual(user_details[list_uuids[2]], '{"firstname": "Ida", "surname", "Larue", "telephone": "+443069990250", "status": "ACTIVE"}')
-
+        self.assertEqual(user_details[list_uuids[0]]['firstname'], "Bhavana")
+        self.assertEqual(user_details[list_uuids[1]]['firstname'], "Chandana")
+        self.assertEqual(user_details[list_uuids[2]]['firstname'], "Ida")
 if __name__ == '__main__':
     unittest.main()
