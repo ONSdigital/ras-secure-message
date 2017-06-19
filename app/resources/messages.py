@@ -12,7 +12,6 @@ from app.repository.modifier import Modifier
 from app.repository.retriever import Retriever
 from app.repository.saver import Saver
 from app.validation.domain import MessageSchema
-from app.validation.user import User
 from app.resources.drafts import DraftModifyById
 from app.common.utilities import get_options, paginated_list_to_json
 

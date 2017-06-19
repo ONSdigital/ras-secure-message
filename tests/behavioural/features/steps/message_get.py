@@ -44,6 +44,7 @@ def step_impl_there_is_a_message_to_be_retrieved(context):
     data['msg_from'] = 'respondent.122342'
     token_data['user_uuid'] = 'respondent.122342'
     token_data['role'] = 'respondent'
+    headers['Authorization'] = update_encrypted_jwt()
     context.response = app.test_client().post("http://localhost:5050/message/send", data=flask.json.dumps(data),
                                               headers=headers)
     msg_resp = json.loads(context.response.data)
@@ -145,7 +146,7 @@ def step_impl_the_retrieved_message_should_have_label_sent(context):
 @given("an internal user sends a message")
 def step_impl_an_internal_user_sends_a_message(context):
     data['msg_to'] = 'respondent.122342'
-    data['msg_from'] = 'internal.12344'
+    data['msg_from'] = 'BRES'
     token_data['user_uuid'] = 'internal.12344'
     token_data['role'] = 'internal'
     headers['Authorization'] = update_encrypted_jwt()

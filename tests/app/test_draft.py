@@ -203,7 +203,7 @@ class DraftTestCase(unittest.TestCase):
             {
                 'msg_id': self.msg_id,
                 'msg_to': 'richard',
-                'msg_from': 'torrance',
+                'msg_from': 'BRES',
                 'subject': 'MyMessage',
                 'body': 'hello',
                 'thread_id': '',

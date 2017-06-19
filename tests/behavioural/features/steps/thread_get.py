@@ -47,16 +47,16 @@ def step_impl_respondent_and_internal_user_hav_a_conversation(context):
         token_data['role'] = 'respondent'
         headers['Authorization'] = update_encrypted_jwt()
 
-        data['msg_to'] = 'internal.12344'
+        data['msg_to'] = 'BRES'
         data['msg_from'] = 'respondent.122342'
         context.response = app.test_client().post("http://localhost:5050/message/send", data=flask.json.dumps(data),
                                                   headers=headers)
-        token_data['user_uuid'] = 'internal.12344'
+        token_data['user_uuid'] = 'BRES'
         token_data['role'] = 'internal'
         headers['Authorization'] = update_encrypted_jwt()
 
         data['msg_to'] = 'respondent.122342'
-        data['msg_from'] = 'internal.12344'
+        data['msg_from'] = 'BRES'
         context.response = app.test_client().post("http://localhost:5050/message/send", data=flask.json.dumps(data),
                                                   headers=headers)
 
@@ -79,7 +79,7 @@ def step_impl_assert_all_messages_in_conversation_are_received(context):
 
 @when("the internal user gets this conversation")
 def step_impl_internal_user_gets_conversation(context):
-    token_data['user_uuid'] = 'internal.12344'
+    token_data['user_uuid'] = 'BRES'
     token_data['role'] = 'internal'
     headers['Authorization'] = update_encrypted_jwt()
     context.response = app.test_client().get(url.format(data['thread_id']), headers=headers)
@@ -89,12 +89,12 @@ def step_impl_internal_user_gets_conversation(context):
 
 @given("internal user creates a draft")
 def step_impl_internal_user_creates_a_draft(context):
-    token_data['user_uuid'] = 'internal.12344'
+    token_data['user_uuid'] = 'BRES'
     token_data['role'] = 'internal'
     headers['Authorization'] = update_encrypted_jwt()
 
     data['msg_to'] = 'respondent.122342'
-    data['msg_from'] = 'internal.12344'
+    data['msg_from'] = 'BRES'
     data['thread_id'] = 'AConversation'
     context.response = app.test_client().post("http://localhost:5050/draft/save", data=flask.json.dumps(data),
                                               headers=headers)
@@ -114,12 +114,18 @@ def step_impl_internal_user_has_multiple_conversations(context):
 
     for _ in range(0, 2):
         data['thread_id'] = str(uuid.uuid4())
-        data['msg_to'] = 'internal.12344'
+        data['msg_to'] = 'BRES'
         data['msg_from'] = 'respondent.122342'
+        token_data['user_uuid'] = 'respondent.122342'
+        token_data['role'] = 'respondent'
+        headers['Authorization'] = update_encrypted_jwt()
         context.response = app.test_client().post("http://localhost:5050/message/send", data=flask.json.dumps(data),
                                                   headers=headers)
         data['msg_to'] = 'respondent.122342'
-        data['msg_from'] = 'internal.12344'
+        data['msg_from'] = 'BRES'
+        token_data['user_uuid'] = 'BRES'
+        token_data['role'] = 'internal'
+        headers['Authorization'] = update_encrypted_jwt()
         context.response = app.test_client().post("http://localhost:5050/message/send", data=flask.json.dumps(data),
                                                   headers=headers)
     data['thread_id'] = 'AConversation'
