@@ -1,3 +1,4 @@
+from werkzeug.exceptions import BadRequest
 
 respondent_ids = {}
 
@@ -8,10 +9,12 @@ respondent_ids['01b51fcc-ed43-4cdb-ad1c-450f9986859b'] = {"firstname": "Chandana
 respondent_ids['dd5a38ff-1ecb-4634-94c8-2358df33e614'] = {"firstname": "Ida", "surname": "Larue", "telephone": "+443069990250", "status": "ACTIVE"}
 
 
-def get_details_by_uuid(uuid):
-    respondent_details = {}
-    for x in uuid:
-        respondent_details[x] = respondent_ids[x]
-    return respondent_details
-
+def get_details_by_uuids(uuids):
+        respondent_details = {}
+        for x in uuids:
+            try:
+                respondent_details[x] = respondent_ids[x]
+            except KeyError:
+                raise (BadRequest(description="An error has occurred"))
+        return respondent_details
 
