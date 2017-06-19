@@ -44,6 +44,9 @@ headers['Authorization'] = update_encrypted_jwt()
 def step_impl(context):
     data['msg_to'] = 'internal.12344'
     data['msg_from'] = 'respondent.122342'
+    token_data['user_uuid'] = data['msg_from']
+    token_data['role'] = 'respondent'
+    headers['Authorization'] = update_encrypted_jwt()
     context.response = app.test_client().post("http://localhost:5050/message/send",
                                               data=flask.json.dumps(data), headers=headers)
     msg_resp = json.loads(context.response.data)
@@ -54,7 +57,7 @@ def step_impl(context):
 def step_impl_message_is_archived(context):
     modify_data['action'] = 'add'
     modify_data['label'] = 'ARCHIVE'
-    token_data['user_urn'] = data['msg_from']
+    token_data['user_uuid'] = data['msg_from']
     headers['Authorization'] = update_encrypted_jwt()
     context.response = app.test_client().put(url.format(context.msg_id),
                                              data=flask.json.dumps(modify_data), headers=headers)
@@ -73,6 +76,9 @@ def step_impl_assert_message_is_marked_as_archived(context):
 def step_impl_the_message_is_archived(context):
     data['msg_to'] = 'internal.12344'
     data['msg_from'] = 'respondent.122342'
+    token_data['user_uuid'] = data['msg_from']
+    token_data['role'] = 'respondent'
+    headers['Authorization'] = update_encrypted_jwt()
     context.response = app.test_client().post("http://localhost:5050/message/send",
                                               data=flask.json.dumps(data), headers=headers)
     msg_resp = json.loads(context.response.data)
@@ -115,6 +121,7 @@ def step_impl_message_has_been_read(context):
 
     modify_data['action'] = 'remove'
     modify_data['label'] = 'UNREAD'
+    modify_data['msg_from'] = 'BRES'
     token_data['user_uuid'] = 'internal.12344'
     token_data['role'] = 'internal'
     headers['Authorization'] = update_encrypted_jwt()
@@ -168,6 +175,9 @@ def step_impl_message_read_date_should_be_set(context):
 def step_impl_a_message_is_sent(context):
     data['msg_to'] = 'internal.12344'
     data['msg_from'] = 'respondent.122342'
+    token_data['user_uuid'] = data['msg_from']
+    token_data['role'] = 'respondent'
+    headers['Authorization'] = update_encrypted_jwt()
     context.response = app.test_client().post("http://localhost:5050/message/send",
                                               data=flask.json.dumps(data), headers=headers)
     msg_resp = json.loads(context.response.data)
@@ -248,6 +258,9 @@ def step_impl_a_bad_request_is_displayed(context):
 # Scenario - internal - message status automatically changes to read - on opening message
 @given("a message with the status 'unread' is shown to an internal user")
 def step_impl_message_with_status_unread_shown_to_the_user(context):
+    token_data['user_uuid'] = data['msg_from']
+    token_data['role'] = 'respondent'
+    headers['Authorization'] = update_encrypted_jwt()
     response = app.test_client().post("http://localhost:5050/message/send", data=json.dumps(data), headers=headers)
     resp_data = json.loads(response.data)
     context.msg_id = resp_data['msg_id']
@@ -255,7 +268,7 @@ def step_impl_message_with_status_unread_shown_to_the_user(context):
 
 @when("the internal user opens the message")
 def step_impl_an_internal_user_opens_the_message(context):
-    token_data['user_urn'] = data['msg_from']
+    token_data['user_uuid'] = data['msg_from']
     headers['Authorization'] = update_encrypted_jwt()
     response_get = app.test_client().get("http://localhost:5050/message/{0}".format(context.msg_id), headers=headers)
     context.get_json = json.loads(response_get.data)
@@ -271,6 +284,9 @@ def step_impl_no_unread_messages_returned(context):
 def step_impl_message_with_status_read_returned(context):
     data['msg_to'] = 'internal.12344'
     data['msg_from'] = 'respondent.122342'
+    token_data['user_uuid'] = data['msg_from']
+    token_data['role'] = 'respondent'
+    headers['Authorization'] = update_encrypted_jwt()
     context.response = app.test_client().post("http://localhost:5050/message/send",
                                               data=flask.json.dumps(data), headers=headers)
     msg_resp = json.loads(context.response.data)
@@ -300,6 +316,9 @@ def step_impl_status_of_message_changes_to_unread(context):
 
 @given("a message with the status unread is displayed to an internal user")
 def step_impl_message_status_unread_returned(context):
+    token_data['user_uuid'] = data['msg_from']
+    token_data['role'] = 'respondent'
+    headers['Authorization'] = update_encrypted_jwt()
     response = app.test_client().post("http://localhost:5050/message/send", data=json.dumps(data), headers=headers)
     resp_data = json.loads(response.data)
     context.msg_id = resp_data['msg_id']
@@ -322,6 +341,9 @@ def step_impl_message_status_chanegs_to_read(context):
 # Scenario: As an external user - message status automatically changes to read - on opening message
 @given("a message with the status 'unread' is shown to an external user")
 def step_impl_message_status_unread_returned(context):
+    token_data['user_uuid'] = data['msg_from']
+    token_data['role'] = 'respondent'
+    headers['Authorization'] = update_encrypted_jwt()
     response = app.test_client().post("http://localhost:5050/message/send", data=json.dumps(data), headers=headers)
     resp_data = json.loads(response.data)
     context.msg_id = resp_data['msg_id']
@@ -341,6 +363,9 @@ def step_impl_message_statis_changes_from_unread_to_read(context):
 # Scenario - external - as an external user I want to be able to change my message from read to unread
 @given("a message with the status read is displayed to an external user")
 def step_implmessage_with_status_read_returned(context):
+    token_data['user_uuid'] = data['msg_from']
+    token_data['role'] = 'respondent'
+    headers['Authorization'] = update_encrypted_jwt()
     response = app.test_client().post("http://localhost:5050/message/send", data=json.dumps(data), headers=headers)
     resp_data = json.loads(response.data)
     context.msg_id = resp_data['msg_id']
@@ -365,6 +390,9 @@ def step_impl_the_status_of_the_message_changes_to_unread(context):
 
 @given("a message with the status unread is displayed to an external user")
 def step_impl_message_with_Status_unread_returned(context):
+    token_data['user_uuid'] = data['msg_from']
+    token_data['role'] = 'respondent'
+    headers['Authorization'] = update_encrypted_jwt()
     response = app.test_client().post("http://localhost:5050/message/send", data=json.dumps(data), headers=headers)
     resp_data = json.loads(response.data)
     context.msg_id = resp_data['msg_id']

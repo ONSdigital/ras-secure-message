@@ -8,7 +8,10 @@ from testfixtures import log_capture
 import logging
 from structlog import wrap_logger
 from unittest import mock
+from app.application import app
 from app.logger_config import logger_initial_config
+from app.validation.user import User
+from flask import g
 
 saved_stdout = sys.stdout
 
@@ -25,8 +28,10 @@ class LoggingTestCase(unittest.TestCase):
         sys.stdout = out
         message = {'msg_to': 'richard', 'msg_from': 'torrance', 'subject': 'hello', 'body': 'hello world',
                    'thread_id': ''}
-        schema = MessageSchema()
-        schema.load(message)
+        with app.app_context():
+            g.user = User('torrence', 'respondent')
+            schema = MessageSchema()
+            schema.load(message)
         output = out.getvalue().strip()
         self.assertIsNotNone(output)
 
