@@ -17,7 +17,7 @@ class SaverTestCase(unittest.TestCase):
         app.testing = True
         app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:////tmp/messages.db'
         self.engine = create_engine('sqlite:////tmp/messages.db')
-        self.test_message = Message(**{'urn_to': 'tej', 'urn_from': 'gemma', 'subject': 'MyMessage',
+        self.test_message = Message(**{'msg_to': 'tej', 'msg_from': 'gemma', 'subject': 'MyMessage',
                                     'body': 'hello', 'thread_id': ""})
         with app.app_context():
             database.db.init_app(current_app)

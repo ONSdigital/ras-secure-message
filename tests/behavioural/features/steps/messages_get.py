@@ -14,8 +14,8 @@ token_data = {
 
 headers = {'Content-Type': 'application/json', 'Authorization': ''}
 
-data = {'urn_to': 'test',
-        'urn_from': 'test',
+data = {'msg_to': 'test',
+        'msg_from': 'test',
         'subject': 'Hello World',
         'body': 'Test',
         'thread_id': '',
@@ -46,8 +46,8 @@ def step_impl_respondent_sends_multiple_messages(context):
     headers['Authorization'] = update_encrypted_jwt()
 
     for x in range(0, 2):
-        data['urn_to'] = 'internal.12344'
-        data['urn_from'] = 'respondent.122342'
+        data['msg_to'] = 'internal.12344'
+        data['msg_from'] = 'respondent.122342'
         context.response = app.test_client().post("http://localhost:5050/message/send", data=flask.json.dumps(data),
                                                   headers=headers)
 
@@ -77,8 +77,8 @@ def step_impl_internal_user_sends_multiple_messages(context):
     headers['Authorization'] = update_encrypted_jwt()
 
     for x in range(0, 2):
-        data['urn_to'] = 'respondent.122342'
-        data['urn_from'] = 'internal.12344'
+        data['msg_to'] = 'respondent.122342'
+        data['msg_from'] = 'internal.12344'
         context.response = app.test_client().post("http://localhost:5050/message/send", data=flask.json.dumps(data),
                                                   headers=headers)
 
@@ -111,7 +111,7 @@ def step_impl_message_should_have_correct_inbox_and_unread_labels(context):
 @given("multiple messages have been sent to an external user")
 def step_implmultiple_messages_sent_to_external_user(context):
     for x in range(0, 2):
-        data['urn_to'] = 'respondent.123'
+        data['msg_to'] = 'respondent.123'
         app.test_client().post("http://localhost:5050/message/send", headers=headers)
 
 
@@ -140,8 +140,8 @@ def step_impl_respondant_and_internal_user_send_multiple_messages(context):
 
 
     for x in range(0, 2):
-        data['urn_to'] = 'respondent.122342'
-        data['urn_from'] = 'internal.12344'
+        data['msg_to'] = 'respondent.122342'
+        data['msg_from'] = 'internal.12344'
         context.response = app.test_client().post("http://localhost:5050/message/send",
                                                   data=flask.json.dumps(data), headers=headers)
 
@@ -150,8 +150,8 @@ def step_impl_respondant_and_internal_user_send_multiple_messages(context):
     headers['Authorization'] = update_encrypted_jwt()
 
     for x in range(0, 2):
-        data['urn_to'] = 'internal.12344'
-        data['urn_from'] = 'respondent.122342'
+        data['msg_to'] = 'internal.12344'
+        data['msg_from'] = 'respondent.122342'
         context.response = app.test_client().post("http://localhost:5050/message/send",
                                                   data=flask.json.dumps(data), headers=headers)
 
@@ -183,14 +183,14 @@ def step_impl_internal_user_sends_multiple_messages_with_different_ru(context):
     headers['Authorization'] = update_encrypted_jwt()
 
     for x in range(0, 2):
-        data['urn_to'] = 'respondent.122342'
-        data['urn_from'] = 'internal.12344'
+        data['msg_to'] = 'respondent.122342'
+        data['msg_from'] = 'internal.12344'
         context.response = app.test_client().post("http://localhost:5050/message/send",
                                                   data=flask.json.dumps(data), headers=headers)
 
     for x in range(0, 2):
-        data['urn_to'] = 'respondent.122342'
-        data['urn_from'] = 'internal.12344'
+        data['msg_to'] = 'respondent.122342'
+        data['msg_from'] = 'internal.12344'
         data['reporting_unit'] = 'AnotherReportingUnit'
         context.response = app.test_client().post("http://localhost:5050/message/send",
                                                   data=flask.json.dumps(data), headers=headers)
@@ -221,13 +221,13 @@ def step_impl_respondent_retrieves_list_of_messages_with_busines_name(context):
     headers['Authorization'] = update_encrypted_jwt()
 
     for x in range(0, 2):
-        data['urn_to'] = 'respondent.122342'
-        data['urn_from'] = 'internal.12344'
+        data['msg_to'] = 'respondent.122342'
+        data['msg_from'] = 'internal.12344'
         context.response = app.test_client().post("http://localhost:5050/message/send",
                                                   data=flask.json.dumps(data), headers=headers)
     for x in range(0, 2):
-        data['urn_to'] = 'respondent.122342'
-        data['urn_from'] = 'internal.12344'
+        data['msg_to'] = 'respondent.122342'
+        data['msg_from'] = 'internal.12344'
         data['business_name'] = 'AnotherBusiness'
         context.response = app.test_client().post("http://localhost:5050/message/send",
                                                   data=flask.json.dumps(data), headers=headers)
@@ -260,13 +260,13 @@ def step_impl_internal_user_sends_multiple_messages_with_different_survey(contex
     headers['Authorization'] = update_encrypted_jwt()
 
     for x in range(0, 2):
-        data['urn_to'] = 'respondent.122342'
-        data['urn_from'] = 'internal.12344'
+        data['msg_to'] = 'respondent.122342'
+        data['msg_from'] = 'internal.12344'
         context.response = app.test_client().post("http://localhost:5050/message/send",
                                                   data=flask.json.dumps(data), headers=headers)
     for x in range(0, 2):
-        data['urn_to'] = 'respondent.122342'
-        data['urn_from'] = 'internal.12344'
+        data['msg_to'] = 'respondent.122342'
+        data['msg_from'] = 'internal.12344'
         data['survey'] = 'AnotherSurvey'
         context.response = app.test_client().post("http://localhost:5050/message/send",
                                                   data=flask.json.dumps(data), headers=headers)
@@ -298,13 +298,13 @@ def step_impl_internal_user_sends_multiple_messages_with_different_collection_ca
     headers['Authorization'] = update_encrypted_jwt()
 
     for x in range(0, 2):
-        data['urn_to'] = 'respondent.122342'
-        data['urn_from'] = 'internal.12344'
+        data['msg_to'] = 'respondent.122342'
+        data['msg_from'] = 'internal.12344'
         context.response = app.test_client().post("http://localhost:5050/message/send",
                                                   data=flask.json.dumps(data), headers=headers)
     for x in range(0, 2):
-        data['urn_to'] = 'respondent.122342'
-        data['urn_from'] = 'internal.12344'
+        data['msg_to'] = 'respondent.122342'
+        data['msg_from'] = 'internal.12344'
         data['collection_case'] = 'AnotherCollectionCase'
         context.response = app.test_client().post("http://localhost:5050/message/send",
                                                   data=flask.json.dumps(data), headers=headers)
@@ -333,8 +333,8 @@ def step_impl_assert_messages_have_correct_collection_case(context):
 def step_impl_respondent_creates_multiple_draft_messages(context):
 
     for x in range(0, 2):
-        draft = {'urn_to': 'internal.12344',
-                 'urn_from': 'respondent.122342',
+        draft = {'msg_to': 'internal.12344',
+                 'msg_from': 'respondent.122342',
                  'subject': 'test',
                  'body': 'Test',
                  'thread_id': '',
@@ -378,7 +378,7 @@ def step_impl_external_user_has_multiple_messages(context):
     token_data['role'] = 'internal'
 
     headers['Authorization'] = update_encrypted_jwt()
-    data['urn_from'] = 'internal.123'
+    data['msg_from'] = 'internal.123'
     for x in range(0, 2):
         app.test_client().post("http://localhost:5050/message/send", data=flask.json.dumps(data), headers=headers)
         app.test_client().post("http://localhost:5050/draft/save", data=flask.json.dumps(data), headers=headers)
@@ -403,7 +403,7 @@ def step_impl_assert_correct_number_of_messages_returned(context):
 def step_impl_internal_user_has_multiple_messages(context):
     token_data['user_urn'] = 'internal.123'
     headers['Authorization'] = update_encrypted_jwt()
-    data['urn_from'] = 'BRES'
+    data['msg_from'] = 'BRES'
     for x in range(0, 2):
         app.test_client().post("http://localhost:5050/message/send", data=flask.json.dumps(data), headers=headers)
         app.test_client().post("http://localhost:5050/draft/save", data=flask.json.dumps(data), headers=headers)
@@ -427,8 +427,8 @@ def step_impl_internal_user_receives_multiple_messages(context):
     headers['Authorization'] = update_encrypted_jwt()
 
     for x in range(0, 2):
-        data['urn_to'] = 'internal.123'
-        data['urn_from'] = 'respondent.123'
+        data['msg_to'] = 'internal.123'
+        data['msg_from'] = 'respondent.123'
         context.response = app.test_client().post("http://localhost:5050/message/send",
                                                   data=flask.json.dumps(data), headers=headers)
 
@@ -499,13 +499,13 @@ def step_impl_return_400(context):
 def step_impl_multiple_messages_for_all_labels(context):
 
     for _ in range(0, 2):
-        data['urn_to'] = 'respondent.122342'
-        data['urn_from'] = 'internal.12344'
+        data['msg_to'] = 'respondent.122342'
+        data['msg_from'] = 'internal.12344'
         context.response = app.test_client().post("http://localhost:5050/message/send",
                                                   data=flask.json.dumps(data), headers=headers)
     for _ in range(0, 2):
-        data['urn_to'] = 'internal.12344'
-        data['urn_from'] = 'respondent.122342'
+        data['msg_to'] = 'internal.12344'
+        data['msg_from'] = 'respondent.122342'
         context.response = app.test_client().post("http://localhost:5050/message/send",
                                                   data=flask.json.dumps(data), headers=headers)
     # need to implement adding draft messages, archived messages and read messages for user respondent.122342
@@ -662,8 +662,8 @@ def step_impl_respondent_recieves_multiple_messages(context):
     headers['Authorization'] = update_encrypted_jwt()
 
     for x in range(0, 2):
-        data['urn_to'] = 'respondent.123'
-        data['urn_from'] = 'internal.123'
+        data['msg_to'] = 'respondent.123'
+        data['msg_from'] = 'internal.123'
         context.response = app.test_client().post("http://localhost:5050/message/send",
                                                   data=flask.json.dumps(data), headers=headers)
 

@@ -61,7 +61,7 @@ Feature: Message Send Endpoint
     When the message is sent
     Then a 201 status code is the response
 
-  Scenario: Message sent with a urn_to too long
+  Scenario: Message sent with a msg_to too long
     Given the 'To' field exceeds max limit in size
     When the message is sent
     Then a 400 error status is returned

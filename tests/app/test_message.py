@@ -17,7 +17,7 @@ class MessageTestCase(unittest.TestCase):
         sut = Message('to', 'from', 'subject', 'body', '5', 'AMsgId', 'ACollectionCase',
                       'AReportingUnit', 'ASurveyType', 'ABusiness')
         sut_str = repr(sut)
-        expected = '<Message(msg_id=AMsgId urn_to=to urn_from=from subject=subject body=body thread_id=5 collection_case=ACollectionCase reporting_unit=AReportingUnit business_name=ABusiness survey=ASurveyType)>'
+        expected = '<Message(msg_id=AMsgId msg_to=to msg_from=from subject=subject body=body thread_id=5 collection_case=ACollectionCase reporting_unit=AReportingUnit business_name=ABusiness survey=ASurveyType)>'
         self.assertEquals(sut_str, expected)
 
     def test_message_with_different_collection_case_not_equal(self):
@@ -61,7 +61,7 @@ class MessageSchemaTestCase(unittest.TestCase):
     """Test case for MessageSchema"""
     def setUp(self):
         """setup test environment"""
-        self.json_message = {'urn_to': 'Tej', 'urn_from': 'Gemma', 'subject': 'MyMessage', 'body': 'hello',
+        self.json_message = {'msg_to': 'Tej', 'msg_from': 'Gemma', 'subject': 'MyMessage', 'body': 'hello',
                              'thread_id': "", 'survey': "RSI"}
         self.now = datetime.now(timezone.utc)
 
@@ -74,7 +74,7 @@ class MessageSchemaTestCase(unittest.TestCase):
     def test_valid_domain_message_passes_deserialization(self):
         """checking marshaling message object to json does not raise errors"""
         schema = MessageSchema()
-        message_object = Message(**{'urn_to': 'Tej', 'urn_from': 'Gemma', 'subject': 'MyMessage', 'body': 'hello',
+        message_object = Message(**{'msg_to': 'Tej', 'msg_from': 'Gemma', 'subject': 'MyMessage', 'body': 'hello',
                                     'thread_id': ""})
         message_json = schema.dumps(message_object)
         self.assertTrue(message_json.errors == {})
@@ -89,7 +89,7 @@ class MessageSchemaTestCase(unittest.TestCase):
 
     def test_missing_body_fails_validation(self):
         """marshalling message with no body field """
-        message = {'urn_to': 'richard', 'urn_from': 'torrance', 'body': '', 'survey': 'RSI', 'subject': 'MyMessage'}
+        message = {'msg_to': 'richard', 'msg_from': 'torrance', 'body': '', 'survey': 'RSI', 'subject': 'MyMessage'}
         schema = MessageSchema()
         errors = schema.load(message)[1]
         self.assertTrue(errors == {'body': ['Body field not populated.']})
@@ -133,7 +133,7 @@ class MessageSchemaTestCase(unittest.TestCase):
 
     def test_setting_read_date_field_causes_error(self):
         """marshalling message with no thread_id field"""
-        message = {'urn_to': 'torrance', 'urn_from': 'someone', 'body': 'hello', 'subject': 'subject',
+        message = {'msg_to': 'torrance', 'msg_from': 'someone', 'body': 'hello', 'subject': 'subject',
                    'read_date': self.now}
         schema = MessageSchema()
         errors = schema.load(message)[1]
@@ -148,10 +148,10 @@ class MessageSchemaTestCase(unittest.TestCase):
 
     def test_same_to_from_causes_error(self):
         """marshalling message with same to and from field"""
-        self.json_message['urn_to'] = self.json_message['urn_from']
+        self.json_message['msg_to'] = self.json_message['msg_from']
         schema = MessageSchema()
         errors = schema.load(self.json_message)[1]
-        self.assertTrue(errors == {'_schema': ['urn_to and urn_from fields can not be the same.']})
+        self.assertTrue(errors == {'_schema': ['msg_to and msg_from fields can not be the same.']})
 
 
 if __name__ == '__main__':

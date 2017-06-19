@@ -15,8 +15,8 @@ token_data = {
 headers = {'Content-Type': 'application/json', 'Authorization': ''}
 
 
-post_data = {'urn_to': 'internal.000000',
-             'urn_from': 'respondent.000000',
+post_data = {'msg_to': 'internal.000000',
+             'msg_from': 'respondent.000000',
              'subject': 'test',
              'body': 'Test',
              'thread_id': '2',
@@ -24,8 +24,8 @@ post_data = {'urn_to': 'internal.000000',
              'reporting_unit': 'reporting case1',
              'business_name': 'ABusiness',
              'survey': 'survey'}
-data = {'urn_to': 'internal.000000',
-        'urn_from': 'respondent.000000',
+data = {'msg_to': 'internal.000000',
+        'msg_from': 'respondent.000000',
         'subject': 'test',
         'body': 'Test',
         'thread_id': '2',
@@ -59,8 +59,8 @@ def step_impl_user_edits_saved_draft(context):
     get_draft = app.test_client().get('http://localhost:5050/draft/{0}'.format(context.msg_id), headers=headers)
     context.etag = get_draft.headers.get('ETag')
     data.update({'msg_id': context.msg_id,
-                 'urn_to': 'internal.000000',
-                 'urn_from': 'respondent.000000',
+                 'msg_to': 'internal.000000',
+                 'msg_from': 'respondent.000000',
                  'subject': 'test',
                  'body': 'Test',
                  'collection_case': 'collection case1',
@@ -95,8 +95,8 @@ def step_impl_success_returned(context):
 @given('a user edits a non-existing draft')
 def step_impl_user_edits_non_existant_draft(context):
     data.update({'msg_id': '001',
-                 'urn_to': 'internal.000000',
-                 'urn_from': 'respondent.000000',
+                 'msg_to': 'internal.000000',
+                 'msg_from': 'respondent.000000',
                  'subject': 'test',
                  'body': 'Test',
                  'thread_id': '2',
@@ -115,8 +115,8 @@ def step_impl_modifies_draft_to_attribute_too_big(context):
     post_resp = json.loads(add_draft.data)
     context.msg_id = post_resp['msg_id']
     data.update({'msg_id': context.msg_id,
-                 'urn_to': 'internal.000000',
-                 'urn_from': 'respondent.000000',
+                 'msg_to': 'internal.000000',
+                 'msg_from': 'respondent.000000',
                  'subject': 'test',
                  'body': 'Test',
                  'thread_id': '2',
@@ -124,7 +124,7 @@ def step_impl_modifies_draft_to_attribute_too_big(context):
                  'reporting_unit': 'reporting case1',
                  'business_name': 'ABusiness',
                  'survey': 'survey'})
-    data['urn_to'] = 'x' * (constants.MAX_TO_LEN+1)
+    data['msg_to'] = 'x' * (constants.MAX_TO_LEN+1)
 
 
 # Scenario 4: A user edits a draft that has a too large from attribute
@@ -134,8 +134,8 @@ def step_impl_user_modifies_draft_from_attribute_too_big(context):
     post_resp = json.loads(add_draft.data)
     context.msg_id = post_resp['msg_id']
     data.update({'msg_id': context.msg_id,
-                 'urn_to': 'internal.000000',
-                 'urn_from': 'respondent.000000',
+                 'msg_to': 'internal.000000',
+                 'msg_from': 'respondent.000000',
                  'subject': 'test',
                  'body': 'Test',
                  'thread_id': '2',
@@ -143,7 +143,7 @@ def step_impl_user_modifies_draft_from_attribute_too_big(context):
                  'reporting_unit': 'reporting case1',
                  'business_name': 'ABusiness',
                  'survey': 'survey'})
-    data['urn_from'] = 'x' * (constants.MAX_FROM_LEN+1)
+    data['msg_from'] = 'x' * (constants.MAX_FROM_LEN+1)
 
 
 # Scenario 5: A user edits a draft that has a too large body attribute
@@ -153,8 +153,8 @@ def step_impl_user_modifies_draft_body_attribute_too_big(context):
     post_resp = json.loads(add_draft.data)
     context.msg_id = post_resp['msg_id']
     data.update({'msg_id': context.msg_id,
-                 'urn_to': 'internal.000000',
-                 'urn_from': 'respondent.000000',
+                 'msg_to': 'internal.000000',
+                 'msg_from': 'respondent.000000',
                  'subject': 'test',
                  'body': 'Test',
                  'thread_id': '2',
@@ -172,8 +172,8 @@ def step_impl_user_modifies_draft_subject_attribute_too_big(context):
     post_resp = json.loads(add_draft.data)
     context.msg_id = post_resp['msg_id']
     data.update({'msg_id': context.msg_id,
-                 'urn_to': 'internal.000000',
-                 'urn_from': 'respondent.000000',
+                 'msg_to': 'internal.000000',
+                 'msg_from': 'respondent.000000',
                  'subject': 'test',
                  'body': 'Test',
                  'thread_id': '2',
@@ -193,8 +193,8 @@ def step_impl_user_modifies_draft_no_to_attribute(context):
     get_draft = app.test_client().get('http://localhost:5050/draft/{0}'.format(context.msg_id), headers=headers)
     context.etag = get_draft.headers.get('ETag')
     data.update({'msg_id': context.msg_id,
-                 'urn_to': 'internal.000000',
-                 'urn_from': 'respondent.000000',
+                 'msg_to': 'internal.000000',
+                 'msg_from': 'respondent.000000',
                  'subject': 'test',
                  'body': 'Test',
                  'thread_id': '2',
@@ -202,7 +202,7 @@ def step_impl_user_modifies_draft_no_to_attribute(context):
                  'reporting_unit': 'reporting case1',
                  'business_name': 'ABusiness',
                  'survey': 'survey'})
-    data['urn_to'] = ''
+    data['msg_to'] = ''
 
 
 # Scenario 8: A user edits a draft not including a body attribute
@@ -214,8 +214,8 @@ def step_impl_user_modifies_draft_no_body(context):
     get_draft = app.test_client().get('http://localhost:5050/draft/{0}'.format(context.msg_id), headers=headers)
     context.etag = get_draft.headers.get('ETag')
     data.update({'msg_id': context.msg_id,
-                 'urn_to': 'internal.000000',
-                 'urn_from': 'respondent.000000',
+                 'msg_to': 'internal.000000',
+                 'msg_from': 'respondent.000000',
                  'subject': 'test',
                  'body': 'Test',
                  'thread_id': '2',
@@ -235,8 +235,8 @@ def step_impl_user_modifies_draft_no_subject(context):
     get_draft = app.test_client().get('http://localhost:5050/draft/{0}'.format(context.msg_id), headers=headers)
     context.etag = get_draft.headers.get('ETag')
     data.update({'msg_id': context.msg_id,
-                 'urn_to': 'internal.000000',
-                 'urn_from': 'respondent.000000',
+                 'msg_to': 'internal.000000',
+                 'msg_from': 'respondent.000000',
                  'subject': 'test',
                  'body': 'Test',
                  'thread_id': '2',
@@ -256,8 +256,8 @@ def step_impluser_modifies_draft_no_thread_id(context):
     get_draft = app.test_client().get('http://localhost:5050/draft/{0}'.format(context.msg_id), headers=headers)
     context.etag = get_draft.headers.get('ETag')
     data.update({'msg_id': context.msg_id,
-                 'urn_to': 'internal.000000',
-                 'urn_from': 'respondent.000000',
+                 'msg_to': 'internal.000000',
+                 'msg_from': 'respondent.000000',
                  'subject': 'test',
                  'body': 'Test',
                  'thread_id': '2',
@@ -275,8 +275,8 @@ def step_impl_user_modifies_draft_with_mismatched_msg_id(context):
     post_resp = json.loads(add_draft.data)
     context.msg_id = post_resp['msg_id']
     data.update({'msg_id': '0000-0000-0000-0000',
-                 'urn_to': 'internal.000000',
-                 'urn_from': 'respondent.000000',
+                 'msg_to': 'internal.000000',
+                 'msg_from': 'respondent.000000',
                  'subject': 'test',
                  'body': 'Test',
                  'thread_id': '2',
@@ -297,8 +297,8 @@ def step_impl_draft_message_is_being_edited(context):
                                           headers=headers)
         context.etag = get_draft.headers.get('ETag')
         data.update({'msg_id': context.msg_id,
-                     'urn_to': 'internal.000000',
-                     'urn_from': 'respondent.000000',
+                     'msg_to': 'internal.000000',
+                     'msg_from': 'respondent.000000',
                      'subject': 'test',
                      'body': 'test',
                      'thread_id': '2',
@@ -315,8 +315,8 @@ def step_impl_draft_message_is_being_edited(context):
 @when("another user tries to modify the same draft message")
 def step_impl_another_user_tries_to_modify_same_draft(context):
     data.update({'msg_id': context.msg_id,
-                 'urn_to': 'internal.000000',
-                 'urn_from': 'respondent.000000',
+                 'msg_to': 'internal.000000',
+                 'msg_from': 'respondent.000000',
                  'subject': 'test',
                  'body': 'test',
                  'thread_id': '2',
@@ -351,8 +351,8 @@ def step_impl_there_is_a_draft_to_be_modified(context):
 @when('the user modifies the draft')
 def step_impl_the_user_modifies_the_draft(context):
     data.update({'msg_id':context.msg_id,
-                 'urn_to': 'internal.000000',
-                 'urn_from': 'respondent.000000',
+                 'msg_to': 'internal.000000',
+                 'msg_from': 'respondent.000000',
                  'subject': 'test',
                  'body': 'Edited',
                  'thread_id': '',
@@ -380,8 +380,8 @@ def step_impl_new_etag_should_be_returned(context):
 @when('the user edits the draft without etag')
 def step_impl_user_saves_the_draft_without_etag(context):
     data.update({'msg_id': context.msg_id,
-                 'urn_to': 'internal.000000',
-                 'urn_from': 'respondent.000000',
+                 'msg_to': 'internal.000000',
+                 'msg_from': 'respondent.000000',
                  'subject': 'test',
                  'body': 'Test',
                  'collection_case': 'collection case1',

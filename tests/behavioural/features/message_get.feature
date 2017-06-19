@@ -8,8 +8,8 @@ Feature: Message get by ID Endpoint
 
    Examples: Fields
     |field  |
-    |urn_to |
-    |urn_from |
+    |msg_to |
+    |msg_from |
     |body    |
     |subject |
     |ReportingUnit   |
@@ -30,8 +30,8 @@ Feature: Message get by ID Endpoint
 
    Examples: Fields
     |field  |
-    |urn_to |
-    |urn_from |
+    |msg_to |
+    |msg_from |
     |body    |
     |subject |
     |ReportingUnit   |

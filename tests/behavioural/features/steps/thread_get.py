@@ -15,8 +15,8 @@ token_data = {
 
 headers = {'Content-Type': 'application/json', 'Authorization': ''}
 
-data = {'urn_to': 'test',
-        'urn_from': 'test',
+data = {'msg_to': 'test',
+        'msg_from': 'test',
         'subject': 'Hello World',
         'body': 'Test',
         'thread_id': 'AConversation',
@@ -47,16 +47,16 @@ def step_impl_respondent_and_internal_user_hav_a_conversation(context):
         token_data['role'] = 'respondent'
         headers['Authorization'] = update_encrypted_jwt()
 
-        data['urn_to'] = 'internal.12344'
-        data['urn_from'] = 'respondent.122342'
+        data['msg_to'] = 'internal.12344'
+        data['msg_from'] = 'respondent.122342'
         context.response = app.test_client().post("http://localhost:5050/message/send", data=flask.json.dumps(data),
                                                   headers=headers)
         token_data['user_uuid'] = 'internal.12344'
         token_data['role'] = 'internal'
         headers['Authorization'] = update_encrypted_jwt()
 
-        data['urn_to'] = 'respondent.122342'
-        data['urn_from'] = 'internal.12344'
+        data['msg_to'] = 'respondent.122342'
+        data['msg_from'] = 'internal.12344'
         context.response = app.test_client().post("http://localhost:5050/message/send", data=flask.json.dumps(data),
                                                   headers=headers)
 
@@ -93,8 +93,8 @@ def step_impl_internal_user_creates_a_draft(context):
     token_data['role'] = 'internal'
     headers['Authorization'] = update_encrypted_jwt()
 
-    data['urn_to'] = 'respondent.122342'
-    data['urn_from'] = 'internal.12344'
+    data['msg_to'] = 'respondent.122342'
+    data['msg_from'] = 'internal.12344'
     data['thread_id'] = 'AConversation'
     context.response = app.test_client().post("http://localhost:5050/draft/save", data=flask.json.dumps(data),
                                               headers=headers)
@@ -114,12 +114,12 @@ def step_impl_internal_user_has_multiple_conversations(context):
 
     for _ in range(0, 2):
         data['thread_id'] = str(uuid.uuid4())
-        data['urn_to'] = 'internal.12344'
-        data['urn_from'] = 'respondent.122342'
+        data['msg_to'] = 'internal.12344'
+        data['msg_from'] = 'respondent.122342'
         context.response = app.test_client().post("http://localhost:5050/message/send", data=flask.json.dumps(data),
                                                   headers=headers)
-        data['urn_to'] = 'respondent.122342'
-        data['urn_from'] = 'internal.12344'
+        data['msg_to'] = 'respondent.122342'
+        data['msg_from'] = 'internal.12344'
         context.response = app.test_client().post("http://localhost:5050/message/send", data=flask.json.dumps(data),
                                                   headers=headers)
     data['thread_id'] = 'AConversation'

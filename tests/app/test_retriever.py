@@ -72,7 +72,7 @@ class RetrieverTestCaseHelper:
             if single:
                 msg_id = str(uuid.uuid4())
                 self.add_secure_message(msg_id=msg_id)
-                self.add_status(label="SENT", msg_id=msg_id, actor="respondent.21345")
+                self.add_status(label="SENT", msg_id=msg_id, actor="0a7ad740-10d5-4ecb-b7ca-3c0384afb882")
                 self.add_status(label="INBOX", msg_id=msg_id, actor="SurveyType")
                 self.add_status(label="UNREAD", msg_id=msg_id, actor="SurveyType")
                 self.add_event(event="Sent", msg_id=msg_id, date_time=datetime(year, month, day))
@@ -84,14 +84,14 @@ class RetrieverTestCaseHelper:
                 msg_id = str(uuid.uuid4())
                 self.add_secure_message(msg_id=msg_id)
                 self.add_status(label="SENT", msg_id=msg_id, actor="SurveyType")
-                self.add_status(label="INBOX", msg_id=msg_id, actor="respondent.21345")
-                self.add_status(label="UNREAD", msg_id=msg_id, actor="respondent.21345")
+                self.add_status(label="INBOX", msg_id=msg_id, actor="0a7ad740-10d5-4ecb-b7ca-3c0384afb882")
+                self.add_status(label="UNREAD", msg_id=msg_id, actor="0a7ad740-10d5-4ecb-b7ca-3c0384afb882")
                 self.add_event(event="Sent", msg_id=msg_id, date_time=datetime(year, month, day+1))
 
             if add_draft:
                 msg_id = str(uuid.uuid4())
                 self.add_secure_message(msg_id=msg_id)
-                self.add_status(label="DRAFT_INBOX", msg_id=msg_id, actor="respondent.21345")
+                self.add_status(label="DRAFT_INBOX", msg_id=msg_id, actor="0a7ad740-10d5-4ecb-b7ca-3c0384afb882")
                 self.add_status(label="DRAFT", msg_id=msg_id, actor="SurveyType")
                 self.add_event(event="Draft_Saved", msg_id=msg_id, date_time=datetime(year, month, day))
 
@@ -101,7 +101,7 @@ class RetrieverTestCaseHelper:
                                         collection_case="AnotherCollectionCase",
                                         reporting_unit="AnotherReportingUnit", survey="AnotherSurveyType",
                                         business_name="AnotherBusiness")
-                self.add_status(label="SENT", msg_id=msg_id, actor="respondent.0000")
+                self.add_status(label="SENT", msg_id=msg_id, actor="1a7ad740-10d5-4ecb-b7ca-fb8823c0384a")
                 self.add_status(label="INBOX", msg_id=msg_id, actor="AnotherSurveyType")
                 self.add_status(label="UNREAD", msg_id=msg_id, actor="AnotherSurveyType")
                 self.add_event(event="Sent", msg_id=msg_id, date_time=datetime(year, month, day))
@@ -128,7 +128,7 @@ class RetrieverTestCaseHelper:
             thread_id = msg_id
             threads.append(thread_id)
             self.add_secure_message(msg_id=msg_id, thread_id=thread_id, survey="BRES")
-            self.add_status(label="SENT", msg_id=msg_id, actor="respondent.21345")
+            self.add_status(label="SENT", msg_id=msg_id, actor="0a7ad740-10d5-4ecb-b7ca-3c0384afb882")
             self.add_status(label="INBOX", msg_id=msg_id, actor="BRES")
             self.add_event(event="Sent", msg_id=msg_id, date_time=datetime(year, month, day))
             self.add_event(event="Read", msg_id=msg_id, date_time=datetime(year, month, day + 1))
@@ -136,8 +136,8 @@ class RetrieverTestCaseHelper:
             msg_id = str(uuid.uuid4())
             self.add_secure_message(msg_id=msg_id, thread_id=thread_id, survey="BRES")
             self.add_status(label="SENT", msg_id=msg_id, actor="BRES")
-            self.add_status(label="UNREAD", msg_id=msg_id, actor="respondent.21345")
-            self.add_status(label="INBOX", msg_id=msg_id, actor="respondent.21345")
+            self.add_status(label="UNREAD", msg_id=msg_id, actor="0a7ad740-10d5-4ecb-b7ca-3c0384afb882")
+            self.add_status(label="INBOX", msg_id=msg_id, actor="0a7ad740-10d5-4ecb-b7ca-3c0384afb882")
             self.add_event(event="Sent", msg_id=msg_id, date_time=datetime(year, month, day + 1))
 
             last_msg_id = msg_id
@@ -145,19 +145,19 @@ class RetrieverTestCaseHelper:
             if add_internal_draft:  # adds draft from internal
                 msg_id = str(uuid.uuid4())
                 self.add_secure_message(msg_id=msg_id, thread_id=thread_id, survey="BRES")
-                self.add_status(label="DRAFT_INBOX", msg_id=msg_id, actor="respondent.21345")
+                self.add_status(label="DRAFT_INBOX", msg_id=msg_id, actor="0a7ad740-10d5-4ecb-b7ca-3c0384afb882")
                 self.add_status(label="DRAFT", msg_id=msg_id, actor="BRES")
                 self.add_event(event="Draft_Saved", msg_id=msg_id, date_time=datetime(year, month, day+2))
 
             if add_respondent_draft:  # adds draft from respondent
 
-                self.del_status(label="UNREAD", msg_id=last_msg_id, actor="respondent.21345")
+                self.del_status(label="UNREAD", msg_id=last_msg_id, actor="0a7ad740-10d5-4ecb-b7ca-3c0384afb882")
                 self.add_event(event="Read", msg_id=last_msg_id, date_time=datetime(year, month, day + 1))
 
                 msg_id = str(uuid.uuid4())
                 self.add_secure_message(msg_id=msg_id, thread_id=thread_id, survey="BRES")
                 self.add_status(label="DRAFT_INBOX", msg_id=msg_id, actor="BRES")
-                self.add_status(label="DRAFT", msg_id=msg_id, actor="respondent.21345")
+                self.add_status(label="DRAFT", msg_id=msg_id, actor="0a7ad740-10d5-4ecb-b7ca-3c0384afb882")
                 self.add_event(event="Draft_Saved", msg_id=msg_id, date_time=datetime(year, month, day + 2))
 
         return threads
@@ -178,8 +178,8 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
             database.db.create_all()
             self.db = database.db
 
-        self.user_internal = User('internal.21345', 'internal')
-        self.user_respondent = User('respondent.21345', 'respondent')
+        self.user_internal = User('ce12b958-2a5f-44f4-a6da-861e59070a31', 'internal')
+        self.user_respondent = User('0a7ad740-10d5-4ecb-b7ca-3c0384afb882', 'respondent')
 
     def test_0_msg_returned_when_db_empty_true(self):
         """retrieves messages from empty database"""
@@ -340,9 +340,9 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
                 with current_app.test_request_context():
                     msg_id = str(names[0])
                     response = Retriever().retrieve_message(msg_id, self.user_respondent)
-                    urn_to = ['SurveyType']
-                    self.assertEqual(response['urn_to'], urn_to)
-                    self.assertEqual(response['urn_from'], self.user_respondent.user_uuid)
+                    msg_to = ['SurveyType']
+                    self.assertEqual(response['msg_to'], msg_to)
+                    self.assertEqual(response['msg_from'], self.user_respondent.user_uuid)
 
     def test_retrieve_message_raises_error(self):
         """retrieves message from when db does not exist"""
@@ -753,8 +753,8 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
                 with current_app.test_request_context():
                     msg_id = str(names[0])
                     response = Retriever().retrieve_message(msg_id, self.user_internal)
-                    self.assertEqual(response['urn_to'], [self.user_respondent.user_uuid])
-                    self.assertEqual(response['urn_from'], 'SurveyType')
+                    self.assertEqual(response['msg_to'], [self.user_respondent.user_uuid])
+                    self.assertEqual(response['msg_from'], 'SurveyType')
 
     def test_retrieve_draft_raises_error(self):
         """retrieves draft from when db does not exist"""

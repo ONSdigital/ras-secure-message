@@ -15,8 +15,8 @@ token_data = {
 
 headers = {'Content-Type': 'application/json', 'Authorization': ''}
 
-data = {'urn_to': 'test',
-        'urn_from': 'test',
+data = {'msg_to': 'test',
+        'msg_from': 'test',
         'subject': 'Hello World',
         'body': 'Test',
         'thread_id': '',
@@ -42,8 +42,8 @@ headers['Authorization'] = update_encrypted_jwt()
 # Scenario: modifying the status of the message to "archived"
 @given("a valid message is sent")
 def step_impl(context):
-    data['urn_to'] = 'internal.12344'
-    data['urn_from'] = 'respondent.122342'
+    data['msg_to'] = 'internal.12344'
+    data['msg_from'] = 'respondent.122342'
     context.response = app.test_client().post("http://localhost:5050/message/send",
                                               data=flask.json.dumps(data), headers=headers)
     msg_resp = json.loads(context.response.data)
@@ -54,7 +54,7 @@ def step_impl(context):
 def step_impl_message_is_archived(context):
     modify_data['action'] = 'add'
     modify_data['label'] = 'ARCHIVE'
-    token_data['user_urn'] = data['urn_from']
+    token_data['user_urn'] = data['msg_from']
     headers['Authorization'] = update_encrypted_jwt()
     context.response = app.test_client().put(url.format(context.msg_id),
                                              data=flask.json.dumps(modify_data), headers=headers)
@@ -71,8 +71,8 @@ def step_impl_assert_message_is_marked_as_archived(context):
 # Scenario: deleting the "archived" label from a given message
 @given("the message is archived")
 def step_impl_the_message_is_archived(context):
-    data['urn_to'] = 'internal.12344'
-    data['urn_from'] = 'respondent.122342'
+    data['msg_to'] = 'internal.12344'
+    data['msg_from'] = 'respondent.122342'
     context.response = app.test_client().post("http://localhost:5050/message/send",
                                               data=flask.json.dumps(data), headers=headers)
     msg_resp = json.loads(context.response.data)
@@ -103,8 +103,8 @@ def step_impl_message_not_marked_archived(context):
 # Scenario: Modifying the status of the message to "unread"
 @given('a message has been read')
 def step_impl_message_has_been_read(context):
-    data['urn_to'] = 'internal.12344'
-    data['urn_from'] = 'respondent.122342'
+    data['msg_to'] = 'internal.12344'
+    data['msg_from'] = 'respondent.122342'
     token_data['user_uuid'] = 'respondent.122342'
     token_data['role'] = 'respondent'
     headers['Authorization'] = update_encrypted_jwt()
@@ -166,8 +166,8 @@ def step_impl_message_read_date_should_be_set(context):
 # Scenario: validating a request where there is no label provided
 @given('a message is sent')
 def step_impl_a_message_is_sent(context):
-    data['urn_to'] = 'internal.12344'
-    data['urn_from'] = 'respondent.122342'
+    data['msg_to'] = 'internal.12344'
+    data['msg_from'] = 'respondent.122342'
     context.response = app.test_client().post("http://localhost:5050/message/send",
                                               data=flask.json.dumps(data), headers=headers)
     msg_resp = json.loads(context.response.data)
@@ -255,7 +255,7 @@ def step_impl_message_with_status_unread_shown_to_the_user(context):
 
 @when("the internal user opens the message")
 def step_impl_an_internal_user_opens_the_message(context):
-    token_data['user_urn'] = data['urn_from']
+    token_data['user_urn'] = data['msg_from']
     headers['Authorization'] = update_encrypted_jwt()
     response_get = app.test_client().get("http://localhost:5050/message/{0}".format(context.msg_id), headers=headers)
     context.get_json = json.loads(response_get.data)
@@ -269,8 +269,8 @@ def step_impl_no_unread_messages_returned(context):
 # Scenario - internal - as an internal user I want to be able to change my message from read to unread
 @given("a message with the status read is displayed to an internal user")
 def step_impl_message_with_status_read_returned(context):
-    data['urn_to'] = 'internal.12344'
-    data['urn_from'] = 'respondent.122342'
+    data['msg_to'] = 'internal.12344'
+    data['msg_from'] = 'respondent.122342'
     context.response = app.test_client().post("http://localhost:5050/message/send",
                                               data=flask.json.dumps(data), headers=headers)
     msg_resp = json.loads(context.response.data)
