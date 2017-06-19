@@ -6,7 +6,7 @@ from sqlalchemy import Column, String, Integer, DateTime, ForeignKey, Index
 from sqlalchemy.orm import relationship
 from app import constants
 from app.common.labels import Labels
-from app.validation.user import User
+
 
 logger = wrap_logger(logging.getLogger(__name__))
 

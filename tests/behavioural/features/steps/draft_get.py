@@ -44,7 +44,7 @@ with app.app_context():
 @given('a user requests a valid draft')
 def step_impl_user_requests_valid_draft(context):
     data.update({'msg_to': 'test',
-                 'msg_from': 'test',
+                 'msg_from': 'respondent.2134',
                  'subject': 'test',
                  'body': 'Test',
                  'thread_id': '',
@@ -87,7 +87,7 @@ def step_impl_assert_404_returned(context):
 def step_impl_user_not_authorised(self, context):
     #   waiting for  authorisation to be implemented
     data.update({'msg_to': 'test',
-                 'msg_from': 'test',
+                 'msg_from': 'respondent.2134',
                  'subject': 'test',
                  'body': 'Test',
                  'thread_id': '',
@@ -109,7 +109,7 @@ def step_impl_assert_403_returned(context):
 @given("there is a draft")
 def step_impl_there_is_a_draft(context):
     data.update({'msg_to': 'test',
-                 'msg_from': 'test',
+                 'msg_from': 'respondent.2134',
                  'subject': 'test',
                  'body': 'Test',
                  'thread_id': '',

@@ -40,7 +40,7 @@ class FlaskTestCase(unittest.TestCase):
         self.headers = {'Content-Type': 'application/json', 'Authorization': encrypted_jwt}
 
         self.test_message = {'msg_to': '0a7ad740-10d5-4ecb-b7ca-3c0384afb882',
-                             'msg_from': 'ce12b958-2a5f-44f4-a6da-861e59070a31',
+                             'msg_from': 'BRES',
                              'subject': 'MyMessage',
                              'body': 'hello',
                              'thread_id': "",
@@ -186,7 +186,7 @@ class FlaskTestCase(unittest.TestCase):
             {
                 'msg_id': self.msg_id,
                 'msg_to': 'richard',
-                'msg_from': 'torrance',
+                'msg_from': 'BRES',
                 'subject': 'MyMessage',
                 'body': 'hello',
                 'thread_id': '',
@@ -263,7 +263,7 @@ class FlaskTestCase(unittest.TestCase):
         self.test_message.update({
             'msg_id': msg_id,
             'msg_to': '0a7ad740-10d5-4ecb-b7ca-3c0384afb882',
-            'msg_from': 'ce12b958-2a5f-44f4-a6da-861e59070a31',
+            'msg_from': 'BRES',
             'subject': 'MyMessage',
             'body': 'hello',
             'collection_case': 'ACollectionCase',
