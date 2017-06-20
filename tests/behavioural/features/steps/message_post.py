@@ -62,6 +62,9 @@ def step_impl_a_valid_message(context):
 # Scenario 2: Send a draft and receive a 201
 @given('a message is identified as a draft')
 def step_impl_a_message_is_a_draft(context):
+    token_data['user_uuid'] = 'respondent.test'
+    token_data['role'] = 'respondent'
+    headers['Authorization'] = update_encrypted_jwt()
     context.post_draft = app.test_client().post("http://localhost:5050/draft/save", data=json.dumps(data),
                                                 headers=headers)
     msg_resp = json.loads(context.post_draft.data)
@@ -114,6 +117,10 @@ def step_impl_a_message_is_a_draft_reply(context):
                  'reporting_unit': 'reporting case1',
                  'business_name': 'ABusiness',
                  'survey': 'survey'})
+
+    token_data['user_uuid'] = data['msg_from']
+    token_data['role'] = 'respondent'
+    headers['Authorization'] = update_encrypted_jwt()
 
     context.post_draft = app.test_client().post("http://localhost:5050/draft/save", data=json.dumps(data),
                                                 headers=headers)
@@ -208,6 +215,9 @@ def step_impl_draft_message_posted(context):
     if 'msg_id' in data:
         del data['msg_id']
 
+    token_data['user_uuid'] = data['msg_from']
+    token_data['role'] = 'respondent'
+    headers['Authorization'] = update_encrypted_jwt()
     context.post_draft = app.test_client().post("http://localhost:5050/draft/save", data=json.dumps(data),
                                                 headers=headers)
     #get etag from response using context
@@ -226,6 +236,9 @@ def step_impl_draft_message_posted(context):
                        'reporting_unit': 'reporting case1',
                        'business_name': 'ABusiness',
                        'survey': 'survey'}
+    token_data['user_uuid'] = context.message['msg_from']
+    token_data['role'] = 'respondent'
+    headers['Authorization'] = update_encrypted_jwt()
     context.response = app.test_client().post(url, data=json.dumps(context.message), headers=headers)
 
 
@@ -244,6 +257,10 @@ def step_impl_another_user_sends_same_message(context):
 
     data['subject'] = 'edited'
     headers['Etag'] = context.etag
+
+    token_data['user_uuid'] = 'respondent.000000'
+    token_data['role'] = 'respondent'
+    headers['Authorization'] = update_encrypted_jwt()
     context.response = app.test_client().post(url.format(context.msg_id),
                                              data=json.dumps(data), headers=headers)
 
@@ -257,7 +274,7 @@ def step_impl_is_shown_404(context):
 @given('a message is created')
 def step_impl_message_is_created(context):
     context.msg = {  'msg_to': 'test',
-                     'msg_from': 'test2',
+                     'msg_from': 'respondent.test',
                      'subject': 'test',
                      'body': 'Test',
                      'thread_id': '',
@@ -272,6 +289,10 @@ def step_impl_message_sent_no_etag(context):
     if 'ETag' in headers:
         del headers['ETag']
 
+    token_data['user_uuid'] = context.msg['msg_from']
+    token_data['role'] = 'respondent'
+    headers['Authorization'] = update_encrypted_jwt()
+
     context.response = app.test_client().post(url, data=json.dumps(context.msg), headers=headers)
 
 
@@ -280,6 +301,9 @@ def step_impl_message_sent_no_etag(context):
 
 @when("the message is sent")
 def step_implmessage_is_sent(context):
+    token_data['user_uuid'] = data['msg_from']
+    token_data['role'] = 'respondent'
+    headers['Authorization'] = update_encrypted_jwt()
     context.response = app.test_client().post(url, data=json.dumps(data), headers=headers)
 
 
