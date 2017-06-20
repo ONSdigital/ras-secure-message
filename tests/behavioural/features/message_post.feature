@@ -15,6 +15,11 @@ Feature: Message Send Endpoint
     When the draft is sent
     Then a msg_id in the response
 
+  Scenario: A user sends a previously saved draft
+    Given a user retrieves a previously saved draft
+    When the draft is sent
+    Then a success response is given
+
   Scenario: Send a draft and receive a msg_id
     Given a message is identified as a draft
     When the draft is sent
