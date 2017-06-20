@@ -81,6 +81,7 @@ def step_impl_a_message_is_a_draft(context):
                        'survey': 'survey'}
 
 
+# Scenario: A user sends a previously saved draft
 @given('a user retrieves a previously saved draft')
 def step_impl_user_retrieves_draft(context):
     add_draft = app.test_client().post('http://localhost:5050/draft/save', data=json.dumps(data), headers=headers)
@@ -88,15 +89,6 @@ def step_impl_user_retrieves_draft(context):
     context.msg_id = post_resp['msg_id']
     get_draft = app.test_client().get('http://localhost:5050/draft/{0}'.format(context.msg_id), headers=headers)
     context.message = json.loads(get_draft.data)
-
-# # Scenario: A user sends a previously saved draft
-# @when('the message is saved')
-# def step_impl_a_message_is_edited(context):
-#     if 'ETag' in headers:
-#         del headers['ETag']
-#     if hasattr(context, 'etag'):
-#         headers['ETag'] = context.etag
-#     context.response = app.test_client().post(url, data=json.dumps(context.message), headers=headers)
 
 
 @when('the draft is sent')
