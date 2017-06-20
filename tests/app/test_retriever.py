@@ -178,7 +178,7 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
             database.db.create_all()
             self.db = database.db
 
-        self.user_internal = User('ce12b958-2a5f-44f4-a6da-861e59070a31', 'internal')
+        self.user_internal = User('BRES', 'internal')
         self.user_respondent = User('0a7ad740-10d5-4ecb-b7ca-3c0384afb882', 'respondent')
 
     def test_0_msg_returned_when_db_empty_true(self):
@@ -541,13 +541,15 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
                 response = Retriever().retrieve_message_list(1, MESSAGE_QUERY_LIMIT, self.user_respondent,
                                                              descend=True)[1]
                 sent = []
-                read = []
+                #read = []
                 modified = []
                 for message in response.items:
                     serialized_msg = message.serialize(self.user_respondent)
-                    sent.append(serialized_msg['sent_date'])
-                    read.append(serialized_msg['read_date'])
-                    modified.append(serialized_msg['modified_date'])
+                    if 'sent_date' in serialized_msg:
+                        sent.append(serialized_msg['sent_date'])
+                    #read.append(serialized_msg['read_date'])
+                    elif 'modified_date' in serialized_msg:
+                        modified.append(serialized_msg['modified_date'])
 
                 desc_date = sorted(sent, reverse=True)
                 self.assertEqual(len(sent), 5)
@@ -562,13 +564,15 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
                 response = Retriever().retrieve_message_list(1, MESSAGE_QUERY_LIMIT, self.user_respondent,
                                                              descend=False)[1]
                 sent = []
-                read = []
+                #read = []
                 modified = []
                 for message in response.items:
                     serialized_msg = message.serialize(self.user_respondent)
-                    sent.append(serialized_msg['sent_date'])
-                    read.append(serialized_msg['read_date'])
-                    modified.append(serialized_msg['modified_date'])
+                    if 'sent_date' in serialized_msg:
+                        sent.append(serialized_msg['sent_date'])
+                    #read.append(serialized_msg['read_date'])
+                    elif 'modified_date' in serialized_msg:
+                        modified.append(serialized_msg['modified_date'])
 
                 asc_date = sorted(sent, reverse=False)
                 self.assertEqual(len(sent), 5)
@@ -584,14 +588,16 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
                                                              survey='SurveyType',
                                                              descend=False)[1]
                 sent = []
-                read = []
+                #read = []
                 modified = []
                 date = []
                 for message in response.items:
                     serialized_msg = message.serialize(self.user_internal)
-                    sent.append(serialized_msg['sent_date'])
-                    read.append(serialized_msg['read_date'])
-                    modified.append(serialized_msg['modified_date'])
+                    if 'sent_date' in serialized_msg:
+                        sent.append(serialized_msg['sent_date'])
+                    #read.append(serialized_msg['read_date'])
+                    elif 'modified_date' in serialized_msg:
+                        modified.append(serialized_msg['modified_date'])
 
                 for x in range(0, len(sent)):
                     if sent[x] != 'N/A':
@@ -613,14 +619,16 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
                                                              survey='SurveyType',
                                                              descend=True)[1]
                 sent = []
-                read = []
+                #read = []
                 modified = []
                 date = []
                 for message in response.items:
                     serialized_msg = message.serialize(self.user_internal)
-                    sent.append(serialized_msg['sent_date'])
-                    read.append(serialized_msg['read_date'])
-                    modified.append(serialized_msg['modified_date'])
+                    if 'sent_date' in serialized_msg:
+                        sent.append(serialized_msg['sent_date'])
+                    #read.append(serialized_msg['read_date'])
+                    elif 'modified_date' in serialized_msg:
+                        modified.append(serialized_msg['modified_date'])
 
                 for x in range(0, len(sent)):
                     if sent[x] != 'N/A':
@@ -662,8 +670,8 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
                     msg_id = str(names[0])
                     response = Retriever().retrieve_draft(msg_id, self.user_internal)
                     self.assertTrue(response['modified_date'] != "N/A")
-                    self.assertEqual(response['read_date'], 'N/A')
-                    self.assertEqual(response['sent_date'], "N/A")
+                    self.assertTrue('read_date' not in response)
+                    self.assertTrue('sent_date' not in response)
 
     def test_sent_date_returned_for_message(self):
         """retrieves message using id and checks the sent date returned"""
@@ -678,7 +686,7 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
                 with current_app.test_request_context():
                     msg_id = str(names[0])
                     response = Retriever().retrieve_message(msg_id, self.user_internal)
-                    self.assertEqual(response['modified_date'], "N/A")
+                    self.assertTrue('modified_date' not in response)
                     self.assertTrue(response['sent_date'] != "N/A")
 
     def test_read_date_returned_for_message(self):
@@ -695,7 +703,7 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
                 with current_app.test_request_context():
                     msg_id = str(names[0])
                     response = Retriever().retrieve_message(msg_id, self.user_internal)
-                    self.assertEqual(response['modified_date'], "N/A")
+                    self.assertTrue('modified_date' not in response)
                     self.assertTrue(response['read_date'] != "N/A")
 
     def test_retrieve_draft_with_a_message_msg_id_returns_404(self):
@@ -818,13 +826,15 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
                 self.assertEqual(len(response), 9)
 
                 sent = []
-                read = []
+                #read = []
                 modified = []
                 date = []
                 for message in response:
-                    sent.append(message['sent_date'])
-                    read.append(message['read_date'])
-                    modified.append(message['modified_date'])
+                    if 'sent_date' in message:
+                        sent.append(message['sent_date'])
+                    #read.append(message['read_date'])
+                    elif 'modified_date' in message:
+                        modified.append(message['modified_date'])
 
                 for x in range(0, len(sent)):
                     if sent[x] != 'N/A':
@@ -876,16 +886,19 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
                 response = Retriever().retrieve_thread_list(1, MESSAGE_QUERY_LIMIT, self.user_respondent)[1]
 
                 sent = []
-                read = []
+                #read = []
                 modified = []
                 thread_ids = []
                 date = []
                 for message in response.items:
                     serialized_msg = message.serialize(self.user_respondent)
-                    sent.append(serialized_msg['sent_date'])
-                    read.append(serialized_msg['read_date'])
-                    thread_ids.append(serialized_msg['thread_id'])
-                    modified.append(serialized_msg['modified_date'])
+                    if 'sent_date' in serialized_msg:
+                        sent.append(serialized_msg['sent_date'])
+                    #read.append(serialized_msg['read_date'])
+                    elif 'thread_id' in serialized_msg:
+                        thread_ids.append(serialized_msg['thread_id'])
+                    elif 'modified_date' in serialized_msg:
+                        modified.append(serialized_msg['modified_date'])
 
                 for x in range(0, len(sent)):
                     if sent[x] != 'N/A':
@@ -907,16 +920,19 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
                 response = Retriever().retrieve_thread_list(1, MESSAGE_QUERY_LIMIT, self.user_internal)[1]
 
                 sent = []
-                read = []
+                #read = []
                 modified = []
                 thread_ids = []
                 date = []
                 for message in response.items:
                     serialized_msg = message.serialize(self.user_internal)
-                    sent.append(serialized_msg['sent_date'])
-                    read.append(serialized_msg['read_date'])
-                    thread_ids.append(serialized_msg['thread_id'])
-                    modified.append(serialized_msg['modified_date'])
+                    if 'sent_date' in serialized_msg:
+                        sent.append(serialized_msg['sent_date'])
+                    #read.append(serialized_msg['read_date'])
+                    elif 'thread_id' in serialized_msg:
+                        thread_ids.append(serialized_msg['thread_id'])
+                    elif 'modified_date' in serialized_msg:
+                        modified.append(serialized_msg['modified_date'])
 
                 for x in range(0, len(sent)):
                     if sent[x] != 'N/A':
@@ -938,16 +954,14 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
                 response = Retriever().retrieve_thread_list(1, MESSAGE_QUERY_LIMIT, self.user_respondent)[1]
 
                 sent = []
-                read = []
                 modified = []
-                thread_ids = []
                 date = []
                 for message in response.items:
                     serialized_msg = message.serialize(self.user_respondent)
-                    sent.append(serialized_msg['sent_date'])
-                    read.append(serialized_msg['read_date'])
-                    thread_ids.append(serialized_msg['thread_id'])
-                    modified.append(serialized_msg['modified_date'])
+                    if 'sent_date' in serialized_msg:
+                        sent.append(serialized_msg['sent_date'])
+                    elif 'modified_date' in serialized_msg:
+                        modified.append(serialized_msg['modified_date'])
 
                 for x in range(0, len(sent)):
                     if sent[x] != 'N/A':
@@ -969,16 +983,19 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
                 response = Retriever().retrieve_thread_list(1, MESSAGE_QUERY_LIMIT, self.user_internal)[1]
 
                 sent = []
-                read = []
+                #read = []
                 modified = []
                 thread_ids = []
                 date = []
                 for message in response.items:
                     serialized_msg = message.serialize(self.user_internal)
-                    sent.append(serialized_msg['sent_date'])
-                    read.append(serialized_msg['read_date'])
-                    thread_ids.append(serialized_msg['thread_id'])
-                    modified.append(serialized_msg['modified_date'])
+                    if 'sent_date' in serialized_msg:
+                        sent.append(serialized_msg['sent_date'])
+                    #read.append(serialized_msg['read_date'])
+                    elif 'thread_id' in serialized_msg:
+                        thread_ids.append(serialized_msg['thread_id'])
+                    elif 'modified_date' in serialized_msg:
+                        modified.append(serialized_msg['modified_date'])
 
                 for x in range(0, len(sent)):
                     if sent[x] != 'N/A':
@@ -1006,11 +1023,16 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
                 msg_ids = []
                 for message in response.items:
                     serialized_msg = message.serialize(self.user_internal)
-                    sent.append(serialized_msg['sent_date'])
-                    read.append(serialized_msg['read_date'])
-                    thread_ids.append(serialized_msg['thread_id'])
-                    modified.append(serialized_msg['modified_date'])
-                    msg_ids.append(serialized_msg['msg_id'])
+                    if 'sent_date' in serialized_msg:
+                        sent.append(serialized_msg['sent_date'])
+                    elif 'read_date' in serialized_msg:
+                        read.append(serialized_msg['read_date'])
+                    elif 'thread_id' in serialized_msg:
+                        thread_ids.append(serialized_msg['thread_id'])
+                    elif 'modified_date' in serialized_msg:
+                        modified.append(serialized_msg['modified_date'])
+                    elif 'msg_id' in serialized_msg:
+                        msg_ids.append(serialized_msg['msg_id'])
 
                 self.assertEqual(len(msg_ids), 5)
 
@@ -1036,11 +1058,16 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
                 msg_ids = []
                 for message in response.items:
                     serialized_msg = message.serialize(self.user_respondent)
-                    sent.append(serialized_msg['sent_date'])
-                    read.append(serialized_msg['read_date'])
-                    thread_ids.append(serialized_msg['thread_id'])
-                    modified.append(serialized_msg['modified_date'])
-                    msg_ids.append(serialized_msg['msg_id'])
+                    if 'sent_date' in serialized_msg:
+                        sent.append(serialized_msg['sent_date'])
+                    elif 'read_date' in serialized_msg:
+                        read.append(serialized_msg['read_date'])
+                    elif 'thread_date' in serialized_msg:
+                        thread_ids.append(serialized_msg['thread_id'])
+                    elif 'modified_date' in serialized_msg:
+                        modified.append(serialized_msg['modified_date'])
+                    elif 'msg_id' in serialized_msg:
+                        msg_ids.append(serialized_msg['msg_id'])
 
                 self.assertEqual(len(msg_ids), 5)
 
@@ -1066,11 +1093,16 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
                 msg_ids = []
                 for message in response.items:
                     serialized_msg = message.serialize(self.user_internal)
-                    sent.append(serialized_msg['sent_date'])
-                    read.append(serialized_msg['read_date'])
-                    thread_ids.append(serialized_msg['thread_id'])
-                    modified.append(serialized_msg['modified_date'])
-                    msg_ids.append(serialized_msg['msg_id'])
+                    if 'sent_date' in serialized_msg:
+                        sent.append(serialized_msg['sent_date'])
+                    elif 'read_date' in serialized_msg:
+                        read.append(serialized_msg['read_date'])
+                    elif 'thread_id' in serialized_msg:
+                        thread_ids.append(serialized_msg['thread_id'])
+                    elif 'modified_date' in serialized_msg:
+                        modified.append(serialized_msg['modified_date'])
+                    elif 'msg_id' in serialized_msg:
+                        msg_ids.append(serialized_msg['msg_id'])
 
                 self.assertEqual(len(msg_ids), 5)
 
@@ -1096,11 +1128,16 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
                 msg_ids = []
                 for message in response.items:
                     serialized_msg = message.serialize(self.user_respondent)
-                    sent.append(serialized_msg['sent_date'])
-                    read.append(serialized_msg['read_date'])
-                    thread_ids.append(serialized_msg['thread_id'])
-                    modified.append(serialized_msg['modified_date'])
-                    msg_ids.append(serialized_msg['msg_id'])
+                    if 'sent_date' in serialized_msg:
+                        sent.append(serialized_msg['sent_date'])
+                    elif 'read_date' in serialized_msg:
+                        read.append(serialized_msg['read_date'])
+                    elif 'thread_id' in serialized_msg:
+                        thread_ids.append(serialized_msg['thread_id'])
+                    elif 'modified_date' in serialized_msg:
+                        modified.append(serialized_msg['modified_date'])
+                    elif 'msg_id' in serialized_msg:
+                        msg_ids.append(serialized_msg['msg_id'])
 
                 self.assertEqual(len(msg_ids), 5)
 
@@ -1126,11 +1163,16 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
                 msg_ids = []
                 for message in response.items:
                     serialized_msg = message.serialize(self.user_internal)
-                    sent.append(serialized_msg['sent_date'])
-                    read.append(serialized_msg['read_date'])
-                    thread_ids.append(serialized_msg['thread_id'])
-                    modified.append(serialized_msg['modified_date'])
-                    msg_ids.append(serialized_msg['msg_id'])
+                    if 'sent_date' in serialized_msg:
+                        sent.append(serialized_msg['sent_date'])
+                    elif 'read_date' in serialized_msg:
+                        read.append(serialized_msg['read_date'])
+                    elif 'thread_id' in serialized_msg:
+                        thread_ids.append(serialized_msg['thread_id'])
+                    elif 'modified_date' in serialized_msg:
+                        modified.append(serialized_msg['modified_date'])
+                    elif 'msg_id' in serialized_msg:
+                        msg_ids.append(serialized_msg['msg_id'])
 
                 self.assertEqual(len(msg_ids), 5)
 
@@ -1156,11 +1198,16 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
                 msg_ids = []
                 for message in response.items:
                     serialized_msg = message.serialize(self.user_respondent)
-                    sent.append(serialized_msg['sent_date'])
-                    read.append(serialized_msg['read_date'])
-                    thread_ids.append(serialized_msg['thread_id'])
-                    modified.append(serialized_msg['modified_date'])
-                    msg_ids.append(serialized_msg['msg_id'])
+                    if 'sent_date' in serialized_msg:
+                        sent.append(serialized_msg['sent_date'])
+                    elif 'read_date' in serialized_msg:
+                        read.append(serialized_msg['read_date'])
+                    elif 'thread_id' in serialized_msg:
+                        thread_ids.append(serialized_msg['thread_id'])
+                    elif 'modified_date' in serialized_msg:
+                        modified.append(serialized_msg['modified_date'])
+                    elif 'msg_id' in serialized_msg:
+                        msg_ids.append(serialized_msg['msg_id'])
 
                 self.assertEqual(len(msg_ids), 5)
 
@@ -1186,11 +1233,16 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
                 msg_ids = []
                 for message in response.items:
                     serialized_msg = message.serialize(self.user_internal)
-                    sent.append(serialized_msg['sent_date'])
-                    read.append(serialized_msg['read_date'])
-                    thread_ids.append(serialized_msg['thread_id'])
-                    modified.append(serialized_msg['modified_date'])
-                    msg_ids.append(serialized_msg['msg_id'])
+                    if 'sent_date' in serialized_msg:
+                        sent.append(serialized_msg['sent_date'])
+                    elif 'read_date' in serialized_msg:
+                        read.append(serialized_msg['read_date'])
+                    elif 'thread_id' in serialized_msg:
+                        thread_ids.append(serialized_msg['thread_id'])
+                    elif 'modified_date' in serialized_msg:
+                        modified.append(serialized_msg['modified_date'])
+                    elif 'msg_id' in serialized_msg:
+                        msg_ids.append(serialized_msg['msg_id'])
 
                 self.assertEqual(len(msg_ids), 5)
 
