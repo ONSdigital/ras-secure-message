@@ -14,7 +14,7 @@ Feature: Message Send Endpoint
     Given a message is identified as a draft
     When the draft is sent
     Then a msg_id in the response
-
+  @ignore
   Scenario: A user sends a previously saved draft
     Given a user retrieves a previously saved draft
     When the draft is sent
