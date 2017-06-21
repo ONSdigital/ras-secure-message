@@ -55,6 +55,20 @@ class MessageSchema(Schema):
         self.validate_not_present(data, 'read_date')
         return data
 
+    @pre_load
+    def check_format_of_msg_to_and_msg_from(self, data):
+        if data.get('msg_to') and not isinstance(data.get('msg_to'), str) and "id" in data.get('msg_to'):
+            data['msg_to'] = data['msg_to']['id']
+        elif data.get('msg_to') and not isinstance(data.get('msg_to'), str):
+            raise ValidationError("'msg_to' is missing an 'id'")
+
+        if data.get('msg_from') and not isinstance(data.get('msg_from'), str) and "id" in data.get('msg_from'):
+            data['msg_from'] = data['msg_from']['id']
+        elif data.get('msg_from') and not isinstance(data.get('msg_from'), str):
+            raise ValidationError("'msg_from' is missing an 'id'")
+
+        return data
+
     @validates_schema
     def validate_to_from_not_equal(self, data):
         if 'msg_to' in data.keys() and 'msg_from' in data.keys() and data['msg_to'] == data['msg_from']:
@@ -136,6 +150,20 @@ class DraftSchema(Schema):
             raise ValidationError("{0} Missing".format('msg_from'))
         if 'survey' not in data or len(data['survey']) == 0:
             raise ValidationError("{0} Missing".format('survey'))
+        return data
+
+    @pre_load
+    def check_format_of_msg_to_and_msg_from(self, data):
+        if data.get('msg_to') and not isinstance(data.get('msg_to'), str) and "id" in data.get('msg_to'):
+            data['msg_to'] = data['msg_to']['id']
+        elif data.get('msg_to') and not isinstance(data.get('msg_to'), str):
+            raise ValidationError("'msg_to' is missing an 'id'")
+
+        if data.get('msg_from') and not isinstance(data.get('msg_from'), str) and "id" in data.get('msg_from'):
+            data['msg_from'] = data['msg_from']['id']
+        elif data.get('msg_from') and not isinstance(data.get('msg_from'), str):
+            raise ValidationError("'msg_from' is missing an 'id'")
+
         return data
 
     @validates("msg_to")
