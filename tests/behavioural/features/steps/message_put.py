@@ -42,7 +42,7 @@ headers['Authorization'] = update_encrypted_jwt()
 # Scenario: modifying the status of the message to "archived"
 @given("a valid message is sent")
 def step_impl(context):
-    data['msg_to'] = 'internal.12344'
+    data['msg_to'] = 'BRES'
     data['msg_from'] = 'respondent.122342'
     token_data['user_uuid'] = data['msg_from']
     token_data['role'] = 'respondent'
@@ -74,7 +74,7 @@ def step_impl_assert_message_is_marked_as_archived(context):
 # Scenario: deleting the "archived" label from a given message
 @given("the message is archived")
 def step_impl_the_message_is_archived(context):
-    data['msg_to'] = 'internal.12344'
+    data['msg_to'] = 'BRES'
     data['msg_from'] = 'respondent.122342'
     token_data['user_uuid'] = data['msg_from']
     token_data['role'] = 'respondent'
@@ -109,7 +109,7 @@ def step_impl_message_not_marked_archived(context):
 # Scenario: Modifying the status of the message to "unread"
 @given('a message has been read')
 def step_impl_message_has_been_read(context):
-    data['msg_to'] = 'internal.12344'
+    data['msg_to'] = 'BRES'
     data['msg_from'] = 'respondent.122342'
     token_data['user_uuid'] = 'respondent.122342'
     token_data['role'] = 'respondent'
@@ -122,7 +122,7 @@ def step_impl_message_has_been_read(context):
     modify_data['action'] = 'remove'
     modify_data['label'] = 'UNREAD'
     modify_data['msg_from'] = 'BRES'
-    token_data['user_uuid'] = 'internal.12344'
+    token_data['user_uuid'] = 'BRES'
     token_data['role'] = 'internal'
     headers['Authorization'] = update_encrypted_jwt()
     context.response = app.test_client().put(url.format(context.msg_id),
@@ -152,6 +152,9 @@ def step_imp_check_message_is_marked_unread(context):
 def step_impl_the_message_is_marked_read(context):
     modify_data['action'] = 'remove'
     modify_data['label'] = "UNREAD"
+    token_data['user_uuid'] = 'BRES'
+    token_data['role'] = 'internal'
+    headers['Authorization'] = update_encrypted_jwt()
     context.response = app.test_client().put(url.format(context.msg_id),
                                              data=flask.json.dumps(modify_data), headers=headers)
 
@@ -173,7 +176,7 @@ def step_impl_message_read_date_should_be_set(context):
 # Scenario: validating a request where there is no label provided
 @given('a message is sent')
 def step_impl_a_message_is_sent(context):
-    data['msg_to'] = 'internal.12344'
+    data['msg_to'] = 'BRES'
     data['msg_from'] = 'respondent.122342'
     token_data['user_uuid'] = data['msg_from']
     token_data['role'] = 'respondent'
@@ -282,7 +285,7 @@ def step_impl_no_unread_messages_returned(context):
 # Scenario - internal - as an internal user I want to be able to change my message from read to unread
 @given("a message with the status read is displayed to an internal user")
 def step_impl_message_with_status_read_returned(context):
-    data['msg_to'] = 'internal.12344'
+    data['msg_to'] = 'BRES'
     data['msg_from'] = 'respondent.122342'
     token_data['user_uuid'] = data['msg_from']
     token_data['role'] = 'respondent'
