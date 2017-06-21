@@ -59,6 +59,18 @@ class MessageSend(Resource):
                 if post_data['thread_id'] == draft_id:
                     post_data['thread_id'] = ''
 
+                if post_data.get('msg_to') and not isinstance(post_data.get('msg_to'),
+                                                              str) and "id" in post_data.get('msg_to'):
+                    post_data['msg_to'] = post_data['msg_to']['id']
+                elif post_data.get('msg_to') and not isinstance(post_data.get('msg_to'), str):
+                    raise (BadRequest(description="'msg_to' is missing an 'id'"))
+
+                if post_data.get('msg_from') and not isinstance(post_data.get('msg_from'),
+                                                                str) and "id" in post_data.get('msg_from'):
+                    post_data['msg_from'] = post_data['msg_from']['id']
+                elif post_data.get('msg_from') and not isinstance(post_data.get('msg_from'), str):
+                    raise (BadRequest(description="'msg_from' is missing an 'id'"))
+
             else:
                 raise (BadRequest(description="Message can not include msg_id"))
 
