@@ -119,6 +119,17 @@ class DraftModifyById(Resource):
                            mimetype="text/html")
             return res
 
+        if data.get('msg_to') and not isinstance(data.get('msg_to'), str) and "id" in data.get('msg_to'):
+            data['msg_to'] = data['msg_to']['id']
+        elif data.get('msg_to') and not isinstance(data.get('msg_to'), str):
+            raise (BadRequest(description="'msg_to' is missing an 'id'"))
+
+        if data.get('msg_from') and not isinstance(data.get('msg_from'), str) and "id" in data.get(
+                'msg_from'):
+            data['msg_from'] = data['msg_from']['id']
+        elif data.get('msg_from') and not isinstance(data.get('msg_from'), str):
+            raise (BadRequest(description="'msg_from' is missing an 'id'"))
+
         draft = DraftSchema().load(data)
         if draft.errors == {}:
             Modifier().replace_current_draft(draft_id, draft.data)
