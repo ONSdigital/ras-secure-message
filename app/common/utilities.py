@@ -2,6 +2,7 @@ from app.constants import MESSAGE_BY_ID_ENDPOINT, MESSAGE_LIST_ENDPOINT, MESSAGE
 from flask import jsonify
 from structlog import wrap_logger
 import logging
+import hashlib
 
 logger = wrap_logger(logging.getLogger(__name__))
 
@@ -86,3 +87,10 @@ def paginated_list_to_json(paginated_list, page, limit, host_url, user, string_q
                                                             string_query_args, (page - 1), limit)}
 
     return jsonify({"messages": messages, "_links": links})
+
+
+def generate_etag(draft_data):
+    hash_object = hashlib.sha1(str(sorted(draft_data.items())).encode())
+    etag = hash_object.hexdigest()
+
+    return etag
