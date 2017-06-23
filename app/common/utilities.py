@@ -2,6 +2,7 @@ from app.constants import MESSAGE_BY_ID_ENDPOINT, MESSAGE_LIST_ENDPOINT, MESSAGE
 from flask import jsonify
 from structlog import wrap_logger
 import logging
+from app.resources import user_by_uuid
 
 logger = wrap_logger(logging.getLogger(__name__))
 
@@ -84,5 +85,24 @@ def paginated_list_to_json(paginated_list, page, limit, host_url, user, string_q
         links['prev'] = {
             "href": "{0}{1}{2}{3}page={4}&limit={5}".format(host_url, endpoint, arg_joiner,
                                                             string_query_args, (page - 1), limit)}
+    messages = add_to_and_from_details(messages)
 
     return jsonify({"messages": messages, "_links": links})
+
+
+def add_to_and_from_details(messages):
+    to_list = []
+    from_list = []
+
+    for message in messages:
+        to_list.append(message['msg_to'][0])
+        from_list.append(message['msg_from'])
+
+    to_details = user_by_uuid.get_details_by_uuids(to_list)
+    from_details = user_by_uuid.get_details_by_uuids(from_list)
+
+    for message in messages:
+        message['msg_to'] = [to_details[message['msg_to'][0]]]
+        message['msg_from'] = from_details[message['msg_from']]
+
+    return messages

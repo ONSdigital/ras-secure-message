@@ -253,6 +253,9 @@ class FlaskTestCase(unittest.TestCase):
             for row in request:
                 self.assertTrue(row is not None)
 
+    def test_get_message_by_id(self):
+        """Test"""
+
     def test_draft_inbox_labels_removed_on_draft_send(self):
         """Test that draft inbox labels are removed on draft send"""
 

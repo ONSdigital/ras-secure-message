@@ -9,7 +9,7 @@ from app.common.labels import Labels
 from app.constants import DRAFT_LIST_ENDPOINT
 from app.repository.saver import Saver
 from app.validation.domain import DraftSchema
-from app.validation.user import User
+from app.resources import user_by_uuid
 from app.repository.modifier import Modifier
 from app.repository.retriever import Retriever
 from app.common.utilities import get_options, paginated_list_to_json
@@ -66,6 +66,7 @@ class DraftById(Resource):
         # check user is authorised to view message
         message_service = Retriever()
         draft_data = message_service.retrieve_draft(draft_id, g.user)
+        draft_data = DraftById.get_to_and_from_details(draft_data)
         etag = DraftById.generate_etag(draft_data)
         resp = jsonify(draft_data)
         resp.headers['ETag'] = etag
@@ -78,6 +79,17 @@ class DraftById(Resource):
         etag = hash_object.hexdigest()
 
         return etag
+
+    @staticmethod
+    def get_to_and_from_details(draft):
+        uuids = [draft['msg_from']]
+        if draft['msg_to'] is not None:
+            uuids.append(draft['msg_to'][0])
+        user_details = user_by_uuid.get_details_by_uuids(uuids)
+        draft['msg_from'] = user_details[draft['msg_from']]
+        if draft['msg_to'] is not None:
+            draft['msg_to'] = user_details[draft['msg_to'][0]]
+        return draft
 
 
 class DraftList(Resource):

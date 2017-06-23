@@ -1,5 +1,4 @@
 import logging
-
 from flask import request, jsonify, g, Response
 from flask_restful import Resource
 from werkzeug.exceptions import BadRequest
@@ -14,6 +13,7 @@ from app.repository.saver import Saver
 from app.validation.domain import MessageSchema
 from app.resources.drafts import DraftModifyById
 from app.common.utilities import get_options, paginated_list_to_json
+from app.resources.user_by_uuid import get_details_by_uuids
 
 logger = wrap_logger(logging.getLogger(__name__))
 
@@ -122,6 +122,10 @@ class MessageById(Resource):
         # check user is authorised to view message
         message_service = Retriever()
         resp = message_service.retrieve_message(message_id, g.user)
+
+        data = get_details_by_uuids([resp['msg_from'], resp["msg_to"][0]])
+        resp["msg_from"] = data[resp['msg_from']]
+        resp["msg_to"] = data[resp['msg_to'][0]]
         return jsonify(resp)
 
 
