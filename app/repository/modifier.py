@@ -69,7 +69,7 @@ class Modifier:
         """Remove unread label from status"""
         inbox = Labels.INBOX.value
         unread = Labels.UNREAD.value
-        if inbox in message['labels'] and unread in message['labels'] and message['read_date'] == None:
+        if inbox in message['labels'] and unread in message['labels'] and 'read_date' not in message:
             Saver().save_msg_event(message['msg_id'], 'Read')
         Modifier.remove_label(unread, message, user)
         return True
