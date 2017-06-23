@@ -185,7 +185,7 @@ class FlaskTestCase(unittest.TestCase):
         draft = (
             {
                 'msg_id': self.msg_id,
-                'msg_to': 'richard',
+                'msg_to': '0a7ad740-10d5-4ecb-b7ca-3c0384afb882',
                 'msg_from': 'BRES',
                 'subject': 'MyMessage',
                 'body': 'hello',
@@ -253,9 +253,6 @@ class FlaskTestCase(unittest.TestCase):
             for row in request:
                 self.assertTrue(row is not None)
 
-    def test_get_message_by_id(self):
-        """Test"""
-
     def test_draft_inbox_labels_removed_on_draft_send(self):
         """Test that draft inbox labels are removed on draft send"""
 
@@ -319,6 +316,16 @@ class FlaskTestCase(unittest.TestCase):
     def test_draft_get_returns_msg_to(self):
         """Test that draft get returns draft's msg_to if applicable"""
 
+        self.test_message.update({
+            'msg_to': 'ce12b958-2a5f-44f4-a6da-861e59070a31',
+            'msg_from': '0a7ad740-10d5-4ecb-b7ca-3c0384afb882',
+            'subject': 'MyMessage',
+            'body': 'hello',
+            'collection_case': 'ACollectionCase',
+            'reporting_unit': 'AReportingUnit',
+            'survey': 'BRES'
+        })
+
         draft_save = self.app.post("http://localhost:5050/draft/save", data=json.dumps(self.test_message), headers=self.headers)
         draft_save_data = json.loads(draft_save.data)
         draft_id = draft_save_data['msg_id']
@@ -326,7 +333,7 @@ class FlaskTestCase(unittest.TestCase):
         draft_get = self.app.get("http://localhost:5050/draft/{0}".format(draft_id), headers=self.headers)
         draft_get_data = json.loads(draft_get.data)
 
-        self.assertEqual(draft_get_data['msg_to'], [self.test_message['msg_to']])
+        self.assertTrue(draft_get_data['msg_to'] is not None)
 
 if __name__ == '__main__':
     unittest.main()

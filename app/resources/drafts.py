@@ -66,8 +66,8 @@ class DraftById(Resource):
         # check user is authorised to view message
         message_service = Retriever()
         draft_data = message_service.retrieve_draft(draft_id, g.user)
-        draft_data = DraftById.get_to_and_from_details(draft_data)
         etag = DraftById.generate_etag(draft_data)
+        draft_data = DraftById.get_to_and_from_details(draft_data)
         resp = jsonify(draft_data)
         resp.headers['ETag'] = etag
 

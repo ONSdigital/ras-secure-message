@@ -63,7 +63,7 @@ class PartyTestCase(unittest.TestCase):
         message = json.loads(message_resp.data)
 
         self.assertEqual(message['msg_from'], {'telephone': '+443069990289', 'firstname': 'Vana', 'email': 'vana123@aol.com', 'id': '0a7ad740-10d5-4ecb-b7ca-3c0384afb882', 'status': 'ACTIVE', 'surname': 'Oorschot'})
-        self.assertEqual(message['msg_to'], {"id": "", "firstname": "BRES", "surname": "", "email": "", "telephone": "", "status": ""})
+        self.assertEqual(message['msg_to'], [{"id": "", "firstname": "BRES", "surname": "", "email": "", "telephone": "", "status": ""}])
 
     def test_messages_get_replaces_uuids_with_user_details(self):
         data = {'msg_to': 'BRES',

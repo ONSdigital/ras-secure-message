@@ -125,7 +125,7 @@ class MessageById(Resource):
 
         data = get_details_by_uuids([resp['msg_from'], resp["msg_to"][0]])
         resp["msg_from"] = data[resp['msg_from']]
-        resp["msg_to"] = data[resp['msg_to'][0]]
+        resp["msg_to"] = [data[resp['msg_to'][0]]]
         return jsonify(resp)
 
 

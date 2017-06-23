@@ -8,14 +8,14 @@ from app import settings
 
 url = "http://localhost:5050/messages"
 token_data = {
-            "user_uuid": "000000000",
+            "user_uuid": "ce12b958-2a5f-44f4-a6da-861e59070a31",
             "role": "internal"
         }
 
 headers = {'Content-Type': 'application/json', 'Authorization': ''}
 
 data = {'msg_to': 'test',
-        'msg_from': 'BRES',
+        'msg_from': 'ce12b958-2a5f-44f4-a6da-861e59070a31',
         'subject': 'Hello World',
         'body': 'Test',
         'thread_id': '',
@@ -41,14 +41,14 @@ headers['Authorization'] = update_encrypted_jwt()
 def step_impl_respondent_sends_multiple_messages(context):
 
 
-    token_data['user_uuid'] = 'respondent.122342'
+    token_data['user_uuid'] = '0a7ad740-10d5-4ecb-b7ca-3c0384afb882'
     token_data['role'] = 'respondent'
     headers['Authorization'] = update_encrypted_jwt()
 
     for x in range(0, 2):
         data['msg_to'] = 'BRES'
-        data['msg_from'] = 'respondent.122342'
-        token_data['user_uuid'] = 'respondent.122342'
+        data['msg_from'] = '0a7ad740-10d5-4ecb-b7ca-3c0384afb882'
+        token_data['user_uuid'] = '0a7ad740-10d5-4ecb-b7ca-3c0384afb882'
         token_data['role'] = 'respondent'
         headers['Authorization'] = update_encrypted_jwt()
         context.response = app.test_client().post("http://localhost:5050/message/send", data=flask.json.dumps(data),
@@ -57,7 +57,7 @@ def step_impl_respondent_sends_multiple_messages(context):
 
 @when("the respondent gets their messages")
 def step_impl_respondent_gets_their_messages(context):
-    token_data['user_uuid'] = 'respondent.122342'
+    token_data['user_uuid'] = '0a7ad740-10d5-4ecb-b7ca-3c0384afb882'
     token_data['role'] = 'respondent'
     headers['Authorization'] = update_encrypted_jwt()
     context.response = app.test_client().get(url, headers=headers)
@@ -80,7 +80,7 @@ def step_impl_internal_user_sends_multiple_messages(context):
     headers['Authorization'] = update_encrypted_jwt()
 
     for x in range(0, 2):
-        data['msg_to'] = 'respondent.122342'
+        data['msg_to'] = '0a7ad740-10d5-4ecb-b7ca-3c0384afb882'
         data['msg_from'] = 'BRES'
         context.response = app.test_client().post("http://localhost:5050/message/send", data=flask.json.dumps(data),
                                                   headers=headers)
@@ -143,19 +143,19 @@ def step_impl_respondant_and_internal_user_send_multiple_messages(context):
 
 
     for x in range(0, 2):
-        data['msg_to'] = 'respondent.122342'
+        data['msg_to'] = '0a7ad740-10d5-4ecb-b7ca-3c0384afb882'
         data['msg_from'] = 'BRES'
         context.response = app.test_client().post("http://localhost:5050/message/send",
                                                   data=flask.json.dumps(data), headers=headers)
 
-    token_data['user_uuid'] = 'respondent.122342'
+    token_data['user_uuid'] = '0a7ad740-10d5-4ecb-b7ca-3c0384afb882'
     token_data['role'] = 'respondent'
     headers['Authorization'] = update_encrypted_jwt()
 
     for x in range(0, 2):
         data['msg_to'] = 'BRES'
-        data['msg_from'] = 'respondent.122342'
-        token_data['user_uuid'] = 'respondent.122342'
+        data['msg_from'] = '0a7ad740-10d5-4ecb-b7ca-3c0384afb882'
+        token_data['user_uuid'] = '0a7ad740-10d5-4ecb-b7ca-3c0384afb882'
         token_data['role'] = 'respondent'
         headers['Authorization'] = update_encrypted_jwt()
         context.response = app.test_client().post("http://localhost:5050/message/send",
@@ -164,7 +164,7 @@ def step_impl_respondant_and_internal_user_send_multiple_messages(context):
 
 @when('the Respondent gets their sent messages')
 def step_impl_respondent_gets_their_sent_messages(context):
-    token_data['user_uuid'] = 'respondent.122342'
+    token_data['user_uuid'] = '0a7ad740-10d5-4ecb-b7ca-3c0384afb882'
     token_data['role'] = 'respondent'
     headers['Authorization'] = update_encrypted_jwt()
     context.response = app.test_client().get('{0}{1}'.format(url, '?label=SENT'), headers=headers)
@@ -189,13 +189,13 @@ def step_impl_internal_user_sends_multiple_messages_with_different_ru(context):
     headers['Authorization'] = update_encrypted_jwt()
 
     for x in range(0, 2):
-        data['msg_to'] = 'respondent.122342'
+        data['msg_to'] = '0a7ad740-10d5-4ecb-b7ca-3c0384afb882'
         data['msg_from'] = 'BRES'
         context.response = app.test_client().post("http://localhost:5050/message/send",
                                                   data=flask.json.dumps(data), headers=headers)
 
     for x in range(0, 2):
-        data['msg_to'] = 'respondent.122342'
+        data['msg_to'] = '0a7ad740-10d5-4ecb-b7ca-3c0384afb882'
         data['msg_from'] = 'BRES'
         data['reporting_unit'] = 'AnotherReportingUnit'
         context.response = app.test_client().post("http://localhost:5050/message/send",
@@ -204,7 +204,7 @@ def step_impl_internal_user_sends_multiple_messages_with_different_ru(context):
 
 @when('the Respondent gets their messages with particular reporting unit')
 def step_impl_respondent_gets_their_messages_with_particular_ru(context):
-    token_data['user_uuid'] = 'respondent.122342'
+    token_data['user_uuid'] = '0a7ad740-10d5-4ecb-b7ca-3c0384afb882'
     token_data['role'] = 'respondent'
     headers['Authorization'] = update_encrypted_jwt()
     context.response = app.test_client().get('{0}{1}'.format(url, '?ru=AnotherReportingUnit'), headers=headers)
@@ -227,13 +227,13 @@ def step_impl_respondent_retrieves_list_of_messages_with_busines_name(context):
     headers['Authorization'] = update_encrypted_jwt()
 
     for x in range(0, 2):
-        data['msg_to'] = 'respondent.122342'
+        data['msg_to'] = '0a7ad740-10d5-4ecb-b7ca-3c0384afb882'
         data['msg_from'] = 'BRES'
 
         context.response = app.test_client().post("http://localhost:5050/message/send",
                                                   data=flask.json.dumps(data), headers=headers)
     for x in range(0, 2):
-        data['msg_to'] = 'respondent.122342'
+        data['msg_to'] = '0a7ad740-10d5-4ecb-b7ca-3c0384afb882'
         data['msg_from'] = 'BRES'
         data['business_name'] = 'AnotherBusiness'
         context.response = app.test_client().post("http://localhost:5050/message/send",
@@ -242,7 +242,7 @@ def step_impl_respondent_retrieves_list_of_messages_with_busines_name(context):
 
 @when('the Respondent gets their messages with particular business name')
 def step_impl_respondent_retrieves_messages_with_particular_business_name(context):
-    token_data['user_uuid'] = 'respondent.122342'
+    token_data['user_uuid'] = '0a7ad740-10d5-4ecb-b7ca-3c0384afb882'
     token_data['role'] = 'respondent'
     headers['Authorization'] = update_encrypted_jwt()
     context.response = app.test_client().get('{0}{1}'.format(url, '?business=AnotherBusiness'), headers=headers)
@@ -267,12 +267,12 @@ def step_impl_internal_user_sends_multiple_messages_with_different_survey(contex
     headers['Authorization'] = update_encrypted_jwt()
 
     for x in range(0, 2):
-        data['msg_to'] = 'respondent.122342'
+        data['msg_to'] = '0a7ad740-10d5-4ecb-b7ca-3c0384afb882'
         data['msg_from'] = 'BRES'
         context.response = app.test_client().post("http://localhost:5050/message/send",
                                                   data=flask.json.dumps(data), headers=headers)
     for x in range(0, 2):
-        data['msg_to'] = 'respondent.122342'
+        data['msg_to'] = '0a7ad740-10d5-4ecb-b7ca-3c0384afb882'
         data['msg_from'] = 'BRES'
         data['survey'] = 'AnotherSurvey'
         context.response = app.test_client().post("http://localhost:5050/message/send",
@@ -281,15 +281,15 @@ def step_impl_internal_user_sends_multiple_messages_with_different_survey(contex
 
 @when('the Respondent gets their messages with particular survey')
 def step_impl_respondent_gets_their_messages_with_particular_survey(context):
-    token_data['user_uuid'] = 'respondent.122342'
+    token_data['user_uuid'] = '0a7ad740-10d5-4ecb-b7ca-3c0384afb882'
     headers['Authorization'] = update_encrypted_jwt()
-    context.response = app.test_client().get('{0}{1}'.format(url, '?survey=AnotherSurvey'), headers=headers)
+    context.response = app.test_client().get('{0}{1}'.format(url, '?survey=BRES'), headers=headers)
 
 
 @then('the retrieved messages should have the correct survey')
 def step_impl_retrieved_messages_shoud_have_correct_survey(context):
     response = flask.json.loads(context.response.data)
-    nose.tools.assert_equal(response['messages'][1]['survey'], 'AnotherSurvey')
+    nose.tools.assert_equal(response['messages'][1]['survey'], 'BRES')
 
     nose.tools.assert_equal(len(response['messages']), 2)
 
@@ -305,12 +305,12 @@ def step_impl_internal_user_sends_multiple_messages_with_different_collection_ca
     headers['Authorization'] = update_encrypted_jwt()
 
     for x in range(0, 2):
-        data['msg_to'] = 'respondent.122342'
+        data['msg_to'] = '0a7ad740-10d5-4ecb-b7ca-3c0384afb882'
         data['msg_from'] = 'BRES'
         context.response = app.test_client().post("http://localhost:5050/message/send",
                                                   data=flask.json.dumps(data), headers=headers)
     for x in range(0, 2):
-        data['msg_to'] = 'respondent.122342'
+        data['msg_to'] = '0a7ad740-10d5-4ecb-b7ca-3c0384afb882'
         data['msg_from'] = 'BRES'
         data['collection_case'] = 'AnotherCollectionCase'
         context.response = app.test_client().post("http://localhost:5050/message/send",
@@ -319,7 +319,7 @@ def step_impl_internal_user_sends_multiple_messages_with_different_collection_ca
 
 @when('the Respondent gets their messages with particular collection case')
 def step_impl_respondent_retrieves_messaegs_with_particular_collection_case(context):
-    token_data['user_uuid'] = 'respondent.122342'
+    token_data['user_uuid'] = '0a7ad740-10d5-4ecb-b7ca-3c0384afb882'
     token_data['role'] = 'respondent'
     headers['Authorization'] = update_encrypted_jwt()
     context.response = app.test_client().get('{0}{1}'.format(url, '?cc=AnotherCollectionCase'), headers=headers)
@@ -341,14 +341,14 @@ def step_impl_respondent_creates_multiple_draft_messages(context):
 
     for x in range(0, 2):
         draft = {'msg_to': 'BRES',
-                 'msg_from': 'respondent.122342',
+                 'msg_from': '0a7ad740-10d5-4ecb-b7ca-3c0384afb882',
                  'subject': 'test',
                  'body': 'Test',
                  'thread_id': '',
                  'collection_case': 'collection case1',
                  'reporting_unit': 'reporting case1',
-                 'survey': 'survey'}
-        token_data['user_uuid'] = 'respondent.122342'
+                 'survey': 'BRES'}
+        token_data['user_uuid'] = '0a7ad740-10d5-4ecb-b7ca-3c0384afb882'
         token_data['role'] = 'respondent'
         headers['Authorization'] = update_encrypted_jwt()
         context.response = app.test_client().post("http://localhost:5050/draft/save", data=flask.json.dumps(draft),
@@ -357,7 +357,7 @@ def step_impl_respondent_creates_multiple_draft_messages(context):
 
 @when('the Respondent gets their draft messages')
 def step_impl(context):
-    headers['user_uuid'] = 'respondent.122342'
+    headers['user_uuid'] = '0a7ad740-10d5-4ecb-b7ca-3c0384afb882'
     context.response = app.test_client().get('{0}{1}'.format(url, '?label=DRAFT'), headers=headers)
 
 
@@ -431,20 +431,20 @@ def step_impl_internal_user_requests_all_messages(context):
 @given("a internal user receives multiple messages")
 def step_impl_internal_user_receives_multiple_messages(context):
 
-    token_data['user_uuid'] = 'respondent.123'
+    token_data['user_uuid'] = '0a7ad740-10d5-4ecb-b7ca-3c0384afb882'
     token_data['role'] = 'respondent'
     headers['Authorization'] = update_encrypted_jwt()
 
     for x in range(0, 2):
         data['msg_to'] = 'BRES'
-        data['msg_from'] = 'respondent.123'
+        data['msg_from'] = '0a7ad740-10d5-4ecb-b7ca-3c0384afb882'
         context.response = app.test_client().post("http://localhost:5050/message/send",
                                                   data=flask.json.dumps(data), headers=headers)
 
 
 @when("the internal user gets their inbox messages")
 def step_impl_internal_user_gets_their_inbox_messages(context):
-    token_data['user_uuid'] = 'BRES'
+    token_data['user_uuid'] = 'ce12b958-2a5f-44f4-a6da-861e59070a31'
     token_data['role'] = 'internal'
     headers['Authorization'] = update_encrypted_jwt()
     context.response = app.test_client().get('{0}{1}'.format(url, '?label=INBOX'), headers=headers)
@@ -492,7 +492,7 @@ def step_impl_labels_param_set_to_include_all(context):
 
 @when('user gets messages using the parameters')
 def step_impl_get_messages_using_params(context):
-    token_data['user_uuid'] = 'respondent.122342'
+    token_data['user_uuid'] = '0a7ad740-10d5-4ecb-b7ca-3c0384afb882'
     headers['Authorization'] = update_encrypted_jwt()
     url_with_param = "{0}{1}".format(url, context.parms)
     context.response = app.test_client().get(url_with_param, headers=headers)
@@ -508,21 +508,21 @@ def step_impl_return_400(context):
 def step_impl_multiple_messages_for_all_labels(context):
 
     for _ in range(0, 2):
-        data['msg_to'] = 'respondent.122342'
+        data['msg_to'] = '0a7ad740-10d5-4ecb-b7ca-3c0384afb882'
         data['msg_from'] = 'BRES'
         context.response = app.test_client().post("http://localhost:5050/message/send",
                                                   data=flask.json.dumps(data), headers=headers)
     for _ in range(0, 2):
         data['msg_to'] = 'BRES'
-        data['msg_from'] = 'respondent.122342'
+        data['msg_from'] = '0a7ad740-10d5-4ecb-b7ca-3c0384afb882'
         context.response = app.test_client().post("http://localhost:5050/message/send",
                                                   data=flask.json.dumps(data), headers=headers)
-    # need to implement adding draft messages, archived messages and read messages for user respondent.122342
+    # need to implement adding draft messages, archived messages and read messages for user 0a7ad740-10d5-4ecb-b7ca-3c0384afb882
 
 
 @when('respondent gets messages with labels INBOX')
 def step_impl_reponsdent_gets_message_with_label_inbox(context):
-    token_data['user_uuid'] = 'respondent.122342'
+    token_data['user_uuid'] = '0a7ad740-10d5-4ecb-b7ca-3c0384afb882'
     headers['Authorization'] = update_encrypted_jwt()
     parms = "?labels=INBOX"
     url_with_param = "{0}{1}".format(url, parms)
@@ -531,7 +531,7 @@ def step_impl_reponsdent_gets_message_with_label_inbox(context):
 
 @when('respondent gets messages with labels SENT')
 def step_impl_respondent_gets_messages_with_label_sent(context):
-    token_data['user_uuid'] = 'respondent.122342'
+    token_data['user_uuid'] = '0a7ad740-10d5-4ecb-b7ca-3c0384afb882'
     headers['Authorization'] = update_encrypted_jwt()
     parms = "?labels=SENT"
     url_with_param = "{0}{1}".format(url, parms)
@@ -540,7 +540,7 @@ def step_impl_respondent_gets_messages_with_label_sent(context):
 
 @when('respondent gets messages with labels ARCHIVED')
 def step_impl_respondent_gets_messaegs_with_label_archived(context):
-    token_data['user_uuid'] = 'respondent.122342'
+    token_data['user_uuid'] = '0a7ad740-10d5-4ecb-b7ca-3c0384afb882'
     headers['Authorization'] = update_encrypted_jwt()
     parms = "?labels=ARCHIVED"
     url_with_param = "{0}{1}".format(url, parms)
@@ -549,7 +549,7 @@ def step_impl_respondent_gets_messaegs_with_label_archived(context):
 
 @when('respondent gets messages with labels DRAFT')
 def step_impl_respondent_gets_messages_with_label_draft(context):
-    token_data['user_uuid'] = 'respondent.122342'
+    token_data['user_uuid'] = '0a7ad740-10d5-4ecb-b7ca-3c0384afb882'
     headers['Authorization'] = update_encrypted_jwt()
     parms = "?labels=DRAFT"
     url_with_param = "{0}{1}".format(url, parms)
@@ -558,7 +558,7 @@ def step_impl_respondent_gets_messages_with_label_draft(context):
 
 @when('respondent gets messages with labels INBOX-SENT')
 def step_impl_respondent_gets_messages_with_labels_inbox_sent(context):
-    token_data['user_uuid'] = 'respondent.122342'
+    token_data['user_uuid'] = '0a7ad740-10d5-4ecb-b7ca-3c0384afb882'
     headers['Authorization'] = update_encrypted_jwt()
     parms = "?labels=INBOX-SENT"
     url_with_param = "{0}{1}".format(url, parms)
@@ -567,7 +567,7 @@ def step_impl_respondent_gets_messages_with_labels_inbox_sent(context):
 
 @when('respondent gets messages with labels INBOX-SENT-ARCHIVED')
 def step_impl_respondent_gets_messages_with_labels_inbox_sent_archived(context):
-    token_data['user_uuid'] = 'respondent.122342'
+    token_data['user_uuid'] = '0a7ad740-10d5-4ecb-b7ca-3c0384afb882'
     headers['Authorization'] = update_encrypted_jwt()
     parms = "?labels=INBOX-SENT-ARCHIVED"
     url_with_param = "{0}{1}".format(url, parms)
@@ -576,7 +576,7 @@ def step_impl_respondent_gets_messages_with_labels_inbox_sent_archived(context):
 
 @when('respondent gets messages with labels INBOX-SENT-ARCHIVED-DRAFT')
 def step_impl_respondent_gets_messages_with_labels_inbox_sent_archived_draft(context):
-    token_data['user_uuid'] = 'respondent.122342'
+    token_data['user_uuid'] = '0a7ad740-10d5-4ecb-b7ca-3c0384afb882'
     headers['Authorization'] = update_encrypted_jwt()
     parms = "?labels=INBOX-SENT-ARCHIVED-DRAFT"
     url_with_param = "{0}{1}".format(url, parms)
@@ -647,7 +647,7 @@ def step_impl_assert_one_message_has_label_sent_draft(context):
 
 @when('respondent gets messages with labels empty')
 def step_impl_assert_messaegs_with_empty_labels(context):
-    token_data['user_uuid'] = 'respondent.122342'
+    token_data['user_uuid'] = '0a7ad740-10d5-4ecb-b7ca-3c0384afb882'
     headers['Authorization'] = update_encrypted_jwt()
     parms = "?labels="
     url_with_param = "{0}{1}".format(url, parms)
@@ -671,7 +671,7 @@ def step_impl_respondent_recieves_multiple_messages(context):
     headers['Authorization'] = update_encrypted_jwt()
 
     for x in range(0, 2):
-        data['msg_to'] = 'respondent.123'
+        data['msg_to'] = '0a7ad740-10d5-4ecb-b7ca-3c0384afb882'
         data['msg_from'] = 'BRES'
         context.response = app.test_client().post("http://localhost:5050/message/send",
                                                   data=flask.json.dumps(data), headers=headers)
@@ -679,7 +679,7 @@ def step_impl_respondent_recieves_multiple_messages(context):
 
 @when("the respondent user gets their inbox messages")
 def step_impl_assert_respondent_gets_their_inbox_messages(context):
-    token_data['user_uuid'] = 'respondent.123'
+    token_data['user_uuid'] = '0a7ad740-10d5-4ecb-b7ca-3c0384afb882'
     token_data['role'] = 'respondent'
     headers['Authorization'] = update_encrypted_jwt()
     context.response = app.test_client().get('{0}{1}'.format(url, '?label=INBOX'), headers=headers)

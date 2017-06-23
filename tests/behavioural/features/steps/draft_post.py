@@ -13,7 +13,7 @@ import nose
 
 url = "http://localhost:5050/draft/save"
 token_data = {
-            "user_uuid": "000000000",
+            "user_uuid": "ce12b958-2a5f-44f4-a6da-861e59070a31",
             "role": "internal"
         }
 
@@ -42,8 +42,8 @@ with app.app_context():
 # Scenario 1: Save a valid draft get a 201 return
 @given('a valid draft')
 def step_impl_valid_draft(context):
-    data.update({'msg_to': 'test',
-                 'msg_from': 'test',
+    data.update({'msg_to': '',
+                 'msg_from': 'ce12b958-2a5f-44f4-a6da-861e59070a31',
                  'subject': 'test',
                  'body': 'Test',
                  'thread_id': '',
@@ -56,8 +56,8 @@ def step_impl_valid_draft(context):
 # Scenario 2: Save a draft with body field empty return 201
 @given('a draft has an body field set to empty')
 def step_impl_draft_with_empty_body(context):
-    data.update({'msg_to': 'test',
-                 'msg_from': 'test',
+    data.update({'msg_to': '',
+                 'msg_from': 'ce12b958-2a5f-44f4-a6da-861e59070a31',
                  'subject': 'test',
                  'body': '',
                  'thread_id': '',
@@ -72,7 +72,7 @@ def step_impl_draft_with_empty_body(context):
 def step_impl_draft_with_msg_id(context):
     data.update({'msg_id': 'Amsgid',
                  'msg_to': 'test',
-                 'msg_from': 'test',
+                 'msg_from': 'ce12b958-2a5f-44f4-a6da-861e59070a31',
                  'subject': 'test',
                  'body': 'Test',
                  'thread_id': '',
@@ -86,7 +86,7 @@ def step_impl_draft_with_msg_id(context):
 @given('a draft with to field too large in size')
 def step_impl_draft_with_to_field_too_large(context):
     data.update({'msg_to': 'x' * (constants.MAX_TO_LEN+1),
-                 'msg_from': 'test',
+                 'msg_from': 'ce12b958-2a5f-44f4-a6da-861e59070a31',
                  'subject': 'test',
                  'body': 'Test',
                  'thread_id': '',
@@ -114,7 +114,7 @@ def step_impl_draft_with_from_field_too_large(context):
 @given('a draft with body field too large in size')
 def step_impl_draft_with_body_field_too_large(context):
     data.update({'msg_to': 'test',
-                 'msg_from': 'test',
+                 'msg_from': 'ce12b958-2a5f-44f4-a6da-861e59070a31',
                  'subject': 'test',
                  'body': 'x' * (constants.MAX_BODY_LEN+1),
                  'thread_id': '',
@@ -128,7 +128,7 @@ def step_impl_draft_with_body_field_too_large(context):
 @given('a draft with subject field too large in size')
 def step_impl_draft_with_subject_field_too_large(context):
     data.update({'msg_to': 'test',
-                 'msg_from': 'test',
+                 'msg_from': 'ce12b958-2a5f-44f4-a6da-861e59070a31',
                  'subject': 'x' * (constants.MAX_SUBJECT_LEN+1),
                  'body': 'Test',
                  'thread_id': '',
@@ -156,7 +156,7 @@ def step_impl_draft_with_empty_from_field(context):
 @given('a draft with a survey field set as empty')
 def step_impl_draft_with_empty_survey_field(context):
     data.update({'msg_to': 'test',
-                 'msg_from': 'test',
+                 'msg_from': 'ce12b958-2a5f-44f4-a6da-861e59070a31',
                  'subject': 'test',
                  'body': 'Test',
                  'thread_id': '',
@@ -170,7 +170,7 @@ def step_impl_draft_with_empty_survey_field(context):
 @given("a user creates a valid draft")
 def step_impl_user_creates_valid_draft(context):
     context.draft = {'msg_to': 'test',
-                     'msg_from': 'test',
+                     'msg_from': 'ce12b958-2a5f-44f4-a6da-861e59070a31',
                      'subject': 'test',
                      'body': 'Test',
                      'thread_id': '',
@@ -196,7 +196,7 @@ def step_implmsg_id_returned(context):
 @given('A user creates a draft that is not associated with a thread')
 def step_impl_draft_message_withour_thread_id(context):
     data.pop('msg_id', 'Amsgid')
-    data.update({'msg_from': '9976a558-c529-4652-806e-fac1b8d4fdcb',
+    data.update({'msg_from': 'ce12b958-2a5f-44f4-a6da-861e59070a31',
                  'subject': 'test',
                  'body': 'Test',
                  'collection_case': 'collection case1',

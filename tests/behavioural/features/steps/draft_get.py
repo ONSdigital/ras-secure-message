@@ -13,7 +13,7 @@ import uuid
 
 url = "http://localhost:5050/draft/{0}"
 token_data = {
-            "user_uuid": "respondent.2134",
+            "user_uuid": "0a7ad740-10d5-4ecb-b7ca-3c0384afb882",
             "role": "respondent"
         }
 
@@ -43,15 +43,15 @@ with app.app_context():
 
 @given('a user requests a valid draft')
 def step_impl_user_requests_valid_draft(context):
-    data.update({'msg_to': 'test',
-                 'msg_from': 'respondent.2134',
+    data.update({'msg_to': 'BRES',
+                 'msg_from': '0a7ad740-10d5-4ecb-b7ca-3c0384afb882',
                  'subject': 'test',
                  'body': 'Test',
                  'thread_id': '',
                  'collection_case': 'collection case1',
                  'reporting_unit': 'reporting case1',
                  'business_name': 'ABusiness',
-                 'survey': 'survey'})
+                 'survey': 'BRES'})
     response = app.test_client().post("http://localhost:5050/draft/save", data=json.dumps(data),
                                       headers=headers)
     context.resp_data = json.loads(response.data)
@@ -86,15 +86,15 @@ def step_impl_assert_404_returned(context):
 @given('a user is not authorised')
 def step_impl_user_not_authorised(self, context):
     #   waiting for  authorisation to be implemented
-    data.update({'msg_to': 'test',
-                 'msg_from': 'respondent.2134',
+    data.update({'msg_to': 'BRES',
+                 'msg_from': '0a7ad740-10d5-4ecb-b7ca-3c0384afb882',
                  'subject': 'test',
                  'body': 'Test',
                  'thread_id': '',
                  'collection_case': 'collection case1',
                  'reporting_unit': 'reporting case1',
                  'business_name': 'ABusiness',
-                 'survey': 'survey'})
+                 'survey': 'BRES'})
     response = app.test_client().post("http://localhost:5050/draft/save", data=json.dumps(context.draft),
                                       headers=headers)
     context.resp_data = json.loads(response.data)
@@ -108,15 +108,15 @@ def step_impl_assert_403_returned(context):
 #   Scenario: User is retrieving the etag from the header
 @given("there is a draft")
 def step_impl_there_is_a_draft(context):
-    data.update({'msg_to': 'test',
-                 'msg_from': 'respondent.2134',
+    data.update({'msg_to': 'BRES',
+                 'msg_from': '0a7ad740-10d5-4ecb-b7ca-3c0384afb882',
                  'subject': 'test',
                  'body': 'Test',
                  'thread_id': '',
                  'collection_case': 'collection case1',
                  'reporting_unit': 'reporting case1',
                  'business_name': 'ABusiness',
-                 'survey': 'survey'})
+                 'survey': 'BRES'})
     response = app.test_client().post("http://localhost:5050/draft/save", data=json.dumps(data),
                                       headers=headers)
     context.resp_data = json.loads(response.data)
