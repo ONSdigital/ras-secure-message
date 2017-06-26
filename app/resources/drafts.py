@@ -84,6 +84,8 @@ class DraftById(Resource):
 
     @staticmethod
     def get_to_and_from_details(draft):
+        """Get user details for to and from for draft"""
+
         uuids = [draft['msg_from']]
         if draft['msg_to'] is not None:
             uuids.append(draft['msg_to'][0])

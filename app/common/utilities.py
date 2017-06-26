@@ -104,10 +104,6 @@ def add_to_and_from_details(messages):
     user_details = user_by_uuid.get_details_by_uuids(uuid_list)
 
     for message in messages:
-        for user in user_details:
-            if message['msg_to'][0] == user['id']:
-                message['msg_to'] = [user]
-            if message['msg_from'] == user['id']:
-                message['msg_from'] = user
-
+        message['msg_to'][0] = next((user for user in user_details if user["id"] == message['msg_to'][0]), None)
+        message['msg_from'] = next((user for user in user_details if user["id"] == message['msg_from']), None)
     return messages
