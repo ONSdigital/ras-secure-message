@@ -1,5 +1,6 @@
 import unittest
 from app.resources import user_by_uuid
+from app.resources import business_by_ru
 from werkzeug.exceptions import BadRequest
 from app import application
 from app.application import app
@@ -46,6 +47,7 @@ class PartyTestCase(unittest.TestCase):
                 'subject': 'MyMessage',
                 'body': 'hello',
                 'thread': "?",
+                'ru_ref': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc',
                 'survey': "BRES"}
 
         self.headers = {'Content-Type': 'application/json', 'Authorization': "eyJhbGciOiJSU0EtT0FFUCIsImVuYyI6IkEyNTZHQ00ifQ.XMrQ2QMNcoWqv6Pm4KGPZRPAHMSNuCRrmdp-glDvf_9gDzYDoXkxbZEBqy6_pdMTIFINUWUABYa7PdLLuJh5uoU9L7lmvJKEYCq0e5rS076KLRc5pFKHJesgJLNijj7scLke3y4INkd0px82SHhnbek0bGLeu3i8FgRt4vD0Eu8TWODM7kEfAT_eRmvPBM1boyOqrpyhYgE9p0_NklwloFXdYZKjTvHxlHtbiuYmvXSTFkbbp_t8T1xZmDrfgS2EDWTFEagzyKBFFAH4Z5QRUUJPiuAxI3lSNS2atFFtDWiZRhuuhRyJzNA4vqTpmFPUE6h_iggkcbiUPofSBx3CUw.QK4lX7z2vN6jryJz.G9C1zoAvWHfAJywiuijq6E78xCMZ5NOAZD1g3e6PTWhveQKNecBJAPgXyRDVgljgIwSq_vBY2AVTIE5xWapwF3oLZyiC0T0H2LrjlpKFUa51-VU_-Yj8u4ax0iLvyWyRRepQneYJ0riF4zbmcGf1vCCEO3WOwcD5wXBFVXVH6wPqExmI2tjWWLdz2F7oK1Wnh1pbQX_EW5rYb2I4mPuc2J6ijXAr73qcJLAzJbjDo1uk.QrPCckVYuNlcWeCwQmws9A"}
@@ -71,6 +73,7 @@ class PartyTestCase(unittest.TestCase):
                 'subject': 'MyMessage',
                 'body': 'hello',
                 'thread': "?",
+                'ru_ref': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc',
                 'survey': "BRES"}
 
         self.app = application.app.test_client()
@@ -97,6 +100,7 @@ class PartyTestCase(unittest.TestCase):
                 'subject': 'MyMessage',
                 'body': 'hello',
                 'thread': "?",
+                'ru_ref': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc',
                 'survey': "BRES"}
 
         self.app = application.app.test_client()
@@ -122,6 +126,7 @@ class PartyTestCase(unittest.TestCase):
                 'subject': 'MyMessage',
                 'body': 'hello',
                 'thread': "?",
+                'ru_ref': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc',
                 'survey': "BRES"}
 
         self.app = application.app.test_client()
@@ -143,6 +148,24 @@ class PartyTestCase(unittest.TestCase):
             self.assertEqual(draft['msg_from'], {'telephone': '+443069990289', 'firstname': 'Vana', 'email': 'vana123@aol.com', 'id': '0a7ad740-10d5-4ecb-b7ca-3c0384afb882', 'status': 'ACTIVE', 'surname': 'Oorschot'})
             self.assertEqual(draft['msg_to'][0], {"id": "", "firstname": "BRES", "surname": "", "email": "", "telephone": "", "status": ""})
 
+    def test_get_business_details_by_ru(self):
+
+        list_ru = ['f1a5e99c-8edf-489a-9c72-6cabe6c387fc']
+
+        business_details = business_by_ru.get_business_details_by_ru(list_ru)
+
+        self.assertEqual(business_details[list_ru[0]]['ru_ref'], list_ru[0])
+        self.assertEqual(business_details[list_ru[0]]['business_name'], "Apple")
+
+    def test_get_business_details_multiple_ru(self):
+
+        list_ru = ['0a6018a0-3e67-4407-b120-780932434b36', 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc', 'c614e64e-d981-4eba-b016-d9822f09a4fb']
+
+        business_details = business_by_ru.get_business_details_by_ru(list_ru)
+
+        self.assertEqual(business_details[list_ru[0]]['ru_ref'], list_ru[0])
+        self.assertEqual(business_details[list_ru[1]]['ru_ref'], list_ru[1])
+        self.assertEqual(business_details[list_ru[2]]['ru_ref'], list_ru[2])
 
 if __name__ == '__main__':
     unittest.main()

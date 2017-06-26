@@ -123,9 +123,9 @@ class MessageById(Resource):
         message_service = Retriever()
         resp = message_service.retrieve_message(message_id, g.user)
 
-        data = get_details_by_uuids([resp['msg_from'], resp["msg_to"][0]])
-        resp["msg_from"] = data[resp['msg_from']]
-        resp["msg_to"] = [data[resp['msg_to'][0]]]
+        user_data = get_details_by_uuids([resp['msg_from'], resp["msg_to"][0]])
+        resp["msg_from"] = user_data[resp['msg_from']]
+        resp["msg_to"] = [user_data[resp['msg_to'][0]]]
         return jsonify(resp)
 
 
