@@ -250,52 +250,60 @@ class DraftTestCase(unittest.TestCase):
     def test_etag_check_returns_true(self):
         """Test etag_check function returns true for unchanged draft etag"""
 
-        with self.engine.connect() as con:
-            msg_id = str(uuid.uuid4())
-            query = 'INSERT INTO secure_message(msg_id, subject, body, thread_id,' \
-                    ' collection_case, reporting_unit, survey) VALUES ("{0}", "test","test","", ' \
-                    ' "ACollectionCase", "AReportingUnit", ' \
-                    '"SurveyType")'.format(msg_id)
-            con.execute(query)
-            query = 'INSERT INTO status(label, msg_id, actor) VALUES("DRAFT", "{0}",' \
-                    ' "0a7ad740-10d5-4ecb-b7ca-3c0384afb882")'.format(msg_id)
-            con.execute(query)
-            query = 'INSERT INTO status(label, msg_id, actor) VALUES("DRAFT_INBOX", "{0}",' \
-                    ' "SurveyType")'.format(msg_id)
-            con.execute(query)
+        message = {
+            'msg_to': ['BRES'],
+            'msg_from': '0a7ad740-10d5-4ecb-b7ca-3c0384afb882',
+            'msg_id': 'ea420f66-12f6-4d4e-bf36-fe9b6b20c3f4',
+            'subject': 'test',
+            'body': 'test',
+            'thread_id': '',
+            'collection_case': 'ACollectionCase',
+            'reporting_unit': 'reporting_unit',
+            'survey': 'BRES',
+            '_links': '',
+            'labels': ['DRAFT']
+        }
 
-        with app.app_context():
-            with current_app.test_request_context():
-                is_valid_draft = Retriever().check_msg_id_is_a_draft(msg_id, self.user_respondent)
-        hash_object = hashlib.sha1(str(sorted(is_valid_draft[1].items())).encode())
+        etag_data = {
+                        'msg_to': ['BRES'],
+                        'msg_id': 'ea420f66-12f6-4d4e-bf36-fe9b6b20c3f4',
+                        'subject': 'test',
+                        'body': 'test'
+                    }
+
+        hash_object = hashlib.sha1(str(sorted(etag_data.items())).encode())
         etag = hash_object.hexdigest()
 
-        self.assertTrue(DraftModifyById.etag_check({'etag': etag}, is_valid_draft[1]))
+        self.assertTrue(DraftModifyById.etag_check({'etag': etag}, message))
 
     def test_etag_check_returns_false(self):
         """Test etag_check function returns false for changed draft etag"""
 
-        with self.engine.connect() as con:
-            msg_id = str(uuid.uuid4())
-            query = 'INSERT INTO secure_message(msg_id, subject, body, thread_id,' \
-                    ' collection_case, reporting_unit, survey) VALUES ("{0}", "test","test","", ' \
-                    ' "ACollectionCase", "AReportingUnit", ' \
-                    '"SurveyType")'.format(msg_id)
-            con.execute(query)
-            query = 'INSERT INTO status(label, msg_id, actor) VALUES("DRAFT", "{0}", ' \
-                    '"0a7ad740-10d5-4ecb-b7ca-3c0384afb882")'.format(msg_id)
-            con.execute(query)
-            query = 'INSERT INTO status(label, msg_id, actor) VALUES("DRAFT_INBOX", "{0}",' \
-                    ' "SurveyType")'.format(msg_id)
-            con.execute(query)
+        message = {
+            'msg_to': ['BRES'],
+            'msg_from': '0a7ad740-10d5-4ecb-b7ca-3c0384afb882',
+            'msg_id': 'ea420f66-12f6-4d4e-bf36-fe9b6b20c3f4',
+            'subject': 'test',
+            'body': 'test',
+            'thread_id': '',
+            'collection_case': 'ACollectionCase',
+            'reporting_unit': 'reporting_unit',
+            'survey': 'BRES',
+            '_links': '',
+            'labels': ['DRAFT']
+        }
 
-        with app.app_context():
-            with current_app.test_request_context():
-                is_valid_draft = Retriever().check_msg_id_is_a_draft(msg_id, self.user_respondent)
+        etag_data = {
+            'msg_to': ['SOMETHINGELSE'],
+            'msg_id': 'ea420f66-12f6-4d4e-bf36-fe9b6b20c3f4',
+            'subject': 'test',
+            'body': 'test'
+        }
 
-        etag = '1234567sdfghj98765fgh'
+        hash_object = hashlib.sha1(str(sorted(etag_data.items())).encode())
+        etag = hash_object.hexdigest()
 
-        self.assertFalse(DraftModifyById.etag_check({'ETag': etag}, is_valid_draft[1]))
+        self.assertFalse(DraftModifyById.etag_check({'ETag': etag}, message))
 
     def test_draft_modified_since_last_read_t_raises_error(self):
         """Test draft_modified_since_last_read function raises internal server error"""
