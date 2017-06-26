@@ -40,6 +40,7 @@ class PartyTestCase(unittest.TestCase):
             user_by_uuid.get_details_by_uuids(list_uuids)
 
     def test_message_by_id_replaces_uuids(self):
+        """Test get message by id endpoint replaces to and from with user details"""
         data = {'msg_to': 'BRES',
                 'msg_from': '0a7ad740-10d5-4ecb-b7ca-3c0384afb882',
                 'subject': 'MyMessage',
@@ -65,6 +66,7 @@ class PartyTestCase(unittest.TestCase):
         self.assertEqual(message['msg_to'], [{"id": "BRES", "firstname": "BRES", "surname": "", "email": "", "telephone": "", "status": ""}])
 
     def test_messages_get_replaces_uuids_with_user_details(self):
+        """Test get all messages endpoint replaces every messages to and from with user details"""
         data = {'msg_to': 'BRES',
                 'msg_from': '0a7ad740-10d5-4ecb-b7ca-3c0384afb882',
                 'subject': 'MyMessage',
@@ -91,6 +93,7 @@ class PartyTestCase(unittest.TestCase):
             self.assertEqual(message['msg_from'], {'firstname': 'Vana', 'id': '0a7ad740-10d5-4ecb-b7ca-3c0384afb882', 'status': 'ACTIVE', 'telephone': '+443069990289', 'surname': 'Oorschot', 'email': 'vana123@aol.com'})
 
     def test_draft_get_return_user_details_for_to_and_from(self):
+        """Test get draft replaces sender and recipient with user details"""
         data = {'msg_to': 'BRES',
                 'msg_from': '0a7ad740-10d5-4ecb-b7ca-3c0384afb882',
                 'subject': 'MyMessage',
@@ -116,6 +119,7 @@ class PartyTestCase(unittest.TestCase):
         self.assertEqual(draft['msg_from'], {'telephone': '+443069990289', 'firstname': 'Vana', 'email': 'vana123@aol.com', 'id': '0a7ad740-10d5-4ecb-b7ca-3c0384afb882', 'status': 'ACTIVE', 'surname': 'Oorschot'})
 
     def test_drafts_get_return_user_details_in_to_and_from(self):
+        """Test get all drafts returns to and from as user details"""
         data = {'msg_to': 'BRES',
                 'msg_from': '0a7ad740-10d5-4ecb-b7ca-3c0384afb882',
                 'subject': 'MyMessage',

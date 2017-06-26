@@ -91,6 +91,8 @@ def paginated_list_to_json(paginated_list, page, limit, host_url, user, string_q
 
 
 def add_to_and_from_details(messages):
+    """Adds user details for sender and reciepient"""
+
     uuid_list = []
 
     for message in messages:
