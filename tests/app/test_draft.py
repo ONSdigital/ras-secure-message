@@ -14,6 +14,7 @@ from app import settings
 from app.application import app
 from app.authentication.jwe import Encrypter
 from app.authentication.jwt import encode
+from app.common import utilities
 from app.common.alerts import AlertUser, AlertViaGovNotify
 from app.common.labels import Labels
 from app.repository import database
@@ -247,7 +248,7 @@ class DraftTestCase(unittest.TestCase):
                 is_valid_draft = Retriever().check_msg_id_is_a_draft('000000-0000-00000', self.user_respondent)
         self.assertFalse(is_valid_draft[0])
 
-    def test_etag_check_returns_true(self):
+    def test_etag_check_returns_true_if_data_equal(self):
         """Test etag_check function returns true for unchanged draft etag"""
 
         message = {
@@ -264,19 +265,32 @@ class DraftTestCase(unittest.TestCase):
             'labels': ['DRAFT']
         }
 
-        etag_data = {
-                        'msg_to': ['BRES'],
-                        'msg_id': 'ea420f66-12f6-4d4e-bf36-fe9b6b20c3f4',
-                        'subject': 'test',
-                        'body': 'test'
-                    }
-
-        hash_object = hashlib.sha1(str(sorted(etag_data.items())).encode())
-        etag = hash_object.hexdigest()
+        etag = utilities.generate_etag(message['msg_to'],message['msg_id'], message['subject'],message['body'])
 
         self.assertTrue(DraftModifyById.etag_check({'etag': etag}, message))
 
-    def test_etag_check_returns_false(self):
+    def test_etag_check_returns_false_if_msg_to_changed(self):
+        """Test etag_check function returns false for changed draft etag"""
+
+
+        message = {
+            'msg_to': ['BRES'],
+            'msg_from': '0a7ad740-10d5-4ecb-b7ca-3c0384afb882',
+            'msg_id': 'ea420f66-12f6-4d4e-bf36-fe9b6b20c3f4',
+            'subject': 'test',
+            'body': 'test',
+            'thread_id': '',
+            'collection_case': 'ACollectionCase',
+            'reporting_unit': 'reporting_unit',
+            'survey': 'BRES',
+            '_links': '',
+            'labels': ['DRAFT']
+        }
+
+        etag = utilities.generate_etag('XXX',message['msg_id'], message['subject'],message['body'])
+        self.assertFalse(DraftModifyById.etag_check({'ETag': etag}, message))
+
+    def test_etag_check_returns_false_if_msg_id_changed(self):
         """Test etag_check function returns false for changed draft etag"""
 
         message = {
@@ -293,17 +307,50 @@ class DraftTestCase(unittest.TestCase):
             'labels': ['DRAFT']
         }
 
-        etag_data = {
-            'msg_to': ['SOMETHINGELSE'],
+        etag = utilities.generate_etag(message['msg_to'], 'XXX', message['subject'], message['body'])
+        self.assertFalse(DraftModifyById.etag_check({'ETag': etag}, message))
+
+    def test_etag_check_returns_false_if_subject_changed(self):
+        """Test etag_check function returns false for changed draft etag"""
+
+        message = {
+            'msg_to': ['BRES'],
+            'msg_from': '0a7ad740-10d5-4ecb-b7ca-3c0384afb882',
             'msg_id': 'ea420f66-12f6-4d4e-bf36-fe9b6b20c3f4',
             'subject': 'test',
-            'body': 'test'
+            'body': 'test',
+            'thread_id': '',
+            'collection_case': 'ACollectionCase',
+            'reporting_unit': 'reporting_unit',
+            'survey': 'BRES',
+            '_links': '',
+            'labels': ['DRAFT']
         }
 
-        hash_object = hashlib.sha1(str(sorted(etag_data.items())).encode())
-        etag = hash_object.hexdigest()
-
+        etag = utilities.generate_etag(message['msg_to'], message['msg_id'], 'XXX', message['body'])
         self.assertFalse(DraftModifyById.etag_check({'ETag': etag}, message))
+
+    def test_etag_check_returns_false_if_body_changed(self):
+        """Test etag_check function returns false for changed draft etag"""
+
+        message = {
+            'msg_to': ['BRES'],
+            'msg_from': '0a7ad740-10d5-4ecb-b7ca-3c0384afb882',
+            'msg_id': 'ea420f66-12f6-4d4e-bf36-fe9b6b20c3f4',
+            'subject': 'test',
+            'body': 'test',
+            'thread_id': '',
+            'collection_case': 'ACollectionCase',
+            'reporting_unit': 'reporting_unit',
+            'survey': 'BRES',
+            '_links': '',
+            'labels': ['DRAFT']
+        }
+
+        etag = utilities.generate_etag(message['msg_to'], message['msg_id'], message['subject'], 'XXX')
+        self.assertFalse(DraftModifyById.etag_check({'ETag': etag}, message))
+
+
 
     def test_draft_modified_since_last_read_t_raises_error(self):
         """Test draft_modified_since_last_read function raises internal server error"""
