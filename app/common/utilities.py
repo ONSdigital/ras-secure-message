@@ -1,4 +1,3 @@
-import logging
 from flask import jsonify
 from structlog import wrap_logger
 import logging
