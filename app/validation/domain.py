@@ -132,8 +132,6 @@ class DraftSchema(Schema):
     @pre_load
     def check_variables_set_and_not_set(self, data):
         """Check sent and read date not set and that from and survey are set"""
-        self.validate_not_present(data, 'sent_date')
-        self.validate_not_present(data, 'read_date')
         if 'msg_from' not in data or len(data['msg_from']) == 0:
             raise ValidationError("{0} Missing".format('msg_from'))
         if 'survey' not in data or len(data['survey']) == 0:

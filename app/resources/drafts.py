@@ -1,4 +1,3 @@
-import hashlib
 import logging
 
 from flask import g, Response
@@ -9,8 +8,8 @@ from werkzeug.exceptions import BadRequest
 
 from app.common import user_by_uuid
 from app.common.labels import Labels
-from app.common.utilities import get_options, paginated_list_to_json
 from app.constants import DRAFT_LIST_ENDPOINT
+from app.common.utilities import get_options, paginated_list_to_json, generate_etag
 from app.repository.modifier import Modifier
 from app.repository.retriever import Retriever
 from app.repository.saver import Saver
@@ -30,11 +29,8 @@ class DraftSave(Resource):
 
         if draft.errors == {}:
             self._save_draft(draft)
-            message_service = Retriever()
-            saved_draft = message_service.retrieve_draft(draft.data.msg_id, g.user)
 
-            hash_object = hashlib.sha1(str(sorted(saved_draft.items())).encode())
-            etag = hash_object.hexdigest()
+            etag = generate_etag([draft.data.msg_to], draft.data.msg_id, draft.data.subject, draft.data.body)
             resp = jsonify({'status': 'OK', 'msg_id': draft.data.msg_id, 'thread_id': draft.data.thread_id})
             resp.headers['ETag'] = etag
             resp.status_code = 201
@@ -68,19 +64,13 @@ class DraftById(Resource):
         # check user is authorised to view message
         message_service = Retriever()
         draft_data = message_service.retrieve_draft(draft_id, g.user)
-        etag = DraftById.generate_etag(draft_data)
+        etag = generate_etag(draft_data['msg_to'], draft_data['msg_id'], draft_data['subject'], draft_data['body'])
+
         draft_data = DraftById.get_to_and_from_details(draft_data)
         resp = jsonify(draft_data)
         resp.headers['ETag'] = etag
 
         return resp
-
-    @staticmethod
-    def generate_etag(draft_data):
-        hash_object = hashlib.sha1(str(sorted(draft_data.items())).encode())
-        etag = hash_object.hexdigest()
-
-        return etag
 
     @staticmethod
     def get_to_and_from_details(draft):
@@ -144,8 +134,8 @@ class DraftModifyById(Resource):
             message_service = Retriever()
             modified_draft = message_service.retrieve_draft(draft_id, g.user)
 
-            hash_object = hashlib.sha1(str(sorted(modified_draft.items())).encode())
-            etag = hash_object.hexdigest()
+            etag = generate_etag(modified_draft['msg_to'], modified_draft['msg_id'],
+                                 modified_draft['subject'], modified_draft['body'])
             resp = jsonify({'status': 'OK', 'msg_id': draft_id})
             resp.headers['ETag'] = etag
             resp.status_code = 200
@@ -159,8 +149,8 @@ class DraftModifyById(Resource):
     def etag_check(headers, current_draft):
         """Check etag to make sure draft has not been modified since get request"""
         if headers.get('ETag'):
-            hash_object = hashlib.sha1(str(sorted(current_draft.items())).encode())
-            current_etag = hash_object.hexdigest()
+            current_etag = generate_etag(current_draft['msg_to'], current_draft['msg_id'],
+                                         current_draft['subject'], current_draft['body'])
             if current_etag == headers.get('ETag'):
                 return True
             return False
