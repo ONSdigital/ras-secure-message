@@ -1,8 +1,10 @@
-from app.constants import MESSAGE_BY_ID_ENDPOINT, MESSAGE_LIST_ENDPOINT, MESSAGE_QUERY_LIMIT
+import logging
 from flask import jsonify
 from structlog import wrap_logger
 import logging
 import hashlib
+from app.common import user_by_uuid
+from app.constants import MESSAGE_BY_ID_ENDPOINT, MESSAGE_LIST_ENDPOINT, MESSAGE_QUERY_LIMIT
 
 logger = wrap_logger(logging.getLogger(__name__))
 
@@ -85,6 +87,7 @@ def paginated_list_to_json(paginated_list, page, limit, host_url, user, string_q
         links['prev'] = {
             "href": "{0}{1}{2}{3}page={4}&limit={5}".format(host_url, endpoint, arg_joiner,
                                                             string_query_args, (page - 1), limit)}
+    messages = add_to_and_from_details(messages)
 
     return jsonify({"messages": messages, "_links": links})
 
@@ -102,3 +105,23 @@ def generate_etag(msg_to, msg_id, subject, body):
     etag = hash_object.hexdigest()
 
     return etag
+
+
+def add_to_and_from_details(messages):
+    """Adds user details for sender and reciepient"""
+
+    uuid_list = []
+
+    for message in messages:
+        if message['msg_to'] not in uuid_list:
+            uuid_list.append(message['msg_to'][0])
+        if message['msg_from'] not in uuid_list:
+            uuid_list.append(message['msg_from'])
+
+    user_details = user_by_uuid.get_details_by_uuids(uuid_list)
+
+    for message in messages:
+        message['msg_to'][0] = next((user for user in user_details if user["id"] == message['msg_to'][0]), None)
+        message['msg_from'] = next((user for user in user_details if user["id"] == message['msg_from']), None)
+    return messages
+
