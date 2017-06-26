@@ -89,8 +89,15 @@ def paginated_list_to_json(paginated_list, page, limit, host_url, user, string_q
     return jsonify({"messages": messages, "_links": links})
 
 
-def generate_etag(draft_data):
-    hash_object = hashlib.sha1(str(sorted(draft_data.items())).encode())
+def generate_etag(msg_to, msg_id, subject, body):
+    data_to_hash = {
+                    'msg_to': msg_to,
+                    'msg_id': msg_id,
+                    'subject': subject,
+                    'body': body
+                    }
+
+    hash_object = hashlib.sha1(str(sorted(data_to_hash.items())).encode())
     etag = hash_object.hexdigest()
 
     return etag
