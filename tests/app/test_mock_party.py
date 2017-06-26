@@ -1,10 +1,12 @@
 import unittest
-from app.resources import user_by_uuid
+
+from flask import json
+from sqlalchemy import create_engine
 from werkzeug.exceptions import BadRequest
+
 from app import application
 from app.application import app
-from sqlalchemy import create_engine
-from flask import json
+from app.common import user_by_uuid
 
 
 class PartyTestCase(unittest.TestCase):
@@ -16,10 +18,7 @@ class PartyTestCase(unittest.TestCase):
 
         user_details = user_by_uuid.get_details_by_uuids(list_uuids)
 
-        self.assertEqual(user_details[list_uuids[0]]['firstname'], "Bhavana")
-        self.assertEqual(user_details[list_uuids[0]]['surname'], "Lincoln")
-        self.assertEqual(user_details[list_uuids[0]]['telephone'], "+443069990888")
-        self.assertEqual(user_details[list_uuids[0]]['status'], "ACTIVE")
+        self.assertEqual(user_details[0], {"id": "f62dfda8-73b0-4e0e-97cf-1b06327a6712", "firstname": "Bhavana", "surname": "Lincoln", "email": "lincoln.bhavana@gmail.com", "telephone": "+443069990888", "status": "ACTIVE"})
 
     def test_get_user_details_by_uuids(self):
         """Test that user details are returned using uuids"""
@@ -28,9 +27,9 @@ class PartyTestCase(unittest.TestCase):
 
         user_details = user_by_uuid.get_details_by_uuids(list_uuids)
 
-        self.assertEqual(user_details[list_uuids[0]]['firstname'], "Bhavana")
-        self.assertEqual(user_details[list_uuids[1]]['firstname'], "Chandana")
-        self.assertEqual(user_details[list_uuids[2]]['firstname'], "Ida")
+        self.assertEqual(user_details[0], {"id": "f62dfda8-73b0-4e0e-97cf-1b06327a6712", "firstname": "Bhavana", "surname": "Lincoln", "email": "lincoln.bhavana@gmail.com", "telephone": "+443069990888", "status": "ACTIVE"})
+        self.assertEqual(user_details[1], {"id": "01b51fcc-ed43-4cdb-ad1c-450f9986859b", "firstname": "Chandana", "surname": "Blanchet", "email": "cblanc@hotmail.co.uk", "telephone": "+443069990854", "status": "ACTIVE"})
+        self.assertEqual(user_details[2], {"id": "dd5a38ff-1ecb-4634-94c8-2358df33e614", "firstname": "Ida", "surname": "Larue", "email": "ilarue47@yopmail.com", "telephone": "+443069990250", "status": "ACTIVE"})
 
     def test_get_user_details_by_invalid_uuid(self):
         """Test that function returns error when invalid uuid present"""
@@ -63,7 +62,7 @@ class PartyTestCase(unittest.TestCase):
         message = json.loads(message_resp.data)
 
         self.assertEqual(message['msg_from'], {'telephone': '+443069990289', 'firstname': 'Vana', 'email': 'vana123@aol.com', 'id': '0a7ad740-10d5-4ecb-b7ca-3c0384afb882', 'status': 'ACTIVE', 'surname': 'Oorschot'})
-        self.assertEqual(message['msg_to'], [{"id": "", "firstname": "BRES", "surname": "", "email": "", "telephone": "", "status": ""}])
+        self.assertEqual(message['msg_to'], [{"id": "BRES", "firstname": "BRES", "surname": "", "email": "", "telephone": "", "status": ""}])
 
     def test_messages_get_replaces_uuids_with_user_details(self):
         data = {'msg_to': 'BRES',
@@ -141,7 +140,7 @@ class PartyTestCase(unittest.TestCase):
 
         for draft in drafts:
             self.assertEqual(draft['msg_from'], {'telephone': '+443069990289', 'firstname': 'Vana', 'email': 'vana123@aol.com', 'id': '0a7ad740-10d5-4ecb-b7ca-3c0384afb882', 'status': 'ACTIVE', 'surname': 'Oorschot'})
-            self.assertEqual(draft['msg_to'][0], {"id": "", "firstname": "BRES", "surname": "", "email": "", "telephone": "", "status": ""})
+            self.assertEqual(draft['msg_to'][0], {"id": "BRES", "firstname": "BRES", "surname": "", "email": "", "telephone": "", "status": ""})
 
 
 if __name__ == '__main__':

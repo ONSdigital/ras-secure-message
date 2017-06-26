@@ -1,8 +1,8 @@
-from app.constants import MESSAGE_BY_ID_ENDPOINT, MESSAGE_LIST_ENDPOINT, MESSAGE_QUERY_LIMIT
+import logging
 from flask import jsonify
 from structlog import wrap_logger
-import logging
-from app.resources import user_by_uuid
+from app.common import user_by_uuid
+from app.constants import MESSAGE_BY_ID_ENDPOINT, MESSAGE_LIST_ENDPOINT, MESSAGE_QUERY_LIMIT
 
 logger = wrap_logger(logging.getLogger(__name__))
 
@@ -95,14 +95,20 @@ def add_to_and_from_details(messages):
     from_list = []
 
     for message in messages:
-        to_list.append(message['msg_to'][0])
-        from_list.append(message['msg_from'])
+        if message['msg_to'] not in to_list:
+            to_list.append(message['msg_to'][0])
+        if message['msg_from'] not in from_list:
+            from_list.append(message['msg_from'])
 
     to_details = user_by_uuid.get_details_by_uuids(to_list)
     from_details = user_by_uuid.get_details_by_uuids(from_list)
 
     for message in messages:
-        message['msg_to'] = [to_details[message['msg_to'][0]]]
-        message['msg_from'] = from_details[message['msg_from']]
+        for user_to in to_details:
+            if message['msg_to'][0] == user_to['id']:
+                message['msg_to'] = [user_to]
+        for user_from in from_details:
+            if message['msg_from'] == user_from['id']:
+                message['msg_from'] = user_from
 
     return messages

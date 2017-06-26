@@ -1,13 +1,15 @@
+import uuid
+
 import flask
-from flask import json
 import nose.tools
 from behave import given, then, when
-from app.application import app
-import uuid
-from app.authentication.jwt import encode
-from app.authentication.jwe import Encrypter
+from flask import json
+
 from app import settings
-from app.resources import user_by_uuid
+from app.application import app
+from app.authentication.jwe import Encrypter
+from app.authentication.jwt import encode
+from app.common import user_by_uuid
 
 url = "http://localhost:5050/message/{0}"
 token_data = {
