@@ -10,21 +10,21 @@ from app import settings
 
 url = "http://localhost:5050/drafts"
 token_data = {
-            "user_uuid": "respondent.2134",
+            "user_uuid": "0a7ad740-10d5-4ecb-b7ca-3c0384afb882",
             "role": "respondent"
         }
 
 headers = {'Content-Type': 'application/json', 'Authorization': ''}
 
-data = {'msg_to': 'test',
-        'msg_from': 'test',
+data = {'msg_to': 'BRES',
+        'msg_from': '0a7ad740-10d5-4ecb-b7ca-3c0384afb882',
         'subject': 'Hello World',
         'body': 'Test',
         'thread_id': '',
         'collection_case': 'collectioncase',
         'reporting_unit': 'AReportingUnit',
         'business_name': 'ABusiness',
-        'survey': 'survey'}
+        'survey': 'BRES'}
 
 
 def update_encrypted_jwt():
@@ -41,22 +41,22 @@ headers['Authorization'] = update_encrypted_jwt()
 
 @given('the user has created and saved multiple drafts')
 def step_impl_user_has_created__and_saved_multiple_drafts(context):
-    data.update({'msg_to': 'test',
-                 'msg_from': 'respondent.2134',
+    data.update({'msg_to': 'BRES',
+                 'msg_from': '0a7ad740-10d5-4ecb-b7ca-3c0384afb882',
                  'subject': 'test',
                  'body': 'Test',
                  'thread_id': '',
                  'collection_case': 'collection case1',
                  'reporting_unit': 'reporting case1',
                  'business_name': 'ABusiness',
-                 'survey': 'survey'})
+                 'survey': 'BRES'})
     for _ in range(0, 10):
         app.test_client().post("http://localhost:5050/draft/save", data=json.dumps(data), headers=headers)
 
 
 @when("the user requests drafts")
 def step_impl_user_requests_drafts(context):
-    token_data['user_urn'] = 'respondent.2134'
+    token_data['user_urn'] = '0a7ad740-10d5-4ecb-b7ca-3c0384afb882'
     headers['Authorization'] = update_encrypted_jwt()
     context.response = app.test_client().get('{0}?limit={1}&page={2}'.format(url, 7, 1), headers=headers)
 
@@ -66,7 +66,7 @@ def step_impl_only_the_users_drafts_are_returned(context):
     response = flask.json.loads(context.response.data)
     for x in range(0, len(response['messages'])):
         nose.tools.assert_equal(response['messages'][x]['labels'], ['DRAFT'])
-        nose.tools.assert_equal(response['messages'][x]['msg_from'], data['msg_from'])
+        nose.tools.assert_equal(response['messages'][x]['msg_from'], {"id": "0a7ad740-10d5-4ecb-b7ca-3c0384afb882", "firstname": "Vana", "surname": "Oorschot", "email": "vana123@aol.com", "telephone": "+443069990289", "status": "ACTIVE"})
 
     nose.tools.assert_equal(len(response['messages']), 7)
 
@@ -75,7 +75,7 @@ def step_impl_only_the_users_drafts_are_returned(context):
 
 @when("the user requests second page of drafts")
 def step_impl_the_user_requests_second_page_of_drafts(context):
-    token_data['user_urn'] = 'respondent.2134'
+    token_data['user_urn'] = '0a7ad740-10d5-4ecb-b7ca-3c0384afb882'
     headers['Authorization'] = update_encrypted_jwt()
     context.response = app.test_client().get('{0}?limit={1}&page={2}'.format(url, 7, 2), headers=headers)
 
@@ -85,7 +85,7 @@ def step_impl_user_will_get_drafts_from_second_page_of_pagination(context):
     response = flask.json.loads(context.response.data)
     for x in range(0, len(response['messages'])):
         nose.tools.assert_equal(response['messages'][x]['labels'], ['DRAFT'])
-        nose.tools.assert_equal(response['messages'][x]['msg_from'], data['msg_from'])
+        nose.tools.assert_equal(response['messages'][x]['msg_from'], {"id": "0a7ad740-10d5-4ecb-b7ca-3c0384afb882", "firstname": "Vana", "surname": "Oorschot", "email": "vana123@aol.com", "telephone": "+443069990289", "status": "ACTIVE"})
 
     nose.tools.assert_equal(len(response['messages']), 3)
 

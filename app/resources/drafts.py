@@ -1,18 +1,20 @@
 import hashlib
 import logging
-from structlog import wrap_logger
+
 from flask import g, Response
 from flask import request, jsonify
 from flask_restful import Resource
+from structlog import wrap_logger
 from werkzeug.exceptions import BadRequest
+
+from app.common import user_by_uuid
 from app.common.labels import Labels
+from app.common.utilities import get_options, paginated_list_to_json
 from app.constants import DRAFT_LIST_ENDPOINT
-from app.repository.saver import Saver
-from app.validation.domain import DraftSchema
-from app.validation.user import User
 from app.repository.modifier import Modifier
 from app.repository.retriever import Retriever
-from app.common.utilities import get_options, paginated_list_to_json
+from app.repository.saver import Saver
+from app.validation.domain import DraftSchema
 
 logger = wrap_logger(logging.getLogger(__name__))
 
@@ -67,6 +69,7 @@ class DraftById(Resource):
         message_service = Retriever()
         draft_data = message_service.retrieve_draft(draft_id, g.user)
         etag = DraftById.generate_etag(draft_data)
+        draft_data = DraftById.get_to_and_from_details(draft_data)
         resp = jsonify(draft_data)
         resp.headers['ETag'] = etag
 
@@ -78,6 +81,21 @@ class DraftById(Resource):
         etag = hash_object.hexdigest()
 
         return etag
+
+    @staticmethod
+    def get_to_and_from_details(draft):
+        """Get user details for to and from for draft"""
+
+        uuids = [draft['msg_from']]
+        if draft['msg_to'] is not None:
+            uuids.append(draft['msg_to'][0])
+        user_details = user_by_uuid.get_details_by_uuids(uuids)
+        for user in user_details:
+            if draft['msg_from'] == user['id']:
+                draft['msg_from'] = user
+            if draft['msg_to'][0] == user['id']:
+                draft['msg_to'] = [user]
+        return draft
 
 
 class DraftList(Resource):

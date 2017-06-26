@@ -47,8 +47,8 @@ class DraftTestCase(unittest.TestCase):
 
         self.headers = {'Content-Type': 'application/json', 'Authorization': encrypted_jwt}
 
-        self.test_message = {'msg_to': 'richard',
-                             'msg_from': 'torrance',
+        self.test_message = {'msg_to': 'f62dfda8-73b0-4e0e-97cf-1b06327a6712',
+                             'msg_from': 'ce12b958-2a5f-44f4-a6da-861e59070a31',
                              'subject': 'MyMessage',
                              'body': 'hello',
                              'thread_id': '',
@@ -202,7 +202,7 @@ class DraftTestCase(unittest.TestCase):
         self.test_message.update(
             {
                 'msg_id': self.msg_id,
-                'msg_to': 'richard',
+                'msg_to': '0a7ad740-10d5-4ecb-b7ca-3c0384afb882',
                 'msg_from': 'BRES',
                 'subject': 'MyMessage',
                 'body': 'hello',

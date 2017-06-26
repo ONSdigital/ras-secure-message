@@ -9,21 +9,21 @@ from app import settings
 
 url = "http://localhost:5050/message/{}/modify"
 token_data = {
-            "user_uuid": "000000000",
+            "user_uuid": "ce12b958-2a5f-44f4-a6da-861e59070a31",
             "role": "internal"
         }
 
 headers = {'Content-Type': 'application/json', 'Authorization': ''}
 
-data = {'msg_to': 'test',
-        'msg_from': 'test',
+data = {'msg_to': '0a7ad740-10d5-4ecb-b7ca-3c0384afb882',
+        'msg_from': 'ce12b958-2a5f-44f4-a6da-861e59070a31',
         'subject': 'Hello World',
         'body': 'Test',
         'thread_id': '',
         'collection_case': 'collection case1',
         'reporting_unit': 'reporting case1',
         'business_name': 'ABusiness',
-        'survey': 'survey.0000'}
+        'survey': 'BRES'}
 
 modify_data = {'action': '',
                'label': ''}
@@ -43,7 +43,7 @@ headers['Authorization'] = update_encrypted_jwt()
 @given("a valid message is sent")
 def step_impl(context):
     data['msg_to'] = 'BRES'
-    data['msg_from'] = 'respondent.122342'
+    data['msg_from'] = '0a7ad740-10d5-4ecb-b7ca-3c0384afb882'
     token_data['user_uuid'] = data['msg_from']
     token_data['role'] = 'respondent'
     headers['Authorization'] = update_encrypted_jwt()
@@ -75,7 +75,7 @@ def step_impl_assert_message_is_marked_as_archived(context):
 @given("the message is archived")
 def step_impl_the_message_is_archived(context):
     data['msg_to'] = 'BRES'
-    data['msg_from'] = 'respondent.122342'
+    data['msg_from'] = '0a7ad740-10d5-4ecb-b7ca-3c0384afb882'
     token_data['user_uuid'] = data['msg_from']
     token_data['role'] = 'respondent'
     headers['Authorization'] = update_encrypted_jwt()
@@ -110,8 +110,8 @@ def step_impl_message_not_marked_archived(context):
 @given('a message has been read')
 def step_impl_message_has_been_read(context):
     data['msg_to'] = 'BRES'
-    data['msg_from'] = 'respondent.122342'
-    token_data['user_uuid'] = 'respondent.122342'
+    data['msg_from'] = '0a7ad740-10d5-4ecb-b7ca-3c0384afb882'
+    token_data['user_uuid'] = '0a7ad740-10d5-4ecb-b7ca-3c0384afb882'
     token_data['role'] = 'respondent'
     headers['Authorization'] = update_encrypted_jwt()
     context.response = app.test_client().post("http://localhost:5050/message/send",
@@ -177,7 +177,7 @@ def step_impl_message_read_date_should_be_set(context):
 @given('a message is sent')
 def step_impl_a_message_is_sent(context):
     data['msg_to'] = 'BRES'
-    data['msg_from'] = 'respondent.122342'
+    data['msg_from'] = '0a7ad740-10d5-4ecb-b7ca-3c0384afb882'
     token_data['user_uuid'] = data['msg_from']
     token_data['role'] = 'respondent'
     headers['Authorization'] = update_encrypted_jwt()
@@ -286,7 +286,7 @@ def step_impl_no_unread_messages_returned(context):
 @given("a message with the status read is displayed to an internal user")
 def step_impl_message_with_status_read_returned(context):
     data['msg_to'] = 'BRES'
-    data['msg_from'] = 'respondent.122342'
+    data['msg_from'] = '0a7ad740-10d5-4ecb-b7ca-3c0384afb882'
     token_data['user_uuid'] = data['msg_from']
     token_data['role'] = 'respondent'
     headers['Authorization'] = update_encrypted_jwt()
