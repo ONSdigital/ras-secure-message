@@ -42,14 +42,14 @@ def before_scenario(context):
 
 
     data.update({
-                 'msg_to': 'test',
-                 'msg_from': 'respondent.test',
+                 'msg_to': 'BRES',
+                 'msg_from': '01b51fcc-ed43-4cdb-ad1c-450f9986859b',
                  'subject': 'Hello World',
                  'body': 'Test',
                  'thread_id': '',
                  'collection_case': 'collection case1',
                  'ru_ref': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc',
-                 'survey': 'survey'})
+                 'survey': 'BRES'})
 
 
 # Scenario 1: Submitting a valid message and receiving a 201
@@ -61,7 +61,7 @@ def step_impl_a_valid_message(context):
 # Scenario 2: Send a draft and receive a 201
 @given('a message is identified as a draft')
 def step_impl_a_message_is_a_draft(context):
-    token_data['user_uuid'] = 'respondent.test'
+    token_data['user_uuid'] = '01b51fcc-ed43-4cdb-ad1c-450f9986859b'
     token_data['role'] = 'respondent'
     headers['Authorization'] = update_encrypted_jwt()
     context.post_draft = app.test_client().post("http://localhost:5050/draft/save", data=json.dumps(data),
@@ -69,14 +69,14 @@ def step_impl_a_message_is_a_draft(context):
     msg_resp = json.loads(context.post_draft.data)
     context.msg_id = msg_resp['msg_id']
     context.message = {'msg_id': context.msg_id,
-                       'msg_to': 'test',
-                       'msg_from': 'respondent.test',
+                       'msg_to': 'BRES',
+                       'msg_from': '01b51fcc-ed43-4cdb-ad1c-450f9986859b',
                        'subject': 'Hello World',
                        'body': 'Test',
                        'thread_id': context.msg_id,
                        'collection_case': 'collection case1',
                        'ru_ref': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc',
-                       'survey': 'survey'}
+                       'survey': 'BRES'}
 
 
 # Scenario: A user sends a previously saved draft
@@ -98,14 +98,14 @@ def step_impl_draft_is_sent(context):
 
 @given('a message is identified as a draft which is a reply to another message')
 def step_impl_a_message_is_a_draft_reply(context):
-    data.update({'msg_to': 'test',
-                 'msg_from': 'respondent.test',
+    data.update({'msg_to': 'BRES',
+                 'msg_from': '01b51fcc-ed43-4cdb-ad1c-450f9986859b',
                  'subject': 'Hello World',
                  'body': 'Test',
                  'thread_id': '25e9172c-62d9-4ff7-98ac-661300ae9446',
                  'collection_case': 'collection case1',
                  'ru_ref': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc',
-                 'survey': 'survey'})
+                 'survey': 'BRES'})
 
     token_data['user_uuid'] = data['msg_from']
     token_data['role'] = 'respondent'
@@ -116,14 +116,14 @@ def step_impl_a_message_is_a_draft_reply(context):
     msg_resp = json.loads(context.post_draft.data)
     context.msg_id = msg_resp['msg_id']
     context.message = {'msg_id': context.msg_id,
-                       'msg_to': 'test',
-                       'msg_from': 'respondent.test',
+                       'msg_to': 'BRES',
+                       'msg_from': '01b51fcc-ed43-4cdb-ad1c-450f9986859b',
                        'subject': 'Hello World',
                        'body': 'Test',
                        'thread_id': '25e9172c-62d9-4ff7-98ac-661300ae9446',
                        'collection_case': 'collection case1',
                        'ru_ref': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc',
-                       'survey': 'survey'}
+                       'survey': 'BRES'}
 
 
 @then('thread_id is not the same as msg_id')
@@ -186,14 +186,15 @@ def step_impl_survey_field_empty(context):
 @given('a message contains a msg_id and is not a valid draft')
 def step_impl_message_contains_msg_id_and_is_not_valid_draft(context):
     data.update({'msg_id': 'test123',
-                 'msg_to': 'test',
-                 'msg_from': 'respondent.test',
+                 'msg_to': 'BRES',
+                 'msg_from': '01b51fcc-ed43-4cdb-ad1c-450f9986859b',
                  'subject': 'Hello World',
                  'body': 'Test',
                  'thread_id': '',
                  'collection_case': 'collection case1',
                  'ru_ref': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc',
-                 'survey': 'survey'})
+                 'survey': 'BRES'})
+
 
 
 # Scenario 12: When a message with the label of "Draft" is sent and another user is trying to send the same message return a 409
@@ -214,14 +215,15 @@ def step_impl_draft_message_posted(context):
     msg_resp = json.loads(context.post_draft.data)
     context.msg_id = msg_resp['msg_id']
     context.message = {'msg_id': context.msg_id,
-                       'msg_to': 'test',
-                       'msg_from': 'respondent.test',
+                       'msg_to': 'BRES',
+                       'msg_from': '01b51fcc-ed43-4cdb-ad1c-450f9986859b',
                        'subject': 'Hello World',
                        'body': 'Test',
                        'thread_id': '',
                        'collection_case': 'collection case1',
                        'ru_ref': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc',
-                       'survey': 'survey'}
+                       'survey': 'BRES'}
+
     token_data['user_uuid'] = context.message['msg_from']
     token_data['role'] = 'respondent'
     headers['Authorization'] = update_encrypted_jwt()
@@ -231,19 +233,20 @@ def step_impl_draft_message_posted(context):
 @when('another user tries to send the same message')
 def step_impl_another_user_sends_same_message(context):
     data.update({'msg_id': context.msg_id,
-                 'msg_to': 'internal.000000',
-                 'msg_from': 'respondent.000000',
+                 'msg_to': 'BRES',
+                 'msg_from': '0a7ad740-10d5-4ecb-b7ca-3c0384afb882',
                  'subject': 'test',
                  'body': 'test',
                  'thread_id': '2',
                  'collection_case': 'collection case1',
                  'ru_ref': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc',
-                 'survey': 'survey'})
+                 'survey': 'BRES'})
+
 
     data['subject'] = 'edited'
     headers['Etag'] = context.etag
 
-    token_data['user_uuid'] = 'respondent.000000'
+    token_data['user_uuid'] = '0a7ad740-10d5-4ecb-b7ca-3c0384afb882'
     token_data['role'] = 'respondent'
     headers['Authorization'] = update_encrypted_jwt()
     context.response = app.test_client().post(url.format(context.msg_id),
@@ -258,14 +261,14 @@ def step_impl_is_shown_404(context):
 # Scenario 13:  Scenario: A Etag is not present within the header
 @given('a message is created')
 def step_impl_message_is_created(context):
-    context.msg = {  'msg_to': 'test',
-                     'msg_from': 'respondent.test',
+    context.msg = {  'msg_to': 'BRES',
+                     'msg_from': '01b51fcc-ed43-4cdb-ad1c-450f9986859b',
                      'subject': 'test',
                      'body': 'Test',
                      'thread_id': '',
                      'collection_case': 'collection case1',
                      'ru_ref': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc',
-                     'survey': 'RSI'}
+                     'survey': 'BRES'}
 
 
 @when('the message is sent with no Etag')

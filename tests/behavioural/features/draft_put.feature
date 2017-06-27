@@ -6,6 +6,12 @@ Feature: Draft Put Endpoint
     Then the draft stored includes the new changes
     And a success response is given
 
+  Scenario: A user edits a previously saved draft without formatting
+    Given a user edits a previously saved draft without formatting
+    When the user saves the draft
+    Then the draft stored includes the new changes
+    And a success response is given
+
   Scenario: A user edits a draft that has not been previously saved
     Given a user edits a non-existing draft
     When the user saves the draft

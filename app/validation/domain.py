@@ -53,6 +53,24 @@ class MessageSchema(Schema):
         self.validate_not_present(data, 'read_date')
         return data
 
+    @pre_load
+    def check_format_of_msg_to_and_msg_from(self, data):
+
+        if data.get('msg_to') and isinstance(data.get('msg_to'), list) and "id" in data.get('msg_to')[0]:
+            data['msg_to'] = data['msg_to'][0]['id']
+        elif data.get('msg_to') and isinstance(data.get('msg_to'), list) and len(data.get('msg_to')) >= 1:
+            if isinstance(data.get('msg_to')[0], str):
+                data['msg_to'] = data.get('msg_to')[0]
+            else:
+                raise ValidationError("'msg_to' is missing an 'id' or incorrect format")
+
+        if data.get('msg_from') and not isinstance(data.get('msg_from'), str) and "id" in data.get('msg_from'):
+            data['msg_from'] = data['msg_from']['id']
+        elif data.get('msg_from') and not isinstance(data.get('msg_from'), str):
+            raise ValidationError("'msg_from' is missing an 'id' or incorrect format")
+
+        return data
+
     @validates_schema
     def validate_to_from_not_equal(self, data):
         if 'msg_to' in data.keys() and 'msg_from' in data.keys() and data['msg_to'] == data['msg_from']:
@@ -137,6 +155,29 @@ class DraftSchema(Schema):
         if 'survey' not in data or len(data['survey']) == 0:
             raise ValidationError("{0} Missing".format('survey'))
         return data
+
+    @pre_load
+    def check_format_of_msg_to_and_msg_from(self, data):
+
+        if data.get('msg_to') and isinstance(data.get('msg_to'), list) and "id" in data.get('msg_to')[0]:
+            data['msg_to'] = data['msg_to'][0]['id']
+        elif data.get('msg_to') and isinstance(data.get('msg_to'), list) and len(data.get('msg_to')) >= 1:
+            if isinstance(data.get('msg_to')[0], str):
+                data['msg_to'] = data.get('msg_to')[0]
+            else:
+                raise ValidationError("'msg_to' is missing an 'id' or incorrect format")
+
+        if data.get('msg_from') and not isinstance(data.get('msg_from'), str) and "id" in data.get('msg_from'):
+            data['msg_from'] = data['msg_from']['id']
+        elif data.get('msg_from') and not isinstance(data.get('msg_from'), str):
+            raise ValidationError("'msg_from' is missing an 'id' or incorrect format")
+
+        return data
+
+    @validates_schema
+    def validate_to_from_not_equal(self, data):
+        if 'msg_to' in data.keys() and 'msg_from' in data.keys() and data['msg_to'] == data['msg_from']:
+            raise ValidationError("msg_to and msg_from fields can not be the same.")
 
     @validates("msg_to")
     def validate_to(self, msg_to):

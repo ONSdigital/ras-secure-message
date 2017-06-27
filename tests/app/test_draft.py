@@ -359,3 +359,83 @@ class DraftTestCase(unittest.TestCase):
             with current_app.test_request_context():
                 with self.assertRaises(InternalServerError):
                     Retriever().check_msg_id_is_a_draft(msg_id, self.user_respondent)
+
+    def test_draft_same_to_from_causes_error(self):
+        """marshalling message with same to and from field"""
+        self.test_message['msg_to'] = self.test_message['msg_from']
+        with app.app_context():
+            g.user = User(self.test_message['msg_from'], 'respondent')
+            schema = DraftSchema()
+            errors = schema.load(self.test_message)[1]
+
+        self.assertTrue(errors == {'_schema': ['msg_to and msg_from fields can not be the same.']})
+
+    def test_draft_msg_to_list_of_dict(self):
+        """marshalling message where msg_to field is list of dicts"""
+        self.test_message['msg_to'] = [{"id": "01b51fcc-ed43-4cdb-ad1c-450f9986859b", "firstname": "Chandana", "surname": "Blanchet", "email": "cblanc@hotmail.co.uk", "telephone": "+443069990854", "status": "ACTIVE"}]
+        with app.app_context():
+            g.user = User(self.test_message['msg_from'], 'respondent')
+            schema = DraftSchema()
+            errors = schema.load(self.test_message)[1]
+
+        self.assertTrue(errors == {})
+
+    def test_draft_msg_to_list_of_string(self):
+        """marshalling message where msg_to field is list of strings"""
+        self.test_message['msg_to'] = ["01b51fcc-ed43-4cdb-ad1c-450f9986859b"]
+        with app.app_context():
+            g.user = User(self.test_message['msg_from'], 'respondent')
+            schema = DraftSchema()
+            errors = schema.load(self.test_message)[1]
+
+        self.assertTrue(errors == {})
+
+    def test_draft_msg_to_string(self):
+        """marshalling message where msg_to field is string"""
+        self.test_message['msg_to'] = "01b51fcc-ed43-4cdb-ad1c-450f9986859b"
+        with app.app_context():
+            g.user = User(self.test_message['msg_from'], 'respondent')
+            schema = DraftSchema()
+            errors = schema.load(self.test_message)[1]
+
+        self.assertTrue(errors == {})
+
+    def test_draft_msg_to_list_of_dict_without_id(self):
+        """marshalling message where msg_to field is list of dicts without id"""
+        self.test_message['msg_to'] = [{"firstname": "Chandana", "surname": "Blanchet", "email": "cblanc@hotmail.co.uk", "telephone": "+443069990854", "status": "ACTIVE"}]
+        with app.app_context():
+            g.user = User(self.test_message['msg_from'], 'respondent')
+            schema = DraftSchema()
+            errors = schema.load(self.test_message)[1]
+
+        self.assertTrue(errors == {'_schema': ["'msg_to' is missing an 'id' or incorrect format"]})
+
+    def test_draft_msg_from_string(self):
+        """marshalling message where msg_from field is string"""
+        self.test_message['msg_from'] = "01b51fcc-ed43-4cdb-ad1c-450f9986859b"
+        with app.app_context():
+            g.user = User(self.test_message['msg_from'], 'respondent')
+            schema = DraftSchema()
+            errors = schema.load(self.test_message)[1]
+
+        self.assertTrue(errors == {})
+
+    def test_draft_msg_from_dict(self):
+        """marshalling message where msg_from field is dict"""
+        self.test_message['msg_from'] = {"id": "01b51fcc-ed43-4cdb-ad1c-450f9986859b", "firstname": "Chandana", "surname": "Blanchet", "email": "cblanc@hotmail.co.uk", "telephone": "+443069990854", "status": "ACTIVE"}
+        with app.app_context():
+            g.user = User("01b51fcc-ed43-4cdb-ad1c-450f9986859b", 'respondent')
+            schema = DraftSchema()
+            errors = schema.load(self.test_message)[1]
+
+        self.assertTrue(errors == {})
+
+    def test_draft_msg_from_dict_without_id(self):
+        """marshalling message where msg_from field is dict without id"""
+        self.test_message['msg_from'] = {"firstname": "Chandana", "surname": "Blanchet", "email": "cblanc@hotmail.co.uk", "telephone": "+443069990854", "status": "ACTIVE"}
+        with app.app_context():
+            g.user = User("01b51fcc-ed43-4cdb-ad1c-450f9986859b", 'respondent')
+            schema = DraftSchema()
+            errors = schema.load(self.test_message)[1]
+
+        self.assertTrue(errors == {'_schema': ["'msg_from' is missing an 'id' or incorrect format"]})
