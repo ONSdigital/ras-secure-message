@@ -9,11 +9,11 @@ business_details['0a6018a0-3e67-4407-b120-780932434b36'] = {"ru_ref": "0a6018a0-
 
 
 def get_business_details_by_ru(rus):
-    details = {}
+    details = []
 
     for x in rus:
         try:
-            details[x] = business_details[x]
+            details.append(business_details[x])
         except KeyError:
             raise (BadRequest(description="An issue with RU"))
     return details

@@ -208,7 +208,7 @@ class DraftTestCase(unittest.TestCase):
                 'body': 'hello',
                 'thread_id': '',
                 'collection_case': 'ACollectionCase',
-                'reporting_unit': 'AReportingUnit',
+                'ru_ref': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc',
                 'survey': 'ACollectionInstrument'
             }
         )
@@ -223,8 +223,8 @@ class DraftTestCase(unittest.TestCase):
         with self.engine.connect() as con:
             msg_id = str(uuid.uuid4())
             query = 'INSERT INTO secure_message(msg_id, subject, body, thread_id,' \
-                    ' collection_case, reporting_unit, survey) VALUES ("{0}", "test","test","", ' \
-                    ' "ACollectionCase", "AReportingUnit", ' \
+                    ' collection_case, ru_ref, survey) VALUES ("{0}", "test","test","", ' \
+                    ' "ACollectionCase", "f1a5e99c-8edf-489a-9c72-6cabe6c387fc", ' \
                     '"SurveyType")'.format(msg_id)
             con.execute(query)
             query = 'INSERT INTO status(label, msg_id, actor) VALUES("DRAFT", "{0}", ' \
@@ -253,8 +253,8 @@ class DraftTestCase(unittest.TestCase):
         with self.engine.connect() as con:
             msg_id = str(uuid.uuid4())
             query = 'INSERT INTO secure_message(msg_id, subject, body, thread_id,' \
-                    ' collection_case, reporting_unit, survey) VALUES ("{0}", "test","test","", ' \
-                    ' "ACollectionCase", "AReportingUnit", ' \
+                    ' collection_case, ru_ref, survey) VALUES ("{0}", "test","test","", ' \
+                    ' "ACollectionCase", "f1a5e99c-8edf-489a-9c72-6cabe6c387fc", ' \
                     '"SurveyType")'.format(msg_id)
             con.execute(query)
             query = 'INSERT INTO status(label, msg_id, actor) VALUES("DRAFT", "{0}",' \
@@ -278,8 +278,8 @@ class DraftTestCase(unittest.TestCase):
         with self.engine.connect() as con:
             msg_id = str(uuid.uuid4())
             query = 'INSERT INTO secure_message(msg_id, subject, body, thread_id,' \
-                    ' collection_case, reporting_unit, survey) VALUES ("{0}", "test","test","", ' \
-                    ' "ACollectionCase", "AReportingUnit", ' \
+                    ' collection_case, ru_ref, survey) VALUES ("{0}", "test","test","", ' \
+                    ' "ACollectionCase", "f1a5e99c-8edf-489a-9c72-6cabe6c387fc", ' \
                     '"SurveyType")'.format(msg_id)
             con.execute(query)
             query = 'INSERT INTO status(label, msg_id, actor) VALUES("DRAFT", "{0}", ' \

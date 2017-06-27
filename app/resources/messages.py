@@ -1,19 +1,20 @@
 import logging
 from flask import request, jsonify, g, Response
 from flask_restful import Resource
-from werkzeug.exceptions import BadRequest
 from structlog import wrap_logger
+from werkzeug.exceptions import BadRequest
 from app import settings
 from app.common.alerts import AlertUser
 from app.common.labels import Labels
+from app.common.user_by_uuid import get_details_by_uuids
+from app.common.business_by_ru import get_business_details_by_ru
+from app.common.utilities import get_options, paginated_list_to_json
 from app.constants import MESSAGE_LIST_ENDPOINT
 from app.repository.modifier import Modifier
 from app.repository.retriever import Retriever
 from app.repository.saver import Saver
-from app.validation.domain import MessageSchema
 from app.resources.drafts import DraftModifyById
-from app.common.utilities import get_options, paginated_list_to_json
-from app.resources.user_by_uuid import get_details_by_uuids
+from app.validation.domain import MessageSchema
 
 logger = wrap_logger(logging.getLogger(__name__))
 
@@ -27,12 +28,11 @@ class MessageList(Resource):
     @staticmethod
     def get():
         """Get message list with options"""
-        string_query_args, page, limit, ru, survey, cc, label, business, desc = get_options(request.args)
+        string_query_args, page, limit, ru_ref, survey, cc, label, business, desc = get_options(request.args)
 
         message_service = Retriever()
         status, result = message_service.retrieve_message_list(page, limit, g.user,
-                                                               ru=ru, survey=survey, cc=cc, label=label,
-                                                               business=business, descend=desc)
+                                                               ru_ref=ru_ref, survey=survey, cc=cc, label=label, descend=desc)
         if status:
             resp = paginated_list_to_json(result, page, limit, request.host_url,
                                                        g.user, string_query_args, MESSAGE_LIST_ENDPOINT)
@@ -124,8 +124,13 @@ class MessageById(Resource):
         resp = message_service.retrieve_message(message_id, g.user)
 
         user_data = get_details_by_uuids([resp['msg_from'], resp["msg_to"][0]])
-        resp["msg_from"] = user_data[resp['msg_from']]
-        resp["msg_to"] = [user_data[resp['msg_to'][0]]]
+        business_data = get_business_details_by_ru([resp['ru_ref']])
+        resp['ru_ref'] = business_data[0]
+        for user in user_data:
+            if resp['msg_from'] == user['id']:
+                resp['msg_from'] = user
+            if resp['msg_to'][0] == user['id']:
+                resp['msg_to'] = [user]
         return jsonify(resp)
 
 
