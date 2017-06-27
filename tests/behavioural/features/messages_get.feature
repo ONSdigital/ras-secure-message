@@ -59,11 +59,6 @@ Feature: Get Messages list Endpoint
     When the Respondent gets their messages with particular survey 
     Then the retrieved messages should have the correct survey
 
-  Scenario: Respondent and internal user sends multiple messages and Respondent retrieves the list of messages with business name
-    Given an Internal user sends multiple messages with different business names
-    When the Respondent gets their messages with particular business name
-    Then the retrieved messages should have the correct business name
-
   Scenario: Internal user sends multiple messages and Respondent retrieves the list of messages with particular collection case 
     Given a Internal user sends multiple messages with different collection case 
     When the Respondent gets their messages with particular collection case 

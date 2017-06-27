@@ -20,8 +20,7 @@ data = {'msg_to': '0a7ad740-10d5-4ecb-b7ca-3c0384afb882',
         'body': 'Test',
         'thread_id': 'AConversation',
         'collection_case': 'collectioncase',
-        'reporting_unit': 'AReportingUnit',
-        'business_name': 'ABusiness',
+        'ru_ref': '7fc0e8ab-189c-4794-b8f4-9f05a1db185b',
         'survey': 'BRES'}
 
 

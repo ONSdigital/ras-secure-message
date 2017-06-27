@@ -12,11 +12,10 @@ def get_options(args):
     string_query_args = '?'
     page = 1
     limit = MESSAGE_QUERY_LIMIT
-    ru = None
+    ru_ref = None
     survey = None
     cc = None
     label = None
-    business = None
     desc = True
 
     if args.get('limit'):
@@ -25,12 +24,9 @@ def get_options(args):
     if args.get('page'):
         page = int(args.get('page'))
 
-    if args.get('ru'):
-        string_query_args = add_string_query_args(string_query_args, 'ru', args.get('ru'))
-        ru = str(args.get('ru'))
-    if args.get('business'):
-        string_query_args = add_string_query_args(string_query_args, 'business', args.get('business'))
-        business = str(args.get('business'))
+    if args.get('ru_ref'):
+        string_query_args = add_string_query_args(string_query_args, 'ru_ref', args.get('ru_ref'))
+        ru_ref = str(args.get('ru_ref'))
     if args.get('survey'):
         survey = str(args.get('survey'))
         string_query_args = add_string_query_args(string_query_args, 'survey', args.get('survey'))
@@ -44,7 +40,7 @@ def get_options(args):
         desc = False if args.get('desc') == 'false' else True
         string_query_args = add_string_query_args(string_query_args, 'desc', args.get('desc'))
 
-    return string_query_args, page, limit, ru, survey, cc, label, business, desc
+    return string_query_args, page, limit, ru_ref, survey, cc, label, desc
 
 
 def add_string_query_args(string_query_args, arg, val):

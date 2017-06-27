@@ -12,9 +12,8 @@ Feature: Message get by ID Endpoint
     |msg_from |
     |body    |
     |subject |
-    |ReportingUnit   |
+    |RU_Ref   |
     |CollectionCase  |
-    |BusinessName  |
 
   Scenario: Retrieve a draft message
     Given there is a draft message to be retrieved
@@ -34,9 +33,8 @@ Feature: Message get by ID Endpoint
     |msg_from |
     |body    |
     |subject |
-    |ReportingUnit   |
+    |RU_Ref   |
     |CollectionCase  |
-    |BusinessName  |
 
   Scenario: Retrieve a message with incorrect message ID
     Given there is a message to be retrieved

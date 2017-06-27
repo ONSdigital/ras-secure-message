@@ -25,8 +25,7 @@ data = {'msg_to': 'test',
         'body': 'Test',
         'thread_id': '',
         'collection_case': 'collection case1',
-        'reporting_unit': 'reporting case1',
-        'business_name': 'ABusiness',
+        'ru_ref': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc',
         'survey': 'BRES'}
 
 
@@ -93,23 +92,16 @@ def step_impl_correct_subject_returned(context):
     nose.tools.assert_equal(msg_resp['subject'], data['subject'])
 
 
-@then("returned message field ReportingUnit is correct")
+@then("returned message field RU_Ref is correct")
 def step_impl_correct_reporting_unit_returned(context):
     msg_resp = json.loads(context.response.data)
-    nose.tools.assert_equal(msg_resp['reporting_unit'], data['reporting_unit'])
+    nose.tools.assert_equal(msg_resp['ru_ref'], {'ru_ref': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc', 'business_name': 'Apple'})
 
 
 @then("returned message field CollectionCase is correct")
 def step_impl_correct_collection_case_returned(context):
     msg_resp = json.loads(context.response.data)
     nose.tools.assert_equal(msg_resp['collection_case'], data['collection_case'])
-
-
-@then("returned message field BusinessName is correct")
-def step_impl_correct_business_name_returned(context):
-    msg_resp = json.loads(context.response.data)
-    nose.tools.assert_equal(msg_resp['business_name'], data['business_name'])
-
 
 # Scenario: Retrieve a message with incorrect message ID
 @when("the get request has been made with an incorrect message id")
@@ -190,8 +182,7 @@ def step_impl_draft_message_can_be_retrieved(context):
                  'body': 'Test',
                  'thread_id': '',
                  'collection_case': 'collection case1',
-                 'reporting_unit': 'reporting case1',
-                 'business_name': 'ABusiness',
+                 'ru_ref': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc',
                  'survey': 'BRES'})
     response = app.test_client().post("http://localhost:5050/draft/save", data=json.dumps(data),
                                       headers=headers)

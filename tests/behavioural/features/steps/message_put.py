@@ -21,8 +21,7 @@ data = {'msg_to': '0a7ad740-10d5-4ecb-b7ca-3c0384afb882',
         'body': 'Test',
         'thread_id': '',
         'collection_case': 'collection case1',
-        'reporting_unit': 'reporting case1',
-        'business_name': 'ABusiness',
+        'ru_ref': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc',
         'survey': 'BRES'}
 
 modify_data = {'action': '',
@@ -392,7 +391,7 @@ def step_impl_the_status_of_the_message_changes_to_unread(context):
 
 
 @given("a message with the status unread is displayed to an external user")
-def step_impl_message_with_Status_unread_returned(context):
+def step_impl_message_with_status_unread_returned(context):
     token_data['user_uuid'] = data['msg_from']
     token_data['role'] = 'respondent'
     headers['Authorization'] = update_encrypted_jwt()

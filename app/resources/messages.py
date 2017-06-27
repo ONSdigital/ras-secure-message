@@ -28,7 +28,7 @@ class MessageList(Resource):
     @staticmethod
     def get():
         """Get message list with options"""
-        string_query_args, page, limit, ru_ref, survey, cc, label, business, desc = get_options(request.args)
+        string_query_args, page, limit, ru_ref, survey, cc, label, desc = get_options(request.args)
 
         message_service = Retriever()
         status, result = message_service.retrieve_message_list(page, limit, g.user,
