@@ -57,6 +57,7 @@ class MessageSchema(Schema):
 
     @pre_load
     def check_format_of_msg_to_and_msg_from(self, data):
+
         if data.get('msg_to') and type(data.get('msg_to')) is list and "id" in data.get('msg_to')[0]:
             data['msg_to'] = data['msg_to'][0]['id']
         elif data.get('msg_to') and type(data.get('msg_to')) is list and len(data.get('msg_to')) >= 1:
@@ -156,6 +157,7 @@ class DraftSchema(Schema):
 
     @pre_load
     def check_format_of_msg_to_and_msg_from(self, data):
+
         if data.get('msg_to') and type(data.get('msg_to')) is list and "id" in data.get('msg_to')[0]:
             data['msg_to'] = data['msg_to'][0]['id']
         elif data.get('msg_to') and type(data.get('msg_to')) is list and len(data.get('msg_to')) >= 1:
