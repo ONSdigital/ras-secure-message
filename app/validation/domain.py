@@ -58,17 +58,18 @@ class MessageSchema(Schema):
     @pre_load
     def check_format_of_msg_to_and_msg_from(self, data):
 
-        if data.get('msg_to') and type(data.get('msg_to')) is list and "id" in data.get('msg_to')[0]:
+        if data.get('msg_to') and isinstance(data.get('msg_to'), list) and "id" in data.get('msg_to')[0]:
             data['msg_to'] = data['msg_to'][0]['id']
-        elif data.get('msg_to') and type(data.get('msg_to')) is list and len(data.get('msg_to')) >= 1:
-            data['msg_to'] = data.get('msg_to')[0]
-        elif data.get('msg_to') and type(data.get('msg_to')) is list:
-            raise ValidationError("'msg_to' is missing an 'id' or incorrect format")
+        elif data.get('msg_to') and isinstance(data.get('msg_to'), list) and len(data.get('msg_to')) >= 1:
+            if isinstance(data.get('msg_to')[0], str):
+                data['msg_to'] = data.get('msg_to')[0]
+            else:
+                raise ValidationError("'msg_to' is missing an 'id' or incorrect format")
 
         if data.get('msg_from') and not isinstance(data.get('msg_from'), str) and "id" in data.get('msg_from'):
             data['msg_from'] = data['msg_from']['id']
         elif data.get('msg_from') and not isinstance(data.get('msg_from'), str):
-            raise ValidationError("'msg_from' is missing an 'id'")
+            raise ValidationError("'msg_from' is missing an 'id' or incorrect format")
 
         return data
 
@@ -158,12 +159,13 @@ class DraftSchema(Schema):
     @pre_load
     def check_format_of_msg_to_and_msg_from(self, data):
 
-        if data.get('msg_to') and type(data.get('msg_to')) is list and "id" in data.get('msg_to')[0]:
+        if data.get('msg_to') and isinstance(data.get('msg_to'), list) and "id" in data.get('msg_to')[0]:
             data['msg_to'] = data['msg_to'][0]['id']
-        elif data.get('msg_to') and type(data.get('msg_to')) is list and len(data.get('msg_to')) >= 1:
-            data['msg_to'] = data.get('msg_to')[0]
-        elif data.get('msg_to') and type(data.get('msg_to')) is list:
-            raise ValidationError("'msg_to' is missing an 'id' or incorrect format")
+        elif data.get('msg_to') and isinstance(data.get('msg_to'), list) and len(data.get('msg_to')) >= 1:
+            if isinstance(data.get('msg_to')[0], str):
+                data['msg_to'] = data.get('msg_to')[0]
+            else:
+                raise ValidationError("'msg_to' is missing an 'id' or incorrect format")
 
         if data.get('msg_from') and not isinstance(data.get('msg_from'), str) and "id" in data.get('msg_from'):
             data['msg_from'] = data['msg_from']['id']

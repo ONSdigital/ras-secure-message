@@ -397,7 +397,7 @@ def step_impl_user_saves_the_draft_without_etag(context):
 
 # Scenario: A user edits a previously saved draft without formatting
 @given('a user edits a previously saved draft without formatting')
-def step_impl_user_edits_saved_draft(context):
+def step_impl_user_edits_saved_draft_no_formatting(context):
     add_draft = app.test_client().post('http://localhost:5050/draft/save', data=json.dumps(post_data), headers=headers)
     post_resp = json.loads(add_draft.data)
     context.msg_id = post_resp['msg_id']
