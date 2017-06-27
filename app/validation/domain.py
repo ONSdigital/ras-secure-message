@@ -170,9 +170,14 @@ class DraftSchema(Schema):
         if data.get('msg_from') and not isinstance(data.get('msg_from'), str) and "id" in data.get('msg_from'):
             data['msg_from'] = data['msg_from']['id']
         elif data.get('msg_from') and not isinstance(data.get('msg_from'), str):
-            raise ValidationError("'msg_from' is missing an 'id'")
+            raise ValidationError("'msg_from' is missing an 'id' or incorrect format")
 
         return data
+
+    @validates_schema
+    def validate_to_from_not_equal(self, data):
+        if 'msg_to' in data.keys() and 'msg_from' in data.keys() and data['msg_to'] == data['msg_from']:
+            raise ValidationError("msg_to and msg_from fields can not be the same.")
 
     @validates("msg_to")
     def validate_to(self, msg_to):

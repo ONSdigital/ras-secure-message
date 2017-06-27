@@ -188,16 +188,6 @@ class MessageSchemaTestCase(unittest.TestCase):
 
         self.assertTrue(errors == {'_schema': ['msg_to and msg_from fields can not be the same.']})
 
-    def test_same_to_from_causes_error(self):
-        """marshalling message with same to and from field"""
-        self.json_message['msg_to'] = self.json_message['msg_from']
-        with app.app_context():
-            g.user = User(self.json_message['msg_from'], 'respondent')
-            schema = MessageSchema()
-            errors = schema.load(self.json_message)[1]
-
-        self.assertTrue(errors == {'_schema': ['msg_to and msg_from fields can not be the same.']})
-
     def test_msg_to_list_of_dict(self):
         """marshalling message where msg_to field is list of dicts"""
         self.json_message['msg_to'] = [{"id": "01b51fcc-ed43-4cdb-ad1c-450f9986859b", "firstname": "Chandana", "surname": "Blanchet", "email": "cblanc@hotmail.co.uk", "telephone": "+443069990854", "status": "ACTIVE"}]
@@ -252,7 +242,7 @@ class MessageSchemaTestCase(unittest.TestCase):
         """marshalling message where msg_from field is dict"""
         self.json_message['msg_from'] = {"id": "01b51fcc-ed43-4cdb-ad1c-450f9986859b", "firstname": "Chandana", "surname": "Blanchet", "email": "cblanc@hotmail.co.uk", "telephone": "+443069990854", "status": "ACTIVE"}
         with app.app_context():
-            g.user = User(self.json_message['msg_from']['id'], 'respondent')
+            g.user = User("01b51fcc-ed43-4cdb-ad1c-450f9986859b", 'respondent')
             schema = MessageSchema()
             errors = schema.load(self.json_message)[1]
 
@@ -260,7 +250,7 @@ class MessageSchemaTestCase(unittest.TestCase):
 
     def test_msg_from_dict_without_id(self):
         """marshalling message where msg_from field is dict without id"""
-        self.json_message['msg_from'] = { "firstname": "Chandana", "surname": "Blanchet", "email": "cblanc@hotmail.co.uk", "telephone": "+443069990854", "status": "ACTIVE"}
+        self.json_message['msg_from'] = {"firstname": "Chandana", "surname": "Blanchet", "email": "cblanc@hotmail.co.uk", "telephone": "+443069990854", "status": "ACTIVE"}
         with app.app_context():
             g.user = User("01b51fcc-ed43-4cdb-ad1c-450f9986859b", 'respondent')
             schema = MessageSchema()
