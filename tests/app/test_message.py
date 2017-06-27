@@ -29,25 +29,33 @@ class MessageTestCase(unittest.TestCase):
     def test_message_with_different_collection_case_not_equal(self):
         """testing two different Message objects are not equal"""
         message1 = Message('1', '2', '3', '4', '5', 'ACollectionCase',
-                           'AReportingUnit', 'ASurveyType', 'ABusiness')
+                           'AReportingUnit', 'ASurveyType', 'ABusiness', 'ACollectionExercise')
         message2 = Message('1', '2', '3', '4', '5', 'AnotherCollectionCase',
-                           'AReportingUnit', 'ASurveyType', 'ABusiness')
+                           'AReportingUnit', 'ASurveyType', 'ABusiness', 'AnotherCollectionExercise')
+        self.assertTrue(message1 != message2)
+
+    def test_message_with_different_collection_exercise_not_equal(self):
+        """testing two different Message objects are not equal"""
+        message1 = Message('1', '2', '3', '4', '5', 'ACollectionCase',
+                           'AReportingUnit', 'ASurveyType', 'ABusiness', 'ACollectionExercise')
+        message2 = Message('1', '2', '3', '4', '5', 'AnotherCollectionCase',
+                           'AReportingUnit', 'ASurveyType', 'ABusiness', 'AnotherCollectionExercise')
         self.assertTrue(message1 != message2)
 
     def test_message_with_different_reporting_unit_not_equal(self):
         """testing two different Message objects are not equal"""
         message1 = Message('1', '2', '3', '4', '5', 'ACollectionCase',
-                           'AReportingUnit', 'ASurveyType', 'ABusiness')
+                           'AReportingUnit', 'ASurveyType', 'ABusiness', 'ACollectionExercise')
         message2 = Message('1', '2', '3', '4', '5', 'ACollectionCase',
-                           'AnotherReportingUnit', 'ASurveyType', 'ABusiness')
+                           'AnotherReportingUnit', 'ASurveyType', 'ABusiness', 'AnotherCollectionExercise')
         self.assertTrue(message1 != message2)
 
     def test_message_with_different_survey_not_equal(self):
         """testing two different Message objects are not equal"""
         message1 = Message('1', '2', '3', '4', '5', 'ACollectionCase',
-                           'AReportingUnit', 'ASurveyType', 'ABusiness')
+                           'AReportingUnit', 'ASurveyType', 'ABusiness', 'ACollectionExercise')
         message2 = Message('1', '2', '3', '4', '5', 'ACollectionCase',
-                           'AReportingUnit', 'AnotherSurveyType', 'ABusiness')
+                           'AReportingUnit', 'AnotherSurveyType', 'ABusiness', 'AnotherCollectionExercise')
         self.assertTrue(message1 != message2)
 
     def test_message_equal(self):

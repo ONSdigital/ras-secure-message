@@ -167,7 +167,7 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
         string_query_args, page, limit, ru, survey, cc, label, business, desc, ce = utilities.get_options(args)
 
         self.assertEqual(string_query_args,
-                         '?ru=ReportingUnit&business=ABusiness&survey=BRES&cc=CollectionCase&label=INBOX&desc=false&ce=CollectionExercise')
+                         '?ru=ReportingUnit&business=ABusiness&survey=BRES&cc=CollectionCase&label=INBOX&ce=CollectionExercise&desc=false')
         self.assertEqual(page, 2)
         self.assertEqual(limit, 9)
         self.assertEqual(ru, 'ReportingUnit')

@@ -94,6 +94,14 @@ class MessageSchema(Schema):
         if survey is not None:
             self.validate_non_zero_field_length("Survey", len(survey), constants.MAX_SURVEY_LEN)
 
+    @validates("collection_case")
+    def validate_collection_case(self, collection_case):
+        self.validate_field_length("collection_case", len(collection_case), constants.MAX_COLLECTION_CASE_LEN)
+
+    @validates("collection_exercise")
+    def validate_collection_exercise(self, collection_exercise):
+        self.validate_field_length("collection_exercise", len(collection_exercise), constants.MAX_COLLECTION_EXERCISE_LEN)
+
     @post_load
     def make_message(self, data):
         logger.debug("Build message")
@@ -167,6 +175,15 @@ class DraftSchema(Schema):
 
     def validate_survey(self, survey):
         self.validate_field_length(survey, len(survey), constants.MAX_SURVEY_LEN)
+
+    @validates("collection_case")
+    def validate_collection_case(self, collection_case):
+        self.validate_field_length("collection_case", len(collection_case), constants.MAX_COLLECTION_CASE_LEN)
+
+    @validates("collection_exercise")
+    def validate_collection_exercise(self, collection_exercise):
+        self.validate_field_length("collection_exercise", len(collection_exercise),
+                                   constants.MAX_COLLECTION_EXERCISE_LEN)
 
     @post_load
     def make_draft(self, data):
