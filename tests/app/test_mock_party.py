@@ -1,12 +1,10 @@
 import unittest
-
 from flask import json
 from sqlalchemy import create_engine
 from werkzeug.exceptions import BadRequest
-
 from app import application
 from app.application import app
-from app.common import user_by_uuid
+from app.common import user_by_uuid, business_by_ru
 
 
 class PartyTestCase(unittest.TestCase):
@@ -46,6 +44,7 @@ class PartyTestCase(unittest.TestCase):
                 'subject': 'MyMessage',
                 'body': 'hello',
                 'thread': "?",
+                'ru_ref': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc',
                 'survey': "BRES"}
 
         self.headers = {'Content-Type': 'application/json', 'Authorization': "eyJhbGciOiJSU0EtT0FFUCIsImVuYyI6IkEyNTZHQ00ifQ.XMrQ2QMNcoWqv6Pm4KGPZRPAHMSNuCRrmdp-glDvf_9gDzYDoXkxbZEBqy6_pdMTIFINUWUABYa7PdLLuJh5uoU9L7lmvJKEYCq0e5rS076KLRc5pFKHJesgJLNijj7scLke3y4INkd0px82SHhnbek0bGLeu3i8FgRt4vD0Eu8TWODM7kEfAT_eRmvPBM1boyOqrpyhYgE9p0_NklwloFXdYZKjTvHxlHtbiuYmvXSTFkbbp_t8T1xZmDrfgS2EDWTFEagzyKBFFAH4Z5QRUUJPiuAxI3lSNS2atFFtDWiZRhuuhRyJzNA4vqTpmFPUE6h_iggkcbiUPofSBx3CUw.QK4lX7z2vN6jryJz.G9C1zoAvWHfAJywiuijq6E78xCMZ5NOAZD1g3e6PTWhveQKNecBJAPgXyRDVgljgIwSq_vBY2AVTIE5xWapwF3oLZyiC0T0H2LrjlpKFUa51-VU_-Yj8u4ax0iLvyWyRRepQneYJ0riF4zbmcGf1vCCEO3WOwcD5wXBFVXVH6wPqExmI2tjWWLdz2F7oK1Wnh1pbQX_EW5rYb2I4mPuc2J6ijXAr73qcJLAzJbjDo1uk.QrPCckVYuNlcWeCwQmws9A"}
@@ -72,6 +71,7 @@ class PartyTestCase(unittest.TestCase):
                 'subject': 'MyMessage',
                 'body': 'hello',
                 'thread': "?",
+                'ru_ref': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc',
                 'survey': "BRES"}
 
         self.app = application.app.test_client()
@@ -99,6 +99,7 @@ class PartyTestCase(unittest.TestCase):
                 'subject': 'MyMessage',
                 'body': 'hello',
                 'thread': "?",
+                'ru_ref': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc',
                 'survey': "BRES"}
 
         self.app = application.app.test_client()
@@ -125,6 +126,7 @@ class PartyTestCase(unittest.TestCase):
                 'subject': 'MyMessage',
                 'body': 'hello',
                 'thread': "?",
+                'ru_ref': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc',
                 'survey': "BRES"}
 
         self.app = application.app.test_client()
@@ -145,6 +147,141 @@ class PartyTestCase(unittest.TestCase):
         for draft in drafts:
             self.assertEqual(draft['msg_from'], {'telephone': '+443069990289', 'firstname': 'Vana', 'email': 'vana123@aol.com', 'id': '0a7ad740-10d5-4ecb-b7ca-3c0384afb882', 'status': 'ACTIVE', 'surname': 'Oorschot'})
             self.assertEqual(draft['msg_to'][0], {"id": "BRES", "firstname": "BRES", "surname": "", "email": "", "telephone": "", "status": ""})
+
+    def test_get_business_details_by_ru(self):
+        """Test get details for one business using ru_ref"""
+
+        list_ru = ['f1a5e99c-8edf-489a-9c72-6cabe6c387fc']
+
+        business_details = business_by_ru.get_business_details_by_ru(list_ru)
+
+        self.assertEqual(business_details[0]['ru_ref'], list_ru[0])
+        self.assertEqual(business_details[0]['business_name'], "Apple")
+
+    def test_get_business_details_multiple_ru(self):
+        """Test business details are returned for multiple ru's"""
+
+        list_ru = ['0a6018a0-3e67-4407-b120-780932434b36', 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc', 'c614e64e-d981-4eba-b016-d9822f09a4fb']
+
+        business_details = business_by_ru.get_business_details_by_ru(list_ru)
+
+        self.assertEqual(business_details[0]['ru_ref'], list_ru[0])
+        self.assertEqual(business_details[1]['ru_ref'], list_ru[1])
+        self.assertEqual(business_details[2]['ru_ref'], list_ru[2])
+
+    def test_get_message_returns_business_details(self):
+        """Test get message by id returns business details"""
+
+        data = {'msg_to': 'BRES',
+                'msg_from': '0a7ad740-10d5-4ecb-b7ca-3c0384afb882',
+                'subject': 'MyMessage',
+                'body': 'hello',
+                'thread': "?",
+                'ru_ref': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc',
+                'survey': "BRES"}
+
+        self.app = application.app.test_client()
+
+        self.headers = {'Content-Type': 'application/json',
+                        'Authorization': "eyJhbGciOiJSU0EtT0FFUCIsImVuYyI6IkEyNTZHQ00ifQ.XMrQ2QMNcoWqv6Pm4KGPZRPAHMSNuCRrmdp-glDvf_9gDzYDoXkxbZEBqy6_pdMTIFINUWUABYa7PdLLuJh5uoU9L7lmvJKEYCq0e5rS076KLRc5pFKHJesgJLNijj7scLke3y4INkd0px82SHhnbek0bGLeu3i8FgRt4vD0Eu8TWODM7kEfAT_eRmvPBM1boyOqrpyhYgE9p0_NklwloFXdYZKjTvHxlHtbiuYmvXSTFkbbp_t8T1xZmDrfgS2EDWTFEagzyKBFFAH4Z5QRUUJPiuAxI3lSNS2atFFtDWiZRhuuhRyJzNA4vqTpmFPUE6h_iggkcbiUPofSBx3CUw.QK4lX7z2vN6jryJz.G9C1zoAvWHfAJywiuijq6E78xCMZ5NOAZD1g3e6PTWhveQKNecBJAPgXyRDVgljgIwSq_vBY2AVTIE5xWapwF3oLZyiC0T0H2LrjlpKFUa51-VU_-Yj8u4ax0iLvyWyRRepQneYJ0riF4zbmcGf1vCCEO3WOwcD5wXBFVXVH6wPqExmI2tjWWLdz2F7oK1Wnh1pbQX_EW5rYb2I4mPuc2J6ijXAr73qcJLAzJbjDo1uk.QrPCckVYuNlcWeCwQmws9A"}
+
+        app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:////tmp/messages.db'
+        self.engine = create_engine('sqlite:////tmp/messages.db')
+
+        message_post = self.app.post("http://localhost:5050/message/send", data=json.dumps(data), headers=self.headers)
+        message_data = json.loads(message_post.data)
+        msg_id = message_data['msg_id']
+
+        message_get = self.app.get("http://localhost:5050/message/{}".format(msg_id), headers=self.headers)
+        message = json.loads(message_get.data)
+
+        self.assertEqual(message['@ru_ref']['business_name'], "Apple")
+
+    def test_get_messages_returns_business_details(self):
+        """Test get all messages returns business details"""
+
+        data = {'msg_to': 'BRES',
+                'msg_from': '0a7ad740-10d5-4ecb-b7ca-3c0384afb882',
+                'subject': 'MyMessage',
+                'body': 'hello',
+                'thread': "?",
+                'ru_ref': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc',
+                'survey': "BRES"}
+
+        self.app = application.app.test_client()
+
+        self.headers = {'Content-Type': 'application/json',
+                        'Authorization': "eyJhbGciOiJSU0EtT0FFUCIsImVuYyI6IkEyNTZHQ00ifQ.XMrQ2QMNcoWqv6Pm4KGPZRPAHMSNuCRrmdp-glDvf_9gDzYDoXkxbZEBqy6_pdMTIFINUWUABYa7PdLLuJh5uoU9L7lmvJKEYCq0e5rS076KLRc5pFKHJesgJLNijj7scLke3y4INkd0px82SHhnbek0bGLeu3i8FgRt4vD0Eu8TWODM7kEfAT_eRmvPBM1boyOqrpyhYgE9p0_NklwloFXdYZKjTvHxlHtbiuYmvXSTFkbbp_t8T1xZmDrfgS2EDWTFEagzyKBFFAH4Z5QRUUJPiuAxI3lSNS2atFFtDWiZRhuuhRyJzNA4vqTpmFPUE6h_iggkcbiUPofSBx3CUw.QK4lX7z2vN6jryJz.G9C1zoAvWHfAJywiuijq6E78xCMZ5NOAZD1g3e6PTWhveQKNecBJAPgXyRDVgljgIwSq_vBY2AVTIE5xWapwF3oLZyiC0T0H2LrjlpKFUa51-VU_-Yj8u4ax0iLvyWyRRepQneYJ0riF4zbmcGf1vCCEO3WOwcD5wXBFVXVH6wPqExmI2tjWWLdz2F7oK1Wnh1pbQX_EW5rYb2I4mPuc2J6ijXAr73qcJLAzJbjDo1uk.QrPCckVYuNlcWeCwQmws9A"}
+
+        app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:////tmp/messages.db'
+        self.engine = create_engine('sqlite:////tmp/messages.db')
+
+        self.app.post("http://localhost:5050/message/send", data=json.dumps(data), headers=self.headers)
+        self.app.post("http://localhost:5050/message/send", data=json.dumps(data), headers=self.headers)
+
+        messages_get = self.app.get("http://localhost:5050/messages", headers=self.headers)
+        get_return = json.loads(messages_get.data)
+        messages = get_return['messages']
+
+        for message in messages:
+            self.assertEqual(message['@ru_ref']['business_name'], "Apple")
+
+    def test_get_draft_returns_business_details(self):
+        """Test get draft returns business details"""
+
+        data = {'msg_to': 'BRES',
+                'msg_from': '0a7ad740-10d5-4ecb-b7ca-3c0384afb882',
+                'subject': 'MyMessage',
+                'body': 'hello',
+                'thread': "?",
+                'ru_ref': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc',
+                'survey': "BRES"}
+
+        self.app = application.app.test_client()
+
+        self.headers = {'Content-Type': 'application/json',
+                        'Authorization': "eyJhbGciOiJSU0EtT0FFUCIsImVuYyI6IkEyNTZHQ00ifQ.XMrQ2QMNcoWqv6Pm4KGPZRPAHMSNuCRrmdp-glDvf_9gDzYDoXkxbZEBqy6_pdMTIFINUWUABYa7PdLLuJh5uoU9L7lmvJKEYCq0e5rS076KLRc5pFKHJesgJLNijj7scLke3y4INkd0px82SHhnbek0bGLeu3i8FgRt4vD0Eu8TWODM7kEfAT_eRmvPBM1boyOqrpyhYgE9p0_NklwloFXdYZKjTvHxlHtbiuYmvXSTFkbbp_t8T1xZmDrfgS2EDWTFEagzyKBFFAH4Z5QRUUJPiuAxI3lSNS2atFFtDWiZRhuuhRyJzNA4vqTpmFPUE6h_iggkcbiUPofSBx3CUw.QK4lX7z2vN6jryJz.G9C1zoAvWHfAJywiuijq6E78xCMZ5NOAZD1g3e6PTWhveQKNecBJAPgXyRDVgljgIwSq_vBY2AVTIE5xWapwF3oLZyiC0T0H2LrjlpKFUa51-VU_-Yj8u4ax0iLvyWyRRepQneYJ0riF4zbmcGf1vCCEO3WOwcD5wXBFVXVH6wPqExmI2tjWWLdz2F7oK1Wnh1pbQX_EW5rYb2I4mPuc2J6ijXAr73qcJLAzJbjDo1uk.QrPCckVYuNlcWeCwQmws9A"}
+
+        app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:////tmp/messages.db'
+        self.engine = create_engine('sqlite:////tmp/messages.db')
+
+        draft_save = self.app.post("http://localhost:5050/draft/save", data=json.dumps(data), headers=self.headers)
+        draft_data = json.loads(draft_save.data)
+        draft_id = draft_data['msg_id']
+
+        message_get = self.app.get("http://localhost:5050/draft/{}".format(draft_id), headers=self.headers)
+        message = json.loads(message_get.data)
+
+        self.assertEqual(message['@ru_ref']['business_name'], "Apple")
+
+    def test_get_drafts_returns_business_details(self):
+        """Test get all drafts includes business details"""
+
+        data = {'msg_to': 'BRES',
+                'msg_from': '0a7ad740-10d5-4ecb-b7ca-3c0384afb882',
+                'subject': 'MyMessage',
+                'body': 'hello',
+                'thread': "?",
+                'ru_ref': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc',
+                'survey': "BRES"}
+
+        self.app = application.app.test_client()
+
+        self.headers = {'Content-Type': 'application/json',
+                        'Authorization': "eyJhbGciOiJSU0EtT0FFUCIsImVuYyI6IkEyNTZHQ00ifQ.XMrQ2QMNcoWqv6Pm4KGPZRPAHMSNuCRrmdp-glDvf_9gDzYDoXkxbZEBqy6_pdMTIFINUWUABYa7PdLLuJh5uoU9L7lmvJKEYCq0e5rS076KLRc5pFKHJesgJLNijj7scLke3y4INkd0px82SHhnbek0bGLeu3i8FgRt4vD0Eu8TWODM7kEfAT_eRmvPBM1boyOqrpyhYgE9p0_NklwloFXdYZKjTvHxlHtbiuYmvXSTFkbbp_t8T1xZmDrfgS2EDWTFEagzyKBFFAH4Z5QRUUJPiuAxI3lSNS2atFFtDWiZRhuuhRyJzNA4vqTpmFPUE6h_iggkcbiUPofSBx3CUw.QK4lX7z2vN6jryJz.G9C1zoAvWHfAJywiuijq6E78xCMZ5NOAZD1g3e6PTWhveQKNecBJAPgXyRDVgljgIwSq_vBY2AVTIE5xWapwF3oLZyiC0T0H2LrjlpKFUa51-VU_-Yj8u4ax0iLvyWyRRepQneYJ0riF4zbmcGf1vCCEO3WOwcD5wXBFVXVH6wPqExmI2tjWWLdz2F7oK1Wnh1pbQX_EW5rYb2I4mPuc2J6ijXAr73qcJLAzJbjDo1uk.QrPCckVYuNlcWeCwQmws9A"}
+
+        app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:////tmp/messages.db'
+        self.engine = create_engine('sqlite:////tmp/messages.db')
+
+        self.app.post("http://localhost:5050/draft/save", data=json.dumps(data), headers=self.headers)
+        self.app.post("http://localhost:5050/draft/save", data=json.dumps(data), headers=self.headers)
+
+        drafts_get = self.app.get("http://localhost:5050/drafts", headers=self.headers)
+        drafts_data = json.loads(drafts_get.data)
+        drafts = drafts_data['messages']
+
+        for draft in drafts:
+            self.assertEqual(draft['@ru_ref']['business_name'], "Apple")
 
 
 if __name__ == '__main__':

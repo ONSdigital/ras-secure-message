@@ -22,8 +22,7 @@ data = {'msg_to': 'BRES',
         'body': 'Test',
         'thread_id': '',
         'collection_case': 'collectioncase',
-        'reporting_unit': 'AReportingUnit',
-        'business_name': 'ABusiness',
+        'ru_ref': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc',
         'survey': 'BRES'}
 
 
@@ -47,8 +46,7 @@ def step_impl_user_has_created__and_saved_multiple_drafts(context):
                  'body': 'Test',
                  'thread_id': '',
                  'collection_case': 'collection case1',
-                 'reporting_unit': 'reporting case1',
-                 'business_name': 'ABusiness',
+                 'ru_ref': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc',
                  'survey': 'BRES'})
     for _ in range(0, 10):
         app.test_client().post("http://localhost:5050/draft/save", data=json.dumps(data), headers=headers)

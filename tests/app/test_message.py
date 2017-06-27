@@ -21,33 +21,33 @@ class MessageTestCase(unittest.TestCase):
         """creating Message object"""
         now_string = self.now.__str__()
         sut = Message('to', 'from', 'subject', 'body', '5', 'AMsgId', 'ACollectionCase',
-                      'AReportingUnit', 'ASurveyType', 'ABusiness')
+                      'ASurveyType', 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc')
         sut_str = repr(sut)
-        expected = '<Message(msg_id=AMsgId msg_to=to msg_from=from subject=subject body=body thread_id=5 collection_case=ACollectionCase reporting_unit=AReportingUnit business_name=ABusiness survey=ASurveyType)>'
+        expected = '<Message(msg_id=AMsgId msg_to=to msg_from=from subject=subject body=body thread_id=5 collection_case=ACollectionCase ru_ref=f1a5e99c-8edf-489a-9c72-6cabe6c387fc survey=ASurveyType)>'
         self.assertEquals(sut_str, expected)
 
     def test_message_with_different_collection_case_not_equal(self):
         """testing two different Message objects are not equal"""
         message1 = Message('1', '2', '3', '4', '5', 'ACollectionCase',
-                           'AReportingUnit', 'ASurveyType', 'ABusiness')
+                           'f1a5e99c-8edf-489a-9c72-6cabe6c387fc', 'ASurveyType', 'ABusiness')
         message2 = Message('1', '2', '3', '4', '5', 'AnotherCollectionCase',
-                           'AReportingUnit', 'ASurveyType', 'ABusiness')
+                           'f1a5e99c-8edf-489a-9c72-6cabe6c387fc', 'ASurveyType', 'ABusiness')
         self.assertTrue(message1 != message2)
 
     def test_message_with_different_reporting_unit_not_equal(self):
         """testing two different Message objects are not equal"""
         message1 = Message('1', '2', '3', '4', '5', 'ACollectionCase',
-                           'AReportingUnit', 'ASurveyType', 'ABusiness')
+                           'f1a5e99c-8edf-489a-9c72-6cabe6c387fc', 'ASurveyType', 'ABusiness')
         message2 = Message('1', '2', '3', '4', '5', 'ACollectionCase',
-                           'AnotherReportingUnit', 'ASurveyType', 'ABusiness')
+                           '7fc0e8ab-189c-4794-b8f4-9f05a1db185b', 'ASurveyType', 'ABusiness')
         self.assertTrue(message1 != message2)
 
     def test_message_with_different_survey_not_equal(self):
         """testing two different Message objects are not equal"""
         message1 = Message('1', '2', '3', '4', '5', 'ACollectionCase',
-                           'AReportingUnit', 'ASurveyType', 'ABusiness')
+                           'f1a5e99c-8edf-489a-9c72-6cabe6c387fc', 'ASurveyType', 'ABusiness')
         message2 = Message('1', '2', '3', '4', '5', 'ACollectionCase',
-                           'AReportingUnit', 'AnotherSurveyType', 'ABusiness')
+                           'f1a5e99c-8edf-489a-9c72-6cabe6c387fc', 'AnotherSurveyType', 'ABusiness')
         self.assertTrue(message1 != message2)
 
     def test_message_equal(self):
@@ -59,7 +59,7 @@ class MessageTestCase(unittest.TestCase):
     def test_message_not_equal_to_different_type(self):
 
         message1 = Message('1', '2', '3', '4', '5', 'ACollectionCase',
-                           'AReportingUnit', 'ASurveyType')
+                           'f1a5e99c-8edf-489a-9c72-6cabe6c387fc', 'ASurveyType')
         self.assertFalse(message1 == "Message1")
 
 
@@ -68,7 +68,7 @@ class MessageSchemaTestCase(unittest.TestCase):
     def setUp(self):
         """setup test environment"""
         self.json_message = {'msg_to': 'Tej', 'msg_from': 'Gemma', 'subject': 'MyMessage', 'body': 'hello',
-                             'thread_id': "", 'survey': "RSI"}
+                             'thread_id': "", 'ru_ref': "7fc0e8ab-189c-4794-b8f4-9f05a1db185b", 'survey': "RSI"}
         self.now = datetime.now(timezone.utc)
 
     def test_valid_message_passes_validation(self):
@@ -83,7 +83,7 @@ class MessageSchemaTestCase(unittest.TestCase):
         """checking marshaling message object to json does not raise errors"""
         schema = MessageSchema()
         message_object = Message(**{'msg_to': 'Tej', 'msg_from': 'Gemma', 'subject': 'MyMessage', 'body': 'hello',
-                                    'thread_id': ""})
+                                    'thread_id': "", 'ru_ref': "7fc0e8ab-189c-4794-b8f4-9f05a1db185b"})
         message_json = schema.dumps(message_object)
         self.assertTrue(message_json.errors == {})
 
@@ -101,7 +101,7 @@ class MessageSchemaTestCase(unittest.TestCase):
 
     def test_missing_body_fails_validation(self):
         """marshalling message with no body field """
-        message = {'msg_to': 'richard', 'msg_from': 'torrance', 'body': '', 'survey': 'RSI', 'subject': 'MyMessage'}
+        message = {'msg_to': 'richard', 'msg_from': 'torrance', 'body': '', 'survey': 'RSI', 'subject': 'MyMessage', 'ru_ref': '7fc0e8ab-189c-4794-b8f4-9f05a1db185b'}
 
         with app.app_context():
             g.user = User(message['msg_from'], 'respondent')

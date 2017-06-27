@@ -2,7 +2,7 @@ from flask import jsonify
 from structlog import wrap_logger
 import logging
 import hashlib
-from app.common import user_by_uuid
+from app.common import user_by_uuid, business_by_ru
 from app.constants import MESSAGE_BY_ID_ENDPOINT, MESSAGE_LIST_ENDPOINT, MESSAGE_QUERY_LIMIT
 
 logger = wrap_logger(logging.getLogger(__name__))
@@ -13,11 +13,10 @@ def get_options(args):
     string_query_args = '?'
     page = 1
     limit = MESSAGE_QUERY_LIMIT
-    ru = None
+    ru_ref = None
     survey = None
     cc = None
     label = None
-    business = None
     desc = True
 
     if args.get('limit'):
@@ -26,12 +25,9 @@ def get_options(args):
     if args.get('page'):
         page = int(args.get('page'))
 
-    if args.get('ru'):
-        string_query_args = add_string_query_args(string_query_args, 'ru', args.get('ru'))
-        ru = str(args.get('ru'))
-    if args.get('business'):
-        string_query_args = add_string_query_args(string_query_args, 'business', args.get('business'))
-        business = str(args.get('business'))
+    if args.get('ru_ref'):
+        string_query_args = add_string_query_args(string_query_args, 'ru_ref', args.get('ru_ref'))
+        ru_ref = str(args.get('ru_ref'))
     if args.get('survey'):
         survey = str(args.get('survey'))
         string_query_args = add_string_query_args(string_query_args, 'survey', args.get('survey'))
@@ -45,7 +41,7 @@ def get_options(args):
         desc = False if args.get('desc') == 'false' else True
         string_query_args = add_string_query_args(string_query_args, 'desc', args.get('desc'))
 
-    return string_query_args, page, limit, ru, survey, cc, label, business, desc
+    return string_query_args, page, limit, ru_ref, survey, cc, label, desc
 
 
 def add_string_query_args(string_query_args, arg, val):
@@ -122,5 +118,23 @@ def add_to_and_from_details(messages):
     for message in messages:
         message['msg_to'][0] = next((user for user in user_details if user["id"] == message['msg_to'][0]), None)
         message['msg_from'] = next((user for user in user_details if user["id"] == message['msg_from']), None)
+
+    messages = add_business_details(messages)
+    return messages
+
+
+def add_business_details(messages):
+    """Adds business details"""
+
+    ru_list = []
+
+    for message in messages:
+        if message['ru_ref'] not in ru_list:
+            ru_list.append(message['ru_ref'])
+
+    business_details = business_by_ru.get_business_details_by_ru(ru_list)
+
+    for message in messages:
+        message['@ru_ref'] = next((business for business in business_details if business["ru_ref"] == message['ru_ref']), None)
     return messages
 

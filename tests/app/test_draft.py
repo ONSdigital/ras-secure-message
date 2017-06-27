@@ -54,7 +54,7 @@ class DraftTestCase(unittest.TestCase):
                              'body': 'hello',
                              'thread_id': '',
                              'collection_case': 'ACollectionCase',
-                             'reporting_unit': 'AReportingUnit',
+                             'ru_ref': '7fc0e8ab-189c-4794-b8f4-9f05a1db185b',
                              'survey': 'ACollectionInstrument'}
 
         with app.app_context():
@@ -209,7 +209,7 @@ class DraftTestCase(unittest.TestCase):
                 'body': 'hello',
                 'thread_id': '',
                 'collection_case': 'ACollectionCase',
-                'reporting_unit': 'AReportingUnit',
+                'ru_ref': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc',
                 'survey': 'ACollectionInstrument'
             }
         )
@@ -224,8 +224,8 @@ class DraftTestCase(unittest.TestCase):
         with self.engine.connect() as con:
             msg_id = str(uuid.uuid4())
             query = 'INSERT INTO secure_message(msg_id, subject, body, thread_id,' \
-                    ' collection_case, reporting_unit, survey) VALUES ("{0}", "test","test","", ' \
-                    ' "ACollectionCase", "AReportingUnit", ' \
+                    ' collection_case, ru_ref, survey) VALUES ("{0}", "test","test","", ' \
+                    ' "ACollectionCase", "f1a5e99c-8edf-489a-9c72-6cabe6c387fc", ' \
                     '"SurveyType")'.format(msg_id)
             con.execute(query)
             query = 'INSERT INTO status(label, msg_id, actor) VALUES("DRAFT", "{0}", ' \
@@ -251,6 +251,7 @@ class DraftTestCase(unittest.TestCase):
     def test_etag_check_returns_true_if_data_equal(self):
         """Test etag_check function returns true for unchanged draft etag"""
 
+
         message = {
             'msg_to': ['BRES'],
             'msg_from': '0a7ad740-10d5-4ecb-b7ca-3c0384afb882',
@@ -259,11 +260,12 @@ class DraftTestCase(unittest.TestCase):
             'body': 'test',
             'thread_id': '',
             'collection_case': 'ACollectionCase',
-            'reporting_unit': 'reporting_unit',
+            'ru_ref': '7fc0e8ab-189c-4794-b8f4-9f05a1db185b',
             'survey': 'BRES',
             '_links': '',
             'labels': ['DRAFT']
         }
+
 
         etag = utilities.generate_etag(message['msg_to'],message['msg_id'], message['subject'],message['body'])
 
@@ -272,7 +274,6 @@ class DraftTestCase(unittest.TestCase):
     def test_etag_check_returns_false_if_msg_to_changed(self):
         """Test etag_check function returns false for changed draft etag"""
 
-
         message = {
             'msg_to': ['BRES'],
             'msg_from': '0a7ad740-10d5-4ecb-b7ca-3c0384afb882',
@@ -281,13 +282,13 @@ class DraftTestCase(unittest.TestCase):
             'body': 'test',
             'thread_id': '',
             'collection_case': 'ACollectionCase',
-            'reporting_unit': 'reporting_unit',
+            'ru_ref': '7fc0e8ab-189c-4794-b8f4-9f05a1db185b',
             'survey': 'BRES',
             '_links': '',
             'labels': ['DRAFT']
         }
 
-        etag = utilities.generate_etag('XXX',message['msg_id'], message['subject'],message['body'])
+        etag = utilities.generate_etag('XXX', message['msg_id'], message['subject'],message['body'])
         self.assertFalse(DraftModifyById.etag_check({'ETag': etag}, message))
 
     def test_etag_check_returns_false_if_msg_id_changed(self):
@@ -301,7 +302,7 @@ class DraftTestCase(unittest.TestCase):
             'body': 'test',
             'thread_id': '',
             'collection_case': 'ACollectionCase',
-            'reporting_unit': 'reporting_unit',
+            'ru_ref': '7fc0e8ab-189c-4794-b8f4-9f05a1db185b',
             'survey': 'BRES',
             '_links': '',
             'labels': ['DRAFT']
@@ -321,7 +322,7 @@ class DraftTestCase(unittest.TestCase):
             'body': 'test',
             'thread_id': '',
             'collection_case': 'ACollectionCase',
-            'reporting_unit': 'reporting_unit',
+            'ru_ref': '7fc0e8ab-189c-4794-b8f4-9f05a1db185b',
             'survey': 'BRES',
             '_links': '',
             'labels': ['DRAFT']
@@ -341,7 +342,7 @@ class DraftTestCase(unittest.TestCase):
             'body': 'test',
             'thread_id': '',
             'collection_case': 'ACollectionCase',
-            'reporting_unit': 'reporting_unit',
+            'ru_ref': '7fc0e8ab-189c-4794-b8f4-9f05a1db185b',
             'survey': 'BRES',
             '_links': '',
             'labels': ['DRAFT']

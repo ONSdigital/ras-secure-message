@@ -49,8 +49,7 @@ def step_impl_user_requests_valid_draft(context):
                  'body': 'Test',
                  'thread_id': '',
                  'collection_case': 'collection case1',
-                 'reporting_unit': 'reporting case1',
-                 'business_name': 'ABusiness',
+                 'ru_ref': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc',
                  'survey': 'BRES'})
     response = app.test_client().post("http://localhost:5050/draft/save", data=json.dumps(data),
                                       headers=headers)
@@ -92,8 +91,7 @@ def step_impl_user_not_authorised(self, context):
                  'body': 'Test',
                  'thread_id': '',
                  'collection_case': 'collection case1',
-                 'reporting_unit': 'reporting case1',
-                 'business_name': 'ABusiness',
+                 'ru_ref': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc',
                  'survey': 'BRES'})
     response = app.test_client().post("http://localhost:5050/draft/save", data=json.dumps(context.draft),
                                       headers=headers)
@@ -114,8 +112,7 @@ def step_impl_there_is_a_draft(context):
                  'body': 'Test',
                  'thread_id': '',
                  'collection_case': 'collection case1',
-                 'reporting_unit': 'reporting case1',
-                 'business_name': 'ABusiness',
+                 'ru_ref': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc',
                  'survey': 'BRES'})
     response = app.test_client().post("http://localhost:5050/draft/save", data=json.dumps(data),
                                       headers=headers)
