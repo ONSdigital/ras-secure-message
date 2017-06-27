@@ -103,6 +103,7 @@ def step_impl_correct_collection_case_returned(context):
     msg_resp = json.loads(context.response.data)
     nose.tools.assert_equal(msg_resp['collection_case'], data['collection_case'])
 
+
 # Scenario: Retrieve a message with incorrect message ID
 @when("the get request has been made with an incorrect message id")
 def step_impl_the_get_request_has_been_made_with_incorrect_message_id(context):

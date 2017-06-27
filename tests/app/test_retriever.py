@@ -18,6 +18,7 @@ class RetrieverTestCaseHelper:
     def add_secure_message(self, msg_id, subject="test", body="test", thread_id="ThreadId",
                            collection_case="ACollectionCase", ru_ref="f1a5e99c-8edf-489a-9c72-6cabe6c387fc",
                            survey="BRES"):
+
         """ Populate the secure_message table"""
 
         with self.engine.connect() as con:

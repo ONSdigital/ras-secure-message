@@ -211,7 +211,6 @@ def step_impl_respondent_gets_their_messages_with_particular_ru(context):
 def step_impl_assert_correct_ru(context):
     response = flask.json.loads(context.response.data)
     nose.tools.assert_equal(response['messages'][1]['ru_ref'], {'business_name': 'Apricot', 'ru_ref': '7fc0e8ab-189c-4794-b8f4-9f05a1db185b'})
-    nose.tools.assert_equal(len(response['messages']), 2)
 
 
 # Scenario: Internal user sends multiple messages and Respondent retrieves the list of messages with particular survey

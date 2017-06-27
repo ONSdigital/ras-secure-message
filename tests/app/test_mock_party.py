@@ -7,6 +7,10 @@ from app import application
 from app.application import app
 from app.common import user_by_uuid, business_by_ru
 
+from app import application
+from app.application import app
+from app.common import user_by_uuid
+
 
 class PartyTestCase(unittest.TestCase):
 

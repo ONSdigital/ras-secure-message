@@ -136,12 +136,12 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
             'survey': 'BRES',
             'ru_ref': '7fc0e8ab-189c-4794-b8f4-9f05a1db185b'
         }
-        string_query_args, page, limit, ru, survey, cc, label, desc = utilities.get_options(args)
+        string_query_args, page, limit, ru_ref, survey, cc, label, desc = utilities.get_options(args)
 
         self.assertEqual(string_query_args, '?ru_ref=7fc0e8ab-189c-4794-b8f4-9f05a1db185b&survey=BRES')
         self.assertEqual(page, 2)
         self.assertEqual(limit, MESSAGE_QUERY_LIMIT)
-        self.assertEqual(ru, '7fc0e8ab-189c-4794-b8f4-9f05a1db185b')
+        self.assertEqual(ru_ref, '7fc0e8ab-189c-4794-b8f4-9f05a1db185b')
         self.assertEqual(survey, 'BRES')
         self.assertEqual(cc, None)
         self.assertEqual(label, None)
@@ -181,3 +181,4 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
         string_query_args = '?survey=BRES'
         string_query_args = utilities.add_string_query_args(string_query_args, 'ru_ref', '7fc0e8ab-189c-4794-b8f4-9f05a1db185b')
         self.assertEqual(string_query_args, '?survey=BRES&ru_ref=7fc0e8ab-189c-4794-b8f4-9f05a1db185b')
+
