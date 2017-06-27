@@ -268,11 +268,11 @@ class DraftTestCase(unittest.TestCase):
             'thread_id': '',
             'collection_case': 'ACollectionCase',
             'reporting_unit': 'reporting_unit',
+            'collection_exercise': 'ACollectionExercise',
             'survey': 'BRES',
             '_links': '',
             'labels': ['DRAFT']
         }
-
 
         etag = utilities.generate_etag(message['msg_to'],message['msg_id'], message['subject'],message['body'])
 
@@ -290,6 +290,7 @@ class DraftTestCase(unittest.TestCase):
             'thread_id': '',
             'collection_case': 'ACollectionCase',
             'reporting_unit': 'reporting_unit',
+            'collection_exercise': 'ACollectionExercise',
             'survey': 'BRES',
             '_links': '',
             'labels': ['DRAFT']
@@ -310,6 +311,7 @@ class DraftTestCase(unittest.TestCase):
             'thread_id': '',
             'collection_case': 'ACollectionCase',
             'reporting_unit': 'reporting_unit',
+            'collection_exercise': 'ACollectionExercise',
             'survey': 'BRES',
             '_links': '',
             'labels': ['DRAFT']
@@ -330,6 +332,7 @@ class DraftTestCase(unittest.TestCase):
             'thread_id': '',
             'collection_case': 'ACollectionCase',
             'reporting_unit': 'reporting_unit',
+            'collection_exercise': 'ACollectionExercise',
             'survey': 'BRES',
             '_links': '',
             'labels': ['DRAFT']
@@ -350,6 +353,7 @@ class DraftTestCase(unittest.TestCase):
             'thread_id': '',
             'collection_case': 'ACollectionCase',
             'reporting_unit': 'reporting_unit',
+            'collection_exercise': 'ACollectionExercise',
             'survey': 'BRES',
             '_links': '',
             'labels': ['DRAFT']
@@ -357,8 +361,6 @@ class DraftTestCase(unittest.TestCase):
 
         etag = utilities.generate_etag(message['msg_to'], message['msg_id'], message['subject'], 'XXX')
         self.assertFalse(DraftModifyById.etag_check({'ETag': etag}, message))
-
-
 
     def test_draft_modified_since_last_read_t_raises_error(self):
         """Test draft_modified_since_last_read function raises internal server error"""
