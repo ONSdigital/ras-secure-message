@@ -54,6 +54,7 @@ class DraftTestCase(unittest.TestCase):
                              'thread_id': '',
                              'collection_case': 'ACollectionCase',
                              'reporting_unit': 'AReportingUnit',
+                             'collection_exercise': 'ACollectionExercise',
                              'survey': 'ACollectionInstrument'}
 
         with app.app_context():
@@ -105,6 +106,13 @@ class DraftTestCase(unittest.TestCase):
         """Test draft can be saved without Collection Case field"""
 
         self.test_message['collection_case'] = ''
+        response = self.app.post(self.url, data=json.dumps(self.test_message), headers=self.headers)
+        self.assertEqual(response.status_code, 201)
+
+    def test_draft_empty_collection_exercise_field_returns_201(self):
+        """Test draft can be saved without Collection Exercise field"""
+
+        self.test_message['collection_exercise'] = ''
         response = self.app.post(self.url, data=json.dumps(self.test_message), headers=self.headers)
         self.assertEqual(response.status_code, 201)
 
@@ -209,6 +217,7 @@ class DraftTestCase(unittest.TestCase):
                 'thread_id': '',
                 'collection_case': 'ACollectionCase',
                 'reporting_unit': 'AReportingUnit',
+                'collection_exercise': 'ACollectionExercise',
                 'survey': 'ACollectionInstrument'
             }
         )
@@ -223,8 +232,8 @@ class DraftTestCase(unittest.TestCase):
         with self.engine.connect() as con:
             msg_id = str(uuid.uuid4())
             query = 'INSERT INTO secure_message(msg_id, subject, body, thread_id,' \
-                    ' collection_case, reporting_unit, survey) VALUES ("{0}", "test","test","", ' \
-                    ' "ACollectionCase", "AReportingUnit", ' \
+                    ' collection_case, reporting_unit, collection_exercise, survey) VALUES ("{0}", "test","test","", ' \
+                    ' "ACollectionCase", "AReportingUnit", "ACollectionExercise", ' \
                     '"SurveyType")'.format(msg_id)
             con.execute(query)
             query = 'INSERT INTO status(label, msg_id, actor) VALUES("DRAFT", "{0}", ' \
@@ -253,8 +262,8 @@ class DraftTestCase(unittest.TestCase):
         with self.engine.connect() as con:
             msg_id = str(uuid.uuid4())
             query = 'INSERT INTO secure_message(msg_id, subject, body, thread_id,' \
-                    ' collection_case, reporting_unit, survey) VALUES ("{0}", "test","test","", ' \
-                    ' "ACollectionCase", "AReportingUnit", ' \
+                    ' collection_case, reporting_unit, collection_exercise, survey) VALUES ("{0}", "test","test","", ' \
+                    ' "ACollectionCase", "AReportingUnit", "ACollectionExercise", ' \
                     '"SurveyType")'.format(msg_id)
             con.execute(query)
             query = 'INSERT INTO status(label, msg_id, actor) VALUES("DRAFT", "{0}",' \
@@ -278,8 +287,8 @@ class DraftTestCase(unittest.TestCase):
         with self.engine.connect() as con:
             msg_id = str(uuid.uuid4())
             query = 'INSERT INTO secure_message(msg_id, subject, body, thread_id,' \
-                    ' collection_case, reporting_unit, survey) VALUES ("{0}", "test","test","", ' \
-                    ' "ACollectionCase", "AReportingUnit", ' \
+                    ' collection_case, reporting_unit, collection_exercise, survey) VALUES ("{0}", "test","test","", ' \
+                    ' "ACollectionCase", "AReportingUnit", "ACollectionExercise", ' \
                     '"SurveyType")'.format(msg_id)
             con.execute(query)
             query = 'INSERT INTO status(label, msg_id, actor) VALUES("DRAFT", "{0}", ' \

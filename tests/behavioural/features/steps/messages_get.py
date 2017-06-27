@@ -22,6 +22,7 @@ data = {'msg_to': 'test',
         'collection_case': 'collectioncase',
         'reporting_unit': 'AReportingUnit',
         'business_name': 'ABusiness',
+        'collection_exercise': 'collectionexercise',
         'survey': 'BRES'}
 
 
@@ -347,6 +348,7 @@ def step_impl_respondent_creates_multiple_draft_messages(context):
                  'thread_id': '',
                  'collection_case': 'collection case1',
                  'reporting_unit': 'reporting case1',
+                 'collection_exercise': 'collection exercise1',
                  'survey': 'survey'}
         token_data['user_uuid'] = 'respondent.122342'
         token_data['role'] = 'respondent'

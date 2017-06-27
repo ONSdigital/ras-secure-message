@@ -14,7 +14,7 @@ logger = wrap_logger(logging.getLogger(__name__))
 class Retriever:
     """Created when retrieving messages"""
     @staticmethod
-    def retrieve_message_list(page, limit, user, ru=None, survey=None, cc=None, label=None,
+    def retrieve_message_list(page, limit, user, ru=None, survey=None, cc=None, ce=None, label=None,
                               business=None, descend=True):
         """returns list of messages from db"""
         conditions = []
@@ -44,6 +44,9 @@ class Retriever:
 
         if cc is not None:
             conditions.append(SecureMessage.collection_case == str(cc))
+
+        if ce is not None:
+            conditions.append(SecureMessage.collection_exercise == str(ce))
 
         try:
             t = db.session.query(SecureMessage.msg_id, func.max(Events.date_time).label('max_date')) \

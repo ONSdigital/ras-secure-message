@@ -23,6 +23,7 @@ data = {'msg_to': 'test',
         'collection_case': 'collection case1',
         'reporting_unit': 'reporting case1',
         'business_name': 'ABusiness',
+        'collection_exercise': 'collection exercise1',
         'survey': 'survey.0000'}
 
 modify_data = {'action': '',

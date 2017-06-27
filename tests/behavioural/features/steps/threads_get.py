@@ -22,6 +22,7 @@ data = {'msg_to': 'test',
         'collection_case': 'collectioncase',
         'reporting_unit': 'AReportingUnit',
         'business_name': 'ABusiness',
+        'collection_exercise': 'collectionexercise',
         'survey': 'BRES'}
 
 

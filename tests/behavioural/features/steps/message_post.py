@@ -40,7 +40,6 @@ def before_scenario(context):
         database.db.drop_all()
         database.db.create_all()
 
-
     data.update({
                  'msg_to': 'test',
                  'msg_from': 'respondent.test',
@@ -50,6 +49,7 @@ def before_scenario(context):
                  'collection_case': 'collection case1',
                  'reporting_unit': 'reporting case1',
                  'business_name': 'ABusiness',
+                 'collection_exercise': 'collection exercise1',
                  'survey': 'survey'})
 
 
@@ -78,6 +78,7 @@ def step_impl_a_message_is_a_draft(context):
                        'collection_case': 'collection case1',
                        'reporting_unit': 'reporting case1',
                        'business_name': 'ABusiness',
+                       'collection_exercise': 'collection exercise1',
                        'survey': 'survey'}
 
 
@@ -108,6 +109,7 @@ def step_impl_a_message_is_a_draft_reply(context):
                  'collection_case': 'collection case1',
                  'reporting_unit': 'reporting case1',
                  'business_name': 'ABusiness',
+                 'collection_exercise': 'collection exercise1',
                  'survey': 'survey'})
 
     token_data['user_uuid'] = data['msg_from']
@@ -127,6 +129,7 @@ def step_impl_a_message_is_a_draft_reply(context):
                        'collection_case': 'collection case1',
                        'reporting_unit': 'reporting case1',
                        'business_name': 'ABusiness',
+                       'collection_exercise': 'collection exercise1',
                        'survey': 'survey'}
 
 
@@ -198,6 +201,7 @@ def step_impl_message_contains_msg_id_and_is_not_valid_draft(context):
                  'collection_case': 'collection case1',
                  'reporting_unit': 'reporting case1',
                  'business_name': 'ABusiness',
+                 'collection_exercise': 'collection exercise1',
                  'survey': 'survey'})
 
 
@@ -227,6 +231,7 @@ def step_impl_draft_message_posted(context):
                        'collection_case': 'collection case1',
                        'reporting_unit': 'reporting case1',
                        'business_name': 'ABusiness',
+                       'collection_exercise': 'collection exercise1',
                        'survey': 'survey'}
     token_data['user_uuid'] = context.message['msg_from']
     token_data['role'] = 'respondent'
@@ -245,6 +250,7 @@ def step_impl_another_user_sends_same_message(context):
                  'collection_case': 'collection case1',
                  'reporting_unit': 'reporting case1',
                  'business_name': 'ABusiness',
+                 'collection_exercise': 'collection exercise1',
                  'survey': 'survey'})
 
     data['subject'] = 'edited'
@@ -273,6 +279,7 @@ def step_impl_message_is_created(context):
                      'collection_case': 'collection case1',
                      'reporting_unit': 'reporting case1',
                      'business_name': 'ABusiness',
+                     'collection_exercise': 'collection exercise1',
                      'survey': 'RSI'}
 
 

@@ -24,6 +24,7 @@ data = {'msg_to': 'test',
         'collection_case': 'collection case1',
         'reporting_unit': 'reporting case1',
         'business_name': 'ABusiness',
+        'collection_exercise': 'collection exercise1',
         'survey': 'BRES'}
 
 
@@ -106,6 +107,11 @@ def step_impl_correct_business_name_returned(context):
     nose.tools.assert_equal(msg_resp['business_name'], data['business_name'])
 
 
+@then("returned message field CollectionExercise is correct")
+def step_impl_correct_collection_exercise_returned(context):
+    msg_resp = json.loads(context.response.data)
+    nose.tools.assert_equal(msg_resp['collection_exercise'], data['collection_exercise'])
+
 # Scenario: Retrieve a message with incorrect message ID
 @when("the get request has been made with an incorrect message id")
 def step_impl_the_get_request_has_been_made_with_incorrect_message_id(context):
@@ -187,6 +193,7 @@ def step_impl_draft_message_can_be_retrieved(context):
                  'collection_case': 'collection case1',
                  'reporting_unit': 'reporting case1',
                  'business_name': 'ABusiness',
+                 'collection_exercise': 'collection exercise1',
                  'survey': 'BRES'})
     response = app.test_client().post("http://localhost:5050/draft/save", data=json.dumps(data),
                                       headers=headers)

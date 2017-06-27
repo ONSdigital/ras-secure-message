@@ -17,6 +17,7 @@ def get_options(args):
     label = None
     business = None
     desc = True
+    ce = None
 
     if args.get('limit'):
         limit = int(args.get('limit'))
@@ -42,8 +43,11 @@ def get_options(args):
     if args.get('desc'):
         desc = False if args.get('desc') == 'false' else True
         string_query_args = add_string_query_args(string_query_args, 'desc', args.get('desc'))
+    if args.get('ce'):
+        ce = str(args.get('ce'))
+        string_query_args = add_string_query_args(string_query_args, 'ce', args.get('ce'))
 
-    return string_query_args, page, limit, ru, survey, cc, label, business, desc
+    return string_query_args, page, limit, ru, survey, cc, label, business, desc, ce
 
 
 def add_string_query_args(string_query_args, arg, val):

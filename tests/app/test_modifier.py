@@ -24,8 +24,8 @@ class ModifyTestCaseHelper:
             for i in range(record_count):
                 msg_id = str(uuid.uuid4())
                 query = 'INSERT INTO secure_message(id, msg_id, subject, body, thread_id,' \
-                        ' collection_case, reporting_unit, survey) VALUES ({0}, "{1}", "test","test","", ' \
-                        ' "ACollectionCase", "AReportingUnit", ' \
+                        ' collection_case, reporting_unit, collection_exercise, survey) VALUES ({0}, "{1}", "test",' \
+                        '"test","", "ACollectionCase", "AReportingUnit", "ACollectionExercise", ' \
                         '"SurveyType")'.format(i, msg_id)
                 con.execute(query)
                 query = 'INSERT INTO status(label, msg_id, actor) VALUES("SENT", "{0}", ' \
@@ -219,6 +219,7 @@ class ModifyTestCase(unittest.TestCase, ModifyTestCaseHelper):
                     'collection_case': 'ACollectionCase',
                     'reporting_unit': 'AReportingUnit',
                     'business_name': 'ABusiness',
+                    'collection_exercise': 'ACollectionExercise',
                     'survey': 'ACollectionInstrument'
                 }
 
@@ -253,6 +254,7 @@ class ModifyTestCase(unittest.TestCase, ModifyTestCaseHelper):
                     'collection_case': 'ACollectionCase',
                     'reporting_unit': 'AReportingUnit',
                     'business_name': 'ABusiness',
+                    'collection_exercise': 'ACollectionExercise',
                     'survey': 'ACollectionInstrument'
                 }
 
@@ -260,13 +262,14 @@ class ModifyTestCase(unittest.TestCase, ModifyTestCaseHelper):
                 with self.engine.connect() as con:
                     add_draft_event = ("INSERT INTO events (event, msg_id, date_time) "
                                  "VALUES ('{0}', 'test123', '{1}')").format('Draft_Saved',
-                                                                          datetime.now(timezone.utc))
-                    add_draft = "INSERT INTO secure_message (msg_id, body, subject, thread_id, collection_case, reporting_unit, " \
-                               "survey, business_name) VALUES ('{0}', '{1}', '{2}', '{3}', '{4}', '{5}', '{6}', '{7}')" \
+                                                                            datetime.now(timezone.utc))
+                    add_draft = "INSERT INTO secure_message (msg_id, body, subject, thread_id, collection_case, " \
+                                "reporting_unit, survey, business_name, collection_exercise) VALUES ('{0}', '{1}', " \
+                                "'{2}', '{3}', '{4}', '{5}', '{6}', '{7}', '{8}')" \
                         .format(self.test_message['msg_id'], self.test_message['body'], self.test_message['subject'],
                                 self.test_message['thread_id'],
                                 self.test_message['collection_case'], self.test_message['reporting_unit'],
-                                'test', self.test_message['business_name'])
+                                'test', self.test_message['business_name'], self.test_message['collection_exercise'])
                     con.execute(add_draft)
                     con.execute(add_draft_event)
                 modifier.del_draft(self.test_message['msg_id'])
@@ -291,19 +294,22 @@ class ModifyTestCase(unittest.TestCase, ModifyTestCaseHelper):
                     'collection_case': 'ACollectionCase',
                     'reporting_unit': 'AReportingUnit',
                     'business_name': 'ABusiness',
+                    'collection_exercise': 'ACollectionExercise',
                     'survey': 'ACollectionInstrument'
                 }
 
                 modifier = Modifier()
                 with self.engine.connect() as con:
                     add_draft = "INSERT INTO secure_message (msg_id, body, subject, thread_id, collection_case, " \
-                                "reporting_unit, survey, business_name) VALUES ('{0}', '{1}', '{2}', '{3}', '{4}', " \
-                                "'{5}', '{6}', '{7}')".format(self.test_message['msg_id'], self.test_message['body'],
-                                                              self.test_message['subject'],
-                                                              self.test_message['thread_id'],
-                                                              self.test_message['collection_case'],
-                                                              self.test_message['reporting_unit'], 'test',
-                                                              self.test_message['business_name'])
+                                "reporting_unit, survey, business_name, collection_exercise) VALUES ('{0}', '{1}', " \
+                                "'{2}', '{3}', '{4}', '{5}', '{6}', '{7}', '{8}')".format(self.test_message['msg_id'],
+                                                                                         self.test_message['body'],
+                                                                                         self.test_message['subject'],
+                                                                                         self.test_message['thread_id'],
+                                                                                         self.test_message['collection_case'],
+                                                                                         self.test_message['reporting_unit'], 'test',
+                                                                                         self.test_message['business_name'],
+                                                                                         self.test_message['collection_exercise'])
                     con.execute(add_draft)
                     draft = DraftSchema().load(self.test_message)
                     modifier.replace_current_draft(self.test_message['msg_id'], draft.data)

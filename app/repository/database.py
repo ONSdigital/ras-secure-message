@@ -29,10 +29,11 @@ class SecureMessage(db.Model):
     survey = Column("survey", String(constants.MAX_SURVEY_LEN+1))
     statuses = relationship('Status', backref='secure_message')
     events = relationship('Events', backref='secure_message', order_by='Events.date_time')
-    __table_args__ = (Index("idx_ru_survey_cc", "reporting_unit", "survey", "collection_case"), )
+    collection_exercise = Column("collection_exercise", String(constants.MAX_COLLECTION_EXERCISE_LEN+1))
+    __table_args__ = (Index("idx_ru_survey_cc", "reporting_unit", "survey", "collection_case", "collection_exercise"), )
 
     def __init__(self, msg_id="", subject="", body="", thread_id="", collection_case='',
-                 reporting_unit='', survey='', business_name=''):
+                 reporting_unit='', survey='', business_name='', collection_exercise=''):
         logger.debug("Initialised Secure Message entity: msg_id: {}".format(id))
         self.msg_id = msg_id
         self.subject = subject
@@ -42,6 +43,7 @@ class SecureMessage(db.Model):
         self.reporting_unit = reporting_unit
         self.business_name = business_name
         self.survey = survey
+        self.collection_exercise = collection_exercise
 
     def set_from_domain_model(self, domain_model):
         """set dbMessage attributes to domain_model attributes"""
@@ -53,6 +55,7 @@ class SecureMessage(db.Model):
         self.reporting_unit = domain_model.reporting_unit
         self.business_name = domain_model.business_name
         self.survey = domain_model.survey
+        self.collection_exercise = domain_model.collection_exercise
 
     def serialize(self, user):
         """Return object data in easily serializeable format"""
@@ -67,6 +70,7 @@ class SecureMessage(db.Model):
             'reporting_unit': self.reporting_unit,
             'business_name': self.business_name,
             'survey': self.survey,
+            'collection_exercise': self.collection_exercise,
             '_links': '',
             'labels': []
         }

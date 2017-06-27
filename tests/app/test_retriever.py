@@ -17,14 +17,16 @@ class RetrieverTestCaseHelper:
     """Helper class for Retriever Tests"""
     def add_secure_message(self, msg_id, subject="test", body="test", thread_id="ThreadId",
                            collection_case="ACollectionCase", reporting_unit="AReportingUnit",
-                           survey="SurveyType", business_name="ABusiness"):
+                           survey="SurveyType", business_name="ABusiness", collection_exercise='CollectionExercise'):
         """ Populate the secure_message table"""
 
         with self.engine.connect() as con:
             query = 'INSERT INTO secure_message(msg_id, subject, body, thread_id,' \
-                    ' collection_case, reporting_unit, survey, business_name) VALUES ("{0}", "{1}","{2}",' \
-                    '"{3}", "{4}", "{5}", "{6}", "{7}")'.format(msg_id, subject, body, thread_id, collection_case,
-                                                                reporting_unit, survey, business_name)
+                    ' collection_case, reporting_unit, survey, business_name, collection_exercise) VALUES ("{0}", ' \
+                    '"{1}","{2}", "{3}", "{4}", "{5}", "{6}", "{7}", "{8}")'.format(msg_id, subject, body, thread_id,
+                                                                                    collection_case, reporting_unit,
+                                                                                    survey, business_name,
+                                                                                    collection_exercise)
             con.execute(query)
 
     def add_status(self, label, msg_id, actor):
@@ -100,7 +102,7 @@ class RetrieverTestCaseHelper:
                 self.add_secure_message(msg_id=msg_id, thread_id="AnotherThreadId",
                                         collection_case="AnotherCollectionCase",
                                         reporting_unit="AnotherReportingUnit", survey="AnotherSurveyType",
-                                        business_name="AnotherBusiness")
+                                        business_name="AnotherBusiness", collection_exercise="AnotherCollectionExercise")
                 self.add_status(label="SENT", msg_id=msg_id, actor="1a7ad740-10d5-4ecb-b7ca-fb8823c0384a")
                 self.add_status(label="INBOX", msg_id=msg_id, actor="AnotherSurveyType")
                 self.add_status(label="UNREAD", msg_id=msg_id, actor="AnotherSurveyType")

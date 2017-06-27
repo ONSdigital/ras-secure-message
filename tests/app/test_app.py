@@ -46,6 +46,7 @@ class FlaskTestCase(unittest.TestCase):
                              'thread_id': "",
                              'collection_case': 'ACollectionCase',
                              'reporting_unit': 'AReportingUnit',
+                             'collection_exercise': 'ACollectionExercise',
                              'survey': 'test-123'}
 
         with app.app_context():
@@ -139,6 +140,7 @@ class FlaskTestCase(unittest.TestCase):
                         'body': 'hello',
                         'collection_case': 'ACollectionCase',
                         'reporting_unit': 'AReportingUnit',
+                        'collection_exercise': 'ACollectionExercise',
                         'survey': 'ACollectionInstrument'}
         try:
             self.app.post(url, data=json.dumps(test_message), headers=self.headers)
@@ -192,6 +194,7 @@ class FlaskTestCase(unittest.TestCase):
                 'thread_id': '',
                 'collection_case': 'ACollectionCase',
                 'reporting_unit': 'AReportingUnit',
+                'collection_exercise': 'ACollectionExercise',
                 'survey': 'ACollectionInstrument'
             }
         )
@@ -268,6 +271,7 @@ class FlaskTestCase(unittest.TestCase):
             'body': 'hello',
             'collection_case': 'ACollectionCase',
             'reporting_unit': 'AReportingUnit',
+            'collcetion_exercise': 'ACollectionExercise',
             'survey': 'ACollectionInstrument'
         })
 
@@ -289,6 +293,7 @@ class FlaskTestCase(unittest.TestCase):
             'body': 'hello',
             'collection_case': 'ACollectionCase',
             'reporting_unit': 'AReportingUnit',
+            'collection_exercise': 'ACollectionExercise',
             'survey': 'ACollectionInstrument'
         })
 

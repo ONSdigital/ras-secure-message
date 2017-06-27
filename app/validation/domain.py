@@ -11,7 +11,7 @@ class Message:
 
     """Class to hold message attributes"""
     def __init__(self, msg_to, msg_from, subject, body, thread_id=None, msg_id='', collection_case='',
-                 reporting_unit='', survey='', business_name=''):
+                 reporting_unit='', survey='', business_name='', collection_exercise=''):
 
         logger.debug("Message Class created {0}, {1}".format(subject, body))
         self.msg_id = str(uuid.uuid4()) if len(msg_id) == 0 else msg_id  # If empty msg_id assign to a uuid
@@ -23,10 +23,11 @@ class Message:
         self.collection_case = collection_case
         self.reporting_unit = reporting_unit
         self.business_name = business_name
+        self.collection_exercise = collection_exercise
         self.survey = survey
 
     def __repr__(self):
-        return '<Message(msg_id={self.msg_id} msg_to={self.msg_to} msg_from={self.msg_from} subject={self.subject} body={self.body} thread_id={self.thread_id} collection_case={self.collection_case} reporting_unit={self.reporting_unit} business_name={self.business_name} survey={self.survey})>'.format(self=self)
+        return '<Message(msg_id={self.msg_id} msg_to={self.msg_to} msg_from={self.msg_from} subject={self.subject} body={self.body} thread_id={self.thread_id} collection_case={self.collection_case} reporting_unit={self.reporting_unit} business_name={self.business_name} collection_exercise={self.collection_exercise} survey={self.survey})>'.format(self=self)
 
     def __eq__(self, other):
         if isinstance(other, Message):
@@ -48,6 +49,7 @@ class MessageSchema(Schema):
     reporting_unit = fields.Str(allow_none=True)
     business_name = fields.Str(allow_none=True)
     survey = fields.Str(required=True)
+    collection_exercise = fields.Str(allow_none=True)
 
     @pre_load
     def check_sent_and_read_date(self, data):
@@ -128,6 +130,7 @@ class DraftSchema(Schema):
     reporting_unit = fields.Str(allow_none=True)
     business_name = fields.Str(allow_none=True)
     survey = fields.Str(required=True)
+    collection_exercise = fields.Str(allow_none=True)
 
     @pre_load
     def check_variables_set_and_not_set(self, data):

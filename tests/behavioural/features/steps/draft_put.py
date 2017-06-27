@@ -23,6 +23,7 @@ post_data = {'msg_to': 'internal.000000',
              'collection_case': 'collection case1',
              'reporting_unit': 'reporting case1',
              'business_name': 'ABusiness',
+             'collection_exercise': 'collection exercise1',
              'survey': 'survey'}
 data = {'msg_to': 'internal.000000',
         'msg_from': 'respondent.000000',
@@ -32,6 +33,7 @@ data = {'msg_to': 'internal.000000',
         'collection_case': 'collection case1',
         'reporting_unit': 'reporting case1',
         'business_name': 'ABusiness',
+        'collection_exercise': 'collection exercise1',
         'survey': 'survey'}
 
 with app.app_context():
@@ -66,6 +68,7 @@ def step_impl_user_edits_saved_draft(context):
                  'collection_case': 'collection case1',
                  'reporting_unit': 'reporting case1',
                  'business_name': 'ABusiness',
+                 'collection_exercise': 'collection exercise1',
                  'survey': 'survey'})
     data['body'] = 'replaced'
 
@@ -103,6 +106,7 @@ def step_impl_user_edits_non_existant_draft(context):
                  'collection_case': 'collection case1',
                  'reporting_unit': 'reporting case1',
                  'business_name': 'ABusiness',
+                 'collection_exercise': 'collection_exercise1',
                  'survey': 'survey'})
     data['body'] = 'replaced'
     context.msg_id = data['msg_id']
@@ -123,6 +127,7 @@ def step_impl_modifies_draft_to_attribute_too_big(context):
                  'collection_case': 'collection case1',
                  'reporting_unit': 'reporting case1',
                  'business_name': 'ABusiness',
+                 'collection_exercise': 'collection excercise1',
                  'survey': 'survey'})
     data['msg_to'] = 'x' * (constants.MAX_TO_LEN+1)
 
@@ -142,6 +147,7 @@ def step_impl_user_modifies_draft_from_attribute_too_big(context):
                  'collection_case': 'collection case1',
                  'reporting_unit': 'reporting case1',
                  'business_name': 'ABusiness',
+                 'collection_exercise': 'collection exercise1',
                  'survey': 'survey'})
     data['msg_from'] = 'x' * (constants.MAX_FROM_LEN+1)
 
@@ -161,6 +167,7 @@ def step_impl_user_modifies_draft_body_attribute_too_big(context):
                  'collection_case': 'collection case1',
                  'reporting_unit': 'reporting case1',
                  'business_name': 'ABusiness',
+                 'collection_exercise': 'collection exercise1',
                  'survey': 'survey'})
     data['body'] = 'x' * (constants.MAX_BODY_LEN+1)
 
@@ -180,6 +187,7 @@ def step_impl_user_modifies_draft_subject_attribute_too_big(context):
                  'collection_case': 'collection case1',
                  'reporting_unit': 'reporting case1',
                  'business_name': 'ABusiness',
+                 'collection_exercise': 'collection exercise1',
                  'survey': 'survey'})
     data['subject'] = 'x' * (constants.MAX_SUBJECT_LEN+1)
 
@@ -201,6 +209,7 @@ def step_impl_user_modifies_draft_no_to_attribute(context):
                  'collection_case': 'collection case1',
                  'reporting_unit': 'reporting case1',
                  'business_name': 'ABusiness',
+                 'collection_exercise': 'collection exercise1',
                  'survey': 'survey'})
     data['msg_to'] = ''
 
@@ -222,6 +231,7 @@ def step_impl_user_modifies_draft_no_body(context):
                  'collection_case': 'collection case1',
                  'reporting_unit': 'reporting case1',
                  'business_name': 'ABusiness',
+                 'collection_exercise': 'collection exercise1',
                  'survey': 'survey'})
     data['body'] = ''
 
@@ -243,6 +253,7 @@ def step_impl_user_modifies_draft_no_subject(context):
                  'collection_case': 'collection case1',
                  'reporting_unit': 'reporting case1',
                  'business_name': 'ABusiness',
+                 'collcetion_exercise': 'collection exercise1',
                  'survey': 'survey'})
     data['subject'] = ''
 
@@ -264,6 +275,7 @@ def step_impluser_modifies_draft_no_thread_id(context):
                  'collection_case': 'collection case1',
                  'reporting_unit': 'reporting case1',
                  'business_name': 'ABusiness',
+                 'collection_exerise': 'collection exercise1',
                  'survey': 'survey'})
     data['thread_id'] = ''
 
@@ -283,6 +295,7 @@ def step_impl_user_modifies_draft_with_mismatched_msg_id(context):
                  'collection_case': 'collection case1',
                  'reporting_unit': 'reporting case1',
                  'business_name': 'ABusiness',
+                 'collection_exercise': 'collection exercise1',
                  'survey': 'survey'})
 
 
@@ -305,6 +318,7 @@ def step_impl_draft_message_is_being_edited(context):
                      'collection_case': 'collection case1',
                      'reporting_unit': 'reporting case1',
                      'business_name': 'ABusiness',
+                     'collection_exercise': 'collection exercise1',
                      'survey': 'survey'})
         data['body'] = ''
         headers['ETag'] = context.etag
@@ -323,6 +337,7 @@ def step_impl_another_user_tries_to_modify_same_draft(context):
                  'collection_case': 'collection case1',
                  'reporting_unit': 'reporting case1',
                  'business_name': 'ABusiness',
+                 'collection_exercise': 'collection exercise1',
                  'survey': 'survey'})
 
     data['subject'] = 'edited'
@@ -359,6 +374,7 @@ def step_impl_the_user_modifies_the_draft(context):
                  'collection_case': 'collection case1',
                  'reporting_unit': 'reporting case1',
                  'business_name': 'ABusiness',
+                 'collection_exercise': 'collection exercise1',
                  'survey': 'survey'})
 
     if 'ETag' in headers:
@@ -387,6 +403,7 @@ def step_impl_user_saves_the_draft_without_etag(context):
                  'collection_case': 'collection case1',
                  'reporting_unit': 'reporting case1',
                  'business_name': 'ABusiness',
+                 'collection_exercise': 'collection exercise1',
                  'survey': 'survey'})
     data['body'] = 'different'
 

@@ -118,7 +118,7 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
         """Tests get messages list with no options provided"""
         args = {}
 
-        string_query_args, page, limit, ru, survey, cc, label, business, desc = utilities.get_options(args)
+        string_query_args, page, limit, ru, survey, cc, label, business, desc, ce = utilities.get_options(args)
 
         self.assertEqual(string_query_args, '?')
         self.assertEqual(page, 1)
@@ -129,6 +129,7 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
         self.assertEqual(label, None)
         self.assertEqual(business, None)
         self.assertEqual(desc, True)
+        self.assertEqual(ce, None)
 
     def test_three_options(self):
         """Tests get messages list with few options provided"""
@@ -137,7 +138,7 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
             'survey': 'Survey',
             'ru': 'ReportingUnit'
         }
-        string_query_args, page, limit, ru, survey, cc, label, business, desc = utilities.get_options(args)
+        string_query_args, page, limit, ru, survey, cc, label, business, desc, ce = utilities.get_options(args)
 
         self.assertEqual(string_query_args, '?ru=ReportingUnit&survey=Survey')
         self.assertEqual(page, 2)
@@ -148,6 +149,7 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
         self.assertEqual(label, None)
         self.assertEqual(business, None)
         self.assertEqual(desc, True)
+        self.assertEqual(ce, None)
 
     def test_all_options(self):
         """Tests get messages list with all options provided"""
@@ -160,11 +162,12 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
             'label': 'INBOX',
             'desc': 'false',
             'business': 'ABusiness',
+            'ce': 'CollectionExercise'
         }
-        string_query_args, page, limit, ru, survey, cc, label, business, desc = utilities.get_options(args)
+        string_query_args, page, limit, ru, survey, cc, label, business, desc, ce = utilities.get_options(args)
 
         self.assertEqual(string_query_args,
-                         '?ru=ReportingUnit&business=ABusiness&survey=Survey&cc=CollectionCase&label=INBOX&desc=false')
+                         '?ru=ReportingUnit&business=ABusiness&survey=Survey&cc=CollectionCase&label=INBOX&desc=false&ce=CollectionExercise')
         self.assertEqual(page, 2)
         self.assertEqual(limit, 9)
         self.assertEqual(ru, 'ReportingUnit')
@@ -173,6 +176,7 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
         self.assertEqual(label, 'INBOX')
         self.assertEqual(desc, False)
         self.assertEqual(business, 'ABusiness')
+        self.assertEqual(ce, 'CollectionExercise')
 
     def test_add_string_query_no_args(self):
         """Adding args to empty string query"""

@@ -21,9 +21,9 @@ class MessageTestCase(unittest.TestCase):
         """creating Message object"""
         now_string = self.now.__str__()
         sut = Message('to', 'from', 'subject', 'body', '5', 'AMsgId', 'ACollectionCase',
-                      'AReportingUnit', 'ASurveyType', 'ABusiness')
+                      'AReportingUnit', 'ASurveyType', 'ABusiness', 'CollectionExercise')
         sut_str = repr(sut)
-        expected = '<Message(msg_id=AMsgId msg_to=to msg_from=from subject=subject body=body thread_id=5 collection_case=ACollectionCase reporting_unit=AReportingUnit business_name=ABusiness survey=ASurveyType)>'
+        expected = '<Message(msg_id=AMsgId msg_to=to msg_from=from subject=subject body=body thread_id=5 collection_case=ACollectionCase reporting_unit=AReportingUnit business_name=ABusiness collection_exercise=CollectionExercise survey=ASurveyType)>'
         self.assertEquals(sut_str, expected)
 
     def test_message_with_different_collection_case_not_equal(self):

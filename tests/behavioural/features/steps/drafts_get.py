@@ -24,6 +24,7 @@ data = {'msg_to': 'test',
         'collection_case': 'collectioncase',
         'reporting_unit': 'AReportingUnit',
         'business_name': 'ABusiness',
+        'collection_exercise': 'collectionexercise',
         'survey': 'survey'}
 
 
@@ -49,6 +50,7 @@ def step_impl_user_has_created__and_saved_multiple_drafts(context):
                  'collection_case': 'collection case1',
                  'reporting_unit': 'reporting case1',
                  'business_name': 'ABusiness',
+                 'collection_exercise': 'collection exercise1',
                  'survey': 'survey'})
     for _ in range(0, 10):
         app.test_client().post("http://localhost:5050/draft/save", data=json.dumps(data), headers=headers)
