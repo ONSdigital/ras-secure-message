@@ -394,3 +394,15 @@ def step_impl_user_saves_the_draft_without_etag(context):
         del headers['ETag']
     context.response = app.test_client().put(url.format(context.msg_id), data=json.dumps(data), headers=headers)
 
+
+# Scenario: A user edits a previously saved draft without formatting
+@given('a user edits a previously saved draft without formatting')
+def step_impl_user_edits_saved_draft(context):
+    add_draft = app.test_client().post('http://localhost:5050/draft/save', data=json.dumps(post_data), headers=headers)
+    post_resp = json.loads(add_draft.data)
+    context.msg_id = post_resp['msg_id']
+    get_draft = app.test_client().get('http://localhost:5050/draft/{0}'.format(context.msg_id), headers=headers)
+    context.etag = get_draft.headers.get('ETag')
+    data.update(json.loads(get_draft.data))
+    data['body'] = 'replaced'
+
