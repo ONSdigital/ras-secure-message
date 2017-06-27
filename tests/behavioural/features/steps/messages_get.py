@@ -334,6 +334,44 @@ def step_impl_assert_messages_have_correct_collection_case(context):
     nose.tools.assert_equal(len(response['messages']), 2)
 
 
+# Scenario: Internal user sends multiple messages and Respondent retrieves the list of messages with particular ce
+
+
+@given('a Internal user sends multiple messages with different collection exercise')
+def step_impl_internal_user_sends_multiple_messages_with_different_collection_exercise(context):
+
+    token_data['user_uuid'] = 'BRES'
+    token_data['role'] = 'internal'
+    headers['Authorization'] = update_encrypted_jwt()
+
+    for x in range(0, 2):
+        data['msg_to'] = '0a7ad740-10d5-4ecb-b7ca-3c0384afb882'
+        data['msg_from'] = 'BRES'
+        context.response = app.test_client().post("http://localhost:5050/message/send",
+                                                  data=flask.json.dumps(data), headers=headers)
+    for x in range(0, 2):
+        data['msg_to'] = '0a7ad740-10d5-4ecb-b7ca-3c0384afb882'
+        data['msg_from'] = 'BRES'
+        data['collection_exercise'] = 'AnotherCollectionExercise'
+        context.response = app.test_client().post("http://localhost:5050/message/send",
+                                                  data=flask.json.dumps(data), headers=headers)
+
+
+@when('the Respondent gets their messages with particular collection exercise')
+def step_impl_respondent_retrieves_messages_with_particular_collection_exercise(context):
+    token_data['user_uuid'] = '0a7ad740-10d5-4ecb-b7ca-3c0384afb882'
+    token_data['role'] = 'respondent'
+    headers['Authorization'] = update_encrypted_jwt()
+    context.response = app.test_client().get('{0}{1}'.format(url, '?ce=AnotherCollectionExercise'), headers=headers)
+
+
+@then('the retrieved messages should have the correct collection exercise')
+def step_impl_assert_messages_have_correct_collection_exercise(context):
+    response = flask.json.loads(context.response.data)
+    nose.tools.assert_equal(response['messages'][1]['collection_exercise'], 'AnotherCollectionExercise')
+
+    nose.tools.assert_equal(len(response['messages']), 2)
+
 # Scenario: Respondent creates multiple draft messages and Respondent retrieves the list of draft messages
 
 

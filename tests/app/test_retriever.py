@@ -535,6 +535,36 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
                     self.assertTrue(serialized_msg['collection_case'] == 'AnotherCollectionCase')
                 self.assertEqual(len(msg), 0)
 
+    def test_all_message_returned_with_ce_option(self):
+        """retrieves all messages from database for user with ce option"""
+        self.populate_database(5)
+
+        with app.app_context():
+            with current_app.test_request_context():
+                response = Retriever().retrieve_message_list(1, MESSAGE_QUERY_LIMIT, self.user_respondent,
+                                                             ce='CollectionExercise')[1]
+                msg = []
+                for message in response.items:
+                    serialized_msg = message.serialize(self.user_respondent)
+                    msg.append(serialized_msg)
+                    self.assertTrue(serialized_msg['collection_exercise'] == 'CollectionExercise')
+                self.assertEqual(len(msg), 5)
+
+    def test_no_message_returned_with_ce_option(self):
+        """retrieves no messages from database for user with ce option"""
+        self.populate_database(5)
+
+        with app.app_context():
+            with current_app.test_request_context():
+                response = Retriever().retrieve_message_list(1, MESSAGE_QUERY_LIMIT, self.user_respondent,
+                                                             ce='AnotherCollectionExercise')[1]
+                msg = []
+                for message in response.items:
+                    serialized_msg = message.serialize(self.user_respondent)
+                    msg.append(serialized_msg)
+                    self.assertTrue(serialized_msg['collection_exercise'] == 'AnotherCollectionExercise')
+                self.assertEqual(len(msg), 0)
+
     def test_message_list_returned_in_descending_order(self):
         """retrieves messages from database in desc sent_date order"""
         self.populate_database(5)
