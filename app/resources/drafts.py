@@ -85,23 +85,6 @@ class DraftById(Resource):
         return draft
 
     @staticmethod
-    def get_to_and_from_details(draft):
-        """Get user details for to and from for draft"""
-
-        uuids = [draft['msg_from']]
-        if draft['msg_to'] is not None:
-            uuids.append(draft['msg_to'][0])
-        user_details = user_by_uuid.get_details_by_uuids(uuids)
-        for user in user_details:
-            if draft['msg_from'] == user['id']:
-                draft['msg_from'] = user
-            if draft['msg_to'][0] == user['id']:
-                draft['msg_to'] = [user]
-        if draft['ru_ref'] is not None:
-            draft = DraftById.get_business_details(draft)
-        return draft
-
-    @staticmethod
     def get_business_details(draft):
         """Get business details for ru"""
 
@@ -119,7 +102,7 @@ class DraftList(Resource):
     @staticmethod
     def get():
         """Get message list with options"""
-        string_query_args, page, limit, ru, survey, cc, label, desc = get_options(request.args)
+        string_query_args, page, limit, ru_ref, survey, cc, label, desc = get_options(request.args)
 
         message_service = Retriever()
         status, result = message_service.retrieve_message_list(page, limit, g.user, label=Labels.DRAFT.value)

@@ -87,7 +87,6 @@ def paginated_list_to_json(paginated_list, page, limit, host_url, user, string_q
     return jsonify({"messages": messages, "_links": links})
 
 
-
 def generate_etag(msg_to, msg_id, subject, body):
     """Function used to create an ETag"""
     data_to_hash = {
