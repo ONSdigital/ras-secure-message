@@ -1,15 +1,10 @@
 import unittest
-
 from flask import json
 from sqlalchemy import create_engine
 from werkzeug.exceptions import BadRequest
 from app import application
 from app.application import app
 from app.common import user_by_uuid, business_by_ru
-
-from app import application
-from app.application import app
-from app.common import user_by_uuid
 
 
 class PartyTestCase(unittest.TestCase):
@@ -200,7 +195,7 @@ class PartyTestCase(unittest.TestCase):
         message_get = self.app.get("http://localhost:5050/message/{}".format(msg_id), headers=self.headers)
         message = json.loads(message_get.data)
 
-        self.assertEqual(message['ru_ref']['business_name'], "Apple")
+        self.assertEqual(message['@ru_ref']['business_name'], "Apple")
 
     def test_get_messages_returns_business_details(self):
         """Test get all messages returns business details"""
@@ -229,7 +224,7 @@ class PartyTestCase(unittest.TestCase):
         messages = get_return['messages']
 
         for message in messages:
-            self.assertEqual(message['ru_ref']['business_name'], "Apple")
+            self.assertEqual(message['@ru_ref']['business_name'], "Apple")
 
     def test_get_draft_returns_business_details(self):
         """Test get draft returns business details"""
@@ -257,7 +252,7 @@ class PartyTestCase(unittest.TestCase):
         message_get = self.app.get("http://localhost:5050/draft/{}".format(draft_id), headers=self.headers)
         message = json.loads(message_get.data)
 
-        self.assertEqual(message['ru_ref']['business_name'], "Apple")
+        self.assertEqual(message['@ru_ref']['business_name'], "Apple")
 
     def test_get_drafts_returns_business_details(self):
         """Test get all drafts includes business details"""
@@ -286,7 +281,7 @@ class PartyTestCase(unittest.TestCase):
         drafts = drafts_data['messages']
 
         for draft in drafts:
-            self.assertEqual(draft['ru_ref']['business_name'], "Apple")
+            self.assertEqual(draft['@ru_ref']['business_name'], "Apple")
 
 
 if __name__ == '__main__':

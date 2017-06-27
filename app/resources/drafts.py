@@ -109,7 +109,7 @@ class DraftById(Resource):
         business_details = business_by_ru.get_business_details_by_ru(ru)
         for business in business_details:
             if draft['ru_ref'] == business['ru_ref']:
-                draft['ru_ref'] = business
+                draft['@ru_ref'] = business
         return draft
 
 

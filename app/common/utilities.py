@@ -136,6 +136,6 @@ def add_business_details(messages):
     business_details = business_by_ru.get_business_details_by_ru(ru_list)
 
     for message in messages:
-        message['ru_ref'] = next((user for user in business_details if user["ru_ref"] == message['ru_ref']), None)
+        message['@ru_ref'] = next((business for business in business_details if business["ru_ref"] == message['ru_ref']), None)
     return messages
 

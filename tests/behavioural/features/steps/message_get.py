@@ -95,7 +95,7 @@ def step_impl_correct_subject_returned(context):
 @then("returned message field RU_Ref is correct")
 def step_impl_correct_reporting_unit_returned(context):
     msg_resp = json.loads(context.response.data)
-    nose.tools.assert_equal(msg_resp['ru_ref'], {'ru_ref': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc', 'business_name': 'Apple'})
+    nose.tools.assert_equal(msg_resp['ru_ref'], 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc')
 
 
 @then("returned message field CollectionCase is correct")

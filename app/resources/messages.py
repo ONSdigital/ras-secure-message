@@ -125,7 +125,7 @@ class MessageById(Resource):
 
         user_data = get_details_by_uuids([resp['msg_from'], resp["msg_to"][0]])
         business_data = get_business_details_by_ru([resp['ru_ref']])
-        resp['ru_ref'] = business_data[0]
+        resp['@ru_ref'] = business_data[0]
         for user in user_data:
             if resp['msg_from'] == user['id']:
                 resp['msg_from'] = user
