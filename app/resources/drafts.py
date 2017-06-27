@@ -82,6 +82,7 @@ class DraftById(Resource):
                 draft['msg_from'] = user
             if draft['msg_to'][0] == user['id']:
                 draft['msg_to'] = [user]
+        draft = DraftById.get_business_details(draft)
         return draft
 
     @staticmethod
