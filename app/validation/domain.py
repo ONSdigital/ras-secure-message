@@ -108,8 +108,8 @@ class MessageSchema(Schema):
         self.validate_non_zero_field_length("Survey", len(survey), constants.MAX_SURVEY_LEN)
 
     @validates("ru_ref")
-    def validate_ru_ref(self, ru):
-        self.validate_non_zero_field_length("ru_ref", len(ru), constants.MAX_REPORTING_UNIT_LEN)
+    def validate_ru_ref(self, ru_ref):
+        self.validate_non_zero_field_length("ru_ref", len(ru_ref), constants.MAX_REPORTING_UNIT_LEN)
 
     @post_load
     def make_message(self, data):
