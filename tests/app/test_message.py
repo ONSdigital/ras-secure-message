@@ -21,41 +21,44 @@ class MessageTestCase(unittest.TestCase):
         """creating Message object"""
         now_string = self.now.__str__()
         sut = Message('to', 'from', 'subject', 'body', '5', 'AMsgId', 'ACollectionCase',
-                      'AReportingUnit', 'ASurveyType', 'ABusiness', 'CollectionExercise')
+                      'ASurveyType', 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc', 'CollectionExercise')
         sut_str = repr(sut)
-        expected = '<Message(msg_id=AMsgId msg_to=to msg_from=from subject=subject body=body thread_id=5 collection_case=ACollectionCase reporting_unit=AReportingUnit business_name=ABusiness collection_exercise=CollectionExercise survey=ASurveyType)>'
+        expected = '<Message(msg_id=AMsgId msg_to=to msg_from=from subject=subject body=body thread_id=5 collection_case=ACollectionCase ru_ref=f1a5e99c-8edf-489a-9c72-6cabe6c387fc survey=ASurveyType, collection_exercise=CollectionExercise)>'
         self.assertEquals(sut_str, expected)
 
     def test_message_with_different_collection_case_not_equal(self):
         """testing two different Message objects are not equal"""
         message1 = Message('1', '2', '3', '4', '5', 'ACollectionCase',
-                           'AReportingUnit', 'ASurveyType', 'ABusiness', 'ACollectionExercise')
+                           'f1a5e99c-8edf-489a-9c72-6cabe6c387f', 'ASurveyType', 'ACollectionExercise')
         message2 = Message('1', '2', '3', '4', '5', 'AnotherCollectionCase',
-                           'AReportingUnit', 'ASurveyType', 'ABusiness', 'AnotherCollectionExercise')
+                           'f1a5e99c-8edf-489a-9c72-6cabe6c387f', 'ASurveyType', 'AnotherCollectionExercise')
         self.assertTrue(message1 != message2)
 
     def test_message_with_different_collection_exercise_not_equal(self):
         """testing two different Message objects are not equal"""
         message1 = Message('1', '2', '3', '4', '5', 'ACollectionCase',
-                           'AReportingUnit', 'ASurveyType', 'ABusiness', 'ACollectionExercise')
+                           'f1a5e99c-8edf-489a-9c72-6cabe6c387fc', 'ASurveyType', 'ACollectionExercise')
         message2 = Message('1', '2', '3', '4', '5', 'AnotherCollectionCase',
-                           'AReportingUnit', 'ASurveyType', 'ABusiness', 'AnotherCollectionExercise')
+                           'f1a5e99c-8edf-489a-9c72-6cabe6c387fc', 'ASurveyType', 'AnotherCollectionExercise')
+
         self.assertTrue(message1 != message2)
 
     def test_message_with_different_reporting_unit_not_equal(self):
         """testing two different Message objects are not equal"""
         message1 = Message('1', '2', '3', '4', '5', 'ACollectionCase',
-                           'AReportingUnit', 'ASurveyType', 'ABusiness', 'ACollectionExercise')
+                           'f1a5e99c-8edf-489a-9c72-6cabe6c387fc', 'ASurveyType', 'ACollectionExercise')
         message2 = Message('1', '2', '3', '4', '5', 'ACollectionCase',
-                           'AnotherReportingUnit', 'ASurveyType', 'ABusiness', 'AnotherCollectionExercise')
+                           '7fc0e8ab-189c-4794-b8f4-9f05a1db185b', 'ASurveyType', 'AnotherCollectionExercise')
+
         self.assertTrue(message1 != message2)
 
     def test_message_with_different_survey_not_equal(self):
         """testing two different Message objects are not equal"""
         message1 = Message('1', '2', '3', '4', '5', 'ACollectionCase',
-                           'AReportingUnit', 'ASurveyType', 'ABusiness', 'ACollectionExercise')
+                           'f1a5e99c-8edf-489a-9c72-6cabe6c387fc', 'ASurveyType', 'ACollectionExercise')
         message2 = Message('1', '2', '3', '4', '5', 'ACollectionCase',
-                           'AReportingUnit', 'AnotherSurveyType', 'ABusiness', 'AnotherCollectionExercise')
+                           'f1a5e99c-8edf-489a-9c72-6cabe6c387fc', 'AnotherSurveyType', 'AnotherCollectionExercise')
+
         self.assertTrue(message1 != message2)
 
     def test_message_equal(self):
@@ -67,7 +70,7 @@ class MessageTestCase(unittest.TestCase):
     def test_message_not_equal_to_different_type(self):
 
         message1 = Message('1', '2', '3', '4', '5', 'ACollectionCase',
-                           'AReportingUnit', 'ASurveyType')
+                           'f1a5e99c-8edf-489a-9c72-6cabe6c387fc', 'ASurveyType')
         self.assertFalse(message1 == "Message1")
 
 
@@ -76,7 +79,7 @@ class MessageSchemaTestCase(unittest.TestCase):
     def setUp(self):
         """setup test environment"""
         self.json_message = {'msg_to': 'Tej', 'msg_from': 'Gemma', 'subject': 'MyMessage', 'body': 'hello',
-                             'thread_id': "", 'survey': "RSI"}
+                             'thread_id': "", 'ru_ref': "7fc0e8ab-189c-4794-b8f4-9f05a1db185b", 'survey': "RSI"}
         self.now = datetime.now(timezone.utc)
 
     def test_valid_message_passes_validation(self):
@@ -91,7 +94,7 @@ class MessageSchemaTestCase(unittest.TestCase):
         """checking marshaling message object to json does not raise errors"""
         schema = MessageSchema()
         message_object = Message(**{'msg_to': 'Tej', 'msg_from': 'Gemma', 'subject': 'MyMessage', 'body': 'hello',
-                                    'thread_id': ""})
+                                    'thread_id': "", 'ru_ref': "7fc0e8ab-189c-4794-b8f4-9f05a1db185b"})
         message_json = schema.dumps(message_object)
         self.assertTrue(message_json.errors == {})
 
@@ -109,7 +112,7 @@ class MessageSchemaTestCase(unittest.TestCase):
 
     def test_missing_body_fails_validation(self):
         """marshalling message with no body field """
-        message = {'msg_to': 'richard', 'msg_from': 'torrance', 'body': '', 'survey': 'RSI', 'subject': 'MyMessage'}
+        message = {'msg_to': 'richard', 'msg_from': 'torrance', 'body': '', 'survey': 'RSI', 'subject': 'MyMessage', 'ru_ref': '7fc0e8ab-189c-4794-b8f4-9f05a1db185b'}
 
         with app.app_context():
             g.user = User(message['msg_from'], 'respondent')
@@ -195,6 +198,76 @@ class MessageSchemaTestCase(unittest.TestCase):
             errors = schema.load(self.json_message)[1]
 
         self.assertTrue(errors == {'_schema': ['msg_to and msg_from fields can not be the same.']})
+
+    def test_msg_to_list_of_dict(self):
+        """marshalling message where msg_to field is list of dicts"""
+        self.json_message['msg_to'] = [{"id": "01b51fcc-ed43-4cdb-ad1c-450f9986859b", "firstname": "Chandana", "surname": "Blanchet", "email": "cblanc@hotmail.co.uk", "telephone": "+443069990854", "status": "ACTIVE"}]
+        with app.app_context():
+            g.user = User(self.json_message['msg_from'], 'respondent')
+            schema = MessageSchema()
+            errors = schema.load(self.json_message)[1]
+
+        self.assertTrue(errors == {})
+
+    def test_msg_to_list_of_string(self):
+        """marshalling message where msg_to field is list of strings"""
+        self.json_message['msg_to'] = ["01b51fcc-ed43-4cdb-ad1c-450f9986859b"]
+        with app.app_context():
+            g.user = User(self.json_message['msg_from'], 'respondent')
+            schema = MessageSchema()
+            errors = schema.load(self.json_message)[1]
+
+        self.assertTrue(errors == {})
+
+    def test_msg_to_string(self):
+        """marshalling message where msg_to field is string"""
+        self.json_message['msg_to'] = "01b51fcc-ed43-4cdb-ad1c-450f9986859b"
+        with app.app_context():
+            g.user = User(self.json_message['msg_from'], 'respondent')
+            schema = MessageSchema()
+            errors = schema.load(self.json_message)[1]
+
+        self.assertTrue(errors == {})
+
+    def test_msg_to_list_of_dict_without_id(self):
+        """marshalling message where msg_to field is list of dicts without id"""
+        self.json_message['msg_to'] = [{"firstname": "Chandana", "surname": "Blanchet", "email": "cblanc@hotmail.co.uk", "telephone": "+443069990854", "status": "ACTIVE"}]
+        with app.app_context():
+            g.user = User(self.json_message['msg_from'], 'respondent')
+            schema = MessageSchema()
+            errors = schema.load(self.json_message)[1]
+
+        self.assertTrue(errors == {'_schema': ["'msg_to' is missing an 'id' or incorrect format"]})
+
+    def test_msg_from_string(self):
+        """marshalling message where msg_from field is string"""
+        self.json_message['msg_from'] = "01b51fcc-ed43-4cdb-ad1c-450f9986859b"
+        with app.app_context():
+            g.user = User(self.json_message['msg_from'], 'respondent')
+            schema = MessageSchema()
+            errors = schema.load(self.json_message)[1]
+
+        self.assertTrue(errors == {})
+
+    def test_msg_from_dict(self):
+        """marshalling message where msg_from field is dict"""
+        self.json_message['msg_from'] = {"id": "01b51fcc-ed43-4cdb-ad1c-450f9986859b", "firstname": "Chandana", "surname": "Blanchet", "email": "cblanc@hotmail.co.uk", "telephone": "+443069990854", "status": "ACTIVE"}
+        with app.app_context():
+            g.user = User("01b51fcc-ed43-4cdb-ad1c-450f9986859b", 'respondent')
+            schema = MessageSchema()
+            errors = schema.load(self.json_message)[1]
+
+        self.assertTrue(errors == {})
+
+    def test_msg_from_dict_without_id(self):
+        """marshalling message where msg_from field is dict without id"""
+        self.json_message['msg_from'] = {"firstname": "Chandana", "surname": "Blanchet", "email": "cblanc@hotmail.co.uk", "telephone": "+443069990854", "status": "ACTIVE"}
+        with app.app_context():
+            g.user = User("01b51fcc-ed43-4cdb-ad1c-450f9986859b", 'respondent')
+            schema = MessageSchema()
+            errors = schema.load(self.json_message)[1]
+
+        self.assertTrue(errors == {'_schema': ["'msg_from' is missing an 'id' or incorrect format"]})
 
 
 if __name__ == '__main__':

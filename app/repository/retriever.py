@@ -14,8 +14,8 @@ logger = wrap_logger(logging.getLogger(__name__))
 class Retriever:
     """Created when retrieving messages"""
     @staticmethod
-    def retrieve_message_list(page, limit, user, ru=None, survey=None, cc=None, ce=None, label=None,
-                              business=None, descend=True):
+    def retrieve_message_list(page, limit, user, ru_ref=None, survey=None, cc=None, ce=None, label=None,
+                              descend=True):
         """returns list of messages from db"""
         conditions = []
         status_conditions = []
@@ -33,11 +33,8 @@ class Retriever:
         else:
             status_conditions.append(Status.label != Labels.DRAFT_INBOX.value)
 
-        if ru is not None:
-            conditions.append(SecureMessage.reporting_unit == str(ru))
-
-        if business is not None:
-            conditions.append(SecureMessage.business_name == str(business))
+        if ru_ref is not None:
+            conditions.append(SecureMessage.ru_ref == str(ru_ref))
 
         if survey is not None:
             conditions.append(SecureMessage.survey == str(survey))

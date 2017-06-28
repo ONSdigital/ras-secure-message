@@ -1,9 +1,7 @@
 import hashlib
 import unittest
 import uuid
-
 from flask import g
-
 from app.repository.retriever import Retriever
 from unittest import mock
 from flask import current_app, json
@@ -54,9 +52,9 @@ class DraftTestCase(unittest.TestCase):
                              'body': 'hello',
                              'thread_id': '',
                              'collection_case': 'ACollectionCase',
-                             'reporting_unit': 'AReportingUnit',
                              'collection_exercise': 'ACollectionExercise',
-                             'survey': 'ACollectionInstrument'}
+                             'ru_ref': '7fc0e8ab-189c-4794-b8f4-9f05a1db185b',
+                             'survey': 'BRES'}
 
         with app.app_context():
             database.db.init_app(current_app)
@@ -217,9 +215,9 @@ class DraftTestCase(unittest.TestCase):
                 'body': 'hello',
                 'thread_id': '',
                 'collection_case': 'ACollectionCase',
-                'reporting_unit': 'AReportingUnit',
                 'collection_exercise': 'ACollectionExercise',
-                'survey': 'ACollectionInstrument'
+                'ru_ref': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc',
+                'survey': 'BRES'
             }
         )
 
@@ -233,9 +231,9 @@ class DraftTestCase(unittest.TestCase):
         with self.engine.connect() as con:
             msg_id = str(uuid.uuid4())
             query = 'INSERT INTO secure_message(msg_id, subject, body, thread_id,' \
-                    ' collection_case, reporting_unit, collection_exercise, survey) VALUES ("{0}", "test","test","", ' \
-                    ' "ACollectionCase", "AReportingUnit", "ACollectionExercise", ' \
-                    '"SurveyType")'.format(msg_id)
+                    ' collection_case, ru_ref, survey) VALUES ("{0}", "test","test","", ' \
+                    ' "ACollectionCase", "f1a5e99c-8edf-489a-9c72-6cabe6c387fc", "ACollectionExercise"' \
+                    '"BRES")'.format(msg_id)
             con.execute(query)
             query = 'INSERT INTO status(label, msg_id, actor) VALUES("DRAFT", "{0}", ' \
                     '"0a7ad740-10d5-4ecb-b7ca-3c0384afb882")'.format(msg_id)
@@ -259,6 +257,7 @@ class DraftTestCase(unittest.TestCase):
 
     def test_etag_check_returns_true_if_data_equal(self):
         """Test etag_check function returns true for unchanged draft etag"""
+
         message = {
             'msg_to': ['BRES'],
             'msg_from': '0a7ad740-10d5-4ecb-b7ca-3c0384afb882',
@@ -267,12 +266,13 @@ class DraftTestCase(unittest.TestCase):
             'body': 'test',
             'thread_id': '',
             'collection_case': 'ACollectionCase',
-            'reporting_unit': 'reporting_unit',
             'collection_exercise': 'ACollectionExercise',
+            'ru_ref': '7fc0e8ab-189c-4794-b8f4-9f05a1db185b',
             'survey': 'BRES',
             '_links': '',
             'labels': ['DRAFT']
         }
+
 
         etag = utilities.generate_etag(message['msg_to'],message['msg_id'], message['subject'],message['body'])
 
@@ -289,14 +289,14 @@ class DraftTestCase(unittest.TestCase):
             'body': 'test',
             'thread_id': '',
             'collection_case': 'ACollectionCase',
-            'reporting_unit': 'reporting_unit',
             'collection_exercise': 'ACollectionExercise',
+            'ru_ref': '7fc0e8ab-189c-4794-b8f4-9f05a1db185b',
             'survey': 'BRES',
             '_links': '',
             'labels': ['DRAFT']
         }
 
-        etag = utilities.generate_etag('XXX',message['msg_id'], message['subject'],message['body'])
+        etag = utilities.generate_etag('XXX', message['msg_id'], message['subject'],message['body'])
         self.assertFalse(DraftModifyById.etag_check({'ETag': etag}, message))
 
     def test_etag_check_returns_false_if_msg_id_changed(self):
@@ -310,8 +310,8 @@ class DraftTestCase(unittest.TestCase):
             'body': 'test',
             'thread_id': '',
             'collection_case': 'ACollectionCase',
-            'reporting_unit': 'reporting_unit',
             'collection_exercise': 'ACollectionExercise',
+            'ru_ref': '7fc0e8ab-189c-4794-b8f4-9f05a1db185b',
             'survey': 'BRES',
             '_links': '',
             'labels': ['DRAFT']
@@ -331,8 +331,8 @@ class DraftTestCase(unittest.TestCase):
             'body': 'test',
             'thread_id': '',
             'collection_case': 'ACollectionCase',
-            'reporting_unit': 'reporting_unit',
             'collection_exercise': 'ACollectionExercise',
+            'ru_ref': '7fc0e8ab-189c-4794-b8f4-9f05a1db185b',
             'survey': 'BRES',
             '_links': '',
             'labels': ['DRAFT']
@@ -352,8 +352,8 @@ class DraftTestCase(unittest.TestCase):
             'body': 'test',
             'thread_id': '',
             'collection_case': 'ACollectionCase',
-            'reporting_unit': 'reporting_unit',
             'collection_exercise': 'ACollectionExercise',
+            'ru_ref': '7fc0e8ab-189c-4794-b8f4-9f05a1db185b',
             'survey': 'BRES',
             '_links': '',
             'labels': ['DRAFT']
@@ -370,3 +370,83 @@ class DraftTestCase(unittest.TestCase):
             with current_app.test_request_context():
                 with self.assertRaises(InternalServerError):
                     Retriever().check_msg_id_is_a_draft(msg_id, self.user_respondent)
+
+    def test_draft_same_to_from_causes_error(self):
+        """marshalling message with same to and from field"""
+        self.test_message['msg_to'] = self.test_message['msg_from']
+        with app.app_context():
+            g.user = User(self.test_message['msg_from'], 'respondent')
+            schema = DraftSchema()
+            errors = schema.load(self.test_message)[1]
+
+        self.assertTrue(errors == {'_schema': ['msg_to and msg_from fields can not be the same.']})
+
+    def test_draft_msg_to_list_of_dict(self):
+        """marshalling message where msg_to field is list of dicts"""
+        self.test_message['msg_to'] = [{"id": "01b51fcc-ed43-4cdb-ad1c-450f9986859b", "firstname": "Chandana", "surname": "Blanchet", "email": "cblanc@hotmail.co.uk", "telephone": "+443069990854", "status": "ACTIVE"}]
+        with app.app_context():
+            g.user = User(self.test_message['msg_from'], 'respondent')
+            schema = DraftSchema()
+            errors = schema.load(self.test_message)[1]
+
+        self.assertTrue(errors == {})
+
+    def test_draft_msg_to_list_of_string(self):
+        """marshalling message where msg_to field is list of strings"""
+        self.test_message['msg_to'] = ["01b51fcc-ed43-4cdb-ad1c-450f9986859b"]
+        with app.app_context():
+            g.user = User(self.test_message['msg_from'], 'respondent')
+            schema = DraftSchema()
+            errors = schema.load(self.test_message)[1]
+
+        self.assertTrue(errors == {})
+
+    def test_draft_msg_to_string(self):
+        """marshalling message where msg_to field is string"""
+        self.test_message['msg_to'] = "01b51fcc-ed43-4cdb-ad1c-450f9986859b"
+        with app.app_context():
+            g.user = User(self.test_message['msg_from'], 'respondent')
+            schema = DraftSchema()
+            errors = schema.load(self.test_message)[1]
+
+        self.assertTrue(errors == {})
+
+    def test_draft_msg_to_list_of_dict_without_id(self):
+        """marshalling message where msg_to field is list of dicts without id"""
+        self.test_message['msg_to'] = [{"firstname": "Chandana", "surname": "Blanchet", "email": "cblanc@hotmail.co.uk", "telephone": "+443069990854", "status": "ACTIVE"}]
+        with app.app_context():
+            g.user = User(self.test_message['msg_from'], 'respondent')
+            schema = DraftSchema()
+            errors = schema.load(self.test_message)[1]
+
+        self.assertTrue(errors == {'_schema': ["'msg_to' is missing an 'id' or incorrect format"]})
+
+    def test_draft_msg_from_string(self):
+        """marshalling message where msg_from field is string"""
+        self.test_message['msg_from'] = "01b51fcc-ed43-4cdb-ad1c-450f9986859b"
+        with app.app_context():
+            g.user = User(self.test_message['msg_from'], 'respondent')
+            schema = DraftSchema()
+            errors = schema.load(self.test_message)[1]
+
+        self.assertTrue(errors == {})
+
+    def test_draft_msg_from_dict(self):
+        """marshalling message where msg_from field is dict"""
+        self.test_message['msg_from'] = {"id": "01b51fcc-ed43-4cdb-ad1c-450f9986859b", "firstname": "Chandana", "surname": "Blanchet", "email": "cblanc@hotmail.co.uk", "telephone": "+443069990854", "status": "ACTIVE"}
+        with app.app_context():
+            g.user = User("01b51fcc-ed43-4cdb-ad1c-450f9986859b", 'respondent')
+            schema = DraftSchema()
+            errors = schema.load(self.test_message)[1]
+
+        self.assertTrue(errors == {})
+
+    def test_draft_msg_from_dict_without_id(self):
+        """marshalling message where msg_from field is dict without id"""
+        self.test_message['msg_from'] = {"firstname": "Chandana", "surname": "Blanchet", "email": "cblanc@hotmail.co.uk", "telephone": "+443069990854", "status": "ACTIVE"}
+        with app.app_context():
+            g.user = User("01b51fcc-ed43-4cdb-ad1c-450f9986859b", 'respondent')
+            schema = DraftSchema()
+            errors = schema.load(self.test_message)[1]
+
+        self.assertTrue(errors == {'_schema': ["'msg_from' is missing an 'id' or incorrect format"]})

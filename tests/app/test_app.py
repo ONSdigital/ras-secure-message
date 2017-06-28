@@ -45,9 +45,9 @@ class FlaskTestCase(unittest.TestCase):
                              'body': 'hello',
                              'thread_id': "",
                              'collection_case': 'ACollectionCase',
-                             'reporting_unit': 'AReportingUnit',
                              'collection_exercise': 'ACollectionExercise',
-                             'survey': 'test-123'}
+                             'ru_ref': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc',
+                             'survey': 'BRES'}
 
         with app.app_context():
             database.db.init_app(current_app)
@@ -66,6 +66,7 @@ class FlaskTestCase(unittest.TestCase):
                 'subject': 'MyMessage',
                 'body': 'hello',
                 'thread': "?",
+                'ru_ref': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc',
                 'create_date': datetime.now(timezone.utc),
                 'read_date': datetime.now(timezone.utc)}
 
@@ -139,9 +140,9 @@ class FlaskTestCase(unittest.TestCase):
                         'subject': 'MyMessage',
                         'body': 'hello',
                         'collection_case': 'ACollectionCase',
-                        'reporting_unit': 'AReportingUnit',
                         'collection_exercise': 'ACollectionExercise',
-                        'survey': 'ACollectionInstrument'}
+                        'ru_ref': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc',
+                        'survey': 'BRES'}
         try:
             self.app.post(url, data=json.dumps(test_message), headers=self.headers)
             self.assertTrue(True)  # i.e no exception
@@ -193,9 +194,8 @@ class FlaskTestCase(unittest.TestCase):
                 'body': 'hello',
                 'thread_id': '',
                 'collection_case': 'ACollectionCase',
-                'reporting_unit': 'AReportingUnit',
-                'collection_exercise': 'ACollectionExercise',
-                'survey': 'ACollectionInstrument'
+                'ru_ref': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc',
+                'survey': 'BRES'
             }
         )
 
@@ -270,9 +270,9 @@ class FlaskTestCase(unittest.TestCase):
             'subject': 'MyMessage',
             'body': 'hello',
             'collection_case': 'ACollectionCase',
-            'reporting_unit': 'AReportingUnit',
             'collcetion_exercise': 'ACollectionExercise',
-            'survey': 'ACollectionInstrument'
+            'ru_ref': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc',
+            'survey': 'BRES'
         })
 
         self.app.post("http://localhost:5050/message/send", data=json.dumps(self.test_message), headers=self.headers)
@@ -292,9 +292,9 @@ class FlaskTestCase(unittest.TestCase):
             'subject': 'MyMessage',
             'body': 'hello',
             'collection_case': 'ACollectionCase',
-            'reporting_unit': 'AReportingUnit',
             'collection_exercise': 'ACollectionExercise',
-            'survey': 'ACollectionInstrument'
+            'ru_ref': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc',
+            'survey': 'BRES'
         })
 
         resp = self.app.post("http://localhost:5050/draft/save", data=json.dumps(self.test_message), headers=self.headers)
@@ -327,7 +327,8 @@ class FlaskTestCase(unittest.TestCase):
             'subject': 'MyMessage',
             'body': 'hello',
             'collection_case': 'ACollectionCase',
-            'reporting_unit': 'AReportingUnit',
+            'collection_exercise': 'ACollectionExercise',
+            'ru_ref': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc',
             'survey': 'BRES'
         })
 

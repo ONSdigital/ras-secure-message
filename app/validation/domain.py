@@ -11,7 +11,8 @@ class Message:
 
     """Class to hold message attributes"""
     def __init__(self, msg_to, msg_from, subject, body, thread_id=None, msg_id='', collection_case='',
-                 reporting_unit='', survey='', business_name='', collection_exercise=''):
+                 survey='', ru_ref='', collection_exercise=''):
+
 
         logger.debug("Message Class created {0}, {1}".format(subject, body))
         self.msg_id = str(uuid.uuid4()) if len(msg_id) == 0 else msg_id  # If empty msg_id assign to a uuid
@@ -21,13 +22,12 @@ class Message:
         self.body = body
         self.thread_id = self.msg_id if not thread_id else thread_id  # If empty thread_id then set to message id
         self.collection_case = collection_case
-        self.reporting_unit = reporting_unit
-        self.business_name = business_name
+        self.ru_ref = ru_ref
         self.collection_exercise = collection_exercise
         self.survey = survey
 
     def __repr__(self):
-        return '<Message(msg_id={self.msg_id} msg_to={self.msg_to} msg_from={self.msg_from} subject={self.subject} body={self.body} thread_id={self.thread_id} collection_case={self.collection_case} reporting_unit={self.reporting_unit} business_name={self.business_name} collection_exercise={self.collection_exercise} survey={self.survey})>'.format(self=self)
+        return '<Message(msg_id={self.msg_id} msg_to={self.msg_to} msg_from={self.msg_from} subject={self.subject} body={self.body} thread_id={self.thread_id} collection_case={self.collection_case} ru_ref={self.ru_ref} collection_exercise={self.collection_exercise} survey={self.survey})>'.format(self=self)
 
     def __eq__(self, other):
         if isinstance(other, Message):
@@ -46,8 +46,7 @@ class MessageSchema(Schema):
     subject = fields.Str(required=True)
     thread_id = fields.Str(allow_none=True)
     collection_case = fields.Str(allow_none=True)
-    reporting_unit = fields.Str(allow_none=True)
-    business_name = fields.Str(allow_none=True)
+    ru_ref = fields.Str(required=True)
     survey = fields.Str(required=True)
     collection_exercise = fields.Str(allow_none=True)
 
@@ -55,6 +54,24 @@ class MessageSchema(Schema):
     def check_sent_and_read_date(self, data):
         self.validate_not_present(data, 'sent_date')
         self.validate_not_present(data, 'read_date')
+        return data
+
+    @pre_load
+    def check_format_of_msg_to_and_msg_from(self, data):
+
+        if data.get('msg_to') and isinstance(data.get('msg_to'), list) and "id" in data.get('msg_to')[0]:
+            data['msg_to'] = data['msg_to'][0]['id']
+        elif data.get('msg_to') and isinstance(data.get('msg_to'), list) and len(data.get('msg_to')) >= 1:
+            if isinstance(data.get('msg_to')[0], str):
+                data['msg_to'] = data.get('msg_to')[0]
+            else:
+                raise ValidationError("'msg_to' is missing an 'id' or incorrect format")
+
+        if data.get('msg_from') and not isinstance(data.get('msg_from'), str) and "id" in data.get('msg_from'):
+            data['msg_from'] = data['msg_from']['id']
+        elif data.get('msg_from') and not isinstance(data.get('msg_from'), str):
+            raise ValidationError("'msg_from' is missing an 'id' or incorrect format")
+
         return data
 
     @validates_schema
@@ -91,8 +108,11 @@ class MessageSchema(Schema):
 
     @validates("survey")
     def validate_survey(self, survey):
-        if survey is not None:
-            self.validate_non_zero_field_length("Survey", len(survey), constants.MAX_SURVEY_LEN)
+        self.validate_non_zero_field_length("Survey", len(survey), constants.MAX_SURVEY_LEN)
+
+    @validates("ru_ref")
+    def validate_ru_ref(self, ru_ref):
+        self.validate_non_zero_field_length("ru_ref", len(ru_ref), constants.MAX_REPORTING_UNIT_LEN)
 
     @validates("collection_case")
     def validate_collection_case(self, collection_case):
@@ -135,8 +155,7 @@ class DraftSchema(Schema):
     subject = fields.Str(allow_none=True)
     thread_id = fields.Str(allow_none=True)
     collection_case = fields.Str(allow_none=True)
-    reporting_unit = fields.Str(allow_none=True)
-    business_name = fields.Str(allow_none=True)
+    ru_ref = fields.Str(allow_none=True)
     survey = fields.Str(required=True)
     collection_exercise = fields.Str(allow_none=True)
 
@@ -148,6 +167,29 @@ class DraftSchema(Schema):
         if 'survey' not in data or len(data['survey']) == 0:
             raise ValidationError("{0} Missing".format('survey'))
         return data
+
+    @pre_load
+    def check_format_of_msg_to_and_msg_from(self, data):
+
+        if data.get('msg_to') and isinstance(data.get('msg_to'), list) and "id" in data.get('msg_to')[0]:
+            data['msg_to'] = data['msg_to'][0]['id']
+        elif data.get('msg_to') and isinstance(data.get('msg_to'), list) and len(data.get('msg_to')) >= 1:
+            if isinstance(data.get('msg_to')[0], str):
+                data['msg_to'] = data.get('msg_to')[0]
+            else:
+                raise ValidationError("'msg_to' is missing an 'id' or incorrect format")
+
+        if data.get('msg_from') and not isinstance(data.get('msg_from'), str) and "id" in data.get('msg_from'):
+            data['msg_from'] = data['msg_from']['id']
+        elif data.get('msg_from') and not isinstance(data.get('msg_from'), str):
+            raise ValidationError("'msg_from' is missing an 'id' or incorrect format")
+
+        return data
+
+    @validates_schema
+    def validate_to_from_not_equal(self, data):
+        if 'msg_to' in data.keys() and 'msg_from' in data.keys() and data['msg_to'] == data['msg_from']:
+            raise ValidationError("msg_to and msg_from fields can not be the same.")
 
     @validates("msg_to")
     def validate_to(self, msg_to):

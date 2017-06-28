@@ -20,9 +20,8 @@ data = {'msg_to': 'test',
         'body': 'Test',
         'thread_id': '',
         'collection_case': 'collectioncase',
-        'reporting_unit': 'AReportingUnit',
-        'business_name': 'ABusiness',
         'collection_exercise': 'collectionexercise',
+        'ru_ref': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc',
         'survey': 'BRES'}
 
 
@@ -40,7 +39,6 @@ headers['Authorization'] = update_encrypted_jwt()
 
 @given("a respondent sends multiple messages")
 def step_impl_respondent_sends_multiple_messages(context):
-
 
     token_data['user_uuid'] = '0a7ad740-10d5-4ecb-b7ca-3c0384afb882'
     token_data['role'] = 'respondent'
@@ -142,7 +140,6 @@ def step_impl_respondant_and_internal_user_send_multiple_messages(context):
     token_data['role'] = 'internal'
     headers['Authorization'] = update_encrypted_jwt()
 
-
     for x in range(0, 2):
         data['msg_to'] = '0a7ad740-10d5-4ecb-b7ca-3c0384afb882'
         data['msg_from'] = 'BRES'
@@ -198,7 +195,7 @@ def step_impl_internal_user_sends_multiple_messages_with_different_ru(context):
     for x in range(0, 2):
         data['msg_to'] = '0a7ad740-10d5-4ecb-b7ca-3c0384afb882'
         data['msg_from'] = 'BRES'
-        data['reporting_unit'] = 'AnotherReportingUnit'
+        data['ru_ref'] = '7fc0e8ab-189c-4794-b8f4-9f05a1db185b'
         context.response = app.test_client().post("http://localhost:5050/message/send",
                                                   data=flask.json.dumps(data), headers=headers)
 
@@ -208,54 +205,13 @@ def step_impl_respondent_gets_their_messages_with_particular_ru(context):
     token_data['user_uuid'] = '0a7ad740-10d5-4ecb-b7ca-3c0384afb882'
     token_data['role'] = 'respondent'
     headers['Authorization'] = update_encrypted_jwt()
-    context.response = app.test_client().get('{0}{1}'.format(url, '?ru=AnotherReportingUnit'), headers=headers)
+    context.response = app.test_client().get('{0}{1}'.format(url, '?ru_ref=7fc0e8ab-189c-4794-b8f4-9f05a1db185b'), headers=headers)
 
 
 @then('the retrieved messages should have the correct reporting unit')
 def step_impl_assert_correct_ru(context):
     response = flask.json.loads(context.response.data)
-    nose.tools.assert_equal(response['messages'][1]['reporting_unit'], 'AnotherReportingUnit')
-    nose.tools.assert_equal(len(response['messages']), 2)
-
-
-# Scenario: Respondent and internal user sends multiple messages and Respondent retrieves the list of messages with business name
-
-@given('an Internal user sends multiple messages with different business names')
-def step_impl_respondent_retrieves_list_of_messages_with_busines_name(context):
-
-    token_data['user_uuid'] = 'BRES'
-    token_data['role'] = 'internal'
-    headers['Authorization'] = update_encrypted_jwt()
-
-    for x in range(0, 2):
-        data['msg_to'] = '0a7ad740-10d5-4ecb-b7ca-3c0384afb882'
-        data['msg_from'] = 'BRES'
-
-        context.response = app.test_client().post("http://localhost:5050/message/send",
-                                                  data=flask.json.dumps(data), headers=headers)
-    for x in range(0, 2):
-        data['msg_to'] = '0a7ad740-10d5-4ecb-b7ca-3c0384afb882'
-        data['msg_from'] = 'BRES'
-        data['business_name'] = 'AnotherBusiness'
-        context.response = app.test_client().post("http://localhost:5050/message/send",
-                                                  data=flask.json.dumps(data), headers=headers)
-
-
-@when('the Respondent gets their messages with particular business name')
-def step_impl_respondent_retrieves_messages_with_particular_business_name(context):
-    token_data['user_uuid'] = '0a7ad740-10d5-4ecb-b7ca-3c0384afb882'
-    token_data['role'] = 'respondent'
-    headers['Authorization'] = update_encrypted_jwt()
-    context.response = app.test_client().get('{0}{1}'.format(url, '?business=AnotherBusiness'), headers=headers)
-
-
-@then('the retrieved messages should have the correct business name')
-def step_impl_assert_messages_have_correct_business_name(context):
-    response = flask.json.loads(context.response.data)
-
-    for x in range(1, len(response['messages'])):
-        nose.tools.assert_equal(response['messages'][x]['business_name'], 'AnotherBusiness')
-    nose.tools.assert_equal(len(response['messages']), 2)
+    nose.tools.assert_equal(response['messages'][1]['ru_ref'], '7fc0e8ab-189c-4794-b8f4-9f05a1db185b')
 
 
 # Scenario: Internal user sends multiple messages and Respondent retrieves the list of messages with particular survey
@@ -385,8 +341,8 @@ def step_impl_respondent_creates_multiple_draft_messages(context):
                  'body': 'Test',
                  'thread_id': '',
                  'collection_case': 'collection case1',
-                 'reporting_unit': 'reporting case1',
                  'collection_exercise': 'collection exercise1',
+                 'ru_ref': '7fc0e8ab-189c-4794-b8f4-9f05a1db185b',
                  'survey': 'BRES'}
         token_data['user_uuid'] = '0a7ad740-10d5-4ecb-b7ca-3c0384afb882'
         token_data['role'] = 'respondent'
@@ -520,9 +476,9 @@ def step_impl_parameter_label_has_value_not_a_label(context):
     context.parms = "?labels=NotALabel"
 
 
-@given('parameter reportingUnit has value LongerThan11Chars')
+@given('parameter ru_ref has value LongerThan11Chars')
 def step_implreporting_unit_equals_longer_than_1_character(context):
-    context.parms = "?reportingUnit=LongerThan11Chars"
+    context.parms = "?ru_ref=LongerThan11Chars"
 
 
 @given('parameter labels has value INBOX-SENT-ARCHIVED-DRAFT-INBOX-SENT-ARCHIVED-DRAFT')

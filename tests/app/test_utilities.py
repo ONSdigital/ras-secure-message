@@ -118,16 +118,15 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
         """Tests get messages list with no options provided"""
         args = {}
 
-        string_query_args, page, limit, ru, survey, cc, label, business, desc, ce = utilities.get_options(args)
+        string_query_args, page, limit, ru_ref, survey, cc, label, desc, ce = utilities.get_options(args)
 
         self.assertEqual(string_query_args, '?')
         self.assertEqual(page, 1)
         self.assertEqual(limit, MESSAGE_QUERY_LIMIT)
-        self.assertEqual(ru, None)
+        self.assertEqual(ru_ref, None)
         self.assertEqual(survey, None)
         self.assertEqual(cc, None)
         self.assertEqual(label, None)
-        self.assertEqual(business, None)
         self.assertEqual(desc, True)
         self.assertEqual(ce, None)
 
@@ -136,18 +135,18 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
         args = {
             'page': 2,
             'survey': 'BRES',
-            'ru': 'ReportingUnit'
+            'ru_ref': '7fc0e8ab-189c-4794-b8f4-9f05a1db185b'
         }
-        string_query_args, page, limit, ru, survey, cc, label, business, desc, ce = utilities.get_options(args)
 
-        self.assertEqual(string_query_args, '?ru=ReportingUnit&survey=BRES')
+        string_query_args, page, limit, ru_ref, survey, cc, label, desc, ce = utilities.get_options(args)
+
+        self.assertEqual(string_query_args, '?ru_ref=7fc0e8ab-189c-4794-b8f4-9f05a1db185b&survey=BRES')
         self.assertEqual(page, 2)
         self.assertEqual(limit, MESSAGE_QUERY_LIMIT)
-        self.assertEqual(ru, 'ReportingUnit')
+        self.assertEqual(ru_ref, '7fc0e8ab-189c-4794-b8f4-9f05a1db185b')
         self.assertEqual(survey, 'BRES')
         self.assertEqual(cc, None)
         self.assertEqual(label, None)
-        self.assertEqual(business, None)
         self.assertEqual(desc, True)
         self.assertEqual(ce, None)
 
@@ -157,35 +156,35 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
             'page': 2,
             'limit': 9,
             'survey': 'BRES',
-            'ru': 'ReportingUnit',
+            'ru_ref': '7fc0e8ab-189c-4794-b8f4-9f05a1db185b',
             'cc': 'CollectionCase',
             'label': 'INBOX',
             'desc': 'false',
-            'business': 'ABusiness',
             'ce': 'CollectionExercise'
         }
-        string_query_args, page, limit, ru, survey, cc, label, business, desc, ce = utilities.get_options(args)
+        string_query_args, page, limit, ru_ref, survey, cc, label, business, desc, ce = utilities.get_options(args)
 
         self.assertEqual(string_query_args,
-                         '?ru=ReportingUnit&business=ABusiness&survey=BRES&cc=CollectionCase&label=INBOX&ce=CollectionExercise&desc=false')
+                         '?ru_ref=7fc0e8ab-189c-4794-b8f4-9f05a1db185b&business=ABusiness&survey=BRES&cc=CollectionCase&label=INBOX&ce=CollectionExercise&desc=false')
+
         self.assertEqual(page, 2)
         self.assertEqual(limit, 9)
-        self.assertEqual(ru, 'ReportingUnit')
+        self.assertEqual(ru_ref, '7fc0e8ab-189c-4794-b8f4-9f05a1db185b')
         self.assertEqual(survey, 'BRES')
         self.assertEqual(cc, 'CollectionCase')
         self.assertEqual(label, 'INBOX')
         self.assertEqual(desc, False)
-        self.assertEqual(business, 'ABusiness')
         self.assertEqual(ce, 'CollectionExercise')
 
     def test_add_string_query_no_args(self):
         """Adding args to empty string query"""
         string_query_args = '?'
-        string_query_args = utilities.add_string_query_args(string_query_args, 'ru', 'ReportingUnit')
-        self.assertEqual(string_query_args, '?ru=ReportingUnit')
+        string_query_args = utilities.add_string_query_args(string_query_args, 'ru_ref', '7fc0e8ab-189c-4794-b8f4-9f05a1db185b')
+        self.assertEqual(string_query_args, '?ru_ref=7fc0e8ab-189c-4794-b8f4-9f05a1db185b')
 
     def test_add_string_query_with_args(self):
         """Adding args to string query with arg"""
         string_query_args = '?survey=BRES'
-        string_query_args = utilities.add_string_query_args(string_query_args, 'ru', 'ReportingUnit')
-        self.assertEqual(string_query_args, '?survey=BRES&ru=ReportingUnit')
+        string_query_args = utilities.add_string_query_args(string_query_args, 'ru_ref', '7fc0e8ab-189c-4794-b8f4-9f05a1db185b')
+        self.assertEqual(string_query_args, '?survey=BRES&ru_ref=7fc0e8ab-189c-4794-b8f4-9f05a1db185b')
+

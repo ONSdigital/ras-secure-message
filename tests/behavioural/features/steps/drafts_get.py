@@ -22,9 +22,8 @@ data = {'msg_to': 'BRES',
         'body': 'Test',
         'thread_id': '',
         'collection_case': 'collectioncase',
-        'reporting_unit': 'AReportingUnit',
-        'business_name': 'ABusiness',
         'collection_exercise': 'collectionexercise',
+        'ru_ref': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc',
         'survey': 'BRES'}
 
 
@@ -49,9 +48,8 @@ def step_impl_user_has_created__and_saved_multiple_drafts(context):
                  'body': 'Test',
                  'thread_id': '',
                  'collection_case': 'collection case1',
-                 'reporting_unit': 'reporting case1',
-                 'business_name': 'ABusiness',
                  'collection_exercise': 'collection exercise1',
+                 'ru_ref': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc',
                  'survey': 'BRES'})
 
     for _ in range(0, 10):
@@ -92,4 +90,3 @@ def step_impl_user_will_get_drafts_from_second_page_of_pagination(context):
         nose.tools.assert_equal(response['messages'][x]['msg_from'], {"id": "0a7ad740-10d5-4ecb-b7ca-3c0384afb882", "firstname": "Vana", "surname": "Oorschot", "email": "vana123@aol.com", "telephone": "+443069990289", "status": "ACTIVE"})
 
     nose.tools.assert_equal(len(response['messages']), 3)
-
