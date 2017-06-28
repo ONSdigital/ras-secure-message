@@ -18,3 +18,13 @@ Feature: Get Drafts
     Given the user is not allowed to view drafts
     When the user requests drafts
     Then the user is forbidden
+
+  Scenario: Internal user saves multiple drafts and Respondent retrieves the list of drafts with particular collection case 
+    Given an Internal user saves multiple drafts with different collection case 
+    When the Respondent gets their drafts with particular collection case 
+    Then the retrieved drafts should have the correct collection case
+
+  Scenario: Internal user saves multiple drafts and Respondent retrieves the list of drafts with particular collection exercise 
+    Given an Internal user saves multiple drafts with different collection exercise 
+    When the Respondent gets their drafts with particular collection exercise 
+    Then the retrieved drafts should have the correct collection exercise
