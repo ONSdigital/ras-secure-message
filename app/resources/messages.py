@@ -6,7 +6,7 @@ from werkzeug.exceptions import BadRequest
 from app import settings
 from app.common.alerts import AlertUser
 from app.common.labels import Labels
-from app.common.utilities import get_options, paginated_list_to_json, get_business_details_by_ru, get_details_by_uuids
+from app.common.utilities import get_options, paginated_list_to_json, add_business_details, add_to_and_from_details
 from app.constants import MESSAGE_LIST_ENDPOINT
 from app.repository.modifier import Modifier
 from app.repository.retriever import Retriever
@@ -123,14 +123,8 @@ class MessageById(Resource):
         message = message_service.retrieve_message(message_id, g.user)
 
         if authorized_to_view_message(g.user, message):
-            user_data = get_details_by_uuids([message['msg_from'], message["msg_to"][0]])
-            business_data = get_business_details_by_ru([message['ru_ref']])
-            message['@ru_ref'] = business_data[0]
-            for user in user_data:
-                if message['msg_from'] == user['id']:
-                    message['msg_from'] = user
-                if message['msg_to'][0] == user['id']:
-                    message['msg_to'] = [user]
+            message = add_to_and_from_details([message])[0]
+            message = add_business_details([message])[0]
             return jsonify(message)
 
 
