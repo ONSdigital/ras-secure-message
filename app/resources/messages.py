@@ -27,11 +27,13 @@ class MessageList(Resource):
     @staticmethod
     def get():
         """Get message list with options"""
-        string_query_args, page, limit, ru_ref, survey, cc, label, desc = get_options(request.args)
+
+        string_query_args, page, limit, ru_ref, survey, cc, label, desc, ce = get_options(request.args)
 
         message_service = Retriever()
         status, result = message_service.retrieve_message_list(page, limit, g.user,
-                                                               ru_ref=ru_ref, survey=survey, cc=cc, label=label, descend=desc)
+                                                               ru_ref=ru_ref, survey=survey, cc=cc, label=label, descend=desc, ce=ce)
+
         if status:
             resp = paginated_list_to_json(result, page, limit, request.host_url,
                                                        g.user, string_query_args, MESSAGE_LIST_ENDPOINT)

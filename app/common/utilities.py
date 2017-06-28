@@ -20,6 +20,7 @@ def get_options(args):
     cc = None
     label = None
     desc = True
+    ce = None
 
     if args.get('limit'):
         limit = int(args.get('limit'))
@@ -39,11 +40,14 @@ def get_options(args):
     if args.get('label'):
         label = str(args.get('label'))
         string_query_args = add_string_query_args(string_query_args, 'label', args.get('label'))
+    if args.get('ce'):
+        ce = str(args.get('ce'))
+        string_query_args = add_string_query_args(string_query_args, 'ce', args.get('ce'))
     if args.get('desc'):
         desc = False if args.get('desc') == 'false' else True
         string_query_args = add_string_query_args(string_query_args, 'desc', args.get('desc'))
 
-    return string_query_args, page, limit, ru_ref, survey, cc, label, desc
+    return string_query_args, page, limit, ru_ref, survey, cc, label, desc, ce
 
 
 def add_string_query_args(string_query_args, arg, val):
@@ -172,4 +176,3 @@ def add_business_details(messages):
     for message in messages:
         message['@ru_ref'] = next((business for business in business_details if business["ru_ref"] == message['ru_ref']), None)
     return messages
-

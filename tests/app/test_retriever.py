@@ -17,15 +17,15 @@ class RetrieverTestCaseHelper:
     """Helper class for Retriever Tests"""
     def add_secure_message(self, msg_id, subject="test", body="test", thread_id="ThreadId",
                            collection_case="ACollectionCase", ru_ref="f1a5e99c-8edf-489a-9c72-6cabe6c387fc",
-                           survey="BRES"):
+                           survey="BRES", collection_exercise='CollectionExercise'):
 
         """ Populate the secure_message table"""
 
         with self.engine.connect() as con:
             query = 'INSERT INTO secure_message(msg_id, subject, body, thread_id,' \
-                    ' collection_case, ru_ref, survey) VALUES ("{0}", "{1}","{2}",' \
-                    '"{3}", "{4}", "{5}", "{6}")'.format(msg_id, subject, body, thread_id, collection_case,
-                                                                ru_ref, survey)
+                    ' collection_case, ru_ref, survey, collection_exercise) VALUES ("{0}", "{1}","{2}",' \
+                    '"{3}", "{4}", "{5}", "{6}", "{7}")'.format(msg_id, subject, body, thread_id, collection_case,
+                                                                ru_ref, survey, collection_exercise)
             con.execute(query)
 
     def add_status(self, label, msg_id, actor):
@@ -99,7 +99,7 @@ class RetrieverTestCaseHelper:
             if multiple_users:
                 msg_id = str(uuid.uuid4())
                 self.add_secure_message(msg_id=msg_id, thread_id="AnotherThreadId",
-                                        collection_case="AnotherCollectionCase",
+                                        collection_case="AnotherCollectionCase", collection_exercise="AnotherCollectionExercise",
                                         ru_ref='0a6018a0-3e67-4407-b120-780932434b36', survey="AnotherSurvey",)
                 self.add_status(label="SENT", msg_id=msg_id, actor="1a7ad740-10d5-4ecb-b7ca-fb8823c0384a")
                 self.add_status(label="INBOX", msg_id=msg_id, actor="AnotherSurvey")
@@ -500,6 +500,36 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
                     serialized_msg = message.serialize(self.user_respondent)
                     msg.append(serialized_msg)
                     self.assertTrue(serialized_msg['collection_case'] == 'AnotherCollectionCase')
+                self.assertEqual(len(msg), 0)
+
+    def test_all_message_returned_with_ce_option(self):
+        """retrieves all messages from database for user with ce option"""
+        self.populate_database(5)
+
+        with app.app_context():
+            with current_app.test_request_context():
+                response = Retriever().retrieve_message_list(1, MESSAGE_QUERY_LIMIT, self.user_respondent,
+                                                             ce='CollectionExercise')[1]
+                msg = []
+                for message in response.items:
+                    serialized_msg = message.serialize(self.user_respondent)
+                    msg.append(serialized_msg)
+                    self.assertTrue(serialized_msg['collection_exercise'] == 'CollectionExercise')
+                self.assertEqual(len(msg), 5)
+
+    def test_no_message_returned_with_ce_option(self):
+        """retrieves no messages from database for user with ce option"""
+        self.populate_database(5)
+
+        with app.app_context():
+            with current_app.test_request_context():
+                response = Retriever().retrieve_message_list(1, MESSAGE_QUERY_LIMIT, self.user_respondent,
+                                                             ce='AnotherCollectionExercise')[1]
+                msg = []
+                for message in response.items:
+                    serialized_msg = message.serialize(self.user_respondent)
+                    msg.append(serialized_msg)
+                    self.assertTrue(serialized_msg['collection_exercise'] == 'AnotherCollectionExercise')
                 self.assertEqual(len(msg), 0)
 
     def test_message_list_returned_in_descending_order(self):

@@ -100,10 +100,10 @@ class Modifier:
         """used to replace draft content in message table"""
         Modifier.del_draft(draft_id, del_status=False)
         save_new_draft = "INSERT INTO secure_message (msg_id, subject, body, thread_id, " \
-                         "collection_case, ru_ref, survey) VALUES ('{0}', '{1}', '{2}', '{3}'," \
-                         " '{4}', '{5}', '{6}')"\
+                         "collection_case, ru_ref, collection_exercise, survey) VALUES ('{0}', '{1}', '{2}', '{3}'," \
+                         " '{4}', '{5}', '{6}', '{7}')"\
                          .format(draft_id, draft.subject, draft.body, draft.thread_id, draft.collection_case,
-                                 draft.ru_ref, draft.survey)
+                                 draft.ru_ref, draft.collection_exercise, draft.survey)
 
         try:
             db.get_engine(app=db.get_app()).execute(save_new_draft)

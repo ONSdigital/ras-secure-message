@@ -14,6 +14,8 @@ Feature: Message get by ID Endpoint
     |subject |
     |RU_Ref   |
     |CollectionCase  |
+    |CollectionExercise  |
+
 
   Scenario: Retrieve a draft message
     Given there is a draft message to be retrieved
@@ -35,6 +37,7 @@ Feature: Message get by ID Endpoint
     |subject |
     |RU_Ref   |
     |CollectionCase  |
+    |CollectionExercise  |
 
   Scenario: Retrieve a message with incorrect message ID
     Given there is a message to be retrieved

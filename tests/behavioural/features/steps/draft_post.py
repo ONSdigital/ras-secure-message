@@ -50,6 +50,7 @@ def step_impl_valid_draft(context):
                  'collection_case': 'collection case1',
                  'reporting_unit': 'reporting case1',
                  'business_name': 'ABusiness',
+                 'collection_exercise': 'collection exercise1',
                  'survey': 'survey'})
 
 
@@ -64,6 +65,7 @@ def step_impl_draft_with_empty_body(context):
                  'collection_case': 'collection case1',
                  'reporting_unit': 'reporting case1',
                  'business_name': 'ABusiness',
+                 'collection_exercise': 'collection exercise1',
                  'survey': 'survey'})
 
 
@@ -79,6 +81,7 @@ def step_impl_draft_with_msg_id(context):
                  'collection_case': 'collection case1',
                  'reporting_unit': 'reporting case1',
                  'business_name': 'ABusiness',
+                 'collection_exercise': 'collection exercise1',
                  'survey': 'survey'})
 
 
@@ -93,6 +96,7 @@ def step_impl_draft_with_to_field_too_large(context):
                  'collection_case': 'collection case1',
                  'reporting_unit': 'reporting case1',
                  'business_name': 'ABusiness',
+                 'collection_exercise': 'collection exercise1',
                  'survey': 'survey'})
 
 
@@ -107,6 +111,7 @@ def step_impl_draft_with_from_field_too_large(context):
                  'collection_case': 'collection case1',
                  'reporting_unit': 'reporting case1',
                  'business_name': 'ABusiness',
+                 'collection_exercise': 'collection exercise1',
                  'survey': 'survey'})
 
 
@@ -121,6 +126,7 @@ def step_impl_draft_with_body_field_too_large(context):
                  'collection_case': 'collection case1',
                  'reporting_unit': 'reporting case1',
                  'business_name': 'ABusiness',
+                 'collection_exercise': 'collection exercise1',
                  'survey': 'survey'})
 
 
@@ -135,6 +141,7 @@ def step_impl_draft_with_subject_field_too_large(context):
                  'collection_case': 'collection case1',
                  'reporting_unit': 'reporting case1',
                  'business_name': 'ABusiness',
+                 'collection_exercise': 'collection exercise1',
                  'survey': 'survey'})
 
 
@@ -149,6 +156,7 @@ def step_impl_draft_with_empty_from_field(context):
                  'collection_case': 'collection case1',
                  'reporting_unit': 'reporting case1',
                  'business_name': 'ABusiness',
+                 'collection_exercise': 'collection exercise1',
                  'survey': 'survey'})
 
 
@@ -163,7 +171,38 @@ def step_impl_draft_with_empty_survey_field(context):
                  'collection_case': 'collection case1',
                  'reporting_unit': 'reporting case1',
                  'business_name': 'ABusiness',
+                 'collection_exercise': 'collection exercise1',
                  'survey': ''})
+
+
+# Scenario 10: Save a draft with a collection case field too large return 400
+@given('a draft with collection case field too large in size')
+def step_impl_draft_with_collection_case_field_too_large(context):
+    data.update({'msg_to': 'test',
+                 'msg_from': 'ce12b958-2a5f-44f4-a6da-861e59070a31',
+                 'subject': 'test',
+                 'body': 'Test',
+                 'thread_id': '',
+                 'collection_case': 'x' * (constants.MAX_COLLECTION_CASE_LEN+1),
+                 'reporting_unit': 'reporting case1',
+                 'business_name': 'ABusiness',
+                 'collection_exercise': 'collection exercise1',
+                 'survey': 'survey'})
+
+
+# Scenario 11: Save a draft with a collection exercise field too large return 400
+@given('a draft with collection exercise field too large in size')
+def step_impl_draft_with_collection_exercise_field_too_large(context):
+    data.update({'msg_to': 'test',
+                 'msg_from': 'ce12b958-2a5f-44f4-a6da-861e59070a31',
+                 'subject': 'test',
+                 'body': 'Test',
+                 'thread_id': '',
+                 'collection_case': 'collection case1',
+                 'reporting_unit': 'reporting case1',
+                 'business_name': 'ABusiness',
+                 'collection_exercise': 'x' * (constants.MAX_COLLECTION_EXERCISE_LEN+1),
+                 'survey': 'survey'})
 
 
 # Scenario: As a user the message id for my saved draft should be returned when saving a draft
@@ -177,6 +216,7 @@ def step_impl_user_creates_valid_draft(context):
                      'collection_case': 'collection case1',
                      'reporting_unit': 'reporting case1',
                      'business_name': 'ABusiness',
+                     'collection_exercise': 'collection exercise1',
                      'survey': 'RSI'}
 
 
@@ -202,6 +242,7 @@ def step_impl_draft_message_withour_thread_id(context):
                  'collection_case': 'collection case1',
                  'reporting_unit': 'reporting case1',
                  'business_name': 'ABusiness',
+                 'collection_exercise': 'collection exercise1',
                  'survey': 'survey'})
 
 

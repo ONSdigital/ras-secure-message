@@ -21,6 +21,7 @@ data = {'msg_to': '0a7ad740-10d5-4ecb-b7ca-3c0384afb882',
         'body': 'Test',
         'thread_id': '',
         'collection_case': 'collection case1',
+        'collection_exercise': 'collection exercise1',
         'ru_ref': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc',
         'survey': 'BRES'}
 

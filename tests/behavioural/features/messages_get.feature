@@ -64,6 +64,11 @@ Feature: Get Messages list Endpoint
     When the Respondent gets their messages with particular collection case 
     Then the retrieved messages should have the correct collection case
 
+  Scenario: Internal user sends multiple messages and Respondent retrieves the list of messages with particular collection exercise 
+    Given a Internal user sends multiple messages with different collection exercise 
+    When the Respondent gets their messages with particular collection exercise 
+    Then the retrieved messages should have the correct collection exercise
+
   Scenario: Respondent creates multiple draft messages and Respondent retrieves the list of draft messages 
     Given a Respondent creates multiple draft messages 
     When the Respondent gets their draft messages 

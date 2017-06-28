@@ -25,13 +25,16 @@ class SecureMessage(db.Model):
     thread_id = Column("thread_id", String(constants.MAX_THREAD_LEN + 1), index=True)
     collection_case = Column("collection_case", String(constants.MAX_COLLECTION_CASE_LEN+1))
     ru_ref = Column("ru_ref", String(constants.MAX_REPORTING_UNIT_LEN+1))
+    collection_exercise = Column("collection_exercise", String(constants.MAX_COLLECTION_EXERCISE_LEN+1))
     survey = Column("survey", String(constants.MAX_SURVEY_LEN+1))
     statuses = relationship('Status', backref='secure_message')
     events = relationship('Events', backref='secure_message', order_by='Events.date_time')
-    __table_args__ = (Index("idx_ru_survey_cc", "ru_ref", "survey", "collection_case"), )
+
+    __table_args__ = (Index("idx_ru_survey_cc", "ru_ref", "survey", "collection_case", "collection_exercise"), )
 
     def __init__(self, msg_id="", subject="", body="", thread_id="", collection_case='',
-                 ru_ref='', survey=''):
+                 ru_ref='', survey='', collection_exercise=''):
+
         logger.debug("Initialised Secure Message entity: msg_id: {}".format(id))
         self.msg_id = msg_id
         self.subject = subject
@@ -40,6 +43,7 @@ class SecureMessage(db.Model):
         self.collection_case = collection_case
         self.ru_ref = ru_ref
         self.survey = survey
+        self.collection_exercise = collection_exercise
 
     def set_from_domain_model(self, domain_model):
         """set dbMessage attributes to domain_model attributes"""
@@ -50,6 +54,7 @@ class SecureMessage(db.Model):
         self.collection_case = domain_model.collection_case
         self.ru_ref = domain_model.ru_ref
         self.survey = domain_model.survey
+        self.collection_exercise = domain_model.collection_exercise
 
     def serialize(self, user):
         """Return object data in easily serializeable format"""
@@ -63,6 +68,7 @@ class SecureMessage(db.Model):
             'collection_case': self.collection_case,
             'ru_ref': self.ru_ref,
             'survey': self.survey,
+            'collection_exercise': self.collection_exercise,
             '_links': '',
             'labels': []
         }

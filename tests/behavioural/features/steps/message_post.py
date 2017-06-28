@@ -40,7 +40,6 @@ def before_scenario(context):
         database.db.drop_all()
         database.db.create_all()
 
-
     data.update({
                  'msg_to': 'BRES',
                  'msg_from': '01b51fcc-ed43-4cdb-ad1c-450f9986859b',
@@ -48,6 +47,7 @@ def before_scenario(context):
                  'body': 'Test',
                  'thread_id': '',
                  'collection_case': 'collection case1',
+                 'collection_exercise': 'collection exercise1',
                  'ru_ref': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc',
                  'survey': 'BRES'})
 
@@ -75,6 +75,7 @@ def step_impl_a_message_is_a_draft(context):
                        'body': 'Test',
                        'thread_id': context.msg_id,
                        'collection_case': 'collection case1',
+                       'collection_exercise': 'collection exercise1',
                        'ru_ref': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc',
                        'survey': 'BRES'}
 
@@ -104,6 +105,7 @@ def step_impl_a_message_is_a_draft_reply(context):
                  'body': 'Test',
                  'thread_id': '25e9172c-62d9-4ff7-98ac-661300ae9446',
                  'collection_case': 'collection case1',
+                 'collection_exercise': 'collection exercise1',
                  'ru_ref': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc',
                  'survey': 'BRES'})
 
@@ -122,6 +124,7 @@ def step_impl_a_message_is_a_draft_reply(context):
                        'body': 'Test',
                        'thread_id': '25e9172c-62d9-4ff7-98ac-661300ae9446',
                        'collection_case': 'collection case1',
+                       'collection_exercise': 'collection exercise1',
                        'ru_ref': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc',
                        'survey': 'BRES'}
 
@@ -192,9 +195,9 @@ def step_impl_message_contains_msg_id_and_is_not_valid_draft(context):
                  'body': 'Test',
                  'thread_id': '',
                  'collection_case': 'collection case1',
+                 'collection_exercise': 'collection exercise1',
                  'ru_ref': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc',
                  'survey': 'BRES'})
-
 
 
 # Scenario 12: When a message with the label of "Draft" is sent and another user is trying to send the same message return a 409
@@ -221,6 +224,7 @@ def step_impl_draft_message_posted(context):
                        'body': 'Test',
                        'thread_id': '',
                        'collection_case': 'collection case1',
+                       'collection_exercise': 'collection exercise1',
                        'ru_ref': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc',
                        'survey': 'BRES'}
 
@@ -239,6 +243,7 @@ def step_impl_another_user_sends_same_message(context):
                  'body': 'test',
                  'thread_id': '2',
                  'collection_case': 'collection case1',
+                 'collection_exercise': 'collection exercise1',
                  'ru_ref': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc',
                  'survey': 'BRES'})
 
@@ -267,6 +272,7 @@ def step_impl_message_is_created(context):
                      'body': 'Test',
                      'thread_id': '',
                      'collection_case': 'collection case1',
+                     'collection_exercise': 'collection exercise1',
                      'ru_ref': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc',
                      'survey': 'BRES'}
 

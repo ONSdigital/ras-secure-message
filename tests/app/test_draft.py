@@ -1,9 +1,7 @@
 import hashlib
 import unittest
 import uuid
-
 from flask import g
-
 from app.repository.retriever import Retriever
 from unittest import mock
 from flask import current_app, json
@@ -54,8 +52,9 @@ class DraftTestCase(unittest.TestCase):
                              'body': 'hello',
                              'thread_id': '',
                              'collection_case': 'ACollectionCase',
+                             'collection_exercise': 'ACollectionExercise',
                              'ru_ref': '7fc0e8ab-189c-4794-b8f4-9f05a1db185b',
-                             'survey': 'ACollectionInstrument'}
+                             'survey': 'BRES'}
 
         with app.app_context():
             database.db.init_app(current_app)
@@ -106,6 +105,13 @@ class DraftTestCase(unittest.TestCase):
         """Test draft can be saved without Collection Case field"""
 
         self.test_message['collection_case'] = ''
+        response = self.app.post(self.url, data=json.dumps(self.test_message), headers=self.headers)
+        self.assertEqual(response.status_code, 201)
+
+    def test_draft_empty_collection_exercise_field_returns_201(self):
+        """Test draft can be saved without Collection Exercise field"""
+
+        self.test_message['collection_exercise'] = ''
         response = self.app.post(self.url, data=json.dumps(self.test_message), headers=self.headers)
         self.assertEqual(response.status_code, 201)
 
@@ -209,8 +215,9 @@ class DraftTestCase(unittest.TestCase):
                 'body': 'hello',
                 'thread_id': '',
                 'collection_case': 'ACollectionCase',
+                'collection_exercise': 'ACollectionExercise',
                 'ru_ref': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc',
-                'survey': 'ACollectionInstrument'
+                'survey': 'BRES'
             }
         )
 
@@ -225,8 +232,8 @@ class DraftTestCase(unittest.TestCase):
             msg_id = str(uuid.uuid4())
             query = 'INSERT INTO secure_message(msg_id, subject, body, thread_id,' \
                     ' collection_case, ru_ref, survey) VALUES ("{0}", "test","test","", ' \
-                    ' "ACollectionCase", "f1a5e99c-8edf-489a-9c72-6cabe6c387fc", ' \
-                    '"SurveyType")'.format(msg_id)
+                    ' "ACollectionCase", "f1a5e99c-8edf-489a-9c72-6cabe6c387fc", "ACollectionExercise"' \
+                    '"BRES")'.format(msg_id)
             con.execute(query)
             query = 'INSERT INTO status(label, msg_id, actor) VALUES("DRAFT", "{0}", ' \
                     '"0a7ad740-10d5-4ecb-b7ca-3c0384afb882")'.format(msg_id)
@@ -251,7 +258,6 @@ class DraftTestCase(unittest.TestCase):
     def test_etag_check_returns_true_if_data_equal(self):
         """Test etag_check function returns true for unchanged draft etag"""
 
-
         message = {
             'msg_to': ['BRES'],
             'msg_from': '0a7ad740-10d5-4ecb-b7ca-3c0384afb882',
@@ -260,6 +266,7 @@ class DraftTestCase(unittest.TestCase):
             'body': 'test',
             'thread_id': '',
             'collection_case': 'ACollectionCase',
+            'collection_exercise': 'ACollectionExercise',
             'ru_ref': '7fc0e8ab-189c-4794-b8f4-9f05a1db185b',
             'survey': 'BRES',
             '_links': '',
@@ -282,6 +289,7 @@ class DraftTestCase(unittest.TestCase):
             'body': 'test',
             'thread_id': '',
             'collection_case': 'ACollectionCase',
+            'collection_exercise': 'ACollectionExercise',
             'ru_ref': '7fc0e8ab-189c-4794-b8f4-9f05a1db185b',
             'survey': 'BRES',
             '_links': '',
@@ -302,6 +310,7 @@ class DraftTestCase(unittest.TestCase):
             'body': 'test',
             'thread_id': '',
             'collection_case': 'ACollectionCase',
+            'collection_exercise': 'ACollectionExercise',
             'ru_ref': '7fc0e8ab-189c-4794-b8f4-9f05a1db185b',
             'survey': 'BRES',
             '_links': '',
@@ -322,6 +331,7 @@ class DraftTestCase(unittest.TestCase):
             'body': 'test',
             'thread_id': '',
             'collection_case': 'ACollectionCase',
+            'collection_exercise': 'ACollectionExercise',
             'ru_ref': '7fc0e8ab-189c-4794-b8f4-9f05a1db185b',
             'survey': 'BRES',
             '_links': '',
@@ -342,6 +352,7 @@ class DraftTestCase(unittest.TestCase):
             'body': 'test',
             'thread_id': '',
             'collection_case': 'ACollectionCase',
+            'collection_exercise': 'ACollectionExercise',
             'ru_ref': '7fc0e8ab-189c-4794-b8f4-9f05a1db185b',
             'survey': 'BRES',
             '_links': '',

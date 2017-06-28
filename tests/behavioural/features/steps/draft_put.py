@@ -21,14 +21,17 @@ post_data = {'msg_to': 'ce12b958-2a5f-44f4-a6da-861e59070a31',
              'body': 'Test',
              'thread_id': '2',
              'collection_case': 'collection case1',
+             'collection_exercise': 'collection exercise1',
              'ru_ref': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc',
              'survey': 'BRES'}
+
 data = {'msg_to': 'ce12b958-2a5f-44f4-a6da-861e59070a31',
         'msg_from': '0a7ad740-10d5-4ecb-b7ca-3c0384afb882',
         'subject': 'test',
         'body': 'Test',
         'thread_id': '2',
         'collection_case': 'collection case1',
+        'collection_exercise': 'collection exercise1',
         'ru_ref': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc',
         'survey': 'BRES'}
 
@@ -62,6 +65,7 @@ def step_impl_user_edits_saved_draft(context):
                  'subject': 'test',
                  'body': 'Test',
                  'collection_case': 'collection case1',
+                 'collection_exercise': 'collection exercise1',
                  'ru_ref': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc',
                  'survey': 'BRES'})
     data['body'] = 'replaced'
@@ -98,8 +102,10 @@ def step_impl_user_edits_non_existant_draft(context):
                  'body': 'Test',
                  'thread_id': '2',
                  'collection_case': 'collection case1',
+                 'collection_exercise': 'collection_exercise1',
                  'ru_ref': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc',
                  'survey': 'BRES'})
+
     data['body'] = 'replaced'
     context.msg_id = data['msg_id']
 
@@ -117,6 +123,7 @@ def step_impl_modifies_draft_to_attribute_too_big(context):
                  'body': 'Test',
                  'thread_id': '2',
                  'collection_case': 'collection case1',
+                 'collection_exercise': 'collection excercise1',
                  'ru_ref': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc',
                  'survey': 'survey'})
     data['msg_to'] = 'x' * (constants.MAX_TO_LEN+1)
@@ -135,6 +142,7 @@ def step_impl_user_modifies_draft_from_attribute_too_big(context):
                  'body': 'Test',
                  'thread_id': '2',
                  'collection_case': 'collection case1',
+                 'collection_exercise': 'collection exercise1',
                  'ru_ref': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc',
                  'survey': 'survey'})
     data['msg_from'] = 'x' * (constants.MAX_FROM_LEN+1)
@@ -153,6 +161,7 @@ def step_impl_user_modifies_draft_body_attribute_too_big(context):
                  'body': 'Test',
                  'thread_id': '2',
                  'collection_case': 'collection case1',
+                 'collection_exercise': 'collection exercise1',
                  'ru_ref': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc',
                  'survey': 'survey'})
     data['body'] = 'x' * (constants.MAX_BODY_LEN+1)
@@ -171,8 +180,9 @@ def step_impl_user_modifies_draft_subject_attribute_too_big(context):
                  'body': 'Test',
                  'thread_id': '2',
                  'collection_case': 'collection case1',
+                 'collection_exercise': 'collection exercise1',
                  'ru_ref': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc',
-                 'survey': 'survey'})
+                 'survey': 'BRES'})
     data['subject'] = 'x' * (constants.MAX_SUBJECT_LEN+1)
 
 
@@ -191,8 +201,9 @@ def step_impl_user_modifies_draft_no_to_attribute(context):
                  'body': 'Test',
                  'thread_id': '2',
                  'collection_case': 'collection case1',
+                 'collection_exercise': 'collection exercise1',
                  'ru_ref': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc',
-                 'survey': 'survey'})
+                 'survey': 'BRES'})
     data['msg_to'] = ''
 
 
@@ -211,8 +222,9 @@ def step_impl_user_modifies_draft_no_body(context):
                  'body': 'Test',
                  'thread_id': '2',
                  'collection_case': 'collection case1',
+                 'collection_exercise': 'collection exercise1',
                  'ru_ref': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc',
-                 'survey': 'survey'})
+                 'survey': 'BRES'})
     data['body'] = ''
 
 
@@ -231,8 +243,9 @@ def step_impl_user_modifies_draft_no_subject(context):
                  'body': 'Test',
                  'thread_id': '2',
                  'collection_case': 'collection case1',
+                 'collcetion_exercise': 'collection exercise1',
                  'ru_ref': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc',
-                 'survey': 'survey'})
+                 'survey': 'BRES'})
     data['subject'] = ''
 
 
@@ -251,8 +264,9 @@ def step_impluser_modifies_draft_no_thread_id(context):
                  'body': 'Test',
                  'thread_id': '2',
                  'collection_case': 'collection case1',
+                 'collection_exerise': 'collection exercise1',
                  'ru_ref': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc',
-                 'survey': 'survey'})
+                 'survey': 'BRES'})
     data['thread_id'] = ''
 
 
@@ -269,8 +283,9 @@ def step_impl_user_modifies_draft_with_mismatched_msg_id(context):
                  'body': 'Test',
                  'thread_id': '2',
                  'collection_case': 'collection case1',
+                 'collection_exercise': 'collection exercise1',
                  'ru_ref': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc',
-                 'survey': 'survey'})
+                 'survey': 'BRES'})
 
 
 # Scenario 12: A user is editing a draft while another user tries to modify the same draft
@@ -290,8 +305,9 @@ def step_impl_draft_message_is_being_edited(context):
                      'body': 'test',
                      'thread_id': '2',
                      'collection_case': 'collection case1',
+                     'collection_exercise': 'collection exercise1',
                      'ru_ref': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc',
-                     'survey': 'survey'})
+                     'survey': 'BRES'})
         data['body'] = ''
         headers['ETag'] = context.etag
         context.response = app.test_client().put(url.format(context.msg_id),
@@ -307,8 +323,9 @@ def step_impl_another_user_tries_to_modify_same_draft(context):
                  'body': 'test',
                  'thread_id': '2',
                  'collection_case': 'collection case1',
+                 'collection_exercise': 'collection exercise1',
                  'ru_ref': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc',
-                 'survey': 'survey'})
+                 'survey': 'BRES'})
 
     data['subject'] = 'edited'
     headers['ETag'] = context.etag
@@ -342,8 +359,9 @@ def step_impl_the_user_modifies_the_draft(context):
                  'body': 'Edited',
                  'thread_id': '',
                  'collection_case': 'collection case1',
+                 'collection_exercise': 'collection exercise1',
                  'ru_ref': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc',
-                 'survey': 'survey'})
+                 'survey': 'BRES'})
 
     if 'ETag' in headers:
         del headers['ETag']
@@ -369,8 +387,9 @@ def step_impl_user_saves_the_draft_without_etag(context):
                  'subject': 'test',
                  'body': 'Test',
                  'collection_case': 'collection case1',
+                 'collection_exercise': 'collection exercise1',
                  'ru_ref': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc',
-                 'survey': 'survey'})
+                 'survey': 'BRES'})
     data['body'] = 'different'
 
     if 'ETag' in headers:
@@ -388,4 +407,3 @@ def step_impl_user_edits_saved_draft_no_formatting(context):
     context.etag = get_draft.headers.get('ETag')
     data.update(json.loads(get_draft.data))
     data['body'] = 'replaced'
-
