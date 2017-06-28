@@ -162,10 +162,10 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
             'desc': 'false',
             'ce': 'CollectionExercise'
         }
-        string_query_args, page, limit, ru_ref, survey, cc, label, business, desc, ce = utilities.get_options(args)
+        string_query_args, page, limit, ru_ref, survey, cc, label, desc, ce = utilities.get_options(args)
 
         self.assertEqual(string_query_args,
-                         '?ru_ref=7fc0e8ab-189c-4794-b8f4-9f05a1db185b&business=ABusiness&survey=BRES&cc=CollectionCase&label=INBOX&ce=CollectionExercise&desc=false')
+                         '?ru_ref=7fc0e8ab-189c-4794-b8f4-9f05a1db185b&survey=BRES&cc=CollectionCase&label=INBOX&ce=CollectionExercise&desc=false')
 
         self.assertEqual(page, 2)
         self.assertEqual(limit, 9)

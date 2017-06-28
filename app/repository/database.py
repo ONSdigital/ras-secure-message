@@ -25,6 +25,7 @@ class SecureMessage(db.Model):
     thread_id = Column("thread_id", String(constants.MAX_THREAD_LEN + 1), index=True)
     collection_case = Column("collection_case", String(constants.MAX_COLLECTION_CASE_LEN+1))
     ru_ref = Column("ru_ref", String(constants.MAX_REPORTING_UNIT_LEN+1))
+    collection_exercise = Column("collection_exercise", String(constants.MAX_COLLECTION_EXERCISE_LEN+1))
     survey = Column("survey", String(constants.MAX_SURVEY_LEN+1))
     statuses = relationship('Status', backref='secure_message')
     events = relationship('Events', backref='secure_message', order_by='Events.date_time')

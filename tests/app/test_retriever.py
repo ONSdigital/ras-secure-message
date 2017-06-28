@@ -23,7 +23,7 @@ class RetrieverTestCaseHelper:
 
         with self.engine.connect() as con:
             query = 'INSERT INTO secure_message(msg_id, subject, body, thread_id,' \
-                    ' collection_case, ru_ref, survey) VALUES ("{0}", "{1}","{2}",' \
+                    ' collection_case, ru_ref, survey, collection_exercise) VALUES ("{0}", "{1}","{2}",' \
                     '"{3}", "{4}", "{5}", "{6}", "{7}")'.format(msg_id, subject, body, thread_id, collection_case,
                                                                 ru_ref, survey, collection_exercise)
             con.execute(query)
@@ -99,13 +99,8 @@ class RetrieverTestCaseHelper:
             if multiple_users:
                 msg_id = str(uuid.uuid4())
                 self.add_secure_message(msg_id=msg_id, thread_id="AnotherThreadId",
-                                        collection_case="AnotherCollectionCase",
-<<<<<<< HEAD
-                                        reporting_unit="AnotherReportingUnit", survey="AnotherSurvey",
-                                        business_name="AnotherBusiness", collection_exercise="AnotherCollectionExercise")
-=======
+                                        collection_case="AnotherCollectionCase", collection_exercise="AnotherCollectionExercise",
                                         ru_ref='0a6018a0-3e67-4407-b120-780932434b36', survey="AnotherSurvey",)
->>>>>>> master
                 self.add_status(label="SENT", msg_id=msg_id, actor="1a7ad740-10d5-4ecb-b7ca-fb8823c0384a")
                 self.add_status(label="INBOX", msg_id=msg_id, actor="AnotherSurvey")
                 self.add_status(label="UNREAD", msg_id=msg_id, actor="AnotherSurvey")
