@@ -9,7 +9,7 @@ from app import settings
 from app.application import app
 from app.authentication.jwe import Encrypter
 from app.authentication.jwt import encode
-from app.common import user_by_uuid
+from app import mocked_party
 
 url = "http://localhost:5050/message/{0}"
 token_data = {
@@ -69,14 +69,14 @@ def step_impl_a_200_http_response_is_returned(context):
 @then("returned message field msg_to is correct")
 def step_impl_correct_msg_to_returned(context):
     msg_resp = json.loads(context.response.data)
-    msg_to = user_by_uuid.respondent_ids[data['msg_to']]
+    msg_to = mocked_party.respondent_ids[data['msg_to']]
     nose.tools.assert_equal(msg_resp['msg_to'], [msg_to])
 
 
 @then("returned message field msg_from is correct")
 def step_impl_correct_msg_from_returned(context):
     msg_resp = json.loads(context.response.data)
-    msg_from = user_by_uuid.respondent_ids[data['msg_from']]
+    msg_from = mocked_party.respondent_ids[data['msg_from']]
     nose.tools.assert_equal(msg_resp['msg_from'], msg_from)
 
 

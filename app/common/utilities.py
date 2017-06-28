@@ -1,9 +1,11 @@
+from flask import json
 from flask import jsonify
 from structlog import wrap_logger
 import logging
 import hashlib
-from app.common import user_by_uuid, business_by_ru
+from werkzeug.exceptions import ExpectationFailed
 from app.constants import MESSAGE_BY_ID_ENDPOINT, MESSAGE_LIST_ENDPOINT, MESSAGE_QUERY_LIMIT
+from app import mocked_party
 
 logger = wrap_logger(logging.getLogger(__name__))
 
@@ -102,6 +104,39 @@ def generate_etag(msg_to, msg_id, subject, body):
     return etag
 
 
+def get_business_details_by_ru(rus):
+    """Function to retrieve business details from ru using the party service"""
+
+    details = []
+
+    for x in rus:
+
+        detail = mocked_party.business_details_endpoint(x)
+
+        if detail.status_code == 200:
+            details.append(json.loads(detail.data))
+        else:
+            raise ExpectationFailed(description="Received an unexpected response from Party service")
+
+    return details
+
+
+def get_details_by_uuids(uuids):
+    """Function to retrieve user details from uuids using the party service"""
+
+    respondent_details = []
+    for x in uuids:
+
+        detail = mocked_party.user_details_endpoint(x)
+
+        if detail.status_code == 200:
+            respondent_details.append(json.loads(detail.data))
+        else:
+            raise ExpectationFailed(description="Received an unexpected response from Party service")
+
+    return respondent_details
+
+
 def add_to_and_from_details(messages):
     """Adds user details for sender and reciepient"""
 
@@ -113,7 +148,7 @@ def add_to_and_from_details(messages):
         if message['msg_from'] not in uuid_list:
             uuid_list.append(message['msg_from'])
 
-    user_details = user_by_uuid.get_details_by_uuids(uuid_list)
+    user_details = get_details_by_uuids(uuid_list)
 
     for message in messages:
         message['msg_to'][0] = next((user for user in user_details if user["id"] == message['msg_to'][0]), None)
@@ -132,7 +167,7 @@ def add_business_details(messages):
         if message['ru_ref'] not in ru_list:
             ru_list.append(message['ru_ref'])
 
-    business_details = business_by_ru.get_business_details_by_ru(ru_list)
+    business_details = get_business_details_by_ru(ru_list)
 
     for message in messages:
         message['@ru_ref'] = next((business for business in business_details if business["ru_ref"] == message['ru_ref']), None)
