@@ -1,4 +1,13 @@
-from werkzeug.exceptions import BadRequest
+from flask import Response
+from flask import json
+
+business_details = {}
+
+business_details['c614e64e-d981-4eba-b016-d9822f09a4fb'] = {"ru_ref": "c614e64e-d981-4eba-b016-d9822f09a4fb", "business_name": "AOL"}
+business_details['f1a5e99c-8edf-489a-9c72-6cabe6c387fc'] = {"ru_ref": "f1a5e99c-8edf-489a-9c72-6cabe6c387fc", "business_name": "Apple"}
+business_details['7fc0e8ab-189c-4794-b8f4-9f05a1db185b'] = {"ru_ref": "7fc0e8ab-189c-4794-b8f4-9f05a1db185b", "business_name": "Apricot"}
+business_details['0a6018a0-3e67-4407-b120-780932434b36'] = {"ru_ref": "0a6018a0-3e67-4407-b120-780932434b36", "business_name": "Asparagus"}
+
 
 respondent_ids = {}
 
@@ -11,11 +20,17 @@ respondent_ids['BRES'] = {"id": "BRES", "firstname": "BRES", "surname": "", "ema
 respondent_ids['AnotherSurvey'] = {"id": "AnotherSurvey", "firstname": "AnotherSurvey", "surname": "", "email": "", "telephone": "", "status": ""}
 
 
-def get_details_by_uuids(uuids):
-        respondent_details = []
-        for x in uuids:
-            try:
-                respondent_details.append(respondent_ids[x])
-            except KeyError:
-                raise (BadRequest(description="An error has occurred"))
-        return respondent_details
+def business_details_endpoint(ru):
+    try:
+        return Response(response=json.dumps(business_details[ru]), status=200,  mimetype="text/html")
+    except KeyError:
+        return Response(response="ru does not valid", status=404,
+                               mimetype="text/html")
+
+
+def user_details_endpoint(uuid):
+    try:
+        return Response(response=json.dumps(respondent_ids[uuid]), status=200,  mimetype="text/html")
+    except KeyError:
+        return Response(response="uuid not valid", status=404,
+                               mimetype="text/html")

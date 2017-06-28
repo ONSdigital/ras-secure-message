@@ -1,10 +1,10 @@
 import unittest
 from flask import json
 from sqlalchemy import create_engine
-from werkzeug.exceptions import BadRequest
+from werkzeug.exceptions import ExpectationFailed
 from app import application
 from app.application import app
-from app.common import user_by_uuid, business_by_ru
+from app.common.utilities import get_business_details_by_ru, get_details_by_uuids
 
 
 class PartyTestCase(unittest.TestCase):
@@ -14,7 +14,7 @@ class PartyTestCase(unittest.TestCase):
 
         list_uuids = ['f62dfda8-73b0-4e0e-97cf-1b06327a6712']
 
-        user_details = user_by_uuid.get_details_by_uuids(list_uuids)
+        user_details = get_details_by_uuids(list_uuids)
 
         self.assertEqual(user_details[0], {"id": "f62dfda8-73b0-4e0e-97cf-1b06327a6712", "firstname": "Bhavana", "surname": "Lincoln", "email": "lincoln.bhavana@gmail.com", "telephone": "+443069990888", "status": "ACTIVE"})
 
@@ -23,7 +23,7 @@ class PartyTestCase(unittest.TestCase):
 
         list_uuids = ['f62dfda8-73b0-4e0e-97cf-1b06327a6712', '01b51fcc-ed43-4cdb-ad1c-450f9986859b', 'dd5a38ff-1ecb-4634-94c8-2358df33e614']
 
-        user_details = user_by_uuid.get_details_by_uuids(list_uuids)
+        user_details = get_details_by_uuids(list_uuids)
 
         self.assertEqual(user_details[0], {"id": "f62dfda8-73b0-4e0e-97cf-1b06327a6712", "firstname": "Bhavana", "surname": "Lincoln", "email": "lincoln.bhavana@gmail.com", "telephone": "+443069990888", "status": "ACTIVE"})
         self.assertEqual(user_details[1], {"id": "01b51fcc-ed43-4cdb-ad1c-450f9986859b", "firstname": "Chandana", "surname": "Blanchet", "email": "cblanc@hotmail.co.uk", "telephone": "+443069990854", "status": "ACTIVE"})
@@ -34,8 +34,8 @@ class PartyTestCase(unittest.TestCase):
 
         list_uuids = ['f62dfda8-73b0-4e0e-97cf-1b06327a6778']
 
-        with self.assertRaises(BadRequest):
-            user_by_uuid.get_details_by_uuids(list_uuids)
+        with self.assertRaises(ExpectationFailed):
+            get_details_by_uuids(list_uuids)
 
     def test_message_by_id_replaces_uuids(self):
         """Test get message by id endpoint replaces to and from with user details"""
@@ -153,7 +153,7 @@ class PartyTestCase(unittest.TestCase):
 
         list_ru = ['f1a5e99c-8edf-489a-9c72-6cabe6c387fc']
 
-        business_details = business_by_ru.get_business_details_by_ru(list_ru)
+        business_details = get_business_details_by_ru(list_ru)
 
         self.assertEqual(business_details[0]['ru_ref'], list_ru[0])
         self.assertEqual(business_details[0]['business_name'], "Apple")
@@ -163,7 +163,7 @@ class PartyTestCase(unittest.TestCase):
 
         list_ru = ['0a6018a0-3e67-4407-b120-780932434b36', 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc', 'c614e64e-d981-4eba-b016-d9822f09a4fb']
 
-        business_details = business_by_ru.get_business_details_by_ru(list_ru)
+        business_details = get_business_details_by_ru(list_ru)
 
         self.assertEqual(business_details[0]['ru_ref'], list_ru[0])
         self.assertEqual(business_details[1]['ru_ref'], list_ru[1])

@@ -4,10 +4,10 @@ from flask import request, jsonify
 from flask_restful import Resource
 from structlog import wrap_logger
 from werkzeug.exceptions import BadRequest
-from app.common import user_by_uuid, business_by_ru
 from app.common.labels import Labels
 from app.constants import DRAFT_LIST_ENDPOINT
-from app.common.utilities import get_options, paginated_list_to_json, generate_etag
+from app.common.utilities import get_options, paginated_list_to_json, generate_etag, \
+    get_business_details_by_ru, get_details_by_uuids
 from app.repository.modifier import Modifier
 from app.repository.retriever import Retriever
 from app.repository.saver import Saver
@@ -76,7 +76,7 @@ class DraftById(Resource):
         uuids = [draft['msg_from']]
         if draft['msg_to'] is not None:
             uuids.append(draft['msg_to'][0])
-        user_details = user_by_uuid.get_details_by_uuids(uuids)
+        user_details = get_details_by_uuids(uuids)
         for user in user_details:
             if draft['msg_from'] == user['id']:
                 draft['msg_from'] = user
@@ -90,7 +90,7 @@ class DraftById(Resource):
         """Get business details for ru"""
 
         ru = [draft['ru_ref']]
-        business_details = business_by_ru.get_business_details_by_ru(ru)
+        business_details = get_business_details_by_ru(ru)
         for business in business_details:
             if draft['ru_ref'] == business['ru_ref']:
                 draft['@ru_ref'] = business
