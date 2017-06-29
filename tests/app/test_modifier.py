@@ -364,13 +364,6 @@ class ModifyTestCase(unittest.TestCase, ModifyTestCaseHelper):
                 with self.assertRaises(InternalServerError):
                     Modifier.del_draft('0', 'TRUE')
 
-    def test_exception_for_replace_current_draft_raises(self):
-        with app.app_context():
-            database.db.drop_all()
-            with current_app.test_request_context():
-                with self.assertRaises(InternalServerError):
-                    Modifier.replace_current_draft(self.user_internal, 'Richard')
-
     def test_replace_current_recipient_status_raises(self):
         with app.app_context():
             database.db.drop_all()
