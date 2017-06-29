@@ -104,16 +104,10 @@ class Modifier:
                                        thread_id=draft.thread_id, collection_case=draft.collection_case,
                                        ru_ref=draft.ru_ref, collection_exercise=draft.collection_exercise,
                                        survey=draft.survey)
-        # save_new_draft = "INSERT INTO secure_message (msg_id, subject, body, thread_id, " \
-        #                  "collection_case, ru_ref, collection_exercise, survey) VALUES ('{0}', '{1}', '{2}', '{3}'," \
-        #                  " '{4}', '{5}', '{6}', '{7}')"\
-        #                  .format(draft_id, draft.subject, draft.body, draft.thread_id, draft.collection_case,
-        #                          draft.ru_ref, draft.collection_exercise, draft.survey)
 
         try:
             session.add(secure_message)
             session.commit()
-            #db.get_engine(app=db.get_app()).execute(save_new_draft)
         except Exception as e:
             session.rollbeck()
             logger.error(e)
@@ -130,15 +124,11 @@ class Modifier:
         del_current_status = "DELETE FROM status WHERE msg_id='{0}' AND label='{1}'" \
             .format(draft_id, Labels.DRAFT_INBOX.value)
         new_status = Status(msg_id=draft_id, actor=draft_to, label=Labels.DRAFT_INBOX.value)
-        # save_new_status = "INSERT INTO status (msg_id, actor, label) VALUES ('{0}', '{1}', '{2}')" \
-        #     .format(draft_id, draft_to, Labels.DRAFT_INBOX.value)
 
         try:
             db.get_engine(app=db.get_app()).execute(del_current_status)
             session.add(new_status)
             session.commit()
-
-            #db.get_engine(app=db.get_app()).execute(save_new_status)
         except Exception as e:
             session.rollback()
             logger.error(e)
