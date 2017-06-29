@@ -34,7 +34,6 @@ class ThreadList(Resource):
 
         string_query_args, page, limit, ru_ref, survey, cc, label, desc, ce = get_options(request.args)
 
-
         message_service = Retriever()
         status, result = message_service.retrieve_thread_list(page, limit, g.user)
 

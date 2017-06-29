@@ -3,6 +3,7 @@ import uuid
 from datetime import datetime, timezone
 
 from flask import current_app
+from flask import g
 from sqlalchemy import create_engine
 from werkzeug.exceptions import InternalServerError
 
@@ -211,7 +212,7 @@ class ModifyTestCase(unittest.TestCase, ModifyTestCaseHelper):
             with current_app.test_request_context():
                 self.test_message = {
                     'msg_id': 'test123',
-                    'msg_to': 'richard',
+                    'msg_to': 'BRES',
                     'msg_from': '0a7ad740-10d5-4ecb-b7ca-3c0384afb882',
                     'subject': 'MyMessage',
                     'body': 'hello',
@@ -284,7 +285,7 @@ class ModifyTestCase(unittest.TestCase, ModifyTestCaseHelper):
             with current_app.test_request_context():
                 self.test_message = {
                     'msg_id': 'test123',
-                    'msg_to': 'richard',
+                    'msg_to': 'BRES',
                     'msg_from': '0a7ad740-10d5-4ecb-b7ca-3c0384afb882',
                     'subject': 'MyMessage',
                     'body': 'hello',
@@ -307,6 +308,7 @@ class ModifyTestCase(unittest.TestCase, ModifyTestCaseHelper):
                                                               self.test_message['collection_exercise'])
 
                     con.execute(add_draft)
+                    g.user = User('0a7ad740-10d5-4ecb-b7ca-3c0384afb882', 'respondent')
                     draft = DraftSchema().load(self.test_message)
                     modifier.replace_current_draft(self.test_message['msg_id'], draft.data)
                     replaced_draft = con.execute("SELECT * FROM secure_message WHERE msg_id='{0}'".format(self.test_message['msg_id']))
