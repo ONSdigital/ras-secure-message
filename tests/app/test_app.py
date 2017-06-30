@@ -281,7 +281,7 @@ class FlaskTestCase(unittest.TestCase):
             request = con.execute("SELECT * FROM status WHERE msg_id='{0}'".format(msg_id))
 
             for row in request:
-                self.assertFalse(row['label'], 'DRAFT_INBOX')
+                self.assertNotEqual(row['label'], 'DRAFT_INBOX')
 
     def test_draft_created_by_respondent_does_not_show_for_internal(self):
         """Test whether a draft created by a respondent is returned to an internal user"""
