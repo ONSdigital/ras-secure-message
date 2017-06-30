@@ -76,6 +76,26 @@ def step_impl_user_edits_saved_draft(context):
     data['body'] = 'replaced'
 
 
+# Scenario: A user edits a previously saved draft adding an apostrophe
+@given('a user edits a previously saved draft adding an apostrophe')
+def step_impl_user_edits_saved_draft_apostrophe(context):
+    add_draft = app.test_client().post('http://localhost:5050/draft/save', data=json.dumps(post_data), headers=headers)
+    post_resp = json.loads(add_draft.data)
+    context.msg_id = post_resp['msg_id']
+    get_draft = app.test_client().get('http://localhost:5050/draft/{0}'.format(context.msg_id), headers=headers)
+    context.etag = get_draft.headers.get('ETag')
+    data.update({'msg_id': context.msg_id,
+                 'msg_to': 'ce12b958-2a5f-44f4-a6da-861e59070a31',
+                 'msg_from': '0a7ad740-10d5-4ecb-b7ca-3c0384afb882',
+                 'subject': 'te\'st',
+                 'body': 'Test',
+                 'collection_case': 'collection case1',
+                 'collection_exercise': 'collection exercise1',
+                 'ru_ref': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc',
+                 'survey': 'BRES'})
+    data['body'] = 'replaced'
+
+
 @when('the user saves the draft')
 def step_impl_user_saves_the_draft(context):
     if 'ETag' in headers:

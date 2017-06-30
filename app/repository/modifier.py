@@ -3,9 +3,8 @@ from structlog import wrap_logger
 from werkzeug.exceptions import InternalServerError
 
 from app.common.labels import Labels
-from app.repository.database import db
+from app.repository.database import db, Status, SecureMessage, Events
 from app.repository.saver import Saver
-from app.validation.user import User
 
 logger = wrap_logger(logging.getLogger(__name__))
 
@@ -14,15 +13,17 @@ class Modifier:
     """Modifies message to add / remove statuses"""
 
     @staticmethod
-    def add_label(label, message, user):
+    def add_label(label, message, user, session=db.session):
         """add a label to status table"""
         actor = user.user_uuid if user.is_respondent else message['survey']
+
         try:
-            query = "INSERT INTO status (label, msg_id, actor) VALUES ('{0}','{1}','{2}')". \
-                format(label, message['msg_id'], actor)
-            db.get_engine(app=db.get_app()).execute(query)
+            status = Status(label=label, msg_id=message['msg_id'], actor=actor)
+            session.add(status)
+            session.commit()
             return True
         except Exception as e:
+            session.rollback()
             logger.error(e)
             raise (InternalServerError(description="Error retrieving messages from database"))
 
@@ -96,18 +97,19 @@ class Modifier:
             raise (InternalServerError(description="Error retrieving messages from database"))
 
     @staticmethod
-    def replace_current_draft(draft_id, draft):
+    def replace_current_draft(draft_id, draft, session=db.session):
         """used to replace draft content in message table"""
         Modifier.del_draft(draft_id, del_status=False)
-        save_new_draft = "INSERT INTO secure_message (msg_id, subject, body, thread_id, " \
-                         "collection_case, ru_ref, collection_exercise, survey) VALUES ('{0}', '{1}', '{2}', '{3}'," \
-                         " '{4}', '{5}', '{6}', '{7}')"\
-                         .format(draft_id, draft.subject, draft.body, draft.thread_id, draft.collection_case,
-                                 draft.ru_ref, draft.collection_exercise, draft.survey)
+        secure_message = SecureMessage(msg_id=draft_id, subject=draft.subject, body=draft.body,
+                                       thread_id=draft.thread_id, collection_case=draft.collection_case,
+                                       ru_ref=draft.ru_ref, collection_exercise=draft.collection_exercise,
+                                       survey=draft.survey)
 
         try:
-            db.get_engine(app=db.get_app()).execute(save_new_draft)
+            session.add(secure_message)
+            session.commit()
         except Exception as e:
+            session.rollbeck()
             logger.error(e)
             raise (InternalServerError(description="Error replacing message"))
 
@@ -117,16 +119,17 @@ class Modifier:
             Modifier.replace_current_recipient_status(draft_id, draft.msg_to)
 
     @staticmethod
-    def replace_current_recipient_status(draft_id, draft_to):
+    def replace_current_recipient_status(draft_id, draft_to, session=db.session):
         """used to replace the draft INBOX_DRAFT label"""
         del_current_status = "DELETE FROM status WHERE msg_id='{0}' AND label='{1}'" \
             .format(draft_id, Labels.DRAFT_INBOX.value)
-        save_new_status = "INSERT INTO status (msg_id, actor, label) VALUES ('{0}', '{1}', '{2}')" \
-            .format(draft_id, draft_to, Labels.DRAFT_INBOX.value)
+        new_status = Status(msg_id=draft_id, actor=draft_to, label=Labels.DRAFT_INBOX.value)
 
         try:
             db.get_engine(app=db.get_app()).execute(del_current_status)
-            db.get_engine(app=db.get_app()).execute(save_new_status)
+            session.add(new_status)
+            session.commit()
         except Exception as e:
+            session.rollback()
             logger.error(e)
             raise (InternalServerError(description="Error replacing DRAFT_INBOX label"))

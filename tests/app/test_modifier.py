@@ -366,13 +366,6 @@ class ModifyTestCase(unittest.TestCase, ModifyTestCaseHelper):
                 with self.assertRaises(InternalServerError):
                     Modifier.del_draft('0', 'TRUE')
 
-    def test_exception_for_replace_current_draft_raises(self):
-        with app.app_context():
-            database.db.drop_all()
-            with current_app.test_request_context():
-                with self.assertRaises(InternalServerError):
-                    Modifier.replace_current_draft(self.user_internal,'Richard')
-
     def test_replace_current_recipient_status_raises(self):
         with app.app_context():
             database.db.drop_all()
@@ -380,3 +373,21 @@ class ModifyTestCase(unittest.TestCase, ModifyTestCaseHelper):
                 with self.assertRaises(InternalServerError):
                     Modifier.replace_current_recipient_status(self.user_internal, 'Torrance')
 
+    def test_exception_for_replace_current_draft_raises(self):
+        draft = {
+                    'msg_id': 'test123',
+                    'msg_to': 'richard',
+                    'msg_from': '0a7ad740-10d5-4ecb-b7ca-3c0384afb882',
+                    'subject': 'MyMessage',
+                    'body': 'hello',
+                    'thread_id': '',
+                    'collection_case': 'ACollectionCase',
+                    'collection_exercise': 'ACollectionExercise',
+                    'ru_ref': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc',
+                    'survey': 'BRES'
+                }
+        with app.app_context():
+            database.db.drop_all()
+            with current_app.test_request_context():
+                with self.assertRaises(InternalServerError):
+                    Modifier.replace_current_draft(2, draft)
