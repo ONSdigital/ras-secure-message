@@ -4,7 +4,7 @@ from flask import g
 
 import app.constants
 from datetime import datetime, timezone
-from app.validation.domain import Message, MessageSchema
+from app.validation.domain import Message, MessageSchema, DraftSchema
 from app.validation.user import User
 from app.application import app
 from app.constants import MAX_SUBJECT_LEN, MAX_BODY_LEN, MAX_THREAD_LEN
@@ -275,6 +275,29 @@ class MessageSchemaTestCase(unittest.TestCase):
             errors = schema.load(self.json_message)[1]
 
         self.assertTrue(errors == {'_schema': ["'msg_from' is missing an 'id' or incorrect format"]})
+
+    def test_msg_from_validation_internal(self):
+        """marshalling message where msg_from field is an internal user and the 'uuid' is not BRES"""
+        self.json_message['msg_to'] = [{"id": "01b51fcc-ed43-4cdb-ad1c-450f9986859b", "firstname": "Chandana", "surname": "Blanchet", "email": "cblanc@hotmail.co.uk", "telephone": "+443069990854", "status": "ACTIVE"}]
+        self.json_message['msg_from'] = "SomeOtherWorkGroup"
+        with app.app_context():
+            g.user = User("BRES", 'internal')
+            schema = DraftSchema()
+            errors = schema.load(self.json_message)[1]
+
+        self.assertTrue(errors == {
+            'msg_from': ['You are not authorised to save a draft on behalf of user or work group SomeOtherWorkGroup']})
+
+    def test_msg_from_validation_respondent(self):
+        """marshalling message where msg_from field is a respondent and msg_from is not equal to uuid in token"""
+        self.json_message['msg_to'] = ["BRES"]
+        self.json_message['msg_from'] = {"id": "6779kgh83-ed43-474b-ad1c-500f5287439a", "firstname": "Chandana", "surname": "Blanchet", "email": "cblanc@hotmail.co.uk", "telephone": "+443069990854", "status": "ACTIVE"}
+        with app.app_context():
+            g.user = User("01b51fcc-ed43-4cdb-ad1c-450f9986859b", 'respondent')
+            schema = DraftSchema()
+            errors = schema.load(self.json_message)[1]
+
+        self.assertTrue(errors == {'msg_from': ['You are not authorised to save a draft on behalf of user or work group 6779kgh83-ed43-474b-ad1c-500f5287439a']})
 
 
 if __name__ == '__main__':

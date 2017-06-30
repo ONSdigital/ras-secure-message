@@ -227,6 +227,7 @@ class DraftSchema(Schema):
         if thread_id is not None:
             self.validate_field_length(thread_id, len(thread_id), constants.MAX_THREAD_LEN)
 
+    @validates("survey")
     def validate_survey(self, survey):
         self.validate_field_length(survey, len(survey), constants.MAX_SURVEY_LEN)
 
@@ -242,11 +243,6 @@ class DraftSchema(Schema):
     @post_load
     def make_draft(self, data):
         return Message(**data)
-
-    @staticmethod
-    def validate_not_present(data, field_name):
-        if field_name in data.keys():
-            raise ValidationError("{0} can not be set.".format(field_name))
 
     @staticmethod
     def validate_field_length(field_name, length, max_field_len):
