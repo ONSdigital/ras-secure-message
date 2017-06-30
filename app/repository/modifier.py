@@ -102,7 +102,7 @@ class Modifier:
         Modifier.del_draft(draft_id, del_status=False)
         secure_message = SecureMessage(msg_id=draft_id, subject=draft.subject, body=draft.body,
                                        thread_id=draft.thread_id, collection_case=draft.collection_case,
-                                       ru_ref=draft.ru_ref, collection_exercise=draft.collection_exercise,
+                                       ru_id=draft.ru_id, collection_exercise=draft.collection_exercise,
                                        survey=draft.survey)
 
         try:

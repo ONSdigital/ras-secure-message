@@ -11,7 +11,7 @@ class Message:
 
     """Class to hold message attributes"""
     def __init__(self, msg_to, msg_from, subject, body, thread_id=None, msg_id='', collection_case='',
-                 survey='', ru_ref='', collection_exercise=''):
+                 survey='', ru_id='', collection_exercise=''):
 
 
         logger.debug("Message Class created {0}, {1}".format(subject, body))
@@ -22,12 +22,12 @@ class Message:
         self.body = body
         self.thread_id = self.msg_id if not thread_id else thread_id  # If empty thread_id then set to message id
         self.collection_case = collection_case
-        self.ru_ref = ru_ref
+        self.ru_id = ru_id
         self.collection_exercise = collection_exercise
         self.survey = survey
 
     def __repr__(self):
-        return '<Message(msg_id={self.msg_id} msg_to={self.msg_to} msg_from={self.msg_from} subject={self.subject} body={self.body} thread_id={self.thread_id} collection_case={self.collection_case} ru_ref={self.ru_ref} collection_exercise={self.collection_exercise} survey={self.survey})>'.format(self=self)
+        return '<Message(msg_id={self.msg_id} msg_to={self.msg_to} msg_from={self.msg_from} subject={self.subject} body={self.body} thread_id={self.thread_id} collection_case={self.collection_case} ru_id={self.ru_id} collection_exercise={self.collection_exercise} survey={self.survey})>'.format(self=self)
 
     def __eq__(self, other):
         if isinstance(other, Message):
@@ -46,7 +46,7 @@ class MessageSchema(Schema):
     subject = fields.Str(required=True)
     thread_id = fields.Str(allow_none=True)
     collection_case = fields.Str(allow_none=True)
-    ru_ref = fields.Str(required=True)
+    ru_id = fields.Str(required=True)
     survey = fields.Str(required=True)
     collection_exercise = fields.Str(allow_none=True)
 
@@ -110,9 +110,9 @@ class MessageSchema(Schema):
     def validate_survey(self, survey):
         self.validate_non_zero_field_length("Survey", len(survey), constants.MAX_SURVEY_LEN)
 
-    @validates("ru_ref")
-    def validate_ru_ref(self, ru_ref):
-        self.validate_non_zero_field_length("ru_ref", len(ru_ref), constants.MAX_REPORTING_UNIT_LEN)
+    @validates("ru_id")
+    def validate_ru_id(self, ru_id):
+        self.validate_non_zero_field_length("ru_id", len(ru_id), constants.MAX_RU_ID_LEN)
 
     @validates("collection_case")
     def validate_collection_case(self, collection_case):
@@ -155,7 +155,7 @@ class DraftSchema(Schema):
     subject = fields.Str(allow_none=True)
     thread_id = fields.Str(allow_none=True)
     collection_case = fields.Str(allow_none=True)
-    ru_ref = fields.Str(allow_none=True)
+    ru_id = fields.Str(allow_none=True)
     survey = fields.Str(required=True)
     collection_exercise = fields.Str(allow_none=True)
 
@@ -226,6 +226,10 @@ class DraftSchema(Schema):
     def validate_collection_exercise(self, collection_exercise):
         self.validate_field_length("collection_exercise", len(collection_exercise),
                                    constants.MAX_COLLECTION_EXERCISE_LEN)
+
+    @validates("ru_id")
+    def validate_ru_id(self, ru_id):
+        self.validate_field_length("ru_id", len(ru_id), constants.MAX_RU_ID_LEN)
 
     @post_load
     def make_draft(self, data):

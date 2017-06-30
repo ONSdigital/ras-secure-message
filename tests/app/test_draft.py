@@ -21,6 +21,7 @@ from app.resources.drafts import DraftModifyById
 from app.resources.drafts import DraftSave
 from app.validation.domain import DraftSchema
 from app.validation.user import User
+from app.constants import MAX_RU_ID_LEN
 
 
 class DraftTestCase(unittest.TestCase):
@@ -53,7 +54,7 @@ class DraftTestCase(unittest.TestCase):
                              'thread_id': '',
                              'collection_case': 'ACollectionCase',
                              'collection_exercise': 'ACollectionExercise',
-                             'ru_ref': '7fc0e8ab-189c-4794-b8f4-9f05a1db185b',
+                             'ru_id': '7fc0e8ab-189c-4794-b8f4-9f05a1db185b',
                              'survey': 'BRES'}
 
         with app.app_context():
@@ -115,17 +116,17 @@ class DraftTestCase(unittest.TestCase):
         response = self.app.post(self.url, data=json.dumps(self.test_message), headers=self.headers)
         self.assertEqual(response.status_code, 201)
 
-    def test_draft_empty_reporting_unit_field_returns_201(self):
+    def test_draft_empty_ru_id_field_returns_201(self):
         """Test draft can be saved without Reporting Unit field"""
 
-        self.test_message['reporting_unit'] = ''
+        self.test_message['ru_id'] = ''
         response = self.app.post(self.url, data=json.dumps(self.test_message), headers=self.headers)
         self.assertEqual(response.status_code, 201)
 
     def test_draft_empty_survey_field_returns_201(self):
         """Test draft can be saved without Survey field"""
 
-        self.test_message['reporting_unit'] = ''
+        self.test_message['ru_id'] = ''
         response = self.app.post(self.url, data=json.dumps(self.test_message), headers=self.headers)
         self.assertEqual(response.status_code, 201)
 
@@ -216,7 +217,7 @@ class DraftTestCase(unittest.TestCase):
                 'thread_id': '',
                 'collection_case': 'ACollectionCase',
                 'collection_exercise': 'ACollectionExercise',
-                'ru_ref': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc',
+                'ru_id': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc',
                 'survey': 'BRES'
             }
         )
@@ -231,7 +232,7 @@ class DraftTestCase(unittest.TestCase):
         with self.engine.connect() as con:
             msg_id = str(uuid.uuid4())
             query = 'INSERT INTO secure_message(msg_id, subject, body, thread_id,' \
-                    ' collection_case, ru_ref, survey) VALUES ("{0}", "test","test","", ' \
+                    ' collection_case, ru_id, survey) VALUES ("{0}", "test","test","", ' \
                     ' "ACollectionCase", "f1a5e99c-8edf-489a-9c72-6cabe6c387fc", "ACollectionExercise"' \
                     '"BRES")'.format(msg_id)
             con.execute(query)
@@ -267,12 +268,11 @@ class DraftTestCase(unittest.TestCase):
             'thread_id': '',
             'collection_case': 'ACollectionCase',
             'collection_exercise': 'ACollectionExercise',
-            'ru_ref': '7fc0e8ab-189c-4794-b8f4-9f05a1db185b',
+            'ru_id': '7fc0e8ab-189c-4794-b8f4-9f05a1db185b',
             'survey': 'BRES',
             '_links': '',
             'labels': ['DRAFT']
         }
-
 
         etag = utilities.generate_etag(message['msg_to'],message['msg_id'], message['subject'],message['body'])
 
@@ -290,7 +290,7 @@ class DraftTestCase(unittest.TestCase):
             'thread_id': '',
             'collection_case': 'ACollectionCase',
             'collection_exercise': 'ACollectionExercise',
-            'ru_ref': '7fc0e8ab-189c-4794-b8f4-9f05a1db185b',
+            'ru_id': '7fc0e8ab-189c-4794-b8f4-9f05a1db185b',
             'survey': 'BRES',
             '_links': '',
             'labels': ['DRAFT']
@@ -311,7 +311,7 @@ class DraftTestCase(unittest.TestCase):
             'thread_id': '',
             'collection_case': 'ACollectionCase',
             'collection_exercise': 'ACollectionExercise',
-            'ru_ref': '7fc0e8ab-189c-4794-b8f4-9f05a1db185b',
+            'ru_id': '7fc0e8ab-189c-4794-b8f4-9f05a1db185b',
             'survey': 'BRES',
             '_links': '',
             'labels': ['DRAFT']
@@ -332,7 +332,7 @@ class DraftTestCase(unittest.TestCase):
             'thread_id': '',
             'collection_case': 'ACollectionCase',
             'collection_exercise': 'ACollectionExercise',
-            'ru_ref': '7fc0e8ab-189c-4794-b8f4-9f05a1db185b',
+            'ru_id': '7fc0e8ab-189c-4794-b8f4-9f05a1db185b',
             'survey': 'BRES',
             '_links': '',
             'labels': ['DRAFT']
@@ -353,7 +353,7 @@ class DraftTestCase(unittest.TestCase):
             'thread_id': '',
             'collection_case': 'ACollectionCase',
             'collection_exercise': 'ACollectionExercise',
-            'ru_ref': '7fc0e8ab-189c-4794-b8f4-9f05a1db185b',
+            'ru_id': '7fc0e8ab-189c-4794-b8f4-9f05a1db185b',
             'survey': 'BRES',
             '_links': '',
             'labels': ['DRAFT']
@@ -450,3 +450,13 @@ class DraftTestCase(unittest.TestCase):
             errors = schema.load(self.test_message)[1]
 
         self.assertTrue(errors == {'_schema': ["'msg_from' is missing an 'id' or incorrect format"]})
+
+    def test_ru_id_field_too_long_causes_error(self):
+        """marshalling message with ru_id field too long"""
+        self.test_message['ru_id'] = "x" * (MAX_RU_ID_LEN + 1)
+        expected_error = 'ru_id field length must not be greater than {0}.'.format(MAX_RU_ID_LEN)
+        with app.app_context():
+            g.user = User(self.test_message['msg_from'], 'respondent')
+            schema = DraftSchema()
+            sut = schema.load(self.test_message)
+        self.assertTrue(expected_error in sut.errors['ru_id'])

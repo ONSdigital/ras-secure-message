@@ -48,7 +48,7 @@ def step_impl_valid_draft(context):
                  'body': 'Test',
                  'thread_id': '',
                  'collection_case': 'collection case1',
-                 'reporting_unit': 'reporting case1',
+                 'ru_id': 'reporting case1',
                  'business_name': 'ABusiness',
                  'collection_exercise': 'collection exercise1',
                  'survey': 'survey'})
@@ -63,7 +63,7 @@ def step_impl_draft_with_empty_body(context):
                  'body': '',
                  'thread_id': '',
                  'collection_case': 'collection case1',
-                 'reporting_unit': 'reporting case1',
+                 'ru_id': 'reporting case1',
                  'business_name': 'ABusiness',
                  'collection_exercise': 'collection exercise1',
                  'survey': 'survey'})
@@ -79,7 +79,7 @@ def step_impl_draft_with_msg_id(context):
                  'body': 'Test',
                  'thread_id': '',
                  'collection_case': 'collection case1',
-                 'reporting_unit': 'reporting case1',
+                 'ru_id': 'reporting case1',
                  'business_name': 'ABusiness',
                  'collection_exercise': 'collection exercise1',
                  'survey': 'survey'})
@@ -94,7 +94,7 @@ def step_impl_draft_with_to_field_too_large(context):
                  'body': 'Test',
                  'thread_id': '',
                  'collection_case': 'collection case1',
-                 'reporting_unit': 'reporting case1',
+                 'ru_id': 'reporting case1',
                  'business_name': 'ABusiness',
                  'collection_exercise': 'collection exercise1',
                  'survey': 'survey'})
@@ -109,7 +109,7 @@ def step_impl_draft_with_from_field_too_large(context):
                  'body': 'Test',
                  'thread_id': '',
                  'collection_case': 'collection case1',
-                 'reporting_unit': 'reporting case1',
+                 'ru_id': 'reporting case1',
                  'business_name': 'ABusiness',
                  'collection_exercise': 'collection exercise1',
                  'survey': 'survey'})
@@ -124,7 +124,7 @@ def step_impl_draft_with_body_field_too_large(context):
                  'body': 'x' * (constants.MAX_BODY_LEN+1),
                  'thread_id': '',
                  'collection_case': 'collection case1',
-                 'reporting_unit': 'reporting case1',
+                 'ru_id': 'reporting case1',
                  'business_name': 'ABusiness',
                  'collection_exercise': 'collection exercise1',
                  'survey': 'survey'})
@@ -139,7 +139,7 @@ def step_impl_draft_with_subject_field_too_large(context):
                  'body': 'Test',
                  'thread_id': '',
                  'collection_case': 'collection case1',
-                 'reporting_unit': 'reporting case1',
+                 'ru_id': 'reporting case1',
                  'business_name': 'ABusiness',
                  'collection_exercise': 'collection exercise1',
                  'survey': 'survey'})
@@ -154,7 +154,7 @@ def step_impl_draft_with_empty_from_field(context):
                  'body': 'Test',
                  'thread_id': '',
                  'collection_case': 'collection case1',
-                 'reporting_unit': 'reporting case1',
+                 'ru_id': 'reporting case1',
                  'business_name': 'ABusiness',
                  'collection_exercise': 'collection exercise1',
                  'survey': 'survey'})
@@ -169,7 +169,7 @@ def step_impl_draft_with_empty_survey_field(context):
                  'body': 'Test',
                  'thread_id': '',
                  'collection_case': 'collection case1',
-                 'reporting_unit': 'reporting case1',
+                 'ru_id': 'reporting case1',
                  'business_name': 'ABusiness',
                  'collection_exercise': 'collection exercise1',
                  'survey': ''})
@@ -184,7 +184,7 @@ def step_impl_draft_with_collection_case_field_too_large(context):
                  'body': 'Test',
                  'thread_id': '',
                  'collection_case': 'x' * (constants.MAX_COLLECTION_CASE_LEN+1),
-                 'reporting_unit': 'reporting case1',
+                 'ru_id': 'reporting case1',
                  'business_name': 'ABusiness',
                  'collection_exercise': 'collection exercise1',
                  'survey': 'survey'})
@@ -199,7 +199,7 @@ def step_impl_draft_with_collection_exercise_field_too_large(context):
                  'body': 'Test',
                  'thread_id': '',
                  'collection_case': 'collection case1',
-                 'reporting_unit': 'reporting case1',
+                 'ru_id': 'reporting case1',
                  'business_name': 'ABusiness',
                  'collection_exercise': 'x' * (constants.MAX_COLLECTION_EXERCISE_LEN+1),
                  'survey': 'survey'})
@@ -214,7 +214,7 @@ def step_impl_user_creates_valid_draft(context):
                      'body': 'Test',
                      'thread_id': '',
                      'collection_case': 'collection case1',
-                     'reporting_unit': 'reporting case1',
+                     'ru_id': 'reporting case1',
                      'business_name': 'ABusiness',
                      'collection_exercise': 'collection exercise1',
                      'survey': 'RSI'}
@@ -240,7 +240,7 @@ def step_impl_draft_message_withour_thread_id(context):
                  'subject': 'test',
                  'body': 'Test',
                  'collection_case': 'collection case1',
-                 'reporting_unit': 'reporting case1',
+                 'ru_id': 'reporting case1',
                  'business_name': 'ABusiness',
                  'collection_exercise': 'collection exercise1',
                  'survey': 'survey'})

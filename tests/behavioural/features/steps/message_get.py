@@ -26,7 +26,7 @@ data = {'msg_to': 'test',
         'thread_id': '',
         'collection_case': 'collection case1',
         'collection_exercise': 'collection exercise1',
-        'ru_ref': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc',
+        'ru_id': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc',
         'survey': 'BRES'}
 
 
@@ -93,10 +93,10 @@ def step_impl_correct_subject_returned(context):
     nose.tools.assert_equal(msg_resp['subject'], data['subject'])
 
 
-@then("returned message field RU_Ref is correct")
-def step_impl_correct_reporting_unit_returned(context):
+@then("returned message field RU_id is correct")
+def step_impl_correct_ru_id_returned(context):
     msg_resp = json.loads(context.response.data)
-    nose.tools.assert_equal(msg_resp['ru_ref'], 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc')
+    nose.tools.assert_equal(msg_resp['ru_id'], 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc')
 
 
 @then("returned message field CollectionCase is correct")
@@ -191,7 +191,7 @@ def step_impl_draft_message_can_be_retrieved(context):
                  'thread_id': '',
                  'collection_case': 'collection case1',
                  'collection_exercise': 'collection exercise1',
-                 'ru_ref': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc',
+                 'ru_id': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc',
                  'survey': 'BRES'})
     response = app.test_client().post("http://localhost:5050/draft/save", data=json.dumps(data),
                                       headers=headers)

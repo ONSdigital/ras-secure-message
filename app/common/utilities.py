@@ -15,7 +15,7 @@ def get_options(args):
     string_query_args = '?'
     page = 1
     limit = MESSAGE_QUERY_LIMIT
-    ru_ref = None
+    ru_id = None
     survey = None
     cc = None
     label = None
@@ -28,9 +28,9 @@ def get_options(args):
     if args.get('page'):
         page = int(args.get('page'))
 
-    if args.get('ru_ref'):
-        string_query_args = add_string_query_args(string_query_args, 'ru_ref', args.get('ru_ref'))
-        ru_ref = str(args.get('ru_ref'))
+    if args.get('ru_id'):
+        string_query_args = add_string_query_args(string_query_args, 'ru_id', args.get('ru_id'))
+        ru_id = str(args.get('ru_id'))
     if args.get('survey'):
         survey = str(args.get('survey'))
         string_query_args = add_string_query_args(string_query_args, 'survey', args.get('survey'))
@@ -47,7 +47,7 @@ def get_options(args):
         desc = False if args.get('desc') == 'false' else True
         string_query_args = add_string_query_args(string_query_args, 'desc', args.get('desc'))
 
-    return string_query_args, page, limit, ru_ref, survey, cc, label, desc, ce
+    return string_query_args, page, limit, ru_id, survey, cc, label, desc, ce
 
 
 def add_string_query_args(string_query_args, arg, val):
@@ -168,11 +168,11 @@ def add_business_details(messages):
     ru_list = []
 
     for message in messages:
-        if message['ru_ref'] not in ru_list:
-            ru_list.append(message['ru_ref'])
+        if message['ru_id'] not in ru_list:
+            ru_list.append(message['ru_id'])
 
     business_details = get_business_details_by_ru(ru_list)
 
     for message in messages:
-        message['@ru_ref'] = next((business for business in business_details if business["ru_ref"] == message['ru_ref']), None)
+        message['@ru_id'] = next((business for business in business_details if business["ru_id"] == message['ru_id']), None)
     return messages

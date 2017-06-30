@@ -52,7 +52,7 @@ class PartyTestCase(unittest.TestCase):
                 'subject': 'MyMessage',
                 'body': 'hello',
                 'thread': "?",
-                'ru_ref': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc',
+                'ru_id': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc',
                 'survey': "BRES"}
 
         self.headers = {'Content-Type': 'application/json', 'Authorization': "eyJhbGciOiJSU0EtT0FFUCIsImVuYyI6IkEyNTZHQ00ifQ.XMrQ2QMNcoWqv6Pm4KGPZRPAHMSNuCRrmdp-glDvf_9gDzYDoXkxbZEBqy6_pdMTIFINUWUABYa7PdLLuJh5uoU9L7lmvJKEYCq0e5rS076KLRc5pFKHJesgJLNijj7scLke3y4INkd0px82SHhnbek0bGLeu3i8FgRt4vD0Eu8TWODM7kEfAT_eRmvPBM1boyOqrpyhYgE9p0_NklwloFXdYZKjTvHxlHtbiuYmvXSTFkbbp_t8T1xZmDrfgS2EDWTFEagzyKBFFAH4Z5QRUUJPiuAxI3lSNS2atFFtDWiZRhuuhRyJzNA4vqTpmFPUE6h_iggkcbiUPofSBx3CUw.QK4lX7z2vN6jryJz.G9C1zoAvWHfAJywiuijq6E78xCMZ5NOAZD1g3e6PTWhveQKNecBJAPgXyRDVgljgIwSq_vBY2AVTIE5xWapwF3oLZyiC0T0H2LrjlpKFUa51-VU_-Yj8u4ax0iLvyWyRRepQneYJ0riF4zbmcGf1vCCEO3WOwcD5wXBFVXVH6wPqExmI2tjWWLdz2F7oK1Wnh1pbQX_EW5rYb2I4mPuc2J6ijXAr73qcJLAzJbjDo1uk.QrPCckVYuNlcWeCwQmws9A"}
@@ -79,7 +79,7 @@ class PartyTestCase(unittest.TestCase):
                 'subject': 'MyMessage',
                 'body': 'hello',
                 'thread': "?",
-                'ru_ref': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc',
+                'ru_id': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc',
                 'survey': "BRES"}
 
         self.app = application.app.test_client()
@@ -107,7 +107,7 @@ class PartyTestCase(unittest.TestCase):
                 'subject': 'MyMessage',
                 'body': 'hello',
                 'thread': "?",
-                'ru_ref': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc',
+                'ru_id': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc',
                 'survey': "BRES"}
 
         self.app = application.app.test_client()
@@ -134,7 +134,7 @@ class PartyTestCase(unittest.TestCase):
                 'subject': 'MyMessage',
                 'body': 'hello',
                 'thread': "?",
-                'ru_ref': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc',
+                'ru_id': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc',
                 'survey': "BRES"}
 
         self.app = application.app.test_client()
@@ -157,13 +157,13 @@ class PartyTestCase(unittest.TestCase):
             self.assertEqual(draft['msg_to'][0], {"id": "BRES", "firstname": "BRES", "surname": "", "email": "", "telephone": "", "status": ""})
 
     def test_get_business_details_by_ru(self):
-        """Test get details for one business using ru_ref"""
+        """Test get details for one business using ru_id"""
 
         list_ru = ['f1a5e99c-8edf-489a-9c72-6cabe6c387fc']
 
         business_details = get_business_details_by_ru(list_ru)
 
-        self.assertEqual(business_details[0]['ru_ref'], list_ru[0])
+        self.assertEqual(business_details[0]['ru_id'], list_ru[0])
         self.assertEqual(business_details[0]['business_name'], "Apple")
 
     def test_get_business_details_multiple_ru(self):
@@ -173,9 +173,9 @@ class PartyTestCase(unittest.TestCase):
 
         business_details = get_business_details_by_ru(list_ru)
 
-        self.assertEqual(business_details[0]['ru_ref'], list_ru[0])
-        self.assertEqual(business_details[1]['ru_ref'], list_ru[1])
-        self.assertEqual(business_details[2]['ru_ref'], list_ru[2])
+        self.assertEqual(business_details[0]['ru_id'], list_ru[0])
+        self.assertEqual(business_details[1]['ru_id'], list_ru[1])
+        self.assertEqual(business_details[2]['ru_id'], list_ru[2])
 
     def test_get_message_returns_business_details(self):
         """Test get message by id returns business details"""
@@ -185,7 +185,7 @@ class PartyTestCase(unittest.TestCase):
                 'subject': 'MyMessage',
                 'body': 'hello',
                 'thread': "?",
-                'ru_ref': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc',
+                'ru_id': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc',
                 'survey': "BRES"}
 
         self.app = application.app.test_client()
@@ -203,7 +203,7 @@ class PartyTestCase(unittest.TestCase):
         message_get = self.app.get("http://localhost:5050/message/{}".format(msg_id), headers=self.headers)
         message = json.loads(message_get.data)
 
-        self.assertEqual(message['@ru_ref']['business_name'], "Apple")
+        self.assertEqual(message['@ru_id']['business_name'], "Apple")
 
     def test_get_messages_returns_business_details(self):
         """Test get all messages returns business details"""
@@ -213,7 +213,7 @@ class PartyTestCase(unittest.TestCase):
                 'subject': 'MyMessage',
                 'body': 'hello',
                 'thread': "?",
-                'ru_ref': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc',
+                'ru_id': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc',
                 'survey': "BRES"}
 
         self.app = application.app.test_client()
@@ -232,7 +232,7 @@ class PartyTestCase(unittest.TestCase):
         messages = get_return['messages']
 
         for message in messages:
-            self.assertEqual(message['@ru_ref']['business_name'], "Apple")
+            self.assertEqual(message['@ru_id']['business_name'], "Apple")
 
     def test_get_draft_returns_business_details(self):
         """Test get draft returns business details"""
@@ -242,7 +242,7 @@ class PartyTestCase(unittest.TestCase):
                 'subject': 'MyMessage',
                 'body': 'hello',
                 'thread': "?",
-                'ru_ref': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc',
+                'ru_id': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc',
                 'survey': "BRES"}
 
         self.app = application.app.test_client()
@@ -260,7 +260,7 @@ class PartyTestCase(unittest.TestCase):
         message_get = self.app.get("http://localhost:5050/draft/{}".format(draft_id), headers=self.headers)
         message = json.loads(message_get.data)
 
-        self.assertEqual(message['@ru_ref']['business_name'], "Apple")
+        self.assertEqual(message['@ru_id']['business_name'], "Apple")
 
     def test_get_drafts_returns_business_details(self):
         """Test get all drafts includes business details"""
@@ -270,7 +270,7 @@ class PartyTestCase(unittest.TestCase):
                 'subject': 'MyMessage',
                 'body': 'hello',
                 'thread': "?",
-                'ru_ref': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc',
+                'ru_id': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc',
                 'survey': "BRES"}
 
         self.app = application.app.test_client()
@@ -289,7 +289,7 @@ class PartyTestCase(unittest.TestCase):
         drafts = drafts_data['messages']
 
         for draft in drafts:
-            self.assertEqual(draft['@ru_ref']['business_name'], "Apple")
+            self.assertEqual(draft['@ru_id']['business_name'], "Apple")
 
 
 if __name__ == '__main__':

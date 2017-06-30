@@ -89,11 +89,11 @@ class DraftById(Resource):
     def get_business_details(draft):
         """Get business details for ru"""
 
-        ru = [draft['ru_ref']]
+        ru = [draft['ru_id']]
         business_details = get_business_details_by_ru(ru)
         for business in business_details:
-            if draft['ru_ref'] == business['ru_ref']:
-                draft['@ru_ref'] = business
+            if draft['ru_id'] == business['ru_id']:
+                draft['@ru_id'] = business
         return draft
 
 
@@ -104,7 +104,7 @@ class DraftList(Resource):
     def get():
         """Get message list with options"""
 
-        string_query_args, page, limit, ru_ref, survey, cc, label, desc, ce = get_options(request.args)
+        string_query_args, page, limit, ru_id, survey, cc, label, desc, ce = get_options(request.args)
 
         message_service = Retriever()
         status, result = message_service.retrieve_message_list(page, limit, g.user, label=Labels.DRAFT.value)

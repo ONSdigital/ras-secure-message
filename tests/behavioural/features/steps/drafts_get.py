@@ -23,7 +23,7 @@ data = {'msg_to': 'BRES',
         'thread_id': '',
         'collection_case': 'collectioncase',
         'collection_exercise': 'collectionexercise',
-        'ru_ref': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc',
+        'ru_id': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc',
         'survey': 'BRES'}
 
 
@@ -49,7 +49,7 @@ def step_impl_user_has_created__and_saved_multiple_drafts(context):
                  'thread_id': '',
                  'collection_case': 'collection case1',
                  'collection_exercise': 'collection exercise1',
-                 'ru_ref': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc',
+                 'ru_id': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc',
                  'survey': 'BRES'})
 
     for _ in range(0, 10):
