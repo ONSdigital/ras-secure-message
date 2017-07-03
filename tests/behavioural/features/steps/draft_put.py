@@ -14,7 +14,6 @@ token_data = {
         }
 headers = {'Content-Type': 'application/json', 'Authorization': ''}
 
-
 post_data = {'msg_to': 'ce12b958-2a5f-44f4-a6da-861e59070a31',
              'msg_from': '0a7ad740-10d5-4ecb-b7ca-3c0384afb882',
              'subject': 'test',
@@ -34,6 +33,7 @@ data = {'msg_to': 'ce12b958-2a5f-44f4-a6da-861e59070a31',
         'collection_exercise': 'collection exercise1',
         'ru_id': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc',
         'survey': 'BRES'}
+
 
 with app.app_context():
     database.db.init_app(current_app)
