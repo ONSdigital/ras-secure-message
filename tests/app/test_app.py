@@ -287,7 +287,7 @@ class FlaskTestCase(unittest.TestCase):
         """Test whether a draft created by a respondent is returned to an internal user"""
 
         self.test_message.update({
-            'msg_to': 'ce12b958-2a5f-44f4-a6da-861e59070a31',
+            'msg_to': ['ce12b958-2a5f-44f4-a6da-861e59070a31'],
             'msg_from': '0a7ad740-10d5-4ecb-b7ca-3c0384afb882',
             'subject': 'MyMessage',
             'body': 'hello',

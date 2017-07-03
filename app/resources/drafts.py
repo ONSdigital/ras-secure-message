@@ -79,9 +79,9 @@ class DraftById(Resource):
         user_details = get_details_by_uuids(uuids)
         for user in user_details:
             if draft['msg_from'] == user['id']:
-                draft['msg_from'] = user
+                draft['@msg_from'] = user
             if draft['msg_to'][0] == user['id']:
-                draft['msg_to'] = [user]
+                draft['@msg_to'] = [user]
         draft = DraftById.get_business_details(draft)
         return draft
 
