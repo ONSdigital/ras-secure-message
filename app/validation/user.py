@@ -1,3 +1,5 @@
+from app import mocked_party
+
 
 class User:
     """Determines whether the user is internal or external"""
@@ -16,3 +18,13 @@ class User:
     @property
     def is_respondent(self):
         return bool(self.role == 'respondent')
+
+    @staticmethod
+    def is_valid_user(uuid):
+
+        response = mocked_party.user_details_endpoint(uuid)
+
+        if response.status_code == 200:
+            return True
+        else:
+            return False

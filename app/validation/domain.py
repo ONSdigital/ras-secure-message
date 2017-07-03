@@ -3,6 +3,7 @@ import logging
 from app import constants
 import uuid
 from flask import g
+from app.validation.user import User
 
 logger = logging.getLogger(__name__)
 
@@ -10,13 +11,13 @@ logger = logging.getLogger(__name__)
 class Message:
 
     """Class to hold message attributes"""
-    def __init__(self, msg_to, msg_from, subject, body, thread_id=None, msg_id='', collection_case='',
-                 survey='', ru_id='', collection_exercise=''):
 
+    def __init__(self, msg_from, subject, body, msg_to='', thread_id=None, msg_id='', collection_case='',
+                 survey='', ru_id='', collection_exercise=''):
 
         logger.debug("Message Class created {0}, {1}".format(subject, body))
         self.msg_id = str(uuid.uuid4()) if len(msg_id) == 0 else msg_id  # If empty msg_id assign to a uuid
-        self.msg_to = msg_to
+        self.msg_to = None if len(msg_to) == 0 else msg_to
         self.msg_from = msg_from
         self.subject = subject
         self.body = body
@@ -82,6 +83,8 @@ class MessageSchema(Schema):
     @validates('msg_to')
     def validate_to(self, msg_to):
         self.validate_non_zero_field_length("msg_to", len(msg_to), constants.MAX_TO_LEN)
+        if msg_to != 'BRES' and not User.is_valid_user(msg_to):
+            raise ValidationError("{0} is not a valid user.".format(msg_to))
 
     @validates('msg_from')
     def validate_from(self, msg_from):
@@ -171,13 +174,16 @@ class DraftSchema(Schema):
     @pre_load
     def check_format_of_msg_to_and_msg_from(self, data):
 
-        if data.get('msg_to') and isinstance(data.get('msg_to'), list) and "id" in data.get('msg_to')[0]:
-            data['msg_to'] = data['msg_to'][0]['id']
-        elif data.get('msg_to') and isinstance(data.get('msg_to'), list) and len(data.get('msg_to')) >= 1:
+        if data.get('msg_to') and isinstance(data.get('msg_to'), list) and len(data.get('msg_to')) > 0\
+                and isinstance(data.get('msg_to')[0], dict) and "id" in data.get('msg_to')[0].keys():
+                data['msg_to'] = data['msg_to'][0]['id']
+        elif 'msg_to' in data.keys() and isinstance(data.get('msg_to'), list) and len(data.get('msg_to')) > 0:
             if isinstance(data.get('msg_to')[0], str):
                 data['msg_to'] = data.get('msg_to')[0]
             else:
                 raise ValidationError("'msg_to' is missing an 'id' or incorrect format")
+        elif 'msg_to' in data.keys() and isinstance(data.get('msg_to'), list) and len(data.get('msg_to')) == 0:
+            data.pop('msg_to')
 
         if data.get('msg_from') and not isinstance(data.get('msg_from'), str) and "id" in data.get('msg_from'):
             data['msg_from'] = data['msg_from']['id']
@@ -195,10 +201,18 @@ class DraftSchema(Schema):
     def validate_to(self, msg_to):
         if msg_to is not None:
             self.validate_field_length(msg_to, len(msg_to), constants.MAX_TO_LEN)
+            if len(msg_to) > 0 and msg_to != 'BRES' and not User.is_valid_user(msg_to):
+                raise ValidationError("{0} is not a valid user.".format(msg_to))
 
     @validates("msg_from")
     def validate_from(self, msg_from):
         self.validate_field_length(msg_from, len(msg_from), constants.MAX_FROM_LEN)
+        if g.user.is_internal and msg_from != 'BRES':
+            raise ValidationError('You are not authorised to save a draft on behalf of user or work group {0}'
+                                  .format(msg_from))
+        if g.user.is_respondent and msg_from != g.user.user_uuid:
+            raise ValidationError('You are not authorised to save a draft on behalf of user or work group {0}'
+                                  .format(msg_from))
 
     @validates("body")
     def validate_body(self, body):
@@ -215,6 +229,7 @@ class DraftSchema(Schema):
         if thread_id is not None:
             self.validate_field_length(thread_id, len(thread_id), constants.MAX_THREAD_LEN)
 
+    @validates("survey")
     def validate_survey(self, survey):
         self.validate_field_length(survey, len(survey), constants.MAX_SURVEY_LEN)
 
@@ -234,11 +249,6 @@ class DraftSchema(Schema):
     @post_load
     def make_draft(self, data):
         return Message(**data)
-
-    @staticmethod
-    def validate_not_present(data, field_name):
-        if field_name in data.keys():
-            raise ValidationError("{0} can not be set.".format(field_name))
 
     @staticmethod
     def validate_field_length(field_name, length, max_field_len):
