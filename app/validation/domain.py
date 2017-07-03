@@ -11,12 +11,12 @@ logger = logging.getLogger(__name__)
 class Message:
 
     """Class to hold message attributes"""
-    def __init__(self, msg_from, subject, body, msg_to=None, thread_id=None, msg_id='', collection_case='',
+    def __init__(self, msg_from, subject, body, msg_to='', thread_id=None, msg_id='', collection_case='',
                  survey='', ru_ref='', collection_exercise=''):
 
         logger.debug("Message Class created {0}, {1}".format(subject, body))
         self.msg_id = str(uuid.uuid4()) if len(msg_id) == 0 else msg_id  # If empty msg_id assign to a uuid
-        self.msg_to = msg_to
+        self.msg_to = None if len(msg_to) == 0 else msg_to
         self.msg_from = msg_from
         self.subject = subject
         self.body = body
@@ -199,7 +199,7 @@ class DraftSchema(Schema):
     def validate_to(self, msg_to):
         if msg_to is not None:
             self.validate_field_length(msg_to, len(msg_to), constants.MAX_TO_LEN)
-            if msg_to != 'BRES' and not User.is_valid_user(msg_to):
+            if len(msg_to) > 0 and msg_to != 'BRES' and not User.is_valid_user(msg_to):
                 raise ValidationError("{0} is not a valid user.".format(msg_to))
 
     @validates("msg_from")
