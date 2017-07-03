@@ -79,12 +79,12 @@ class DraftTestCase(unittest.TestCase):
         saver.save_message.assert_called_with(draft.data)
         saver.save_msg_status.assert_called_with(draft.data.msg_from, draft.data.msg_id, Labels.DRAFT.value)
 
-    # def test_draft_empty_to_field_returns_201(self):
-    #     """Test draft can be saved without To field"""
-    #
-    #     self.test_message['msg_to'] = ''
-    #     response = self.app.post(self.url, data=json.dumps(self.test_message), headers=self.headers)
-    #     self.assertEqual(response.status_code, 201)
+    def test_draft_empty_to_field_returns_201(self):
+        """Test draft can be saved without To field"""
+
+        self.test_message['msg_to'] = ''
+        response = self.app.post(self.url, data=json.dumps(self.test_message), headers=self.headers)
+        self.assertEqual(response.status_code, 201)
 
     def test_draft_empty_subject_field_returns_201(self):
         """Test draft can be saved without Subject field"""
