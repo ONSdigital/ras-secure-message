@@ -300,6 +300,17 @@ class MessageSchemaTestCase(unittest.TestCase):
 
         self.assertTrue(errors == {'msg_from': ['You are not authorised to save a draft on behalf of user or work group 6779kgh83-ed43-474b-ad1c-500f5287439a']})
 
+    def test_msg_to_validation_invalid_user(self):
+        """marshalling message where msg_to field is a invalid user"""
+        self.json_message['msg_to'] = ["NotAValidUser"]
+        self.json_message['msg_from'] = {"id": "01b51fcc-ed43-4cdb-ad1c-450f9986859b", "firstname": "Chandana", "surname": "Blanchet", "email": "cblanc@hotmail.co.uk", "telephone": "+443069990854", "status": "ACTIVE"}
+        with app.app_context():
+            g.user = User("01b51fcc-ed43-4cdb-ad1c-450f9986859b", 'respondent')
+            schema = DraftSchema()
+            errors = schema.load(self.json_message)[1]
+
+        self.assertTrue(errors == {'msg_to': ['NotAValidUser is not a valid user.']})
+
 
 if __name__ == '__main__':
     unittest.main()
