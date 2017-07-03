@@ -113,8 +113,7 @@ class MessageSchemaTestCase(unittest.TestCase):
 
     def test_missing_body_fails_validation(self):
         """marshalling message with no body field """
-        message = {'msg_to': '01b51fcc-ed43-4cdb-ad1c-450f9986859b', 'msg_from': 'torrance', 'body': '', 'survey': 'RSI', 'subject': 'MyMessage', 'ru_ref': '7fc0e8ab-189c-4794-b8f4-9f05a1db185b'}
-
+        message = {'msg_to': '01b51fcc-ed43-4cdb-ad1c-450f9986859b', 'msg_from': 'torrance', 'body': '', 'survey': 'RSI', 'subject': 'MyMessage', 'ru_id': '7fc0e8ab-189c-4794-b8f4-9f05a1db185b'}
 
         with app.app_context():
             g.user = User(message['msg_from'], 'respondent')

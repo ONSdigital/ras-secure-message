@@ -12,7 +12,7 @@ class Message:
 
     """Class to hold message attributes"""
 
-    def __init__(self, msg_from, subject, body, msg_to=None, thread_id=None, msg_id='', collection_case='',
+    def __init__(self, msg_from, subject, body, msg_to='', thread_id=None, msg_id='', collection_case='',
                  survey='', ru_id='', collection_exercise=''):
 
         logger.debug("Message Class created {0}, {1}".format(subject, body))

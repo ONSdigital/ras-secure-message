@@ -59,7 +59,7 @@ def before_scenario(context):
                  'thread_id': '2',
                  'collection_case': 'collection case1',
                  'collection_exercise': 'collection exercise1',
-                 'ru_ref': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc',
+                 'ru_id': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc',
                  'survey': 'BRES'})
 
     data.update({'msg_to': 'BRES',
@@ -69,7 +69,7 @@ def before_scenario(context):
             'thread_id': '2',
             'collection_case': 'collection case1',
             'collection_exercise': 'collection exercise1',
-            'ru_ref': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc',
+            'ru_id': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc',
             'survey': 'BRES'})
 
 
