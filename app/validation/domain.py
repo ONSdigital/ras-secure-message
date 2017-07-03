@@ -173,9 +173,10 @@ class DraftSchema(Schema):
     @pre_load
     def check_format_of_msg_to_and_msg_from(self, data):
 
-        if data.get('msg_to') and isinstance(data.get('msg_to'), list) and "id" in data.get('msg_to')[0]:
-            data['msg_to'] = data['msg_to'][0]['id']
-        elif data.get('msg_to') and isinstance(data.get('msg_to'), list) and len(data.get('msg_to')) > 0:
+        if data.get('msg_to') and isinstance(data.get('msg_to'), list) and len(data.get('msg_to')) > 0\
+                and isinstance(data.get('msg_to')[0], dict) and "id" in data.get('msg_to')[0].keys():
+                data['msg_to'] = data['msg_to'][0]['id']
+        elif 'msg_to' in data.keys() and isinstance(data.get('msg_to'), list) and len(data.get('msg_to')) > 0:
             if isinstance(data.get('msg_to')[0], str):
                 data['msg_to'] = data.get('msg_to')[0]
             else:
