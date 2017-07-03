@@ -12,7 +12,7 @@ Feature: Message get by ID Endpoint
     |msg_from |
     |body    |
     |subject |
-    |RU_Ref   |
+    |RU_id   |
     |CollectionCase  |
     |CollectionExercise  |
 
@@ -35,7 +35,7 @@ Feature: Message get by ID Endpoint
     |msg_from |
     |body    |
     |subject |
-    |RU_Ref   |
+    |RU_id   |
     |CollectionCase  |
     |CollectionExercise  |
 

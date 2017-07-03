@@ -7,8 +7,8 @@ MAX_SUBJECT_LEN = 1000            # Maximum length of the subject field in a mes
 MAX_THREAD_LEN = 60               # Maximum size of a thread_id UUID in a message
 MAX_MSG_ID_LEN = 60               # Maximum size of a message UUID in a message
 MAX_COLLECTION_CASE_LEN = 60      # Maximum size of the message collection case identifier
-MAX_REPORTING_UNIT_LEN = 60       # Maximum size of the message reporting_unit identifier
-MAX_BUSINESS_NAME_LEN = 60        # Maximum size of the message reporting_unit identifier
+MAX_RU_ID_LEN = 60                # Maximum size of the message ru_id identifier
+MAX_BUSINESS_NAME_LEN = 60        # Maximum size of the message business name identifier
 MAX_SURVEY_LEN = 60      # Maximum size of the message collection instrument identifier
 MAX_COLLECTION_EXERCISE_LEN = 60  # Maximum size of the message collection exercise identifier
 

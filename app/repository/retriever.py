@@ -14,7 +14,7 @@ logger = wrap_logger(logging.getLogger(__name__))
 class Retriever:
     """Created when retrieving messages"""
     @staticmethod
-    def retrieve_message_list(page, limit, user, ru_ref=None, survey=None, cc=None, ce=None, label=None,
+    def retrieve_message_list(page, limit, user, ru_id=None, survey=None, cc=None, ce=None, label=None,
                               descend=True):
         """returns list of messages from db"""
         conditions = []
@@ -33,8 +33,8 @@ class Retriever:
         else:
             status_conditions.append(Status.label != Labels.DRAFT_INBOX.value)
 
-        if ru_ref is not None:
-            conditions.append(SecureMessage.ru_ref == str(ru_ref))
+        if ru_id is not None:
+            conditions.append(SecureMessage.ru_id == str(ru_id))
 
         if survey is not None:
             conditions.append(SecureMessage.survey == str(survey))
@@ -81,7 +81,6 @@ class Retriever:
             status_conditions.append(Status.actor == 'BRES')
 
         status_conditions.append(Status.label != Labels.DRAFT_INBOX.value)
-
 
         try:
             t = db.session.query(SecureMessage.msg_id, SecureMessage.thread_id, func.max(Events.date_time).label('max_date'))\

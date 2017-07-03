@@ -48,7 +48,7 @@ def before_scenario(context):
                  'thread_id': '',
                  'collection_case': 'collection case1',
                  'collection_exercise': 'collection exercise1',
-                 'ru_ref': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc',
+                 'ru_id': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc',
                  'survey': 'BRES'})
 
 
@@ -76,7 +76,7 @@ def step_impl_a_message_is_a_draft(context):
                        'thread_id': context.msg_id,
                        'collection_case': 'collection case1',
                        'collection_exercise': 'collection exercise1',
-                       'ru_ref': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc',
+                       'ru_id': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc',
                        'survey': 'BRES'}
 
 
@@ -106,7 +106,7 @@ def step_impl_a_message_is_a_draft_reply(context):
                  'thread_id': '25e9172c-62d9-4ff7-98ac-661300ae9446',
                  'collection_case': 'collection case1',
                  'collection_exercise': 'collection exercise1',
-                 'ru_ref': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc',
+                 'ru_id': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc',
                  'survey': 'BRES'})
 
     token_data['user_uuid'] = data['msg_from']
@@ -125,7 +125,7 @@ def step_impl_a_message_is_a_draft_reply(context):
                        'thread_id': '25e9172c-62d9-4ff7-98ac-661300ae9446',
                        'collection_case': 'collection case1',
                        'collection_exercise': 'collection exercise1',
-                       'ru_ref': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc',
+                       'ru_id': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc',
                        'survey': 'BRES'}
 
 
@@ -196,7 +196,7 @@ def step_impl_message_contains_msg_id_and_is_not_valid_draft(context):
                  'thread_id': '',
                  'collection_case': 'collection case1',
                  'collection_exercise': 'collection exercise1',
-                 'ru_ref': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc',
+                 'ru_id': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc',
                  'survey': 'BRES'})
 
 
@@ -225,7 +225,7 @@ def step_impl_draft_message_posted(context):
                        'thread_id': '',
                        'collection_case': 'collection case1',
                        'collection_exercise': 'collection exercise1',
-                       'ru_ref': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc',
+                       'ru_id': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc',
                        'survey': 'BRES'}
 
     token_data['user_uuid'] = context.message['msg_from']
@@ -244,7 +244,7 @@ def step_impl_another_user_sends_same_message(context):
                  'thread_id': '2',
                  'collection_case': 'collection case1',
                  'collection_exercise': 'collection exercise1',
-                 'ru_ref': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc',
+                 'ru_id': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc',
                  'survey': 'BRES'})
 
 
@@ -273,7 +273,7 @@ def step_impl_message_is_created(context):
                      'thread_id': '',
                      'collection_case': 'collection case1',
                      'collection_exercise': 'collection exercise1',
-                     'ru_ref': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc',
+                     'ru_id': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc',
                      'survey': 'BRES'}
 
 

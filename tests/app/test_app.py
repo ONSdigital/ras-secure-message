@@ -46,7 +46,7 @@ class FlaskTestCase(unittest.TestCase):
                              'thread_id': "",
                              'collection_case': 'ACollectionCase',
                              'collection_exercise': 'ACollectionExercise',
-                             'ru_ref': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc',
+                             'ru_id': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc',
                              'survey': 'BRES'}
 
         with app.app_context():
@@ -66,7 +66,7 @@ class FlaskTestCase(unittest.TestCase):
                 'subject': 'MyMessage',
                 'body': 'hello',
                 'thread': "?",
-                'ru_ref': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc',
+                'ru_id': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc',
                 'create_date': datetime.now(timezone.utc),
                 'read_date': datetime.now(timezone.utc)}
 
@@ -141,7 +141,7 @@ class FlaskTestCase(unittest.TestCase):
                         'body': 'hello',
                         'collection_case': 'ACollectionCase',
                         'collection_exercise': 'ACollectionExercise',
-                        'ru_ref': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc',
+                        'ru_id': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc',
                         'survey': 'BRES'}
         try:
             self.app.post(url, data=json.dumps(test_message), headers=self.headers)
@@ -194,7 +194,7 @@ class FlaskTestCase(unittest.TestCase):
                 'body': 'hello',
                 'thread_id': '',
                 'collection_case': 'ACollectionCase',
-                'ru_ref': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc',
+                'ru_id': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc',
                 'survey': 'BRES'
             }
         )
@@ -271,7 +271,7 @@ class FlaskTestCase(unittest.TestCase):
             'body': 'hello',
             'collection_case': 'ACollectionCase',
             'collcetion_exercise': 'ACollectionExercise',
-            'ru_ref': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc',
+            'ru_id': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc',
             'survey': 'BRES'
         })
 
@@ -293,7 +293,7 @@ class FlaskTestCase(unittest.TestCase):
             'body': 'hello',
             'collection_case': 'ACollectionCase',
             'collection_exercise': 'ACollectionExercise',
-            'ru_ref': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc',
+            'ru_id': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc',
             'survey': 'BRES'
         })
 
@@ -328,7 +328,7 @@ class FlaskTestCase(unittest.TestCase):
             'body': 'hello',
             'collection_case': 'ACollectionCase',
             'collection_exercise': 'ACollectionExercise',
-            'ru_ref': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc',
+            'ru_id': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc',
             'survey': 'BRES'
         })
 
