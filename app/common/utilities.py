@@ -158,9 +158,10 @@ def add_to_and_from_details(messages):
     user_details = get_details_by_uuids(uuid_list)
 
     for message in messages:
+
         if len(message['msg_to']) > 0:
-            message['msg_to'][0] = next((user for user in user_details if user["id"] == message['msg_to'][0]), None)
-        message['msg_from'] = next((user for user in user_details if user["id"] == message['msg_from']), None)
+            message['@msg_to'] = [next((user for user in user_details if user["id"] == message['msg_to'][0]), None)]
+        message['@msg_from'] = next((user for user in user_details if user["id"] == message['msg_from']), None)
 
     messages = add_business_details(messages)
     return messages
