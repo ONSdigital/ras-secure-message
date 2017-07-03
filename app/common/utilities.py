@@ -95,6 +95,9 @@ def paginated_list_to_json(paginated_list, page, limit, host_url, user, string_q
 
 def generate_etag(msg_to, msg_id, subject, body):
     """Function used to create an ETag"""
+    if None in msg_to:
+        msg_to = []
+
     data_to_hash = {
                     'msg_to': msg_to,
                     'msg_id': msg_id,
@@ -147,7 +150,7 @@ def add_to_and_from_details(messages):
     uuid_list = []
 
     for message in messages:
-        if message['msg_to'] not in uuid_list:
+        if len(message['msg_to']) > 0 and message['msg_to'][0] not in uuid_list:
             uuid_list.append(message['msg_to'][0])
         if message['msg_from'] not in uuid_list:
             uuid_list.append(message['msg_from'])
@@ -155,7 +158,9 @@ def add_to_and_from_details(messages):
     user_details = get_details_by_uuids(uuid_list)
 
     for message in messages:
-        message['@msg_to'] = [next((user for user in user_details if user["id"] == message['msg_to'][0]), None)]
+
+        if len(message['msg_to']) > 0:
+            message['@msg_to'] = [next((user for user in user_details if user["id"] == message['msg_to'][0]), None)]
         message['@msg_from'] = next((user for user in user_details if user["id"] == message['msg_from']), None)
 
     messages = add_business_details(messages)

@@ -4,7 +4,7 @@ from flask import g
 
 import app.constants
 from datetime import datetime, timezone
-from app.validation.domain import Message, MessageSchema
+from app.validation.domain import Message, MessageSchema, DraftSchema
 from app.validation.user import User
 from app.application import app
 from app.constants import MAX_SUBJECT_LEN, MAX_BODY_LEN, MAX_THREAD_LEN
@@ -20,7 +20,7 @@ class MessageTestCase(unittest.TestCase):
     def test_message(self):
         """creating Message object"""
         now_string = self.now.__str__()
-        sut = Message('to', 'from', 'subject', 'body', '5', 'AMsgId', 'ACollectionCase',
+        sut = Message('from', 'subject', 'body', 'to', '5', 'AMsgId', 'ACollectionCase',
                       'ASurveyType', 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc', 'CollectionExercise')
         sut_str = repr(sut)
         expected = '<Message(msg_id=AMsgId msg_to=to msg_from=from subject=subject body=body thread_id=5 collection_case=ACollectionCase ru_id=f1a5e99c-8edf-489a-9c72-6cabe6c387fc collection_exercise=CollectionExercise survey=ASurveyType)>'
@@ -84,6 +84,7 @@ class MessageSchemaTestCase(unittest.TestCase):
 
     def test_valid_message_passes_validation(self):
         """marshaling a valid message"""
+        self.json_message['msg_to'] = ["01b51fcc-ed43-4cdb-ad1c-450f9986859b"]
         schema = MessageSchema()
         with app.app_context():
             g.user = User(self.json_message['msg_from'], 'respondent')
@@ -112,7 +113,7 @@ class MessageSchemaTestCase(unittest.TestCase):
 
     def test_missing_body_fails_validation(self):
         """marshalling message with no body field """
-        message = {'msg_to': 'richard', 'msg_from': 'torrance', 'body': '', 'survey': 'RSI', 'subject': 'MyMessage', 'ru_id': '7fc0e8ab-189c-4794-b8f4-9f05a1db185b'}
+        message = {'msg_to': '01b51fcc-ed43-4cdb-ad1c-450f9986859b', 'msg_from': 'torrance', 'body': '', 'survey': 'RSI', 'subject': 'MyMessage', 'ru_id': '7fc0e8ab-189c-4794-b8f4-9f05a1db185b'}
 
         with app.app_context():
             g.user = User(message['msg_from'], 'respondent')
@@ -123,6 +124,7 @@ class MessageSchemaTestCase(unittest.TestCase):
     def test_missing_subject_fails_validation(self):
         """marshalling message with no subject field """
         self.json_message.pop('subject', 'MyMessage')
+        self.json_message['msg_to'] = ["01b51fcc-ed43-4cdb-ad1c-450f9986859b"]
         with app.app_context():
             g.user = User(self.json_message['msg_from'], 'respondent')
             schema = MessageSchema()
@@ -141,6 +143,7 @@ class MessageSchemaTestCase(unittest.TestCase):
 
     def test_missing_thread_field_does_not_cause_error(self):
         """marshalling message with no thread_id field"""
+        self.json_message['msg_to'] = ["01b51fcc-ed43-4cdb-ad1c-450f9986859b"]
         self.json_message.pop('thread_id', "")
         with app.app_context():
             g.user = User(self.json_message['msg_from'], 'respondent')
@@ -161,7 +164,7 @@ class MessageSchemaTestCase(unittest.TestCase):
     def test_missing_msg_id_causes_a_string_the_same_length_as_uuid_to_be_used(self):
         """Missing msg_id causes a uuid is used"""
         self.json_message['msg_id'] = ''
-
+        self.json_message['msg_to'] = '01b51fcc-ed43-4cdb-ad1c-450f9986859b'
         with app.app_context():
             g.user = User(self.json_message['msg_from'], 'respondent')
             schema = MessageSchema()
@@ -182,6 +185,7 @@ class MessageSchemaTestCase(unittest.TestCase):
 
     def test_missing_survey_causes_error(self):
         """marshalling message with no survey field"""
+        self.json_message['msg_to'] = ["01b51fcc-ed43-4cdb-ad1c-450f9986859b"]
         self.json_message['survey'] = ''
         with app.app_context():
             g.user = User(self.json_message['msg_from'], 'respondent')
@@ -191,7 +195,8 @@ class MessageSchemaTestCase(unittest.TestCase):
 
     def test_same_to_from_causes_error(self):
         """marshalling message with same to and from field"""
-        self.json_message['msg_to'] = self.json_message['msg_from']
+        self.json_message['msg_from'] = "01b51fcc-ed43-4cdb-ad1c-450f9986859b"
+        self.json_message['msg_to'] = "01b51fcc-ed43-4cdb-ad1c-450f9986859b"
         with app.app_context():
             g.user = User(self.json_message['msg_from'], 'respondent')
             schema = MessageSchema()
@@ -241,6 +246,7 @@ class MessageSchemaTestCase(unittest.TestCase):
 
     def test_msg_from_string(self):
         """marshalling message where msg_from field is string"""
+        self.json_message['msg_to'] = ["BRES"]
         self.json_message['msg_from'] = "01b51fcc-ed43-4cdb-ad1c-450f9986859b"
         with app.app_context():
             g.user = User(self.json_message['msg_from'], 'respondent')
@@ -251,6 +257,7 @@ class MessageSchemaTestCase(unittest.TestCase):
 
     def test_msg_from_dict(self):
         """marshalling message where msg_from field is dict"""
+        self.json_message['msg_to'] = ["BRES"]
         self.json_message['msg_from'] = {"id": "01b51fcc-ed43-4cdb-ad1c-450f9986859b", "firstname": "Chandana", "surname": "Blanchet", "email": "cblanc@hotmail.co.uk", "telephone": "+443069990854", "status": "ACTIVE"}
         with app.app_context():
             g.user = User("01b51fcc-ed43-4cdb-ad1c-450f9986859b", 'respondent')
@@ -268,6 +275,40 @@ class MessageSchemaTestCase(unittest.TestCase):
             errors = schema.load(self.json_message)[1]
 
         self.assertTrue(errors == {'_schema': ["'msg_from' is missing an 'id' or incorrect format"]})
+
+    def test_msg_from_validation_internal(self):
+        """marshalling message where msg_from field is an internal user and the 'uuid' is not BRES"""
+        self.json_message['msg_to'] = [{"id": "01b51fcc-ed43-4cdb-ad1c-450f9986859b", "firstname": "Chandana", "surname": "Blanchet", "email": "cblanc@hotmail.co.uk", "telephone": "+443069990854", "status": "ACTIVE"}]
+        self.json_message['msg_from'] = "SomeOtherWorkGroup"
+        with app.app_context():
+            g.user = User("BRES", 'internal')
+            schema = DraftSchema()
+            errors = schema.load(self.json_message)[1]
+
+        self.assertTrue(errors == {
+            'msg_from': ['You are not authorised to save a draft on behalf of user or work group SomeOtherWorkGroup']})
+
+    def test_msg_from_validation_respondent(self):
+        """marshalling message where msg_from field is a respondent and msg_from is not equal to uuid in token"""
+        self.json_message['msg_to'] = ["BRES"]
+        self.json_message['msg_from'] = {"id": "6779kgh83-ed43-474b-ad1c-500f5287439a", "firstname": "Chandana", "surname": "Blanchet", "email": "cblanc@hotmail.co.uk", "telephone": "+443069990854", "status": "ACTIVE"}
+        with app.app_context():
+            g.user = User("01b51fcc-ed43-4cdb-ad1c-450f9986859b", 'respondent')
+            schema = DraftSchema()
+            errors = schema.load(self.json_message)[1]
+
+        self.assertTrue(errors == {'msg_from': ['You are not authorised to save a draft on behalf of user or work group 6779kgh83-ed43-474b-ad1c-500f5287439a']})
+
+    def test_msg_to_validation_invalid_user(self):
+        """marshalling message where msg_to field is a invalid user"""
+        self.json_message['msg_to'] = ["NotAValidUser"]
+        self.json_message['msg_from'] = {"id": "01b51fcc-ed43-4cdb-ad1c-450f9986859b", "firstname": "Chandana", "surname": "Blanchet", "email": "cblanc@hotmail.co.uk", "telephone": "+443069990854", "status": "ACTIVE"}
+        with app.app_context():
+            g.user = User("01b51fcc-ed43-4cdb-ad1c-450f9986859b", 'respondent')
+            schema = DraftSchema()
+            errors = schema.load(self.json_message)[1]
+
+        self.assertTrue(errors == {'msg_to': ['NotAValidUser is not a valid user.']})
 
 
 if __name__ == '__main__':

@@ -6,8 +6,7 @@ from structlog import wrap_logger
 from werkzeug.exceptions import BadRequest
 from app.common.labels import Labels
 from app.constants import DRAFT_LIST_ENDPOINT
-from app.common.utilities import get_options, paginated_list_to_json, generate_etag, \
-    get_business_details_by_ru, get_details_by_uuids
+from app.common.utilities import get_options, paginated_list_to_json, generate_etag, add_to_and_from_details, add_business_details
 from app.repository.modifier import Modifier
 from app.repository.retriever import Retriever
 from app.repository.saver import Saver
@@ -63,7 +62,8 @@ class DraftById(Resource):
         message_service = Retriever()
         draft_data = message_service.retrieve_draft(draft_id, g.user)
         etag = generate_etag(draft_data['msg_to'], draft_data['msg_id'], draft_data['subject'], draft_data['body'])
-        draft_data = DraftById.get_to_and_from_details(draft_data)
+        draft_data = add_to_and_from_details([draft_data])[0]
+        draft_data = add_business_details([draft_data])[0]
         resp = jsonify(draft_data)
         resp.headers['ETag'] = etag
 
@@ -76,7 +76,7 @@ class DraftById(Resource):
         uuids = [draft['msg_from']]
         if draft['msg_to'] is not None:
             uuids.append(draft['msg_to'][0])
-        user_details = get_details_by_uuids(uuids)
+        user_details = add_to_and_from_details(uuids)
         for user in user_details:
             if draft['msg_from'] == user['id']:
                 draft['@msg_from'] = user
@@ -90,7 +90,7 @@ class DraftById(Resource):
         """Get business details for ru"""
 
         ru = [draft['ru_id']]
-        business_details = get_business_details_by_ru(ru)
+        business_details = add_business_details(ru)
         for business in business_details:
             if draft['ru_id'] == business['ru_id']:
                 draft['@ru_id'] = business

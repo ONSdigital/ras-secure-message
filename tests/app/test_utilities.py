@@ -1,8 +1,10 @@
+import hashlib
 import unittest
 from flask import current_app
 from flask import json
 from sqlalchemy import create_engine
 from app.application import app
+from app.common.utilities import generate_etag
 from app.repository import database
 from app.repository.retriever import Retriever
 from tests.app.test_retriever import RetrieverTestCaseHelper
@@ -188,3 +190,36 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
         string_query_args = utilities.add_string_query_args(string_query_args, 'ru_id', '7fc0e8ab-189c-4794-b8f4-9f05a1db185b')
         self.assertEqual(string_query_args, '?survey=BRES&ru_id=7fc0e8ab-189c-4794-b8f4-9f05a1db185b')
 
+    def test_generate_etag_with_none_in_msg_to(self):
+        """Generating etag when msg_to has a None value"""
+
+        generated_etag = generate_etag([None], 'd740-10d5-4ecb-b', 'subject', 'body')
+
+        data_to_hash = {
+            'msg_to': [],
+            'msg_id': 'd740-10d5-4ecb-b',
+            'subject': 'subject',
+            'body': 'body'
+        }
+
+        hash_object = hashlib.sha1(str(sorted(data_to_hash.items())).encode())
+        etag = hash_object.hexdigest()
+
+        self.assertEqual(generated_etag, etag)
+
+    def test_generate_etag_with_msg_to(self):
+        """Generating etag when msg_to has a uuid value"""
+
+        generated_etag = generate_etag(['7fc0e8ab-189c-4794-b8f4-9f05a1db185b'], 'd740-10d5-4ecb-b', 'subject', 'body')
+
+        data_to_hash = {
+            'msg_to': ['7fc0e8ab-189c-4794-b8f4-9f05a1db185b'],
+            'msg_id': 'd740-10d5-4ecb-b',
+            'subject': 'subject',
+            'body': 'body'
+        }
+
+        hash_object = hashlib.sha1(str(sorted(data_to_hash.items())).encode())
+        etag = hash_object.hexdigest()
+
+        self.assertEqual(generated_etag, etag)

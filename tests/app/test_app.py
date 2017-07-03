@@ -25,7 +25,7 @@ class FlaskTestCase(unittest.TestCase):
         AlertUser.alert_method = mock.Mock(AlertViaGovNotify)
 
         token_data = {
-            "user_uuid": "ce12b958-2a5f-44f4-a6da-861e59070a31",
+            "user_uuid": "BRES",
             "role": "internal"
         }
         encrypter = Encrypter(_private_key=settings.SM_USER_AUTHENTICATION_PRIVATE_KEY,
@@ -287,7 +287,7 @@ class FlaskTestCase(unittest.TestCase):
         """Test whether a draft created by a respondent is returned to an internal user"""
 
         self.test_message.update({
-            'msg_to': ['ce12b958-2a5f-44f4-a6da-861e59070a31'],
+            'msg_to': ['BRES'],
             'msg_from': '0a7ad740-10d5-4ecb-b7ca-3c0384afb882',
             'subject': 'MyMessage',
             'body': 'hello',
@@ -297,12 +297,23 @@ class FlaskTestCase(unittest.TestCase):
             'survey': 'BRES'
         })
 
+        token_data = {
+            "user_uuid": "0a7ad740-10d5-4ecb-b7ca-3c0384afb882",
+            "role": "respondent"
+        }
+        encrypter = Encrypter(_private_key=settings.SM_USER_AUTHENTICATION_PRIVATE_KEY,
+                              _private_key_password=settings.SM_USER_AUTHENTICATION_PRIVATE_KEY_PASSWORD,
+                              _public_key=settings.SM_USER_AUTHENTICATION_PUBLIC_KEY)
+        signed_jwt = encode(token_data)
+        encrypted_jwt = encrypter.encrypt_token(signed_jwt)
+        self.headers = {'Content-Type': 'application/json', 'Authorization': encrypted_jwt}
+
         resp = self.app.post("http://localhost:5050/draft/save", data=json.dumps(self.test_message), headers=self.headers)
         save_data = json.loads(resp.data)
         msg_id = save_data['msg_id']
 
         token_data = {
-            "user_uuid": "ce12b958-2a5f-44f4-a6da-861e59070a31",
+            "user_uuid": "BRES",
             "role": "internal"
         }
         encrypter = Encrypter(_private_key=settings.SM_USER_AUTHENTICATION_PRIVATE_KEY,
@@ -322,7 +333,7 @@ class FlaskTestCase(unittest.TestCase):
         """Test that draft get returns draft's msg_to if applicable"""
 
         self.test_message.update({
-            'msg_to': 'ce12b958-2a5f-44f4-a6da-861e59070a31',
+            'msg_to': 'BRES',
             'msg_from': '0a7ad740-10d5-4ecb-b7ca-3c0384afb882',
             'subject': 'MyMessage',
             'body': 'hello',
@@ -331,6 +342,17 @@ class FlaskTestCase(unittest.TestCase):
             'ru_id': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc',
             'survey': 'BRES'
         })
+
+        token_data = {
+            "user_uuid": "0a7ad740-10d5-4ecb-b7ca-3c0384afb882",
+            "role": "respondent"
+        }
+        encrypter = Encrypter(_private_key=settings.SM_USER_AUTHENTICATION_PRIVATE_KEY,
+                              _private_key_password=settings.SM_USER_AUTHENTICATION_PRIVATE_KEY_PASSWORD,
+                              _public_key=settings.SM_USER_AUTHENTICATION_PUBLIC_KEY)
+        signed_jwt = encode(token_data)
+        encrypted_jwt = encrypter.encrypt_token(signed_jwt)
+        self.headers = {'Content-Type': 'application/json', 'Authorization': encrypted_jwt}
 
         draft_save = self.app.post("http://localhost:5050/draft/save", data=json.dumps(self.test_message), headers=self.headers)
         draft_save_data = json.loads(draft_save.data)
