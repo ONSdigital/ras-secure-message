@@ -1,7 +1,7 @@
 import logging
 from logging.config import dictConfig
 from flask import Flask, request
-from flask import jsonify
+from flask import jsonify, json
 from flask_restful import Api
 from flask_cors import CORS
 from app import settings
@@ -55,6 +55,18 @@ api.add_resource(ThreadList, '/threads')
 @app.before_request
 def before_request():
     if request.endpoint is not None and 'health' not in request.endpoint and request.method != 'OPTIONS':
+        header = request.headers
+        req_data = request.data
+        req_data = json.loads(req_data)
+        req_args = request.args
+        args_list = []
+        count = 0
+        for key, val in req_args.items():
+            count += 1
+            list_data = 'arg: ' + str(count) + ' = ' + str(key) + ': ' + str(val)
+            args_list.append(list_data)
+        string = ''.join(args_list)
+        logger.debug('Headers: ' + str(header['Postman-Token']) + ' Body: ' + str(req_data) + ' Arguments: ' + str(string))
         res = authenticate(request.headers)
         if res != {'status': "ok"}:
             return res
