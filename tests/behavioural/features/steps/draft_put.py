@@ -466,7 +466,7 @@ def step_impl_user_edits_saved_draft_no_formatting(context):
 
 # Scenario: A user edits a previously saved draft without formatting and msg_to
 @given('a user edits a previously saved draft without formatting and msg_to')
-def step_impl_user_edits_saved_draft_no_formatting(context):
+def step_impl_user_edits_saved_draft_no_formatting_and_msg_to(context):
     before_scenario(context)
     post_data.pop('msg_to', None)
     add_draft = app.test_client().post('http://localhost:5050/draft/save', data=json.dumps(post_data), headers=headers)
