@@ -38,4 +38,3 @@ SM_USER_AUTHENTICATION_PUBLIC_KEY = open("{0}/jwt-test-keys/sm-user-authenticati
 
 #  password
 SM_USER_AUTHENTICATION_PRIVATE_KEY_PASSWORD = "digitaleq"
-
