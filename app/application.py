@@ -1,7 +1,7 @@
 import logging
 from logging.config import dictConfig
 from flask import Flask, request
-from flask import jsonify
+from flask import jsonify, json
 from flask_restful import Api
 from flask_cors import CORS
 from app import settings
@@ -55,6 +55,7 @@ api.add_resource(ThreadList, '/threads')
 @app.before_request
 def before_request():
     if request.endpoint is not None and 'health' not in request.endpoint and request.method != 'OPTIONS':
+        log_request()
         res = authenticate(request.headers)
         if res != {'status': "ok"}:
             return res
@@ -65,3 +66,29 @@ def handle_save_exception(error):
     response = jsonify(error.to_dict())
     response.status_code = error.status_code
     return response
+
+
+def log_request():
+    """ Outputs the request header, body and parameters information from request in the form of a debug logger"""
+    header = request.headers
+    header_list = []
+    for x, y in header.items():
+        header_list.append(str(x) + ': ' + str(y) + ', ')
+    headers = ''.join(header_list)
+
+    req_data = request.data
+    if req_data is None or req_data is b'':
+        req_data = 'Empty'
+    else:
+        req_data = json.loads(req_data)
+
+    req_args = request.args
+    args_list = []
+    count = 0
+
+    for key, val in req_args.items():
+        count += 1
+        args_list.append('arg ' + str(count) + ' = ' + str(key) + ': ' + str(val))
+
+    params = ''.join(args_list)
+    logger.debug('Headers: ' + str(headers) + ' Body: ' + str(req_data) + ' Arguments: ' + str(params))
