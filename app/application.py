@@ -56,6 +56,11 @@ api.add_resource(ThreadList, '/threads')
 def before_request():
     if request.endpoint is not None and 'health' not in request.endpoint and request.method != 'OPTIONS':
         header = request.headers
+        header_list = []
+        for x, y in header.items():
+            header_data = str(x) + ': ' + str(y) + ', '
+            header_list.append(header_data)
+        str_1 = ''.join(header_list)
         req_data = request.data
         req_data = json.loads(req_data)
         req_args = request.args
@@ -63,10 +68,10 @@ def before_request():
         count = 0
         for key, val in req_args.items():
             count += 1
-            list_data = 'arg: ' + str(count) + ' = ' + str(key) + ': ' + str(val)
+            list_data = 'arg ' + str(count) + ' = ' + str(key) + ': ' + str(val)
             args_list.append(list_data)
         string = ''.join(args_list)
-        logger.debug('Headers: ' + str(header['Postman-Token']) + ' Body: ' + str(req_data) + ' Arguments: ' + str(string))
+        logger.debug('Headers: ' + str(str_1) + ' Body: ' + str(req_data) + ' Arguments: ' + str(string))
         res = authenticate(request.headers)
         if res != {'status': "ok"}:
             return res
