@@ -69,11 +69,12 @@ def handle_save_exception(error):
 
 
 def log_request():
+    """ Outputs the request header, body and parameters information from request in the form of a debug logger"""
     header = request.headers
     header_list = []
     for x, y in header.items():
         header_list.append(str(x) + ': ' + str(y) + ', ')
-    str_1 = ''.join(header_list)
+    headers = ''.join(header_list)
 
     req_data = request.data
     if req_data is None or req_data is b'':
@@ -89,5 +90,5 @@ def log_request():
         count += 1
         args_list.append('arg ' + str(count) + ' = ' + str(key) + ': ' + str(val))
 
-    string = ''.join(args_list)
-    logger.debug('Headers: ' + str(str_1) + ' Body: ' + str(req_data) + ' Arguments: ' + str(string))
+    params = ''.join(args_list)
+    logger.debug('Headers: ' + str(headers) + ' Body: ' + str(req_data) + ' Arguments: ' + str(params))
