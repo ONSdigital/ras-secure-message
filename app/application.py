@@ -58,18 +58,23 @@ def before_request():
         header = request.headers
         header_list = []
         for x, y in header.items():
-            header_data = str(x) + ': ' + str(y) + ', '
-            header_list.append(header_data)
+            header_list.append(str(x) + ': ' + str(y) + ', ')
         str_1 = ''.join(header_list)
+
         req_data = request.data
-        req_data = json.loads(req_data)
+        if req_data is None or req_data is b'':
+            req_data = 'Empty'
+        else:
+            req_data = json.loads(req_data)
+
         req_args = request.args
         args_list = []
         count = 0
+
         for key, val in req_args.items():
             count += 1
-            list_data = 'arg ' + str(count) + ' = ' + str(key) + ': ' + str(val)
-            args_list.append(list_data)
+            args_list.append('arg ' + str(count) + ' = ' + str(key) + ': ' + str(val))
+
         string = ''.join(args_list)
         logger.debug('Headers: ' + str(str_1) + ' Body: ' + str(req_data) + ' Arguments: ' + str(string))
         res = authenticate(request.headers)
