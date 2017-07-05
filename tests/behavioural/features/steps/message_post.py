@@ -289,6 +289,11 @@ def step_impl_message_sent_no_etag(context):
     context.response = app.test_client().post(url, data=json.dumps(context.msg), headers=headers)
 
 
+@given('a msg_to is entered as a string')
+def step_impl_msg_to_string(context):
+    data['msg_to'] = 'BRES'
+    isinstance(data['msg_to'], str)
+
 # Common Steps: used in multiple scenarios
 
 

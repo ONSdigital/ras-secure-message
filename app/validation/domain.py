@@ -42,6 +42,7 @@ class MessageSchema(Schema):
     """ Class to marshal JSON to Message"""
     msg_id = fields.Str(allow_none=True)
     msg_to = fields.Str(required=True)
+    # msg_to = fields.List(required=True)
     msg_from = fields.Str(required=True)
     body = fields.Str(required=True)
     subject = fields.Str(required=True)
@@ -153,6 +154,7 @@ class DraftSchema(Schema):
 
     msg_id = fields.Str(allow_none=True)
     msg_to = fields.Str(allow_none=True)
+    # msg_to = fields.List(allow_none=True)
     msg_from = fields.Str(required=True)
     body = fields.Str(allow_none=True)
     subject = fields.Str(allow_none=True)
