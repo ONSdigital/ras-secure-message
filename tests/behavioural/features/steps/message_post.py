@@ -52,6 +52,20 @@ def before_scenario(context):
                  'survey': 'BRES'})
 
 
+@given('a msg_to is entered as a string')
+def step_impl_msg_to_string(context):
+    context.message = {'msg_to': 'BRES',
+                 'msg_from': '01b51fcc-ed43-4cdb-ad1c-450f9986859b',
+                 'subject': 'Hello World',
+                 'body': 'Test',
+                 'thread_id': '',
+                 'collection_case': 'collection case1',
+                 'collection_exercise': 'collection exercise1',
+                 'ru_id': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc',
+                 'survey': 'BRES'}
+    isinstance(data['msg_to'], str)
+
+
 # Scenario 1: Submitting a valid message and receiving a 201
 @given('a valid message')
 def step_impl_a_valid_message(context):
@@ -289,12 +303,14 @@ def step_impl_message_sent_no_etag(context):
     context.response = app.test_client().post(url, data=json.dumps(context.msg), headers=headers)
 
 
-@given('a msg_to is entered as a string')
-def step_impl_msg_to_string(context):
-    data['msg_to'] = 'BRES'
-    isinstance(data['msg_to'], str)
-
 # Common Steps: used in multiple scenarios
+
+@when("the message is sent with msg_to string")
+def step_impl_message_is_sent(context):
+    token_data['user_uuid'] = data['msg_from']
+    token_data['role'] = 'respondent'
+    headers['Authorization'] = update_encrypted_jwt()
+    context.response = app.test_client().post(url, data=json.dumps(context), headers=headers)
 
 
 @when("the message is sent")

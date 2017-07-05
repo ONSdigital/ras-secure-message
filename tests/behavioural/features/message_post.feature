@@ -93,5 +93,5 @@ Feature: Message Send Endpoint
 
   Scenario: Send a message where msg_to is a string
     Given a msg_to is entered as a string
-    When the message is sent
+    When the message is sent with msg_to string
     Then a 400 error status is returned
