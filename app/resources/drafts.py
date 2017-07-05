@@ -43,7 +43,7 @@ class DraftSave(Resource):
         saver.save_message(draft.data)
 
         if draft.data.msg_to is not None and len(draft.data.msg_to) != 0:
-            uuid_to = draft.data.msg_to if g.user.is_internal else draft.data.survey
+            uuid_to = draft.data.msg_to[0] if g.user.is_internal else draft.data.survey
             saver.save_msg_status(uuid_to, draft.data.msg_id, Labels.DRAFT_INBOX.value)
 
         uuid_from = draft.data.msg_from if g.user.is_respondent else draft.data.survey
@@ -61,7 +61,7 @@ class DraftById(Resource):
         # check user is authorised to view message
         message_service = Retriever()
         draft_data = message_service.retrieve_draft(draft_id, g.user)
-        etag = generate_etag(draft_data['msg_to'], draft_data['msg_id'], draft_data['subject'], draft_data['body'])
+        etag = generate_etag(draft_data['msg_to'][0], draft_data['msg_id'], draft_data['subject'], draft_data['body'])
         draft_data = add_to_and_from_details([draft_data])[0]
         draft_data = add_business_details([draft_data])[0]
         resp = jsonify(draft_data)
@@ -116,7 +116,7 @@ class DraftModifyById(Resource):
             message_service = Retriever()
             modified_draft = message_service.retrieve_draft(draft_id, g.user)
 
-            etag = generate_etag(modified_draft['msg_to'], modified_draft['msg_id'],
+            etag = generate_etag(modified_draft['msg_to'][0], modified_draft['msg_id'],
                                  modified_draft['subject'], modified_draft['body'])
             resp = jsonify({'status': 'OK', 'msg_id': draft_id})
             resp.headers['ETag'] = etag
@@ -131,7 +131,7 @@ class DraftModifyById(Resource):
     def etag_check(headers, current_draft):
         """Check etag to make sure draft has not been modified since get request"""
         if headers.get('ETag'):
-            current_etag = generate_etag(current_draft['msg_to'], current_draft['msg_id'],
+            current_etag = generate_etag(current_draft['msg_to'][0], current_draft['msg_id'],
                                          current_draft['subject'], current_draft['body'])
             if current_etag == headers.get('ETag'):
                 return True
