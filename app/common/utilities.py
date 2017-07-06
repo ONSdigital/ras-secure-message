@@ -158,8 +158,7 @@ def add_to_and_from_details(messages):
 
     for message in messages:
 
-        if len(message['msg_to']) > 0:
-            message['@msg_to'] = [user for user in user_details if user["id"] in message['msg_to']]
+        message['@msg_to'] = [user for user in user_details if user["id"] in message['msg_to']]
         message['@msg_from'] = next((user for user in user_details if user["id"] == message['msg_from']), None)
 
     messages = add_business_details(messages)
