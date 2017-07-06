@@ -99,7 +99,7 @@ def generate_etag(msg_to, msg_id, subject, body):
         msg_to = []
 
     data_to_hash = {
-                    'msg_to': msg_to,
+                    'msg_to': msg_to.sort(),
                     'msg_id': msg_id,
                     'subject': subject,
                     'body': body

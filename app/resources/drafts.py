@@ -61,7 +61,7 @@ class DraftById(Resource):
         # check user is authorised to view message
         message_service = Retriever()
         draft_data = message_service.retrieve_draft(draft_id, g.user)
-        etag = generate_etag(draft_data['msg_to'][0], draft_data['msg_id'], draft_data['subject'], draft_data['body'])
+        etag = generate_etag(draft_data['msg_to'], draft_data['msg_id'], draft_data['subject'], draft_data['body'])
         draft_data = add_to_and_from_details([draft_data])[0]
         draft_data = add_business_details([draft_data])[0]
         resp = jsonify(draft_data)
@@ -131,7 +131,7 @@ class DraftModifyById(Resource):
     def etag_check(headers, current_draft):
         """Check etag to make sure draft has not been modified since get request"""
         if headers.get('ETag'):
-            current_etag = generate_etag(current_draft['msg_to'][0], current_draft['msg_id'],
+            current_etag = generate_etag(current_draft['msg_to'], current_draft['msg_id'],
                                          current_draft['subject'], current_draft['body'])
             if current_etag == headers.get('ETag'):
                 return True
