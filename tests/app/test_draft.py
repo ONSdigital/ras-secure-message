@@ -147,7 +147,7 @@ class DraftTestCase(unittest.TestCase):
     def test_draft_correct_labels_saved_to_status_without_to(self):
         """Check correct labels are saved to status table for draft saved without a to"""
 
-        self.test_message['msg_to'] = ''
+        self.test_message['msg_to'] = []
 
         self.app.post(self.url, data=json.dumps(self.test_message), headers=self.headers)
 
@@ -272,7 +272,7 @@ class DraftTestCase(unittest.TestCase):
             'labels': ['DRAFT']
         }
 
-        etag = utilities.generate_etag(message['msg_to'],message['msg_id'], message['subject'],message['body'])
+        etag = utilities.generate_etag(message['msg_to'], message['msg_id'], message['subject'], message['body'])
 
         self.assertTrue(DraftModifyById.etag_check({'etag': etag}, message))
 
@@ -294,7 +294,7 @@ class DraftTestCase(unittest.TestCase):
             'labels': ['DRAFT']
         }
 
-        etag = utilities.generate_etag(['XXX'], message['msg_id'], message['subject'],message['body'])
+        etag = utilities.generate_etag(['XXX'], message['msg_id'], message['subject'], message['body'])
         self.assertFalse(DraftModifyById.etag_check({'ETag': etag}, message))
 
     def test_etag_check_returns_false_if_msg_id_changed(self):

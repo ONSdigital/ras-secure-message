@@ -278,7 +278,8 @@ class MessageSchemaTestCase(unittest.TestCase):
 
     def test_msg_from_validation_internal(self):
         """marshalling message where msg_from field is an internal user and the 'uuid' is not BRES"""
-        self.json_message['msg_to'] = [{"id": "01b51fcc-ed43-4cdb-ad1c-450f9986859b", "firstname": "Chandana", "surname": "Blanchet", "email": "cblanc@hotmail.co.uk", "telephone": "+443069990854", "status": "ACTIVE"}]
+        #self.json_message['msg_to'] = [{"id": "01b51fcc-ed43-4cdb-ad1c-450f9986859b", "firstname": "Chandana", "surname": "Blanchet", "email": "cblanc@hotmail.co.uk", "telephone": "+443069990854", "status": "ACTIVE"}]
+        self.json_message['msg_to'] = ["01b51fcc-ed43-4cdb-ad1c-450f9986859b"]
         self.json_message['msg_from'] = "SomeOtherWorkGroup"
         with app.app_context():
             g.user = User("BRES", 'internal')
@@ -291,7 +292,8 @@ class MessageSchemaTestCase(unittest.TestCase):
     def test_msg_from_validation_respondent(self):
         """marshalling message where msg_from field is a respondent and msg_from is not equal to uuid in token"""
         self.json_message['msg_to'] = ["BRES"]
-        self.json_message['msg_from'] = {"id": "6779kgh83-ed43-474b-ad1c-500f5287439a", "firstname": "Chandana", "surname": "Blanchet", "email": "cblanc@hotmail.co.uk", "telephone": "+443069990854", "status": "ACTIVE"}
+        #self.json_message['msg_from'] = {"id": "6779kgh83-ed43-474b-ad1c-500f5287439a", "firstname": "Chandana", "surname": "Blanchet", "email": "cblanc@hotmail.co.uk", "telephone": "+443069990854", "status": "ACTIVE"}
+        self.json_message['msg_from'] = "6779kgh83-ed43-474b-ad1c-500f5287439a"
         with app.app_context():
             g.user = User("01b51fcc-ed43-4cdb-ad1c-450f9986859b", 'respondent')
             schema = DraftSchema()
@@ -302,7 +304,8 @@ class MessageSchemaTestCase(unittest.TestCase):
     def test_msg_to_validation_invalid_user(self):
         """marshalling message where msg_to field is a invalid user"""
         self.json_message['msg_to'] = ["NotAValidUser"]
-        self.json_message['msg_from'] = {"id": "01b51fcc-ed43-4cdb-ad1c-450f9986859b", "firstname": "Chandana", "surname": "Blanchet", "email": "cblanc@hotmail.co.uk", "telephone": "+443069990854", "status": "ACTIVE"}
+        #self.json_message['msg_from'] = {"id": "01b51fcc-ed43-4cdb-ad1c-450f9986859b", "firstname": "Chandana", "surname": "Blanchet", "email": "cblanc@hotmail.co.uk", "telephone": "+443069990854", "status": "ACTIVE"}
+        self.json_message['msg_from'] = "01b51fcc-ed43-4cdb-ad1c-450f9986859b"
         with app.app_context():
             g.user = User("01b51fcc-ed43-4cdb-ad1c-450f9986859b", 'respondent')
             schema = DraftSchema()

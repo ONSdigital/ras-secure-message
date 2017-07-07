@@ -41,7 +41,7 @@ def before_scenario(context):
         database.db.create_all()
 
     data.update({
-                 'msg_to': 'BRES',
+                 'msg_to': ['BRES'],
                  'msg_from': '01b51fcc-ed43-4cdb-ad1c-450f9986859b',
                  'subject': 'Hello World',
                  'body': 'Test',
@@ -69,7 +69,7 @@ def step_impl_a_message_is_a_draft(context):
     msg_resp = json.loads(context.post_draft.data)
     context.msg_id = msg_resp['msg_id']
     context.message = {'msg_id': context.msg_id,
-                       'msg_to': 'BRES',
+                       'msg_to': ['BRES'],
                        'msg_from': '01b51fcc-ed43-4cdb-ad1c-450f9986859b',
                        'subject': 'Hello World',
                        'body': 'Test',
@@ -99,7 +99,7 @@ def step_impl_draft_is_sent(context):
 
 @given('a message is identified as a draft which is a reply to another message')
 def step_impl_a_message_is_a_draft_reply(context):
-    data.update({'msg_to': 'BRES',
+    data.update({'msg_to': ['BRES'],
                  'msg_from': '01b51fcc-ed43-4cdb-ad1c-450f9986859b',
                  'subject': 'Hello World',
                  'body': 'Test',
@@ -118,7 +118,7 @@ def step_impl_a_message_is_a_draft_reply(context):
     msg_resp = json.loads(context.post_draft.data)
     context.msg_id = msg_resp['msg_id']
     context.message = {'msg_id': context.msg_id,
-                       'msg_to': 'BRES',
+                       'msg_to': ['BRES'],
                        'msg_from': '01b51fcc-ed43-4cdb-ad1c-450f9986859b',
                        'subject': 'Hello World',
                        'body': 'Test',
@@ -139,7 +139,7 @@ def step_impl_thread_id_and_msg_id_are_not_equal(context):
 # Scenario 3: Submit a message with a missing "To" field and receive a 400 error
 @given("the 'To' field is empty")
 def step_impl_to_field_empty(context):
-    data['msg_to'] = ''
+    data['msg_to'] = ['']
 
 
 # Scenario 4: Submit a message with a missing "From" field and receive a 400 error
@@ -170,7 +170,7 @@ def step_impl_thread_id_field_empty(context):
 # Scenario 8: Message sent with a msg_to too long
 @given("the 'To' field exceeds max limit in size")
 def step_impl_to_field_exceeds_max_limit(context):
-    data['msg_to'] = "x" * (constants.MAX_TO_LEN+1)
+    data['msg_to'] = ["x" * (constants.MAX_TO_LEN+1)]
 
 
 # Scenario 9: Message sent with a msg_from too long
@@ -189,7 +189,7 @@ def step_impl_survey_field_empty(context):
 @given('a message contains a msg_id and is not a valid draft')
 def step_impl_message_contains_msg_id_and_is_not_valid_draft(context):
     data.update({'msg_id': 'test123',
-                 'msg_to': 'BRES',
+                 'msg_to': ['BRES'],
                  'msg_from': '01b51fcc-ed43-4cdb-ad1c-450f9986859b',
                  'subject': 'Hello World',
                  'body': 'Test',
@@ -218,7 +218,7 @@ def step_impl_draft_message_posted(context):
     msg_resp = json.loads(context.post_draft.data)
     context.msg_id = msg_resp['msg_id']
     context.message = {'msg_id': context.msg_id,
-                       'msg_to': 'BRES',
+                       'msg_to': ['BRES'],
                        'msg_from': '01b51fcc-ed43-4cdb-ad1c-450f9986859b',
                        'subject': 'Hello World',
                        'body': 'Test',
@@ -237,7 +237,7 @@ def step_impl_draft_message_posted(context):
 @when('another user tries to send the same message')
 def step_impl_another_user_sends_same_message(context):
     data.update({'msg_id': context.msg_id,
-                 'msg_to': 'BRES',
+                 'msg_to': ['BRES'],
                  'msg_from': '0a7ad740-10d5-4ecb-b7ca-3c0384afb882',
                  'subject': 'test',
                  'body': 'test',
@@ -266,15 +266,15 @@ def step_impl_is_shown_404(context):
 # Scenario 13:  Scenario: A Etag is not present within the header
 @given('a message is created')
 def step_impl_message_is_created(context):
-    context.msg = {  'msg_to': 'BRES',
-                     'msg_from': '01b51fcc-ed43-4cdb-ad1c-450f9986859b',
-                     'subject': 'test',
-                     'body': 'Test',
-                     'thread_id': '',
-                     'collection_case': 'collection case1',
-                     'collection_exercise': 'collection exercise1',
-                     'ru_id': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc',
-                     'survey': 'BRES'}
+    context.msg = {'msg_to': ['BRES'],
+                   'msg_from': '01b51fcc-ed43-4cdb-ad1c-450f9986859b',
+                   'subject': 'test',
+                   'body': 'Test',
+                   'thread_id': '',
+                   'collection_case': 'collection case1',
+                   'collection_exercise': 'collection exercise1',
+                   'ru_id': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc',
+                   'survey': 'BRES'}
 
 
 @when('the message is sent with no Etag')
@@ -291,7 +291,7 @@ def step_impl_message_sent_no_etag(context):
 
 @given('a msg_to is entered as a string')
 def step_impl_msg_to_string(context):
-    context.message = {'msg_to': 'BRES',
+    context.message = {'msg_to': ['BRES'],
                        'msg_from': '01b51fcc-ed43-4cdb-ad1c-450f9986859b',
                        'subject': 'Hello World',
                        'body': 'Test',

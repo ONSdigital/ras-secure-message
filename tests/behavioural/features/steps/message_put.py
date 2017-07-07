@@ -15,7 +15,7 @@ token_data = {
 
 headers = {'Content-Type': 'application/json', 'Authorization': ''}
 
-data = {'msg_to': '0a7ad740-10d5-4ecb-b7ca-3c0384afb882',
+data = {'msg_to': ['0a7ad740-10d5-4ecb-b7ca-3c0384afb882'],
         'msg_from': 'ce12b958-2a5f-44f4-a6da-861e59070a31',
         'subject': 'Hello World',
         'body': 'Test',
@@ -42,7 +42,7 @@ headers['Authorization'] = update_encrypted_jwt()
 # Scenario: modifying the status of the message to "archived"
 @given("a valid message is sent")
 def step_impl(context):
-    data['msg_to'] = 'BRES'
+    data['msg_to'] = ['BRES']
     data['msg_from'] = '0a7ad740-10d5-4ecb-b7ca-3c0384afb882'
     token_data['user_uuid'] = data['msg_from']
     token_data['role'] = 'respondent'
@@ -74,7 +74,7 @@ def step_impl_assert_message_is_marked_as_archived(context):
 # Scenario: deleting the "archived" label from a given message
 @given("the message is archived")
 def step_impl_the_message_is_archived(context):
-    data['msg_to'] = 'BRES'
+    data['msg_to'] = ['BRES']
     data['msg_from'] = '0a7ad740-10d5-4ecb-b7ca-3c0384afb882'
     token_data['user_uuid'] = data['msg_from']
     token_data['role'] = 'respondent'
@@ -109,7 +109,7 @@ def step_impl_message_not_marked_archived(context):
 # Scenario: Modifying the status of the message to "unread"
 @given('a message has been read')
 def step_impl_message_has_been_read(context):
-    data['msg_to'] = 'BRES'
+    data['msg_to'] = ['BRES']
     data['msg_from'] = '0a7ad740-10d5-4ecb-b7ca-3c0384afb882'
     token_data['user_uuid'] = '0a7ad740-10d5-4ecb-b7ca-3c0384afb882'
     token_data['role'] = 'respondent'
@@ -176,7 +176,7 @@ def step_impl_message_read_date_should_be_set(context):
 # Scenario: validating a request where there is no label provided
 @given('a message is sent')
 def step_impl_a_message_is_sent(context):
-    data['msg_to'] = 'BRES'
+    data['msg_to'] = ['BRES']
     data['msg_from'] = '0a7ad740-10d5-4ecb-b7ca-3c0384afb882'
     token_data['user_uuid'] = data['msg_from']
     token_data['role'] = 'respondent'
@@ -285,7 +285,7 @@ def step_impl_no_unread_messages_returned(context):
 # Scenario - internal - as an internal user I want to be able to change my message from read to unread
 @given("a message with the status read is displayed to an internal user")
 def step_impl_message_with_status_read_returned(context):
-    data['msg_to'] = 'BRES'
+    data['msg_to'] = ['BRES']
     data['msg_from'] = '0a7ad740-10d5-4ecb-b7ca-3c0384afb882'
     token_data['user_uuid'] = data['msg_from']
     token_data['role'] = 'respondent'

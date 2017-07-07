@@ -98,8 +98,10 @@ def generate_etag(msg_to, msg_id, subject, body):
     if None in msg_to:
         msg_to = []
 
+    msg_to_str = ' '.join(str(uuid) for uuid in msg_to)
+
     data_to_hash = {
-                    'msg_to': msg_to.sort(),
+                    'msg_to': msg_to_str,
                     'msg_id': msg_id,
                     'subject': subject,
                     'body': body

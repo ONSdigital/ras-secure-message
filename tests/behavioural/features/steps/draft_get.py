@@ -43,7 +43,7 @@ with app.app_context():
 
 @given('a user requests a valid draft')
 def step_impl_user_requests_valid_draft(context):
-    data.update({'msg_to': 'BRES',
+    data.update({'msg_to': ['BRES'],
                  'msg_from': '0a7ad740-10d5-4ecb-b7ca-3c0384afb882',
                  'subject': 'test',
                  'body': 'Test',
@@ -87,7 +87,7 @@ def step_impl_assert_404_returned(context):
 @given('a user is not authorised')
 def step_impl_user_not_authorised(self, context):
     #   waiting for  authorisation to be implemented
-    data.update({'msg_to': 'BRES',
+    data.update({'msg_to': ['BRES'],
                  'msg_from': '0a7ad740-10d5-4ecb-b7ca-3c0384afb882',
                  'subject': 'test',
                  'body': 'Test',
@@ -109,7 +109,7 @@ def step_impl_assert_403_returned(context):
 #   Scenario: User is retrieving the etag from the header
 @given("there is a draft")
 def step_impl_there_is_a_draft(context):
-    data.update({'msg_to': 'BRES',
+    data.update({'msg_to': ['BRES'],
                  'msg_from': '0a7ad740-10d5-4ecb-b7ca-3c0384afb882',
                  'subject': 'test',
                  'body': 'Test',

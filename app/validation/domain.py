@@ -203,12 +203,14 @@ class DraftSchema(Schema):
 
     @validates("msg_to")
     def validate_to(self, msg_to):
-        if not msg_to:
+        if msg_to:
         # if msg_to is not None:
             for item in msg_to:
                 self.validate_field_length(msg_to, len(item), constants.MAX_TO_LEN)
                 if len(msg_to) > 0 and msg_to != 'BRES' and not User.is_valid_user(item):
                     raise ValidationError("{0} is not a valid user.".format(item))
+        else:
+            logger.debug("")
 
     @validates("msg_from")
     def validate_from(self, msg_from):
