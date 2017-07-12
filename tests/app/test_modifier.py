@@ -5,6 +5,8 @@ from datetime import datetime, timezone
 from flask import current_app
 from flask import g
 from sqlalchemy import create_engine
+from sqlalchemy.engine import Engine
+from sqlalchemy import event
 from werkzeug.exceptions import InternalServerError
 
 from app.application import app
@@ -64,6 +66,13 @@ class ModifyTestCase(unittest.TestCase, ModifyTestCaseHelper):
 
         self.user_internal = User('ce12b958-2a5f-44f4-a6da-861e59070a31', 'internal')
         self.user_respondent = User('0a7ad740-10d5-4ecb-b7ca-3c0384afb882', 'respondent')
+
+    @event.listens_for(Engine, "connect")
+    def set_sqlite_pragma(dbapi_connection, connection_record):
+        """enable foreign key constraint for tests"""
+        cursor = dbapi_connection.cursor()
+        cursor.execute("PRAGMA foreign_keys=ON")
+        cursor.close()
 
     def test_archived_label_is_added_to_message(self):
         """testing message is added to database with archived label attached"""
@@ -224,6 +233,16 @@ class ModifyTestCase(unittest.TestCase, ModifyTestCaseHelper):
                 }
 
                 modifier = Modifier()
+
+                with self.engine.connect() as con:
+                    add_message = "INSERT INTO secure_message (msg_id, body, subject, thread_id, collection_case, ru_id, " \
+                            "survey, collection_exercise) VALUES ('{0}', '{1}', '{2}', '{3}', '{4}', '{5}', '{6}', '{7}')" \
+                    .format(self.test_message['msg_id'], self.test_message['body'], self.test_message['subject'],
+                            self.test_message['thread_id'],
+                            self.test_message['collection_case'], self.test_message['ru_id'],
+                            'test', self.test_message['collection_exercise'])
+                    con.execute(add_message)
+
                 with self.engine.connect() as con:
                     add_draft = ("INSERT INTO status (label, msg_id, actor) "
                                  "VALUES ('{0}', 'test123', '0a7ad740-10d5-4ecb-b7ca-3c0384afb882')")\
