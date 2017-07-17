@@ -5,6 +5,8 @@ from app.repository.retriever import Retriever
 from unittest import mock
 from flask import current_app, json
 from sqlalchemy import create_engine
+from sqlalchemy.engine import Engine
+from sqlalchemy import event
 from werkzeug.exceptions import InternalServerError
 from app import application
 from app import settings
@@ -64,6 +66,13 @@ class DraftTestCase(unittest.TestCase):
 
         self.user_internal = User('ce12b958-2a5f-44f4-a6da-861e59070a31', 'internal')
         self.user_respondent = User('0a7ad740-10d5-4ecb-b7ca-3c0384afb882', 'respondent')
+
+    @event.listens_for(Engine, "connect")
+    def set_sqlite_pragma(dbapi_connection, connection_record):
+        """enable foreign key constraint for tests"""
+        cursor = dbapi_connection.cursor()
+        cursor.execute("PRAGMA foreign_keys=ON")
+        cursor.close()
 
     def test_draft_call_saver(self):
         """Test saver called as expected to save draft"""

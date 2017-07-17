@@ -74,7 +74,7 @@ def before_scenario(context):
 
 
 # Scenario 1: A user edits a previously saved draft
-@given('a user edits a previously saved draft')
+@given('+a user edits a previously saved draft')
 def step_impl_user_edits_saved_draft(context):
     before_scenario(context)
     add_draft = app.test_client().post('http://localhost:5050/draft/save', data=json.dumps(post_data), headers=headers)

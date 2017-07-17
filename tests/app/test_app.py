@@ -4,6 +4,8 @@ from unittest import mock
 from flask import current_app
 from flask import json
 from sqlalchemy import create_engine
+from sqlalchemy.engine import Engine
+from sqlalchemy import event
 from app import application
 from app import settings
 from app.application import app
@@ -54,6 +56,14 @@ class FlaskTestCase(unittest.TestCase):
             database.db.drop_all()
             database.db.create_all()
             self.db = database.db
+
+
+    @event.listens_for(Engine, "connect")
+    def set_sqlite_pragma(dbapi_connection, connection_record):
+        """enable foreign key constraint for tests"""
+        cursor = dbapi_connection.cursor()
+        cursor.execute("PRAGMA foreign_keys=ON")
+        cursor.close()
 
     def test_that_checks_post_request_is_within_database(self):
         """check messages from messageSend endpoint saved in database correctly"""

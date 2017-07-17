@@ -84,29 +84,32 @@ class Modifier:
         del_draft_msg = "DELETE FROM secure_message WHERE msg_id='{0}'".format(draft_id)
 
         try:
-            db.get_engine(app=db.get_app()).execute(del_draft_event)
             if del_status is True:
                 db.get_engine(app=db.get_app()).execute(del_draft_status)
                 db.get_engine(app=db.get_app()).execute(del_draft_inbox_status)
 
             if del_event is True:
-                db.get_engine(app=db.get_app()).execute(del_draft_msg)
+                db.get_engine(app=db.get_app()).execute(del_draft_event)
+
+            db.get_engine(app=db.get_app()).execute(del_draft_msg)
 
         except Exception as e:
             logger.error(e)
             raise (InternalServerError(description="Error retrieving messages from database"))
 
+
+
     @staticmethod
     def replace_current_draft(draft_id, draft, session=db.session):
         """used to replace draft content in message table"""
-        Modifier.del_draft(draft_id, del_status=False)
         secure_message = SecureMessage(msg_id=draft_id, subject=draft.subject, body=draft.body,
                                        thread_id=draft.thread_id, collection_case=draft.collection_case,
                                        ru_id=draft.ru_id, collection_exercise=draft.collection_exercise,
                                        survey=draft.survey)
 
         try:
-            session.add(secure_message)
+            setattr(secure_message, 'subject',secure_message.subject)
+            setattr(secure_message, 'body', secure_message.body)
             session.commit()
         except Exception as e:
             session.rollbeck()
