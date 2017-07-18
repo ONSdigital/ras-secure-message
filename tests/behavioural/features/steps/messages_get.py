@@ -14,7 +14,7 @@ token_data = {
 
 headers = {'Content-Type': 'application/json', 'Authorization': ''}
 
-data = {'msg_to': 'test',
+data = {'msg_to': ['test'],
         'msg_from': 'ce12b958-2a5f-44f4-a6da-861e59070a31',
         'subject': 'Hello World',
         'body': 'Test',
@@ -45,7 +45,7 @@ def step_impl_respondent_sends_multiple_messages(context):
     headers['Authorization'] = update_encrypted_jwt()
 
     for x in range(0, 2):
-        data['msg_to'] = 'BRES'
+        data['msg_to'] = ['BRES']
         data['msg_from'] = '0a7ad740-10d5-4ecb-b7ca-3c0384afb882'
         token_data['user_uuid'] = '0a7ad740-10d5-4ecb-b7ca-3c0384afb882'
         token_data['role'] = 'respondent'
@@ -79,7 +79,7 @@ def step_impl_internal_user_sends_multiple_messages(context):
     headers['Authorization'] = update_encrypted_jwt()
 
     for x in range(0, 2):
-        data['msg_to'] = '0a7ad740-10d5-4ecb-b7ca-3c0384afb882'
+        data['msg_to'] = ['0a7ad740-10d5-4ecb-b7ca-3c0384afb882']
         data['msg_from'] = 'BRES'
         context.response = app.test_client().post("http://localhost:5050/message/send", data=flask.json.dumps(data),
                                                   headers=headers)
@@ -113,7 +113,7 @@ def step_impl_message_should_have_correct_inbox_and_unread_labels(context):
 @given("multiple messages have been sent to an external user")
 def step_implmultiple_messages_sent_to_external_user(context):
     for x in range(0, 2):
-        data['msg_to'] = 'respondent.123'
+        data['msg_to'] = ['respondent.123']
         app.test_client().post("http://localhost:5050/message/send", headers=headers)
 
 
@@ -141,7 +141,7 @@ def step_impl_respondant_and_internal_user_send_multiple_messages(context):
     headers['Authorization'] = update_encrypted_jwt()
 
     for x in range(0, 2):
-        data['msg_to'] = '0a7ad740-10d5-4ecb-b7ca-3c0384afb882'
+        data['msg_to'] = ['0a7ad740-10d5-4ecb-b7ca-3c0384afb882']
         data['msg_from'] = 'BRES'
         context.response = app.test_client().post("http://localhost:5050/message/send",
                                                   data=flask.json.dumps(data), headers=headers)
@@ -151,7 +151,7 @@ def step_impl_respondant_and_internal_user_send_multiple_messages(context):
     headers['Authorization'] = update_encrypted_jwt()
 
     for x in range(0, 2):
-        data['msg_to'] = 'BRES'
+        data['msg_to'] = ['BRES']
         data['msg_from'] = '0a7ad740-10d5-4ecb-b7ca-3c0384afb882'
         token_data['user_uuid'] = '0a7ad740-10d5-4ecb-b7ca-3c0384afb882'
         token_data['role'] = 'respondent'
@@ -187,13 +187,13 @@ def step_impl_internal_user_sends_multiple_messages_with_different_ru(context):
     headers['Authorization'] = update_encrypted_jwt()
 
     for x in range(0, 2):
-        data['msg_to'] = '0a7ad740-10d5-4ecb-b7ca-3c0384afb882'
+        data['msg_to'] = ['0a7ad740-10d5-4ecb-b7ca-3c0384afb882']
         data['msg_from'] = 'BRES'
         context.response = app.test_client().post("http://localhost:5050/message/send",
                                                   data=flask.json.dumps(data), headers=headers)
 
     for x in range(0, 2):
-        data['msg_to'] = '0a7ad740-10d5-4ecb-b7ca-3c0384afb882'
+        data['msg_to'] = ['0a7ad740-10d5-4ecb-b7ca-3c0384afb882']
         data['msg_from'] = 'BRES'
         data['ru_id'] = '7fc0e8ab-189c-4794-b8f4-9f05a1db185b'
         context.response = app.test_client().post("http://localhost:5050/message/send",
@@ -205,7 +205,8 @@ def step_impl_respondent_gets_their_messages_with_particular_ru(context):
     token_data['user_uuid'] = '0a7ad740-10d5-4ecb-b7ca-3c0384afb882'
     token_data['role'] = 'respondent'
     headers['Authorization'] = update_encrypted_jwt()
-    context.response = app.test_client().get('{0}{1}'.format(url, '?ru_id=7fc0e8ab-189c-4794-b8f4-9f05a1db185b'), headers=headers)
+    context.response = app.test_client().get('{0}{1}'.format(url, '?ru_id=7fc0e8ab-189c-4794-b8f4-9f05a1db185b'),
+                                             headers=headers)
 
 
 @then('the retrieved messages should have the correct reporting unit')
@@ -224,12 +225,12 @@ def step_impl_internal_user_sends_multiple_messages_with_different_survey(contex
     headers['Authorization'] = update_encrypted_jwt()
 
     for x in range(0, 2):
-        data['msg_to'] = '0a7ad740-10d5-4ecb-b7ca-3c0384afb882'
+        data['msg_to'] = ['0a7ad740-10d5-4ecb-b7ca-3c0384afb882']
         data['msg_from'] = 'BRES'
         context.response = app.test_client().post("http://localhost:5050/message/send",
                                                   data=flask.json.dumps(data), headers=headers)
     for x in range(0, 2):
-        data['msg_to'] = '0a7ad740-10d5-4ecb-b7ca-3c0384afb882'
+        data['msg_to'] = ['0a7ad740-10d5-4ecb-b7ca-3c0384afb882']
         data['msg_from'] = 'BRES'
         data['survey'] = 'AnotherSurvey'
         context.response = app.test_client().post("http://localhost:5050/message/send",
@@ -262,12 +263,12 @@ def step_impl_internal_user_sends_multiple_messages_with_different_collection_ca
     headers['Authorization'] = update_encrypted_jwt()
 
     for x in range(0, 2):
-        data['msg_to'] = '0a7ad740-10d5-4ecb-b7ca-3c0384afb882'
+        data['msg_to'] = ['0a7ad740-10d5-4ecb-b7ca-3c0384afb882']
         data['msg_from'] = 'BRES'
         context.response = app.test_client().post("http://localhost:5050/message/send",
                                                   data=flask.json.dumps(data), headers=headers)
     for x in range(0, 2):
-        data['msg_to'] = '0a7ad740-10d5-4ecb-b7ca-3c0384afb882'
+        data['msg_to'] = ['0a7ad740-10d5-4ecb-b7ca-3c0384afb882']
         data['msg_from'] = 'BRES'
         data['collection_case'] = 'AnotherCollectionCase'
         context.response = app.test_client().post("http://localhost:5050/message/send",
@@ -301,12 +302,12 @@ def step_impl_internal_user_sends_multiple_messages_with_different_collection_ex
     headers['Authorization'] = update_encrypted_jwt()
 
     for x in range(0, 2):
-        data['msg_to'] = '0a7ad740-10d5-4ecb-b7ca-3c0384afb882'
+        data['msg_to'] = ['0a7ad740-10d5-4ecb-b7ca-3c0384afb882']
         data['msg_from'] = 'BRES'
         context.response = app.test_client().post("http://localhost:5050/message/send",
                                                   data=flask.json.dumps(data), headers=headers)
     for x in range(0, 2):
-        data['msg_to'] = '0a7ad740-10d5-4ecb-b7ca-3c0384afb882'
+        data['msg_to'] = ['0a7ad740-10d5-4ecb-b7ca-3c0384afb882']
         data['msg_from'] = 'BRES'
         data['collection_exercise'] = 'AnotherCollectionExercise'
         context.response = app.test_client().post("http://localhost:5050/message/send",
@@ -335,7 +336,7 @@ def step_impl_assert_messages_have_correct_collection_exercise(context):
 def step_impl_respondent_creates_multiple_draft_messages(context):
 
     for x in range(0, 2):
-        draft = {'msg_to': 'BRES',
+        draft = {'msg_to': ['BRES'],
                  'msg_from': '0a7ad740-10d5-4ecb-b7ca-3c0384afb882',
                  'subject': 'test',
                  'body': 'Test',
@@ -432,7 +433,7 @@ def step_impl_internal_user_receives_multiple_messages(context):
     headers['Authorization'] = update_encrypted_jwt()
 
     for x in range(0, 2):
-        data['msg_to'] = 'BRES'
+        data['msg_to'] = ['BRES']
         data['msg_from'] = '0a7ad740-10d5-4ecb-b7ca-3c0384afb882'
         context.response = app.test_client().post("http://localhost:5050/message/send",
                                                   data=flask.json.dumps(data), headers=headers)
@@ -504,12 +505,12 @@ def step_impl_return_400(context):
 def step_impl_multiple_messages_for_all_labels(context):
 
     for _ in range(0, 2):
-        data['msg_to'] = '0a7ad740-10d5-4ecb-b7ca-3c0384afb882'
+        data['msg_to'] = ['0a7ad740-10d5-4ecb-b7ca-3c0384afb882']
         data['msg_from'] = 'BRES'
         context.response = app.test_client().post("http://localhost:5050/message/send",
                                                   data=flask.json.dumps(data), headers=headers)
     for _ in range(0, 2):
-        data['msg_to'] = 'BRES'
+        data['msg_to'] = ['BRES']
         data['msg_from'] = '0a7ad740-10d5-4ecb-b7ca-3c0384afb882'
         context.response = app.test_client().post("http://localhost:5050/message/send",
                                                   data=flask.json.dumps(data), headers=headers)
@@ -667,7 +668,7 @@ def step_impl_respondent_recieves_multiple_messages(context):
     headers['Authorization'] = update_encrypted_jwt()
 
     for x in range(0, 2):
-        data['msg_to'] = '0a7ad740-10d5-4ecb-b7ca-3c0384afb882'
+        data['msg_to'] = ['0a7ad740-10d5-4ecb-b7ca-3c0384afb882']
         data['msg_from'] = 'BRES'
         context.response = app.test_client().post("http://localhost:5050/message/send",
                                                   data=flask.json.dumps(data), headers=headers)

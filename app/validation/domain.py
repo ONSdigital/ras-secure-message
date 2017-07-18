@@ -41,7 +41,7 @@ class MessageSchema(Schema):
 
     """ Class to marshal JSON to Message"""
     msg_id = fields.Str(allow_none=True)
-    msg_to = fields.Str(required=True)
+    msg_to = fields.List(fields.String(required=True))
     msg_from = fields.Str(required=True)
     body = fields.Str(required=True)
     subject = fields.Str(required=True)
@@ -57,34 +57,18 @@ class MessageSchema(Schema):
         self.validate_not_present(data, 'read_date')
         return data
 
-    @pre_load
-    def check_format_of_msg_to_and_msg_from(self, data):
-
-        if data.get('msg_to') and isinstance(data.get('msg_to'), list) and "id" in data.get('msg_to')[0]:
-            data['msg_to'] = data['msg_to'][0]['id']
-        elif data.get('msg_to') and isinstance(data.get('msg_to'), list) and len(data.get('msg_to')) >= 1:
-            if isinstance(data.get('msg_to')[0], str):
-                data['msg_to'] = data.get('msg_to')[0]
-            else:
-                raise ValidationError("'msg_to' is missing an 'id' or incorrect format")
-
-        if data.get('msg_from') and not isinstance(data.get('msg_from'), str) and "id" in data.get('msg_from'):
-            data['msg_from'] = data['msg_from']['id']
-        elif data.get('msg_from') and not isinstance(data.get('msg_from'), str):
-            raise ValidationError("'msg_from' is missing an 'id' or incorrect format")
-
-        return data
-
     @validates_schema
     def validate_to_from_not_equal(self, data):
-        if 'msg_to' in data.keys() and 'msg_from' in data.keys() and data['msg_to'] == data['msg_from']:
+        if 'msg_to' in data.keys() and 'msg_from' in data.keys() and data['msg_to'][0] == data['msg_from']:
             raise ValidationError("msg_to and msg_from fields can not be the same.")
 
+    # TODO: Validate UUID with mock party
     @validates('msg_to')
     def validate_to(self, msg_to):
-        self.validate_non_zero_field_length("msg_to", len(msg_to), constants.MAX_TO_LEN)
-        if msg_to != 'BRES' and not User.is_valid_user(msg_to):
-            raise ValidationError("{0} is not a valid user.".format(msg_to))
+        for item in msg_to:
+            self.validate_non_zero_field_length("msg_to", len(item), constants.MAX_TO_LEN)
+            if msg_to != 'BRES' and not User.is_valid_user(item):
+                raise ValidationError("{0} is not a valid user.".format(item))
 
     @validates('msg_from')
     def validate_from(self, msg_from):
@@ -152,7 +136,7 @@ class DraftSchema(Schema):
     """Class to marshal JSON to Draft"""
 
     msg_id = fields.Str(allow_none=True)
-    msg_to = fields.Str(allow_none=True)
+    msg_to = fields.List(fields.String(allow_none=True))
     msg_from = fields.Str(required=True)
     body = fields.Str(allow_none=True)
     subject = fields.Str(allow_none=True)
@@ -171,27 +155,6 @@ class DraftSchema(Schema):
             raise ValidationError("{0} Missing".format('survey'))
         return data
 
-    @pre_load
-    def check_format_of_msg_to_and_msg_from(self, data):
-
-        if data.get('msg_to') and isinstance(data.get('msg_to'), list) and len(data.get('msg_to')) > 0\
-                and isinstance(data.get('msg_to')[0], dict) and "id" in data.get('msg_to')[0].keys():
-                data['msg_to'] = data['msg_to'][0]['id']
-        elif 'msg_to' in data.keys() and isinstance(data.get('msg_to'), list) and len(data.get('msg_to')) > 0:
-            if isinstance(data.get('msg_to')[0], str):
-                data['msg_to'] = data.get('msg_to')[0]
-            else:
-                raise ValidationError("'msg_to' is missing an 'id' or incorrect format")
-        elif 'msg_to' in data.keys() and isinstance(data.get('msg_to'), list) and len(data.get('msg_to')) == 0:
-            data.pop('msg_to')
-
-        if data.get('msg_from') and not isinstance(data.get('msg_from'), str) and "id" in data.get('msg_from'):
-            data['msg_from'] = data['msg_from']['id']
-        elif data.get('msg_from') and not isinstance(data.get('msg_from'), str):
-            raise ValidationError("'msg_from' is missing an 'id' or incorrect format")
-
-        return data
-
     @validates_schema
     def validate_to_from_not_equal(self, data):
         if 'msg_to' in data.keys() and 'msg_from' in data.keys() and data['msg_to'] == data['msg_from']:
@@ -199,10 +162,13 @@ class DraftSchema(Schema):
 
     @validates("msg_to")
     def validate_to(self, msg_to):
-        if msg_to is not None:
-            self.validate_field_length(msg_to, len(msg_to), constants.MAX_TO_LEN)
-            if len(msg_to) > 0 and msg_to != 'BRES' and not User.is_valid_user(msg_to):
-                raise ValidationError("{0} is not a valid user.".format(msg_to))
+        if msg_to:
+            for item in msg_to:
+                self.validate_field_length(msg_to, len(item), constants.MAX_TO_LEN)
+                if len(msg_to) > 0 and msg_to != 'BRES' and not User.is_valid_user(item):
+                    raise ValidationError("{0} is not a valid user.".format(item))
+        else:
+            logger.debug("msg_to field empty")
 
     @validates("msg_from")
     def validate_from(self, msg_from):

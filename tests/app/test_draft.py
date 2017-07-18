@@ -46,7 +46,7 @@ class DraftTestCase(unittest.TestCase):
 
         self.headers = {'Content-Type': 'application/json', 'Authorization': encrypted_jwt}
 
-        self.test_message = {'msg_to': 'f62dfda8-73b0-4e0e-97cf-1b06327a6712',
+        self.test_message = {'msg_to': ['f62dfda8-73b0-4e0e-97cf-1b06327a6712'],
                              'msg_from': 'BRES',
                              'subject': 'MyMessage',
                              'body': 'hello',
@@ -82,7 +82,7 @@ class DraftTestCase(unittest.TestCase):
     def test_draft_empty_to_field_returns_201(self):
         """Test draft can be saved without To field"""
 
-        self.test_message['msg_to'] = ''
+        self.test_message['msg_to'] = []
         response = self.app.post(self.url, data=json.dumps(self.test_message), headers=self.headers)
         self.assertEqual(response.status_code, 201)
 
@@ -147,7 +147,7 @@ class DraftTestCase(unittest.TestCase):
     def test_draft_correct_labels_saved_to_status_without_to(self):
         """Check correct labels are saved to status table for draft saved without a to"""
 
-        self.test_message['msg_to'] = ''
+        self.test_message['msg_to'] = []
 
         self.app.post(self.url, data=json.dumps(self.test_message), headers=self.headers)
 
@@ -208,7 +208,7 @@ class DraftTestCase(unittest.TestCase):
         self.test_message.update(
             {
                 'msg_id': self.msg_id,
-                'msg_to': '0a7ad740-10d5-4ecb-b7ca-3c0384afb882',
+                'msg_to': ['0a7ad740-10d5-4ecb-b7ca-3c0384afb882'],
                 'msg_from': 'BRES',
                 'subject': 'MyMessage',
                 'body': 'hello',
@@ -272,7 +272,7 @@ class DraftTestCase(unittest.TestCase):
             'labels': ['DRAFT']
         }
 
-        etag = utilities.generate_etag(message['msg_to'],message['msg_id'], message['subject'],message['body'])
+        etag = utilities.generate_etag(message['msg_to'], message['msg_id'], message['subject'], message['body'])
 
         self.assertTrue(DraftModifyById.etag_check({'etag': etag}, message))
 
@@ -294,7 +294,7 @@ class DraftTestCase(unittest.TestCase):
             'labels': ['DRAFT']
         }
 
-        etag = utilities.generate_etag(['XXX'], message['msg_id'], message['subject'],message['body'])
+        etag = utilities.generate_etag(['XXX'], message['msg_id'], message['subject'], message['body'])
         self.assertFalse(DraftModifyById.etag_check({'ETag': etag}, message))
 
     def test_etag_check_returns_false_if_msg_id_changed(self):
@@ -371,23 +371,14 @@ class DraftTestCase(unittest.TestCase):
 
     def test_draft_same_to_from_causes_error(self):
         """marshalling message with same to and from field"""
-        self.test_message['msg_to'] = self.test_message['msg_from']
-        with app.app_context():
-            g.user = User(self.test_message['msg_from'], 'respondent')
-            schema = DraftSchema()
-            errors = schema.load(self.test_message)[1]
+        # self.test_message['msg_to'] = self.test_message['msg_from']
+        if self.test_message['msg_from'] in self.test_message['msg_to']:
+            with app.app_context():
+                g.user = User(self.test_message['msg_from'], 'respondent')
+                schema = DraftSchema()
+                errors = schema.load(self.test_message)[1]
 
-        self.assertTrue(errors == {'_schema': ['msg_to and msg_from fields can not be the same.']})
-
-    def test_draft_msg_to_list_of_dict(self):
-        """marshalling message where msg_to field is list of dicts"""
-        self.test_message['msg_to'] = [{"id": "01b51fcc-ed43-4cdb-ad1c-450f9986859b", "firstname": "Chandana", "surname": "Blanchet", "email": "cblanc@hotmail.co.uk", "telephone": "+443069990854", "status": "ACTIVE"}]
-        with app.app_context():
-            g.user = User(self.test_message['msg_from'], 'respondent')
-            schema = DraftSchema()
-            errors = schema.load(self.test_message)[1]
-
-        self.assertTrue(errors == {})
+            self.assertTrue(errors == {'_schema': ['msg_to and msg_from fields can not be the same.']})
 
     def test_draft_msg_to_list_of_string(self):
         """marshalling message where msg_to field is list of strings"""
@@ -401,23 +392,13 @@ class DraftTestCase(unittest.TestCase):
 
     def test_draft_msg_to_string(self):
         """marshalling message where msg_to field is string"""
-        self.test_message['msg_to'] = "01b51fcc-ed43-4cdb-ad1c-450f9986859b"
+        self.test_message['msg_to'] = ["01b51fcc-ed43-4cdb-ad1c-450f9986859b"]
         with app.app_context():
             g.user = User(self.test_message['msg_from'], 'respondent')
             schema = DraftSchema()
             errors = schema.load(self.test_message)[1]
 
         self.assertTrue(errors == {})
-
-    def test_draft_msg_to_list_of_dict_without_id(self):
-        """marshalling message where msg_to field is list of dicts without id"""
-        self.test_message['msg_to'] = [{"firstname": "Chandana", "surname": "Blanchet", "email": "cblanc@hotmail.co.uk", "telephone": "+443069990854", "status": "ACTIVE"}]
-        with app.app_context():
-            g.user = User(self.test_message['msg_from'], 'respondent')
-            schema = DraftSchema()
-            errors = schema.load(self.test_message)[1]
-
-        self.assertTrue(errors == {'_schema': ["'msg_to' is missing an 'id' or incorrect format"]})
 
     def test_draft_msg_from_string(self):
         """marshalling message where msg_from field is string"""
@@ -428,26 +409,6 @@ class DraftTestCase(unittest.TestCase):
             errors = schema.load(self.test_message)[1]
 
         self.assertTrue(errors == {})
-
-    def test_draft_msg_from_dict(self):
-        """marshalling message where msg_from field is dict"""
-        self.test_message['msg_from'] = {"id": "01b51fcc-ed43-4cdb-ad1c-450f9986859b", "firstname": "Chandana", "surname": "Blanchet", "email": "cblanc@hotmail.co.uk", "telephone": "+443069990854", "status": "ACTIVE"}
-        with app.app_context():
-            g.user = User("01b51fcc-ed43-4cdb-ad1c-450f9986859b", 'respondent')
-            schema = DraftSchema()
-            errors = schema.load(self.test_message)[1]
-
-        self.assertTrue(errors == {})
-
-    def test_draft_msg_from_dict_without_id(self):
-        """marshalling message where msg_from field is dict without id"""
-        self.test_message['msg_from'] = {"firstname": "Chandana", "surname": "Blanchet", "email": "cblanc@hotmail.co.uk", "telephone": "+443069990854", "status": "ACTIVE"}
-        with app.app_context():
-            g.user = User("01b51fcc-ed43-4cdb-ad1c-450f9986859b", 'respondent')
-            schema = DraftSchema()
-            errors = schema.load(self.test_message)[1]
-
-        self.assertTrue(errors == {'_schema': ["'msg_from' is missing an 'id' or incorrect format"]})
 
     def test_ru_id_field_too_long_causes_error(self):
         """marshalling message with ru_id field too long"""
