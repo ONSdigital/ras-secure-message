@@ -14,8 +14,10 @@ from app.common.labels import Labels
 from app.repository import database
 from app.repository.modifier import Modifier
 from app.repository.retriever import Retriever
+from app.repository.saver import Saver
 from app.validation.domain import DraftSchema
 from app.validation.user import User
+from app.repository.database import SecureMessage
 
 
 class ModifyTestCaseHelper:
@@ -315,25 +317,26 @@ class ModifyTestCase(unittest.TestCase, ModifyTestCaseHelper):
                     'survey': 'BRES'
                 }
 
-                modifier = Modifier()
-                with self.engine.connect() as con:
-                    add_draft = "INSERT INTO secure_message (msg_id, body, subject, thread_id, collection_case, " \
-                                "ru_id, survey, collection_exercise) VALUES ('{0}', '{1}', '{2}', '{3}', '{4}', " \
-                                "'{5}', '{6}', '{7}')".format(self.test_message['msg_id'], self.test_message['body'],
-                                                              self.test_message['subject'],
-                                                              self.test_message['thread_id'],
-                                                              self.test_message['collection_case'],
-                                                              self.test_message['ru_id'], 'test',
-                                                              self.test_message['collection_exercise'])
+                Saver().save_message(SecureMessage(msg_id=self.test_message['msg_id'],
+                                                   body=self.test_message['body'],
+                                                   subject=self.test_message['subject'],
+                                                   thread_id=self.test_message['thread_id'],
+                                                   collection_case=self.test_message['collection_case'],
+                                                   ru_id=self.test_message['ru_id'],
+                                                   survey=self.test_message['survey'],
+                                                   collection_exercise=self.test_message['collection_exercise']))
 
-                    con.execute(add_draft)
-                    g.user = User('0a7ad740-10d5-4ecb-b7ca-3c0384afb882', 'respondent')
-                    draft = DraftSchema().load(self.test_message)
-                    modifier.replace_current_draft(self.test_message['msg_id'], draft.data)
-                    replaced_draft = con.execute("SELECT * FROM secure_message WHERE msg_id='{0}'".format(self.test_message['msg_id']))
+                g.user = User(self.test_message['msg_from'], 'respondent')
+                draft = DraftSchema().load(self.test_message)
 
-                    for row in replaced_draft:
-                        self.assertEquals(row['survey'], self.test_message['survey'])
+                draft.data.body = 'not hello'
+                draft.data.subject = 'not MyMessage'
+                Modifier().replace_current_draft(self.test_message['msg_id'], draft.data)
+
+                retrieved_data=Retriever().retrieve_message(self.test_message['msg_id'],g.user)
+
+                self.assertEqual(retrieved_data["body"], 'not hello')
+                self.assertEqual(retrieved_data["subject"], 'not MyMessage')
 
     def test_archive_is_removed_for_both_respondent_and_internal(self):
         """testing archive label is removed after being added to both respondent and internal"""
