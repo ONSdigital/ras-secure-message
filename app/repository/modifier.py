@@ -102,13 +102,10 @@ class Modifier:
     @staticmethod
     def replace_current_draft(draft_id, draft, session=db.session):
         """used to replace draft content in message table"""
-        secure_message = SecureMessage(msg_id=draft_id, subject=draft['subject'], body=draft['body'],
-                                       thread_id=draft['thread_id'], collection_case=draft['collection_case'],
-                                       ru_id=draft['ru_id'], collection_exercise=draft['collection_exercise'],
-                                       survey=draft['survey'])
 
         try:
-            session.add(secure_message)
+            session.query(SecureMessage).filter_by(msg_id=draft_id).update({"subject": draft.subject,
+                                                                            "body": draft.body})
             session.commit()
         except Exception as e:
             session.rollback()
