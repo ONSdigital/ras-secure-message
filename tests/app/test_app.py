@@ -41,7 +41,7 @@ class FlaskTestCase(unittest.TestCase):
 
         self.headers = {'Content-Type': 'application/json', 'Authorization': encrypted_jwt}
 
-        self.test_message = {'msg_to': '0a7ad740-10d5-4ecb-b7ca-3c0384afb882',
+        self.test_message = {'msg_to': ['0a7ad740-10d5-4ecb-b7ca-3c0384afb882'],
                              'msg_from': 'BRES',
                              'subject': 'MyMessage',
                              'body': 'hello',
@@ -71,7 +71,7 @@ class FlaskTestCase(unittest.TestCase):
 
         url = "http://localhost:5050/message/send"
 
-        data = {'msg_to': '0a7ad740-10d5-4ecb-b7ca-3c0384afb882',
+        data = {'msg_to': ['0a7ad740-10d5-4ecb-b7ca-3c0384afb882'],
                 'msg_from': 'ce12b958-2a5f-44f4-a6da-861e59070a31',
                 'subject': 'MyMessage',
                 'body': 'hello',
@@ -145,7 +145,7 @@ class FlaskTestCase(unittest.TestCase):
         """posts to message send end point without 'thread_id'"""
         url = "http://localhost:5050/message/send"
 
-        test_message = {'msg_to': '0a7ad740-10d5-4ecb-b7ca-3c0384afb882',
+        test_message = {'msg_to': ['0a7ad740-10d5-4ecb-b7ca-3c0384afb882'],
                         'msg_from': 'ce12b958-2a5f-44f4-a6da-861e59070a31',
                         'subject': 'MyMessage',
                         'body': 'hello',
@@ -198,7 +198,7 @@ class FlaskTestCase(unittest.TestCase):
         draft = (
             {
                 'msg_id': self.msg_id,
-                'msg_to': '0a7ad740-10d5-4ecb-b7ca-3c0384afb882',
+                'msg_to': ['0a7ad740-10d5-4ecb-b7ca-3c0384afb882'],
                 'msg_from': 'BRES',
                 'subject': 'MyMessage',
                 'body': 'hello',
@@ -231,10 +231,10 @@ class FlaskTestCase(unittest.TestCase):
 
         response = self.app.post(url, data=json.dumps(self.test_message), headers=self.headers)
         data = json.loads(response.data)
-
+        # dereferencing msg_to for purpose of test
         with self.engine.connect() as con:
             request = con.execute("SELECT * FROM status WHERE label='INBOX' OR label='UNREAD' AND msg_id='{0}'"
-                                  " AND actor='{1}'".format(data['msg_id'], self.test_message['msg_to']))
+                                  " AND actor='{1}'".format(data['msg_id'], self.test_message['msg_to'][0]))
             for row in request:
                 self.assertTrue(row is not None)
 
@@ -275,7 +275,7 @@ class FlaskTestCase(unittest.TestCase):
 
         self.test_message.update({
             'msg_id': msg_id,
-            'msg_to': '0a7ad740-10d5-4ecb-b7ca-3c0384afb882',
+            'msg_to': ['0a7ad740-10d5-4ecb-b7ca-3c0384afb882'],
             'msg_from': 'BRES',
             'subject': 'MyMessage',
             'body': 'hello',
@@ -343,7 +343,7 @@ class FlaskTestCase(unittest.TestCase):
         """Test that draft get returns draft's msg_to if applicable"""
 
         self.test_message.update({
-            'msg_to': 'BRES',
+            'msg_to': ['BRES'],
             'msg_from': '0a7ad740-10d5-4ecb-b7ca-3c0384afb882',
             'subject': 'MyMessage',
             'body': 'hello',

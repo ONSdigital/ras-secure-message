@@ -58,7 +58,7 @@ class PartyTestCase(unittest.TestCase):
 
     def test_message_by_id_replaces_uuids(self):
         """Test get message by id endpoint replaces to and from with user details"""
-        data = {'msg_to': 'BRES',
+        data = {'msg_to': ['BRES'],
                 'msg_from': '0a7ad740-10d5-4ecb-b7ca-3c0384afb882',
                 'subject': 'MyMessage',
                 'body': 'hello',
@@ -85,7 +85,7 @@ class PartyTestCase(unittest.TestCase):
 
     def test_messages_get_replaces_uuids_with_user_details(self):
         """Test get all messages endpoint replaces every messages to and from with user details"""
-        data = {'msg_to': 'BRES',
+        data = {'msg_to': ['BRES'],
                 'msg_from': '0a7ad740-10d5-4ecb-b7ca-3c0384afb882',
                 'subject': 'MyMessage',
                 'body': 'hello',
@@ -113,7 +113,7 @@ class PartyTestCase(unittest.TestCase):
 
     def test_draft_get_return_user_details_for_to_and_from(self):
         """Test get draft replaces sender and recipient with user details"""
-        data = {'msg_to': 'BRES',
+        data = {'msg_to': ['BRES'],
                 'msg_from': '0a7ad740-10d5-4ecb-b7ca-3c0384afb882',
                 'subject': 'MyMessage',
                 'body': 'hello',
@@ -140,7 +140,7 @@ class PartyTestCase(unittest.TestCase):
 
     def test_drafts_get_return_user_details_in_to_and_from(self):
         """Test get all drafts returns to and from as user details"""
-        data = {'msg_to': 'BRES',
+        data = {'msg_to': ['BRES'],
                 'msg_from': '0a7ad740-10d5-4ecb-b7ca-3c0384afb882',
                 'subject': 'MyMessage',
                 'body': 'hello',
@@ -191,7 +191,7 @@ class PartyTestCase(unittest.TestCase):
     def test_get_message_returns_business_details(self):
         """Test get message by id returns business details"""
 
-        data = {'msg_to': 'BRES',
+        data = {'msg_to': ['BRES'],
                 'msg_from': '0a7ad740-10d5-4ecb-b7ca-3c0384afb882',
                 'subject': 'MyMessage',
                 'body': 'hello',
@@ -219,7 +219,7 @@ class PartyTestCase(unittest.TestCase):
     def test_get_messages_returns_business_details(self):
         """Test get all messages returns business details"""
 
-        data = {'msg_to': 'BRES',
+        data = {'msg_to': ['BRES'],
                 'msg_from': '0a7ad740-10d5-4ecb-b7ca-3c0384afb882',
                 'subject': 'MyMessage',
                 'body': 'hello',
@@ -248,7 +248,7 @@ class PartyTestCase(unittest.TestCase):
     def test_get_draft_returns_business_details(self):
         """Test get draft returns business details"""
 
-        data = {'msg_to': 'BRES',
+        data = {'msg_to': ['BRES'],
                 'msg_from': '0a7ad740-10d5-4ecb-b7ca-3c0384afb882',
                 'subject': 'MyMessage',
                 'body': 'hello',
@@ -276,7 +276,7 @@ class PartyTestCase(unittest.TestCase):
     def test_get_drafts_returns_business_details(self):
         """Test get all drafts includes business details"""
 
-        data = {'msg_to': 'BRES',
+        data = {'msg_to': ['BRES'],
                 'msg_from': '0a7ad740-10d5-4ecb-b7ca-3c0384afb882',
                 'subject': 'MyMessage',
                 'body': 'hello',

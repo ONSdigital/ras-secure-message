@@ -86,8 +86,12 @@ Feature: Message Send Endpoint
     When another user tries to send the same message
     Then is shown a 409 error status
 
-
   Scenario: A Etag is not present within the header
     Given a message is created
     When the message is sent with no Etag
     Then a 201 status code is the response
+
+  Scenario: Send a message where msg_to is a string
+    Given a msg_to is entered as a string
+    When the message is sent with msg_to string
+    Then a 400 error status is returned

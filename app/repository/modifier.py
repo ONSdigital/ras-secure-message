@@ -122,7 +122,8 @@ class Modifier:
         """used to replace the draft INBOX_DRAFT label"""
         del_current_status = "DELETE FROM status WHERE msg_id='{0}' AND label='{1}'" \
             .format(draft_id, Labels.DRAFT_INBOX.value)
-        new_status = Status(msg_id=draft_id, actor=draft_to, label=Labels.DRAFT_INBOX.value)
+        # TODO: Only handling first item in list.
+        new_status = Status(msg_id=draft_id, actor=draft_to[0], label=Labels.DRAFT_INBOX.value)
 
         try:
             db.get_engine(app=db.get_app()).execute(del_current_status)

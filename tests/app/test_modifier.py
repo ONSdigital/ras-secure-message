@@ -223,7 +223,7 @@ class ModifyTestCase(unittest.TestCase, ModifyTestCaseHelper):
             with current_app.test_request_context():
                 self.test_message = {
                     'msg_id': 'test123',
-                    'msg_to': 'BRES',
+                    'msg_to': ['BRES'],
                     'msg_from': '0a7ad740-10d5-4ecb-b7ca-3c0384afb882',
                     'subject': 'MyMessage',
                     'body': 'hello',
@@ -267,7 +267,7 @@ class ModifyTestCase(unittest.TestCase, ModifyTestCaseHelper):
             with current_app.test_request_context():
                 self.test_message = {
                     'msg_id': 'test123',
-                    'msg_to': 'richard',
+                    'msg_to': ['richard'],
                     'msg_from': '0a7ad740-10d5-4ecb-b7ca-3c0384afb882',
                     'subject': 'MyMessage',
                     'body': 'hello',
@@ -306,7 +306,7 @@ class ModifyTestCase(unittest.TestCase, ModifyTestCaseHelper):
             with current_app.test_request_context():
                 self.test_message = {
                     'msg_id': 'test123',
-                    'msg_to': 'BRES',
+                    'msg_to': ['BRES'],
                     'msg_from': '0a7ad740-10d5-4ecb-b7ca-3c0384afb882',
                     'subject': 'MyMessage',
                     'body': 'hello',
@@ -398,7 +398,7 @@ class ModifyTestCase(unittest.TestCase, ModifyTestCaseHelper):
     def test_exception_for_replace_current_draft_raises(self):
         draft = {
                     'msg_id': 'test123',
-                    'msg_to': 'richard',
+                    'msg_to': ['richard'],
                     'msg_from': '0a7ad740-10d5-4ecb-b7ca-3c0384afb882',
                     'subject': 'MyMessage',
                     'body': 'hello',

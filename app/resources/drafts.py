@@ -43,7 +43,7 @@ class DraftSave(Resource):
         saver.save_message(draft.data)
 
         if draft.data.msg_to is not None and len(draft.data.msg_to) != 0:
-            uuid_to = draft.data.msg_to if g.user.is_internal else draft.data.survey
+            uuid_to = draft.data.msg_to[0] if g.user.is_internal else draft.data.survey
             saver.save_msg_status(uuid_to, draft.data.msg_id, Labels.DRAFT_INBOX.value)
 
         uuid_from = draft.data.msg_from if g.user.is_respondent else draft.data.survey
@@ -116,7 +116,7 @@ class DraftModifyById(Resource):
             message_service = Retriever()
             modified_draft = message_service.retrieve_draft(draft_id, g.user)
 
-            etag = generate_etag(modified_draft['msg_to'], modified_draft['msg_id'],
+            etag = generate_etag(modified_draft['msg_to'][0], modified_draft['msg_id'],
                                  modified_draft['subject'], modified_draft['body'])
             resp = jsonify({'status': 'OK', 'msg_id': draft_id})
             resp.headers['ETag'] = etag

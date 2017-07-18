@@ -95,8 +95,8 @@ class MessageSend(Resource):
         else:
             save.save_msg_status(message.data.survey, message.data.msg_id, Labels.SENT.value)
             save.save_msg_audit(message.data.msg_id, message.data.msg_from)
-            save.save_msg_status(message.data.msg_to, message.data.msg_id, Labels.INBOX.value)
-            save.save_msg_status(message.data.msg_to, message.data.msg_id, Labels.UNREAD.value)
+            save.save_msg_status(message.data.msg_to[0], message.data.msg_id, Labels.INBOX.value)
+            save.save_msg_status(message.data.msg_to[0], message.data.msg_id, Labels.UNREAD.value)
 
         if is_draft is True:
             self._del_draft_labels(draft_id)
