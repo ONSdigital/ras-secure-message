@@ -317,14 +317,17 @@ class ModifyTestCase(unittest.TestCase, ModifyTestCaseHelper):
 
                 modifier = Modifier()
                 with self.engine.connect() as con:
-                    add_draft = "INSERT INTO secure_message (msg_id, body, subject, thread_id, collection_case, " \
-                                "ru_id, survey, collection_exercise) VALUES ('{0}', '{1}', '{2}', '{3}', '{4}', " \
-                                "'{5}', '{6}', '{7}')".format(self.test_message['msg_id'], self.test_message['body'],
+                    add_draft = "INSERT INTO secure_message (msg_id, subject, body, thread_id, " \
+                                "collection_case, collection_exercise, ru_id, survey) VALUES " \
+                                "('{0}', '{1}', '{2}', '{3}', '{4}', " \
+                                "'{5}', '{6}', '{7}')".format(self.test_message['msg_id'],
                                                               self.test_message['subject'],
+                                                              self.test_message['body'],
                                                               self.test_message['thread_id'],
                                                               self.test_message['collection_case'],
-                                                              self.test_message['ru_id'], 'test',
-                                                              self.test_message['collection_exercise'])
+                                                              self.test_message['collection_exercise'],
+                                                              self.test_message['ru_id'],
+                                                              self.test_message['survey'])
 
                     con.execute(add_draft)
                     g.user = User('0a7ad740-10d5-4ecb-b7ca-3c0384afb882', 'respondent')

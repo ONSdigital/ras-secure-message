@@ -102,17 +102,16 @@ class Modifier:
     @staticmethod
     def replace_current_draft(draft_id, draft, session=db.session):
         """used to replace draft content in message table"""
-        secure_message = SecureMessage(msg_id=draft_id, subject=draft.subject, body=draft.body,
-                                       thread_id=draft.thread_id, collection_case=draft.collection_case,
-                                       ru_id=draft.ru_id, collection_exercise=draft.collection_exercise,
-                                       survey=draft.survey)
+        secure_message = SecureMessage(msg_id=draft_id, subject=draft['subject'], body=draft['body'],
+                                       thread_id=draft['thread_id'], collection_case=draft['collection_case'],
+                                       ru_id=draft['ru_id'], collection_exercise=draft['collection_exercise'],
+                                       survey=draft['survey'])
 
         try:
-            setattr(secure_message, 'subject',secure_message.subject)
-            setattr(secure_message, 'body', secure_message.body)
+            session.add(secure_message)
             session.commit()
         except Exception as e:
-            session.rollbeck()
+            session.rollback()
             logger.error(e)
             raise (InternalServerError(description="Error replacing message"))
 
