@@ -95,7 +95,7 @@ def paginated_list_to_json(paginated_list, page, limit, host_url, user, string_q
 
 def generate_etag(msg_to, msg_id, subject, body):
     """Function used to create an ETag"""
-    if None in msg_to:
+    if msg_to is None:
         msg_to = []
 
     msg_to_str = ' '.join(str(uuid) for uuid in msg_to)

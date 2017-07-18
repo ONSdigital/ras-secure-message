@@ -193,7 +193,7 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
     def test_generate_etag_with_none_in_msg_to(self):
         """Generating etag when msg_to has a None value"""
 
-        generated_etag = generate_etag([None], 'd740-10d5-4ecb-b', 'subject', 'body')
+        generated_etag = generate_etag([], 'd740-10d5-4ecb-b', 'subject', 'body')
 
         msg_to = []
         msg_to_str = ' '.join(str(uuid) for uuid in msg_to)

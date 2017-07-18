@@ -70,8 +70,8 @@ def step_impl_a_200_http_response_is_returned(context):
 @then("returned message field msg_to is correct")
 def step_impl_correct_msg_to_returned(context):
     msg_resp = json.loads(context.response.data)
-    msg_to = mocked_party.respondent_ids[data['msg_to']]
-    nose.tools.assert_equal(msg_resp['msg_to'], [data['msg_to']])
+    msg_to = mocked_party.respondent_ids[data['msg_to'][0]]
+    nose.tools.assert_equal(msg_resp['msg_to'], [data['msg_to'][0]])
     nose.tools.assert_equal(msg_resp['@msg_to'], [msg_to])
 
 
