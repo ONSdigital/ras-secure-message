@@ -107,7 +107,6 @@ class Modifier:
             session.query(SecureMessage).filter_by(msg_id=draft_id).update({"subject": draft.subject,
                                                                             "body": draft.body})
             session.commit()
-
         except Exception as e:
             session.rollback()
             logger.error(e)
