@@ -12,6 +12,7 @@ from app.exception.exceptions import MessageSaveException
 from app.validation.domain import Message
 from app.repository.database import SecureMessage
 
+
 class SaverTestCase(unittest.TestCase):
     """Test case for message saving"""
     def setUp(self):
@@ -33,7 +34,6 @@ class SaverTestCase(unittest.TestCase):
         cursor = dbapi_connection.cursor()
         cursor.execute("PRAGMA foreign_keys=ON")
         cursor.close()
-
 
     def test_save_message_raises_message_save_exception_on_db_error(self):
         """Tests exception is logged if message save fails"""
@@ -74,7 +74,7 @@ class SaverTestCase(unittest.TestCase):
             with current_app.test_request_context():
                 Saver().save_message(SecureMessage(msg_id='MsgId'))
                 Saver().save_msg_audit(message_audit['msg_id'], message_audit['msg_urn'])
-
+                self.assertTrue(True)
 
     def test_save_msg_audit_raises_message_save_exception_on_db_error(self):
         """Tests MessageSaveException generated if db commit fails saving message audit"""
@@ -119,8 +119,7 @@ class SaverTestCase(unittest.TestCase):
         with app.app_context():
             with current_app.test_request_context():
                 with self.assertRaises(MessageSaveException):
-                    Saver().save_msg_status( message_status['actor'], message_status['msg_id'], 'INBOX, UNREAD')
-
+                    Saver().save_msg_status(message_status['actor'], message_status['msg_id'], 'INBOX, UNREAD')
 
     def test_event_commit_exception_raises_MessageSaveException(self):
         """check event commit exception clears the session"""
@@ -129,8 +128,6 @@ class SaverTestCase(unittest.TestCase):
             with current_app.test_request_context():
                 with self.assertRaises(MessageSaveException):
                     Saver().save_msg_event(message_event['msg_id'], message_event['event'])
-
-
 
     def test_msg_commit_exception_does_a_rollback(self):
         """check message commit exception clears the session"""
@@ -155,5 +152,3 @@ class SaverTestCase(unittest.TestCase):
             with current_app.test_request_context():
                 with self.assertRaises(MessageSaveException):
                     Saver().save_msg_audit(message_audit['msg_id'], message_audit['msg_urn'])
-
-
