@@ -62,11 +62,6 @@ def step_impl_the_get_request_is_made_with_a_correct_message_id(context):
     context.response = app.test_client().get(url.format(context.msg_id), headers=headers)
 
 
-@then("a 200 HTTP response is returned")
-def step_impl_a_200_http_response_is_returned(context):
-    nose.tools.assert_equal(context.response.status_code, 200)
-
-
 @then("returned message field msg_to is correct")
 def step_impl_correct_msg_to_returned(context):
     msg_resp = json.loads(context.response.data)
@@ -117,11 +112,6 @@ def step_impl_correct_collection_exercise_returned(context):
 @when("the get request has been made with an incorrect message id")
 def step_impl_the_get_request_has_been_made_with_incorrect_message_id(context):
     context.response = app.test_client().get(url.format(str(uuid.uuid4())), headers=headers)
-
-
-@then("a 404 HTTP response is returned")
-def step_impl_a_404_http_response_is_returned(context):
-    nose.tools.assert_equal(context.response.status_code, 404)
 
 
 # Scenario: Respondent sends message and retrieves the same message with it's labels
@@ -213,6 +203,8 @@ def step_impl_assert_returned_is_draft(context):
     response = json.loads(context.response.data)
     nose.tools.assert_equal(response['msg_id'], context.resp_data['msg_id'])
     nose.tools.assert_in("DRAFT", response['labels'])
+
+# common
 
 
 

@@ -130,11 +130,6 @@ def step_impl_success_returned(context):
     nose.tools.assert_equal(changed_draft['body'], data['body'])
 
 
-@then('a success response is given')
-def step_impl_success_returned(context):
-    nose.tools.assert_equal(context.response.status_code, 200)
-
-
 # Scenario 2: A user edits a draft that has not been previously saved
 @given('a user edits a non-existing draft')
 def step_impl_user_edits_non_existant_draft(context):

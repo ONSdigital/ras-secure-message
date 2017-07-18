@@ -64,22 +64,11 @@ def step_impl_assert_draft_is_retuned(context):
     nose.tools.assert_equal(response['msg_id'], context.resp_data['msg_id'])
 
 
-@then('a success response is returned')
-def step_impl_assert_200_returned(context):
-    nose.tools.assert_equal(context.response.status_code, 200)
-
-
 #   Scenario: User requests draft that does not exist
-
 @given('a user wants a draft that does not exist')
 def step_impl_user_request_non_existant_draft(context):
     context.resp_data = dict(msg_id='')
     context.resp_data['msg_id'] = str(uuid.uuid4())
-
-
-@then('the user receives a draft not found response')
-def step_impl_assert_404_returned(context):
-    nose.tools.assert_equal(context.response.status_code, 404)
 
 
 #   Scenario: User requests draft not authorised to view

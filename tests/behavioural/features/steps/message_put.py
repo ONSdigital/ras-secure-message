@@ -195,11 +195,6 @@ def step_impl_the_label_is_empty(context):
                                              data=flask.json.dumps(modify_data), headers=headers)
 
 
-@then('a Bad Request error is returned')
-def step_impl_a_bad_request_is_returned(context):
-    nose.tools.assert_equal(context.response.status_code, 400)
-
-
 #  Scenario: validating a request where there is no action provided
 
 @when('the action is empty')
@@ -208,11 +203,6 @@ def step_impl_the_action_is_empty(context):
     modify_data['label'] = 'SENT'
     context.response = app.test_client().put(url.format(context.msg_id),
                                              data=flask.json.dumps(modify_data), headers=headers)
-
-
-@then('a Bad Request 400 error is returned')
-def step_impl_a_bad_request_400_is_returned(context):
-    nose.tools.assert_equal(context.response.status_code, 400)
 
 
 # Scenario: validating a request where there in an invalid label provided
@@ -225,11 +215,6 @@ def step_impl_an_invalid_label_is_provided(context):
                                              data=flask.json.dumps(modify_data), headers=headers)
 
 
-@then('display a Bad Request is returned')
-def step_impl_display_a_bad_request_is_returned(context):
-    nose.tools.assert_equal(context.response.status_code, 400)
-
-
 #  Scenario: validating a request where there in an invalid action provided
 @when('an invalid action is provided')
 def step_impl_an_invalid_action_is_provided(context):
@@ -239,11 +224,6 @@ def step_impl_an_invalid_action_is_provided(context):
                                              data=flask.json.dumps(modify_data), headers=headers)
 
 
-@then('show a Bad Request is returned')
-def step_impl_a_bad_request_is_returned(context):
-    nose.tools.assert_equal(context.response.status_code, 400)
-
-
 #  Scenario: validating a request where there in an unmodifiable label is provided
 @when('an unmmodifiable label is provided')
 def step_impl_an_unmodifiable_label_is_provided(context):
@@ -251,11 +231,6 @@ def step_impl_an_unmodifiable_label_is_provided(context):
     modify_data['label'] = 'UNREAD'
     context.response = app.test_client().put(url.format(context.msg_id),
                                              data=flask.json.dumps(modify_data), headers=headers)
-
-
-@then('a Bad Request is displayed to the user')
-def step_impl_a_bad_request_is_displayed(context):
-    nose.tools.assert_equal(context.response.status_code, 400)
 
 
 # Scenario - internal - message status automatically changes to read - on opening message
@@ -427,8 +402,3 @@ def step_impl_searched_for(context):
     modify_data['label'] = 'UNREAD'
     context.response = app.test_client().put(url.format(context.msg_id),
                                              data=json.dumps(modify_data), headers=headers)
-
-
-@then("a 404 error code is returned")
-def step_impl_404_returned(context):
-    nose.tools.assert_equal(context.response.status_code, 404)
