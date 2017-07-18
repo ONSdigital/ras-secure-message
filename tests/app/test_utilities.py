@@ -229,3 +229,23 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
         etag = hash_object.hexdigest()
 
         self.assertEqual(generated_etag, etag)
+
+    def test_generate_etag_with_multiple_msg_to(self):
+        """Generating etag when msg_to has a uuid value"""
+
+        generated_etag = generate_etag(['1', '2', '3'], 'd740-10d5-4ecb-b', 'subject', 'body')
+
+        msg_to = ['1', '2', '3']
+        msg_to_str = ' '.join(str(uuid) for uuid in msg_to)
+
+        data_to_hash = {
+            'msg_to': msg_to_str,
+            'msg_id': 'd740-10d5-4ecb-b',
+            'subject': 'subject',
+            'body': 'body'
+        }
+
+        hash_object = hashlib.sha1(str(sorted(data_to_hash.items())).encode())
+        etag = hash_object.hexdigest()
+
+        self.assertEqual(generated_etag, etag)
