@@ -1,14 +1,14 @@
 import unittest
 import uuid
 from flask import current_app
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, event
+from sqlalchemy.engine import Engine
 from werkzeug.exceptions import NotFound, InternalServerError
 from app.application import app
 from app.repository import database
 from app.repository.retriever import Retriever
 from app.constants import MESSAGE_QUERY_LIMIT
 from datetime import datetime
-import random
 
 from app.validation.user import User
 
@@ -180,6 +180,13 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
 
         self.user_internal = User('ce12b958-2a5f-44f4-a6da-861e59070a31', 'internal')
         self.user_respondent = User('0a7ad740-10d5-4ecb-b7ca-3c0384afb882', 'respondent')
+
+    @event.listens_for(Engine, "connect")
+    def set_sqlite_pragma(dbapi_connection, connection_record):
+        """enable foreign key constraint for tests"""
+        cursor = dbapi_connection.cursor()
+        cursor.execute("PRAGMA foreign_keys=ON")
+        cursor.close()
 
     def test_0_msg_returned_when_db_empty_true(self):
         """retrieves messages from empty database"""
