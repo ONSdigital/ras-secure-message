@@ -76,7 +76,7 @@ class Modifier:
         return True
 
     @staticmethod
-    def del_draft(draft_id, del_status=True, del_event=True):
+    def del_draft(draft_id):
         """Remove draft from status table and secure message table"""
         del_draft_status = "DELETE FROM status WHERE msg_id='{0}' AND label='{1}'".format(draft_id, Labels.DRAFT.value)
         del_draft_event = "DELETE FROM events WHERE msg_id='{0}'".format(draft_id)
@@ -84,12 +84,10 @@ class Modifier:
         del_draft_msg = "DELETE FROM secure_message WHERE msg_id='{0}'".format(draft_id)
 
         try:
-            if del_status is True:
-                db.get_engine(app=db.get_app()).execute(del_draft_status)
-                db.get_engine(app=db.get_app()).execute(del_draft_inbox_status)
+            db.get_engine(app=db.get_app()).execute(del_draft_status)
+            db.get_engine(app=db.get_app()).execute(del_draft_inbox_status)
 
-            if del_event is True:
-                db.get_engine(app=db.get_app()).execute(del_draft_event)
+            db.get_engine(app=db.get_app()).execute(del_draft_event)
 
             db.get_engine(app=db.get_app()).execute(del_draft_msg)
 
