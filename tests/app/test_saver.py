@@ -1,8 +1,7 @@
 import unittest
 from app.repository.saver import Saver
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, event
 from sqlalchemy.engine import Engine
-from sqlalchemy import event
 from app.repository import database
 from app.repository.database import db
 from flask import current_app

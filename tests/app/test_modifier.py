@@ -2,11 +2,9 @@ import unittest
 import uuid
 from datetime import datetime, timezone
 
-from flask import current_app
-from flask import g
-from sqlalchemy import create_engine
+from flask import current_app, g
+from sqlalchemy import create_engine, event
 from sqlalchemy.engine import Engine
-from sqlalchemy import event
 from werkzeug.exceptions import InternalServerError
 
 from app.application import app

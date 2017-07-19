@@ -1,8 +1,7 @@
 import unittest
 from flask import json
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, event
 from sqlalchemy.engine import Engine
-from sqlalchemy import event
 from werkzeug.exceptions import ExpectationFailed
 from app import application
 from app.application import app

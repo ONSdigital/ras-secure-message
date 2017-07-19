@@ -1,13 +1,10 @@
 import unittest
 from datetime import datetime, timezone
 from unittest import mock
-from flask import current_app
-from flask import json
-from sqlalchemy import create_engine
+from flask import current_app, json
+from sqlalchemy import create_engine, event
 from sqlalchemy.engine import Engine
-from sqlalchemy import event
-from app import application
-from app import settings
+from app import application, settings
 from app.application import app
 from app.common.alerts import AlertUser, AlertViaGovNotify
 from app.repository import database

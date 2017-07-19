@@ -1,10 +1,8 @@
 import hashlib
 import unittest
-from flask import current_app
-from flask import json
-from sqlalchemy import create_engine
+from flask import current_app, json
+from sqlalchemy import create_engine, event
 from sqlalchemy.engine import Engine
-from sqlalchemy import event
 from app.application import app
 from app.common.utilities import generate_etag
 from app.repository import database

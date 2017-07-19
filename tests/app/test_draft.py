@@ -4,12 +4,10 @@ from flask import g
 from app.repository.retriever import Retriever
 from unittest import mock
 from flask import current_app, json
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, event
 from sqlalchemy.engine import Engine
-from sqlalchemy import event
 from werkzeug.exceptions import InternalServerError
-from app import application
-from app import settings
+from app import application, settings
 from app.application import app
 from app.authentication.jwe import Encrypter
 from app.authentication.jwt import encode
@@ -18,8 +16,7 @@ from app.common.alerts import AlertUser, AlertViaGovNotify
 from app.common.labels import Labels
 from app.repository import database
 from app.repository.saver import Saver
-from app.resources.drafts import DraftModifyById
-from app.resources.drafts import DraftSave
+from app.resources.drafts import DraftModifyById, DraftSave
 from app.validation.domain import DraftSchema
 from app.validation.user import User
 from app.constants import MAX_RU_ID_LEN
