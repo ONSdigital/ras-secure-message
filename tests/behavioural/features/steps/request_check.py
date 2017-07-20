@@ -23,51 +23,13 @@ def update_encrypted_jwt():
 headers['Authorization'] = update_encrypted_jwt()
 
 
-# Scenario: GET request without a user urn in header
-
-
-@given("no user uuid is in the header")
-def step_impl_no_user_urn_in_the_header(context):
-    if 'user_uuid' in token_data:
-        del token_data['user_uuid']
-        headers['Authorization'] = update_encrypted_jwt()
-
-
-@given("no role is in the header")
-def step_impl_no_role_in_the_header(context):
-    if 'user_uuid' not in token_data:
-        token_data['user_uuid'] = "000000000"
-
-    if 'role' in token_data:
-        del token_data['role']
-        headers['Authorization'] = update_encrypted_jwt()
-
-
-@when("a GET request is made")
-def step_impl_get_request_is_made(context):
-    url = "http://localhost:5050/message/1"
-    context.response = app.test_client().get(url, headers=headers)
-
-
-# Scenario: POST request without a user urn in header
-
-
-@when("a POST request is made")
-def step_impl_post_request_is_made(context):
-    url = "http://localhost:5050/message/send"
-    context.response = app.test_client().post(url, headers=headers)
-
-#   Scenario: PUT request without a user urn in header
-
-
-@when("a PUT request is made")
-def step_impl_put_request_is_made(context):
-    url = "http://localhost:5050/message/1/modify"
-    context.response = app.test_client().put(url, headers=headers)
-
-#   Scenario Outline: User tries to use endpoint with the wrong method
-
-
+# Scenario 1: GET request without a user urn in header (see common steps)
+# Scenario 2: POST request without user in header (see common steps)
+# Scenario 3: PUT request without a user in header (see common steps)
+# Scenario 4: GET request without a role in header (see common steps)
+# Scenario 5: POST request without a role in header (see common steps)
+# Scenario 6: PUT request without a role in header (see common steps)
+# Scenario 7: User tries to use endpoint with the wrong method
 @given("user wants to use /draft/save endpoint")
 def step_impl_use_draft_save_endpoint(context):
     context.url = "http://localhost:5050/draft/save"
@@ -138,3 +100,39 @@ def step_impl_access_endpoint_with_put(context):
 @then("a 405 error status is returned")
 def step_impl_assert_405_returned(context):
     nose.tools.assert_equal(context.response.status_code, 405)
+
+
+# Common Steps: used in multiple scenarios
+@given("no user uuid is in the header")
+def step_impl_no_user_urn_in_the_header(context):
+    if 'user_uuid' in token_data:
+        del token_data['user_uuid']
+        headers['Authorization'] = update_encrypted_jwt()
+
+
+@given("no role is in the header")
+def step_impl_no_role_in_the_header(context):
+    if 'user_uuid' not in token_data:
+        token_data['user_uuid'] = "000000000"
+
+    if 'role' in token_data:
+        del token_data['role']
+        headers['Authorization'] = update_encrypted_jwt()
+
+
+@when("a POST request is made")
+def step_impl_post_request_is_made(context):
+    url = "http://localhost:5050/message/send"
+    context.response = app.test_client().post(url, headers=headers)
+
+
+@when("a PUT request is made")
+def step_impl_put_request_is_made(context):
+    url = "http://localhost:5050/message/1/modify"
+    context.response = app.test_client().put(url, headers=headers)
+
+
+@when("a GET request is made")
+def step_impl_get_request_is_made(context):
+    url = "http://localhost:5050/message/1"
+    context.response = app.test_client().get(url, headers=headers)

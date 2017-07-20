@@ -14,6 +14,7 @@ Feature: Get draft by id
     When the user requests the draft
     Then a 404 error code is returned
 
+   # Integration only test
   @ignore
   Scenario: User requests draft not authorised to view
     Given a user is not authorised

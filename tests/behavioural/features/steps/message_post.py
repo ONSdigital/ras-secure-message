@@ -59,28 +59,8 @@ def step_impl_a_valid_message(context):
 
 
 # Scenario 2: Send a draft and receive a 201
-@given('a message is identified as a draft')
-def step_impl_a_message_is_a_draft(context):
-    token_data['user_uuid'] = '01b51fcc-ed43-4cdb-ad1c-450f9986859b'
-    token_data['role'] = 'respondent'
-    headers['Authorization'] = update_encrypted_jwt()
-    context.post_draft = app.test_client().post("http://localhost:5050/draft/save", data=json.dumps(data),
-                                                headers=headers)
-    msg_resp = json.loads(context.post_draft.data)
-    context.msg_id = msg_resp['msg_id']
-    context.message = {'msg_id': context.msg_id,
-                       'msg_to': ['BRES'],
-                       'msg_from': '01b51fcc-ed43-4cdb-ad1c-450f9986859b',
-                       'subject': 'Hello World',
-                       'body': 'Test',
-                       'thread_id': context.msg_id,
-                       'collection_case': 'collection case1',
-                       'collection_exercise': 'collection exercise1',
-                       'ru_id': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc',
-                       'survey': 'BRES'}
-
-
-# Scenario: A user sends a previously saved draft
+# Scenario 3: Send a draft and receive a msg_id (see common code)
+# Scenario 4: A user sends a previously saved draft
 @given('a user retrieves a previously saved draft')
 def step_impl_user_retrieves_draft(context):
     add_draft = app.test_client().post('http://localhost:5050/draft/save', data=json.dumps(data), headers=headers)
@@ -90,12 +70,15 @@ def step_impl_user_retrieves_draft(context):
     context.message = json.loads(get_draft.data)
 
 
-@when('the draft is sent')
-def step_impl_draft_is_sent(context):
-    context.response = app.test_client().post(url, data=json.dumps(context.message), headers=headers)
+# Scenario 5: Send a draft and receive a thread_id
+@then('thread_id is the same as msg_id')
+def step_impl_thread_id_and_msg_id_are_equal(context):
+    resp = json.loads(context.response.data)
+    nose.tools.assert_equal(resp['thread_id'], resp['msg_id'])
 
 
-#  Scenario: Send a draft which is a reply to another message
+# Scenario 6: Send a draft and receive a msg_id (see common code)
+# Scenario 7: Send a draft which is a reply to another message
 
 @given('a message is identified as a draft which is a reply to another message')
 def step_impl_a_message_is_a_draft_reply(context):
@@ -136,56 +119,56 @@ def step_impl_thread_id_and_msg_id_are_not_equal(context):
     nose.tools.assert_equal(resp['thread_id'], '25e9172c-62d9-4ff7-98ac-661300ae9446')
 
 
-# Scenario 3: Submit a message with a missing "To" field and receive a 400 error
+# Scenario 8: Submit a message with a missing "To" field and receive a 400 error
 @given("the 'To' field is empty")
 def step_impl_to_field_empty(context):
     data['msg_to'] = ['']
 
 
-# Scenario 4: Submit a message with a missing "From" field and receive a 400 error
+# Scenario 9: Submit a message with a missing "From" field and receive a 400 error
 @given("the 'From' field is empty")
 def step_impl_from_field_empty(context):
     data['msg_from'] = ''
 
 
-# Scenario 5: Submit a message with a missing "Body" field and receive a 400 error
+# Scenario 10: Submit a message with a missing "Body" field and receive a 400 error
 @given("the 'Body' field is empty")
 def step_impl_body_field_empty(context):
     data['body'] = ''
 
 
-# Scenario 6: Submit a message with a missing "Subject" field and receive a 400
+# Scenario 11: Submit a message with a missing "Subject" field and receive a 400
 @given("the 'Subject' field is empty")
 def step_impl_subject_field_empty(context):
     data['subject'] = ""
 
 
-# Scenario 7: Message sent without a thread id
+# Scenario 12: Message sent without a thread id
 @given("the 'Thread ID' field is empty")
 def step_impl_thread_id_field_empty(context):
     before_scenario(context)
     data['thread_id'] = ''
 
 
-# Scenario 8: Message sent with a msg_to too long
+# Scenario 13: Message sent with a msg_to too long
 @given("the 'To' field exceeds max limit in size")
 def step_impl_to_field_exceeds_max_limit(context):
     data['msg_to'] = ["x" * (constants.MAX_TO_LEN+1)]
 
 
-# Scenario 9: Message sent with a msg_from too long
+# Scenario 14: Message sent with a msg_from too long
 @given("the 'From' field exceeds max limit in size")
 def step_impl_from_field_exceeds_max_limit(context):
     data['msg_from'] = "y" * (constants.MAX_FROM_LEN+1)
 
 
-# Scenario 10: Message sent with an empty survey field return 400
+# Scenario 15: Message sent with an empty survey field return 400
 @given('the survey field is empty')
 def step_impl_survey_field_empty(context):
     data['survey'] = ''
 
 
-# Scenario 11: Message sent with a msg_id not a valid draft returns 400
+# Scenario 16: Send a message with a msg_id not a valid draft returns 400
 @given('a message contains a msg_id and is not a valid draft')
 def step_impl_message_contains_msg_id_and_is_not_valid_draft(context):
     data.update({'msg_id': 'test123',
@@ -200,7 +183,7 @@ def step_impl_message_contains_msg_id_and_is_not_valid_draft(context):
                  'survey': 'BRES'})
 
 
-# Scenario 12: When a message with the label of "Draft" is sent and another user is trying to send the same message return a 409
+# Scenario 17: When a message with the label of "Draft" is sent and another user is trying to send the same message return a 409
 @given('a draft message is posted')
 def step_impl_draft_message_posted(context):
     if 'msg_id' in data:
@@ -211,7 +194,7 @@ def step_impl_draft_message_posted(context):
     headers['Authorization'] = update_encrypted_jwt()
     context.post_draft = app.test_client().post("http://localhost:5050/draft/save", data=json.dumps(data),
                                                 headers=headers)
-    #get etag from response using context
+    # get etag from response using context
     context.etag =  json.loads(context.post_draft.data)
     headers['Etag'] = context.etag
 
@@ -247,7 +230,6 @@ def step_impl_another_user_sends_same_message(context):
                  'ru_id': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc',
                  'survey': 'BRES'})
 
-
     data['subject'] = 'edited'
     headers['Etag'] = context.etag
 
@@ -258,12 +240,7 @@ def step_impl_another_user_sends_same_message(context):
                                              data=json.dumps(data), headers=headers)
 
 
-@then('is shown a 409 error status')
-def step_impl_is_shown_404(context):
-    nose.tools.assert_equal(context.response.status_code, 409)
-
-
-# Scenario 13:  Scenario: A Etag is not present within the header
+# Scenario 18: A Etag is not present within the header
 @given('a message is created')
 def step_impl_message_is_created(context):
     context.msg = {'msg_to': ['BRES'],
@@ -289,6 +266,7 @@ def step_impl_message_sent_no_etag(context):
     context.response = app.test_client().post(url, data=json.dumps(context.msg), headers=headers)
 
 
+# Scenario 19: Send a message where msg_to is a string
 @given('a msg_to is entered as a string')
 def step_impl_msg_to_string(context):
     context.message = {'msg_to': ['BRES'],
@@ -304,6 +282,26 @@ def step_impl_msg_to_string(context):
 
 
 # Common Steps: used in multiple scenarios
+@given('a message is identified as a draft')
+def step_impl_a_message_is_a_draft(context):
+    token_data['user_uuid'] = '01b51fcc-ed43-4cdb-ad1c-450f9986859b'
+    token_data['role'] = 'respondent'
+    headers['Authorization'] = update_encrypted_jwt()
+    context.post_draft = app.test_client().post("http://localhost:5050/draft/save", data=json.dumps(data),
+                                                headers=headers)
+    msg_resp = json.loads(context.post_draft.data)
+    context.msg_id = msg_resp['msg_id']
+    context.message = {'msg_id': context.msg_id,
+                       'msg_to': ['BRES'],
+                       'msg_from': '01b51fcc-ed43-4cdb-ad1c-450f9986859b',
+                       'subject': 'Hello World',
+                       'body': 'Test',
+                       'thread_id': context.msg_id,
+                       'collection_case': 'collection case1',
+                       'collection_exercise': 'collection exercise1',
+                       'ru_id': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc',
+                       'survey': 'BRES'}
+
 
 @when("the message is sent with msg_to string")
 def step_impl_message_is_sent(context):
@@ -313,8 +311,13 @@ def step_impl_message_is_sent(context):
     context.response = app.test_client().post(url, data=json.dumps(context.message), headers=headers)
 
 
+@when('the draft is sent')
+def step_impl_draft_is_sent(context):
+    context.response = app.test_client().post(url, data=json.dumps(context.message), headers=headers)
+
+
 @when("the message is sent")
-def step_implmessage_is_sent(context):
+def step_impl_msg_is_sent(context):
     token_data['user_uuid'] = data['msg_from']
     token_data['role'] = 'respondent'
     headers['Authorization'] = update_encrypted_jwt()
@@ -333,17 +336,3 @@ def step_impl_thread_id_in_response(context):
     nose.tools.assert_true(resp['thread_id'] is not None)
 
 
-@then('thread_id is the same as msg_id')
-def step_impl_thread_id_and_msg_id_are_equal(context):
-    resp = json.loads(context.response.data)
-    nose.tools.assert_equal(resp['thread_id'], resp['msg_id'])
-
-
-@then("a 400 error status is returned")
-def step_impl_400_returned(context):
-    nose.tools.assert_equal(context.response.status_code, 400)
-
-
-@then('a 201 status code is the response')
-def step_impl_201_returned(context):
-    nose.tools.assert_equal(context.response.status_code, 201)

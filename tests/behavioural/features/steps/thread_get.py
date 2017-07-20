@@ -35,9 +35,47 @@ def update_encrypted_jwt():
 
 headers['Authorization'] = update_encrypted_jwt()
 
-# Scenario: Respondent and internal user have a conversation and respondent retrieves the conversation
+
+# Scenario 1: Respondent and internal user have a conversation and respondent retrieves the conversation (see common steps)
+# Scenario 2: Respondent and internal user have a conversation and respondent retrieves the conversation (see common steps)
+# Scenario 3: Respondent and internal user have a conversation, including a draft, and respondent retrieves the conversation (see common steps)
+# Scenario 4: Respondent and internal user have a conversation, including a draft, and internal user retrieves the conversation
+@then("all messages from that conversation should be received including draft")
+def step_impl_assert_all_messages_from_conversation_are_received(context):
+    response = flask.json.loads(context.response.data)
+    nose.tools.assert_equal(len(response), 5)
 
 
+# Scenario 5: Respondent and internal user have a conversation and internal user retrieves that conversation from multiple conversations
+@given("internal user has multiple conversations")
+def step_impl_internal_user_has_multiple_conversations(context):
+
+    for _ in range(0, 2):
+        data['thread_id'] = str(uuid.uuid4())
+        data['msg_to'] = ['BRES']
+        data['msg_from'] = '0a7ad740-10d5-4ecb-b7ca-3c0384afb882'
+        token_data['user_uuid'] = '0a7ad740-10d5-4ecb-b7ca-3c0384afb882'
+        token_data['role'] = 'respondent'
+        headers['Authorization'] = update_encrypted_jwt()
+        context.response = app.test_client().post("http://localhost:5050/message/send", data=flask.json.dumps(data),
+                                                  headers=headers)
+        data['msg_to'] = ['0a7ad740-10d5-4ecb-b7ca-3c0384afb882']
+        data['msg_from'] = 'BRES'
+        token_data['user_uuid'] = 'BRES'
+        token_data['role'] = 'internal'
+        headers['Authorization'] = update_encrypted_jwt()
+        context.response = app.test_client().post("http://localhost:5050/message/send", data=flask.json.dumps(data),
+                                                  headers=headers)
+    data['thread_id'] = 'AConversation'
+
+
+# Scenario 6: User tries to retrieve a conversation that does not exist
+@given("a respondent picks a conversation that does not exist")
+def step_impl_pick_conversation_that_does_not_exist(context):
+    data['thread_id'] = str(uuid.uuid4())
+
+
+# Common Steps: used in multiple scenarios
 @given("a respondent and internal user have a conversation")
 def step_impl_respondent_and_internal_user_hav_a_conversation(context):
 
@@ -61,32 +99,6 @@ def step_impl_respondent_and_internal_user_hav_a_conversation(context):
                                                   headers=headers)
 
 
-@when("the respondent gets this conversation")
-def step_impl_respondent_gets_conversation(context):
-    token_data['user_uuid'] = '0a7ad740-10d5-4ecb-b7ca-3c0384afb882'
-    token_data['role'] = 'respondent'
-    headers['Authorization'] = update_encrypted_jwt()
-    context.response = app.test_client().get(url.format(data['thread_id']), headers=headers)
-
-
-@then("all messages from that conversation should be received")
-def step_impl_assert_all_messages_in_conversation_are_received(context):
-    response = flask.json.loads(context.response.data)
-    nose.tools.assert_equal(len(response), 4)
-
-
-#   Scenario: Respondent and internal user have a conversation and respondent retrieves the conversation
-
-@when("the internal user gets this conversation")
-def step_impl_internal_user_gets_conversation(context):
-    token_data['user_uuid'] = 'BRES'
-    token_data['role'] = 'internal'
-    headers['Authorization'] = update_encrypted_jwt()
-    context.response = app.test_client().get(url.format(data['thread_id']), headers=headers)
-
-# Scenario: Respondent and internal user have a conversation, including a draft, and respondent retrieves the conversation
-
-
 @given("internal user creates a draft")
 def step_impl_internal_user_creates_a_draft(context):
     token_data['user_uuid'] = 'BRES'
@@ -99,39 +111,24 @@ def step_impl_internal_user_creates_a_draft(context):
     context.response = app.test_client().post("http://localhost:5050/draft/save", data=flask.json.dumps(data),
                                               headers=headers)
 
-#   Scenario: Respondent and internal user have a conversation, including a draft, and internal user retrieves the conversation
+
+@when("the respondent gets this conversation")
+def step_impl_respondent_gets_conversation(context):
+    token_data['user_uuid'] = '0a7ad740-10d5-4ecb-b7ca-3c0384afb882'
+    token_data['role'] = 'respondent'
+    headers['Authorization'] = update_encrypted_jwt()
+    context.response = app.test_client().get(url.format(data['thread_id']), headers=headers)
 
 
-@then("all messages from that conversation should be received including draft")
-def step_impl_assert_all_messages_from_conversation_are_received(context):
+@when("the internal user gets this conversation")
+def step_impl_internal_user_gets_conversation(context):
+    token_data['user_uuid'] = 'BRES'
+    token_data['role'] = 'internal'
+    headers['Authorization'] = update_encrypted_jwt()
+    context.response = app.test_client().get(url.format(data['thread_id']), headers=headers)
+
+
+@then("all messages from that conversation should be received")
+def step_impl_assert_all_messages_in_conversation_are_received(context):
     response = flask.json.loads(context.response.data)
-    nose.tools.assert_equal(len(response), 5)
-
-
-#   Scenario: Respondent and internal user have a conversation and internal user retrieves that conversation from multiple conversations
-@given("internal user has multiple conversations")
-def step_impl_internal_user_has_multiple_conversations(context):
-
-    for _ in range(0, 2):
-        data['thread_id'] = str(uuid.uuid4())
-        data['msg_to'] = ['BRES']
-        data['msg_from'] = '0a7ad740-10d5-4ecb-b7ca-3c0384afb882'
-        token_data['user_uuid'] = '0a7ad740-10d5-4ecb-b7ca-3c0384afb882'
-        token_data['role'] = 'respondent'
-        headers['Authorization'] = update_encrypted_jwt()
-        context.response = app.test_client().post("http://localhost:5050/message/send", data=flask.json.dumps(data),
-                                                  headers=headers)
-        data['msg_to'] = ['0a7ad740-10d5-4ecb-b7ca-3c0384afb882']
-        data['msg_from'] = 'BRES'
-        token_data['user_uuid'] = 'BRES'
-        token_data['role'] = 'internal'
-        headers['Authorization'] = update_encrypted_jwt()
-        context.response = app.test_client().post("http://localhost:5050/message/send", data=flask.json.dumps(data),
-                                                  headers=headers)
-    data['thread_id'] = 'AConversation'
-
-
-#   Scenario: User tries to retrieve a conversation that does not exist
-@given("a respondent picks a conversation that does not exist")
-def step_impl_pick_conversation_that_does_not_exist(context):
-    data['thread_id'] = str(uuid.uuid4())
+    nose.tools.assert_equal(len(response), 4)

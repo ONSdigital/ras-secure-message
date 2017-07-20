@@ -205,7 +205,27 @@ def step_impl_draft_with_collection_exercise_field_too_large(context):
                  'survey': 'survey'})
 
 
-# Scenario: As a user the message id for my saved draft should be returned when saving a draft
+# Scenario 12: As a user I would like a new draft message not related to a thread to be given the message id as a thread id
+@given('A user creates a draft that is not associated with a thread')
+def step_impl_draft_message_withour_thread_id(context):
+    data.pop('msg_id', 'Amsgid')
+    data.update({'msg_from': 'BRES',
+                 'subject': 'test',
+                 'body': 'Test',
+                 'collection_case': 'collection case1',
+                 'ru_id': 'reporting case1',
+                 'business_name': 'ABusiness',
+                 'collection_exercise': 'collection exercise1',
+                 'survey': 'survey'})
+
+
+@then('the thread id should be set to the message id')
+def step_impl_thread_id_set_as_msg_id(context):
+    response = json.loads(context.response.data)
+    nose.tools.assert_equal(response['msg_id'], response['thread_id'])
+
+
+# Scenario 13: As a user the message id for my saved draft should be returned when saving a draft
 @given("a user creates a valid draft")
 def step_impl_user_creates_valid_draft(context):
     context.draft = {'msg_to': ['0a7ad740-10d5-4ecb-b7ca-3c0384afb882'],
@@ -231,28 +251,7 @@ def step_implmsg_id_returned(context):
     nose.tools.assert_true(resp_data['msg_id'] is not None)
 
 
-# Scenario: As a user I would like a new draft message not related to a thread to be given the message id as a thread id
-
-@given('A user creates a draft that is not associated with a thread')
-def step_impl_draft_message_withour_thread_id(context):
-    data.pop('msg_id', 'Amsgid')
-    data.update({'msg_from': 'BRES',
-                 'subject': 'test',
-                 'body': 'Test',
-                 'collection_case': 'collection case1',
-                 'ru_id': 'reporting case1',
-                 'business_name': 'ABusiness',
-                 'collection_exercise': 'collection exercise1',
-                 'survey': 'survey'})
-
-
-@then('the thread id should be set to the message id')
-def step_impl_thread_id_set_as_msg_id(context):
-    response = json.loads(context.response.data)
-    nose.tools.assert_equal(response['msg_id'], response['thread_id'])
-
-
-# Common
+# Common Steps: used in multiple scenarios
 @when('the draft is saved')
 def step_impl_draft_is_saved(context):
     context.response = app.test_client().post(url, data=json.dumps(data), headers=headers)
