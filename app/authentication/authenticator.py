@@ -27,7 +27,7 @@ def authenticate(headers):
 
 
 def check_jwt(token):
-    JWT_ENCRYPT = settings.JWT_ENCRYPT
+    JWT_ENCRYPT = settings.SM_JWT_ENCRYPT
     try:
         if (JWT_ENCRYPT == '1'):
             decrypter = Decrypter()
