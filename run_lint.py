@@ -1,6 +1,7 @@
+import os
 import pylint.lint
 
 if __name__ == '__main__':
-    # pylint.lint.something(__file__, justerrors=True)
-    # now continue with unit testing
-    pylint.lint.Run(['--errors-only', './app', './tests'])
+    os.system('flake8 --count --format=pylint')
+    pylint.lint.Run(['--reports=n', '--output-format=colorized', '--rcfile=.pylintrc', '-j', '0', './app', './tests'])
+    # pylint.lint.Run(['--errors-only', '--output-format=colorized', '--rcfile=.pylintrc', './app', './tests'])
