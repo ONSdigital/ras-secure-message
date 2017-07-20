@@ -2,9 +2,9 @@ import unittest
 import uuid
 from datetime import datetime, timezone
 
-from flask import current_app
-from flask import g
-from sqlalchemy import create_engine
+from flask import current_app, g
+from sqlalchemy import create_engine, event
+from sqlalchemy.engine import Engine
 from werkzeug.exceptions import InternalServerError
 
 from app.application import app
@@ -12,8 +12,10 @@ from app.common.labels import Labels
 from app.repository import database
 from app.repository.modifier import Modifier
 from app.repository.retriever import Retriever
+from app.repository.saver import Saver
 from app.validation.domain import DraftSchema
 from app.validation.user import User
+from app.repository.database import SecureMessage
 
 
 class ModifyTestCaseHelper:
@@ -64,6 +66,13 @@ class ModifyTestCase(unittest.TestCase, ModifyTestCaseHelper):
 
         self.user_internal = User('ce12b958-2a5f-44f4-a6da-861e59070a31', 'internal')
         self.user_respondent = User('0a7ad740-10d5-4ecb-b7ca-3c0384afb882', 'respondent')
+
+    @event.listens_for(Engine, "connect")
+    def set_sqlite_pragma(dbapi_connection, connection_record):
+        """enable foreign key constraint for tests"""
+        cursor = dbapi_connection.cursor()
+        cursor.execute("PRAGMA foreign_keys=ON")
+        cursor.close()
 
     def test_archived_label_is_added_to_message(self):
         """testing message is added to database with archived label attached"""
@@ -224,6 +233,16 @@ class ModifyTestCase(unittest.TestCase, ModifyTestCaseHelper):
                 }
 
                 modifier = Modifier()
+
+                with self.engine.connect() as con:
+                    add_message = "INSERT INTO secure_message (msg_id, body, subject, thread_id, collection_case, ru_id, " \
+                            "survey, collection_exercise) VALUES ('{0}', '{1}', '{2}', '{3}', '{4}', '{5}', '{6}', '{7}')" \
+                    .format(self.test_message['msg_id'], self.test_message['body'], self.test_message['subject'],
+                            self.test_message['thread_id'],
+                            self.test_message['collection_case'], self.test_message['ru_id'],
+                            'test', self.test_message['collection_exercise'])
+                    con.execute(add_message)
+
                 with self.engine.connect() as con:
                     add_draft = ("INSERT INTO status (label, msg_id, actor) "
                                  "VALUES ('{0}', 'test123', '0a7ad740-10d5-4ecb-b7ca-3c0384afb882')")\
@@ -296,25 +315,26 @@ class ModifyTestCase(unittest.TestCase, ModifyTestCaseHelper):
                     'survey': 'BRES'
                 }
 
-                modifier = Modifier()
-                with self.engine.connect() as con:
-                    add_draft = "INSERT INTO secure_message (msg_id, body, subject, thread_id, collection_case, " \
-                                "ru_id, survey, collection_exercise) VALUES ('{0}', '{1}', '{2}', '{3}', '{4}', " \
-                                "'{5}', '{6}', '{7}')".format(self.test_message['msg_id'], self.test_message['body'],
-                                                              self.test_message['subject'],
-                                                              self.test_message['thread_id'],
-                                                              self.test_message['collection_case'],
-                                                              self.test_message['ru_id'], 'test',
-                                                              self.test_message['collection_exercise'])
+                Saver().save_message(SecureMessage(msg_id=self.test_message['msg_id'],
+                                                   body=self.test_message['body'],
+                                                   subject=self.test_message['subject'],
+                                                   thread_id=self.test_message['thread_id'],
+                                                   collection_case=self.test_message['collection_case'],
+                                                   ru_id=self.test_message['ru_id'],
+                                                   survey=self.test_message['survey'],
+                                                   collection_exercise=self.test_message['collection_exercise']))
 
-                    con.execute(add_draft)
-                    g.user = User('0a7ad740-10d5-4ecb-b7ca-3c0384afb882', 'respondent')
-                    draft = DraftSchema().load(self.test_message)
-                    modifier.replace_current_draft(self.test_message['msg_id'], draft.data)
-                    replaced_draft = con.execute("SELECT * FROM secure_message WHERE msg_id='{0}'".format(self.test_message['msg_id']))
+                g.user = User(self.test_message['msg_from'], 'respondent')
+                draft = DraftSchema().load(self.test_message)
 
-                    for row in replaced_draft:
-                        self.assertEquals(row['survey'], self.test_message['survey'])
+                draft.data.body = 'not hello'
+                draft.data.subject = 'not MyMessage'
+                Modifier().replace_current_draft(self.test_message['msg_id'], draft.data)
+
+                retrieved_data=Retriever().retrieve_message(self.test_message['msg_id'],g.user)
+
+                self.assertEqual(retrieved_data["body"], 'not hello')
+                self.assertEqual(retrieved_data["subject"], 'not MyMessage')
 
     def test_archive_is_removed_for_both_respondent_and_internal(self):
         """testing archive label is removed after being added to both respondent and internal"""
@@ -358,13 +378,6 @@ class ModifyTestCase(unittest.TestCase, ModifyTestCaseHelper):
             with current_app.test_request_context():
                 with self.assertRaises(InternalServerError):
                     Modifier.remove_label('UNREAD', {'survey': 'survey'}, self.user_internal)
-
-    def test_exception_for_del_draft_raises(self):
-        with app.app_context():
-            database.db.drop_all()
-            with current_app.test_request_context():
-                with self.assertRaises(InternalServerError):
-                    Modifier.del_draft('0', 'TRUE')
 
     def test_replace_current_recipient_status_raises(self):
         with app.app_context():

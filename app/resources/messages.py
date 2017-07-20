@@ -78,11 +78,6 @@ class MessageSend(Resource):
             resp.status_code = 400
             return resp
 
-    @staticmethod
-    def _del_draft_labels(draft_id):
-        modifier = Modifier()
-        modifier.del_draft(draft_id)
-
     def _message_save(self, message, is_draft, draft_id):
         """Saves the message to the database along with the subsequent status and audit"""
         save = Saver()
@@ -99,7 +94,7 @@ class MessageSend(Resource):
             save.save_msg_status(message.data.msg_to[0], message.data.msg_id, Labels.UNREAD.value)
 
         if is_draft is True:
-            self._del_draft_labels(draft_id)
+            Modifier().del_draft(draft_id)
         return MessageSend._alert_recipients(message.data.msg_id, message.data.thread_id)
 
     @staticmethod

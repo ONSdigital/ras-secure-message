@@ -1,8 +1,8 @@
 import hashlib
 import unittest
-from flask import current_app
-from flask import json
-from sqlalchemy import create_engine
+from flask import current_app, json
+from sqlalchemy import create_engine, event
+from sqlalchemy.engine import Engine
 from app.application import app
 from app.common.utilities import generate_etag
 from app.repository import database
@@ -29,6 +29,13 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
             self.db = database.db
 
         self.user = User('0a7ad740-10d5-4ecb-b7ca-3c0384afb882', 'respondent')
+
+    @event.listens_for(Engine, "connect")
+    def set_sqlite_pragma(dbapi_connection, connection_record):
+        """enable foreign key constraint for tests"""
+        cursor = dbapi_connection.cursor()
+        cursor.execute("PRAGMA foreign_keys=ON")
+        cursor.close()
 
     def test_paginated_to_json_returns_correct_messages_len(self):
         """turns paginated result list to json checking correct amount of messages are given"""

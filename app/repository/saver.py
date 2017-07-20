@@ -24,11 +24,11 @@ class Saver:
             raise MessageSaveException(e)
 
     @staticmethod
-    def save_msg_status(msg_urn, msg_id, label, session=db.session):
+    def save_msg_status(actor, msg_id, label, session=db.session):
         """save message status to database"""
 
         db_status_to = Status()
-        db_status_to.set_from_domain_model(msg_id, msg_urn, label)
+        db_status_to.set_from_domain_model(msg_id, actor, label)
         try:
             session.add(db_status_to)
             session.commit()

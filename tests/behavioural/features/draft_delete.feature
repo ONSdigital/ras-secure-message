@@ -1,5 +1,7 @@
 Feature: Delete Draft By Id
 
+
+
   @ignore
   Scenario: A user deletes a draft that does not exist
     Given the user requests to delete a draft that does not exist

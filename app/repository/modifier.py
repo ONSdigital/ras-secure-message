@@ -76,40 +76,37 @@ class Modifier:
         return True
 
     @staticmethod
-    def del_draft(draft_id, del_status=True, del_event=True):
+    def del_draft(draft_id):
         """Remove draft from status table and secure message table"""
-        del_draft_msg = "DELETE FROM secure_message WHERE msg_id='{0}'".format(draft_id)
         del_draft_status = "DELETE FROM status WHERE msg_id='{0}' AND label='{1}'".format(draft_id, Labels.DRAFT.value)
         del_draft_event = "DELETE FROM events WHERE msg_id='{0}'".format(draft_id)
         del_draft_inbox_status = "DELETE FROM status WHERE msg_id='{0}' AND label='{1}'".format(draft_id, Labels.DRAFT_INBOX.value)
+        del_draft_msg = "DELETE FROM secure_message WHERE msg_id='{0}'".format(draft_id)
 
         try:
-            db.get_engine(app=db.get_app()).execute(del_draft_msg)
-            if del_status is True:
-                db.get_engine(app=db.get_app()).execute(del_draft_status)
-                db.get_engine(app=db.get_app()).execute(del_draft_inbox_status)
+            db.get_engine(app=db.get_app()).execute(del_draft_status)
+            db.get_engine(app=db.get_app()).execute(del_draft_inbox_status)
 
-            if del_event is True:
-                db.get_engine(app=db.get_app()).execute(del_draft_event)
+            db.get_engine(app=db.get_app()).execute(del_draft_event)
+
+            db.get_engine(app=db.get_app()).execute(del_draft_msg)
 
         except Exception as e:
             logger.error(e)
             raise (InternalServerError(description="Error retrieving messages from database"))
 
+
+
     @staticmethod
     def replace_current_draft(draft_id, draft, session=db.session):
         """used to replace draft content in message table"""
-        Modifier.del_draft(draft_id, del_status=False)
-        secure_message = SecureMessage(msg_id=draft_id, subject=draft.subject, body=draft.body,
-                                       thread_id=draft.thread_id, collection_case=draft.collection_case,
-                                       ru_id=draft.ru_id, collection_exercise=draft.collection_exercise,
-                                       survey=draft.survey)
 
         try:
-            session.add(secure_message)
+            session.query(SecureMessage).filter_by(msg_id=draft_id).update({"subject": draft.subject,
+                                                                            "body": draft.body})
             session.commit()
         except Exception as e:
-            session.rollbeck()
+            session.rollback()
             logger.error(e)
             raise (InternalServerError(description="Error replacing message"))
 
