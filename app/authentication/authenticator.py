@@ -4,6 +4,7 @@ from flask import Response, g
 from jose import JWTError
 from app.validation.user import User
 from werkzeug.exceptions import BadRequest
+from app import settings
 
 import logging
 
@@ -26,10 +27,14 @@ def authenticate(headers):
 
 
 def check_jwt(token):
+    JWT_ENCRYPT = settings.JWT_ENCRYPT
     try:
-        decrypter = Decrypter()
-        decrypted_jwt_token = decrypter.decrypt_token(token)
-        decoded_jwt_token = decode(decrypted_jwt_token)
+        if (JWT_ENCRYPT == '1'):
+            decrypter = Decrypter()
+            decrypted_jwt_token = decrypter.decrypt_token(token)
+            decoded_jwt_token = decode(decrypted_jwt_token)
+        else:
+            decoded_jwt_token = decode(token)
 
         if not decoded_jwt_token.get('user_uuid'):
             raise BadRequest(description="Missing user_uuid claim,"
