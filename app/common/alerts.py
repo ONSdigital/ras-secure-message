@@ -1,7 +1,7 @@
+import logging
 from app import settings
 from notifications_python_client import NotificationsAPIClient
 from structlog import wrap_logger
-import logging
 
 
 logger = wrap_logger(logging.getLogger(__name__))
@@ -11,7 +11,7 @@ class AlertViaGovNotify:
     """Notify Api handler"""
 
     @staticmethod
-    def send(email,  reference):
+    def send(email, reference):
         notifications_client = NotificationsAPIClient(settings.NOTIFICATION_COMBINED_KEY)
         notifications_client.send_email_notification(
             email_address=email,

@@ -6,7 +6,6 @@ from sqlalchemy.exc import SQLAlchemyError
 from werkzeug.exceptions import InternalServerError, NotFound
 from app.common.labels import Labels
 from app.repository.database import SecureMessage, Status, Events, db
-from app.validation.user import User
 
 logger = wrap_logger(logging.getLogger(__name__))
 
@@ -65,7 +64,7 @@ class Retriever:
 
         except Exception as e:
             logger.error(e)
-            raise(InternalServerError(description="Error retrieving messages from database"))
+            raise InternalServerError(description="Error retrieving messages from database")
 
         return True, result
 
@@ -99,7 +98,7 @@ class Retriever:
 
         except Exception as e:
             logger.error(e)
-            raise (InternalServerError(description="Error retrieving messages from database"))
+            raise InternalServerError(description="Error retrieving messages from database")
 
         return True, result
 
@@ -111,10 +110,10 @@ class Retriever:
         try:
             result = db_model.query.filter_by(msg_id=message_id).first()
             if result is None:
-                raise (NotFound(description="Message with msg_id '{0}' does not exist".format(message_id)))
+                raise NotFound(description="Message with msg_id '{0}' does not exist".format(message_id))
         except SQLAlchemyError as e:
             logger.error(e)
-            raise(InternalServerError(description="Error retrieving message from database"))
+            raise InternalServerError(description="Error retrieving message from database")
 
         message = result.serialize(user)
 
@@ -142,11 +141,11 @@ class Retriever:
                                else_=0).desc(), Events.event.desc())
 
             if result.count() == 0:
-                raise (NotFound(description="Conversation with thread_id '{0}' does not exist".format(thread_id)))
+                raise NotFound(description="Conversation with thread_id '{0}' does not exist".format(thread_id))
 
         except SQLAlchemyError as e:
             logger.error(e)
-            raise(InternalServerError(description="Error retrieving conversation from database"))
+            raise InternalServerError(description="Error retrieving conversation from database")
 
         conversation = []
 
@@ -163,10 +162,10 @@ class Retriever:
             result = SecureMessage.query.filter(SecureMessage.msg_id == message_id)\
                 .filter(SecureMessage.statuses.any(Status.label == Labels.DRAFT.value)).first()
             if result is None:
-                raise (NotFound(description="Draft with msg_id '{0}' does not exist".format(message_id)))
+                raise NotFound(description="Draft with msg_id '{0}' does not exist".format(message_id))
         except SQLAlchemyError as e:
             logger.error(e)
-            raise (InternalServerError(description="Error retrieving draft from database"))
+            raise InternalServerError(description="Error retrieving draft from database")
 
         message = result.serialize(user)
 
@@ -197,7 +196,7 @@ class Retriever:
                 .filter(SecureMessage.statuses.any(Status.label == Labels.DRAFT.value)).first()
         except Exception as e:
             logger.error(e)
-            raise (InternalServerError(description="Error retrieving message from database"))
+            raise InternalServerError(description="Error retrieving message from database")
 
         if result is None:
             return False, result

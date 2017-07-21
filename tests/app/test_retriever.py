@@ -1,5 +1,6 @@
 import unittest
 import uuid
+from datetime import datetime
 from flask import current_app
 from sqlalchemy import create_engine, event
 from sqlalchemy.engine import Engine
@@ -8,7 +9,6 @@ from app.application import app
 from app.repository import database
 from app.repository.retriever import Retriever
 from app.constants import MESSAGE_QUERY_LIMIT
-from datetime import datetime
 
 from app.validation.user import User
 
@@ -36,7 +36,7 @@ class RetrieverTestCaseHelper:
                 label, msg_id, actor)
             con.execute(query)
 
-    def add_event(self,event, msg_id, date_time):
+    def add_event(self, event, msg_id, date_time):
         """ Populate the event table"""
 
         with self.engine.connect() as con:

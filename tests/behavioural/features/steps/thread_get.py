@@ -33,6 +33,7 @@ def update_encrypted_jwt():
     signed_jwt = encode(token_data)
     return encrypter.encrypt_token(signed_jwt)
 
+
 headers['Authorization'] = update_encrypted_jwt()
 
 

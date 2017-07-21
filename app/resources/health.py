@@ -1,10 +1,9 @@
+import logging
 from flask_restful import Resource
-from flask import jsonify
+from flask import jsonify, current_app
 from app.repository.retriever import Retriever
 from app import settings
-from flask import current_app
 from structlog import wrap_logger
-import logging
 
 logger = wrap_logger(logging.getLogger(__name__))
 
@@ -42,8 +41,7 @@ class HealthDetails(Resource):
 
         details = {'SMS Log level': settings.SMS_LOG_LEVEL,
                    'APP Log Level': settings.APP_LOG_LEVEL,
-                   'Database URL' : current_app.config['SQLALCHEMY_DATABASE_URI'],
-                   'API Functionality': func_list
-                   }
+                   'Database URL': current_app.config['SQLALCHEMY_DATABASE_URI'],
+                   'API Functionality': func_list}
 
         return jsonify(details)

@@ -1,14 +1,12 @@
 import unittest
-
-from flask import current_app
-from flask import json
-
+from flask import current_app, json
 from app import application
 from app.application import app
 from app.repository import database
 from app.repository.retriever import Retriever
 from sqlalchemy.engine import Engine
 from sqlalchemy import event
+
 
 class HealthTestCase(unittest.TestCase):
     """Test case for application health monitor"""
@@ -54,6 +52,6 @@ class HealthTestCase(unittest.TestCase):
         details = {'SMS Log level': '',
                    'APP Log Level': '',
                    'Database URL': '',
-                   'API Functionality': ''
-                   }
+                   'API Functionality': ''}
+
         self.assertEqual(json.loads(response.get_data()).keys(), details.keys())

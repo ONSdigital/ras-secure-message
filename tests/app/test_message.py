@@ -1,9 +1,7 @@
 import unittest
-
-from flask import g
-
-import app.constants
 from datetime import datetime, timezone
+import app.constants
+from flask import g
 from app.validation.domain import Message, MessageSchema, DraftSchema
 from app.validation.user import User
 from app.application import app
@@ -23,7 +21,8 @@ class MessageTestCase(unittest.TestCase):
         sut = Message('from', 'subject', 'body', ['to'], '5', 'AMsgId', 'ACollectionCase',
                       'ASurveyType', 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc', 'CollectionExercise')
         sut_str = repr(sut)
-        expected = '<Message(msg_id=AMsgId msg_to=[\'to\'] msg_from=from subject=subject body=body thread_id=5 collection_case=ACollectionCase ru_id=f1a5e99c-8edf-489a-9c72-6cabe6c387fc collection_exercise=CollectionExercise survey=ASurveyType)>'
+        expected = '<Message(msg_id=AMsgId msg_to=[\'to\'] msg_from=from subject=subject body=body thread_id=5 collection_case=ACollectionCase ' \
+                   'ru_id=f1a5e99c-8edf-489a-9c72-6cabe6c387fc collection_exercise=CollectionExercise survey=ASurveyType)>'
         self.assertEquals(sut_str, expected)
 
     def test_message_with_different_collection_case_not_equal(self):
@@ -113,7 +112,8 @@ class MessageSchemaTestCase(unittest.TestCase):
 
     def test_missing_body_fails_validation(self):
         """marshalling message with no body field """
-        message = {'msg_to': ['01b51fcc-ed43-4cdb-ad1c-450f9986859b'], 'msg_from': 'torrance', 'body': '', 'survey': 'RSI', 'subject': 'MyMessage', 'ru_id': '7fc0e8ab-189c-4794-b8f4-9f05a1db185b'}
+        message = {'msg_to': ['01b51fcc-ed43-4cdb-ad1c-450f9986859b'], 'msg_from': 'torrance', 'body': '', 'survey': 'RSI', 'subject': 'MyMessage',
+                   'ru_id': '7fc0e8ab-189c-4794-b8f4-9f05a1db185b'}
 
         with app.app_context():
             g.user = User(message['msg_from'], 'respondent')
@@ -237,7 +237,6 @@ class MessageSchemaTestCase(unittest.TestCase):
 
     def test_msg_from_validation_internal(self):
         """marshalling message where msg_from field is an internal user and the 'uuid' is not BRES"""
-        #self.json_message['msg_to'] = [{"id": "01b51fcc-ed43-4cdb-ad1c-450f9986859b", "firstname": "Chandana", "surname": "Blanchet", "email": "cblanc@hotmail.co.uk", "telephone": "+443069990854", "status": "ACTIVE"}]
         self.json_message['msg_to'] = ["01b51fcc-ed43-4cdb-ad1c-450f9986859b"]
         self.json_message['msg_from'] = "SomeOtherWorkGroup"
         with app.app_context():
@@ -251,19 +250,18 @@ class MessageSchemaTestCase(unittest.TestCase):
     def test_msg_from_validation_respondent(self):
         """marshalling message where msg_from field is a respondent and msg_from is not equal to uuid in token"""
         self.json_message['msg_to'] = ["BRES"]
-        #self.json_message['msg_from'] = {"id": "6779kgh83-ed43-474b-ad1c-500f5287439a", "firstname": "Chandana", "surname": "Blanchet", "email": "cblanc@hotmail.co.uk", "telephone": "+443069990854", "status": "ACTIVE"}
         self.json_message['msg_from'] = "6779kgh83-ed43-474b-ad1c-500f5287439a"
         with app.app_context():
             g.user = User("01b51fcc-ed43-4cdb-ad1c-450f9986859b", 'respondent')
             schema = DraftSchema()
             errors = schema.load(self.json_message)[1]
 
-        self.assertTrue(errors == {'msg_from': ['You are not authorised to save a draft on behalf of user or work group 6779kgh83-ed43-474b-ad1c-500f5287439a']})
+        self.assertTrue(errors == {'msg_from': ['You are not authorised to save a draft on behalf of user or work group '
+                                                '6779kgh83-ed43-474b-ad1c-500f5287439a']})
 
     def test_msg_to_validation_invalid_user(self):
         """marshalling message where msg_to field is a invalid user"""
         self.json_message['msg_to'] = ["NotAValidUser"]
-        #self.json_message['msg_from'] = {"id": "01b51fcc-ed43-4cdb-ad1c-450f9986859b", "firstname": "Chandana", "surname": "Blanchet", "email": "cblanc@hotmail.co.uk", "telephone": "+443069990854", "status": "ACTIVE"}
         self.json_message['msg_from'] = "01b51fcc-ed43-4cdb-ad1c-450f9986859b"
         with app.app_context():
             g.user = User("01b51fcc-ed43-4cdb-ad1c-450f9986859b", 'respondent')

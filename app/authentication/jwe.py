@@ -2,6 +2,7 @@
 Module to generate encrypt and decrypt token
 """
 import os
+import base64
 from cryptography.hazmat.backends.openssl.backend import backend
 from cryptography.hazmat.primitives.ciphers import Cipher
 from cryptography.hazmat.primitives.ciphers import algorithms
@@ -9,7 +10,6 @@ from cryptography.hazmat.primitives.ciphers import modes
 from cryptography.hazmat.primitives.asymmetric import padding
 from cryptography.hazmat.primitives import hashes
 from app import settings
-import base64
 from werkzeug.exceptions import BadRequest
 from flask import json
 

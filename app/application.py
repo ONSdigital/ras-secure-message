@@ -1,5 +1,4 @@
 import logging
-from logging.config import dictConfig
 from flask import Flask, request
 from flask import jsonify, json
 from flask_restful import Api
@@ -32,6 +31,7 @@ logger.info('Starting application')
 
 def drop_database():
     database.db.drop_all()
+
 
 with app.app_context():
     database.db.create_all()

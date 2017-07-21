@@ -54,7 +54,6 @@ class FlaskTestCase(unittest.TestCase):
             database.db.create_all()
             self.db = database.db
 
-
     @event.listens_for(Engine, "connect")
     def set_sqlite_pragma(dbapi_connection, connection_record):
         """enable foreign key constraint for tests"""
@@ -192,19 +191,15 @@ class FlaskTestCase(unittest.TestCase):
             for row in request:
                 self.msg_id = row['msg_id']
 
-        draft = (
-            {
-                'msg_id': self.msg_id,
-                'msg_to': ['0a7ad740-10d5-4ecb-b7ca-3c0384afb882'],
-                'msg_from': 'BRES',
-                'subject': 'MyMessage',
-                'body': 'hello',
-                'thread_id': '',
-                'collection_case': 'ACollectionCase',
-                'ru_id': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc',
-                'survey': 'BRES'
-            }
-        )
+        draft = ({'msg_id': self.msg_id,
+                  'msg_to': ['0a7ad740-10d5-4ecb-b7ca-3c0384afb882'],
+                  'msg_from': 'BRES',
+                  'subject': 'MyMessage',
+                  'body': 'hello',
+                  'thread_id': '',
+                  'collection_case': 'ACollectionCase',
+                  'ru_id': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc',
+                  'survey': 'BRES'})
 
         response = self.app.post('http://localhost:5050/message/send', data=json.dumps(draft),
                                  headers=self.headers)
@@ -369,6 +364,7 @@ class FlaskTestCase(unittest.TestCase):
         draft_get_data = json.loads(draft_get.data)
 
         self.assertTrue(draft_get_data['msg_to'] is not None)
+
 
 if __name__ == '__main__':
     unittest.main()

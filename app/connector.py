@@ -7,7 +7,8 @@ conn = None
 # uri = 'postgres://postgres:password@host.pcfdev.io:5431/postgres'
 uri = None
 
-### Extract the database URI value from VCAP_SERVICES
+
+# Extract the database URI value from VCAP_SERVICES
 def getDatabaseUri():
 
     logger = wrap_logger(logging.getLogger(__name__))

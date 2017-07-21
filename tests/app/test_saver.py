@@ -1,4 +1,5 @@
 import unittest
+from unittest import mock
 from app.repository.saver import Saver
 from sqlalchemy import create_engine, event
 from sqlalchemy.engine import Engine
@@ -6,7 +7,6 @@ from app.repository import database
 from app.repository.database import db
 from flask import current_app
 from app.application import app
-from unittest import mock
 from app.exception.exceptions import MessageSaveException
 from app.validation.domain import Message
 from app.repository.database import SecureMessage
@@ -20,7 +20,7 @@ class SaverTestCase(unittest.TestCase):
         app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:////tmp/messages.db'
         self.engine = create_engine('sqlite:////tmp/messages.db')
         self.test_message = Message(**{'msg_to': 'tej', 'msg_from': 'gemma', 'subject': 'MyMessage',
-                                    'body': 'hello', 'thread_id': ""})
+                                       'body': 'hello', 'thread_id': ""})
         with app.app_context():
             database.db.init_app(current_app)
             database.db.drop_all()
@@ -49,7 +49,7 @@ class SaverTestCase(unittest.TestCase):
         with app.app_context():
             with current_app.test_request_context():
                 Saver().save_message(SecureMessage(msg_id='AMsgId'))
-                Saver().save_msg_status(message_status['actor'], message_status['msg_id'],  'INBOX, UNREAD')
+                Saver().save_msg_status(message_status['actor'], message_status['msg_id'], 'INBOX, UNREAD')
 
         with self.engine.connect() as con:
             request = con.execute('SELECT * FROM status')

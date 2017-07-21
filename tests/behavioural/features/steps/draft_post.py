@@ -31,6 +31,7 @@ def update_encrypted_jwt():
     signed_jwt = encode(token_data)
     return encrypter.encrypt_token(signed_jwt)
 
+
 headers['Authorization'] = update_encrypted_jwt()
 
 with app.app_context():
@@ -255,4 +256,3 @@ def step_implmsg_id_returned(context):
 @when('the draft is saved')
 def step_impl_draft_is_saved(context):
     context.response = app.test_client().post(url, data=json.dumps(data), headers=headers)
-

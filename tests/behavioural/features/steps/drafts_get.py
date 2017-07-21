@@ -34,6 +34,7 @@ def update_encrypted_jwt():
     signed_jwt = encode(token_data)
     return encrypter.encrypt_token(signed_jwt)
 
+
 headers['Authorization'] = update_encrypted_jwt()
 
 
@@ -51,7 +52,9 @@ def step_impl_only_the_users_drafts_are_returned(context):
     for x in range(0, len(response['messages'])):
         nose.tools.assert_equal(response['messages'][x]['labels'], ['DRAFT'])
         nose.tools.assert_equal(response['messages'][x]['msg_from'], "0a7ad740-10d5-4ecb-b7ca-3c0384afb882")
-        nose.tools.assert_equal(response['messages'][x]['@msg_from'], {"id": "0a7ad740-10d5-4ecb-b7ca-3c0384afb882", "firstname": "Vana", "surname": "Oorschot", "email": "vana123@aol.com", "telephone": "+443069990289", "status": "ACTIVE"})
+        nose.tools.assert_equal(response['messages'][x]['@msg_from'], {"id": "0a7ad740-10d5-4ecb-b7ca-3c0384afb882", "firstname": "Vana",
+                                                                       "surname": "Oorschot", "email": "vana123@aol.com", "telephone": "+443069990289",
+                                                                       "status": "ACTIVE"})
 
     nose.tools.assert_equal(len(response['messages']), 7)
 
@@ -70,7 +73,9 @@ def step_impl_user_will_get_drafts_from_second_page_of_pagination(context):
     for x in range(0, len(response['messages'])):
         nose.tools.assert_equal(response['messages'][x]['labels'], ['DRAFT'])
         nose.tools.assert_equal(response['messages'][x]['msg_from'], "0a7ad740-10d5-4ecb-b7ca-3c0384afb882")
-        nose.tools.assert_equal(response['messages'][x]['@msg_from'], {"id": "0a7ad740-10d5-4ecb-b7ca-3c0384afb882", "firstname": "Vana", "surname": "Oorschot", "email": "vana123@aol.com", "telephone": "+443069990289", "status": "ACTIVE"})
+        nose.tools.assert_equal(response['messages'][x]['@msg_from'], {"id": "0a7ad740-10d5-4ecb-b7ca-3c0384afb882", "firstname": "Vana",
+                                                                       "surname": "Oorschot", "email": "vana123@aol.com", "telephone": "+443069990289",
+                                                                       "status": "ACTIVE"})
 
     nose.tools.assert_equal(len(response['messages']), 3)
 

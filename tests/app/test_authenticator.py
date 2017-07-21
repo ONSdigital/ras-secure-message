@@ -1,10 +1,10 @@
+import unittest
 from app.authentication.authenticator import check_jwt, authenticate
 from app.authentication.jwt import encode, decode
 from app.authentication.jwe import Encrypter
 from werkzeug.exceptions import BadRequest
 from app.application import app
 from flask import Response
-import unittest
 from app import settings
 
 
@@ -13,10 +13,9 @@ class AuthenticationTestCase(unittest.TestCase):
     def test_authentication_jwt_pass(self):
         """Authenticate request using correct JWT"""
         expected_res = {'status': "ok"}
-        data = {
-                  "user_uuid": "ce12b958-2a5f-44f4-a6da-861e59070a31",
-                  "role": "internal"
-                }
+        data = {"user_uuid": "ce12b958-2a5f-44f4-a6da-861e59070a31",
+                "role": "internal"}
+
         encrypter = Encrypter(_private_key=settings.SM_USER_AUTHENTICATION_PRIVATE_KEY,
                               _private_key_password=settings.SM_USER_AUTHENTICATION_PRIVATE_KEY_PASSWORD,
                               _public_key=settings.SM_USER_AUTHENTICATION_PUBLIC_KEY)
@@ -44,8 +43,7 @@ class AuthenticationTestCase(unittest.TestCase):
     def test_authentication_jwt_user_urn_missing_fail(self):
         """Authenticate request with missing user_urn claim"""
 
-        data = {
-        }
+        data = {}
 
         encrypter = Encrypter(_private_key=settings.SM_USER_AUTHENTICATION_PRIVATE_KEY,
                               _private_key_password=settings.SM_USER_AUTHENTICATION_PRIVATE_KEY_PASSWORD,
@@ -58,9 +56,7 @@ class AuthenticationTestCase(unittest.TestCase):
     def test_authentication_jwt_not_encrypted_fail(self):
         """Authenticate request using JWT without encryption"""
 
-        data = {
-            "user_uuid": "12345678910"
-        }
+        data = {"user_uuid": "12345678910"}
 
         with self.assertRaises(BadRequest):
             check_jwt(encode(data))
@@ -68,10 +64,9 @@ class AuthenticationTestCase(unittest.TestCase):
     def test_authenticate_request_with_correct_header_data(self):
         """Authenticate request using authenticate function and with correct header data"""
         expected_res = {'status': "ok"}
-        data = {
-                  "user_uuid": "12345678910",
-                  "role": "internal"
-                }
+        data = {"user_uuid": "12345678910",
+                "role": "internal"}
+
         encrypter = Encrypter(_private_key=settings.SM_USER_AUTHENTICATION_PRIVATE_KEY,
                               _private_key_password=settings.SM_USER_AUTHENTICATION_PRIVATE_KEY_PASSWORD,
                               _public_key=settings.SM_USER_AUTHENTICATION_PUBLIC_KEY)
@@ -92,10 +87,8 @@ class AuthenticationTestCase(unittest.TestCase):
 
     def test_encode_decode_jwt(self):
         """decoding and encoding jwt"""
-        data = {
-            "user_uuid": "12345678910"
-        }
+        data = {"user_uuid": "12345678910"}
+
         signed_jwt = encode(data)
         decoded_jwt = decode(signed_jwt)
         self.assertEqual(data, decoded_jwt)
-

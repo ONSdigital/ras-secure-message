@@ -1,6 +1,6 @@
 import logging
-from structlog import wrap_logger
 from datetime import datetime, timezone
+from structlog import wrap_logger
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import Column, String, Integer, DateTime, ForeignKey, Index
 from sqlalchemy.orm import relationship

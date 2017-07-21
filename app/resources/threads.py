@@ -1,8 +1,7 @@
-from flask import g, request
-from flask import jsonify
+import logging
+from flask import g, request, jsonify
 from flask_restful import Resource
 from structlog import wrap_logger
-import logging
 from app.common.utilities import get_options, paginated_list_to_json
 from app.constants import THREAD_LIST_ENDPOINT
 from app.repository.retriever import Retriever
@@ -39,6 +38,6 @@ class ThreadList(Resource):
 
         if status:
             resp = paginated_list_to_json(result, page, limit, request.host_url,
-                                                       g.user, string_query_args, THREAD_LIST_ENDPOINT)
+                                          g.user, string_query_args, THREAD_LIST_ENDPOINT)
             resp.status_code = 200
             return resp

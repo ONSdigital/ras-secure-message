@@ -1,8 +1,8 @@
 import unittest
 import uuid
+from unittest import mock
 from flask import g
 from app.repository.retriever import Retriever
-from unittest import mock
 from flask import current_app, json
 from sqlalchemy import create_engine, event
 from sqlalchemy.engine import Engine

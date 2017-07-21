@@ -1,9 +1,8 @@
 import logging
 from structlog import wrap_logger
 from werkzeug.exceptions import InternalServerError
-
 from app.common.labels import Labels
-from app.repository.database import db, Status, SecureMessage, Events
+from app.repository.database import db, Status, SecureMessage
 from app.repository.saver import Saver
 
 logger = wrap_logger(logging.getLogger(__name__))
@@ -25,7 +24,7 @@ class Modifier:
         except Exception as e:
             session.rollback()
             logger.error(e)
-            raise (InternalServerError(description="Error retrieving messages from database"))
+            raise InternalServerError(description="Error retrieving messages from database")
 
     @staticmethod
     def remove_label(label, message, user):
@@ -38,7 +37,7 @@ class Modifier:
             return True
         except Exception as e:
             logger.error(e)
-            raise (InternalServerError(description="Error retrieving messages from database"))
+            raise InternalServerError(description="Error retrieving messages from database")
 
     @staticmethod
     def add_archived(message, user):
@@ -93,9 +92,7 @@ class Modifier:
 
         except Exception as e:
             logger.error(e)
-            raise (InternalServerError(description="Error retrieving messages from database"))
-
-
+            raise InternalServerError(description="Error retrieving messages from database")
 
     @staticmethod
     def replace_current_draft(draft_id, draft, session=db.session):
@@ -108,7 +105,7 @@ class Modifier:
         except Exception as e:
             session.rollback()
             logger.error(e)
-            raise (InternalServerError(description="Error replacing message"))
+            raise InternalServerError(description="Error replacing message")
 
         Saver().save_msg_event(draft_id, 'Draft_Saved')
 
@@ -130,4 +127,4 @@ class Modifier:
         except Exception as e:
             session.rollback()
             logger.error(e)
-            raise (InternalServerError(description="Error replacing DRAFT_INBOX label"))
+            raise InternalServerError(description="Error replacing DRAFT_INBOX label")
