@@ -59,14 +59,14 @@ def step_impl_user_requests_valid_draft(context):
 
 
 @then('the draft is returned')
-def step_impl_assert_draft_is_retuned(context):
+def step_impl_assert_draft_is_returned(context):
     response = json.loads(context.response.data)
     nose.tools.assert_equal(response['msg_id'], context.resp_data['msg_id'])
 
 
 # Scenario 2: User requests draft that does not exist
 @given('a user wants a draft that does not exist')
-def step_impl_user_request_non_existant_draft(context):
+def step_impl_user_request_non_existent_draft(context):
     context.resp_data = dict(msg_id='')
     context.resp_data['msg_id'] = str(uuid.uuid4())
 

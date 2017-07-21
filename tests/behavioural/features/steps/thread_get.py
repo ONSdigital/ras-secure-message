@@ -50,7 +50,7 @@ def step_impl_assert_all_messages_from_conversation_are_received(context):
 @given("internal user has multiple conversations")
 def step_impl_internal_user_has_multiple_conversations(context):
 
-    for _ in range(0, 2):
+    for x in range(0, 2):
         data['thread_id'] = str(uuid.uuid4())
         data['msg_to'] = ['BRES']
         data['msg_from'] = '0a7ad740-10d5-4ecb-b7ca-3c0384afb882'
@@ -80,7 +80,7 @@ def step_impl_pick_conversation_that_does_not_exist(context):
 def step_impl_respondent_and_internal_user_hav_a_conversation(context):
 
     data['thread_id'] = 'AConversation'
-    for _ in range(0, 2):
+    for x in range(0, 2):
         token_data['user_uuid'] = '0a7ad740-10d5-4ecb-b7ca-3c0384afb882'
         token_data['role'] = 'respondent'
         headers['Authorization'] = update_encrypted_jwt()

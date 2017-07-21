@@ -1,5 +1,5 @@
 from app.application import app
-from behave import given, when, then
+from behave import given, then
 from app.repository import database
 from flask import current_app
 from sqlalchemy.engine import Engine
