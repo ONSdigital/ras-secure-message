@@ -13,6 +13,7 @@ Feature: Get Drafts
     When the user requests second page of drafts
     Then user will get drafts from second page of pagination
 
+   # Integration test only
   @ignore
   Scenario: User not authorised to view drafts
     Given the user is not allowed to view drafts

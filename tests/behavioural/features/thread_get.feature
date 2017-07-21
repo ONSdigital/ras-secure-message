@@ -34,4 +34,4 @@ Feature: Get thread by id Endpoint
   Scenario: User tries to retrieve a conversation that does not exist
     Given a respondent picks a conversation that does not exist
     When the respondent gets this conversation
-    Then a 404 HTTP response is returned
+    Then a 404 error code is returned

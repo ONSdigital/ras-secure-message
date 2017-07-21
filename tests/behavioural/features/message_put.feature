@@ -27,41 +27,49 @@ Feature: Checking correct labels for messages are added & deleted
   Scenario: validating a request where there is no label provided
     Given a message is sent
     When the label is empty
-    Then a Bad Request error is returned
+    Then a bad request error is returned
 
   Scenario: validating a request where there is no action provided
     Given a message is sent
     When the action is empty
-    Then a Bad Request 400 error is returned
+    Then a bad request error is returned
 
   Scenario: validating a request where there in an invalid label provided
     Given a message is sent
     When an invalid label is provided
-    Then display a Bad Request is returned
+    Then a bad request error is returned
 
   Scenario: validating a request where there in an invalid action provided
     Given a message is sent
     When an invalid action is provided
-    Then show a Bad Request is returned
+    Then a bad request error is returned
 
-  Scenario: validating a request where there in an unmodifiable label is provided
+  Scenario: validating a request where an unmodifiable label is provided
     Given a message is sent
-    When an unmmodifiable label is provided
-    Then a Bad Request is displayed to the user
+    When an unmodifiable label is provided
+    Then a bad request error is returned
 
-  @ignore
- Scenario: internal - message status automatically changes to read - on opening message
-    Given a message with the status 'unread' is shown to an internal user
-    When the internal user opens the message
-    Then the status of the message changes from 'unread' to 'read' for all internal users that have access to that survey
+  Scenario: internal - as an internal user I want to be able to change my message from read to unread
+    Given a message with the status read is displayed to an internal user
+    When the internal user chooses to edit the status from read to unread
+    Then the status of that message changes to unread for all internal users that have access to that survey
 
-  @ignore
-  Scenario: As an external user - message status automatically changes to read - on opening message
-    Given a message with the status 'unread' is shown to an external user
-    When the external user opens the message
-    Then the status of the message changes to from unread to read
+  Scenario: internal - as an internal user I want to be able to change my message from unread to read
+    Given a message with the status unread is displayed to an internal user
+    When the internal user chooses to edit the status from unread to read
+    Then the status of that message changes to read for all internal users that have access to that survey
 
-   Scenario: If an incorrect message id is requested by the user return a 404 error
+  Scenario: external  - as an external user I want to be able to change my message from read to unread
+    Given a message with the status read is displayed to an external user
+    When the external user chooses to edit the status from read to unread
+    Then the status of that message changes to unread
+
+  Scenario: external - as an external user I want to be able to change my message from unread to read
+    Given a message with the status unread is displayed to an external user
+    When the external user chooses to edit the status from unread to read
+    Then the status of that message changes to read
+
+  Scenario: If an incorrect message id is requested by the user return a 404 error
     Given a user requests a message with a invalid message id
     When it is searched for
     Then a 404 error code is returned

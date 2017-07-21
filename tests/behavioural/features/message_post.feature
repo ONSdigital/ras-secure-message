@@ -39,22 +39,22 @@ Feature: Message Send Endpoint
   Scenario: Submit a message with a missing "To" field and receive a 400 error
     Given  the 'To' field is empty
     When the message is sent
-    Then a 400 error status is returned
+    Then a bad request error is returned
 
   Scenario: Submit a message with a missing "From" field and receive a 400 error
     Given the 'From' field is empty
     When the message is sent
-    Then a 400 error status is returned
+    Then a bad request error is returned
 
   Scenario: Submit a message with a missing "Body" field and receive a 400 error
     Given the 'Body' field is empty
     When the message is sent
-    Then a 400 error status is returned
+    Then a bad request error is returned
 
   Scenario: Submit a message with a missing "Subject" field and receive a 400
     Given the 'Subject' field is empty
     When the message is sent
-    Then a 400 error status is returned
+    Then a bad request error is returned
 
   Scenario: Message sent without a thread id
     Given the 'Thread ID' field is empty
@@ -64,27 +64,27 @@ Feature: Message Send Endpoint
   Scenario: Message sent with a msg_to too long
     Given the 'To' field exceeds max limit in size
     When the message is sent
-    Then a 400 error status is returned
+    Then a bad request error is returned
 
   Scenario: Message sent with a msg_from too long
     Given the 'From' field exceeds max limit in size
     When the message is sent
-    Then a 400 error status is returned
+    Then a bad request error is returned
 
   Scenario: Message sent with an empty survey field return 400
     Given the survey field is empty
     When the message is sent
-    Then a 400 error status is returned
+    Then a bad request error is returned
 
   Scenario: Send a message with a msg_id not valid draft return 400
     Given a message contains a msg_id and is not a valid draft
     When the message is sent
-    Then a 400 error status is returned
+    Then a bad request error is returned
 
   Scenario: When a message with the label of "Draft" is sent and another user is trying to send the same message return a 409
     Given a draft message is posted
     When another user tries to send the same message
-    Then is shown a 409 error status
+    Then a conflict error is returned
 
   Scenario: A Etag is not present within the header
     Given a message is created
@@ -94,4 +94,4 @@ Feature: Message Send Endpoint
   Scenario: Send a message where msg_to is a string
     Given a msg_to is entered as a string
     When the message is sent with msg_to string
-    Then a 400 error status is returned
+    Then a bad request error is returned

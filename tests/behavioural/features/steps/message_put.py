@@ -39,20 +39,7 @@ def update_encrypted_jwt():
 headers['Authorization'] = update_encrypted_jwt()
 
 
-# Scenario: modifying the status of the message to "archived"
-@given("a valid message is sent")
-def step_impl(context):
-    data['msg_to'] = ['BRES']
-    data['msg_from'] = '0a7ad740-10d5-4ecb-b7ca-3c0384afb882'
-    token_data['user_uuid'] = data['msg_from']
-    token_data['role'] = 'respondent'
-    headers['Authorization'] = update_encrypted_jwt()
-    context.response = app.test_client().post("http://localhost:5050/message/send",
-                                              data=flask.json.dumps(data), headers=headers)
-    msg_resp = json.loads(context.response.data)
-    context.msg_id = msg_resp['msg_id']
-
-
+# Scenario 1: modifying the status of the message to "archived"
 @when("the message is archived")
 def step_impl_message_is_archived(context):
     modify_data['action'] = 'add'
@@ -71,7 +58,7 @@ def step_impl_assert_message_is_marked_as_archived(context):
     nose.tools.assert_true('ARCHIVE' in response['labels'])
 
 
-# Scenario: deleting the "archived" label from a given message
+# Scenario 2: deleting the "archived" label from a given message
 @given("the message is archived")
 def step_impl_the_message_is_archived(context):
     data['msg_to'] = ['BRES']
@@ -106,7 +93,7 @@ def step_impl_message_not_marked_archived(context):
     nose.tools.assert_true('ARCHIVE' not in response)
 
 
-# Scenario: Modifying the status of the message to "unread"
+# Scenario 3: Modifying the status of the message to "unread"
 @given('a message has been read')
 def step_impl_message_has_been_read(context):
     data['msg_to'] = ['BRES']
@@ -145,9 +132,7 @@ def step_imp_check_message_is_marked_unread(context):
     nose.tools.assert_true('UNREAD' in response['labels'])
 
 
-# Scenario: modifying the status of the message so that "unread" is removed
-
-
+# Scenario 4: modifying the status of the message so that "unread" is removed
 @when("the message is marked read")
 def step_impl_the_message_is_marked_read(context):
     modify_data['action'] = 'remove'
@@ -173,20 +158,7 @@ def step_impl_message_read_date_should_be_set(context):
     nose.tools.assert_is_not_none(response['read_date'])
 
 
-# Scenario: validating a request where there is no label provided
-@given('a message is sent')
-def step_impl_a_message_is_sent(context):
-    data['msg_to'] = ['BRES']
-    data['msg_from'] = '0a7ad740-10d5-4ecb-b7ca-3c0384afb882'
-    token_data['user_uuid'] = data['msg_from']
-    token_data['role'] = 'respondent'
-    headers['Authorization'] = update_encrypted_jwt()
-    context.response = app.test_client().post("http://localhost:5050/message/send",
-                                              data=flask.json.dumps(data), headers=headers)
-    msg_resp = json.loads(context.response.data)
-    context.msg_id = msg_resp['msg_id']
-
-
+# Scenario 5: validating a request where there is no label provided
 @when('the label is empty')
 def step_impl_the_label_is_empty(context):
     modify_data['action'] = 'add'
@@ -195,13 +167,7 @@ def step_impl_the_label_is_empty(context):
                                              data=flask.json.dumps(modify_data), headers=headers)
 
 
-@then('a Bad Request error is returned')
-def step_impl_a_bad_request_is_returned(context):
-    nose.tools.assert_equal(context.response.status_code, 400)
-
-
-#  Scenario: validating a request where there is no action provided
-
+# Scenario 6: validating a request where there is no action provided
 @when('the action is empty')
 def step_impl_the_action_is_empty(context):
     modify_data['action'] = ''
@@ -210,13 +176,7 @@ def step_impl_the_action_is_empty(context):
                                              data=flask.json.dumps(modify_data), headers=headers)
 
 
-@then('a Bad Request 400 error is returned')
-def step_impl_a_bad_request_400_is_returned(context):
-    nose.tools.assert_equal(context.response.status_code, 400)
-
-
-# Scenario: validating a request where there in an invalid label provided
-
+# Scenario 7: validating a request where there in an invalid label provided
 @when('an invalid label is provided')
 def step_impl_an_invalid_label_is_provided(context):
     modify_data['action'] = ''
@@ -225,12 +185,7 @@ def step_impl_an_invalid_label_is_provided(context):
                                              data=flask.json.dumps(modify_data), headers=headers)
 
 
-@then('display a Bad Request is returned')
-def step_impl_display_a_bad_request_is_returned(context):
-    nose.tools.assert_equal(context.response.status_code, 400)
-
-
-#  Scenario: validating a request where there in an invalid action provided
+# Scenario 8: validating a request where an invalid action provided
 @when('an invalid action is provided')
 def step_impl_an_invalid_action_is_provided(context):
     modify_data['action'] = ''
@@ -239,13 +194,8 @@ def step_impl_an_invalid_action_is_provided(context):
                                              data=flask.json.dumps(modify_data), headers=headers)
 
 
-@then('show a Bad Request is returned')
-def step_impl_a_bad_request_is_returned(context):
-    nose.tools.assert_equal(context.response.status_code, 400)
-
-
-#  Scenario: validating a request where there in an unmodifiable label is provided
-@when('an unmmodifiable label is provided')
+# Scenario 9: validating a request where there in an unmodifiable label is provided
+@when('an unmodifiable label is provided')
 def step_impl_an_unmodifiable_label_is_provided(context):
     modify_data['action'] = ''
     modify_data['label'] = 'UNREAD'
@@ -253,12 +203,7 @@ def step_impl_an_unmodifiable_label_is_provided(context):
                                              data=flask.json.dumps(modify_data), headers=headers)
 
 
-@then('a Bad Request is displayed to the user')
-def step_impl_a_bad_request_is_displayed(context):
-    nose.tools.assert_equal(context.response.status_code, 400)
-
-
-# Scenario - internal - message status automatically changes to read - on opening message
+# Scenario 10: internal - message status automatically changes to read - on opening message
 @given("a message with the status 'unread' is shown to an internal user")
 def step_impl_message_with_status_unread_shown_to_the_user(context):
     token_data['user_uuid'] = data['msg_from']
@@ -282,7 +227,7 @@ def step_impl_no_unread_messages_returned(context):
     nose.tools.assert_true("UNREAD" not in context.get_json['labels'])
 
 
-# Scenario - internal - as an internal user I want to be able to change my message from read to unread
+# Scenario 11: internal - as an internal user I want to be able to change my message from read to unread
 @given("a message with the status read is displayed to an internal user")
 def step_impl_message_with_status_read_returned(context):
     data['msg_to'] = ['BRES']
@@ -314,9 +259,10 @@ def step_impl_status_of_message_changes_to_unread(context):
     context.response = app.test_client().get("http://localhost:5050/message/{}".format(context.msg_id),
                                              data=flask.json.dumps(modify_data), headers=headers)
     response = flask.json.loads(context.response.data)
-    nose.tools.assert_true('UNREAD' in response['labels'])
+    nose.tools.assert_true('READ' not in response['labels'])
 
 
+# Scenario 12: internal - as an internal user I want to be able to change my message from unread to read
 @given("a message with the status unread is displayed to an internal user")
 def step_impl_message_status_unread_returned(context):
     token_data['user_uuid'] = data['msg_from']
@@ -341,7 +287,7 @@ def step_impl_message_status_chanegs_to_read(context):
     nose.tools.assert_true("UNREAD" not in request_data['labels'])
 
 
-# Scenario: As an external user - message status automatically changes to read - on opening message
+# Scenario 13: external - message status automatically changes to read - on opening message
 @given("a message with the status 'unread' is shown to an external user")
 def step_impl_message_status_unread_returned(context):
     token_data['user_uuid'] = data['msg_from']
@@ -363,7 +309,7 @@ def step_impl_message_statis_changes_from_unread_to_read(context):
     nose.tools.assert_true("UNREAD" not in context.request_data['labels'])
 
 
-# Scenario - external - as an external user I want to be able to change my message from read to unread
+# Scenario 14: external - as an external user I want to be able to change my message from read to unread
 @given("a message with the status read is displayed to an external user")
 def step_implmessage_with_status_read_returned(context):
     token_data['user_uuid'] = data['msg_from']
@@ -388,9 +334,10 @@ def step_impl_external_user_edits_status_from_read_to_unread(context):
 def step_impl_the_status_of_the_message_changes_to_unread(context):
     request = app.test_client().get("http://localhost:5050/message/{0}".format(context.msg_id), headers=headers)
     request_data = json.loads(request.data)
-    nose.tools.assert_true("UNREAD" in request_data['labels'])
+    nose.tools.assert_true("READ" not in request_data['labels'])
 
 
+# Scenario 15: external - as an external user I want to be able to change my message from unread to read
 @given("a message with the status unread is displayed to an external user")
 def step_impl_message_with_status_unread_returned(context):
     token_data['user_uuid'] = data['msg_from']
@@ -415,7 +362,7 @@ def step_impl_assert_message_status_changes_to_read(context):
     nose.tools.assert_true("UNREAD" not in request_data['labels'])
 
 
-# If an incorrect message id is requested by the user return a 404 error
+# Scenario 16: If an incorrect message id is requested by the user return a 404 error
 @given("a user requests a message with a invalid message id")
 def step_impl_return_message_with_invalid_msg_id(context):
     context.msg_id = "RandomMsgIDsdhkbgjksdlfknbsjdshbfjskgbhdhdghgdhdfsdhjghbskggdh"
@@ -429,6 +376,28 @@ def step_impl_searched_for(context):
                                              data=json.dumps(modify_data), headers=headers)
 
 
-@then("a 404 error code is returned")
-def step_impl_404_returned(context):
-    nose.tools.assert_equal(context.response.status_code, 404)
+# Common Steps: used in multiple scenarios
+@given("a valid message is sent")
+def step_impl(context):
+    data['msg_to'] = ['BRES']
+    data['msg_from'] = '0a7ad740-10d5-4ecb-b7ca-3c0384afb882'
+    token_data['user_uuid'] = data['msg_from']
+    token_data['role'] = 'respondent'
+    headers['Authorization'] = update_encrypted_jwt()
+    context.response = app.test_client().post("http://localhost:5050/message/send",
+                                              data=flask.json.dumps(data), headers=headers)
+    msg_resp = json.loads(context.response.data)
+    context.msg_id = msg_resp['msg_id']
+
+
+@given('a message is sent')
+def step_impl_a_message_is_sent(context):
+    data['msg_to'] = ['BRES']
+    data['msg_from'] = '0a7ad740-10d5-4ecb-b7ca-3c0384afb882'
+    token_data['user_uuid'] = data['msg_from']
+    token_data['role'] = 'respondent'
+    headers['Authorization'] = update_encrypted_jwt()
+    context.response = app.test_client().post("http://localhost:5050/message/send",
+                                              data=flask.json.dumps(data), headers=headers)
+    msg_resp = json.loads(context.response.data)
+    context.msg_id = msg_resp['msg_id']

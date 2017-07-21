@@ -36,25 +36,8 @@ def update_encrypted_jwt():
 
 headers['Authorization'] = update_encrypted_jwt()
 
-#  Scenario: User requests list of drafts
 
-
-@given('the user has created and saved multiple drafts')
-def step_impl_user_has_created__and_saved_multiple_drafts(context):
-    data.update({'msg_to': ['BRES'],
-                 'msg_from': '0a7ad740-10d5-4ecb-b7ca-3c0384afb882',
-                 'subject': 'test',
-                 'body': 'Test',
-                 'thread_id': '',
-                 'collection_case': 'collection case1',
-                 'collection_exercise': 'collection exercise1',
-                 'ru_id': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc',
-                 'survey': 'BRES'})
-
-    for _ in range(0, 10):
-        app.test_client().post("http://localhost:5050/draft/save", data=json.dumps(data), headers=headers)
-
-
+# Scenario 1: User requests list of drafts
 @when("the user requests drafts")
 def step_impl_user_requests_drafts(context):
     token_data['user_urn'] = '0a7ad740-10d5-4ecb-b7ca-3c0384afb882'
@@ -73,8 +56,7 @@ def step_impl_only_the_users_drafts_are_returned(context):
     nose.tools.assert_equal(len(response['messages']), 7)
 
 
-#   Scenario: User requests second page of list of drafts
-
+# Scenario 2: User requests second page of list of drafts
 @when("the user requests second page of drafts")
 def step_impl_the_user_requests_second_page_of_drafts(context):
     token_data['user_urn'] = '0a7ad740-10d5-4ecb-b7ca-3c0384afb882'
@@ -92,9 +74,8 @@ def step_impl_user_will_get_drafts_from_second_page_of_pagination(context):
 
     nose.tools.assert_equal(len(response['messages']), 3)
 
-# Scenario: Internal user saves multiple drafts and Respondent retrieves the list of drafts with particular cc
 
-
+# Scenario 4: Internal user saves multiple drafts and Respondent retrieves the list of drafts with particular cc
 @given('an Internal user saves multiple drafts with different collection case')
 def step_impl_internal_user_saves_multiple_drafts_with_different_collection_case(context):
 
@@ -125,9 +106,8 @@ def step_impl_assert_messages_have_correct_collection_case(context):
 
     nose.tools.assert_equal(len(response['messages']), 2)
 
-# Scenario: Internal user saves multiple drafts and Respondent retrieves the list of drafts with particular ce
 
-
+# Scenario 5: Internal user saves multiple drafts and Respondent retrieves the list of drafts with particular ce
 @given('an Internal user saves multiple drafts with different collection exercise')
 def step_impl_internal_user_saves_multiple_drafts_with_different_collection_exercise(context):
 
@@ -157,3 +137,20 @@ def step_impl_assert_drafts_have_correct_collection_exercise(context):
     nose.tools.assert_equal(response['messages'][1]['collection_exercise'], 'AnotherCollectionExercise')
 
     nose.tools.assert_equal(len(response['messages']), 2)
+
+
+# Common Steps: used in multiple scenarios
+@given('the user has created and saved multiple drafts')
+def step_impl_user_has_created__and_saved_multiple_drafts(context):
+    data.update({'msg_to': ['BRES'],
+                 'msg_from': '0a7ad740-10d5-4ecb-b7ca-3c0384afb882',
+                 'subject': 'test',
+                 'body': 'Test',
+                 'thread_id': '',
+                 'collection_case': 'collection case1',
+                 'collection_exercise': 'collection exercise1',
+                 'ru_id': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc',
+                 'survey': 'BRES'})
+
+    for _ in range(0, 10):
+        app.test_client().post("http://localhost:5050/draft/save", data=json.dumps(data), headers=headers)
