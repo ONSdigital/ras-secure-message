@@ -1,6 +1,7 @@
 import unittest
 from flask import json
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, event
+from sqlalchemy.engine import Engine
 from werkzeug.exceptions import ExpectationFailed
 from app import application
 from app.application import app
@@ -8,6 +9,15 @@ from app.common.utilities import get_business_details_by_ru, get_details_by_uuid
 
 
 class PartyTestCase(unittest.TestCase):
+
+
+
+    @event.listens_for(Engine, "connect")
+    def set_sqlite_pragma(dbapi_connection, connection_record):
+        """enable foreign key constraint for tests"""
+        cursor = dbapi_connection.cursor()
+        cursor.execute("PRAGMA foreign_keys=ON")
+        cursor.close()
 
     def test_get_user_details_by_uuid(self):
         """Test that user details are returned using uuids"""

@@ -7,7 +7,8 @@ from app import application
 from app.application import app
 from app.repository import database
 from app.repository.retriever import Retriever
-
+from sqlalchemy.engine import Engine
+from sqlalchemy import event
 
 class HealthTestCase(unittest.TestCase):
     """Test case for application health monitor"""
@@ -21,6 +22,13 @@ class HealthTestCase(unittest.TestCase):
             database.db.drop_all()
             database.db.create_all()
             self.db = database.db
+
+    @event.listens_for(Engine, "connect")
+    def set_sqlite_pragma(dbapi_connection, connection_record):
+        """enable foreign key constraint for tests"""
+        cursor = dbapi_connection.cursor()
+        cursor.execute("PRAGMA foreign_keys=ON")
+        cursor.close()
 
     def test_health_status(self):
         """sends GET request to the application health monitor endpoint"""
