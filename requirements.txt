@@ -10,3 +10,4 @@ structlog==16.1.0
 cryptography==1.8.1
 notifications_python_client==4.2.0
 flake8==3.3.0
+pylint==1.6.4
