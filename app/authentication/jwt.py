@@ -6,7 +6,7 @@ from jose import jwt
 from app import settings
 
 JWT_ALGORITHM = 'HS256'
-JWT_SECRET = settings.JWT_SECRET
+JWT_SECRET = settings.SM_JWT_SECRET
 
 
 def encode(data):
