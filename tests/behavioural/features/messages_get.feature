@@ -77,9 +77,8 @@ Feature: Get Messages list Endpoint
     Given a Respondent creates multiple draft messages 
     When the Internal user gets their messages
     Then the retrieved messages should not have DRAFT_INBOX labels
-  # check to see which ones pass / fail
-  # All fail
-@ignore
+  
+  @ignore
   Scenario Outline: User provides parameters that are invalid
     Given parameter <param> has value <value>
     When user gets messages using the parameters
@@ -91,9 +90,8 @@ Feature: Get Messages list Endpoint
     |page          | string|
     |survey        | NotASurvey |
     |labels        | NotALabel  |
-  # Check this one passes
-  # Fails
-@ignore
+
+  @ignore
   Scenario Outline: User provides parameters that are too large
     Given parameter <param> has value <value>
     When user gets messages using the parameters
@@ -118,9 +116,8 @@ Feature: Get Messages list Endpoint
     |INBOX-SENT  |
     |INBOX-SENT-ARCHIVED |
     |INBOX-SENT-ARCHIVED-DRAFT |
- # Should work but if not don't worry
- # Fails
-@ignore
+
+  @ignore
   Scenario: User gets messages with no labels options
     Given there are multiple messages to retrieve for all labels
     When respondent gets messages with labels empty
