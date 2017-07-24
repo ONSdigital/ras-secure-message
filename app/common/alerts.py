@@ -13,12 +13,10 @@ class AlertViaGovNotify:
     @staticmethod
     def send(email, reference):
         notifications_client = NotificationsAPIClient(settings.NOTIFICATION_COMBINED_KEY)
-        notifications_client.send_email_notification(
-            email_address=email,
-            template_id=settings.NOTIFICATION_TEMPLATE_ID,
-            personalisation=None,
-            reference=reference
-        )
+        notifications_client.send_email_notification(email_address=email,
+                                                     template_id=settings.NOTIFICATION_TEMPLATE_ID,
+                                                     personalisation=None,
+                                                     reference=reference)
 
 
 class AlertUser:

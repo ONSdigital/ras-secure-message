@@ -9,7 +9,7 @@ uri = None
 
 
 # Extract the database URI value from VCAP_SERVICES
-def getDatabaseUri():
+def get_database_uri():
 
     logger = wrap_logger(logging.getLogger(__name__))
     global uri

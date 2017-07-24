@@ -2,8 +2,8 @@ import logging
 import uuid
 from marshmallow import Schema, fields, post_load, validates, ValidationError, pre_load, validates_schema
 from app import constants
-from flask import g
 from app.validation.user import User
+from flask import g
 
 logger = logging.getLogger(__name__)
 

@@ -73,11 +73,9 @@ def paginated_list_to_json(paginated_list, page, limit, host_url, user, string_q
         msg['_links'] = {"self": {"href": "{0}{1}/{2}".format(host_url, MESSAGE_BY_ID_ENDPOINT, msg['msg_id'])}}
         messages.append(msg)
 
-    links = {
-        'first': {"href": "{0}{1}".format(host_url, endpoint)},
-        'self': {"href": "{0}{1}{2}{3}page={4}&limit={5}".format(host_url, endpoint, arg_joiner,
-                                                                 string_query_args, page, limit)}
-    }
+    links = {'first': {"href": "{0}{1}".format(host_url, endpoint)},
+             'self': {"href": "{0}{1}{2}{3}page={4}&limit={5}".format(host_url, endpoint, arg_joiner,
+                                                                      string_query_args, page, limit)}}
 
     if paginated_list.has_next:
         links['next'] = {

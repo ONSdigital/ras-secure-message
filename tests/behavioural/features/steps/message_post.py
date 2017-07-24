@@ -1,15 +1,15 @@
-from flask import json
 import nose.tools
+from flask import json
 from behave import given, then, when
 from app import constants
 from app.application import app
 from app.repository import database
-from flask import current_app
-from unittest import mock
 from app.common.alerts import AlertUser, AlertViaGovNotify
 from app.authentication.jwt import encode
 from app.authentication.jwe import Encrypter
 from app import settings
+from flask import current_app
+from unittest import mock
 
 
 url = "http://localhost:5050/message/send"

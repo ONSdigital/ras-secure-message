@@ -1,6 +1,6 @@
-from flask import json
-import flask
 import nose.tools
+import flask
+from flask import json
 from behave import given, then, when
 from app.application import app
 from app.authentication.jwt import encode
@@ -275,7 +275,7 @@ def step_impl_message_status_unread_returned(context):
 
 
 @when("the internal user chooses to edit the status from unread to read")
-def step_impledit_status_from_unread_to_read(context):
+def step_impl_edit_status_from_unread_to_read(context):
     modify_data['action'] = 'remove'
     modify_data['label'] = 'UNREAD'
     app.test_client().put(url.format(context.msg_id), data=flask.json.dumps(modify_data), headers=headers)
@@ -306,7 +306,7 @@ def step_impl_external_user_opens_the_message(context):
 
 
 @then("the status of the message changes to from unread to read")
-def step_impl_message_statis_changes_from_unread_to_read(context):
+def step_impl_message_status_changes_from_unread_to_read(context):
     nose.tools.assert_true("UNREAD" not in context.request_data['labels'])
 
 

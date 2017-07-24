@@ -2,10 +2,10 @@ import unittest
 from app.authentication.authenticator import check_jwt, authenticate
 from app.authentication.jwt import encode, decode
 from app.authentication.jwe import Encrypter
-from werkzeug.exceptions import BadRequest
 from app.application import app
-from flask import Response
 from app import settings
+from werkzeug.exceptions import BadRequest
+from flask import Response
 
 
 class AuthenticationTestCase(unittest.TestCase):

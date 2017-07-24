@@ -1,3 +1,4 @@
+import nose
 from behave import given, when, then
 from flask import current_app, json
 from app.common.alerts import AlertUser, AlertViaGovNotify
@@ -8,7 +9,6 @@ from app import constants
 from app.authentication.jwt import encode
 from app.authentication.jwe import Encrypter
 from app import settings
-import nose
 
 
 url = "http://localhost:5050/draft/save"

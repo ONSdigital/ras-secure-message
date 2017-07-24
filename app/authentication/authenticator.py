@@ -1,11 +1,11 @@
 import logging
+from app import settings
+from app.validation.user import User
 from app.authentication.jwt import decode
 from app.authentication.jwe import Decrypter
 from flask import Response, g
 from jose import JWTError
-from app.validation.user import User
 from werkzeug.exceptions import BadRequest
-from app import settings
 
 logger = logging.getLogger(__name__)
 

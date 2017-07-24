@@ -24,7 +24,4 @@ class User:
 
         response = mocked_party.user_details_endpoint(uuid)
 
-        if response.status_code == 200:
-            return True
-        else:
-            return False
+        return response.status_code == 200

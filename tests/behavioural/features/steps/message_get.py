@@ -1,10 +1,8 @@
 import uuid
-
 import flask
 import nose.tools
 from behave import given, then, when
 from flask import json
-
 from app import settings
 from app.application import app
 from app.authentication.jwe import Encrypter

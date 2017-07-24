@@ -22,7 +22,7 @@ logger = wrap_logger(logging.getLogger(__name__))
 app = Flask(__name__)
 api = Api(app)
 CORS(app)
-app.config['SQLALCHEMY_DATABASE_URI'] = connector.getDatabaseUri()
+app.config['SQLALCHEMY_DATABASE_URI'] = connector.get_database_uri()
 app.config['SQLALCHEMY_POOL_SIZE'] = settings.SQLALCHEMY_POOL_SIZE
 database.db.init_app(app)
 

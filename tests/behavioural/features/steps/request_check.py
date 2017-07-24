@@ -1,9 +1,10 @@
+import nose.tools
 from behave import given, when, then
 from app.application import app
 from app.authentication.jwt import encode
 from app.authentication.jwe import Encrypter
 from app import settings
-import nose.tools
+
 
 token_data = {
             "user_uuid": "000000000",

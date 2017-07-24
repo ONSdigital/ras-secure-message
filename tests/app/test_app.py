@@ -1,6 +1,6 @@
 import unittest
-from datetime import datetime, timezone
 from unittest import mock
+from datetime import datetime, timezone
 from flask import current_app, json
 from sqlalchemy import create_engine, event
 from sqlalchemy.engine import Engine
@@ -23,10 +23,9 @@ class FlaskTestCase(unittest.TestCase):
 
         AlertUser.alert_method = mock.Mock(AlertViaGovNotify)
 
-        token_data = {
-            "user_uuid": "BRES",
-            "role": "internal"
-        }
+        token_data = {"user_uuid": "BRES",
+                      "role": "internal"}
+
         encrypter = Encrypter(_private_key=settings.SM_USER_AUTHENTICATION_PRIVATE_KEY,
                               _private_key_password=settings.SM_USER_AUTHENTICATION_PRIVATE_KEY_PASSWORD,
                               _public_key=settings.SM_USER_AUTHENTICATION_PUBLIC_KEY)
@@ -265,17 +264,15 @@ class FlaskTestCase(unittest.TestCase):
         resp_data = json.loads(response.data)
         msg_id = resp_data['msg_id']
 
-        self.test_message.update({
-            'msg_id': msg_id,
-            'msg_to': ['0a7ad740-10d5-4ecb-b7ca-3c0384afb882'],
-            'msg_from': 'BRES',
-            'subject': 'MyMessage',
-            'body': 'hello',
-            'collection_case': 'ACollectionCase',
-            'collcetion_exercise': 'ACollectionExercise',
-            'ru_id': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc',
-            'survey': 'BRES'
-        })
+        self.test_message.update({'msg_id': msg_id,
+                                  'msg_to': ['0a7ad740-10d5-4ecb-b7ca-3c0384afb882'],
+                                  'msg_from': 'BRES',
+                                  'subject': 'MyMessage',
+                                  'body': 'hello',
+                                  'collection_case': 'ACollectionCase',
+                                  'collection_exercise': 'ACollectionExercise',
+                                  'ru_id': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc',
+                                  'survey': 'BRES'})
 
         self.app.post("http://localhost:5050/message/send", data=json.dumps(self.test_message), headers=self.headers)
 
@@ -288,21 +285,18 @@ class FlaskTestCase(unittest.TestCase):
     def test_draft_created_by_respondent_does_not_show_for_internal(self):
         """Test whether a draft created by a respondent is returned to an internal user"""
 
-        self.test_message.update({
-            'msg_to': ['BRES'],
-            'msg_from': '0a7ad740-10d5-4ecb-b7ca-3c0384afb882',
-            'subject': 'MyMessage',
-            'body': 'hello',
-            'collection_case': 'ACollectionCase',
-            'collection_exercise': 'ACollectionExercise',
-            'ru_id': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc',
-            'survey': 'BRES'
-        })
+        self.test_message.update({'msg_to': ['BRES'],
+                                  'msg_from': '0a7ad740-10d5-4ecb-b7ca-3c0384afb882',
+                                  'subject': 'MyMessage',
+                                  'body': 'hello',
+                                  'collection_case': 'ACollectionCase',
+                                  'collection_exercise': 'ACollectionExercise',
+                                  'ru_id': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc',
+                                  'survey': 'BRES'})
 
-        token_data = {
-            "user_uuid": "0a7ad740-10d5-4ecb-b7ca-3c0384afb882",
-            "role": "respondent"
-        }
+        token_data = {"user_uuid": "0a7ad740-10d5-4ecb-b7ca-3c0384afb882",
+                      "role": "respondent"}
+
         encrypter = Encrypter(_private_key=settings.SM_USER_AUTHENTICATION_PRIVATE_KEY,
                               _private_key_password=settings.SM_USER_AUTHENTICATION_PRIVATE_KEY_PASSWORD,
                               _public_key=settings.SM_USER_AUTHENTICATION_PUBLIC_KEY)
@@ -314,10 +308,9 @@ class FlaskTestCase(unittest.TestCase):
         save_data = json.loads(resp.data)
         msg_id = save_data['msg_id']
 
-        token_data = {
-            "user_uuid": "BRES",
-            "role": "internal"
-        }
+        token_data = {"user_uuid": "BRES",
+                      "role": "internal"}
+
         encrypter = Encrypter(_private_key=settings.SM_USER_AUTHENTICATION_PRIVATE_KEY,
                               _private_key_password=settings.SM_USER_AUTHENTICATION_PRIVATE_KEY_PASSWORD,
                               _public_key=settings.SM_USER_AUTHENTICATION_PUBLIC_KEY)
@@ -334,21 +327,18 @@ class FlaskTestCase(unittest.TestCase):
     def test_draft_get_returns_msg_to(self):
         """Test that draft get returns draft's msg_to if applicable"""
 
-        self.test_message.update({
-            'msg_to': ['BRES'],
-            'msg_from': '0a7ad740-10d5-4ecb-b7ca-3c0384afb882',
-            'subject': 'MyMessage',
-            'body': 'hello',
-            'collection_case': 'ACollectionCase',
-            'collection_exercise': 'ACollectionExercise',
-            'ru_id': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc',
-            'survey': 'BRES'
-        })
+        self.test_message.update({'msg_to': ['BRES'],
+                                  'msg_from': '0a7ad740-10d5-4ecb-b7ca-3c0384afb882',
+                                  'subject': 'MyMessage',
+                                  'body': 'hello',
+                                  'collection_case': 'ACollectionCase',
+                                  'collection_exercise': 'ACollectionExercise',
+                                  'ru_id': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc',
+                                  'survey': 'BRES'})
 
-        token_data = {
-            "user_uuid": "0a7ad740-10d5-4ecb-b7ca-3c0384afb882",
-            "role": "respondent"
-        }
+        token_data = {"user_uuid": "0a7ad740-10d5-4ecb-b7ca-3c0384afb882",
+                      "role": "respondent"}
+
         encrypter = Encrypter(_private_key=settings.SM_USER_AUTHENTICATION_PRIVATE_KEY,
                               _private_key_password=settings.SM_USER_AUTHENTICATION_PRIVATE_KEY_PASSWORD,
                               _public_key=settings.SM_USER_AUTHENTICATION_PUBLIC_KEY)

@@ -14,7 +14,7 @@ def logger_initial_config(service_name=None,
         logger_format = (
             "%(asctime)s.%(msecs)06dZ|"
             "%(levelname)s: {}: '%(message)s: file='%(name)s.%(funcName)s:line no.='%(lineno)d"
-        ).format(service_name)
+            ).format(service_name)
     if not logger_date_format:
         logger_date_format = os.getenv('LOGGING_DATE_FORMAT', "%Y-%m-%dT%H:%M%s")
 

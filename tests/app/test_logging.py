@@ -1,7 +1,7 @@
 import sys
 import unittest
-from io import StringIO
 from unittest import mock
+from io import StringIO
 from app.validation.domain import MessageSchema
 from app import application
 from app.application import app

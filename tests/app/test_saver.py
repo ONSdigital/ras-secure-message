@@ -1,15 +1,15 @@
 import unittest
 from unittest import mock
-from app.repository.saver import Saver
 from sqlalchemy import create_engine, event
 from sqlalchemy.engine import Engine
+from app.repository.saver import Saver
 from app.repository import database
 from app.repository.database import db
-from flask import current_app
 from app.application import app
 from app.exception.exceptions import MessageSaveException
 from app.validation.domain import Message
 from app.repository.database import SecureMessage
+from flask import current_app
 
 
 class SaverTestCase(unittest.TestCase):

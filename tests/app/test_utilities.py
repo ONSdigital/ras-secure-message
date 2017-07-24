@@ -4,13 +4,13 @@ from flask import current_app, json
 from sqlalchemy import create_engine, event
 from sqlalchemy.engine import Engine
 from app.application import app
+from app.common import utilities
 from app.common.utilities import generate_etag
 from app.repository import database
 from app.repository.retriever import Retriever
-from tests.app.test_retriever import RetrieverTestCaseHelper
-from app.common import utilities
 from app.constants import MESSAGE_QUERY_LIMIT
 from app.validation.user import User
+from tests.app.test_retriever import RetrieverTestCaseHelper
 
 
 class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):

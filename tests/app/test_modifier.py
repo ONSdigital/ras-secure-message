@@ -259,18 +259,16 @@ class ModifyTestCase(unittest.TestCase, ModifyTestCaseHelper):
         """Check draft event is deleted for message"""
         with app.app_context():
             with current_app.test_request_context():
-                self.test_message = {
-                    'msg_id': 'test123',
-                    'msg_to': ['richard'],
-                    'msg_from': '0a7ad740-10d5-4ecb-b7ca-3c0384afb882',
-                    'subject': 'MyMessage',
-                    'body': 'hello',
-                    'thread_id': '',
-                    'collection_case': 'ACollectionCase',
-                    'collection_exercise': 'ACollectionExercise',
-                    'ru_id': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc',
-                    'survey': 'BRES'
-                }
+                self.test_message = {'msg_id': 'test123',
+                                     'msg_to': ['richard'],
+                                     'msg_from': '0a7ad740-10d5-4ecb-b7ca-3c0384afb882',
+                                     'subject': 'MyMessage',
+                                     'body': 'hello',
+                                     'thread_id': '',
+                                     'collection_case': 'ACollectionCase',
+                                     'collection_exercise': 'ACollectionExercise',
+                                     'ru_id': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc',
+                                     'survey': 'BRES'}
 
                 modifier = Modifier()
                 with self.engine.connect() as con:
@@ -298,18 +296,16 @@ class ModifyTestCase(unittest.TestCase, ModifyTestCaseHelper):
         """Check current draft is replaced when modified"""
         with app.app_context():
             with current_app.test_request_context():
-                self.test_message = {
-                    'msg_id': 'test123',
-                    'msg_to': ['BRES'],
-                    'msg_from': '0a7ad740-10d5-4ecb-b7ca-3c0384afb882',
-                    'subject': 'MyMessage',
-                    'body': 'hello',
-                    'thread_id': '',
-                    'collection_case': 'ACollectionCase',
-                    'collection_exercise': 'ACollectionExercise',
-                    'ru_id': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc',
-                    'survey': 'BRES'
-                }
+                self.test_message = {'msg_id': 'test123',
+                                     'msg_to': ['BRES'],
+                                     'msg_from': '0a7ad740-10d5-4ecb-b7ca-3c0384afb882',
+                                     'subject': 'MyMessage',
+                                     'body': 'hello',
+                                     'thread_id': '',
+                                     'collection_case': 'ACollectionCase',
+                                     'collection_exercise': 'ACollectionExercise',
+                                     'ru_id': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc',
+                                     'survey': 'BRES'}
 
                 Saver().save_message(SecureMessage(msg_id=self.test_message['msg_id'],
                                                    body=self.test_message['body'],
