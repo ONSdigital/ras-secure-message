@@ -26,6 +26,20 @@ class AuthenticationTestCase(unittest.TestCase):
             res = check_jwt(encrypted_jwt)
         self.assertEqual(res, expected_res)
 
+    def test_authentication_non_encrypted_jwt_pass(self):
+        """Authenticate request using an un-ecrypted JWT"""
+        settings.SM_JWT_ENCRYPT = '0'
+        expected_res = {'status': "ok"}
+        data = {
+                  "user_uuid": "ce12b958-2a5f-44f4-a6da-861e59070a31",
+                  "role": "internal"
+                }
+
+        signed_jwt = encode(data)
+        with app.app_context():
+            res = check_jwt(signed_jwt)
+        self.assertEqual(res, expected_res)
+
     def test_authentication_jwt_invalid_fail(self):
         """Authenticate request using incorrect JWT"""
         expected_res = Response(response="Invalid token to access this Microservice Resource",
