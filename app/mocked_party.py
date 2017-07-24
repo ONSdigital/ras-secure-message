@@ -1,6 +1,10 @@
 from flask import Response
 from flask import json
 
+import logging
+
+logger = logging.getLogger(__name__)
+
 business_details = {}
 
 business_details['c614e64e-d981-4eba-b016-d9822f09a4fb'] = {"ru_id": "c614e64e-d981-4eba-b016-d9822f09a4fb", "business_name": "AOL"}
@@ -19,12 +23,14 @@ respondent_ids['dd5a38ff-1ecb-4634-94c8-2358df33e614'] = {"id": "dd5a38ff-1ecb-4
 respondent_ids['BRES'] = {"id": "BRES", "firstname": "BRES", "surname": "", "email": "", "telephone": "", "status": ""}
 respondent_ids['AnotherSurvey'] = {"id": "AnotherSurvey", "firstname": "AnotherSurvey", "surname": "", "email": "", "telephone": "", "status": ""}
 
+respondent_ids['ce12b958-2a5f-44f4-a6da-861e59070a32'] = {"id": "ce12b958-2a5f-44f4-a6da-861e59070a32", "firstname": "Liz", "surname": "Larkin", "email": "ilarue47@yopmail.com", "telephone": "+443069990250", "status": "ACTIVE"}
 
 def business_details_endpoint(ru):
     try:
         return Response(response=json.dumps(business_details[ru]), status=200,  mimetype="text/html")
     except KeyError:
-        return Response(response="ru does not valid", status=404,
+        logger.debug('RU %s not in mock party service.', ru)
+        return Response(response="ru is not valid", status=404,
                                mimetype="text/html")
 
 
@@ -32,5 +38,6 @@ def user_details_endpoint(uuid):
     try:
         return Response(response=json.dumps(respondent_ids[uuid]), status=200,  mimetype="text/html")
     except KeyError:
+        logger.debug('User ID %s not in mock party service', uuid)
         return Response(response="uuid not valid", status=404,
                                mimetype="text/html")
