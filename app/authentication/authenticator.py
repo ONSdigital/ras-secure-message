@@ -21,7 +21,8 @@ def authenticate(headers):
         return res
 
     else:
-        res = Response(response="Invalid token to access this Microservice Resource", status=400, mimetype="text/html")
+        res = Response(response="Authorization header required.", status=400, mimetype="text/html")
+        logger.debug("Authorization header not supplied.")
         return res
 
 
