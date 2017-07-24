@@ -34,10 +34,10 @@ def check_jwt(token):
             decrypted_jwt_token = decrypter.decrypt_token(token)
             logger.debug("Decrypted JWT.")
             decoded_jwt_token = decode(decrypted_jwt_token)
-            logger.debug("Decoded JWT.")
+            logger.debug("Decoded JWT. User ID: %s", decoded_jwt_token.get('user_uuid'))
         else:
             decoded_jwt_token = decode(token)
-            logger.debug("Decoded JWT.")
+            logger.debug("Decoded JWT. User ID: %s", decoded_jwt_token.get('user_uuid'))
 
         if not decoded_jwt_token.get('user_uuid'):
             raise BadRequest(description="Missing user_uuid claim,"
