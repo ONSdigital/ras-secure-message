@@ -51,5 +51,5 @@ def check_jwt(token):
 
     except JWTError:
         res = Response(response="Invalid token to access this Microservice Resource", status=400, mimetype="text/html")
-        logger.debug('JWT could not be decrypted. Is the JWT Algorithm and Secret setup correctly?')
+        logger.debug('Failed to decrypt or decoded the JWT. Is the JWT Algorithm and Secret setup correctly?')
         return res
