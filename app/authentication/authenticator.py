@@ -21,20 +21,24 @@ def authenticate(headers):
         return res
 
     else:
-        res = Response(response="Invalid token to access this Microservice Resource", status=400, mimetype="text/html")
-        logger.debug("""The message does not have any JWT needed for .""")
+        res = Response(response="Authorization header required.", status=400, mimetype="text/html")
+        logger.debug("Authorization header not supplied.")
         return res
 
 
 def check_jwt(token):
     JWT_ENCRYPT = settings.SM_JWT_ENCRYPT
+    logger.debug('JWT Encryption (0=disabled, 1=enabled) : %s', JWT_ENCRYPT)
     try:
         if (JWT_ENCRYPT == '1'):
             decrypter = Decrypter()
             decrypted_jwt_token = decrypter.decrypt_token(token)
+            logger.debug("Decrypted JWT.")
             decoded_jwt_token = decode(decrypted_jwt_token)
+            logger.debug("Decoded JWT. User ID: %s", decoded_jwt_token.get('user_uuid'))
         else:
             decoded_jwt_token = decode(token)
+            logger.debug("Decoded JWT. User ID: %s", decoded_jwt_token.get('user_uuid'))
 
         if not decoded_jwt_token.get('user_uuid'):
             raise BadRequest(description="Missing user_uuid claim,"
@@ -48,6 +52,5 @@ def check_jwt(token):
 
     except JWTError:
         res = Response(response="Invalid token to access this Microservice Resource", status=400, mimetype="text/html")
-        logger.debug(
-            'The message does not have a JWT that I can decrypted. Is the JWT Algorithm and Secret setup correctly?')
+        logger.debug('Failed to decrypt or decode the JWT. Is the JWT Algorithm and Secret setup correctly?')
         return res

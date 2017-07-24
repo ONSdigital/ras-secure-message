@@ -10,7 +10,7 @@ def logger_initial_config(service_name=None,
 
 
     if not log_level:
-        log_level = os.getenv('LOGGING_LEVEL', 'INFO')
+        log_level = os.getenv('SMS_LOG_LEVEL', 'INFO')
     if not logger_format:
         logger_format = (
             "%(asctime)s.%(msecs)06dZ|"
