@@ -6,6 +6,22 @@ from app.application import app
 from flask import Response
 import unittest
 from app import settings
+from unittest.mock import patch
+
+
+@patch('app.settings.SM_JWT_ENCRYPT', "0")
+def test_authentication_non_encrypted_jwt_pass(self):
+    """Authenticate request using an un-ecrypted JWT"""
+    expected_res = {'status': "ok"}
+    data = {
+        "user_uuid": "ce12b958-2a5f-44f4-a6da-861e59070a31",
+        "role": "internal"
+    }
+
+    signed_jwt = encode(data)
+    with app.app_context():
+        res = check_jwt(signed_jwt)
+    self.assertEqual(res, expected_res)
 
 
 class AuthenticationTestCase(unittest.TestCase):
