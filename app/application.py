@@ -58,6 +58,7 @@ def before_request():
         log_request()
         res = authenticate(request.headers)
         if res != {'status': "ok"}:
+            logger.debug("Failed to authenticate user")
             return res
 
 
