@@ -17,12 +17,16 @@ Install dependencies for the application using pip
 ```
 pip install -r requirements.txt
 ```
-
-Set RAS_SM_PATH environment variable, this can be done either by setting it in the terminal,
+The next step is to set the environment variables.
+This can be done either by setting it in the terminal, in the IDE (PyCharm or whichever one is being used)
 or by setting it in the source file. For example '.zshrc' '.bashrc' etc
 
 ```
 export RAS_SM_PATH=/Users/user/projects/secure-messaging/ras-secure-message
+```
+```
+SM_JWT_ENCRYPT = 1
+SMS_LOG_LEVEL = DEBUG
 ```
 
 Run the application
@@ -42,7 +46,7 @@ pip install -r requirements-test.txt
 ```
 Once these have been installed the tests can be run from the ras-secure-message directory using the following
 ```
-python3 run_tests.py
+python run_tests.py
 ```
 
 Test the response
