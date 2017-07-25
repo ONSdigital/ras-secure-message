@@ -1,17 +1,15 @@
 import sys
-sys.path.append('../../ras-secure-message')
-from app.validation.domain import MessageSchema
 import unittest
-from io import StringIO
-from app import application
-from testfixtures import log_capture
-import logging
-from structlog import wrap_logger
 from unittest import mock
+from io import StringIO
+from app.validation.domain import MessageSchema
+from app import application
 from app.application import app
 from app.logger_config import logger_initial_config
 from app.validation.user import User
 from flask import g
+
+sys.path.append('../../ras-secure-message')
 
 saved_stdout = sys.stdout
 

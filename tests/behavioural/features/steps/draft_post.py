@@ -1,3 +1,4 @@
+import nose
 from behave import given, when, then
 from flask import current_app, json
 from app.common.alerts import AlertUser, AlertViaGovNotify
@@ -8,7 +9,6 @@ from app import constants
 from app.authentication.jwt import encode
 from app.authentication.jwe import Encrypter
 from app import settings
-import nose
 
 
 url = "http://localhost:5050/draft/save"
@@ -30,6 +30,7 @@ def update_encrypted_jwt():
                           _public_key=settings.SM_USER_AUTHENTICATION_PUBLIC_KEY)
     signed_jwt = encode(token_data)
     return encrypter.encrypt_token(signed_jwt)
+
 
 headers['Authorization'] = update_encrypted_jwt()
 
@@ -255,4 +256,3 @@ def step_implmsg_id_returned(context):
 @when('the draft is saved')
 def step_impl_draft_is_saved(context):
     context.response = app.test_client().post(url, data=json.dumps(data), headers=headers)
-

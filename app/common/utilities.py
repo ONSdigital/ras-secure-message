@@ -1,8 +1,8 @@
+import logging
+import hashlib
 from flask import json
 from flask import jsonify
 from structlog import wrap_logger
-import logging
-import hashlib
 from werkzeug.exceptions import ExpectationFailed
 from app.constants import MESSAGE_BY_ID_ENDPOINT, MESSAGE_LIST_ENDPOINT, MESSAGE_QUERY_LIMIT
 from app import mocked_party
@@ -73,11 +73,9 @@ def paginated_list_to_json(paginated_list, page, limit, host_url, user, string_q
         msg['_links'] = {"self": {"href": "{0}{1}/{2}".format(host_url, MESSAGE_BY_ID_ENDPOINT, msg['msg_id'])}}
         messages.append(msg)
 
-    links = {
-        'first': {"href": "{0}{1}".format(host_url, endpoint)},
-        'self': {"href": "{0}{1}{2}{3}page={4}&limit={5}".format(host_url, endpoint, arg_joiner,
-                                                                 string_query_args, page, limit)}
-    }
+    links = {'first': {"href": "{0}{1}".format(host_url, endpoint)},
+             'self': {"href": "{0}{1}{2}{3}page={4}&limit={5}".format(host_url, endpoint, arg_joiner,
+                                                                      string_query_args, page, limit)}}
 
     if paginated_list.has_next:
         links['next'] = {
@@ -100,12 +98,10 @@ def generate_etag(msg_to, msg_id, subject, body):
 
     msg_to_str = ' '.join(str(uuid) for uuid in msg_to)
 
-    data_to_hash = {
-                    'msg_to': msg_to_str,
+    data_to_hash = {'msg_to': msg_to_str,
                     'msg_id': msg_id,
                     'subject': subject,
-                    'body': body
-                    }
+                    'body': body}
 
     hash_object = hashlib.sha1(str(sorted(data_to_hash.items())).encode())
     etag = hash_object.hexdigest()

@@ -1,15 +1,15 @@
-from flask import json
 import nose.tools
+from flask import json
 from behave import given, then, when
 from app import constants
 from app.application import app
 from app.repository import database
-from flask import current_app
-from unittest import mock
 from app.common.alerts import AlertUser, AlertViaGovNotify
 from app.authentication.jwt import encode
 from app.authentication.jwe import Encrypter
 from app import settings
+from flask import current_app
+from unittest import mock
 
 
 url = "http://localhost:5050/message/send"
@@ -28,6 +28,7 @@ def update_encrypted_jwt():
                           _public_key=settings.SM_USER_AUTHENTICATION_PUBLIC_KEY)
     signed_jwt = encode(token_data)
     return encrypter.encrypt_token(signed_jwt)
+
 
 headers['Authorization'] = update_encrypted_jwt()
 
@@ -195,7 +196,7 @@ def step_impl_draft_message_posted(context):
     context.post_draft = app.test_client().post("http://localhost:5050/draft/save", data=json.dumps(data),
                                                 headers=headers)
     # get etag from response using context
-    context.etag =  json.loads(context.post_draft.data)
+    context.etag = json.loads(context.post_draft.data)
     headers['Etag'] = context.etag
 
     msg_resp = json.loads(context.post_draft.data)
@@ -237,7 +238,7 @@ def step_impl_another_user_sends_same_message(context):
     token_data['role'] = 'respondent'
     headers['Authorization'] = update_encrypted_jwt()
     context.response = app.test_client().post(url.format(context.msg_id),
-                                             data=json.dumps(data), headers=headers)
+                                              data=json.dumps(data), headers=headers)
 
 
 # Scenario 18: A Etag is not present within the header
@@ -334,5 +335,3 @@ def step_impl_msg_id_in_response(context):
 def step_impl_thread_id_in_response(context):
     resp = json.loads(context.response.data)
     nose.tools.assert_true(resp['thread_id'] is not None)
-
-

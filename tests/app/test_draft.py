@@ -1,8 +1,7 @@
-import unittest
 import uuid
-from flask import g
-from app.repository.retriever import Retriever
+import unittest
 from unittest import mock
+from flask import g
 from flask import current_app, json
 from sqlalchemy import create_engine, event
 from sqlalchemy.engine import Engine
@@ -15,6 +14,7 @@ from app.common import utilities
 from app.common.alerts import AlertUser, AlertViaGovNotify
 from app.common.labels import Labels
 from app.repository import database
+from app.repository.retriever import Retriever
 from app.repository.saver import Saver
 from app.resources.drafts import DraftModifyById, DraftSave
 from app.validation.domain import DraftSchema
@@ -211,20 +211,16 @@ class DraftTestCase(unittest.TestCase):
             for row in request:
                 self.msg_id = row['msg_id']
 
-        self.test_message.update(
-            {
-                'msg_id': self.msg_id,
-                'msg_to': ['0a7ad740-10d5-4ecb-b7ca-3c0384afb882'],
-                'msg_from': 'BRES',
-                'subject': 'MyMessage',
-                'body': 'hello',
-                'thread_id': '',
-                'collection_case': 'ACollectionCase',
-                'collection_exercise': 'ACollectionExercise',
-                'ru_id': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc',
-                'survey': 'BRES'
-            }
-        )
+        self.test_message.update({'msg_id': self.msg_id,
+                                  'msg_to': ['0a7ad740-10d5-4ecb-b7ca-3c0384afb882'],
+                                  'msg_from': 'BRES',
+                                  'subject': 'MyMessage',
+                                  'body': 'hello',
+                                  'thread_id': '',
+                                  'collection_case': 'ACollectionCase',
+                                  'collection_exercise': 'ACollectionExercise',
+                                  'ru_id': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc',
+                                  'survey': 'BRES'})
 
         response = self.app.post('http://localhost:5050/message/send', data=json.dumps(self.test_message),
                                  headers=self.headers)
@@ -263,20 +259,18 @@ class DraftTestCase(unittest.TestCase):
     def test_etag_check_returns_true_if_data_equal(self):
         """Test etag_check function returns true for unchanged draft etag"""
 
-        message = {
-            'msg_to': ['BRES'],
-            'msg_from': '0a7ad740-10d5-4ecb-b7ca-3c0384afb882',
-            'msg_id': 'ea420f66-12f6-4d4e-bf36-fe9b6b20c3f4',
-            'subject': 'test',
-            'body': 'test',
-            'thread_id': '',
-            'collection_case': 'ACollectionCase',
-            'collection_exercise': 'ACollectionExercise',
-            'ru_id': '7fc0e8ab-189c-4794-b8f4-9f05a1db185b',
-            'survey': 'BRES',
-            '_links': '',
-            'labels': ['DRAFT']
-        }
+        message = {'msg_to': ['BRES'],
+                   'msg_from': '0a7ad740-10d5-4ecb-b7ca-3c0384afb882',
+                   'msg_id': 'ea420f66-12f6-4d4e-bf36-fe9b6b20c3f4',
+                   'subject': 'test',
+                   'body': 'test',
+                   'thread_id': '',
+                   'collection_case': 'ACollectionCase',
+                   'collection_exercise': 'ACollectionExercise',
+                   'ru_id': '7fc0e8ab-189c-4794-b8f4-9f05a1db185b',
+                   'survey': 'BRES',
+                   '_links': '',
+                   'labels': ['DRAFT']}
 
         etag = utilities.generate_etag(message['msg_to'], message['msg_id'], message['subject'], message['body'])
 
@@ -285,20 +279,18 @@ class DraftTestCase(unittest.TestCase):
     def test_etag_check_returns_false_if_msg_to_changed(self):
         """Test etag_check function returns false for changed draft etag"""
 
-        message = {
-            'msg_to': ['BRES'],
-            'msg_from': '0a7ad740-10d5-4ecb-b7ca-3c0384afb882',
-            'msg_id': 'ea420f66-12f6-4d4e-bf36-fe9b6b20c3f4',
-            'subject': 'test',
-            'body': 'test',
-            'thread_id': '',
-            'collection_case': 'ACollectionCase',
-            'collection_exercise': 'ACollectionExercise',
-            'ru_id': '7fc0e8ab-189c-4794-b8f4-9f05a1db185b',
-            'survey': 'BRES',
-            '_links': '',
-            'labels': ['DRAFT']
-        }
+        message = {'msg_to': ['BRES'],
+                   'msg_from': '0a7ad740-10d5-4ecb-b7ca-3c0384afb882',
+                   'msg_id': 'ea420f66-12f6-4d4e-bf36-fe9b6b20c3f4',
+                   'subject': 'test',
+                   'body': 'test',
+                   'thread_id': '',
+                   'collection_case': 'ACollectionCase',
+                   'collection_exercise': 'ACollectionExercise',
+                   'ru_id': '7fc0e8ab-189c-4794-b8f4-9f05a1db185b',
+                   'survey': 'BRES',
+                   '_links': '',
+                   'labels': ['DRAFT']}
 
         etag = utilities.generate_etag(['XXX'], message['msg_id'], message['subject'], message['body'])
         self.assertFalse(DraftModifyById.etag_check({'ETag': etag}, message))
@@ -306,20 +298,18 @@ class DraftTestCase(unittest.TestCase):
     def test_etag_check_returns_false_if_msg_id_changed(self):
         """Test etag_check function returns false for changed draft etag"""
 
-        message = {
-            'msg_to': ['BRES'],
-            'msg_from': '0a7ad740-10d5-4ecb-b7ca-3c0384afb882',
-            'msg_id': 'ea420f66-12f6-4d4e-bf36-fe9b6b20c3f4',
-            'subject': 'test',
-            'body': 'test',
-            'thread_id': '',
-            'collection_case': 'ACollectionCase',
-            'collection_exercise': 'ACollectionExercise',
-            'ru_id': '7fc0e8ab-189c-4794-b8f4-9f05a1db185b',
-            'survey': 'BRES',
-            '_links': '',
-            'labels': ['DRAFT']
-        }
+        message = {'msg_to': ['BRES'],
+                   'msg_from': '0a7ad740-10d5-4ecb-b7ca-3c0384afb882',
+                   'msg_id': 'ea420f66-12f6-4d4e-bf36-fe9b6b20c3f4',
+                   'subject': 'test',
+                   'body': 'test',
+                   'thread_id': '',
+                   'collection_case': 'ACollectionCase',
+                   'collection_exercise': 'ACollectionExercise',
+                   'ru_id': '7fc0e8ab-189c-4794-b8f4-9f05a1db185b',
+                   'survey': 'BRES',
+                   '_links': '',
+                   'labels': ['DRAFT']}
 
         etag = utilities.generate_etag(message['msg_to'], 'XXX', message['subject'], message['body'])
         self.assertFalse(DraftModifyById.etag_check({'ETag': etag}, message))
@@ -327,20 +317,18 @@ class DraftTestCase(unittest.TestCase):
     def test_etag_check_returns_false_if_subject_changed(self):
         """Test etag_check function returns false for changed draft etag"""
 
-        message = {
-            'msg_to': ['BRES'],
-            'msg_from': '0a7ad740-10d5-4ecb-b7ca-3c0384afb882',
-            'msg_id': 'ea420f66-12f6-4d4e-bf36-fe9b6b20c3f4',
-            'subject': 'test',
-            'body': 'test',
-            'thread_id': '',
-            'collection_case': 'ACollectionCase',
-            'collection_exercise': 'ACollectionExercise',
-            'ru_id': '7fc0e8ab-189c-4794-b8f4-9f05a1db185b',
-            'survey': 'BRES',
-            '_links': '',
-            'labels': ['DRAFT']
-        }
+        message = {'msg_to': ['BRES'],
+                   'msg_from': '0a7ad740-10d5-4ecb-b7ca-3c0384afb882',
+                   'msg_id': 'ea420f66-12f6-4d4e-bf36-fe9b6b20c3f4',
+                   'subject': 'test',
+                   'body': 'test',
+                   'thread_id': '',
+                   'collection_case': 'ACollectionCase',
+                   'collection_exercise': 'ACollectionExercise',
+                   'ru_id': '7fc0e8ab-189c-4794-b8f4-9f05a1db185b',
+                   'survey': 'BRES',
+                   '_links': '',
+                   'labels': ['DRAFT']}
 
         etag = utilities.generate_etag(message['msg_to'], message['msg_id'], 'XXX', message['body'])
         self.assertFalse(DraftModifyById.etag_check({'ETag': etag}, message))
@@ -348,20 +336,18 @@ class DraftTestCase(unittest.TestCase):
     def test_etag_check_returns_false_if_body_changed(self):
         """Test etag_check function returns false for changed draft etag"""
 
-        message = {
-            'msg_to': ['BRES'],
-            'msg_from': '0a7ad740-10d5-4ecb-b7ca-3c0384afb882',
-            'msg_id': 'ea420f66-12f6-4d4e-bf36-fe9b6b20c3f4',
-            'subject': 'test',
-            'body': 'test',
-            'thread_id': '',
-            'collection_case': 'ACollectionCase',
-            'collection_exercise': 'ACollectionExercise',
-            'ru_id': '7fc0e8ab-189c-4794-b8f4-9f05a1db185b',
-            'survey': 'BRES',
-            '_links': '',
-            'labels': ['DRAFT']
-        }
+        message = {'msg_to': ['BRES'],
+                   'msg_from': '0a7ad740-10d5-4ecb-b7ca-3c0384afb882',
+                   'msg_id': 'ea420f66-12f6-4d4e-bf36-fe9b6b20c3f4',
+                   'subject': 'test',
+                   'body': 'test',
+                   'thread_id': '',
+                   'collection_case': 'ACollectionCase',
+                   'collection_exercise': 'ACollectionExercise',
+                   'ru_id': '7fc0e8ab-189c-4794-b8f4-9f05a1db185b',
+                   'survey': 'BRES',
+                   '_links': '',
+                   'labels': ['DRAFT']}
 
         etag = utilities.generate_etag(message['msg_to'], message['msg_id'], message['subject'], 'XXX')
         self.assertFalse(DraftModifyById.etag_check({'ETag': etag}, message))

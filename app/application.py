@@ -1,5 +1,4 @@
 import logging
-from logging.config import dictConfig
 from flask import Flask, request
 from flask import jsonify, json
 from flask_restful import Api
@@ -23,7 +22,7 @@ logger = wrap_logger(logging.getLogger(__name__))
 app = Flask(__name__)
 api = Api(app)
 CORS(app)
-app.config['SQLALCHEMY_DATABASE_URI'] = connector.getDatabaseUri()
+app.config['SQLALCHEMY_DATABASE_URI'] = connector.get_database_uri()
 app.config['SQLALCHEMY_POOL_SIZE'] = settings.SQLALCHEMY_POOL_SIZE
 database.db.init_app(app)
 
@@ -32,6 +31,7 @@ logger.info('Starting application')
 
 def drop_database():
     database.db.drop_all()
+
 
 with app.app_context():
     database.db.create_all()

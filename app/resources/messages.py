@@ -36,7 +36,7 @@ class MessageList(Resource):
 
         if status:
             resp = paginated_list_to_json(result, page, limit, request.host_url,
-                                                       g.user, string_query_args, MESSAGE_LIST_ENDPOINT)
+                                          g.user, string_query_args, MESSAGE_LIST_ENDPOINT)
             resp.status_code = 200
             return resp
 
@@ -61,13 +61,13 @@ class MessageSend(Resource):
                     post_data['thread_id'] = ''
 
             else:
-                raise (BadRequest(description="Message can not include msg_id"))
+                raise BadRequest(description="Message can not include msg_id")
 
             last_modified = DraftModifyById.etag_check(request.headers, returned_draft)
             if last_modified is False:
 
                 res = Response(response="Draft has been modified since last check", status=409,
-                           mimetype="text/html")
+                               mimetype="text/html")
                 return res
 
         message = MessageSchema().load(post_data)

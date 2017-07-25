@@ -5,6 +5,7 @@ from structlog import wrap_logger
 
 logger = wrap_logger(logging.getLogger(__name__))
 
+
 class MessageSaveException(Exception):
 
     """ This exception is used when the service fails to save a secure message"""

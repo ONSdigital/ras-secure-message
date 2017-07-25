@@ -1,9 +1,10 @@
+import nose.tools
 from behave import given, when, then
 from app.application import app
 from app.authentication.jwt import encode
 from app.authentication.jwe import Encrypter
 from app import settings
-import nose.tools
+
 
 token_data = {
             "user_uuid": "000000000",
@@ -19,6 +20,7 @@ def update_encrypted_jwt():
                           _public_key=settings.SM_USER_AUTHENTICATION_PUBLIC_KEY)
     signed_jwt = encode(token_data)
     return encrypter.encrypt_token(signed_jwt)
+
 
 headers['Authorization'] = update_encrypted_jwt()
 

@@ -1,6 +1,6 @@
 import logging
-from structlog import wrap_logger
 from datetime import datetime, timezone
+from structlog import wrap_logger
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import Column, String, Integer, DateTime, ForeignKey, Index
 from sqlalchemy.orm import relationship
@@ -58,20 +58,18 @@ class SecureMessage(db.Model):
 
     def serialize(self, user):
         """Return object data in easily serializeable format"""
-        message = {
-            'msg_to': [],
-            'msg_from': '',
-            'msg_id': self.msg_id,
-            'subject': self.subject,
-            'body': self.body,
-            'thread_id': self.thread_id,
-            'collection_case': self.collection_case,
-            'ru_id': self.ru_id,
-            'survey': self.survey,
-            'collection_exercise': self.collection_exercise,
-            '_links': '',
-            'labels': []
-        }
+        message = {'msg_to': [],
+                   'msg_from': '',
+                   'msg_id': self.msg_id,
+                   'subject': self.subject,
+                   'body': self.body,
+                   'thread_id': self.thread_id,
+                   'collection_case': self.collection_case,
+                   'ru_id': self.ru_id,
+                   'survey': self.survey,
+                   'collection_exercise': self.collection_exercise,
+                   '_links': '',
+                   'labels': []}
 
         if user.is_internal:
             actor = self.survey
@@ -125,11 +123,10 @@ class Status(db.Model):
     @property
     def serialize(self):
         """Return object data in easily serializeable format"""
-        data = {
-            'msg_id': self.msg_id,
-            'actor': self.actor,
-            'label': self.label
-        }
+        data = {'msg_id': self.msg_id,
+                'actor': self.actor,
+                'label': self.label}
+
         return data
 
 
@@ -153,10 +150,9 @@ class InternalSentAudit(db.Model):
     @property
     def serialize(self):
         """Return object data in easily serializeable format"""
-        data = {
-            'msg_id': self.msg_id,
-            'internal_user': self.internal_user
-        }
+        data = {'msg_id': self.msg_id,
+                'internal_user': self.internal_user}
+
         return data
 
 

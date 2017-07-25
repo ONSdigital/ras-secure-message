@@ -22,7 +22,7 @@ class DraftSave(Resource):
         draft = DraftSchema().load(post_data)
 
         if 'msg_id' in post_data:
-            raise (BadRequest(description="Message can not include msg_id"))
+            raise BadRequest(description="Message can not include msg_id")
 
         if draft.errors == {}:
             self._save_draft(draft)
@@ -69,6 +69,7 @@ class DraftById(Resource):
 
         return resp
 
+
 class DraftList(Resource):
     """Return a list of drafts for the user"""
 
@@ -83,7 +84,7 @@ class DraftList(Resource):
 
         if status:
             resp = paginated_list_to_json(result, page, limit, request.host_url,
-                                                       g.user, string_query_args, DRAFT_LIST_ENDPOINT)
+                                          g.user, string_query_args, DRAFT_LIST_ENDPOINT)
             resp.status_code = 200
             return resp
 
@@ -95,12 +96,12 @@ class DraftModifyById(Resource):
         """Handles modifying of drafts"""
         data = request.get_json()
         if 'msg_id' not in data:
-            raise (BadRequest(description="Draft put requires msg_id"))
+            raise BadRequest(description="Draft put requires msg_id")
         if data['msg_id'] != draft_id:
-            raise (BadRequest(description="Conflicting msg_id's"))
+            raise BadRequest(description="Conflicting msg_id's")
         is_draft = Retriever().check_msg_id_is_a_draft(draft_id, g.user)
         if is_draft[0] is False:
-            raise (BadRequest(description="Draft put requires valid draft"))
+            raise BadRequest(description="Draft put requires valid draft")
 
         not_modified = self.etag_check(request.headers, is_draft[1])
 

@@ -1,10 +1,8 @@
 import uuid
-
 import flask
 import nose.tools
 from behave import given, then, when
 from flask import json
-
 from app import settings
 from app.application import app
 from app.authentication.jwe import Encrypter
@@ -36,6 +34,7 @@ def update_encrypted_jwt():
                           _public_key=settings.SM_USER_AUTHENTICATION_PUBLIC_KEY)
     signed_jwt = encode(token_data)
     return encrypter.encrypt_token(signed_jwt)
+
 
 headers['Authorization'] = update_encrypted_jwt()
 

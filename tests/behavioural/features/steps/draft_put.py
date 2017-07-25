@@ -1,11 +1,11 @@
+import nose.tools
 from behave import given, when, then
 from app.application import app
 from app.repository import database
-from flask import current_app, json
-import nose.tools
 from app.authentication.jwt import encode
 from app.authentication.jwe import Encrypter
 from app import settings, constants
+from flask import current_app, json
 
 url = "http://localhost:5050/draft/{0}/modify"
 token_data = {

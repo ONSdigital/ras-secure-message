@@ -1,12 +1,10 @@
 import unittest
 import uuid
 from datetime import datetime, timezone
-
 from flask import current_app, g
 from sqlalchemy import create_engine, event
 from sqlalchemy.engine import Engine
 from werkzeug.exceptions import InternalServerError
-
 from app.application import app
 from app.common.labels import Labels
 from app.repository import database
@@ -219,28 +217,26 @@ class ModifyTestCase(unittest.TestCase, ModifyTestCaseHelper):
         """Check draft label is deleted for message"""
         with app.app_context():
             with current_app.test_request_context():
-                self.test_message = {
-                    'msg_id': 'test123',
-                    'msg_to': ['BRES'],
-                    'msg_from': '0a7ad740-10d5-4ecb-b7ca-3c0384afb882',
-                    'subject': 'MyMessage',
-                    'body': 'hello',
-                    'thread_id': '',
-                    'collection_case': 'ACollectionCase',
-                    'collection_exercise': 'ACollectionExercise',
-                    'ru_id': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc',
-                    'survey': 'BRES'
-                }
+                self.test_message = {'msg_id': 'test123',
+                                     'msg_to': ['BRES'],
+                                     'msg_from': '0a7ad740-10d5-4ecb-b7ca-3c0384afb882',
+                                     'subject': 'MyMessage',
+                                     'body': 'hello',
+                                     'thread_id': '',
+                                     'collection_case': 'ACollectionCase',
+                                     'collection_exercise': 'ACollectionExercise',
+                                     'ru_id': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc',
+                                     'survey': 'BRES'}
 
                 modifier = Modifier()
 
                 with self.engine.connect() as con:
                     add_message = "INSERT INTO secure_message (msg_id, body, subject, thread_id, collection_case, ru_id, " \
                             "survey, collection_exercise) VALUES ('{0}', '{1}', '{2}', '{3}', '{4}', '{5}', '{6}', '{7}')" \
-                    .format(self.test_message['msg_id'], self.test_message['body'], self.test_message['subject'],
-                            self.test_message['thread_id'],
-                            self.test_message['collection_case'], self.test_message['ru_id'],
-                            'test', self.test_message['collection_exercise'])
+                            .format(self.test_message['msg_id'], self.test_message['body'], self.test_message['subject'],
+                                    self.test_message['thread_id'],
+                                    self.test_message['collection_case'], self.test_message['ru_id'], 'test',
+                                    self.test_message['collection_exercise'])
                     con.execute(add_message)
 
                 with self.engine.connect() as con:
@@ -263,24 +259,22 @@ class ModifyTestCase(unittest.TestCase, ModifyTestCaseHelper):
         """Check draft event is deleted for message"""
         with app.app_context():
             with current_app.test_request_context():
-                self.test_message = {
-                    'msg_id': 'test123',
-                    'msg_to': ['richard'],
-                    'msg_from': '0a7ad740-10d5-4ecb-b7ca-3c0384afb882',
-                    'subject': 'MyMessage',
-                    'body': 'hello',
-                    'thread_id': '',
-                    'collection_case': 'ACollectionCase',
-                    'collection_exercise': 'ACollectionExercise',
-                    'ru_id': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc',
-                    'survey': 'BRES'
-                }
+                self.test_message = {'msg_id': 'test123',
+                                     'msg_to': ['richard'],
+                                     'msg_from': '0a7ad740-10d5-4ecb-b7ca-3c0384afb882',
+                                     'subject': 'MyMessage',
+                                     'body': 'hello',
+                                     'thread_id': '',
+                                     'collection_case': 'ACollectionCase',
+                                     'collection_exercise': 'ACollectionExercise',
+                                     'ru_id': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc',
+                                     'survey': 'BRES'}
 
                 modifier = Modifier()
                 with self.engine.connect() as con:
                     add_draft_event = ("INSERT INTO events (event, msg_id, date_time) "
                                        "VALUES ('{0}', 'test123', '{1}')").format('Draft_Saved',
-                                                                            datetime.now(timezone.utc))
+                                                                                  datetime.now(timezone.utc))
                     add_draft = "INSERT INTO secure_message (msg_id, body, subject, thread_id, collection_case, ru_id, " \
                                 "survey, collection_exercise) VALUES ('{0}', '{1}', '{2}', '{3}', '{4}', '{5}', '{6}', '{7}')" \
                         .format(self.test_message['msg_id'], self.test_message['body'], self.test_message['subject'],
@@ -302,18 +296,16 @@ class ModifyTestCase(unittest.TestCase, ModifyTestCaseHelper):
         """Check current draft is replaced when modified"""
         with app.app_context():
             with current_app.test_request_context():
-                self.test_message = {
-                    'msg_id': 'test123',
-                    'msg_to': ['BRES'],
-                    'msg_from': '0a7ad740-10d5-4ecb-b7ca-3c0384afb882',
-                    'subject': 'MyMessage',
-                    'body': 'hello',
-                    'thread_id': '',
-                    'collection_case': 'ACollectionCase',
-                    'collection_exercise': 'ACollectionExercise',
-                    'ru_id': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc',
-                    'survey': 'BRES'
-                }
+                self.test_message = {'msg_id': 'test123',
+                                     'msg_to': ['BRES'],
+                                     'msg_from': '0a7ad740-10d5-4ecb-b7ca-3c0384afb882',
+                                     'subject': 'MyMessage',
+                                     'body': 'hello',
+                                     'thread_id': '',
+                                     'collection_case': 'ACollectionCase',
+                                     'collection_exercise': 'ACollectionExercise',
+                                     'ru_id': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc',
+                                     'survey': 'BRES'}
 
                 Saver().save_message(SecureMessage(msg_id=self.test_message['msg_id'],
                                                    body=self.test_message['body'],
@@ -331,7 +323,7 @@ class ModifyTestCase(unittest.TestCase, ModifyTestCaseHelper):
                 draft.data.subject = 'not MyMessage'
                 Modifier().replace_current_draft(self.test_message['msg_id'], draft.data)
 
-                retrieved_data=Retriever().retrieve_message(self.test_message['msg_id'],g.user)
+                retrieved_data = Retriever().retrieve_message(self.test_message['msg_id'], g.user)
 
                 self.assertEqual(retrieved_data["body"], 'not hello')
                 self.assertEqual(retrieved_data["subject"], 'not MyMessage')
@@ -387,18 +379,17 @@ class ModifyTestCase(unittest.TestCase, ModifyTestCaseHelper):
                     Modifier.replace_current_recipient_status(self.user_internal, 'Torrance')
 
     def test_exception_for_replace_current_draft_raises(self):
-        draft = {
-                    'msg_id': 'test123',
-                    'msg_to': ['richard'],
-                    'msg_from': '0a7ad740-10d5-4ecb-b7ca-3c0384afb882',
-                    'subject': 'MyMessage',
-                    'body': 'hello',
-                    'thread_id': '',
-                    'collection_case': 'ACollectionCase',
-                    'collection_exercise': 'ACollectionExercise',
-                    'ru_id': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc',
-                    'survey': 'BRES'
-                }
+        draft = {'msg_id': 'test123',
+                 'msg_to': ['richard'],
+                 'msg_from': '0a7ad740-10d5-4ecb-b7ca-3c0384afb882',
+                 'subject': 'MyMessage',
+                 'body': 'hello',
+                 'thread_id': '',
+                 'collection_case': 'ACollectionCase',
+                 'collection_exercise': 'ACollectionExercise',
+                 'ru_id': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc',
+                 'survey': 'BRES'}
+
         with app.app_context():
             database.db.drop_all()
             with current_app.test_request_context():

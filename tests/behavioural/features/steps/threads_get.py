@@ -32,6 +32,7 @@ def update_encrypted_jwt():
     signed_jwt = encode(token_data)
     return encrypter.encrypt_token(signed_jwt)
 
+
 headers['Authorization'] = update_encrypted_jwt()
 
 
@@ -61,9 +62,9 @@ def step_impl_most_recent_message_from_each_conversation_returned_with_draft(con
 def step_impl_respondent_and_internal_user_hav_multiple_conversations(context):
     context.most_recent_messages = []
 
-    for x in range(0,3):
+    for x in range(0, 3):
         data['thread_id'] = 'AConversation{0}'.format(x)
-        for _ in range(0, 2):
+        for y in range(0, 2):
             token_data['user_uuid'] = '0a7ad740-10d5-4ecb-b7ca-3c0384afb882'
             token_data['role'] = 'respondent'
             headers['Authorization'] = update_encrypted_jwt()

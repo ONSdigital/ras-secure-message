@@ -1,11 +1,10 @@
+import nose.tools
 from app.application import app
 from behave import given, then
 from app.repository import database
 from flask import current_app
 from sqlalchemy.engine import Engine
 from sqlalchemy import event
-
-import nose.tools
 
 
 @event.listens_for(Engine, "connect")
