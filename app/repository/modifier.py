@@ -61,8 +61,11 @@ class Modifier:
         unread = Labels.UNREAD.value
         inbox = Labels.INBOX.value
         if inbox in message['labels']:
-            Modifier.add_label(unread, message, user)
-            return True
+            if unread in message['labels']:
+                return True
+            else:
+                Modifier.add_label(unread, message, user)
+                return True
 
     @staticmethod
     def del_unread(message, user):

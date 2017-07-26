@@ -151,6 +151,31 @@ class ModifyTestCase(unittest.TestCase, ModifyTestCaseHelper):
                 message = message_service.retrieve_message(msg_id, self.user_internal)
                 self.assertCountEqual(message['labels'], ['UNREAD', 'INBOX'])
 
+    def test_two_unread_labels_are_added_to_message(self):
+        """testing message is added to database with archived label removed and inbox and read is added instead"""
+        self.populate_database(1)
+        with self.engine.connect() as con:
+            query = 'SELECT msg_id FROM secure_message LIMIT 1'
+            query_x = con.execute(query)
+            names = []
+            for row in query_x:
+                names.append(row[0])
+        with app.app_context():
+            with current_app.test_request_context():
+                msg_id = str(names[0])
+                message_service = Retriever()
+                message = message_service.retrieve_message(msg_id, self.user_internal)
+                modifier = Modifier()
+                modifier.add_unread(message, self.user_internal)
+                modifier.add_unread(message, self.user_internal)
+        with self.engine.connect() as con:
+            query = "SELECT count(label) FROM status WHERE msg_id = '{}' AND label = 'UNREAD'".format(msg_id)
+            query_x = con.execute(query)
+            names2 = []
+            for row in query_x:
+                names2.append(row[0])
+            self.assertTrue(names2[0] == 1)
+
     def test_add_archive_is_added_to_internal(self):
         """testing message is added to database with archived label attached"""
         self.populate_database(1)
