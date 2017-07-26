@@ -147,6 +147,7 @@ class ModifyTestCase(unittest.TestCase, ModifyTestCaseHelper):
                 message = message_service.retrieve_message(msg_id, self.user_internal)
                 modifier = Modifier()
                 modifier.del_unread(message, self.user_internal)
+                message = message_service.retrieve_message(msg_id, self.user_internal)
                 modifier.add_unread(message, self.user_internal)
                 message = message_service.retrieve_message(msg_id, self.user_internal)
                 self.assertCountEqual(message['labels'], ['UNREAD', 'INBOX'])
