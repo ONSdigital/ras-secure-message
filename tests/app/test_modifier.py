@@ -147,9 +147,35 @@ class ModifyTestCase(unittest.TestCase, ModifyTestCaseHelper):
                 message = message_service.retrieve_message(msg_id, self.user_internal)
                 modifier = Modifier()
                 modifier.del_unread(message, self.user_internal)
+                message = message_service.retrieve_message(msg_id, self.user_internal)
                 modifier.add_unread(message, self.user_internal)
                 message = message_service.retrieve_message(msg_id, self.user_internal)
                 self.assertCountEqual(message['labels'], ['UNREAD', 'INBOX'])
+
+    def test_two_unread_labels_are_added_to_message(self):
+        """testing duplicate message labels are not added to the database"""
+        self.populate_database(1)
+        with self.engine.connect() as con:
+            query = 'SELECT msg_id FROM secure_message LIMIT 1'
+            query_x = con.execute(query)
+            names = []
+            for row in query_x:
+                names.append(row[0])
+        with app.app_context():
+            with current_app.test_request_context():
+                msg_id = str(names[0])
+                message_service = Retriever()
+                message = message_service.retrieve_message(msg_id, self.user_internal)
+                modifier = Modifier()
+                modifier.add_unread(message, self.user_internal)
+                modifier.add_unread(message, self.user_internal)
+        with self.engine.connect() as con:
+            query = "SELECT count(label) FROM status WHERE msg_id = '{}' AND label = 'UNREAD'".format(msg_id)
+            query_x = con.execute(query)
+            unread_label_total = []
+            for row in query_x:
+                unread_label_total.append(row[0])
+            self.assertTrue(unread_label_total[0] == 1)
 
     def test_add_archive_is_added_to_internal(self):
         """testing message is added to database with archived label attached"""
@@ -209,6 +235,7 @@ class ModifyTestCase(unittest.TestCase, ModifyTestCaseHelper):
                 message = message_service.retrieve_message(msg_id, self.user_internal)
                 read_date_set = message['read_date']
                 modifier.add_unread(message, self.user_internal)
+                message = message_service.retrieve_message(msg_id, self.user_internal)
                 modifier.del_unread(message, self.user_internal)
                 message = message_service.retrieve_message(msg_id, self.user_internal)
                 self.assertEqual(message['read_date'], read_date_set)
