@@ -62,6 +62,7 @@ class Modifier:
         inbox = Labels.INBOX.value
         if inbox in message['labels']:
             if unread in message['labels']:
+                # Unread label already exists
                 return True
             else:
                 Modifier.add_label(unread, message, user)
