@@ -19,4 +19,4 @@ Feature: Delete Draft By Id
     Given the user requests to delete a draft
     When the draft is deleted
     Then the draft should be removed
-    And a success response should be given
+    And a success status code (200) is returned

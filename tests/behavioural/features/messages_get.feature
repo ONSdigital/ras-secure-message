@@ -82,7 +82,7 @@ Feature: Get Messages list Endpoint
   Scenario Outline: User provides parameters that are invalid
     Given parameter <param> has value <value>
     When user gets messages using the parameters
-    Then a 404 error code is returned
+    Then a not found status code (404) is returned
 
   Examples: Parameters
     |param         | value |
@@ -95,7 +95,7 @@ Feature: Get Messages list Endpoint
   Scenario Outline: User provides parameters that are too large
     Given parameter <param> has value <value>
     When user gets messages using the parameters
-    Then a bad request error is returned
+    Then a bad request status code (400) is returned
 
   Examples: Parameters
     |param         | value |

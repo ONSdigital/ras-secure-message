@@ -4,37 +4,37 @@ Feature: Checking all request pass authorisation
   Scenario: GET request without a user in header
     Given no user uuid is in the header
     When a GET request is made
-    Then a bad request error is returned
+    Then a bad request status code (400) is returned
 
   Scenario: POST request without a user in header
     Given no user uuid is in the header
     When a POST request is made
-    Then a bad request error is returned
+    Then a bad request status code (400) is returned
 
   Scenario: PUT request without a user in header
     Given no user uuid is in the header
     When a PUT request is made
-    Then a bad request error is returned
+    Then a bad request status code (400) is returned
 
   Scenario: GET request without a role in header
     Given no role is in the header
     When a GET request is made
-    Then a bad request error is returned
+    Then a bad request status code (400) is returned
 
   Scenario: POST request without a role in header
     Given no role is in the header
     When a POST request is made
-    Then a bad request error is returned
+    Then a bad request status code (400) is returned
 
   Scenario: PUT request without a role in header
     Given no role is in the header
     When a PUT request is made
-    Then a bad request error is returned
+    Then a bad request status code (400) is returned
 
   Scenario Outline: User tries to use endpoint with the wrong method
     Given user wants to use <endpoint> endpoint
     When user tries to access that endpoint with the <wrong method> method
-    Then a 405 error status is returned
+    Then a '405' status code is returned
 
   Examples: endpoint wrong methods
     |       endpoint        |   wrong method    |

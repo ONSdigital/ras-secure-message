@@ -30,26 +30,29 @@ def step_impl_etag_should_be_sent_with_draft(context):
     nose.tools.assert_true(len(etag) == 40)
 
 
-@then('a success response is given')
+@then('a success status code (200) is returned')
 def step_impl_success_returned(context):
     nose.tools.assert_equal(context.response.status_code, 200)
 
 
-@then('a 201 status code is the response')
-def step_impl_201_returned(context):
+@then('a created status code (201) is returned')
+def step_impl_success_returned(context):
     nose.tools.assert_equal(context.response.status_code, 201)
 
-
-@then('a bad request error is returned')
+@then('a bad request status code (400) is returned')
 def step_impl_a_bad_request_is_returned(context):
     nose.tools.assert_equal(context.response.status_code, 400)
 
 
-@then("a 404 error code is returned")
-def step_impl_404_returned(context):
+@then("a not found status code (404) is returned")
+def step_impl_conflict_returned(context):
     nose.tools.assert_equal(context.response.status_code, 404)
 
-
-@then("a conflict error is returned")
+@then("a conflict error status code (409) is returned")
 def step_impl_conflict_returned(context):
     nose.tools.assert_equal(context.response.status_code, 409)
+
+
+@then("a '{status_code}' status code is returned")
+def step_impl_status_code_returned(context, status_code):
+    nose.tools.assert_equal(context.response.status_code, int(status_code))
