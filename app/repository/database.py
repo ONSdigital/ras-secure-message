@@ -169,4 +169,4 @@ class Events(db.Model):
     def __init__(self, msg_id='', event=''):
         self.msg_id = msg_id
         self.event = event
-        self.date_time = datetime.now(timezone.utc)
+        self.date_time = datetime.now(timezone.utc).strftime('%Y%m%d %H%M%S')
