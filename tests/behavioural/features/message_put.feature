@@ -27,27 +27,27 @@ Feature: Checking correct labels for messages are added & deleted
   Scenario: validating a request where there is no label provided
     Given a message is sent
     When the label is empty
-    Then a bad request error is returned
+    Then a bad request status code (400) is returned
 
   Scenario: validating a request where there is no action provided
     Given a message is sent
     When the action is empty
-    Then a bad request error is returned
+    Then a bad request status code (400) is returned
 
   Scenario: validating a request where there in an invalid label provided
     Given a message is sent
     When an invalid label is provided
-    Then a bad request error is returned
+    Then a bad request status code (400) is returned
 
   Scenario: validating a request where there in an invalid action provided
     Given a message is sent
     When an invalid action is provided
-    Then a bad request error is returned
+    Then a bad request status code (400) is returned
 
   Scenario: validating a request where an unmodifiable label is provided
     Given a message is sent
     When an unmodifiable label is provided
-    Then a bad request error is returned
+    Then a bad request status code (400) is returned
 
   Scenario: internal - as an internal user I want to be able to change my message from read to unread
     Given a message with the status read is displayed to an internal user
@@ -72,4 +72,9 @@ Feature: Checking correct labels for messages are added & deleted
   Scenario: If an incorrect message id is requested by the user return a 404 error
     Given a user requests a message with a invalid message id
     When it is searched for
-    Then a 404 error code is returned
+    Then a not found status code (404) is returned
+
+  Scenario: If an incorrect message id is requested by the user return a 404 error
+    Given a user requests a message with a invalid message id
+    When it is searched for
+    Then a not found status code (404) is returned

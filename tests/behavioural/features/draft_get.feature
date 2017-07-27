@@ -7,12 +7,12 @@ Feature: Get draft by id
     Given a user requests a valid draft
     When the user requests the draft
     Then the draft is returned
-    And a success response is given
+    And a success status code (200) is returned
 
   Scenario: User requests draft that does not exist
     Given a user wants a draft that does not exist
     When the user requests the draft
-    Then a 404 error code is returned
+    Then a not found status code (404) is returned
 
    # Integration only test
   @ignore
