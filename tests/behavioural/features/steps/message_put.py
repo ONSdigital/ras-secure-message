@@ -376,6 +376,25 @@ def step_impl_searched_for(context):
     context.response = app.test_client().put(url.format(context.msg_id),
                                              data=json.dumps(modify_data), headers=headers)
 
+# Scenario 17: As a user I should receive an error if I attempt to mark a message as read that is not in my inbox
+@given("a user has sent a message")
+def step_impl_a_message_is_sent(context):
+    data['msg_to'] = ['BRES']
+    data['msg_from'] = '0a7ad740-10d5-4ecb-b7ca-3c0384afb882'
+    token_data['user_uuid'] = data['msg_from']
+    token_data['role'] = 'respondent'
+    headers['Authorization'] = update_encrypted_jwt()
+    context.response = app.test_client().post("http://localhost:5050/message/send",
+                                              data=flask.json.dumps(data), headers=headers)
+    msg_resp = json.loads(context.response.data)
+    context.msg_id = msg_resp['msg_id']
+
+@when("I attempt to mark a message as read")
+def step_impl_a_message_is_marked_as_read(context):
+    modify_data['action'] = 'add'
+    modify_data['label'] = "READ"
+    context.response = app.test_client().put(url.format(context.msg_id),
+                                             data=flask.json.dumps(modify_data), headers=headers)
 
 # Common Steps: used in multiple scenarios
 @given("a valid message is sent")

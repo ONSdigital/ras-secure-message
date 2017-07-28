@@ -133,15 +133,16 @@ class MessageModifyById(Resource):
         """Update message by status"""
 
         request_data = request.get_json()
-
-        action, label = MessageModifyById._validate_request(request_data)
-
         message = Retriever().retrieve_message(message_id, g.user)
+        action, label = MessageModifyById._validate_request(request_data)
 
         if label == Labels.UNREAD.value:
             resp = MessageModifyById._modify_unread(action, message, g.user)
         else:
             resp = MessageModifyById._modify_label(action, message, g.user, label)
+
+        if label != Labels.INBOX.value:
+            resp = MessageModifyById._validate_status(message, action)
 
         if resp:
             res = jsonify({'status': 'ok'})
@@ -190,3 +191,11 @@ class MessageModifyById(Resource):
             raise BadRequest(description="Invalid action requested: {0}".format(action))
 
         return action, label
+
+    @staticmethod
+    def _validate_status(label, action):
+        message_does_not_exist = label != Labels.INBOX.value
+        res = jsonify({'status': 'error'})
+        if action == 'add' and message_does_not_exist:
+            res.status_code = 400
+            return res
