@@ -1,4 +1,4 @@
-from api_mocks import party_service_mock
+from app.api_mocks import party_service_mock
 
 
 class User:

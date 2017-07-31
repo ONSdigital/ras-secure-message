@@ -6,7 +6,7 @@ from flask import jsonify
 from structlog import wrap_logger
 from werkzeug.exceptions import ExpectationFailed
 
-from api_mocks import party_service_mock
+from app.api_mocks import party_service_mock
 from app.constants import MESSAGE_BY_ID_ENDPOINT, MESSAGE_LIST_ENDPOINT, MESSAGE_QUERY_LIMIT
 
 logger = wrap_logger(logging.getLogger(__name__))

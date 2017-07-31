@@ -5,7 +5,7 @@ import nose.tools
 from behave import given, then, when
 from flask import json
 
-from api_mocks import party_service_mock
+from app.api_mocks import party_service_mock
 from app import settings
 from app.application import app
 from app.authentication.jwe import Encrypter
