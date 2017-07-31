@@ -1,11 +1,13 @@
-import logging
 import hashlib
+import logging
+
 from flask import json
 from flask import jsonify
 from structlog import wrap_logger
 from werkzeug.exceptions import ExpectationFailed
+
+from app.api_mocks import party_service_mock
 from app.constants import MESSAGE_BY_ID_ENDPOINT, MESSAGE_LIST_ENDPOINT, MESSAGE_QUERY_LIMIT
-from app import mocked_party
 
 logger = wrap_logger(logging.getLogger(__name__))
 
@@ -116,7 +118,7 @@ def get_business_details_by_ru(rus):
 
     for x in rus:
 
-        detail = mocked_party.business_details_endpoint(x)
+        detail = party_service_mock.business_details_endpoint(x)
 
         if detail.status_code == 200:
             details.append(json.loads(detail.data))
@@ -132,7 +134,7 @@ def get_details_by_uuids(uuids):
     respondent_details = []
     for x in uuids:
 
-        detail = mocked_party.user_details_endpoint(x)
+        detail = party_service_mock.user_details_endpoint(x)
 
         if detail.status_code == 200:
             respondent_details.append(json.loads(detail.data))

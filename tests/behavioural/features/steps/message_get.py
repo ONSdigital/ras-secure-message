@@ -1,13 +1,15 @@
 import uuid
+
 import flask
 import nose.tools
 from behave import given, then, when
 from flask import json
+
+from app.api_mocks import party_service_mock
 from app import settings
 from app.application import app
 from app.authentication.jwe import Encrypter
 from app.authentication.jwt import encode
-from app import mocked_party
 
 url = "http://localhost:5050/message/{0}"
 token_data = {
@@ -156,7 +158,7 @@ def step_impl_a_respondent_sends_a_message(context):
 @then("returned message field msg_to is correct")
 def step_impl_correct_msg_to_returned(context):
     msg_resp = json.loads(context.response.data)
-    msg_to = mocked_party.respondent_ids[data['msg_to'][0]]
+    msg_to = party_service_mock.respondent_ids[data['msg_to'][0]]
     nose.tools.assert_equal(msg_resp['msg_to'], [data['msg_to'][0]])
     nose.tools.assert_equal(msg_resp['@msg_to'], [msg_to])
 
@@ -164,7 +166,7 @@ def step_impl_correct_msg_to_returned(context):
 @then("returned message field msg_from is correct")
 def step_impl_correct_msg_from_returned(context):
     msg_resp = json.loads(context.response.data)
-    msg_from = mocked_party.respondent_ids[data['msg_from']]
+    msg_from = party_service_mock.respondent_ids[data['msg_from']]
     nose.tools.assert_equal(msg_resp['@msg_from'], msg_from)
     nose.tools.assert_equal(msg_resp['msg_from'], data['msg_from'])
 
