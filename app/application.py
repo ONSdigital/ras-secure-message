@@ -7,6 +7,7 @@ from app import settings
 from app.exception.exceptions import MessageSaveException
 from app.repository import database
 from app.resources.health import Health, DatabaseHealth, HealthDetails
+from app.resources.info import Info
 from app.resources.messages import MessageList, MessageSend, MessageById, MessageModifyById
 from app.authentication.authenticator import authenticate
 from app.resources.drafts import DraftSave, DraftById, DraftModifyById, DraftList
@@ -40,6 +41,7 @@ with app.app_context():
 api.add_resource(Health, '/health')
 api.add_resource(DatabaseHealth, '/health/db')
 api.add_resource(HealthDetails, '/health/details')
+api.add_resource(Info, '/info')
 api.add_resource(MessageList, '/messages')
 api.add_resource(MessageSend, '/message/send')
 api.add_resource(MessageById, '/message/<message_id>')
@@ -54,12 +56,19 @@ api.add_resource(ThreadList, '/threads')
 
 @app.before_request
 def before_request():
-    if request.endpoint is not None and 'health' not in request.endpoint and request.method != 'OPTIONS':
+    if _request_requires_authentication(request):
         log_request()
         res = authenticate(request.headers)
         if res != {'status': "ok"}:
             logger.debug("Failed to authenticate user")
             return res
+
+
+def _request_requires_authentication(req):
+    return req.endpoint is not None and \
+           'health' not in req.endpoint \
+           and req.endpoint != 'info' \
+           and req.method != 'OPTIONS'
 
 
 @app.errorhandler(MessageSaveException)
