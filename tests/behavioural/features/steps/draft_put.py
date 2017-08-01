@@ -9,7 +9,7 @@ from flask import current_app, json
 
 url = "http://localhost:5050/draft/{0}/modify"
 token_data = {
-            "user_uuid": "0a7ad740-10d5-4ecb-b7ca-3c0384afb882",
+            constants.USER_IDENTIFIER: "0a7ad740-10d5-4ecb-b7ca-3c0384afb882",
             "role": "respondent"
         }
 headers = {'Content-Type': 'application/json', 'Authorization': ''}

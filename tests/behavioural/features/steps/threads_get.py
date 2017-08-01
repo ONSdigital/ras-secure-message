@@ -4,11 +4,11 @@ from behave import given, then, when
 from app.application import app
 from app.authentication.jwt import encode
 from app.authentication.jwe import Encrypter
-from app import settings
+from app import settings, constants
 
 url = "http://localhost:5050/threads"
 token_data = {
-            "user_uuid": "000000000",
+            constants.USER_IDENTIFIER: "000000000",
             "role": "internal"
         }
 
@@ -65,7 +65,7 @@ def step_impl_respondent_and_internal_user_hav_multiple_conversations(context):
     for x in range(0, 3):
         data['thread_id'] = 'AConversation{0}'.format(x)
         for y in range(0, 2):
-            token_data['user_uuid'] = '0a7ad740-10d5-4ecb-b7ca-3c0384afb882'
+            token_data[constants.USER_IDENTIFIER] = '0a7ad740-10d5-4ecb-b7ca-3c0384afb882'
             token_data['role'] = 'respondent'
             headers['Authorization'] = update_encrypted_jwt()
 
@@ -74,7 +74,7 @@ def step_impl_respondent_and_internal_user_hav_multiple_conversations(context):
             context.response = app.test_client().post("http://localhost:5050/message/send", data=flask.json.dumps(data),
                                                       headers=headers)
 
-            token_data['user_uuid'] = 'BRES'
+            token_data[constants.USER_IDENTIFIER] = 'BRES'
             token_data['role'] = 'internal'
             headers['Authorization'] = update_encrypted_jwt()
 
@@ -91,7 +91,7 @@ def step_impl_internal_user_has_conversation_with_draft(context):
 
     data['thread_id'] = 'AnotherConversation'
 
-    token_data['user_uuid'] = '0a7ad740-10d5-4ecb-b7ca-3c0384afb882'
+    token_data[constants.USER_IDENTIFIER] = '0a7ad740-10d5-4ecb-b7ca-3c0384afb882'
     token_data['role'] = 'respondent'
     headers['Authorization'] = update_encrypted_jwt()
 
@@ -100,7 +100,7 @@ def step_impl_internal_user_has_conversation_with_draft(context):
     context.response = app.test_client().post("http://localhost:5050/message/send", data=flask.json.dumps(data),
                                               headers=headers)
 
-    token_data['user_uuid'] = 'BRES'
+    token_data[constants.USER_IDENTIFIER] = 'BRES'
     token_data['role'] = 'internal'
     headers['Authorization'] = update_encrypted_jwt()
 
@@ -120,7 +120,7 @@ def step_impl_internal_user_has_conversation_with_draft(context):
 
 @when("the respondent gets all conversations")
 def step_impl_respondent_gets_all_conversations(context):
-    token_data['user_uuid'] = '0a7ad740-10d5-4ecb-b7ca-3c0384afb882'
+    token_data[constants.USER_IDENTIFIER] = '0a7ad740-10d5-4ecb-b7ca-3c0384afb882'
     token_data['role'] = 'respondent'
     headers['Authorization'] = update_encrypted_jwt()
     context.response = app.test_client().get(url, headers=headers)
@@ -128,7 +128,7 @@ def step_impl_respondent_gets_all_conversations(context):
 
 @when("the internal user gets all conversations")
 def step_impl_internal_user_gets_all_conversations(context):
-    token_data['user_uuid'] = 'BRES'
+    token_data[constants.USER_IDENTIFIER] = 'BRES'
     token_data['role'] = 'internal'
     headers['Authorization'] = update_encrypted_jwt()
     context.response = app.test_client().get(url, headers=headers)

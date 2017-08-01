@@ -3,11 +3,11 @@ from behave import given, when, then
 from app.application import app
 from app.authentication.jwt import encode
 from app.authentication.jwe import Encrypter
-from app import settings
+from app import settings, constants
 
 
 token_data = {
-            "user_uuid": "000000000",
+            constants.USER_IDENTIFIER: "000000000",
             "role": "internal"
         }
 
@@ -107,15 +107,15 @@ def step_impl_assert_405_returned(context):
 # Common Steps: used in multiple scenarios
 @given("no user uuid is in the header")
 def step_impl_no_user_urn_in_the_header(context):
-    if 'user_uuid' in token_data:
-        del token_data['user_uuid']
+    if constants.USER_IDENTIFIER in token_data:
+        del token_data[constants.USER_IDENTIFIER]
         headers['Authorization'] = update_encrypted_jwt()
 
 
 @given("no role is in the header")
 def step_impl_no_role_in_the_header(context):
-    if 'user_uuid' not in token_data:
-        token_data['user_uuid'] = "000000000"
+    if constants.USER_IDENTIFIER not in token_data:
+        token_data[constants.USER_IDENTIFIER] = "000000000"
 
     if 'role' in token_data:
         del token_data['role']
