@@ -56,7 +56,7 @@ api.add_resource(ThreadList, '/threads')
 
 @app.before_request
 def before_request():
-    if _request_requires_authentication(request):
+    if _request_requires_authentication():
         log_request()
         res = authenticate(request.headers)
         if res != {'status': "ok"}:
@@ -64,11 +64,11 @@ def before_request():
             return res
 
 
-def _request_requires_authentication(req):
-    return req.endpoint is not None and \
-           'health' not in req.endpoint \
-           and req.endpoint != 'info' \
-           and req.method != 'OPTIONS'
+def _request_requires_authentication():
+    return request.endpoint is not None and \
+           'health' not in request.endpoint \
+           and request.endpoint != 'info' \
+           and request.method != 'OPTIONS'
 
 
 @app.errorhandler(MessageSaveException)
