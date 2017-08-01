@@ -3,12 +3,25 @@ from flask import json
 from sqlalchemy import create_engine, event
 from sqlalchemy.engine import Engine
 from werkzeug.exceptions import ExpectationFailed
-from app import application
+from app import application, constants, settings
 from app.application import app
 from app.common.utilities import get_business_details_by_ru, get_details_by_uuids
+from app.authentication.jwe import Encrypter
+from app.authentication.jwt import encode
 
 
 class PartyTestCase(unittest.TestCase):
+
+    def _generate_encrypted_token(self):
+        token_data = {constants.USER_IDENTIFIER: "0a7ad740-10d5-4ecb-b7ca-3c0384afb882",
+                      "role": "respondent"}
+
+        encrypter = Encrypter(_private_key=settings.SM_USER_AUTHENTICATION_PRIVATE_KEY,
+                              _private_key_password=settings.SM_USER_AUTHENTICATION_PRIVATE_KEY_PASSWORD,
+                              _public_key=settings.SM_USER_AUTHENTICATION_PUBLIC_KEY)
+        signed_jwt = encode(token_data)
+        encrypted_jwt = encrypter.encrypt_token(signed_jwt)
+        return encrypted_jwt
 
     @event.listens_for(Engine, "connect")
     def set_sqlite_pragma(dbapi_connection, connection_record):
@@ -67,8 +80,9 @@ class PartyTestCase(unittest.TestCase):
                 'ru_id': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc',
                 'survey': "BRES"}
 
-        self.headers = {'Content-Type': 'application/json',
-                        'Authorization': "eyJhbGciOiJSU0EtT0FFUCIsImVuYyI6IkEyNTZHQ00ifQ.mLC05y5m8UAT6caQhDVMtnsC4v8JDHFsW2IL9oH5O74Uqx6iDuCxKpfR_C3c7VZM2FZE3GIowPPhzgvyQthW0edN5SU0nhuu1RYKdl1ePhA7USr1lM9jZ_a-yIXrWrJo-6Nt2hfO1NVkQlI5beJijCWmM3lm_HqLWqxD660LK8PUJj0unuFqKIocK4Fr4cqUkHMlyLgxgOAfYSSwx-j05-hPYjvr96K01fkhQ2jKYWf5QGsaB2zXyB2VhgvTk8boi9UrBmea17RXiAkg0Iae9wLFldxjMfJDjwgc5IiKEme9NPvG7pPLVaexOHiQEih179GMFDGPat_4NKhZin6IDQ._eoAW_em6HlC8Mpn.H_SxDw_h1dY4L-wVUFCWQ84qM_2XrNgYFWzYAmL7LVT65oFrWUdGtY1LmN-ckEqeTIJAooFy9VSv__MOTYxXN_O1SvGY48Rc1qyTRv220MxG6N1gZ9bVtZfXqGGOrnMz_OBnT3DgPLUFJgrdO-qD6xybAYxzeR-y5DJ7sZciL13zUhMCsRk37veEayFvL1sDIfyJXXVLzzsEjbVNZo-4NUeBTWT6yp7vwmgeuD9JW1Y.LVW9aQ72CIAUkzY9A4glaA"}
+        encrypted_token = self._generate_encrypted_token()
+
+        self.headers = {'Content-Type': 'application/json', 'Authorization': encrypted_token}
 
         self.app = application.app.test_client()
 
@@ -98,8 +112,9 @@ class PartyTestCase(unittest.TestCase):
 
         self.app = application.app.test_client()
 
-        self.headers = {'Content-Type': 'application/json',
-                        'Authorization': "eyJhbGciOiJSU0EtT0FFUCIsImVuYyI6IkEyNTZHQ00ifQ.mLC05y5m8UAT6caQhDVMtnsC4v8JDHFsW2IL9oH5O74Uqx6iDuCxKpfR_C3c7VZM2FZE3GIowPPhzgvyQthW0edN5SU0nhuu1RYKdl1ePhA7USr1lM9jZ_a-yIXrWrJo-6Nt2hfO1NVkQlI5beJijCWmM3lm_HqLWqxD660LK8PUJj0unuFqKIocK4Fr4cqUkHMlyLgxgOAfYSSwx-j05-hPYjvr96K01fkhQ2jKYWf5QGsaB2zXyB2VhgvTk8boi9UrBmea17RXiAkg0Iae9wLFldxjMfJDjwgc5IiKEme9NPvG7pPLVaexOHiQEih179GMFDGPat_4NKhZin6IDQ._eoAW_em6HlC8Mpn.H_SxDw_h1dY4L-wVUFCWQ84qM_2XrNgYFWzYAmL7LVT65oFrWUdGtY1LmN-ckEqeTIJAooFy9VSv__MOTYxXN_O1SvGY48Rc1qyTRv220MxG6N1gZ9bVtZfXqGGOrnMz_OBnT3DgPLUFJgrdO-qD6xybAYxzeR-y5DJ7sZciL13zUhMCsRk37veEayFvL1sDIfyJXXVLzzsEjbVNZo-4NUeBTWT6yp7vwmgeuD9JW1Y.LVW9aQ72CIAUkzY9A4glaA"}
+        encrypted_token = self._generate_encrypted_token()
+
+        self.headers = {'Content-Type': 'application/json', 'Authorization': encrypted_token}
 
         app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:////tmp/messages.db'
         self.engine = create_engine('sqlite:////tmp/messages.db')
@@ -127,8 +142,9 @@ class PartyTestCase(unittest.TestCase):
 
         self.app = application.app.test_client()
 
-        self.headers = {'Content-Type': 'application/json',
-                        'Authorization': "eyJhbGciOiJSU0EtT0FFUCIsImVuYyI6IkEyNTZHQ00ifQ.mLC05y5m8UAT6caQhDVMtnsC4v8JDHFsW2IL9oH5O74Uqx6iDuCxKpfR_C3c7VZM2FZE3GIowPPhzgvyQthW0edN5SU0nhuu1RYKdl1ePhA7USr1lM9jZ_a-yIXrWrJo-6Nt2hfO1NVkQlI5beJijCWmM3lm_HqLWqxD660LK8PUJj0unuFqKIocK4Fr4cqUkHMlyLgxgOAfYSSwx-j05-hPYjvr96K01fkhQ2jKYWf5QGsaB2zXyB2VhgvTk8boi9UrBmea17RXiAkg0Iae9wLFldxjMfJDjwgc5IiKEme9NPvG7pPLVaexOHiQEih179GMFDGPat_4NKhZin6IDQ._eoAW_em6HlC8Mpn.H_SxDw_h1dY4L-wVUFCWQ84qM_2XrNgYFWzYAmL7LVT65oFrWUdGtY1LmN-ckEqeTIJAooFy9VSv__MOTYxXN_O1SvGY48Rc1qyTRv220MxG6N1gZ9bVtZfXqGGOrnMz_OBnT3DgPLUFJgrdO-qD6xybAYxzeR-y5DJ7sZciL13zUhMCsRk37veEayFvL1sDIfyJXXVLzzsEjbVNZo-4NUeBTWT6yp7vwmgeuD9JW1Y.LVW9aQ72CIAUkzY9A4glaA"}
+        encrypted_token = self._generate_encrypted_token()
+
+        self.headers = {'Content-Type': 'application/json', 'Authorization': encrypted_token}
 
         app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:////tmp/messages.db'
         self.engine = create_engine('sqlite:////tmp/messages.db')
@@ -155,8 +171,9 @@ class PartyTestCase(unittest.TestCase):
 
         self.app = application.app.test_client()
 
-        self.headers = {'Content-Type': 'application/json',
-                        'Authorization': "eyJhbGciOiJSU0EtT0FFUCIsImVuYyI6IkEyNTZHQ00ifQ.mLC05y5m8UAT6caQhDVMtnsC4v8JDHFsW2IL9oH5O74Uqx6iDuCxKpfR_C3c7VZM2FZE3GIowPPhzgvyQthW0edN5SU0nhuu1RYKdl1ePhA7USr1lM9jZ_a-yIXrWrJo-6Nt2hfO1NVkQlI5beJijCWmM3lm_HqLWqxD660LK8PUJj0unuFqKIocK4Fr4cqUkHMlyLgxgOAfYSSwx-j05-hPYjvr96K01fkhQ2jKYWf5QGsaB2zXyB2VhgvTk8boi9UrBmea17RXiAkg0Iae9wLFldxjMfJDjwgc5IiKEme9NPvG7pPLVaexOHiQEih179GMFDGPat_4NKhZin6IDQ._eoAW_em6HlC8Mpn.H_SxDw_h1dY4L-wVUFCWQ84qM_2XrNgYFWzYAmL7LVT65oFrWUdGtY1LmN-ckEqeTIJAooFy9VSv__MOTYxXN_O1SvGY48Rc1qyTRv220MxG6N1gZ9bVtZfXqGGOrnMz_OBnT3DgPLUFJgrdO-qD6xybAYxzeR-y5DJ7sZciL13zUhMCsRk37veEayFvL1sDIfyJXXVLzzsEjbVNZo-4NUeBTWT6yp7vwmgeuD9JW1Y.LVW9aQ72CIAUkzY9A4glaA"}
+        encrypted_token = self._generate_encrypted_token()
+
+        self.headers = {'Content-Type': 'application/json', 'Authorization': encrypted_token}
 
         app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:////tmp/messages.db'
         self.engine = create_engine('sqlite:////tmp/messages.db')
@@ -207,8 +224,9 @@ class PartyTestCase(unittest.TestCase):
 
         self.app = application.app.test_client()
 
-        self.headers = {'Content-Type': 'application/json',
-                        'Authorization': "eyJhbGciOiJSU0EtT0FFUCIsImVuYyI6IkEyNTZHQ00ifQ.mLC05y5m8UAT6caQhDVMtnsC4v8JDHFsW2IL9oH5O74Uqx6iDuCxKpfR_C3c7VZM2FZE3GIowPPhzgvyQthW0edN5SU0nhuu1RYKdl1ePhA7USr1lM9jZ_a-yIXrWrJo-6Nt2hfO1NVkQlI5beJijCWmM3lm_HqLWqxD660LK8PUJj0unuFqKIocK4Fr4cqUkHMlyLgxgOAfYSSwx-j05-hPYjvr96K01fkhQ2jKYWf5QGsaB2zXyB2VhgvTk8boi9UrBmea17RXiAkg0Iae9wLFldxjMfJDjwgc5IiKEme9NPvG7pPLVaexOHiQEih179GMFDGPat_4NKhZin6IDQ._eoAW_em6HlC8Mpn.H_SxDw_h1dY4L-wVUFCWQ84qM_2XrNgYFWzYAmL7LVT65oFrWUdGtY1LmN-ckEqeTIJAooFy9VSv__MOTYxXN_O1SvGY48Rc1qyTRv220MxG6N1gZ9bVtZfXqGGOrnMz_OBnT3DgPLUFJgrdO-qD6xybAYxzeR-y5DJ7sZciL13zUhMCsRk37veEayFvL1sDIfyJXXVLzzsEjbVNZo-4NUeBTWT6yp7vwmgeuD9JW1Y.LVW9aQ72CIAUkzY9A4glaA"}
+        encrypted_token = self._generate_encrypted_token()
+
+        self.headers = {'Content-Type': 'application/json', 'Authorization': encrypted_token}
 
         app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:////tmp/messages.db'
         self.engine = create_engine('sqlite:////tmp/messages.db')
@@ -235,8 +253,9 @@ class PartyTestCase(unittest.TestCase):
 
         self.app = application.app.test_client()
 
-        self.headers = {'Content-Type': 'application/json',
-                        'Authorization': "eyJhbGciOiJSU0EtT0FFUCIsImVuYyI6IkEyNTZHQ00ifQ.mLC05y5m8UAT6caQhDVMtnsC4v8JDHFsW2IL9oH5O74Uqx6iDuCxKpfR_C3c7VZM2FZE3GIowPPhzgvyQthW0edN5SU0nhuu1RYKdl1ePhA7USr1lM9jZ_a-yIXrWrJo-6Nt2hfO1NVkQlI5beJijCWmM3lm_HqLWqxD660LK8PUJj0unuFqKIocK4Fr4cqUkHMlyLgxgOAfYSSwx-j05-hPYjvr96K01fkhQ2jKYWf5QGsaB2zXyB2VhgvTk8boi9UrBmea17RXiAkg0Iae9wLFldxjMfJDjwgc5IiKEme9NPvG7pPLVaexOHiQEih179GMFDGPat_4NKhZin6IDQ._eoAW_em6HlC8Mpn.H_SxDw_h1dY4L-wVUFCWQ84qM_2XrNgYFWzYAmL7LVT65oFrWUdGtY1LmN-ckEqeTIJAooFy9VSv__MOTYxXN_O1SvGY48Rc1qyTRv220MxG6N1gZ9bVtZfXqGGOrnMz_OBnT3DgPLUFJgrdO-qD6xybAYxzeR-y5DJ7sZciL13zUhMCsRk37veEayFvL1sDIfyJXXVLzzsEjbVNZo-4NUeBTWT6yp7vwmgeuD9JW1Y.LVW9aQ72CIAUkzY9A4glaA"}
+        encrypted_token = self._generate_encrypted_token()
+
+        self.headers = {'Content-Type': 'application/json', 'Authorization': encrypted_token}
 
         app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:////tmp/messages.db'
         self.engine = create_engine('sqlite:////tmp/messages.db')
@@ -264,8 +283,9 @@ class PartyTestCase(unittest.TestCase):
 
         self.app = application.app.test_client()
 
-        self.headers = {'Content-Type': 'application/json',
-                        'Authorization': "eyJhbGciOiJSU0EtT0FFUCIsImVuYyI6IkEyNTZHQ00ifQ.mLC05y5m8UAT6caQhDVMtnsC4v8JDHFsW2IL9oH5O74Uqx6iDuCxKpfR_C3c7VZM2FZE3GIowPPhzgvyQthW0edN5SU0nhuu1RYKdl1ePhA7USr1lM9jZ_a-yIXrWrJo-6Nt2hfO1NVkQlI5beJijCWmM3lm_HqLWqxD660LK8PUJj0unuFqKIocK4Fr4cqUkHMlyLgxgOAfYSSwx-j05-hPYjvr96K01fkhQ2jKYWf5QGsaB2zXyB2VhgvTk8boi9UrBmea17RXiAkg0Iae9wLFldxjMfJDjwgc5IiKEme9NPvG7pPLVaexOHiQEih179GMFDGPat_4NKhZin6IDQ._eoAW_em6HlC8Mpn.H_SxDw_h1dY4L-wVUFCWQ84qM_2XrNgYFWzYAmL7LVT65oFrWUdGtY1LmN-ckEqeTIJAooFy9VSv__MOTYxXN_O1SvGY48Rc1qyTRv220MxG6N1gZ9bVtZfXqGGOrnMz_OBnT3DgPLUFJgrdO-qD6xybAYxzeR-y5DJ7sZciL13zUhMCsRk37veEayFvL1sDIfyJXXVLzzsEjbVNZo-4NUeBTWT6yp7vwmgeuD9JW1Y.LVW9aQ72CIAUkzY9A4glaA"}
+        encrypted_token = self._generate_encrypted_token()
+
+        self.headers = {'Content-Type': 'application/json', 'Authorization': encrypted_token}
 
         app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:////tmp/messages.db'
         self.engine = create_engine('sqlite:////tmp/messages.db')
@@ -292,8 +312,9 @@ class PartyTestCase(unittest.TestCase):
 
         self.app = application.app.test_client()
 
-        self.headers = {'Content-Type': 'application/json',
-                        'Authorization': "eyJhbGciOiJSU0EtT0FFUCIsImVuYyI6IkEyNTZHQ00ifQ.mLC05y5m8UAT6caQhDVMtnsC4v8JDHFsW2IL9oH5O74Uqx6iDuCxKpfR_C3c7VZM2FZE3GIowPPhzgvyQthW0edN5SU0nhuu1RYKdl1ePhA7USr1lM9jZ_a-yIXrWrJo-6Nt2hfO1NVkQlI5beJijCWmM3lm_HqLWqxD660LK8PUJj0unuFqKIocK4Fr4cqUkHMlyLgxgOAfYSSwx-j05-hPYjvr96K01fkhQ2jKYWf5QGsaB2zXyB2VhgvTk8boi9UrBmea17RXiAkg0Iae9wLFldxjMfJDjwgc5IiKEme9NPvG7pPLVaexOHiQEih179GMFDGPat_4NKhZin6IDQ._eoAW_em6HlC8Mpn.H_SxDw_h1dY4L-wVUFCWQ84qM_2XrNgYFWzYAmL7LVT65oFrWUdGtY1LmN-ckEqeTIJAooFy9VSv__MOTYxXN_O1SvGY48Rc1qyTRv220MxG6N1gZ9bVtZfXqGGOrnMz_OBnT3DgPLUFJgrdO-qD6xybAYxzeR-y5DJ7sZciL13zUhMCsRk37veEayFvL1sDIfyJXXVLzzsEjbVNZo-4NUeBTWT6yp7vwmgeuD9JW1Y.LVW9aQ72CIAUkzY9A4glaA"}
+        encrypted_token = self._generate_encrypted_token()
+
+        self.headers = {'Content-Type': 'application/json', 'Authorization': encrypted_token}
 
         app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:////tmp/messages.db'
         self.engine = create_engine('sqlite:////tmp/messages.db')
