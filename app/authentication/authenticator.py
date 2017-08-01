@@ -1,6 +1,5 @@
 import logging
-from app import settings
-from app.constants import USER_IDENTIFIER
+from app import settings, constants
 from app.validation.user import User
 from app.authentication.jwt import decode
 from app.authentication.jwe import Decrypter
@@ -35,18 +34,18 @@ def check_jwt(token):
             decrypted_jwt_token = decrypter.decrypt_token(token)
             logger.debug("Decrypted JWT.")
             decoded_jwt_token = decode(decrypted_jwt_token)
-            logger.debug("Decoded JWT. User ID: {}".format(decoded_jwt_token.get(USER_IDENTIFIER)))
+            logger.debug("Decoded JWT. User ID: {}".format(decoded_jwt_token.get(constants.USER_IDENTIFIER)))
         else:
             decoded_jwt_token = decode(token)
-            logger.debug("Decoded JWT. User ID: {}".format(decoded_jwt_token.get(USER_IDENTIFIER)))
+            logger.debug("Decoded JWT. User ID: {}".format(decoded_jwt_token.get(constants.USER_IDENTIFIER)))
 
-        if not decoded_jwt_token.get(USER_IDENTIFIER):
+        if not decoded_jwt_token.get(constants.USER_IDENTIFIER):
             raise BadRequest(description="Missing user_uuid claim,"
                                          "user_uuid is required to access this Microservice Resource")
         if not decoded_jwt_token.get('role'):
             raise BadRequest(description="Missing role claim, role is required to access this Microservice Resource")
 
-        g.user = User(decoded_jwt_token.get(USER_IDENTIFIER), decoded_jwt_token.get('role'))
+        g.user = User(decoded_jwt_token.get(constants.USER_IDENTIFIER), decoded_jwt_token.get('role'))
 
         return {'status': "ok"}
 
