@@ -5,12 +5,12 @@ from behave import given, then, when
 from app.application import app
 from app.authentication.jwt import encode
 from app.authentication.jwe import Encrypter
-from app import settings
+from app import settings, constants
 
 
 url = "http://localhost:5050/thread/{0}"
 token_data = {
-            "user_uuid": "BRES",
+            constants.USER_IDENTIFIER: "BRES",
             "role": "internal"
         }
 
@@ -56,14 +56,14 @@ def step_impl_internal_user_has_multiple_conversations(context):
         data['thread_id'] = str(uuid.uuid4())
         data['msg_to'] = ['BRES']
         data['msg_from'] = '0a7ad740-10d5-4ecb-b7ca-3c0384afb882'
-        token_data['user_uuid'] = '0a7ad740-10d5-4ecb-b7ca-3c0384afb882'
+        token_data[constants.USER_IDENTIFIER] = '0a7ad740-10d5-4ecb-b7ca-3c0384afb882'
         token_data['role'] = 'respondent'
         headers['Authorization'] = update_encrypted_jwt()
         context.response = app.test_client().post("http://localhost:5050/message/send", data=flask.json.dumps(data),
                                                   headers=headers)
         data['msg_to'] = ['0a7ad740-10d5-4ecb-b7ca-3c0384afb882']
         data['msg_from'] = 'BRES'
-        token_data['user_uuid'] = 'BRES'
+        token_data[constants.USER_IDENTIFIER] = 'BRES'
         token_data['role'] = 'internal'
         headers['Authorization'] = update_encrypted_jwt()
         context.response = app.test_client().post("http://localhost:5050/message/send", data=flask.json.dumps(data),
@@ -83,7 +83,7 @@ def step_impl_respondent_and_internal_user_hav_a_conversation(context):
 
     data['thread_id'] = 'AConversation'
     for x in range(0, 2):
-        token_data['user_uuid'] = '0a7ad740-10d5-4ecb-b7ca-3c0384afb882'
+        token_data[constants.USER_IDENTIFIER] = '0a7ad740-10d5-4ecb-b7ca-3c0384afb882'
         token_data['role'] = 'respondent'
         headers['Authorization'] = update_encrypted_jwt()
 
@@ -91,7 +91,7 @@ def step_impl_respondent_and_internal_user_hav_a_conversation(context):
         data['msg_from'] = '0a7ad740-10d5-4ecb-b7ca-3c0384afb882'
         context.response = app.test_client().post("http://localhost:5050/message/send", data=flask.json.dumps(data),
                                                   headers=headers)
-        token_data['user_uuid'] = 'BRES'
+        token_data[constants.USER_IDENTIFIER] = 'BRES'
         token_data['role'] = 'internal'
         headers['Authorization'] = update_encrypted_jwt()
 
@@ -103,7 +103,7 @@ def step_impl_respondent_and_internal_user_hav_a_conversation(context):
 
 @given("internal user creates a draft")
 def step_impl_internal_user_creates_a_draft(context):
-    token_data['user_uuid'] = 'BRES'
+    token_data[constants.USER_IDENTIFIER] = 'BRES'
     token_data['role'] = 'internal'
     headers['Authorization'] = update_encrypted_jwt()
 
@@ -116,7 +116,7 @@ def step_impl_internal_user_creates_a_draft(context):
 
 @when("the respondent gets this conversation")
 def step_impl_respondent_gets_conversation(context):
-    token_data['user_uuid'] = '0a7ad740-10d5-4ecb-b7ca-3c0384afb882'
+    token_data[constants.USER_IDENTIFIER] = '0a7ad740-10d5-4ecb-b7ca-3c0384afb882'
     token_data['role'] = 'respondent'
     headers['Authorization'] = update_encrypted_jwt()
     context.response = app.test_client().get(url.format(data['thread_id']), headers=headers)
@@ -124,7 +124,7 @@ def step_impl_respondent_gets_conversation(context):
 
 @when("the internal user gets this conversation")
 def step_impl_internal_user_gets_conversation(context):
-    token_data['user_uuid'] = 'BRES'
+    token_data[constants.USER_IDENTIFIER] = 'BRES'
     token_data['role'] = 'internal'
     headers['Authorization'] = update_encrypted_jwt()
     context.response = app.test_client().get(url.format(data['thread_id']), headers=headers)
