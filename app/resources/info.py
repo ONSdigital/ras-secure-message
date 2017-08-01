@@ -14,6 +14,7 @@ class Info(Resource):
     def get():
         details = {'name': 'secure_message',
                    'version': '0.0.1',
+                   'origin': 'https://github.com/ONSdigital/ras-secure-message.git',
                    'commit': 'not specified',
                    'branch': 'not specified',
                    'built': '01-01-1900 00:00:00.000'}
