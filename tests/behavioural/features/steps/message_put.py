@@ -402,3 +402,18 @@ def step_impl_a_message_is_sent(context):
                                               data=flask.json.dumps(data), headers=headers)
     msg_resp = json.loads(context.response.data)
     context.msg_id = msg_resp['msg_id']
+
+@given('a message is sent from internal')
+def step_impl_a_message_is_sent(context):
+    data['msg_to'] = ['0a7ad740-10d5-4ecb-b7ca-3c0384afb882']
+    data['msg_from'] = 'BRES'
+    token_data['user_uuid'] = data['msg_from']
+    token_data['role'] = 'internal'
+    headers['Authorization'] = update_encrypted_jwt()
+    context.response = app.test_client().post("http://localhost:5050/message/send",
+                                              data=flask.json.dumps(data), headers=headers)
+    msg_resp = json.loads(context.response.data)
+    context.msg_id = msg_resp['msg_id']
+
+
+

@@ -78,3 +78,9 @@ Feature: Checking correct labels for messages are added & deleted
     Given a user requests a message with a invalid message id
     When it is searched for
     Then a not found status code (404) is returned
+
+  Scenario: As a user I should receive an error if I attempt to mark a message as read that is not in my inbox
+    Given a message is sent from internal
+    When the message is marked read
+    Then a bad request status code (400) is returned
+    

@@ -139,7 +139,7 @@ class MessageModifyById(Resource):
         message = Retriever().retrieve_message(message_id, g.user)
 
         if label == Labels.UNREAD.value:
-            resp = MessageModifyById._modify_unread(action, message, g.user)
+            resp = MessageModifyById._try_modify_unread(action, message, g.user)
         else:
             resp = MessageModifyById._modify_label(action, message, g.user, label)
 
@@ -164,9 +164,11 @@ class MessageModifyById(Resource):
             return False
 
     @staticmethod
-    def _modify_unread(action, message, user):
+    def _try_modify_unread(action, message, user):
         if action == 'add':
             return Modifier.add_unread(message, user)
+        if message['msg_to'][0] != user.user_uuid:
+            return False
         return Modifier.del_unread(message, user)
 
     @staticmethod
