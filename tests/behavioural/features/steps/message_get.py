@@ -157,7 +157,7 @@ def step_impl_a_respondent_sends_a_message(context):
 @then("returned message field msg_to is correct")
 def step_impl_correct_msg_to_returned(context):
     msg_resp = json.loads(context.response.data)
-    msg_to = party_service_mock.respondent_ids[data['msg_to'][0]]
+    msg_to = party_service_mock._respondent_ids[data['msg_to'][0]]
     nose.tools.assert_equal(msg_resp['msg_to'], [data['msg_to'][0]])
     nose.tools.assert_equal(msg_resp['@msg_to'], [msg_to])
 
@@ -165,7 +165,7 @@ def step_impl_correct_msg_to_returned(context):
 @then("returned message field msg_from is correct")
 def step_impl_correct_msg_from_returned(context):
     msg_resp = json.loads(context.response.data)
-    msg_from = party_service_mock.respondent_ids[data['msg_from']]
+    msg_from = party_service_mock._respondent_ids[data['msg_from']]
     nose.tools.assert_equal(msg_resp['@msg_from'], msg_from)
     nose.tools.assert_equal(msg_resp['msg_from'], data['msg_from'])
 

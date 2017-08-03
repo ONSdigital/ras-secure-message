@@ -37,7 +37,7 @@ class PartyTestCase(unittest.TestCase):
 
         user_details = get_details_by_uuids(list_uuids)
 
-        self.assertEqual(user_details[0], {"id": "f62dfda8-73b0-4e0e-97cf-1b06327a6712", "firstname": "Bhavana", "surname": "Lincoln",
+        self.assertEqual(user_details[0], {"id": "f62dfda8-73b0-4e0e-97cf-1b06327a6712", "firstname": "Bhavana", "lastName": "Lincoln",
                                            "email": "lincoln.bhavana@gmail.com", "telephone": "+443069990888", "status": "ACTIVE"})
 
     def test_get_user_details_by_uuids(self):
@@ -47,11 +47,11 @@ class PartyTestCase(unittest.TestCase):
 
         user_details = get_details_by_uuids(list_uuids)
 
-        self.assertEqual(user_details[0], {"id": "f62dfda8-73b0-4e0e-97cf-1b06327a6712", "firstname": "Bhavana", "surname": "Lincoln",
+        self.assertEqual(user_details[0], {"id": "f62dfda8-73b0-4e0e-97cf-1b06327a6712", "firstname": "Bhavana", "lastName": "Lincoln",
                                            "email": "lincoln.bhavana@gmail.com", "telephone": "+443069990888", "status": "ACTIVE"})
-        self.assertEqual(user_details[1], {"id": "01b51fcc-ed43-4cdb-ad1c-450f9986859b", "firstname": "Chandana", "surname": "Blanchet",
+        self.assertEqual(user_details[1], {"id": "01b51fcc-ed43-4cdb-ad1c-450f9986859b", "firstname": "Chandana", "lastName": "Blanchet",
                                            "email": "cblanc@hotmail.co.uk", "telephone": "+443069990854", "status": "ACTIVE"})
-        self.assertEqual(user_details[2], {"id": "dd5a38ff-1ecb-4634-94c8-2358df33e614", "firstname": "Ida", "surname": "Larue",
+        self.assertEqual(user_details[2], {"id": "dd5a38ff-1ecb-4634-94c8-2358df33e614", "firstname": "Ida", "lastName": "Larue",
                                            "email": "ilarue47@yopmail.com", "telephone": "+443069990250", "status": "ACTIVE"})
 
     def test_get_user_details_by_invalid_uuid(self):
@@ -97,8 +97,8 @@ class PartyTestCase(unittest.TestCase):
         message = json.loads(message_resp.data)
 
         self.assertEqual(message['@msg_from'], {'telephone': '+443069990289', 'firstname': 'Vana', 'email': 'vana123@aol.com',
-                                                'id': '0a7ad740-10d5-4ecb-b7ca-3c0384afb882', 'status': 'ACTIVE', 'surname': 'Oorschot'})
-        self.assertEqual(message['@msg_to'], [{"id": "BRES", "firstname": "BRES", "surname": "", "email": "", "telephone": "", "status": ""}])
+                                                'id': '0a7ad740-10d5-4ecb-b7ca-3c0384afb882', 'status': 'ACTIVE', 'lastName': 'Oorschot'})
+        self.assertEqual(message['@msg_to'], [{"id": "BRES", "firstname": "BRES", "lastName": "", "email": "", "telephone": "", "status": ""}])
 
     def test_messages_get_replaces_uuids_with_user_details(self):
         """Test get all messages endpoint replaces every messages to and from with user details"""
@@ -128,7 +128,7 @@ class PartyTestCase(unittest.TestCase):
 
         for message in messages:
             self.assertEqual(message['@msg_from'], {'firstname': 'Vana', 'id': '0a7ad740-10d5-4ecb-b7ca-3c0384afb882', 'status': 'ACTIVE',
-                                                    'telephone': '+443069990289', 'surname': 'Oorschot', 'email': 'vana123@aol.com'})
+                                                    'telephone': '+443069990289', 'lastName': 'Oorschot', 'email': 'vana123@aol.com'})
 
     def test_draft_get_return_user_details_for_to_and_from(self):
         """Test get draft replaces sender and recipient with user details"""
@@ -157,7 +157,7 @@ class PartyTestCase(unittest.TestCase):
         draft = json.loads(draft_get.data)
 
         self.assertEqual(draft['@msg_from'], {'telephone': '+443069990289', 'firstname': 'Vana', 'email': 'vana123@aol.com',
-                                              'id': '0a7ad740-10d5-4ecb-b7ca-3c0384afb882', 'status': 'ACTIVE', 'surname': 'Oorschot'})
+                                              'id': '0a7ad740-10d5-4ecb-b7ca-3c0384afb882', 'status': 'ACTIVE', 'lastName': 'Oorschot'})
 
     def test_drafts_get_return_user_details_in_to_and_from(self):
         """Test get all drafts returns to and from as user details"""
@@ -187,8 +187,8 @@ class PartyTestCase(unittest.TestCase):
 
         for draft in drafts:
             self.assertEqual(draft['@msg_from'], {'telephone': '+443069990289', 'firstname': 'Vana', 'email': 'vana123@aol.com',
-                                                  'id': '0a7ad740-10d5-4ecb-b7ca-3c0384afb882', 'status': 'ACTIVE', 'surname': 'Oorschot'})
-            self.assertEqual(draft['@msg_to'][0], {"id": "BRES", "firstname": "BRES", "surname": "", "email": "", "telephone": "", "status": ""})
+                                                  'id': '0a7ad740-10d5-4ecb-b7ca-3c0384afb882', 'status': 'ACTIVE', 'lastName': 'Oorschot'})
+            self.assertEqual(draft['@msg_to'][0], {"id": "BRES", "firstname": "BRES", "lastName": "", "email": "", "telephone": "", "status": ""})
 
     def test_get_business_details_by_ru(self):
         """Test get details for one business using ru_id"""
@@ -198,7 +198,7 @@ class PartyTestCase(unittest.TestCase):
         business_details = get_business_details_by_ru(list_ru)
 
         self.assertEqual(business_details[0]['ru_id'], list_ru[0])
-        self.assertEqual(business_details[0]['business_name'], "Apple")
+        self.assertEqual(business_details[0]['name'], "Apple")
 
     def test_get_business_details_multiple_ru(self):
         """Test business details are returned for multiple ru's"""
@@ -238,7 +238,7 @@ class PartyTestCase(unittest.TestCase):
         message_get = self.app.get("http://localhost:5050/message/{}".format(msg_id), headers=self.headers)
         message = json.loads(message_get.data)
 
-        self.assertEqual(message['@ru_id']['business_name'], "Apple")
+        self.assertEqual(message['@ru_id']['name'], "Apple")
 
     def test_get_messages_returns_business_details(self):
         """Test get all messages returns business details"""
@@ -268,7 +268,7 @@ class PartyTestCase(unittest.TestCase):
         messages = get_return['messages']
 
         for message in messages:
-            self.assertEqual(message['@ru_id']['business_name'], "Apple")
+            self.assertEqual(message['@ru_id']['name'], "Apple")
 
     def test_get_draft_returns_business_details(self):
         """Test get draft returns business details"""
@@ -297,7 +297,7 @@ class PartyTestCase(unittest.TestCase):
         message_get = self.app.get("http://localhost:5050/draft/{}".format(draft_id), headers=self.headers)
         message = json.loads(message_get.data)
 
-        self.assertEqual(message['@ru_id']['business_name'], "Apple")
+        self.assertEqual(message['@ru_id']['name'], "Apple")
 
     def test_get_drafts_returns_business_details(self):
         """Test get all drafts includes business details"""
@@ -327,7 +327,7 @@ class PartyTestCase(unittest.TestCase):
         drafts = drafts_data['messages']
 
         for draft in drafts:
-            self.assertEqual(draft['@ru_id']['business_name'], "Apple")
+            self.assertEqual(draft['@ru_id']['name'], "Apple")
 
 
 if __name__ == '__main__':
