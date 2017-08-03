@@ -133,16 +133,13 @@ class MessageModifyById(Resource):
         """Update message by status"""
 
         request_data = request.get_json()
+        action, label = MessageModifyById._validate_request(request_data)
         message = Retriever().retrieve_message(message_id, g.user)
-        action, label = MessageModifyById._validate_request(message, request_data)
 
         if label == Labels.UNREAD.value:
             resp = MessageModifyById._modify_unread(action, message, g.user)
         else:
             resp = MessageModifyById._modify_label(action, message, g.user, label)
-
-        if label == Labels.INBOX.value:
-            resp = MessageModifyById._modify_unread(action, message, g.user)
 
         if resp:
             res = jsonify({'status': 'ok'})
