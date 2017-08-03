@@ -171,7 +171,7 @@ class MessageModifyById(Resource):
         return Modifier.del_unread(message, user)
 
     @staticmethod
-    def _validate_request(request_data, message):
+    def _validate_request(request_data):
         """Used to validate data within request body for ModifyById"""
         if 'label' not in request_data:
             raise BadRequest(description="No label provided")
