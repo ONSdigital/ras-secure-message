@@ -2,6 +2,7 @@ Feature: Get draft by id
 
   Background: Reset database
     Given database is reset
+    And using mock party service
 
   Scenario: User requests draft
     Given a user requests a valid draft

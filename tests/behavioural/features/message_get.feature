@@ -1,5 +1,8 @@
 Feature: Message get by ID Endpoint
 
+   Background: Reset database
+    Given using mock party service
+
   Scenario Outline: Retrieve a correct message with message ID
     Given there is a message to be retrieved
     When the get request is made with a correct message id

@@ -21,7 +21,5 @@ class User:
 
     @staticmethod
     def is_valid_user(uuid):
-
-        response = party_service_mock.user_details_endpoint(uuid)
-
+        response = party_service_mock.PartyServiceMock().get_user_details(uuid)
         return response.status_code == 200

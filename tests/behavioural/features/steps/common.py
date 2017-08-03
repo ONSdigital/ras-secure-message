@@ -1,7 +1,9 @@
 import nose.tools
 from app.application import app
+from app.api_mocks import party_service_mock
 from behave import given, then
 from app.repository import database
+from app.common import utilities
 from flask import current_app
 from sqlalchemy.engine import Engine
 from sqlalchemy import event
@@ -21,6 +23,10 @@ def step_impl_reset_db(context):
         database.db.init_app(current_app)
         database.db.drop_all()
         database.db.create_all()
+
+@given("using mock party service")
+def step_impl_use_mock_party_service(context):
+    utilities.party_service = party_service_mock.PartyServiceMock
 
 
 @then("an etag should be sent with the draft")

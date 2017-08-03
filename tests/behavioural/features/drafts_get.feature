@@ -2,6 +2,7 @@ Feature: Get Drafts
 
   Background: Reset database
     Given database is reset
+    And   using mock party service
 
   Scenario: User requests list of drafts
     Given the user has created and saved multiple drafts
