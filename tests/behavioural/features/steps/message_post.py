@@ -1,20 +1,19 @@
 import nose.tools
 from flask import json
 from behave import given, then, when
-from app import constants
 from app.application import app
 from app.repository import database
 from app.common.alerts import AlertUser, AlertViaGovNotify
 from app.authentication.jwt import encode
 from app.authentication.jwe import Encrypter
-from app import settings
+from app import settings, constants
 from flask import current_app
 from unittest import mock
 
 
 url = "http://localhost:5050/message/send"
 token_data = {
-            "user_uuid": "000000000",
+            constants.USER_IDENTIFIER: "000000000",
             "role": "internal"
         }
 
@@ -93,7 +92,7 @@ def step_impl_a_message_is_a_draft_reply(context):
                  'ru_id': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc',
                  'survey': 'BRES'})
 
-    token_data['user_uuid'] = data['msg_from']
+    token_data[constants.USER_IDENTIFIER] = data['msg_from']
     token_data['role'] = 'respondent'
     headers['Authorization'] = update_encrypted_jwt()
 
@@ -190,7 +189,7 @@ def step_impl_draft_message_posted(context):
     if 'msg_id' in data:
         del data['msg_id']
 
-    token_data['user_uuid'] = data['msg_from']
+    token_data[constants.USER_IDENTIFIER] = data['msg_from']
     token_data['role'] = 'respondent'
     headers['Authorization'] = update_encrypted_jwt()
     context.post_draft = app.test_client().post("http://localhost:5050/draft/save", data=json.dumps(data),
@@ -212,7 +211,7 @@ def step_impl_draft_message_posted(context):
                        'ru_id': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc',
                        'survey': 'BRES'}
 
-    token_data['user_uuid'] = context.message['msg_from']
+    token_data[constants.USER_IDENTIFIER] = context.message['msg_from']
     token_data['role'] = 'respondent'
     headers['Authorization'] = update_encrypted_jwt()
     context.response = app.test_client().post(url, data=json.dumps(context.message), headers=headers)
@@ -234,7 +233,7 @@ def step_impl_another_user_sends_same_message(context):
     data['subject'] = 'edited'
     headers['Etag'] = context.etag
 
-    token_data['user_uuid'] = '0a7ad740-10d5-4ecb-b7ca-3c0384afb882'
+    token_data[constants.USER_IDENTIFIER] = '0a7ad740-10d5-4ecb-b7ca-3c0384afb882'
     token_data['role'] = 'respondent'
     headers['Authorization'] = update_encrypted_jwt()
     context.response = app.test_client().post(url.format(context.msg_id),
@@ -260,7 +259,7 @@ def step_impl_message_sent_no_etag(context):
     if 'ETag' in headers:
         del headers['ETag']
 
-    token_data['user_uuid'] = context.msg['msg_from']
+    token_data[constants.USER_IDENTIFIER] = context.msg['msg_from']
     token_data['role'] = 'respondent'
     headers['Authorization'] = update_encrypted_jwt()
 
@@ -285,7 +284,7 @@ def step_impl_msg_to_string(context):
 # Common Steps: used in multiple scenarios
 @given('a message is identified as a draft')
 def step_impl_a_message_is_a_draft(context):
-    token_data['user_uuid'] = '01b51fcc-ed43-4cdb-ad1c-450f9986859b'
+    token_data[constants.USER_IDENTIFIER] = '01b51fcc-ed43-4cdb-ad1c-450f9986859b'
     token_data['role'] = 'respondent'
     headers['Authorization'] = update_encrypted_jwt()
     context.post_draft = app.test_client().post("http://localhost:5050/draft/save", data=json.dumps(data),
@@ -306,7 +305,7 @@ def step_impl_a_message_is_a_draft(context):
 
 @when("the message is sent with msg_to string")
 def step_impl_message_is_sent(context):
-    token_data['user_uuid'] = data['msg_from']
+    token_data[constants.USER_IDENTIFIER] = data['msg_from']
     token_data['role'] = 'respondent'
     headers['Authorization'] = update_encrypted_jwt()
     context.response = app.test_client().post(url, data=json.dumps(context.message), headers=headers)
@@ -319,7 +318,7 @@ def step_impl_draft_is_sent(context):
 
 @when("the message is sent")
 def step_impl_msg_is_sent(context):
-    token_data['user_uuid'] = data['msg_from']
+    token_data[constants.USER_IDENTIFIER] = data['msg_from']
     token_data['role'] = 'respondent'
     headers['Authorization'] = update_encrypted_jwt()
     context.response = app.test_client().post(url, data=json.dumps(data), headers=headers)

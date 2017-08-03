@@ -1,17 +1,18 @@
 import uuid
+
 import flask
 import nose.tools
 from behave import given, then, when
 from flask import json
-from app import settings
+from app.api_mocks import party_service_mock
+from app import settings, constants
 from app.application import app
 from app.authentication.jwe import Encrypter
 from app.authentication.jwt import encode
-from app import mocked_party
 
 url = "http://localhost:5050/message/{0}"
 token_data = {
-            "user_uuid": "000000000",
+            constants.USER_IDENTIFIER: "000000000",
             "role": "internal"
         }
 
@@ -42,7 +43,7 @@ headers['Authorization'] = update_encrypted_jwt()
 # Scenario 1: Retrieve a correct message with message ID
 @when("the get request is made with a correct message id")
 def step_impl_the_get_request_is_made_with_a_correct_message_id(context):
-    token_data['user_uuid'] = '0a7ad740-10d5-4ecb-b7ca-3c0384afb882'
+    token_data[constants.USER_IDENTIFIER] = '0a7ad740-10d5-4ecb-b7ca-3c0384afb882'
     token_data['role'] = 'respondent'
     headers['Authorization'] = update_encrypted_jwt()
     context.response = app.test_client().get(url.format(context.msg_id), headers=headers)
@@ -51,7 +52,7 @@ def step_impl_the_get_request_is_made_with_a_correct_message_id(context):
 # Scenario 2: Retrieve a draft message
 @when('the get request is made with a draft message id')
 def step_impl_the_draft_is_requested(context):
-    token_data['user_uuid'] = '0a7ad740-10d5-4ecb-b7ca-3c0384afb882'
+    token_data[constants.USER_IDENTIFIER] = '0a7ad740-10d5-4ecb-b7ca-3c0384afb882'
     token_data['role'] = 'respondent'
     headers['Authorization'] = update_encrypted_jwt()
     context.response = app.test_client().get(url.format(context.resp_data['msg_id']), headers=headers)
@@ -74,7 +75,7 @@ def step_impl_the_get_request_has_been_made_with_incorrect_message_id(context):
 # Scenario 5: Respondent sends message and retrieves the same message with it's labels
 @when("the respondent wants to see the message")
 def step_impl_the_respondent_wants_to_see_the_message(context):
-    token_data['user_uuid'] = '0a7ad740-10d5-4ecb-b7ca-3c0384afb882'
+    token_data[constants.USER_IDENTIFIER] = '0a7ad740-10d5-4ecb-b7ca-3c0384afb882'
     token_data['role'] = 'respondent'
     headers['Authorization'] = update_encrypted_jwt()
     context.response = app.test_client().get(url.format(context.msg_id), headers=headers)
@@ -83,7 +84,7 @@ def step_impl_the_respondent_wants_to_see_the_message(context):
 # Scenario 6: Internal user sends message and retrieves the same message with it's labels
 @when("the internal user wants to see the message")
 def step_impl_the_internal_user_wants_to_see_the_message(context):
-    token_data['user_uuid'] = 'ce12b958-2a5f-44f4-a6da-861e59070a31'
+    token_data[constants.USER_IDENTIFIER] = 'ce12b958-2a5f-44f4-a6da-861e59070a31'
     token_data['role'] = 'internal'
     headers['Authorization'] = update_encrypted_jwt()
     context.response = app.test_client().get(url.format(context.msg_id), headers=headers)
@@ -103,7 +104,7 @@ def step_impl_the_retrieved_message_should_havethe_labels_inbox_and_unread(conte
 def step_impl_there_is_a_message_to_be_retrieved(context):
     data['msg_to'] = ['BRES']
     data['msg_from'] = '0a7ad740-10d5-4ecb-b7ca-3c0384afb882'
-    token_data['user_uuid'] = '0a7ad740-10d5-4ecb-b7ca-3c0384afb882'
+    token_data[constants.USER_IDENTIFIER] = '0a7ad740-10d5-4ecb-b7ca-3c0384afb882'
     token_data['role'] = 'respondent'
     headers['Authorization'] = update_encrypted_jwt()
     context.response = app.test_client().post("http://localhost:5050/message/send", data=flask.json.dumps(data),
@@ -114,7 +115,7 @@ def step_impl_there_is_a_message_to_be_retrieved(context):
 
 @given('there is a draft message to be retrieved')
 def step_impl_draft_message_can_be_retrieved(context):
-    token_data['user_uuid'] = '0a7ad740-10d5-4ecb-b7ca-3c0384afb882'
+    token_data[constants.USER_IDENTIFIER] = '0a7ad740-10d5-4ecb-b7ca-3c0384afb882'
     token_data['role'] = 'respondent'
     headers['Authorization'] = update_encrypted_jwt()
     data.update({'msg_from': '0a7ad740-10d5-4ecb-b7ca-3c0384afb882',
@@ -134,7 +135,7 @@ def step_impl_draft_message_can_be_retrieved(context):
 def step_impl_an_internal_user_sends_a_message(context):
     data['msg_to'] = ['0a7ad740-10d5-4ecb-b7ca-3c0384afb882']
     data['msg_from'] = 'BRES'
-    token_data['user_uuid'] = 'ce12b958-2a5f-44f4-a6da-861e59070a31'
+    token_data[constants.USER_IDENTIFIER] = 'ce12b958-2a5f-44f4-a6da-861e59070a31'
     token_data['role'] = 'internal'
     headers['Authorization'] = update_encrypted_jwt()
     context.response = app.test_client().post("http://localhost:5050/message/send",
@@ -156,7 +157,7 @@ def step_impl_a_respondent_sends_a_message(context):
 @then("returned message field msg_to is correct")
 def step_impl_correct_msg_to_returned(context):
     msg_resp = json.loads(context.response.data)
-    msg_to = mocked_party.respondent_ids[data['msg_to'][0]]
+    msg_to = party_service_mock.respondent_ids[data['msg_to'][0]]
     nose.tools.assert_equal(msg_resp['msg_to'], [data['msg_to'][0]])
     nose.tools.assert_equal(msg_resp['@msg_to'], [msg_to])
 
@@ -164,7 +165,7 @@ def step_impl_correct_msg_to_returned(context):
 @then("returned message field msg_from is correct")
 def step_impl_correct_msg_from_returned(context):
     msg_resp = json.loads(context.response.data)
-    msg_from = mocked_party.respondent_ids[data['msg_from']]
+    msg_from = party_service_mock.respondent_ids[data['msg_from']]
     nose.tools.assert_equal(msg_resp['@msg_from'], msg_from)
     nose.tools.assert_equal(msg_resp['msg_from'], data['msg_from'])
 

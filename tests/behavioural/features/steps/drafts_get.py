@@ -4,13 +4,13 @@ from behave import given, then, when
 from app.application import app
 from app.authentication.jwt import encode
 from app.authentication.jwe import Encrypter
-from app import settings
+from app import settings, constants
 from flask import json
 
 
 url = "http://localhost:5050/drafts"
 token_data = {
-            "user_uuid": "0a7ad740-10d5-4ecb-b7ca-3c0384afb882",
+            constants.USER_IDENTIFIER: "0a7ad740-10d5-4ecb-b7ca-3c0384afb882",
             "role": "respondent"
         }
 

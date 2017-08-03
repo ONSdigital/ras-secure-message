@@ -4,7 +4,7 @@ from datetime import datetime, timezone
 from flask import current_app, json
 from sqlalchemy import create_engine, event
 from sqlalchemy.engine import Engine
-from app import application, settings
+from app import application, settings, constants
 from app.application import app
 from app.common.alerts import AlertUser, AlertViaGovNotify
 from app.repository import database
@@ -23,7 +23,7 @@ class FlaskTestCase(unittest.TestCase):
 
         AlertUser.alert_method = mock.Mock(AlertViaGovNotify)
 
-        token_data = {"user_uuid": "BRES",
+        token_data = {constants.USER_IDENTIFIER: "BRES",
                       "role": "internal"}
 
         encrypter = Encrypter(_private_key=settings.SM_USER_AUTHENTICATION_PRIVATE_KEY,
@@ -294,7 +294,7 @@ class FlaskTestCase(unittest.TestCase):
                                   'ru_id': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc',
                                   'survey': 'BRES'})
 
-        token_data = {"user_uuid": "0a7ad740-10d5-4ecb-b7ca-3c0384afb882",
+        token_data = {constants.USER_IDENTIFIER: "0a7ad740-10d5-4ecb-b7ca-3c0384afb882",
                       "role": "respondent"}
 
         encrypter = Encrypter(_private_key=settings.SM_USER_AUTHENTICATION_PRIVATE_KEY,
@@ -308,7 +308,7 @@ class FlaskTestCase(unittest.TestCase):
         save_data = json.loads(resp.data)
         msg_id = save_data['msg_id']
 
-        token_data = {"user_uuid": "BRES",
+        token_data = {constants.USER_IDENTIFIER: "BRES",
                       "role": "internal"}
 
         encrypter = Encrypter(_private_key=settings.SM_USER_AUTHENTICATION_PRIVATE_KEY,
@@ -336,7 +336,7 @@ class FlaskTestCase(unittest.TestCase):
                                   'ru_id': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc',
                                   'survey': 'BRES'})
 
-        token_data = {"user_uuid": "0a7ad740-10d5-4ecb-b7ca-3c0384afb882",
+        token_data = {constants.USER_IDENTIFIER: "0a7ad740-10d5-4ecb-b7ca-3c0384afb882",
                       "role": "respondent"}
 
         encrypter = Encrypter(_private_key=settings.SM_USER_AUTHENTICATION_PRIVATE_KEY,

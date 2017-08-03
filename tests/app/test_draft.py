@@ -6,7 +6,7 @@ from flask import current_app, json
 from sqlalchemy import create_engine, event
 from sqlalchemy.engine import Engine
 from werkzeug.exceptions import InternalServerError
-from app import application, settings
+from app import application, settings, constants
 from app.application import app
 from app.authentication.jwe import Encrypter
 from app.authentication.jwt import encode
@@ -31,7 +31,7 @@ class DraftTestCase(unittest.TestCase):
         app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:////tmp/messages.db'
         self.engine = create_engine('sqlite:////tmp/messages.db')
         token_data = {
-            "user_uuid": "BRES",
+            constants.USER_IDENTIFIER: "BRES",
             "role": "internal"
         }
         encrypter = Encrypter(_private_key=settings.SM_USER_AUTHENTICATION_PRIVATE_KEY,

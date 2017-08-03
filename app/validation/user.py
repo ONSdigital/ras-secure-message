@@ -1,4 +1,4 @@
-from app import mocked_party
+from app.api_mocks import party_service_mock
 
 
 class User:
@@ -22,6 +22,6 @@ class User:
     @staticmethod
     def is_valid_user(uuid):
 
-        response = mocked_party.user_details_endpoint(uuid)
+        response = party_service_mock.user_details_endpoint(uuid)
 
         return response.status_code == 200

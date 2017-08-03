@@ -31,6 +31,9 @@ respondent_ids['ce12b958-2a5f-44f4-a6da-861e59070a32'] = {"id": "ce12b958-2a5f-4
                                                           "email": "ilarue47@yopmail.com", "telephone": "+443069990250", "status": "ACTIVE"}
 
 
+respondent_ids['db036fd7-ce17-40c2-a8fc-932e7c228397'] = {"id": "db036fd7-ce17-40c2-a8fc-932e7c228397", "firstname" : "Peter", "surname" : "Smith",
+                                                            "email": "peter.smith@hostmail.com", "telephone" : "+447894056785", "status" : "ACTIVE"}
+
 def business_details_endpoint(ru):
     try:
         return Response(response=json.dumps(business_details[ru]), status=200, mimetype="text/html")
