@@ -1,18 +1,15 @@
 import hashlib
 import logging
-
 from flask import json
 from flask import jsonify
 from structlog import wrap_logger
 from werkzeug.exceptions import ExpectationFailed
+from app.services.service_toggles import party
 
-from app.api_mocks.party_service_mock import PartyServiceMock
-from app.services.party_service import PartyService
 from app.constants import MESSAGE_BY_ID_ENDPOINT, MESSAGE_LIST_ENDPOINT, MESSAGE_QUERY_LIMIT
 
 logger = wrap_logger(logging.getLogger(__name__))
 
-party_service = PartyService    #Can be overriden during tests , else will use this
 
 def get_options(args):
     """extract options"""
@@ -120,7 +117,7 @@ def get_business_details_by_ru(rus):
 
     for x in rus:
 
-        detail = party_service().get_business_details(x)
+        detail = party.get_business_details(x)
 
         if detail.status_code == 200:
             details.append(json.loads(detail.data))
@@ -136,7 +133,7 @@ def get_details_by_uuids(uuids):
     respondent_details = []
     for uuid in uuids:
 
-        detail = party_service().get_user_details(uuid)
+        detail = party.get_user_details(uuid)
 
         if detail.status_code == 200:
             respondent_details.append(json.loads(detail.data))

@@ -1,6 +1,6 @@
 import nose.tools
 from app.application import app
-from app.api_mocks import party_service_mock
+from app.services.service_toggles import party
 from behave import given, then
 from app.repository import database
 from app.common import utilities
@@ -26,7 +26,7 @@ def step_impl_reset_db(context):
 
 @given("using mock party service")
 def step_impl_use_mock_party_service(context):
-    utilities.party_service = party_service_mock.PartyServiceMock
+    party.use_mock_service()
 
 
 @then("an etag should be sent with the draft")

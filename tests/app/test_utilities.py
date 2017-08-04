@@ -11,6 +11,7 @@ from app.repository.retriever import Retriever
 from app.constants import MESSAGE_QUERY_LIMIT
 from app.validation.user import User
 from tests.app.test_retriever import RetrieverTestCaseHelper
+from app.services.service_toggles import party
 
 
 class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
@@ -27,6 +28,7 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
             database.db.drop_all()
             database.db.create_all()
             self.db = database.db
+        party.use_mock_service()
 
         self.user = User('0a7ad740-10d5-4ecb-b7ca-3c0384afb882', 'respondent')
 

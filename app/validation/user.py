@@ -1,4 +1,5 @@
 from app.api_mocks import party_service_mock
+from app.services.service_toggles import party
 
 
 class User:
@@ -21,5 +22,5 @@ class User:
 
     @staticmethod
     def is_valid_user(uuid):
-        response = party_service_mock.PartyServiceMock().get_user_details(uuid)
+        response = party.get_user_details(uuid)
         return response.status_code == 200

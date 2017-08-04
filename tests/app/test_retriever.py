@@ -9,6 +9,7 @@ from app.application import app
 from app.repository import database
 from app.repository.retriever import Retriever
 from app.constants import MESSAGE_QUERY_LIMIT
+from app.services.service_toggles import party
 
 from app.validation.user import User
 
@@ -180,6 +181,7 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
 
         self.user_internal = User('ce12b958-2a5f-44f4-a6da-861e59070a31', 'internal')
         self.user_respondent = User('0a7ad740-10d5-4ecb-b7ca-3c0384afb882', 'respondent')
+        party.use_mock_service()
 
     @event.listens_for(Engine, "connect")
     def set_sqlite_pragma(dbapi_connection, connection_record):
