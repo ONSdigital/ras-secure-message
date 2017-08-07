@@ -133,13 +133,11 @@ class MessageModifyById(Resource):
         """Update message by status"""
 
         request_data = request.get_json()
-
         action, label = MessageModifyById._validate_request(request_data)
-
         message = Retriever().retrieve_message(message_id, g.user)
 
         if label == Labels.UNREAD.value:
-            resp = MessageModifyById._modify_unread(action, message, g.user)
+            resp = MessageModifyById._try_modify_unread(action, message, g.user)
         else:
             resp = MessageModifyById._modify_label(action, message, g.user, label)
 
@@ -164,7 +162,10 @@ class MessageModifyById(Resource):
             return False
 
     @staticmethod
-    def _modify_unread(action, message, user):
+    def _try_modify_unread(action, message, user):
+        """Used to validate that the label can be modified to read"""
+        if message['msg_to'][0] != user.user_uuid:
+            return False
         if action == 'add':
             return Modifier.add_unread(message, user)
         return Modifier.del_unread(message, user)
