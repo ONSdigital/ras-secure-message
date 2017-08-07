@@ -185,12 +185,12 @@ class DraftSchema(Schema):
     @validates("body")
     def validate_body(self, body):
         if body is not None:
-            self.validate_field_length(body, len(body), constants.MAX_BODY_LEN)
+            self.validate_field_length('body', len(body), constants.MAX_BODY_LEN, body)
 
     @validates("subject")
     def validate_subject(self, subject):
         if subject is not None:
-            self.validate_field_length(subject, len(subject), constants.MAX_SUBJECT_LEN)
+            self.validate_field_length('subject', len(subject), constants.MAX_SUBJECT_LEN, subject)
 
     @validates("thread_id")
     def validate_thread_id(self, thread_id):
@@ -219,7 +219,7 @@ class DraftSchema(Schema):
         return Message(**data)
 
     @staticmethod
-    def validate_field_length(field_name, length, max_field_len):
+    def validate_field_length(field_name, length, max_field_len, data=None):
         if length > max_field_len:
             logger.debug("{0} field is too large {1}  max size: {2}".format(field_name, length, max_field_len))
-            raise ValidationError('{0} field length must not be greater than {1}.'.format(field_name, max_field_len))
+            raise ValidationError('{0} field length must not be greater than {1}.'.format(field_name, max_field_len), field_name, [], data)
