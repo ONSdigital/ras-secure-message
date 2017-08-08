@@ -1,4 +1,5 @@
 import logging
+from flask import jsonify
 from structlog import wrap_logger
 from werkzeug.exceptions import InternalServerError
 from app.common.labels import Labels
@@ -67,6 +68,10 @@ class Modifier:
             else:
                 Modifier.add_label(unread, message, user)
                 return True
+        else:
+            res = jsonify({'status': 'error'})
+            res.status_code = 400
+            return res
 
     @staticmethod
     def del_unread(message, user):
