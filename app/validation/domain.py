@@ -65,14 +65,14 @@ class MessageSchema(Schema):
             raise ValidationError("msg_to and msg_from fields can not be the same.")
 
     # TODO: Validate UUID with mock party
-    @validates('msg_to')
+    @validates("msg_to")
     def validate_to(self, msg_to):
         for item in msg_to:
             self.validate_non_zero_field_length("msg_to", len(item), constants.MAX_TO_LEN)
             if msg_to != 'BRES' and not User.is_valid_user(item):
                 raise ValidationError("{0} is not a valid user.".format(item))
 
-    @validates('msg_from')
+    @validates("msg_from")
     def validate_from(self, msg_from):
         self.validate_non_zero_field_length("msg_from", len(msg_from), constants.MAX_FROM_LEN)
         if g.user.is_internal and msg_from != 'BRES':
@@ -82,13 +82,13 @@ class MessageSchema(Schema):
             raise ValidationError('You are not authorised to send a message on behalf of user or work group {0}'
                                   .format(msg_from))
 
-    @validates('body')
+    @validates("body")
     def validate_body(self, body):
         self.validate_non_zero_field_length("Body", len(body), constants.MAX_BODY_LEN)
 
-    @validates('subject')
+    @validates("subject")
     def validate_subject(self, subject):
-        self.validate_field_length("Subject", len(subject), constants.MAX_SUBJECT_LEN)
+        self.validate_field_length("Subject", len(subject), constants.MAX_SUBJECT_LEN, subject)
 
     @validates("thread_id")
     def validate_thread(self, thread_id):
@@ -128,11 +128,10 @@ class MessageSchema(Schema):
         self.validate_field_length(field_name, length, max_field_len)
 
     @staticmethod
-    def validate_field_length(field_name, length, max_field_len):
+    def validate_field_length(field_name, length, max_field_len, data=None):
         if length > max_field_len:
             logger.debug("{0} field is too large {1}  max size: {2}".format(field_name, length, max_field_len))
-            raise ValidationError('{0} field length must not be greater than {1}.'.format(field_name, max_field_len))
-
+            raise ValidationError('{0} field length must not be greater than {1}.'.format(field_name, max_field_len), field_name, [], data)
 
 class DraftSchema(Schema):
     """Class to marshal JSON to Draft"""
@@ -185,21 +184,21 @@ class DraftSchema(Schema):
     @validates("body")
     def validate_body(self, body):
         if body is not None:
-            self.validate_field_length(body, len(body), constants.MAX_BODY_LEN)
+            self.validate_field_length("Body", len(body), constants.MAX_BODY_LEN, body)
 
     @validates("subject")
     def validate_subject(self, subject):
         if subject is not None:
-            self.validate_field_length(subject, len(subject), constants.MAX_SUBJECT_LEN)
+            self.validate_field_length("Subject", len(subject), constants.MAX_SUBJECT_LEN, subject)
 
     @validates("thread_id")
     def validate_thread_id(self, thread_id):
         if thread_id is not None:
-            self.validate_field_length(thread_id, len(thread_id), constants.MAX_THREAD_LEN)
+            self.validate_field_length("Thread", len(thread_id), constants.MAX_THREAD_LEN)
 
     @validates("survey")
     def validate_survey(self, survey):
-        self.validate_field_length(survey, len(survey), constants.MAX_SURVEY_LEN)
+        self.validate_field_length("Survey", len(survey), constants.MAX_SURVEY_LEN)
 
     @validates("collection_case")
     def validate_collection_case(self, collection_case):
@@ -219,7 +218,7 @@ class DraftSchema(Schema):
         return Message(**data)
 
     @staticmethod
-    def validate_field_length(field_name, length, max_field_len):
+    def validate_field_length(field_name, length, max_field_len, data=None):
         if length > max_field_len:
             logger.debug("{0} field is too large {1}  max size: {2}".format(field_name, length, max_field_len))
-            raise ValidationError('{0} field length must not be greater than {1}.'.format(field_name, max_field_len))
+            raise ValidationError('{0} field length must not be greater than {1}.'.format(field_name, max_field_len), field_name, [], data)
