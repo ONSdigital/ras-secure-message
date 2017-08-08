@@ -84,11 +84,11 @@ class MessageSchema(Schema):
 
     @validates("body")
     def validate_body(self, body):
-        self.validate_non_zero_field_length("Body", len(body), constants.MAX_BODY_LEN)
+        self.validate_field_length("Body", len(body), constants.MAX_BODY_LEN, body)
 
     @validates("subject")
     def validate_subject(self, subject):
-        self.validate_field_length("Subject", len(subject), constants.MAX_SUBJECT_LEN)
+        self.validate_field_length("Subject", len(subject), constants.MAX_SUBJECT_LEN, subject)
 
     @validates("thread_id")
     def validate_thread(self, thread_id):
@@ -128,11 +128,10 @@ class MessageSchema(Schema):
         self.validate_field_length(field_name, length, max_field_len)
 
     @staticmethod
-    def validate_field_length(field_name, length, max_field_len):
+    def validate_field_length(field_name, length, max_field_len, data=None):
         if length > max_field_len:
             logger.debug("{0} field is too large {1}  max size: {2}".format(field_name, length, max_field_len))
-            raise ValidationError('{0} field length must not be greater than {1}.'.format(field_name, max_field_len))
-
+            raise ValidationError('{0} field length must not be greater than {1}.'.format(field_name, max_field_len), field_name, [], data)
 
 class DraftSchema(Schema):
     """Class to marshal JSON to Draft"""
