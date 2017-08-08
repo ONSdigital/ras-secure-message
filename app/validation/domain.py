@@ -84,7 +84,7 @@ class MessageSchema(Schema):
 
     @validates("body")
     def validate_body(self, body):
-        self.validate_field_length("Body", len(body), constants.MAX_BODY_LEN, body)
+        self.validate_non_zero_field_length("Body", len(body), constants.MAX_BODY_LEN)
 
     @validates("subject")
     def validate_subject(self, subject):
