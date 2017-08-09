@@ -1,6 +1,7 @@
 import logging
 from flask import Response
 from flask import json
+from app import constants
 
 logger = logging.getLogger(__name__)
 
@@ -8,6 +9,7 @@ logger = logging.getLogger(__name__)
 class PartyServiceMock:
 
     def get_business_details(self, ru):
+        """Return mock business details"""
         try:
             return Response(response=json.dumps(self._business_details[ru]), status=200, mimetype="text/html")
         except KeyError:
@@ -16,6 +18,7 @@ class PartyServiceMock:
                             mimetype="text/html")
 
     def get_user_details(self, uuid):
+        """Return mock user details"""
         try:
             return Response(response=json.dumps(self._respondent_ids[uuid]), status=200, mimetype="text/html")
         except KeyError:
@@ -68,13 +71,13 @@ class PartyServiceMock:
                                                                 "telephone": "+443069990250",
                                                                 "status": "ACTIVE",
                                                                 "sampleUnitType": "BI"},
-                       'BRES':                                 {"id": "BRES",
-                                                                "firstName": "BRES",
-                                                                "lastName": "",
-                                                                "emailAddress": "",
-                                                                "telephone": "",
-                                                                "status": "",
-                                                                "sampleUnitType": "BI"},
+                       constants.BRES_USER:                     {"id": "BRES",
+                                                                 "firstName": "BRES",
+                                                                 "lastName": "",
+                                                                 "emailAddress": "",
+                                                                 "telephone": "",
+                                                                 "status": "",
+                                                                 "sampleUnitType": "BI"},
                        'AnotherSurvey':                        {"id": "AnotherSurvey",
                                                                 "firstName": "AnotherSurvey",
                                                                 "lastName": "",

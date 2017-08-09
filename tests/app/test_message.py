@@ -1,11 +1,12 @@
 import unittest
 from datetime import datetime, timezone
-import app.constants
+from app import constants
 from app.validation.domain import Message, MessageSchema, DraftSchema
 from app.validation.user import User
 from app.application import app
 from app.constants import MAX_SUBJECT_LEN, MAX_BODY_LEN, MAX_THREAD_LEN
 from flask import g
+
 
 
 class MessageTestCase(unittest.TestCase):
@@ -226,7 +227,7 @@ class MessageSchemaTestCase(unittest.TestCase):
 
     def test_msg_from_string(self):
         """marshalling message where msg_from field is string"""
-        self.json_message['msg_to'] = ["BRES"]
+        self.json_message['msg_to'] = [constants.BRES_USER]
         self.json_message['msg_from'] = "01b51fcc-ed43-4cdb-ad1c-450f9986859b"
         with app.app_context():
             g.user = User(self.json_message['msg_from'], 'respondent')
@@ -240,7 +241,7 @@ class MessageSchemaTestCase(unittest.TestCase):
         self.json_message['msg_to'] = ["01b51fcc-ed43-4cdb-ad1c-450f9986859b"]
         self.json_message['msg_from'] = "SomeOtherWorkGroup"
         with app.app_context():
-            g.user = User("BRES", 'internal')
+            g.user = User(constants.BRES_USER, 'internal')
             schema = DraftSchema()
             errors = schema.load(self.json_message)[1]
 
@@ -249,7 +250,7 @@ class MessageSchemaTestCase(unittest.TestCase):
 
     def test_msg_from_validation_respondent(self):
         """marshalling message where msg_from field is a respondent and msg_from is not equal to uuid in token"""
-        self.json_message['msg_to'] = ["BRES"]
+        self.json_message['msg_to'] = [constants.BRES_USER]
         self.json_message['msg_from'] = "6779kgh83-ed43-474b-ad1c-500f5287439a"
         with app.app_context():
             g.user = User("01b51fcc-ed43-4cdb-ad1c-450f9986859b", 'respondent')

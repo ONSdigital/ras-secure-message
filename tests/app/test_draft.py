@@ -31,7 +31,7 @@ class DraftTestCase(unittest.TestCase):
         app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:////tmp/messages.db'
         self.engine = create_engine('sqlite:////tmp/messages.db')
         token_data = {
-            constants.USER_IDENTIFIER: "BRES",
+            constants.USER_IDENTIFIER: constants.BRES_USER,
             "role": "internal"
         }
         encrypter = Encrypter(_private_key=settings.SM_USER_AUTHENTICATION_PRIVATE_KEY,

@@ -101,7 +101,7 @@ class PartyTestCase(unittest.TestCase):
                 'body': 'hello',
                 'thread': "?",
                 'ru_id': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc',
-                'survey': "BRES"}
+                'survey': constants.BRES_SURVEY}
 
         encrypted_token = self._generate_encrypted_token()
 
@@ -144,7 +144,7 @@ class PartyTestCase(unittest.TestCase):
                 'body': 'hello',
                 'thread': "?",
                 'ru_id': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc',
-                'survey': "BRES"}
+                'survey': constants.BRES_SURVEY}
 
         self.app = application.app.test_client()
 
@@ -180,7 +180,7 @@ class PartyTestCase(unittest.TestCase):
                 'body': 'hello',
                 'thread': "?",
                 'ru_id': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc',
-                'survey': "BRES"}
+                'survey': constants.BRES_SURVEY}
 
         self.app = application.app.test_client()
 
@@ -212,7 +212,7 @@ class PartyTestCase(unittest.TestCase):
                 'body': 'hello',
                 'thread': "?",
                 'ru_id': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc',
-                'survey': "BRES"}
+                'survey': constants.BRES_SURVEY}
 
         self.app = application.app.test_client()
 
@@ -238,7 +238,7 @@ class PartyTestCase(unittest.TestCase):
                                                   'status': 'ACTIVE',
                                                   'lastName': 'Oorschot',
                                                   'sampleUnitType': 'BI'})
-            self.assertEqual(draft['@msg_to'][0], {"id": "BRES",
+            self.assertEqual(draft['@msg_to'][0], {"id": constants.BRES_SURVEY,
                                                    "firstName": "BRES",
                                                    "lastName": "",
                                                    "emailAddress": "",
@@ -275,7 +275,7 @@ class PartyTestCase(unittest.TestCase):
                 'body': 'hello',
                 'thread': "?",
                 'ru_id': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc',
-                'survey': "BRES"}
+                'survey': constants.BRES_SURVEY}
 
         self.app = application.app.test_client()
 
@@ -304,7 +304,7 @@ class PartyTestCase(unittest.TestCase):
                 'body': 'hello',
                 'thread': "?",
                 'ru_id': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc',
-                'survey': "BRES"}
+                'survey': constants.BRES_SURVEY}
 
         self.app = application.app.test_client()
 
@@ -334,7 +334,7 @@ class PartyTestCase(unittest.TestCase):
                 'body': 'hello',
                 'thread': "?",
                 'ru_id': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc',
-                'survey': "BRES"}
+                'survey': constants.BRES_SURVEY}
 
         self.app = application.app.test_client()
 
@@ -363,7 +363,7 @@ class PartyTestCase(unittest.TestCase):
                 'body': 'hello',
                 'thread': "?",
                 'ru_id': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc',
-                'survey': "BRES"}
+                'survey': constants.BRES_SURVEY}
 
         self.app = application.app.test_client()
 

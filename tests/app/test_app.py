@@ -23,7 +23,7 @@ class FlaskTestCase(unittest.TestCase):
 
         AlertUser.alert_method = mock.Mock(AlertViaGovNotify)
 
-        token_data = {constants.USER_IDENTIFIER: "BRES",
+        token_data = {constants.USER_IDENTIFIER: constants.BRES_USER,
                       "role": "internal"}
 
         encrypter = Encrypter(_private_key=settings.SM_USER_AUTHENTICATION_PRIVATE_KEY,
@@ -308,7 +308,7 @@ class FlaskTestCase(unittest.TestCase):
         save_data = json.loads(resp.data)
         msg_id = save_data['msg_id']
 
-        token_data = {constants.USER_IDENTIFIER: "BRES",
+        token_data = {constants.USER_IDENTIFIER: constants.BRES_USER,
                       "role": "internal"}
 
         encrypter = Encrypter(_private_key=settings.SM_USER_AUTHENTICATION_PRIVATE_KEY,

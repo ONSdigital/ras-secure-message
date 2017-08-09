@@ -12,7 +12,7 @@ from app import settings, constants
 
 url = "http://localhost:5050/draft/save"
 token_data = {
-            constants.USER_IDENTIFIER: "BRES",
+            constants.USER_IDENTIFIER: constants.BRES_USER,
             "role": "internal"
         }
 
