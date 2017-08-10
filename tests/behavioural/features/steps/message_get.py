@@ -26,7 +26,7 @@ data = {'msg_to': ['test'],
         'collection_case': 'collection case1',
         'collection_exercise': 'collection exercise1',
         'ru_id': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc',
-        'survey': 'BRES'}
+        'survey': constants.BRES_SURVEY}
 
 
 def update_encrypted_jwt():
@@ -102,7 +102,7 @@ def step_impl_the_retrieved_message_should_havethe_labels_inbox_and_unread(conte
 # Common Steps: used in multiple scenarios
 @given("there is a message to be retrieved")
 def step_impl_there_is_a_message_to_be_retrieved(context):
-    data['msg_to'] = ['BRES']
+    data['msg_to'] = [constants.BRES_USER]
     data['msg_from'] = '0a7ad740-10d5-4ecb-b7ca-3c0384afb882'
     token_data[constants.USER_IDENTIFIER] = '0a7ad740-10d5-4ecb-b7ca-3c0384afb882'
     token_data['role'] = 'respondent'
@@ -125,7 +125,7 @@ def step_impl_draft_message_can_be_retrieved(context):
                  'collection_case': 'collection case1',
                  'collection_exercise': 'collection exercise1',
                  'ru_id': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc',
-                 'survey': 'BRES'})
+                 'survey': constants.BRES_SURVEY})
     response = app.test_client().post("http://localhost:5050/draft/save", data=json.dumps(data),
                                       headers=headers)
     context.resp_data = json.loads(response.data)
@@ -134,7 +134,7 @@ def step_impl_draft_message_can_be_retrieved(context):
 @given("an internal user sends a message")
 def step_impl_an_internal_user_sends_a_message(context):
     data['msg_to'] = ['0a7ad740-10d5-4ecb-b7ca-3c0384afb882']
-    data['msg_from'] = 'BRES'
+    data['msg_from'] = constants.BRES_USER
     token_data[constants.USER_IDENTIFIER] = 'ce12b958-2a5f-44f4-a6da-861e59070a31'
     token_data['role'] = 'internal'
     headers['Authorization'] = update_encrypted_jwt()

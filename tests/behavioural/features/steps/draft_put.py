@@ -22,7 +22,7 @@ post_data = {'msg_to': ['ce12b958-2a5f-44f4-a6da-861e59070a31'],
              'collection_case': 'collection case1',
              'collection_exercise': 'collection exercise1',
              'ru_id': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc',
-             'survey': 'BRES'}
+             'survey': constants.BRES_SURVEY}
 
 data = {'msg_to': ['ce12b958-2a5f-44f4-a6da-861e59070a31'],
         'msg_from': '0a7ad740-10d5-4ecb-b7ca-3c0384afb882',
@@ -32,7 +32,7 @@ data = {'msg_to': ['ce12b958-2a5f-44f4-a6da-861e59070a31'],
         'collection_case': 'collection case1',
         'collection_exercise': 'collection exercise1',
         'ru_id': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc',
-        'survey': 'BRES'}
+        'survey': constants.BRES_SURVEY}
 
 
 with app.app_context():
@@ -52,7 +52,7 @@ def update_encrypted_jwt():
 def before_scenario(context):
     headers['Authorization'] = update_encrypted_jwt()
 
-    post_data.update({'msg_to': ['BRES'],
+    post_data.update({'msg_to': [constants.BRES_USER],
                       'msg_from': '0a7ad740-10d5-4ecb-b7ca-3c0384afb882',
                       'subject': 'test',
                       'body': 'Test',
@@ -60,9 +60,9 @@ def before_scenario(context):
                       'collection_case': 'collection case1',
                       'collection_exercise': 'collection exercise1',
                       'ru_id': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc',
-                      'survey': 'BRES'})
+                      'survey': constants.BRES_SURVEY})
 
-    data.update({'msg_to': ['BRES'],
+    data.update({'msg_to': [constants.BRES_USER],
                  'msg_from': '0a7ad740-10d5-4ecb-b7ca-3c0384afb882',
                  'subject': 'test',
                  'body': 'Test',
@@ -70,7 +70,7 @@ def before_scenario(context):
                  'collection_case': 'collection case1',
                  'collection_exercise': 'collection exercise1',
                  'ru_id': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc',
-                 'survey': 'BRES'})
+                 'survey': constants.BRES_SURVEY})
 
 
 # Scenario 1: A user edits a previously saved draft
@@ -83,14 +83,14 @@ def step_impl_user_edits_saved_draft(context):
     get_draft = app.test_client().get('http://localhost:5050/draft/{0}'.format(context.msg_id), headers=headers)
     context.etag = get_draft.headers.get('ETag')
     data.update({'msg_id': context.msg_id,
-                 'msg_to': ['BRES'],
+                 'msg_to': [constants.BRES_USER],
                  'msg_from': '0a7ad740-10d5-4ecb-b7ca-3c0384afb882',
                  'subject': 'test',
                  'body': 'Test',
                  'collection_case': 'collection case1',
                  'collection_exercise': 'collection exercise1',
                  'ru_id': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc',
-                 'survey': 'BRES'})
+                 'survey': constants.BRES_SURVEY})
     data['body'] = 'replaced'
 
 
@@ -111,7 +111,7 @@ def step_impl_user_edits_saved_draft_apostrophe(context):
                  'collection_case': 'collection case1',
                  'collection_exercise': 'collection exercise1',
                  'ru_id': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc',
-                 'survey': 'BRES'})
+                 'survey': constants.BRES_SURVEY})
     data['body'] = 'replaced'
 
 
@@ -146,7 +146,7 @@ def step_impl_user_edits_saved_draft_no_formatting_and_msg_to(context):
 @given('a user edits a non-existing draft')
 def step_impl_user_edits_non_existant_draft(context):
     data.update({'msg_id': '001',
-                 'msg_to': ['BRES'],
+                 'msg_to': [constants.BRES_USER],
                  'msg_from': '0a7ad740-10d5-4ecb-b7ca-3c0384afb882',
                  'subject': 'test',
                  'body': 'Test',
@@ -154,7 +154,7 @@ def step_impl_user_edits_non_existant_draft(context):
                  'collection_case': 'collection case1',
                  'collection_exercise': 'collection_exercise1',
                  'ru_id': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc',
-                 'survey': 'BRES'})
+                 'survey': constants.BRES_SURVEY})
 
     data['body'] = 'replaced'
     context.msg_id = data['msg_id']
@@ -168,7 +168,7 @@ def step_impl_modifies_draft_to_attribute_too_big(context):
     post_resp = json.loads(add_draft.data)
     context.msg_id = post_resp['msg_id']
     data.update({'msg_id': context.msg_id,
-                 'msg_to': ['BRES'],
+                 'msg_to': [constants.BRES_USER],
                  'msg_from': '0a7ad740-10d5-4ecb-b7ca-3c0384afb882',
                  'subject': 'test',
                  'body': 'Test',
@@ -188,7 +188,7 @@ def step_impl_user_modifies_draft_from_attribute_too_big(context):
     post_resp = json.loads(add_draft.data)
     context.msg_id = post_resp['msg_id']
     data.update({'msg_id': context.msg_id,
-                 'msg_to': ['BRES'],
+                 'msg_to': [constants.BRES_USER],
                  'msg_from': '0a7ad740-10d5-4ecb-b7ca-3c0384afb882',
                  'subject': 'test',
                  'body': 'Test',
@@ -208,7 +208,7 @@ def step_impl_user_modifies_draft_body_attribute_too_big(context):
     post_resp = json.loads(add_draft.data)
     context.msg_id = post_resp['msg_id']
     data.update({'msg_id': context.msg_id,
-                 'msg_to': ['BRES'],
+                 'msg_to': [constants.BRES_USER],
                  'msg_from': '0a7ad740-10d5-4ecb-b7ca-3c0384afb882',
                  'subject': 'test',
                  'body': 'Test',
@@ -228,7 +228,7 @@ def step_impl_user_modifies_draft_subject_attribute_too_big(context):
     post_resp = json.loads(add_draft.data)
     context.msg_id = post_resp['msg_id']
     data.update({'msg_id': context.msg_id,
-                 'msg_to': ['BRES'],
+                 'msg_to': [constants.BRES_USER],
                  'msg_from': '0a7ad740-10d5-4ecb-b7ca-3c0384afb882',
                  'subject': 'test',
                  'body': 'Test',
@@ -236,7 +236,7 @@ def step_impl_user_modifies_draft_subject_attribute_too_big(context):
                  'collection_case': 'collection case1',
                  'collection_exercise': 'collection exercise1',
                  'ru_id': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc',
-                 'survey': 'BRES'})
+                 'survey': constants.BRES_SURVEY})
     data['subject'] = 'x' * (constants.MAX_SUBJECT_LEN+1)
 
 
@@ -250,7 +250,7 @@ def step_impl_user_modifies_draft_no_to_attribute(context):
     get_draft = app.test_client().get('http://localhost:5050/draft/{0}'.format(context.msg_id), headers=headers)
     context.etag = get_draft.headers.get('ETag')
     data.update({'msg_id': context.msg_id,
-                 'msg_to': ['BRES'],
+                 'msg_to': [constants.BRES_USER],
                  'msg_from': '0a7ad740-10d5-4ecb-b7ca-3c0384afb882',
                  'subject': 'test',
                  'body': 'Test',
@@ -258,7 +258,7 @@ def step_impl_user_modifies_draft_no_to_attribute(context):
                  'collection_case': 'collection case1',
                  'collection_exercise': 'collection exercise1',
                  'ru_id': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc',
-                 'survey': 'BRES'})
+                 'survey': constants.BRES_SURVEY})
     data.pop('msg_to')
 
 
@@ -272,7 +272,7 @@ def step_impl_user_modifies_draft_no_body(context):
     get_draft = app.test_client().get('http://localhost:5050/draft/{0}'.format(context.msg_id), headers=headers)
     context.etag = get_draft.headers.get('ETag')
     data.update({'msg_id': context.msg_id,
-                 'msg_to': ['BRES'],
+                 'msg_to': [constants.BRES_USER],
                  'msg_from': '0a7ad740-10d5-4ecb-b7ca-3c0384afb882',
                  'subject': 'test',
                  'body': 'Test',
@@ -280,7 +280,7 @@ def step_impl_user_modifies_draft_no_body(context):
                  'collection_case': 'collection case1',
                  'collection_exercise': 'collection exercise1',
                  'ru_id': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc',
-                 'survey': 'BRES'})
+                 'survey': constants.BRES_SURVEY})
     data['body'] = ''
 
 
@@ -294,7 +294,7 @@ def step_impl_user_modifies_draft_no_subject(context):
     get_draft = app.test_client().get('http://localhost:5050/draft/{0}'.format(context.msg_id), headers=headers)
     context.etag = get_draft.headers.get('ETag')
     data.update({'msg_id': context.msg_id,
-                 'msg_to': ['BRES'],
+                 'msg_to': [constants.BRES_USER],
                  'msg_from': '0a7ad740-10d5-4ecb-b7ca-3c0384afb882',
                  'subject': 'test',
                  'body': 'Test',
@@ -302,7 +302,7 @@ def step_impl_user_modifies_draft_no_subject(context):
                  'collection_case': 'collection case1',
                  'collcetion_exercise': 'collection exercise1',
                  'ru_id': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc',
-                 'survey': 'BRES'})
+                 'survey': constants.BRES_SURVEY})
     data['subject'] = ''
 
 
@@ -316,7 +316,7 @@ def step_impluser_modifies_draft_no_thread_id(context):
     get_draft = app.test_client().get('http://localhost:5050/draft/{0}'.format(context.msg_id), headers=headers)
     context.etag = get_draft.headers.get('ETag')
     data.update({'msg_id': context.msg_id,
-                 'msg_to': ['BRES'],
+                 'msg_to': [constants.BRES_USER],
                  'msg_from': '0a7ad740-10d5-4ecb-b7ca-3c0384afb882',
                  'subject': 'test',
                  'body': 'Test',
@@ -324,7 +324,7 @@ def step_impluser_modifies_draft_no_thread_id(context):
                  'collection_case': 'collection case1',
                  'collection_exerise': 'collection exercise1',
                  'ru_id': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc',
-                 'survey': 'BRES'})
+                 'survey': constants.BRES_SURVEY})
     data['thread_id'] = ''
 
 
@@ -336,7 +336,7 @@ def step_impl_user_modifies_draft_with_mismatched_msg_id(context):
     post_resp = json.loads(add_draft.data)
     context.msg_id = post_resp['msg_id']
     data.update({'msg_id': '0000-0000-0000-0000',
-                 'msg_to': ['BRES'],
+                 'msg_to': [constants.BRES_USER],
                  'msg_from': '0a7ad740-10d5-4ecb-b7ca-3c0384afb882',
                  'subject': 'test',
                  'body': 'Test',
@@ -344,14 +344,14 @@ def step_impl_user_modifies_draft_with_mismatched_msg_id(context):
                  'collection_case': 'collection case1',
                  'collection_exercise': 'collection exercise1',
                  'ru_id': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc',
-                 'survey': 'BRES'})
+                 'survey': constants.BRES_SURVEY})
 
 
 # Scenario 15: User retrieves etag from the header when modifying a draft
 @when('the user modifies the draft')
 def step_impl_the_user_modifies_the_draft(context):
     data.update({'msg_id': context.msg_id,
-                 'msg_to': ['BRES'],
+                 'msg_to': [constants.BRES_USER],
                  'msg_from': '0a7ad740-10d5-4ecb-b7ca-3c0384afb882',
                  'subject': 'test',
                  'body': 'Edited',
@@ -359,7 +359,7 @@ def step_impl_the_user_modifies_the_draft(context):
                  'collection_case': 'collection case1',
                  'collection_exercise': 'collection exercise1',
                  'ru_id': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc',
-                 'survey': 'BRES'})
+                 'survey': constants.BRES_SURVEY})
 
     if 'ETag' in headers:
         del headers['ETag']
@@ -387,7 +387,7 @@ def step_impl_draft_message_is_being_edited(context):
                                           headers=headers)
         context.etag = get_draft.headers.get('ETag')
         data.update({'msg_id': context.msg_id,
-                     'msg_to': ['BRES'],
+                     'msg_to': [constants.BRES_USER],
                      'msg_from': '0a7ad740-10d5-4ecb-b7ca-3c0384afb882',
                      'subject': 'test',
                      'body': 'test',
@@ -395,7 +395,7 @@ def step_impl_draft_message_is_being_edited(context):
                      'collection_case': 'collection case1',
                      'collection_exercise': 'collection exercise1',
                      'ru_id': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc',
-                     'survey': 'BRES'})
+                     'survey': constants.BRES_SURVEY})
         data['body'] = ''
         headers['ETag'] = context.etag
         context.response = app.test_client().put(url.format(context.msg_id),
@@ -405,7 +405,7 @@ def step_impl_draft_message_is_being_edited(context):
 @when("another user tries to modify the same draft message")
 def step_impl_another_user_tries_to_modify_same_draft(context):
     data.update({'msg_id': context.msg_id,
-                 'msg_to': ['BRES'],
+                 'msg_to': [constants.BRES_USER],
                  'msg_from': '0a7ad740-10d5-4ecb-b7ca-3c0384afb882',
                  'subject': 'test',
                  'body': 'test',
@@ -413,7 +413,7 @@ def step_impl_another_user_tries_to_modify_same_draft(context):
                  'collection_case': 'collection case1',
                  'collection_exercise': 'collection exercise1',
                  'ru_id': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc',
-                 'survey': 'BRES'})
+                 'survey': constants.BRES_SURVEY})
 
     data['subject'] = 'edited'
     headers['ETag'] = context.etag
@@ -425,14 +425,14 @@ def step_impl_another_user_tries_to_modify_same_draft(context):
 @when('the user edits the draft without etag')
 def step_impl_user_saves_the_draft_without_etag(context):
     data.update({'msg_id': context.msg_id,
-                 'msg_to': ['BRES'],
+                 'msg_to': [constants.BRES_USER],
                  'msg_from': '0a7ad740-10d5-4ecb-b7ca-3c0384afb882',
                  'subject': 'test',
                  'body': 'Test',
                  'collection_case': 'collection case1',
                  'collection_exercise': 'collection exercise1',
                  'ru_id': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc',
-                 'survey': 'BRES'})
+                 'survey': constants.BRES_SURVEY})
     data['body'] = 'different'
 
     if 'ETag' in headers:

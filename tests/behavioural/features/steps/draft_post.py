@@ -43,7 +43,7 @@ with app.app_context():
 @given('a valid draft')
 def step_impl_valid_draft(context):
     data.update({'msg_to': ['0a7ad740-10d5-4ecb-b7ca-3c0384afb882'],
-                 'msg_from': 'BRES',
+                 'msg_from': constants.BRES_USER,
                  'subject': 'test',
                  'body': 'Test',
                  'thread_id': '',
@@ -58,7 +58,7 @@ def step_impl_valid_draft(context):
 @given('a draft has an body field set to empty')
 def step_impl_draft_with_empty_body(context):
     data.update({'msg_to': ['0a7ad740-10d5-4ecb-b7ca-3c0384afb882'],
-                 'msg_from': 'BRES',
+                 'msg_from': constants.BRES_USER,
                  'subject': 'test',
                  'body': '',
                  'thread_id': '',
@@ -74,7 +74,7 @@ def step_impl_draft_with_empty_body(context):
 def step_impl_draft_with_msg_id(context):
     data.update({'msg_id': 'Amsgid',
                  'msg_to': ['0a7ad740-10d5-4ecb-b7ca-3c0384afb882'],
-                 'msg_from': 'BRES',
+                 'msg_from': constants.BRES_USER,
                  'subject': 'test',
                  'body': 'Test',
                  'thread_id': '',
@@ -89,7 +89,7 @@ def step_impl_draft_with_msg_id(context):
 @given('a draft with to field too large in size')
 def step_impl_draft_with_to_field_too_large(context):
     data.update({'msg_to': ['x' * (constants.MAX_TO_LEN+1)],
-                 'msg_from': 'BRES',
+                 'msg_from': constants.BRES_USER,
                  'subject': 'test',
                  'body': 'Test',
                  'thread_id': '',
@@ -119,7 +119,7 @@ def step_impl_draft_with_from_field_too_large(context):
 @given('a draft with body field too large in size')
 def step_impl_draft_with_body_field_too_large(context):
     data.update({'msg_to': ['0a7ad740-10d5-4ecb-b7ca-3c0384afb882'],
-                 'msg_from': 'BRES',
+                 'msg_from': constants.BRES_USER,
                  'subject': 'test',
                  'body': 'x' * (constants.MAX_BODY_LEN+1),
                  'thread_id': '',
@@ -134,7 +134,7 @@ def step_impl_draft_with_body_field_too_large(context):
 @given('a draft with subject field too large in size')
 def step_impl_draft_with_subject_field_too_large(context):
     data.update({'msg_to': ['0a7ad740-10d5-4ecb-b7ca-3c0384afb882'],
-                 'msg_from': 'BRES',
+                 'msg_from': constants.BRES_USER,
                  'subject': 'x' * (constants.MAX_SUBJECT_LEN+1),
                  'body': 'Test',
                  'thread_id': '',
@@ -164,7 +164,7 @@ def step_impl_draft_with_empty_from_field(context):
 @given('a draft with a survey field set as empty')
 def step_impl_draft_with_empty_survey_field(context):
     data.update({'msg_to': ['0a7ad740-10d5-4ecb-b7ca-3c0384afb882'],
-                 'msg_from': 'BRES',
+                 'msg_from': constants.BRES_USER,
                  'subject': 'test',
                  'body': 'Test',
                  'thread_id': '',
@@ -179,7 +179,7 @@ def step_impl_draft_with_empty_survey_field(context):
 @given('a draft with collection case field too large in size')
 def step_impl_draft_with_collection_case_field_too_large(context):
     data.update({'msg_to': ['0a7ad740-10d5-4ecb-b7ca-3c0384afb882'],
-                 'msg_from': 'BRES',
+                 'msg_from': constants.BRES_USER,
                  'subject': 'test',
                  'body': 'Test',
                  'thread_id': '',
@@ -194,7 +194,7 @@ def step_impl_draft_with_collection_case_field_too_large(context):
 @given('a draft with collection exercise field too large in size')
 def step_impl_draft_with_collection_exercise_field_too_large(context):
     data.update({'msg_to': ['0a7ad740-10d5-4ecb-b7ca-3c0384afb882'],
-                 'msg_from': 'BRES',
+                 'msg_from': constants.BRES_USER,
                  'subject': 'test',
                  'body': 'Test',
                  'thread_id': '',
@@ -209,7 +209,7 @@ def step_impl_draft_with_collection_exercise_field_too_large(context):
 @given('A user creates a draft that is not associated with a thread')
 def step_impl_draft_message_withour_thread_id(context):
     data.pop('msg_id', 'Amsgid')
-    data.update({'msg_from': 'BRES',
+    data.update({'msg_from': constants.BRES_USER,
                  'subject': 'test',
                  'body': 'Test',
                  'collection_case': 'collection case1',
@@ -229,7 +229,7 @@ def step_impl_thread_id_set_as_msg_id(context):
 @given("a user creates a valid draft")
 def step_impl_user_creates_valid_draft(context):
     context.draft = {'msg_to': ['0a7ad740-10d5-4ecb-b7ca-3c0384afb882'],
-                     'msg_from': 'BRES',
+                     'msg_from': constants.BRES_USER,
                      'subject': 'test',
                      'body': 'Test',
                      'thread_id': '',

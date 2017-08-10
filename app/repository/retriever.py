@@ -6,6 +6,7 @@ from sqlalchemy.exc import SQLAlchemyError
 from werkzeug.exceptions import InternalServerError, NotFound
 from app.common.labels import Labels
 from app.repository.database import SecureMessage, Status, Events, db
+from app import constants
 
 logger = wrap_logger(logging.getLogger(__name__))
 
@@ -25,7 +26,7 @@ class Retriever:
             if survey is not None:
                 status_conditions.append(Status.actor == str(survey))
             else:
-                status_conditions.append(Status.actor == 'BRES')
+                status_conditions.append(Status.actor == constants.BRES_USER)
 
         if label is not None:
             status_conditions.append(Status.label == str(label))
@@ -77,7 +78,7 @@ class Retriever:
         if user.is_respondent:
             status_conditions.append(Status.actor == str(user.user_uuid))
         else:
-            status_conditions.append(Status.actor == 'BRES')
+            status_conditions.append(Status.actor == constants.BRES_USER)
 
         status_conditions.append(Status.label != Labels.DRAFT_INBOX.value)
 
@@ -120,7 +121,7 @@ class Retriever:
         return message
 
     @staticmethod
-    def retrieve_thread(thread_id, user, _survey='BRES'):
+    def retrieve_thread(thread_id, user, _survey=constants.BRES_SURVEY):
         """returns list of messages for thread id"""
 
         status_conditions = []

@@ -23,7 +23,7 @@ data = {'msg_to': ['0a7ad740-10d5-4ecb-b7ca-3c0384afb882'],
         'collection_case': 'collection case1',
         'collection_exercise': 'collection exercise1',
         'ru_id': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc',
-        'survey': 'BRES'}
+        'survey': constants.BRES_SURVEY}
 
 modify_data = {'action': '',
                'label': ''}
@@ -62,7 +62,7 @@ def step_impl_assert_message_is_marked_as_archived(context):
 # Scenario 2: deleting the "archived" label from a given message
 @given("the message is archived")
 def step_impl_the_message_is_archived(context):
-    data['msg_to'] = ['BRES']
+    data['msg_to'] = [constants.BRES_USER]
     data['msg_from'] = '0a7ad740-10d5-4ecb-b7ca-3c0384afb882'
     token_data[constants.USER_IDENTIFIER] = data['msg_from']
     token_data['role'] = 'respondent'
@@ -97,7 +97,7 @@ def step_impl_message_not_marked_archived(context):
 # Scenario 3: Modifying the status of the message to "unread"
 @given('a message has been read')
 def step_impl_message_has_been_read(context):
-    data['msg_to'] = ['BRES']
+    data['msg_to'] = [constants.BRES_USER]
     data['msg_from'] = '0a7ad740-10d5-4ecb-b7ca-3c0384afb882'
     token_data[constants.USER_IDENTIFIER] = '0a7ad740-10d5-4ecb-b7ca-3c0384afb882'
     token_data['role'] = 'respondent'
@@ -109,8 +109,8 @@ def step_impl_message_has_been_read(context):
 
     modify_data['action'] = 'remove'
     modify_data['label'] = 'UNREAD'
-    modify_data['msg_from'] = 'BRES'
-    token_data[constants.USER_IDENTIFIER] = 'BRES'
+    modify_data['msg_from'] = constants.BRES_USER
+    token_data[constants.USER_IDENTIFIER] = constants.BRES_USER
     token_data['role'] = 'internal'
     headers['Authorization'] = update_encrypted_jwt()
     context.response = app.test_client().put(url.format(context.msg_id),
@@ -138,7 +138,7 @@ def step_imp_check_message_is_marked_unread(context):
 def step_impl_the_message_is_marked_read(context):
     modify_data['action'] = 'remove'
     modify_data['label'] = "UNREAD"
-    token_data[constants.USER_IDENTIFIER] = 'BRES'
+    token_data[constants.USER_IDENTIFIER] = constants.BRES_USER
     token_data['role'] = 'internal'
     headers['Authorization'] = update_encrypted_jwt()
     context.response = app.test_client().put(url.format(context.msg_id),
@@ -231,7 +231,7 @@ def step_impl_no_unread_messages_returned(context):
 # Scenario 11: internal - as an internal user I want to be able to change my message from read to unread
 @given("a message with the status read is displayed to an internal user")
 def step_impl_message_with_status_read_returned(context):
-    data['msg_to'] = ['BRES']
+    data['msg_to'] = [constants.BRES_USER]
     data['msg_from'] = '0a7ad740-10d5-4ecb-b7ca-3c0384afb882'
     token_data[constants.USER_IDENTIFIER] = data['msg_from']
     token_data['role'] = 'respondent'
@@ -379,7 +379,7 @@ def step_impl_searched_for(context):
 # Scenario 17: As a user I should receive an error if I attempt to mark a message as read that is not in my inbox
 @given("a user has sent a message")
 def step_impl_a_message_is_sent(context):
-    data['msg_to'] = ['BRES']
+    data['msg_to'] = [constants.BRES_USER]
     data['msg_from'] = '0a7ad740-10d5-4ecb-b7ca-3c0384afb882'
     token_data['user_uuid'] = data['msg_from']
     token_data['role'] = 'respondent'
@@ -399,7 +399,7 @@ def step_impl_a_message_is_marked_as_read(context):
 # Common Steps: used in multiple scenarios
 @given("a valid message is sent")
 def step_impl(context):
-    data['msg_to'] = ['BRES']
+    data['msg_to'] = [constants.BRES_USER]
     data['msg_from'] = '0a7ad740-10d5-4ecb-b7ca-3c0384afb882'
     token_data[constants.USER_IDENTIFIER] = data['msg_from']
     token_data['role'] = 'respondent'
@@ -412,7 +412,7 @@ def step_impl(context):
 
 @given('a message is sent')
 def step_impl_a_message_is_sent(context):
-    data['msg_to'] = ['BRES']
+    data['msg_to'] = [constants.BRES_USER]
     data['msg_from'] = '0a7ad740-10d5-4ecb-b7ca-3c0384afb882'
     token_data[constants.USER_IDENTIFIER] = data['msg_from']
     token_data['role'] = 'respondent'
@@ -425,7 +425,7 @@ def step_impl_a_message_is_sent(context):
 @given('a message is sent from internal')
 def step_impl_a_message_is_sent(context):
     data['msg_to'] = ['0a7ad740-10d5-4ecb-b7ca-3c0384afb882']
-    data['msg_from'] = 'BRES'
+    data['msg_from'] = constants.BRES_USER
     token_data['user_uuid'] = data['msg_from']
     token_data['role'] = 'internal'
     headers['Authorization'] = update_encrypted_jwt()

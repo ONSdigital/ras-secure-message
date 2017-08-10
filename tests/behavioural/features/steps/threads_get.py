@@ -15,14 +15,14 @@ token_data = {
 headers = {'Content-Type': 'application/json', 'Authorization': ''}
 
 data = {'msg_to': ['0a7ad740-10d5-4ecb-b7ca-3c0384afb882'],
-        'msg_from': 'BRES',
+        'msg_from': constants.BRES_USER,
         'subject': 'Hello World',
         'body': 'Test',
         'thread_id': 'AConversation',
         'collection_case': 'collectioncase',
         'collection_exercise': 'collectionexercise',
         'ru_id': '7fc0e8ab-189c-4794-b8f4-9f05a1db185b',
-        'survey': 'BRES'}
+        'survey': constants.BRES_SURVEY}
 
 
 def update_encrypted_jwt():
@@ -74,12 +74,12 @@ def step_impl_respondent_and_internal_user_hav_multiple_conversations(context):
             context.response = app.test_client().post("http://localhost:5050/message/send", data=flask.json.dumps(data),
                                                       headers=headers)
 
-            token_data[constants.USER_IDENTIFIER] = 'BRES'
+            token_data[constants.USER_IDENTIFIER] = constants.BRES_USER
             token_data['role'] = 'internal'
             headers['Authorization'] = update_encrypted_jwt()
 
             data['msg_to'] = ['0a7ad740-10d5-4ecb-b7ca-3c0384afb882']
-            data['msg_from'] = 'BRES'
+            data['msg_from'] = constants.BRES_USER
             context.response = app.test_client().post("http://localhost:5050/message/send", data=flask.json.dumps(data),
                                                       headers=headers)
 
@@ -95,24 +95,24 @@ def step_impl_internal_user_has_conversation_with_draft(context):
     token_data['role'] = 'respondent'
     headers['Authorization'] = update_encrypted_jwt()
 
-    data['msg_to'] = ['BRES']
+    data['msg_to'] = [constants.BRES_USER]
     data['msg_from'] = '0a7ad740-10d5-4ecb-b7ca-3c0384afb882'
     context.response = app.test_client().post("http://localhost:5050/message/send", data=flask.json.dumps(data),
                                               headers=headers)
 
-    token_data[constants.USER_IDENTIFIER] = 'BRES'
+    token_data[constants.USER_IDENTIFIER] = constants.BRES_USER
     token_data['role'] = 'internal'
     headers['Authorization'] = update_encrypted_jwt()
 
     data['msg_to'] = ['0a7ad740-10d5-4ecb-b7ca-3c0384afb882']
-    data['msg_from'] = 'BRES'
+    data['msg_from'] = constants.BRES_USER
     context.response = app.test_client().post("http://localhost:5050/message/send", data=flask.json.dumps(data),
                                               headers=headers)
 
     context.most_recent_messages.append(flask.json.loads(context.response.data)['msg_id'])
 
     data['msg_to'] = ['0a7ad740-10d5-4ecb-b7ca-3c0384afb882']
-    data['msg_from'] = 'BRES'
+    data['msg_from'] = constants.BRES_USER
     context.response = app.test_client().post("http://localhost:5050/draft/save", data=flask.json.dumps(data),
                                               headers=headers)
     context.draft_id = flask.json.loads(context.response.data)['msg_id']
@@ -128,7 +128,7 @@ def step_impl_respondent_gets_all_conversations(context):
 
 @when("the internal user gets all conversations")
 def step_impl_internal_user_gets_all_conversations(context):
-    token_data[constants.USER_IDENTIFIER] = 'BRES'
+    token_data[constants.USER_IDENTIFIER] = constants.BRES_USER
     token_data['role'] = 'internal'
     headers['Authorization'] = update_encrypted_jwt()
     context.response = app.test_client().get(url, headers=headers)

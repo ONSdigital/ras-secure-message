@@ -22,7 +22,7 @@ data = {'msg_to': ['test'],
         'collection_case': 'collectioncase',
         'collection_exercise': 'collectionexercise',
         'ru_id': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc',
-        'survey': 'BRES'}
+        'survey': constants.BRES_SURVEY}
 
 
 def update_encrypted_jwt():
@@ -43,11 +43,11 @@ headers['Authorization'] = update_encrypted_jwt()
 # Scenario 5: As an external user I would like to be able to view a list of messages
 @given("an external user has multiple messages")
 def step_impl_external_user_has_multiple_messages(context):
-    token_data[constants.USER_IDENTIFIER] = 'BRES'
+    token_data[constants.USER_IDENTIFIER] = constants.BRES_USER
     token_data['role'] = 'internal'
 
     headers['Authorization'] = update_encrypted_jwt()
-    data['msg_from'] = 'BRES'
+    data['msg_from'] = constants.BRES_USER
     for x in range(0, 2):
         app.test_client().post("http://localhost:5050/message/send", data=flask.json.dumps(data), headers=headers)
         app.test_client().post("http://localhost:5050/draft/save", data=flask.json.dumps(data), headers=headers)
@@ -55,7 +55,7 @@ def step_impl_external_user_has_multiple_messages(context):
 
 @when("the external user requests all messages")
 def step_impl_external_user_requests_all_messages(context):
-    token_data[constants.USER_IDENTIFIER] = 'BRES'
+    token_data[constants.USER_IDENTIFIER] = constants.BRES_USER
     token_data['role'] = 'internal'
     headers['Authorization'] = update_encrypted_jwt()
     request = app.test_client().get(url, headers=headers)
@@ -65,9 +65,9 @@ def step_impl_external_user_requests_all_messages(context):
 # Scenario 6: As an internal user I would like to be able to view a list of messages
 @given("an internal user has multiple messages")
 def step_impl_internal_user_has_multiple_messages(context):
-    token_data[constants.USER_IDENTIFIER] = 'BRES'
+    token_data[constants.USER_IDENTIFIER] = constants.BRES_USER
     headers['Authorization'] = update_encrypted_jwt()
-    data['msg_from'] = 'BRES'
+    data['msg_from'] = constants.BRES_USER
     for x in range(0, 2):
         app.test_client().post("http://localhost:5050/message/send", data=flask.json.dumps(data), headers=headers)
         app.test_client().post("http://localhost:5050/draft/save", data=flask.json.dumps(data), headers=headers)
@@ -75,7 +75,7 @@ def step_impl_internal_user_has_multiple_messages(context):
 
 @when("the internal user requests all messages")
 def step_impl_internal_user_requests_all_messages(context):
-    token_data[constants.USER_IDENTIFIER] = 'BRES'
+    token_data[constants.USER_IDENTIFIER] = constants.BRES_USER
     token_data['role'] = 'internal'
     headers['Authorization'] = update_encrypted_jwt()
     request = app.test_client().get(url, headers=headers)
@@ -86,13 +86,13 @@ def step_impl_internal_user_requests_all_messages(context):
 @given('a respondent and an Internal user sends multiple messages')
 def step_impl_respondant_and_internal_user_send_multiple_messages(context):
 
-    token_data[constants.USER_IDENTIFIER] = 'BRES'
+    token_data[constants.USER_IDENTIFIER] = constants.BRES_USER
     token_data['role'] = 'internal'
     headers['Authorization'] = update_encrypted_jwt()
 
     for x in range(0, 2):
         data['msg_to'] = ['0a7ad740-10d5-4ecb-b7ca-3c0384afb882']
-        data['msg_from'] = 'BRES'
+        data['msg_from'] = constants.BRES_USER
         context.response = app.test_client().post("http://localhost:5050/message/send",
                                                   data=flask.json.dumps(data), headers=headers)
 
@@ -101,7 +101,7 @@ def step_impl_respondant_and_internal_user_send_multiple_messages(context):
     headers['Authorization'] = update_encrypted_jwt()
 
     for x in range(0, 2):
-        data['msg_to'] = ['BRES']
+        data['msg_to'] = [constants.BRES_USER]
         data['msg_from'] = '0a7ad740-10d5-4ecb-b7ca-3c0384afb882'
         token_data['user_uuid'] = '0a7ad740-10d5-4ecb-b7ca-3c0384afb882'
         token_data['role'] = 'respondent'
@@ -136,7 +136,7 @@ def step_impl_internal_user_receives_multiple_messages(context):
     headers['Authorization'] = update_encrypted_jwt()
 
     for x in range(0, 2):
-        data['msg_to'] = ['BRES']
+        data['msg_to'] = [constants.BRES_USER]
         data['msg_from'] = '0a7ad740-10d5-4ecb-b7ca-3c0384afb882'
         context.response = app.test_client().post("http://localhost:5050/message/send",
                                                   data=flask.json.dumps(data), headers=headers)
@@ -145,13 +145,13 @@ def step_impl_internal_user_receives_multiple_messages(context):
 @given("a respondent user receives multiple messages")
 def step_impl_respondent_receives_multiple_messages(context):
 
-    token_data[constants.USER_IDENTIFIER] = 'BRES'
+    token_data[constants.USER_IDENTIFIER] = constants.BRES_USER
     token_data['role'] = 'internal'
     headers['Authorization'] = update_encrypted_jwt()
 
     for x in range(0, 2):
         data['msg_to'] = ['0a7ad740-10d5-4ecb-b7ca-3c0384afb882']
-        data['msg_from'] = 'BRES'
+        data['msg_from'] = constants.BRES_USER
         context.response = app.test_client().post("http://localhost:5050/message/send",
                                                   data=flask.json.dumps(data), headers=headers)
 
@@ -176,19 +176,19 @@ def step_impl_assert_all_messages_have_inbox_and_unread_labels(context):
 @given('a Internal user sends multiple messages with different reporting unit')
 def step_impl_internal_user_sends_multiple_messages_with_different_ru(context):
 
-    token_data[constants.USER_IDENTIFIER] = 'BRES'
+    token_data[constants.USER_IDENTIFIER] = constants.BRES_USER
     token_data['role'] = 'internal'
     headers['Authorization'] = update_encrypted_jwt()
 
     for x in range(0, 2):
         data['msg_to'] = ['0a7ad740-10d5-4ecb-b7ca-3c0384afb882']
-        data['msg_from'] = 'BRES'
+        data['msg_from'] = constants.BRES_USER
         context.response = app.test_client().post("http://localhost:5050/message/send",
                                                   data=flask.json.dumps(data), headers=headers)
 
     for x in range(0, 2):
         data['msg_to'] = ['0a7ad740-10d5-4ecb-b7ca-3c0384afb882']
-        data['msg_from'] = 'BRES'
+        data['msg_from'] = constants.BRES_USER
         data['ru_id'] = '7fc0e8ab-189c-4794-b8f4-9f05a1db185b'
         context.response = app.test_client().post("http://localhost:5050/message/send",
                                                   data=flask.json.dumps(data), headers=headers)
@@ -213,18 +213,18 @@ def step_impl_assert_correct_ru(context):
 @given('a Internal user sends multiple messages with different survey')
 def step_impl_internal_user_sends_multiple_messages_with_different_survey(context):
 
-    token_data[constants.USER_IDENTIFIER] = 'BRES'
+    token_data[constants.USER_IDENTIFIER] = constants.BRES_USER
     token_data['role'] = 'internal'
     headers['Authorization'] = update_encrypted_jwt()
 
     for x in range(0, 2):
         data['msg_to'] = ['0a7ad740-10d5-4ecb-b7ca-3c0384afb882']
-        data['msg_from'] = 'BRES'
+        data['msg_from'] = constants.BRES_USER
         context.response = app.test_client().post("http://localhost:5050/message/send",
                                                   data=flask.json.dumps(data), headers=headers)
     for x in range(0, 2):
         data['msg_to'] = ['0a7ad740-10d5-4ecb-b7ca-3c0384afb882']
-        data['msg_from'] = 'BRES'
+        data['msg_from'] = constants.BRES_USER
         data['survey'] = 'AnotherSurvey'
         context.response = app.test_client().post("http://localhost:5050/message/send",
                                                   data=flask.json.dumps(data), headers=headers)
@@ -240,7 +240,7 @@ def step_impl_respondent_gets_their_messages_with_particular_survey(context):
 @then('the retrieved messages should have the correct survey')
 def step_impl_retrieved_messages_shoud_have_correct_survey(context):
     response = flask.json.loads(context.response.data)
-    nose.tools.assert_equal(response['messages'][1]['survey'], 'BRES')
+    nose.tools.assert_equal(response['messages'][1]['survey'], constants.BRES_SURVEY)
 
     nose.tools.assert_equal(len(response['messages']), 2)
 
@@ -249,18 +249,18 @@ def step_impl_retrieved_messages_shoud_have_correct_survey(context):
 @given('a Internal user sends multiple messages with different collection case')
 def step_impl_internal_user_sends_multiple_messages_with_different_collection_case(context):
 
-    token_data[constants.USER_IDENTIFIER] = 'BRES'
+    token_data[constants.USER_IDENTIFIER] = constants.BRES_USER
     token_data['role'] = 'internal'
     headers['Authorization'] = update_encrypted_jwt()
 
     for x in range(0, 2):
         data['msg_to'] = ['0a7ad740-10d5-4ecb-b7ca-3c0384afb882']
-        data['msg_from'] = 'BRES'
+        data['msg_from'] = constants.BRES_USER
         context.response = app.test_client().post("http://localhost:5050/message/send",
                                                   data=flask.json.dumps(data), headers=headers)
     for x in range(0, 2):
         data['msg_to'] = ['0a7ad740-10d5-4ecb-b7ca-3c0384afb882']
-        data['msg_from'] = 'BRES'
+        data['msg_from'] = constants.BRES_USER
         data['collection_case'] = 'AnotherCollectionCase'
         context.response = app.test_client().post("http://localhost:5050/message/send",
                                                   data=flask.json.dumps(data), headers=headers)
@@ -286,18 +286,18 @@ def step_impl_assert_messages_have_correct_collection_case(context):
 @given('a Internal user sends multiple messages with different collection exercise')
 def step_impl_internal_user_sends_multiple_messages_with_different_collection_exercise(context):
 
-    token_data[constants.USER_IDENTIFIER] = 'BRES'
+    token_data[constants.USER_IDENTIFIER] = constants.BRES_USER
     token_data['role'] = 'internal'
     headers['Authorization'] = update_encrypted_jwt()
 
     for x in range(0, 2):
         data['msg_to'] = ['0a7ad740-10d5-4ecb-b7ca-3c0384afb882']
-        data['msg_from'] = 'BRES'
+        data['msg_from'] = constants.BRES_USER
         context.response = app.test_client().post("http://localhost:5050/message/send",
                                                   data=flask.json.dumps(data), headers=headers)
     for x in range(0, 2):
         data['msg_to'] = ['0a7ad740-10d5-4ecb-b7ca-3c0384afb882']
-        data['msg_from'] = 'BRES'
+        data['msg_from'] = constants.BRES_USER
         data['collection_exercise'] = 'AnotherCollectionExercise'
         context.response = app.test_client().post("http://localhost:5050/message/send",
                                                   data=flask.json.dumps(data), headers=headers)
@@ -530,7 +530,7 @@ def step_impl_respondent_sends_multiple_messages(context):
     headers['Authorization'] = update_encrypted_jwt()
 
     for x in range(0, 2):
-        data['msg_to'] = ['BRES']
+        data['msg_to'] = [constants.BRES_USER]
         data['msg_from'] = '0a7ad740-10d5-4ecb-b7ca-3c0384afb882'
         token_data[constants.USER_IDENTIFIER] = '0a7ad740-10d5-4ecb-b7ca-3c0384afb882'
         token_data['role'] = 'respondent'
@@ -542,13 +542,13 @@ def step_impl_respondent_sends_multiple_messages(context):
 @given("a Internal user sends multiple messages")
 def step_impl_internal_user_sends_multiple_messages(context):
 
-    token_data[constants.USER_IDENTIFIER] = 'BRES'
+    token_data[constants.USER_IDENTIFIER] = constants.BRES_USER
     token_data['role'] = 'internal'
     headers['Authorization'] = update_encrypted_jwt()
 
     for x in range(0, 2):
         data['msg_to'] = ['0a7ad740-10d5-4ecb-b7ca-3c0384afb882']
-        data['msg_from'] = 'BRES'
+        data['msg_from'] = constants.BRES_USER
         context.response = app.test_client().post("http://localhost:5050/message/send", data=flask.json.dumps(data),
                                                   headers=headers)
 
@@ -557,7 +557,7 @@ def step_impl_internal_user_sends_multiple_messages(context):
 def step_impl_respondent_creates_multiple_draft_messages(context):
 
     for x in range(0, 2):
-        draft = {'msg_to': ['BRES'],
+        draft = {'msg_to': [constants.BRES_USER],
                  'msg_from': '0a7ad740-10d5-4ecb-b7ca-3c0384afb882',
                  'subject': 'test',
                  'body': 'Test',
@@ -565,7 +565,7 @@ def step_impl_respondent_creates_multiple_draft_messages(context):
                  'collection_case': 'collection case1',
                  'collection_exercise': 'collection exercise1',
                  'ru_id': '7fc0e8ab-189c-4794-b8f4-9f05a1db185b',
-                 'survey': 'BRES'}
+                 'survey': constants.BRES_SURVEY}
         token_data[constants.USER_IDENTIFIER] = '0a7ad740-10d5-4ecb-b7ca-3c0384afb882'
         token_data['role'] = 'respondent'
         headers['Authorization'] = update_encrypted_jwt()
@@ -578,11 +578,11 @@ def step_impl_multiple_messages_for_all_labels(context):
 
     for _ in range(0, 2):
         data['msg_to'] = ['0a7ad740-10d5-4ecb-b7ca-3c0384afb882']
-        data['msg_from'] = 'BRES'
+        data['msg_from'] = constants.BRES_USER
         context.response = app.test_client().post("http://localhost:5050/message/send",
                                                   data=flask.json.dumps(data), headers=headers)
     for _ in range(0, 2):
-        data['msg_to'] = ['BRES']
+        data['msg_to'] = [constants.BRES_USER]
         data['msg_from'] = '0a7ad740-10d5-4ecb-b7ca-3c0384afb882'
         context.response = app.test_client().post("http://localhost:5050/message/send",
                                                   data=flask.json.dumps(data), headers=headers)
@@ -607,7 +607,7 @@ def step_impl_assert_respondent_gets_their_inbox_messages(context):
 
 @when("the Internal user gets their messages")
 def step_impl_internal_user_gets_their_messages(context):
-    token_data[constants.USER_IDENTIFIER] = 'BRES'
+    token_data[constants.USER_IDENTIFIER] = constants.BRES_USER
     token_data['role'] = 'internal'
     headers['Authorization'] = update_encrypted_jwt()
     context.response = app.test_client().get(url, headers=headers)

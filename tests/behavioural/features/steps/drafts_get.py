@@ -16,7 +16,7 @@ token_data = {
 
 headers = {'Content-Type': 'application/json', 'Authorization': ''}
 
-data = {'msg_to': ['BRES'],
+data = {'msg_to': [constants.BRES_USER],
         'msg_from': '0a7ad740-10d5-4ecb-b7ca-3c0384afb882',
         'subject': 'Hello World',
         'body': 'Test',
@@ -24,7 +24,7 @@ data = {'msg_to': ['BRES'],
         'collection_case': 'collectioncase',
         'collection_exercise': 'collectionexercise',
         'ru_id': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc',
-        'survey': 'BRES'}
+        'survey': constants.BRES_SURVEY}
 
 
 def update_encrypted_jwt():
@@ -100,7 +100,7 @@ def step_impl_internal_user_saves_multiple_drafts_with_different_collection_case
     headers['Authorization'] = update_encrypted_jwt()
 
     for x in range(0, 2):
-        data['msg_to'] = ['BRES']
+        data['msg_to'] = [constants.BRES_USER]
         data['msg_from'] = '0a7ad740-10d5-4ecb-b7ca-3c0384afb882'
         context.response = app.test_client().post("http://localhost:5050/draft/save",
                                                   data=flask.json.dumps(data), headers=headers)
@@ -132,7 +132,7 @@ def step_impl_internal_user_saves_multiple_drafts_with_different_collection_exer
     headers['Authorization'] = update_encrypted_jwt()
 
     for x in range(0, 2):
-        data['msg_to'] = ['BRES']
+        data['msg_to'] = [constants.BRES_USER]
         data['msg_from'] = '0a7ad740-10d5-4ecb-b7ca-3c0384afb882'
         context.response = app.test_client().post("http://localhost:5050/draft/save",
                                                   data=flask.json.dumps(data), headers=headers)
@@ -157,7 +157,7 @@ def step_impl_assert_drafts_have_correct_collection_exercise(context):
 # Common Steps: used in multiple scenarios
 @given('the user has created and saved multiple drafts')
 def step_impl_user_has_created__and_saved_multiple_drafts(context):
-    data.update({'msg_to': ['BRES'],
+    data.update({'msg_to': [constants.BRES_USER],
                  'msg_from': '0a7ad740-10d5-4ecb-b7ca-3c0384afb882',
                  'subject': 'test',
                  'body': 'Test',
@@ -165,7 +165,7 @@ def step_impl_user_has_created__and_saved_multiple_drafts(context):
                  'collection_case': 'collection case1',
                  'collection_exercise': 'collection exercise1',
                  'ru_id': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc',
-                 'survey': 'BRES'})
+                 'survey': constants.BRES_SURVEY})
 
     for _ in range(0, 10):
         app.test_client().post("http://localhost:5050/draft/save", data=json.dumps(data), headers=headers)

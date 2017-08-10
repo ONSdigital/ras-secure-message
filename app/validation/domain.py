@@ -69,13 +69,13 @@ class MessageSchema(Schema):
     def validate_to(self, msg_to):
         for item in msg_to:
             self.validate_non_zero_field_length("msg_to", len(item), constants.MAX_TO_LEN)
-            if msg_to != 'BRES' and not User.is_valid_user(item):
+            if msg_to != constants.BRES_USER and not User.is_valid_user(item):
                 raise ValidationError("{0} is not a valid user.".format(item))
 
     @validates('msg_from')
     def validate_from(self, msg_from):
         self.validate_non_zero_field_length("msg_from", len(msg_from), constants.MAX_FROM_LEN)
-        if g.user.is_internal and msg_from != 'BRES':
+        if g.user.is_internal and msg_from != constants.BRES_USER:
             raise ValidationError('You are not authorised to send a message on behalf of user or work group {0}'
                                   .format(msg_from))
         if g.user.is_respondent and msg_from != g.user.user_uuid:
@@ -167,7 +167,7 @@ class DraftSchema(Schema):
         if msg_to:
             for item in msg_to:
                 self.validate_field_length(msg_to, len(item), constants.MAX_TO_LEN)
-                if len(msg_to) > 0 and msg_to[0] != 'BRES' and not User.is_valid_user(item):
+                if len(msg_to) > 0 and msg_to[0] != constants.BRES_USER and not User.is_valid_user(item):
                     raise ValidationError("{0} is not a valid user.".format(item))
         else:
             logger.debug("msg_to field empty")
@@ -175,7 +175,7 @@ class DraftSchema(Schema):
     @validates("msg_from")
     def validate_from(self, msg_from):
         self.validate_field_length(msg_from, len(msg_from), constants.MAX_FROM_LEN)
-        if g.user.is_internal and msg_from != 'BRES':
+        if g.user.is_internal and msg_from != constants.BRES_USER:
             raise ValidationError('You are not authorised to save a draft on behalf of user or work group {0}'
                                   .format(msg_from))
         if g.user.is_respondent and msg_from != g.user.user_uuid:

@@ -46,14 +46,14 @@ class DraftTestCase(unittest.TestCase):
         self.headers = {'Content-Type': 'application/json', 'Authorization': encrypted_jwt}
 
         self.test_message = {'msg_to': ['f62dfda8-73b0-4e0e-97cf-1b06327a6712'],
-                             'msg_from': 'BRES',
+                             'msg_from': constants.BRES_USER,
                              'subject': 'MyMessage',
                              'body': 'hello',
                              'thread_id': '',
                              'collection_case': 'ACollectionCase',
                              'collection_exercise': 'ACollectionExercise',
                              'ru_id': '7fc0e8ab-189c-4794-b8f4-9f05a1db185b',
-                             'survey': 'BRES'}
+                             'survey': constants.BRES_SURVEY}
 
         with app.app_context():
             database.db.init_app(current_app)
@@ -78,7 +78,7 @@ class DraftTestCase(unittest.TestCase):
 
         draft_save = DraftSave()
         with app.app_context():
-            g.user = User('BRES', 'internal')
+            g.user = User(constants.BRES_USER, 'internal')
             draft = DraftSchema().load(self.test_message)
             draft_save._save_draft(draft, saver)
 
@@ -213,14 +213,14 @@ class DraftTestCase(unittest.TestCase):
 
         self.test_message.update({'msg_id': self.msg_id,
                                   'msg_to': ['0a7ad740-10d5-4ecb-b7ca-3c0384afb882'],
-                                  'msg_from': 'BRES',
+                                  'msg_from': constants.BRES_USER,
                                   'subject': 'MyMessage',
                                   'body': 'hello',
                                   'thread_id': '',
                                   'collection_case': 'ACollectionCase',
                                   'collection_exercise': 'ACollectionExercise',
                                   'ru_id': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc',
-                                  'survey': 'BRES'})
+                                  'survey': constants.BRES_SURVEY})
 
         response = self.app.post('http://localhost:5050/message/send', data=json.dumps(self.test_message),
                                  headers=self.headers)
@@ -259,7 +259,7 @@ class DraftTestCase(unittest.TestCase):
     def test_etag_check_returns_true_if_data_equal(self):
         """Test etag_check function returns true for unchanged draft etag"""
 
-        message = {'msg_to': ['BRES'],
+        message = {'msg_to': [constants.BRES_USER],
                    'msg_from': '0a7ad740-10d5-4ecb-b7ca-3c0384afb882',
                    'msg_id': 'ea420f66-12f6-4d4e-bf36-fe9b6b20c3f4',
                    'subject': 'test',
@@ -268,7 +268,7 @@ class DraftTestCase(unittest.TestCase):
                    'collection_case': 'ACollectionCase',
                    'collection_exercise': 'ACollectionExercise',
                    'ru_id': '7fc0e8ab-189c-4794-b8f4-9f05a1db185b',
-                   'survey': 'BRES',
+                   'survey': constants.BRES_SURVEY,
                    '_links': '',
                    'labels': ['DRAFT']}
 
@@ -279,7 +279,7 @@ class DraftTestCase(unittest.TestCase):
     def test_etag_check_returns_false_if_msg_to_changed(self):
         """Test etag_check function returns false for changed draft etag"""
 
-        message = {'msg_to': ['BRES'],
+        message = {'msg_to': [constants.BRES_USER],
                    'msg_from': '0a7ad740-10d5-4ecb-b7ca-3c0384afb882',
                    'msg_id': 'ea420f66-12f6-4d4e-bf36-fe9b6b20c3f4',
                    'subject': 'test',
@@ -288,7 +288,7 @@ class DraftTestCase(unittest.TestCase):
                    'collection_case': 'ACollectionCase',
                    'collection_exercise': 'ACollectionExercise',
                    'ru_id': '7fc0e8ab-189c-4794-b8f4-9f05a1db185b',
-                   'survey': 'BRES',
+                   'survey': constants.BRES_SURVEY,
                    '_links': '',
                    'labels': ['DRAFT']}
 
@@ -298,7 +298,7 @@ class DraftTestCase(unittest.TestCase):
     def test_etag_check_returns_false_if_msg_id_changed(self):
         """Test etag_check function returns false for changed draft etag"""
 
-        message = {'msg_to': ['BRES'],
+        message = {'msg_to': [constants.BRES_USER],
                    'msg_from': '0a7ad740-10d5-4ecb-b7ca-3c0384afb882',
                    'msg_id': 'ea420f66-12f6-4d4e-bf36-fe9b6b20c3f4',
                    'subject': 'test',
@@ -307,7 +307,7 @@ class DraftTestCase(unittest.TestCase):
                    'collection_case': 'ACollectionCase',
                    'collection_exercise': 'ACollectionExercise',
                    'ru_id': '7fc0e8ab-189c-4794-b8f4-9f05a1db185b',
-                   'survey': 'BRES',
+                   'survey': constants.BRES_SURVEY,
                    '_links': '',
                    'labels': ['DRAFT']}
 
@@ -317,7 +317,7 @@ class DraftTestCase(unittest.TestCase):
     def test_etag_check_returns_false_if_subject_changed(self):
         """Test etag_check function returns false for changed draft etag"""
 
-        message = {'msg_to': ['BRES'],
+        message = {'msg_to': [constants.BRES_USER],
                    'msg_from': '0a7ad740-10d5-4ecb-b7ca-3c0384afb882',
                    'msg_id': 'ea420f66-12f6-4d4e-bf36-fe9b6b20c3f4',
                    'subject': 'test',
@@ -326,7 +326,7 @@ class DraftTestCase(unittest.TestCase):
                    'collection_case': 'ACollectionCase',
                    'collection_exercise': 'ACollectionExercise',
                    'ru_id': '7fc0e8ab-189c-4794-b8f4-9f05a1db185b',
-                   'survey': 'BRES',
+                   'survey': constants.BRES_SURVEY,
                    '_links': '',
                    'labels': ['DRAFT']}
 
@@ -336,7 +336,7 @@ class DraftTestCase(unittest.TestCase):
     def test_etag_check_returns_false_if_body_changed(self):
         """Test etag_check function returns false for changed draft etag"""
 
-        message = {'msg_to': ['BRES'],
+        message = {'msg_to': [constants.BRES_USER],
                    'msg_from': '0a7ad740-10d5-4ecb-b7ca-3c0384afb882',
                    'msg_id': 'ea420f66-12f6-4d4e-bf36-fe9b6b20c3f4',
                    'subject': 'test',
@@ -345,7 +345,7 @@ class DraftTestCase(unittest.TestCase):
                    'collection_case': 'ACollectionCase',
                    'collection_exercise': 'ACollectionExercise',
                    'ru_id': '7fc0e8ab-189c-4794-b8f4-9f05a1db185b',
-                   'survey': 'BRES',
+                   'survey': constants.BRES_SURVEY,
                    '_links': '',
                    'labels': ['DRAFT']}
 
