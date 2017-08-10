@@ -87,8 +87,7 @@ def paginated_list_to_json(paginated_list, page, limit, host_url, user, string_q
         links['prev'] = {
             "href": "{0}{1}{2}{3}page={4}&limit={5}".format(host_url, endpoint, arg_joiner,
                                                             string_query_args, (page - 1), limit)}
-    messages = add_to_and_from_details(messages)
-
+    messages = add_users_and_business_details(messages)
     return jsonify({"messages": messages, "_links": links})
 
 
@@ -144,7 +143,7 @@ def get_details_by_uuids(uuids):
 
 
 def add_to_and_from_details(messages):
-    """Adds user details for sender and reciepient"""
+    """Adds user details for sender and recipient"""
 
     uuid_list = []
 
@@ -160,7 +159,6 @@ def add_to_and_from_details(messages):
         message['@msg_to'] = [user for user in user_details if user["id"] in message['msg_to']]
         message['@msg_from'] = next((user for user in user_details if user["id"] == message['msg_from']), None)
 
-    messages = add_business_details(messages)
     return messages
 
 
@@ -176,5 +174,12 @@ def add_business_details(messages):
     business_details = get_business_details_by_ru(ru_list)
 
     for message in messages:
-        message['@ru_id'] = next((business for business in business_details if business["ru_id"] == message['ru_id']), None)
+        message['@ru_id'] = next((business for business in business_details if business["id"] == message['ru_id']), None)
+    return messages
+
+
+def add_users_and_business_details(messages):
+    """Add both user and business details to messages based on data from party service"""
+    messages = add_to_and_from_details(messages)
+    messages = add_business_details(messages)
     return messages

@@ -50,7 +50,9 @@ class PartyTestCase(unittest.TestCase):
 
         list_uuids = ['f62dfda8-73b0-4e0e-97cf-1b06327a6712',
                       '01b51fcc-ed43-4cdb-ad1c-450f9986859b',
-                      'dd5a38ff-1ecb-4634-94c8-2358df33e614'
+                      'dd5a38ff-1ecb-4634-94c8-2358df33e614',
+                      'ab123456-ce17-40c2-a8fc-abcdef123456',
+                      '654321ab-ce17-40c2-a8fc-abcdef123456'
                      ]
 
         user_details = get_details_by_uuids(list_uuids)
@@ -76,6 +78,43 @@ class PartyTestCase(unittest.TestCase):
                                            "telephone": "+443069990250",
                                            "status": "ACTIVE",
                                            "sampleUnitType": "BI"})
+        expected = {"associations": [
+                                           {"enrolments": [
+                                               {
+                                                   "enrolmentStatus": "ENABLED",
+                                                   "name": "Business Register and Employment Survey",
+                                                   "surveyId": "cb0711c3-0ac8-41d3-ae0e-567e5ea1ef87"
+                                               }
+
+                                           ],
+                                            "partyId": "b3ba864b-7cbc-4f44-84fe-88dc018a1a4c",
+                                            "sampleUnitRef": "50012345678"
+                                            }
+                                        ],
+                                        "id": "ab123456-ce17-40c2-a8fc-abcdef123456",
+                                        "firstName": "Ivor",
+                                        "lastName": "Bres",
+                                        "emailAddress": "ivor.bres@hostmail.com",
+                                        "telephone": "+447894056785",
+                                        "status": "ACTIVE",
+                                        "sampleUnitType": "BI"}
+        self.assertEqual(user_details[3], expected)
+        expected = {"associations": [
+                                                                   {"enrolments": [],
+                                                                    "partyId": "b3ba864b-7cbc-4f44-84fe-88dc018a1a4c",
+                                                                    "sampleUnitRef": "50012345678"
+                                                                    }
+                                                               ],
+                                                                   "id": "654321ab-ce17-40c2-a8fc-abcdef123456",
+                                                                   "firstName": "IvorNot",
+                                                                   "lastName": "Bres",
+                                                                   "emailAddress": "ivorNot.bres@hostmail.com",
+                                                                   "telephone": "+447894056786",
+                                                                   "status": "ACTIVE",
+                                                                   "sampleUnitType": "BI"}
+
+        self.assertEqual(user_details[4], expected)
+
 
     def test_get_user_details_by_invalid_uuid(self):
         """Test that function returns error when invalid uuid present"""
@@ -252,19 +291,26 @@ class PartyTestCase(unittest.TestCase):
 
         business_details = get_business_details_by_ru(list_ru)
 
-        self.assertEqual(business_details[0]['ru_id'], list_ru[0])
+        self.assertEqual(business_details[0]['id'], list_ru[0])
         self.assertEqual(business_details[0]['name'], "Apple")
 
     def test_get_business_details_multiple_ru(self):
         """Test business details are returned for multiple ru's"""
 
-        list_ru = ['0a6018a0-3e67-4407-b120-780932434b36', 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc', 'c614e64e-d981-4eba-b016-d9822f09a4fb']
+        list_ru = ['0a6018a0-3e67-4407-b120-780932434b36',
+                   'f1a5e99c-8edf-489a-9c72-6cabe6c387fc',
+                   'c614e64e-d981-4eba-b016-d9822f09a4fb',
+                   'b3ba864b-7cbc-4f44-84fe-88dc018a1a4c'
+                   ]
+
 
         business_details = get_business_details_by_ru(list_ru)
 
-        self.assertEqual(business_details[0]['ru_id'], list_ru[0])
-        self.assertEqual(business_details[1]['ru_id'], list_ru[1])
-        self.assertEqual(business_details[2]['ru_id'], list_ru[2])
+        self.assertEqual(business_details[0]['id'], list_ru[0])
+        self.assertEqual(business_details[1]['id'], list_ru[1])
+        self.assertEqual(business_details[2]['id'], list_ru[2])
+        self.assertEqual(business_details[3]['id'], list_ru[3])
+
 
     def test_get_message_returns_business_details(self):
         """Test get message by id returns business details"""

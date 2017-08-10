@@ -6,7 +6,8 @@ from werkzeug.exceptions import BadRequest
 from app import settings
 from app.common.alerts import AlertUser
 from app.common.labels import Labels
-from app.common.utilities import get_options, paginated_list_to_json, add_business_details, add_to_and_from_details
+from app.common.utilities import get_options, paginated_list_to_json, \
+    add_business_details, add_to_and_from_details,add_users_and_business_details
 from app.constants import MESSAGE_LIST_ENDPOINT
 from app.repository.modifier import Modifier
 from app.repository.retriever import Retriever
@@ -14,6 +15,7 @@ from app.repository.saver import Saver
 from app.resources.drafts import DraftModifyById
 from app.validation.domain import MessageSchema
 from app.authorization.authorizer import authorized_to_view_message
+
 
 logger = wrap_logger(logging.getLogger(__name__))
 
@@ -119,9 +121,8 @@ class MessageById(Resource):
         message_service = Retriever()
         message = message_service.retrieve_message(message_id, g.user)
 
+        message = add_users_and_business_details([message])[0]
         if authorized_to_view_message(g.user, message):
-            message = add_to_and_from_details([message])[0]
-            message = add_business_details([message])[0]
             return jsonify(message)
 
 

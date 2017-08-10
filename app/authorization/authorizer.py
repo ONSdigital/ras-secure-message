@@ -1,3 +1,8 @@
+import logging
+from structlog import wrap_logger
+
+logger = wrap_logger(logging.getLogger(__name__))
+
 
 def authorized_to_view_message(user, message):
     # check if user is respondent or internal
@@ -5,4 +10,10 @@ def authorized_to_view_message(user, message):
     # check response is what is expected     (format of what the party service gives back needs to be agreed)
     # check message ru_id is in the returned data for business associations
     # return true if it is else raise 403 forbidden error
+
     return True
+
+
+
+
+

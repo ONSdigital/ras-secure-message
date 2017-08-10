@@ -1,9 +1,5 @@
 import unittest
-from unittest.mock import patch
 from app.services.service_toggles import party
-from app.api_mocks.party_service_mock import PartyServiceMock
-from app.services.party_service import PartyService
-import logging
 from flask import json
 
 
@@ -55,7 +51,37 @@ class PartyServiceIntegrationTestCase(unittest.TestCase):
 
         response = sut.get_business_details('3b136c4b-7a14-4904-9e01-13364dd7b972')
 
-        self.assertTrue(json.loads(response.data) == expected)
+        result = json.loads(response.data)
+        self.assertTrue(result == expected)
+
+    @unittest.SkipTest
+    def test_calling_get_business_data_returns_expected_message2(self):
+        """Using id expected in test data results in expected data returned"""
+        sut = party
+        sut.use_real_service()
+
+        expected = {"attributes": {},
+                    "businessRef": "49900000000",
+                    "contactName": "Test User",
+                    "employeeCount": 50,
+                    "enterpriseName": "ABC Limited",
+                    "facsimile": "+44 1234 567890",
+                    "fulltimeCount": 35,
+                    "id": "3b136c4b-7a14-4904-9e01-13364dd7b972",
+                    "legalStatus": "Private Limited Company",
+                    "name": "Bolts and Ratchets Ltd",
+                    "sampleUnitType": "B",
+                    "sic2003": "2520",
+                    "sic2007": "2520",
+                    "telephone": "+44 1234 567890",
+                    "tradingName": "ABC Trading Ltd",
+                    "turnover": 350
+                    }
+
+        response = sut.get_business_details('b3ba864b-7cbc-4f44-84fe-88dc018a1a4c')  #test new test uuids here
+
+        result = json.loads(response.data)
+        self.assertTrue(result == expected)
 
     @unittest.SkipTest
     def test_calling_get_user_data_for_non_existent_user_returns_expected_message(self):
