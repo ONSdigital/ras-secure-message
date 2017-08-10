@@ -81,6 +81,14 @@ def step_impl_the_respondent_wants_to_see_the_message(context):
     context.response = app.test_client().get(url.format(context.msg_id), headers=headers)
 
 
+@when("a respondent other than the intended one  wants to see the message")
+def step_impl_the_respondent_wants_to_see_the_message(context):
+    token_data[constants.USER_IDENTIFIER] = '123ad740-10d5-4ecb-b7ca-3c0384afb882'
+    token_data['role'] = 'respondent'
+    headers['Authorization'] = update_encrypted_jwt()
+    context.response = app.test_client().get(url.format(context.msg_id), headers=headers)
+
+
 # Scenario 6: Internal user sends message and retrieves the same message with it's labels
 @when("the internal user wants to see the message")
 def step_impl_the_internal_user_wants_to_see_the_message(context):

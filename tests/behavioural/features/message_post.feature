@@ -98,3 +98,4 @@ Feature: Message Send Endpoint
     Given a msg_to is entered as a string
     When the message is sent with msg_to string
     Then a bad request status code (400) is returned
+

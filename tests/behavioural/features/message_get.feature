@@ -67,3 +67,8 @@ Feature: Message get by ID Endpoint
     Given a respondent sends a message
     When the internal user wants to see the message
     Then the retrieved message should have the labels INBOX and UNREAD
+
+  Scenario: Respondent attempts to read a message they did not send or receive
+    Given an internal user sends a message
+    When  a respondent other than the intended one  wants to see the message
+    Then  a forbidden status code (403) is returned

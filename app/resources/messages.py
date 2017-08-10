@@ -14,7 +14,7 @@ from app.repository.retriever import Retriever
 from app.repository.saver import Saver
 from app.resources.drafts import DraftModifyById
 from app.validation.domain import MessageSchema
-from app.authorization.authorizer import authorized_to_view_message
+from app.authorization.authorizer import Authorizer
 
 
 logger = wrap_logger(logging.getLogger(__name__))
@@ -116,15 +116,17 @@ class MessageById(Resource):
     @staticmethod
     def get(message_id):
         """Get message by id"""
-
         # check user is authorised to view message
         message_service = Retriever()
         message = message_service.retrieve_message(message_id, g.user)
 
         message = add_users_and_business_details([message])[0]
-        if authorized_to_view_message(g.user, message):
+        if Authorizer().can_user_view_message(g.user, message):
             return jsonify(message)
-
+        else:
+            result = jsonify({'status': 'error'})
+            result.status_code = 403
+            return result
 
 class MessageModifyById(Resource):
     """Update message status by id"""

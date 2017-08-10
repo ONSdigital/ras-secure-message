@@ -3,7 +3,6 @@ from app.application import app
 from app.services.service_toggles import party
 from behave import given, then
 from app.repository import database
-from app.common import utilities
 from flask import current_app
 from sqlalchemy.engine import Engine
 from sqlalchemy import event
@@ -23,6 +22,7 @@ def step_impl_reset_db(context):
         database.db.init_app(current_app)
         database.db.drop_all()
         database.db.create_all()
+
 
 @given("using mock party service")
 def step_impl_use_mock_party_service(context):
@@ -45,14 +45,21 @@ def step_impl_success_returned(context):
 def step_impl_success_returned(context):
     nose.tools.assert_equal(context.response.status_code, 201)
 
+
 @then('a bad request status code (400) is returned')
 def step_impl_a_bad_request_is_returned(context):
     nose.tools.assert_equal(context.response.status_code, 400)
 
 
+@then("a forbidden status code (403) is returned")
+def step_impl_conflict_returned(context):
+    nose.tools.assert_equal(context.response.status_code, 403)
+
+
 @then("a not found status code (404) is returned")
 def step_impl_conflict_returned(context):
     nose.tools.assert_equal(context.response.status_code, 404)
+
 
 @then("a conflict error status code (409) is returned")
 def step_impl_conflict_returned(context):
