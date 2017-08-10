@@ -34,6 +34,8 @@ class PartyServiceMock:
                                                                   "name": "Apricot"},
                          '0a6018a0-3e67-4407-b120-780932434b36': {"id": "0a6018a0-3e67-4407-b120-780932434b36",
                                                                   "name": "Asparagus"},
+                         '3b136c4b-7a14-4904-9e01-13364dd7b973': {"ru_id": "3b136c4b-7a14-4904-9e01-13364dd7b973",
+                                                                  "business_name": "Bolts & Ratchet Ltd"},
                          'b3ba864b-7cbc-4f44-84fe-88dc018a1a4c': {
                                                                  "associations": [
                                                                      {
