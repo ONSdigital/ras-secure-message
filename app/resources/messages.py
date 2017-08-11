@@ -51,7 +51,7 @@ class MessageSend(Resource):
         logger.info("Message send POST request.")
         post_data = request.get_json()
         is_draft = False
-        returned_draft = None
+
         draft_id = None
         if 'msg_id' in post_data:
             is_draft, returned_draft = Retriever().check_msg_id_is_a_draft(post_data['msg_id'], g.user)
