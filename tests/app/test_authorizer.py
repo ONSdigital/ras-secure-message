@@ -11,10 +11,10 @@ class AuthorizerTestCase(unittest.TestCase):
         """A user can view a message id they are internal"""
         user = User('1224', 'internal')
         message = {}
-        sut = Authorizer().can_user_view_message
+        sut = Authorizer()
         expected = True
 
-        result = sut(user, message)
+        result = sut.can_user_view_message(user, message)
 
         self.assertTrue(expected == result)
 
@@ -22,10 +22,10 @@ class AuthorizerTestCase(unittest.TestCase):
         """A respondent can view a message id they sent it """
         user = User('1234', 'external')
         message = {'msg_from': '1234'}
-        sut = Authorizer().can_user_view_message
+        sut = Authorizer()
         expected = True
 
-        result = sut(user, message)
+        result = sut.can_user_view_message(user, message)
 
         self.assertTrue(expected == result)
 
@@ -33,10 +33,10 @@ class AuthorizerTestCase(unittest.TestCase):
         """A respondent is authorised to view a message sent to them """
         user = User('1234', 'external')
         message = {'msg_from': constants.BRES_USER, 'msg_to': ['1111', '1234']}
-        sut = Authorizer().can_user_view_message
+        sut = Authorizer()
         expected = True
 
-        result = sut(user, message)
+        result = sut.can_user_view_message(user, message)
 
         self.assertTrue(expected == result)
 
@@ -44,10 +44,10 @@ class AuthorizerTestCase(unittest.TestCase):
         """A respondent is not authorised to view a message they niether sent or received"""
         user = User('1234', 'external')
         message = {'msg_id': '1234567890', 'msg_from': constants.BRES_USER, 'msg_to': ['1111', '2222']}
-        sut = Authorizer().can_user_view_message
+        sut = Authorizer()
         expected = False
 
-        result = sut(user, message)
+        result = sut.can_user_view_message(user, message)
 
         self.assertTrue(expected == result)
 

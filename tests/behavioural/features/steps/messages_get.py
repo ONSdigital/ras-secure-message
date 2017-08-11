@@ -621,6 +621,14 @@ def step_impl_respondent_gets_their_messages(context):
     context.response = app.test_client().get(url, headers=headers)
 
 
+@when("A different external user requests all messages")
+def step_impl_respondent_gets_their_messages(context):
+    token_data[constants.USER_IDENTIFIER] = 'someonee-10d5-4ecb-b7ca-3c0384afb882'
+    token_data['role'] = 'respondent'
+    headers['Authorization'] = update_encrypted_jwt()
+    context.response = app.test_client().get(url, headers=headers)
+
+
 @then("the retrieved messages should have the correct SENT labels")
 def step_impl_retrieved_messages_should_have_sent_labels(context):
     response = flask.json.loads(context.response.data)
@@ -642,3 +650,9 @@ def step_impl_message_should_have_correct_inbox_and_unread_labels(context):
 @then("all of that users messages are returned")
 def step_impl_assert_correct_number_of_messages_returned(context):
     nose.tools.assert_equal(len(context.response['messages']), 4)
+
+
+@then('No messages should be returned')
+def step_impl_no_messages_returned(context):
+    response = flask.json.loads(context.response.data)
+    nose.tools.assert_equal(len(response['messages']), 0)

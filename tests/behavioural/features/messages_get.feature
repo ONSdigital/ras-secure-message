@@ -122,3 +122,9 @@ Feature: Get Messages list Endpoint
     Given there are multiple messages to retrieve for all labels
     When respondent gets messages with labels empty
     Then all messages should be returned
+
+  Scenario: A respondent sends multiple messages , Another respondent should not see any
+  Given a Internal user sends multiple messages
+  When A different external user requests all messages
+  Then a success status code (200) is returned
+  And  No messages should be returned
