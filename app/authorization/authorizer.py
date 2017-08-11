@@ -17,9 +17,10 @@ class Authorizer:
         # A user can view message if
         # a) The user is internal ( currently no restrictions )
         # or b) The user uuid is either the from or the to
-        # This implies that if the user for a ru changes then they cannot see the messages to their predecessor.
+        # This implies that if the user for a ru changes or there are more than one enrolled users per ru
+        # then they cannot see the messages to the other users/ predecessors.
         # If this is a problem we can add a third or whereby the user uuid appears in the business associations as
-        #  a party_id, and the enrolment is valid for the survey
+        # a party_id, and the enrolment is valid for the survey
 
         if user.is_internal:
             return True
@@ -33,6 +34,8 @@ class Authorizer:
         logger.info('user {} (role:{}) was refused viewing of message id {}'.format(user.user_uuid, user.role,
                                                                                     message['msg_id']))
         return False
+
+
 
         # A user can save a message for a specific ru if their uuid exists in the associations and they are
         # currently enrolled on the survey
