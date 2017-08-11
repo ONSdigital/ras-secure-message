@@ -35,10 +35,9 @@ class Authorizer:
                                                                                     message['msg_id']))
         return False
 
-
-
         # A user can save a message for a specific ru if their uuid exists in the associations and they are
         # currently enrolled on the survey
+
 
 
 
