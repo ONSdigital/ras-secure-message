@@ -114,14 +114,14 @@ def get_business_details_by_ru(rus):
 
     details = []
 
-    for x in rus:
+    for ru in rus:
 
-        detail = party.get_business_details(x)
+        detail = party.get_business_details(ru)
 
         if detail.status_code == 200:
             details.append(json.loads(detail.data))
         else:
-            raise ExpectationFailed(description="Received an unexpected response from Party service")
+            logger.info("No details found for RU ID {}".format(ru))
 
     return details
 
@@ -137,7 +137,7 @@ def get_details_by_uuids(uuids):
         if detail.status_code == 200:
             respondent_details.append(json.loads(detail.data))
         else:
-            raise ExpectationFailed(description="Received an unexpected response from Party service")
+            logger.info("No details found for user {}".format(uuid))
 
     return respondent_details
 
