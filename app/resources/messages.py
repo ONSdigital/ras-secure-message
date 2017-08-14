@@ -6,14 +6,16 @@ from werkzeug.exceptions import BadRequest
 from app import settings
 from app.common.alerts import AlertUser
 from app.common.labels import Labels
-from app.common.utilities import get_options, paginated_list_to_json, add_business_details, add_to_and_from_details
+from app.common.utilities import get_options, paginated_list_to_json, \
+    add_business_details, add_to_and_from_details,add_users_and_business_details
 from app.constants import MESSAGE_LIST_ENDPOINT
 from app.repository.modifier import Modifier
 from app.repository.retriever import Retriever
 from app.repository.saver import Saver
 from app.resources.drafts import DraftModifyById
 from app.validation.domain import MessageSchema
-from app.authorization.authorizer import authorized_to_view_message
+from app.authorization.authorizer import Authorizer
+
 
 logger = wrap_logger(logging.getLogger(__name__))
 
@@ -49,7 +51,7 @@ class MessageSend(Resource):
         logger.info("Message send POST request.")
         post_data = request.get_json()
         is_draft = False
-        returned_draft = None
+
         draft_id = None
         if 'msg_id' in post_data:
             is_draft, returned_draft = Retriever().check_msg_id_is_a_draft(post_data['msg_id'], g.user)
@@ -114,16 +116,17 @@ class MessageById(Resource):
     @staticmethod
     def get(message_id):
         """Get message by id"""
-
         # check user is authorised to view message
         message_service = Retriever()
         message = message_service.retrieve_message(message_id, g.user)
 
-        if authorized_to_view_message(g.user, message):
-            message = add_to_and_from_details([message])[0]
-            message = add_business_details([message])[0]
+        message = add_users_and_business_details([message])[0]
+        if Authorizer().can_user_view_message(g.user, message):
             return jsonify(message)
-
+        else:
+            result = jsonify({'status': 'error'})
+            result.status_code = 403
+            return result
 
 class MessageModifyById(Resource):
     """Update message status by id"""

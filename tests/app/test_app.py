@@ -23,7 +23,7 @@ class FlaskTestCase(unittest.TestCase):
 
         AlertUser.alert_method = mock.Mock(AlertViaGovNotify)
 
-        token_data = {constants.USER_IDENTIFIER: "BRES",
+        token_data = {constants.USER_IDENTIFIER: constants.BRES_USER,
                       "role": "internal"}
 
         encrypter = Encrypter(_private_key=settings.SM_USER_AUTHENTICATION_PRIVATE_KEY,
@@ -38,14 +38,14 @@ class FlaskTestCase(unittest.TestCase):
         self.headers = {'Content-Type': 'application/json', 'Authorization': encrypted_jwt}
 
         self.test_message = {'msg_to': ['0a7ad740-10d5-4ecb-b7ca-3c0384afb882'],
-                             'msg_from': 'BRES',
+                             'msg_from': constants.BRES_USER,
                              'subject': 'MyMessage',
                              'body': 'hello',
                              'thread_id': "",
                              'collection_case': 'ACollectionCase',
                              'collection_exercise': 'ACollectionExercise',
                              'ru_id': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc',
-                             'survey': 'BRES'}
+                             'survey': constants.BRES_SURVEY}
 
         with app.app_context():
             database.db.init_app(current_app)
@@ -147,7 +147,7 @@ class FlaskTestCase(unittest.TestCase):
                         'collection_case': 'ACollectionCase',
                         'collection_exercise': 'ACollectionExercise',
                         'ru_id': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc',
-                        'survey': 'BRES'}
+                        'survey': constants.BRES_SURVEY}
         try:
             self.app.post(url, data=json.dumps(test_message), headers=self.headers)
             self.assertTrue(True)  # i.e no exception
@@ -192,13 +192,13 @@ class FlaskTestCase(unittest.TestCase):
 
         draft = ({'msg_id': self.msg_id,
                   'msg_to': ['0a7ad740-10d5-4ecb-b7ca-3c0384afb882'],
-                  'msg_from': 'BRES',
+                  'msg_from': constants.BRES_USER,
                   'subject': 'MyMessage',
                   'body': 'hello',
                   'thread_id': '',
                   'collection_case': 'ACollectionCase',
                   'ru_id': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc',
-                  'survey': 'BRES'})
+                  'survey': constants.BRES_SURVEY})
 
         response = self.app.post('http://localhost:5050/message/send', data=json.dumps(draft),
                                  headers=self.headers)
@@ -266,13 +266,13 @@ class FlaskTestCase(unittest.TestCase):
 
         self.test_message.update({'msg_id': msg_id,
                                   'msg_to': ['0a7ad740-10d5-4ecb-b7ca-3c0384afb882'],
-                                  'msg_from': 'BRES',
+                                  'msg_from': constants.BRES_USER,
                                   'subject': 'MyMessage',
                                   'body': 'hello',
                                   'collection_case': 'ACollectionCase',
                                   'collection_exercise': 'ACollectionExercise',
                                   'ru_id': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc',
-                                  'survey': 'BRES'})
+                                  'survey': constants.BRES_SURVEY})
 
         self.app.post("http://localhost:5050/message/send", data=json.dumps(self.test_message), headers=self.headers)
 
@@ -285,14 +285,14 @@ class FlaskTestCase(unittest.TestCase):
     def test_draft_created_by_respondent_does_not_show_for_internal(self):
         """Test whether a draft created by a respondent is returned to an internal user"""
 
-        self.test_message.update({'msg_to': ['BRES'],
+        self.test_message.update({'msg_to': [constants.BRES_USER],
                                   'msg_from': '0a7ad740-10d5-4ecb-b7ca-3c0384afb882',
                                   'subject': 'MyMessage',
                                   'body': 'hello',
                                   'collection_case': 'ACollectionCase',
                                   'collection_exercise': 'ACollectionExercise',
                                   'ru_id': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc',
-                                  'survey': 'BRES'})
+                                  'survey': constants.BRES_SURVEY})
 
         token_data = {constants.USER_IDENTIFIER: "0a7ad740-10d5-4ecb-b7ca-3c0384afb882",
                       "role": "respondent"}
@@ -308,7 +308,7 @@ class FlaskTestCase(unittest.TestCase):
         save_data = json.loads(resp.data)
         msg_id = save_data['msg_id']
 
-        token_data = {constants.USER_IDENTIFIER: "BRES",
+        token_data = {constants.USER_IDENTIFIER: constants.BRES_USER,
                       "role": "internal"}
 
         encrypter = Encrypter(_private_key=settings.SM_USER_AUTHENTICATION_PRIVATE_KEY,
@@ -327,14 +327,14 @@ class FlaskTestCase(unittest.TestCase):
     def test_draft_get_returns_msg_to(self):
         """Test that draft get returns draft's msg_to if applicable"""
 
-        self.test_message.update({'msg_to': ['BRES'],
+        self.test_message.update({'msg_to': [constants.BRES_USER],
                                   'msg_from': '0a7ad740-10d5-4ecb-b7ca-3c0384afb882',
                                   'subject': 'MyMessage',
                                   'body': 'hello',
                                   'collection_case': 'ACollectionCase',
                                   'collection_exercise': 'ACollectionExercise',
                                   'ru_id': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc',
-                                  'survey': 'BRES'})
+                                  'survey': constants.BRES_SURVEY})
 
         token_data = {constants.USER_IDENTIFIER: "0a7ad740-10d5-4ecb-b7ca-3c0384afb882",
                       "role": "respondent"}

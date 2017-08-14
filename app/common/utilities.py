@@ -1,12 +1,11 @@
 import hashlib
 import logging
-
 from flask import json
 from flask import jsonify
 from structlog import wrap_logger
 from werkzeug.exceptions import ExpectationFailed
+from app.services.service_toggles import party
 
-from app.api_mocks import party_service_mock
 from app.constants import MESSAGE_BY_ID_ENDPOINT, MESSAGE_LIST_ENDPOINT, MESSAGE_QUERY_LIMIT
 
 logger = wrap_logger(logging.getLogger(__name__))
@@ -88,8 +87,7 @@ def paginated_list_to_json(paginated_list, page, limit, host_url, user, string_q
         links['prev'] = {
             "href": "{0}{1}{2}{3}page={4}&limit={5}".format(host_url, endpoint, arg_joiner,
                                                             string_query_args, (page - 1), limit)}
-    messages = add_to_and_from_details(messages)
-
+    messages = add_users_and_business_details(messages)
     return jsonify({"messages": messages, "_links": links})
 
 
@@ -118,7 +116,7 @@ def get_business_details_by_ru(rus):
 
     for x in rus:
 
-        detail = party_service_mock.business_details_endpoint(x)
+        detail = party.get_business_details(x)
 
         if detail.status_code == 200:
             details.append(json.loads(detail.data))
@@ -132,9 +130,9 @@ def get_details_by_uuids(uuids):
     """Function to retrieve user details from uuids using the party service"""
 
     respondent_details = []
-    for x in uuids:
+    for uuid in uuids:
 
-        detail = party_service_mock.user_details_endpoint(x)
+        detail = party.get_user_details(uuid)
 
         if detail.status_code == 200:
             respondent_details.append(json.loads(detail.data))
@@ -145,7 +143,7 @@ def get_details_by_uuids(uuids):
 
 
 def add_to_and_from_details(messages):
-    """Adds user details for sender and reciepient"""
+    """Adds user details for sender and recipient"""
 
     uuid_list = []
 
@@ -161,7 +159,6 @@ def add_to_and_from_details(messages):
         message['@msg_to'] = [user for user in user_details if user["id"] in message['msg_to']]
         message['@msg_from'] = next((user for user in user_details if user["id"] == message['msg_from']), None)
 
-    messages = add_business_details(messages)
     return messages
 
 
@@ -177,5 +174,12 @@ def add_business_details(messages):
     business_details = get_business_details_by_ru(ru_list)
 
     for message in messages:
-        message['@ru_id'] = next((business for business in business_details if business["ru_id"] == message['ru_id']), None)
+        message['@ru_id'] = next((business for business in business_details if business["id"] == message['ru_id']), None)
+    return messages
+
+
+def add_users_and_business_details(messages):
+    """Add both user and business details to messages based on data from party service"""
+    messages = add_to_and_from_details(messages)
+    messages = add_business_details(messages)
     return messages

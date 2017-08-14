@@ -9,6 +9,8 @@ from app.application import app
 from app.repository import database
 from app.repository.retriever import Retriever
 from app.constants import MESSAGE_QUERY_LIMIT
+from app.services.service_toggles import party
+from app import constants
 
 from app.validation.user import User
 
@@ -17,7 +19,7 @@ class RetrieverTestCaseHelper:
     """Helper class for Retriever Tests"""
     def add_secure_message(self, msg_id, subject="test", body="test", thread_id="ThreadId",
                            collection_case="ACollectionCase", ru_id="f1a5e99c-8edf-489a-9c72-6cabe6c387fc",
-                           survey="BRES", collection_exercise='CollectionExercise'):
+                           survey=constants.BRES_USER, collection_exercise='CollectionExercise'):
 
         """ Populate the secure_message table"""
 
@@ -74,17 +76,17 @@ class RetrieverTestCaseHelper:
                 msg_id = str(uuid.uuid4())
                 self.add_secure_message(msg_id=msg_id)
                 self.add_status(label="SENT", msg_id=msg_id, actor="0a7ad740-10d5-4ecb-b7ca-3c0384afb882")
-                self.add_status(label="INBOX", msg_id=msg_id, actor="BRES")
-                self.add_status(label="UNREAD", msg_id=msg_id, actor="BRES")
+                self.add_status(label="INBOX", msg_id=msg_id, actor=constants.BRES_USER)
+                self.add_status(label="UNREAD", msg_id=msg_id, actor=constants.BRES_USER)
                 self.add_event(event="Sent", msg_id=msg_id, date_time=datetime(year, month, day))
 
             if add_reply:
-                self.del_status(label="UNREAD", msg_id=msg_id, actor="BRES")
+                self.del_status(label="UNREAD", msg_id=msg_id, actor=constants.BRES_USER)
                 self.add_event(event="Read", msg_id=msg_id, date_time=datetime(year, month, day + 1))
 
                 msg_id = str(uuid.uuid4())
                 self.add_secure_message(msg_id=msg_id)
-                self.add_status(label="SENT", msg_id=msg_id, actor="BRES")
+                self.add_status(label="SENT", msg_id=msg_id, actor=constants.BRES_USER)
                 self.add_status(label="INBOX", msg_id=msg_id, actor="0a7ad740-10d5-4ecb-b7ca-3c0384afb882")
                 self.add_status(label="UNREAD", msg_id=msg_id, actor="0a7ad740-10d5-4ecb-b7ca-3c0384afb882")
                 self.add_event(event="Sent", msg_id=msg_id, date_time=datetime(year, month, day+1))
@@ -93,7 +95,7 @@ class RetrieverTestCaseHelper:
                 msg_id = str(uuid.uuid4())
                 self.add_secure_message(msg_id=msg_id)
                 self.add_status(label="DRAFT_INBOX", msg_id=msg_id, actor="0a7ad740-10d5-4ecb-b7ca-3c0384afb882")
-                self.add_status(label="DRAFT", msg_id=msg_id, actor="BRES")
+                self.add_status(label="DRAFT", msg_id=msg_id, actor=constants.BRES_USER)
                 self.add_event(event="Draft_Saved", msg_id=msg_id, date_time=datetime(year, month, day))
 
             if multiple_users:
@@ -127,15 +129,15 @@ class RetrieverTestCaseHelper:
             msg_id = str(uuid.uuid4())
             thread_id = msg_id
             threads.append(thread_id)
-            self.add_secure_message(msg_id=msg_id, thread_id=thread_id, survey="BRES")
+            self.add_secure_message(msg_id=msg_id, thread_id=thread_id, survey=constants.BRES_USER)
             self.add_status(label="SENT", msg_id=msg_id, actor="0a7ad740-10d5-4ecb-b7ca-3c0384afb882")
-            self.add_status(label="INBOX", msg_id=msg_id, actor="BRES")
+            self.add_status(label="INBOX", msg_id=msg_id, actor=constants.BRES_USER)
             self.add_event(event="Sent", msg_id=msg_id, date_time=datetime(year, month, day))
             self.add_event(event="Read", msg_id=msg_id, date_time=datetime(year, month, day + 1))
 
             msg_id = str(uuid.uuid4())
-            self.add_secure_message(msg_id=msg_id, thread_id=thread_id, survey="BRES")
-            self.add_status(label="SENT", msg_id=msg_id, actor="BRES")
+            self.add_secure_message(msg_id=msg_id, thread_id=thread_id, survey=constants.BRES_USER)
+            self.add_status(label="SENT", msg_id=msg_id, actor=constants.BRES_USER)
             self.add_status(label="UNREAD", msg_id=msg_id, actor="0a7ad740-10d5-4ecb-b7ca-3c0384afb882")
             self.add_status(label="INBOX", msg_id=msg_id, actor="0a7ad740-10d5-4ecb-b7ca-3c0384afb882")
             self.add_event(event="Sent", msg_id=msg_id, date_time=datetime(year, month, day + 1))
@@ -144,9 +146,9 @@ class RetrieverTestCaseHelper:
 
             if add_internal_draft:  # adds draft from internal
                 msg_id = str(uuid.uuid4())
-                self.add_secure_message(msg_id=msg_id, thread_id=thread_id, survey="BRES")
+                self.add_secure_message(msg_id=msg_id, thread_id=thread_id, survey=constants.BRES_USER)
                 self.add_status(label="DRAFT_INBOX", msg_id=msg_id, actor="0a7ad740-10d5-4ecb-b7ca-3c0384afb882")
-                self.add_status(label="DRAFT", msg_id=msg_id, actor="BRES")
+                self.add_status(label="DRAFT", msg_id=msg_id, actor=constants.BRES_USER)
                 self.add_event(event="Draft_Saved", msg_id=msg_id, date_time=datetime(year, month, day+2))
 
             if add_respondent_draft:  # adds draft from respondent
@@ -155,8 +157,8 @@ class RetrieverTestCaseHelper:
                 self.add_event(event="Read", msg_id=last_msg_id, date_time=datetime(year, month, day + 1))
 
                 msg_id = str(uuid.uuid4())
-                self.add_secure_message(msg_id=msg_id, thread_id=thread_id, survey="BRES")
-                self.add_status(label="DRAFT_INBOX", msg_id=msg_id, actor="BRES")
+                self.add_secure_message(msg_id=msg_id, thread_id=thread_id, survey=constants.BRES_USER)
+                self.add_status(label="DRAFT_INBOX", msg_id=msg_id, actor=constants.BRES_USER)
                 self.add_status(label="DRAFT", msg_id=msg_id, actor="0a7ad740-10d5-4ecb-b7ca-3c0384afb882")
                 self.add_event(event="Draft_Saved", msg_id=msg_id, date_time=datetime(year, month, day + 2))
 
@@ -180,6 +182,7 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
 
         self.user_internal = User('ce12b958-2a5f-44f4-a6da-861e59070a31', 'internal')
         self.user_respondent = User('0a7ad740-10d5-4ecb-b7ca-3c0384afb882', 'respondent')
+        party.use_mock_service()
 
     @event.listens_for(Engine, "connect")
     def set_sqlite_pragma(dbapi_connection, connection_record):
@@ -236,7 +239,7 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
         with app.app_context():
             with current_app.test_request_context():
                 result = Retriever().retrieve_message_list(1, MESSAGE_QUERY_LIMIT, self.user_internal,
-                                                           survey='BRES')[1]
+                                                           survey=constants.BRES_SURVEY)[1]
                 msg = []
                 for message in result.items:
                     serialized_message = message.serialize(self.user_internal)
@@ -347,7 +350,7 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
                 with current_app.test_request_context():
                     msg_id = str(names[0])
                     response = Retriever().retrieve_message(msg_id, self.user_respondent)
-                    msg_to = ['BRES']
+                    msg_to = [constants.BRES_USER]
                     self.assertEqual(response['msg_to'], msg_to)
                     self.assertEqual(response['msg_from'], self.user_respondent.user_uuid)
 
@@ -366,7 +369,7 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
         with app.app_context():
             with current_app.test_request_context():
                 response = Retriever().retrieve_message_list(1, MESSAGE_QUERY_LIMIT,
-                                                             self.user_internal, survey='BRES', label='DRAFT')[1]
+                                                             self.user_internal, survey=constants.BRES_SURVEY, label='DRAFT')[1]
                 msg = []
                 for message in response.items:
                     serialized_msg = message.serialize(self.user_internal)
@@ -396,7 +399,7 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
         with app.app_context():
             with current_app.test_request_context():
                 response = Retriever().retrieve_message_list(1, MESSAGE_QUERY_LIMIT, self.user_internal,
-                                                             label="INBOX", survey='BRES')[1]
+                                                             label="INBOX", survey=constants.BRES_SURVEY)[1]
                 msg = []
                 for message in response.items:
                     serialized_msg = message.serialize(self.user_internal)
@@ -456,12 +459,12 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
         with app.app_context():
             with current_app.test_request_context():
                 response = Retriever().retrieve_message_list(1, MESSAGE_QUERY_LIMIT, self.user_respondent,
-                                                             survey='BRES')[1]
+                                                             survey=constants.BRES_SURVEY)[1]
                 msg = []
                 for message in response.items:
                     serialized_msg = message.serialize(self.user_respondent)
                     msg.append(serialized_msg)
-                    self.assertTrue(serialized_msg['survey'] == 'BRES')
+                    self.assertTrue(serialized_msg['survey'] == constants.BRES_SURVEY)
                 self.assertEqual(len(msg), 5)
 
     def test_no_message_returned_with_survey_option(self):
@@ -586,7 +589,7 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
         with app.app_context():
             with current_app.test_request_context():
                 response = Retriever().retrieve_message_list(1, MESSAGE_QUERY_LIMIT, self.user_internal,
-                                                             survey='BRES',
+                                                             survey=constants.BRES_SURVEY,
                                                              descend=False)[1]
 
                 date = []
@@ -608,7 +611,7 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
         with app.app_context():
             with current_app.test_request_context():
                 response = Retriever().retrieve_message_list(1, MESSAGE_QUERY_LIMIT, self.user_internal,
-                                                             survey='BRES',
+                                                             survey=constants.BRES_SURVEY,
                                                              descend=True)[1]
 
                 date = []
@@ -745,7 +748,7 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
                     msg_id = str(names[0])
                     response = Retriever().retrieve_message(msg_id, self.user_internal)
                     self.assertEqual(response['msg_to'], [self.user_respondent.user_uuid])
-                    self.assertEqual(response['msg_from'], 'BRES')
+                    self.assertEqual(response['msg_from'], constants.BRES_USER)
 
     def test_retrieve_draft_raises_error(self):
         """retrieves draft from when db does not exist"""
@@ -761,7 +764,7 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
 
         with app.app_context():
             with current_app.test_request_context():
-                response = Retriever().retrieve_thread('ThreadId', self.user_internal, _survey='BRES')
+                response = Retriever().retrieve_thread('ThreadId', self.user_internal, _survey=constants.BRES_SURVEY)
                 self.assertEqual(len(response), 9)
 
     def test_all_msg_returned_for_thread_id_without_draft(self):
@@ -805,7 +808,7 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
 
         with app.app_context():
             with current_app.test_request_context():
-                response = Retriever().retrieve_thread('ThreadId', self.user_internal, _survey='BRES')
+                response = Retriever().retrieve_thread('ThreadId', self.user_internal, _survey=constants.BRES_SURVEY)
                 self.assertEqual(len(response), 9)
 
                 date = []

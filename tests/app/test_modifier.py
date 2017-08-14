@@ -14,6 +14,7 @@ from app.repository.saver import Saver
 from app.validation.domain import DraftSchema
 from app.validation.user import User
 from app.repository.database import SecureMessage
+from app import constants
 
 
 class ModifyTestCaseHelper:
@@ -245,7 +246,7 @@ class ModifyTestCase(unittest.TestCase, ModifyTestCaseHelper):
         with app.app_context():
             with current_app.test_request_context():
                 self.test_message = {'msg_id': 'test123',
-                                     'msg_to': ['BRES'],
+                                     'msg_to': [constants.BRES_USER],
                                      'msg_from': '0a7ad740-10d5-4ecb-b7ca-3c0384afb882',
                                      'subject': 'MyMessage',
                                      'body': 'hello',
@@ -253,7 +254,7 @@ class ModifyTestCase(unittest.TestCase, ModifyTestCaseHelper):
                                      'collection_case': 'ACollectionCase',
                                      'collection_exercise': 'ACollectionExercise',
                                      'ru_id': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc',
-                                     'survey': 'BRES'}
+                                     'survey': constants.BRES_SURVEY}
 
                 modifier = Modifier()
 
@@ -295,7 +296,7 @@ class ModifyTestCase(unittest.TestCase, ModifyTestCaseHelper):
                                      'collection_case': 'ACollectionCase',
                                      'collection_exercise': 'ACollectionExercise',
                                      'ru_id': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc',
-                                     'survey': 'BRES'}
+                                     'survey': constants.BRES_SURVEY}
 
                 modifier = Modifier()
                 with self.engine.connect() as con:
@@ -324,7 +325,7 @@ class ModifyTestCase(unittest.TestCase, ModifyTestCaseHelper):
         with app.app_context():
             with current_app.test_request_context():
                 self.test_message = {'msg_id': 'test123',
-                                     'msg_to': ['BRES'],
+                                     'msg_to': [constants.BRES_USER],
                                      'msg_from': '0a7ad740-10d5-4ecb-b7ca-3c0384afb882',
                                      'subject': 'MyMessage',
                                      'body': 'hello',
@@ -332,7 +333,7 @@ class ModifyTestCase(unittest.TestCase, ModifyTestCaseHelper):
                                      'collection_case': 'ACollectionCase',
                                      'collection_exercise': 'ACollectionExercise',
                                      'ru_id': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc',
-                                     'survey': 'BRES'}
+                                     'survey': constants.BRES_SURVEY}
 
                 Saver().save_message(SecureMessage(msg_id=self.test_message['msg_id'],
                                                    body=self.test_message['body'],
@@ -415,7 +416,7 @@ class ModifyTestCase(unittest.TestCase, ModifyTestCaseHelper):
                  'collection_case': 'ACollectionCase',
                  'collection_exercise': 'ACollectionExercise',
                  'ru_id': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc',
-                 'survey': 'BRES'}
+                 'survey': constants.BRES_SURVEY}
 
         with app.app_context():
             database.db.drop_all()

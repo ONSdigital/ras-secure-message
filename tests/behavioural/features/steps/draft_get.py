@@ -44,7 +44,7 @@ with app.app_context():
 
 @given('a user requests a valid draft')
 def step_impl_user_requests_valid_draft(context):
-    data.update({'msg_to': ['BRES'],
+    data.update({'msg_to': [constants.BRES_USER],
                  'msg_from': '0a7ad740-10d5-4ecb-b7ca-3c0384afb882',
                  'subject': 'test',
                  'body': 'Test',
@@ -52,7 +52,7 @@ def step_impl_user_requests_valid_draft(context):
                  'collection_case': 'collection case1',
                  'collection_exercise': 'collection exercise1',
                  'ru_id': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc',
-                 'survey': 'BRES'})
+                 'survey': constants.BRES_SURVEY})
 
     response = app.test_client().post("http://localhost:5050/draft/save", data=json.dumps(data),
                                       headers=headers)
@@ -76,7 +76,7 @@ def step_impl_user_request_non_existent_draft(context):
 @given('a user is not authorised')
 def step_impl_user_not_authorised(self, context):
     #   waiting for  authorisation to be implemented
-    data.update({'msg_to': ['BRES'],
+    data.update({'msg_to': [constants.BRES_USER],
                  'msg_from': '0a7ad740-10d5-4ecb-b7ca-3c0384afb882',
                  'subject': 'test',
                  'body': 'Test',
@@ -84,7 +84,7 @@ def step_impl_user_not_authorised(self, context):
                  'collection_case': 'collection case1',
                  'collection_exercise': 'collection exercise1',
                  'ru_id': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc',
-                 'survey': 'BRES'})
+                 'survey': constants.BRES_SURVEY})
     response = app.test_client().post("http://localhost:5050/draft/save", data=json.dumps(context.draft),
                                       headers=headers)
     context.resp_data = json.loads(response.data)
@@ -98,7 +98,7 @@ def step_impl_assert_403_returned(context):
 #   Scenario 4: User is retrieving the etag from the header
 @given("there is a draft")
 def step_impl_there_is_a_draft(context):
-    data.update({'msg_to': ['BRES'],
+    data.update({'msg_to': [constants.BRES_USER],
                  'msg_from': '0a7ad740-10d5-4ecb-b7ca-3c0384afb882',
                  'subject': 'test',
                  'body': 'Test',
@@ -106,7 +106,7 @@ def step_impl_there_is_a_draft(context):
                  'collection_case': 'collection case1',
                  'collection_exercise': 'collection exercise1',
                  'ru_id': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc',
-                 'survey': 'BRES'})
+                 'survey': constants.BRES_SURVEY})
 
     response = app.test_client().post("http://localhost:5050/draft/save", data=json.dumps(data),
                                       headers=headers)

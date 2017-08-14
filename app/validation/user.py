@@ -1,11 +1,9 @@
 from app.api_mocks import party_service_mock
+from app.services.service_toggles import party
 
 
 class User:
     """Determines whether the user is internal or external"""
-
-    user_uuid = None
-    role = None
 
     def __init__(self, user_uuid, role):
         self.user_uuid = user_uuid
@@ -21,7 +19,5 @@ class User:
 
     @staticmethod
     def is_valid_user(uuid):
-
-        response = party_service_mock.user_details_endpoint(uuid)
-
+        response = party.get_user_details(uuid)
         return response.status_code == 200

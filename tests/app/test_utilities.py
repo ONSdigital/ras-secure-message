@@ -11,6 +11,8 @@ from app.repository.retriever import Retriever
 from app.constants import MESSAGE_QUERY_LIMIT
 from app.validation.user import User
 from tests.app.test_retriever import RetrieverTestCaseHelper
+from app.services.service_toggles import party
+from app import constants
 
 
 class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
@@ -27,6 +29,7 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
             database.db.drop_all()
             database.db.create_all()
             self.db = database.db
+        party.use_mock_service()
 
         self.user = User('0a7ad740-10d5-4ecb-b7ca-3c0384afb882', 'respondent')
 
@@ -129,7 +132,7 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
         """Tests get messages list with few options provided"""
         args = {
             'page': 2,
-            'survey': 'BRES',
+            'survey': constants.BRES_SURVEY,
             'ru_id': '7fc0e8ab-189c-4794-b8f4-9f05a1db185b'
         }
 
@@ -139,7 +142,7 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
         self.assertEqual(page, 2)
         self.assertEqual(limit, MESSAGE_QUERY_LIMIT)
         self.assertEqual(ru_id, '7fc0e8ab-189c-4794-b8f4-9f05a1db185b')
-        self.assertEqual(survey, 'BRES')
+        self.assertEqual(survey, constants.BRES_SURVEY)
         self.assertEqual(cc, None)
         self.assertEqual(label, None)
         self.assertEqual(desc, True)
@@ -150,7 +153,7 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
         args = {
             'page': 2,
             'limit': 9,
-            'survey': 'BRES',
+            'survey': constants.BRES_SURVEY,
             'ru_id': '7fc0e8ab-189c-4794-b8f4-9f05a1db185b',
             'cc': 'CollectionCase',
             'label': 'INBOX',
@@ -165,7 +168,7 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
         self.assertEqual(page, 2)
         self.assertEqual(limit, 9)
         self.assertEqual(ru_id, '7fc0e8ab-189c-4794-b8f4-9f05a1db185b')
-        self.assertEqual(survey, 'BRES')
+        self.assertEqual(survey, constants.BRES_USER)
         self.assertEqual(cc, 'CollectionCase')
         self.assertEqual(label, 'INBOX')
         self.assertEqual(desc, False)
