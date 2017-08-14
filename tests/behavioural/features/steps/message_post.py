@@ -322,7 +322,7 @@ def step_impl_msg_is_sent(context):
     token_data['role'] = 'respondent'
     headers['Authorization'] = update_encrypted_jwt()
     context.response = app.test_client().post(url, data=json.dumps(data), headers=headers)
-
+    x=0
 
 @then('a msg_id in the response')
 def step_impl_msg_id_in_response(context):
@@ -334,3 +334,25 @@ def step_impl_msg_id_in_response(context):
 def step_impl_thread_id_in_response(context):
     resp = json.loads(context.response.data)
     nose.tools.assert_true(resp['thread_id'] is not None)
+
+
+@given('a message to an unknown user is created')
+def step_impl_a_message_to_unknown_user(context):
+    context.msg = {'msg_to': ['UnknownUser'],
+                   'msg_from': constants.BRES_USER,
+                   'subject': 'test',
+                   'body': 'Test',
+                   'thread_id': '',
+                   'collection_case': 'collection case1',
+                   'collection_exercise': 'collection exercise1',
+                   'ru_id': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc',
+                   'survey': constants.BRES_SURVEY}
+
+
+@when('the created message is sent')
+def step_impl_created_message_is_sent(context):
+    token_data[constants.USER_IDENTIFIER] = context.msg['msg_from']
+    token_data['role'] = 'internal'
+    headers['Authorization'] = update_encrypted_jwt()
+    context.response = app.test_client().post("http://localhost:5050/message/send", data=json.dumps(context.msg),
+                                              headers=headers)

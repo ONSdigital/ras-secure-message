@@ -13,6 +13,7 @@ class PartyService:
     @staticmethod
     def get_business_details(ru):
         """Retrieves the business details from the party service"""
+
         url = app.settings.RAS_PARTY_GET_BY_BUSINESS.format(app.settings.RAS_PARTY_SERVICE, ru)
         party_data = requests.get(url, verify=False)
         logger.debug('party get business details result => {} {} : {}'.format(party_data.status_code, party_data.reason,
@@ -23,26 +24,24 @@ class PartyService:
 
         return party_dict, party_data.status_code
 
+
     @staticmethod
     def get_user_details(uuid):
         """Return user details , unless user is Bres in which case return constant data"""
-        try:
-            if uuid == constants.BRES_USER:
-                party_dict = {"id": constants.BRES_USER,
-                              "firstName": "BRES",
-                              "lastName": "",
-                              "emailAddress": "",
-                              "telephone": "",
-                              "status": "",
-                              "sampleUnitType": "BI"}
-            else:
-                url = app.settings.RAS_PARTY_GET_BY_RESPONDENT.format(app.settings.RAS_PARTY_SERVICE, uuid)
-                party_data = requests.get(url, verify=False)
-                logger.debug('party get user details result => {} {} : {}'.format(party_data.status_code,
-                                                                                  party_data.reason, party_data.text))
-                party_dict = json.loads(party_data.text)
-            return party_dict, 200
-        except KeyError:
-            logger.debug('User ID {} not in mock party service', uuid)
-            error = 'uuid {} is not valid'.format(uuid)
-            return error, 404
+
+        if uuid == constants.BRES_USER:
+            party_dict = {"id": constants.BRES_USER,
+                          "firstName": "BRES",
+                          "lastName": "",
+                          "emailAddress": "",
+                          "telephone": "",
+                          "status": "",
+                          "sampleUnitType": "BI"}
+        else:
+            url = app.settings.RAS_PARTY_GET_BY_RESPONDENT.format(app.settings.RAS_PARTY_SERVICE, uuid)
+            party_data = requests.get(url, verify=False)
+            logger.debug('party get user details result => {} {} : {}'.format(party_data.status_code,
+                                                                              party_data.reason, party_data.text))
+            party_dict = json.loads(party_data.text)
+        return party_dict, party_data.status_code
+

@@ -99,3 +99,10 @@ Feature: Message Send Endpoint
     When the message is sent with msg_to string
     Then a bad request status code (400) is returned
 
+  Scenario: Submitting a message to unkonwn user and recieving a
+    Given a message to an unknown user is created
+    When the created message is sent
+    Then a bad request status code (400) is returned
+
+
+

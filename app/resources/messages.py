@@ -15,6 +15,8 @@ from app.repository.saver import Saver
 from app.resources.drafts import DraftModifyById
 from app.validation.domain import MessageSchema
 from app.authorization.authorizer import Authorizer
+from app.services.service_toggles import party
+from app import constants
 
 
 logger = wrap_logger(logging.getLogger(__name__))
@@ -97,17 +99,38 @@ class MessageSend(Resource):
 
         if is_draft is True:
             Modifier().del_draft(draft_id)
-        return MessageSend._alert_recipients(message.data.msg_id, message.data.thread_id)
+
+        # listener errors are logged but still a 201 reported
+        MessageSend._alert_listeners(message.data)
+
+        resp = jsonify({'status': '201', 'msg_id': message.data.msg_id, 'thread_id': message.data.thread_id})
+        resp.status_code = 201
+        return resp
 
     @staticmethod
-    def _alert_recipients(msg_id, thread_id):
-        """used to alert user once messages have been saved"""
-        recipient_email = settings.NOTIFICATION_DEV_EMAIL  # TODO change this when know more about party service
-        alert_user = AlertUser()
-        alert_status, alert_detail = alert_user.send(recipient_email, msg_id)
-        resp = jsonify({'status': '{0}'.format(alert_detail), 'msg_id': msg_id, 'thread_id': thread_id})
-        resp.status_code = alert_status
-        return resp
+    def _alert_listeners(message):
+        """used to alert user and case service once messages have been saved"""
+        MessageSend._inform_case_service(message)
+        MessageSend._try_send_alert_email(message)
+
+    @staticmethod
+    def _try_send_alert_email(message):
+        """Send an email to recipient if appropriate"""
+        if message.msg_to[0] != constants.BRES_USER:
+            party_data, status_code = party.get_user_details(message.msg_to[0])  # todo avoid 2 lookups (see validate)
+            if status_code == 200:
+                if 'emailAddress' in party_data and len(party_data['emailAddress'].strip()) > 0:
+                    recipient_email = party_data['emailAddress'].strip()
+                    alert_user = AlertUser()
+                    alert_user.send(recipient_email, message.msg_id)
+                else:
+                    logger.error('UserId {0} does not have an emailAddress specified'.format(message.msg_to[0]))
+            else:
+                logger.error('UserId {0} not known in party service : alert email not sent but message stored'.format(message.msg_to[0]))
+
+    @staticmethod
+    def _inform_case_service(message):
+        pass
 
 
 class MessageById(Resource):

@@ -54,34 +54,6 @@ class PartyServiceIntegrationTestCase(unittest.TestCase):
         self.assertTrue(result == expected)
 
     @unittest.SkipTest
-    def test_calling_get_business_data_returns_expected_message2(self):
-        """Using id expected in test data results in expected data returned"""
-        sut = party
-        sut.use_real_service()
-
-        expected = {"attributes": {},
-                    "businessRef": "49900000000",
-                    "contactName": "Test User",
-                    "employeeCount": 50,
-                    "enterpriseName": "ABC Limited",
-                    "facsimile": "+44 1234 567890",
-                    "fulltimeCount": 35,
-                    "id": "3b136c4b-7a14-4904-9e01-13364dd7b972",
-                    "legalStatus": "Private Limited Company",
-                    "name": "Bolts and Ratchets Ltd",
-                    "sampleUnitType": "B",
-                    "sic2003": "2520",
-                    "sic2007": "2520",
-                    "telephone": "+44 1234 567890",
-                    "tradingName": "ABC Trading Ltd",
-                    "turnover": 350
-                    }
-
-        result, status_code = sut.get_business_details('b3ba864b-7cbc-4f44-84fe-88dc018a1a4c')  #test new test uuids here
-
-        self.assertTrue(result == expected)
-
-    @unittest.SkipTest
     def test_calling_get_user_data_for_non_existent_user_returns_expected_message(self):
         """test non existi=ant user returns expected error message"""
 
