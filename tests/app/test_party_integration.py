@@ -12,8 +12,8 @@ class PartyServiceIntegrationTestCase(unittest.TestCase):
         sut = party
         sut.use_real_service()
         expected = {"errors": "Business with party id '0a6018a0-3e67-4407-b120-780932434b36' does not exist."}
-        response = sut.get_business_details('0a6018a0-3e67-4407-b120-780932434b36')
-        self.assertEqual(json.loads(response.data), expected)
+        result, status_code = sut.get_business_details('0a6018a0-3e67-4407-b120-780932434b36')
+        self.assertEqual(result, expected)
 
     @unittest.SkipTest
     def test_calling_get_business_data_for_invalid_format_id_returns_expected_message(self):
@@ -21,9 +21,9 @@ class PartyServiceIntegrationTestCase(unittest.TestCase):
         sut = party
         sut.use_real_service()
         expected = {'errors': "'14900000000' is not a valid UUID format for property 'id'."}
-        response = sut.get_business_details('14900000000')
-        response_data = json.loads(response.data)
-        self.assertEqual(response_data, expected)
+        result, status_code = sut.get_business_details('14900000000')
+
+        self.assertEqual(result, expected)
 
     @unittest.SkipTest
     def test_calling_get_business_data_returns_expected_message(self):
@@ -49,9 +49,8 @@ class PartyServiceIntegrationTestCase(unittest.TestCase):
                     "turnover": 350
                     }
 
-        response = sut.get_business_details('3b136c4b-7a14-4904-9e01-13364dd7b972')
+        result, status_code = sut.get_business_details('3b136c4b-7a14-4904-9e01-13364dd7b972')
 
-        result = json.loads(response.data)
         self.assertTrue(result == expected)
 
     @unittest.SkipTest
@@ -78,9 +77,8 @@ class PartyServiceIntegrationTestCase(unittest.TestCase):
                     "turnover": 350
                     }
 
-        response = sut.get_business_details('b3ba864b-7cbc-4f44-84fe-88dc018a1a4c')  #test new test uuids here
+        result, status_code = sut.get_business_details('b3ba864b-7cbc-4f44-84fe-88dc018a1a4c')  #test new test uuids here
 
-        result = json.loads(response.data)
         self.assertTrue(result == expected)
 
     @unittest.SkipTest
@@ -90,8 +88,8 @@ class PartyServiceIntegrationTestCase(unittest.TestCase):
         sut = party
         sut.use_real_service()
         expected = {"errors": "Respondent with party id '0a6018a0-3e67-4407-b120-780932434b36' does not exist."}
-        response = sut.get_user_details('0a6018a0-3e67-4407-b120-780932434b36')
-        self.assertEqual(json.loads(response.data), expected)
+        result, status_code = sut.get_user_details('0a6018a0-3e67-4407-b120-780932434b36')
+        self.assertEqual(result, expected)
 
     @unittest.SkipTest
     def test_calling_get_respondent_data_with_expected_test_data_returns_expected_message(self):
@@ -105,5 +103,5 @@ class PartyServiceIntegrationTestCase(unittest.TestCase):
                     "telephone": "1234",
                     "sampleUnitType": "BI"
                     }
-        response = sut.get_user_details("db036fd7-ce17-40c2-a8fc-932e7c228397")
-        self.assertEqual(json.loads(response.data), expected)
+        result, status_code = sut.get_user_details("db036fd7-ce17-40c2-a8fc-932e7c228397")
+        self.assertEqual(result, expected)

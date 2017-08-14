@@ -11,20 +11,20 @@ class PartyServiceMock:
     def get_business_details(self, ru):
         """Return mock business details"""
         try:
-            return Response(response=json.dumps(self._business_details[ru]), status=200, mimetype="text/html")
+            return self._business_details[ru], 200
         except KeyError:
-            logger.debug('RU %s not in mock party service.', ru)
-            return Response(response="ru is not valid", status=404,
-                            mimetype="text/html")
+            error = 'RU {} not in mock party service.'.format(ru)
+            logger.debug(error)
+            return error, 404
 
     def get_user_details(self, uuid):
         """Return mock user details"""
         try:
-            return Response(response=json.dumps(self._respondent_ids[uuid]), status=200, mimetype="text/html")
+            return self._respondent_ids[uuid], 200
         except KeyError:
-            logger.debug('User ID %s not in mock party service', uuid)
-            return Response(response="uuid not valid", status=404,
-                            mimetype="text/html")
+            error = 'User ID {} is not in mock party service'.format(uuid)
+            logger.debug(error)
+            return error, 404
 
     _business_details = {'c614e64e-d981-4eba-b016-d9822f09a4fb': {"id": "c614e64e-d981-4eba-b016-d9822f09a4fb",
                                                                   "name": "AOL"},
