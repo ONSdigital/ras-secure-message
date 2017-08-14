@@ -63,7 +63,7 @@ class DraftById(Resource):
         message_service = Retriever()
         draft_data = message_service.retrieve_draft(draft_id, g.user)
         etag = generate_etag(draft_data['msg_to'], draft_data['msg_id'], draft_data['subject'], draft_data['body'])
-        draft_data =add_users_and_business_details([draft_data])[0]
+        draft_data = add_users_and_business_details([draft_data])[0]
         resp = jsonify(draft_data)
         resp.headers['ETag'] = etag
 
