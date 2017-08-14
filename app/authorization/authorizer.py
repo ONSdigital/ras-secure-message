@@ -7,7 +7,7 @@ logger = wrap_logger(logging.getLogger(__name__))
 class Authorizer:
 
     @staticmethod
-    def can_user_view_message(user, message)
+    def can_user_view_message(user, message):
         """ 
             A user can view message if
             a) The user is internal ( currently no restrictions )
