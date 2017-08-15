@@ -35,7 +35,7 @@ if cf.detected:
     cf_database_service = cf.database()
     logger.info('* Cloud Foundry protocol "{}"'.format(protocol))
     logger.info('* Cloud Foundry database service "{}"'.format(cf_database_service))
-    app.config['SQLALCHEMY_DATABASE_URI'] = cf_database_service.credentials['uri']
+    app.config['SQLALCHEMY_DATABASE_URI'] = cf.credentials()
 else:
     app.config['SQLALCHEMY_DATABASE_URI'] = connector.get_database_uri()
 
