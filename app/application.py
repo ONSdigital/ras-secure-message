@@ -12,6 +12,7 @@ from app.resources.messages import MessageList, MessageSend, MessageById, Messag
 from app.authentication.authenticator import authenticate
 from app.resources.drafts import DraftSave, DraftById, DraftModifyById, DraftList
 from app.resources.threads import ThreadById, ThreadList
+from app.cloud.cloud_foundry import ONSCloudFoundry
 from app import connector
 from app.logger_config import logger_initial_config
 from structlog import wrap_logger
@@ -20,6 +21,14 @@ logger_initial_config(service_name='ras-secure-message')
 
 logger = wrap_logger(logging.getLogger(__name__))
 
+
+# use cf env to extract Cloud Foundry environment
+cf = ONSCloudFoundry()
+protocol = cf.protocol
+cf_database_service = cf.database()
+logger.info('* Cloud Foundry protocol "{}"'.format(protocol))
+logger.info('* Cloud Foundry database service "{}"'.format(cf_database_service))
+
 app = Flask(__name__)
 api = Api(app)
 CORS(app)
@@ -27,8 +36,7 @@ app.config['SQLALCHEMY_DATABASE_URI'] = connector.get_database_uri()
 app.config['SQLALCHEMY_POOL_SIZE'] = settings.SQLALCHEMY_POOL_SIZE
 database.db.init_app(app)
 
-logger.info('Starting application')
-
+logger.info('Starting Secure Message Service ...')
 
 def drop_database():
     database.db.drop_all()

@@ -24,3 +24,6 @@ class ONSCloudFoundry(object):
     @property
     def protocol(self):
         return self._protocol
+
+    def database(self):
+        return self._cf_env.get_service(tags='database')

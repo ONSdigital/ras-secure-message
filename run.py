@@ -12,12 +12,9 @@ if __name__ == '__main__':
     # First check if secure messaging is deployed in a Cloud Foundry environment
     if cf.detected:
         port = cf.port
-        protocol = cf.protocol
-        database = cf.get_service(tags='database')
         logger.info('* Cloud Foundry environment detected.')
         logger.info('* Cloud Foundry port "{}"'.format(port))
-        logger.info('* Cloud Foundry protocol "{}"'.format(protocol))
-        logger.info('* Cloud Foundry database service "{}"'.format(database))
+
     else:
         port = os.getenv('SMS_DEV_PORT', 5050)
     logger.info('* starting listening port "{}"'.format(port))
