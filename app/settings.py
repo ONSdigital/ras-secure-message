@@ -55,8 +55,6 @@ RM_CASE_SERVICE_PROTOCOL = os.getenv('RM_CASE_SERVICE_PROTOCOL', 'http')
 RM_CASE_SERVICE = '{}://{}:{}/'.format(RM_CASE_SERVICE_PROTOCOL, RM_CASE_SERVICE_HOST, RM_CASE_SERVICE_PORT)
 RM_CASE_POST = '{}cases/{}/events'
 
-
-# curl -H “Accept: application/json” -H “Content-Type: application/json”
-# http://localhost:8171/cases/<case-uuid>/events -v -X POST -d
-# “{\“description\“:\“<description>\“, \“category\“:\“SECURE_MESSAGE_SENT\“, \“createdBy\“:\“<name>\“}”
-# “{\“description\“:\“mytest\“, \“category\“:\“SECURE_MESSAGE_SENT\“, \“createdBy\“:\“gareth\“}”
+# curl -H "Accept: application/json" -H "Content-Type: application/json"
+# http://casesvc-sit.apps.devtest.onsclofo.uk:80/cases/5079d645-3e2e-4a0d-8f2a-9bae99ee4588/events -v POST -d
+# "{\"description\":\"mytest\", \"category\":\"SECURE_MESSAGE_SENT\", \"createdBy\":\"gareth\"}"

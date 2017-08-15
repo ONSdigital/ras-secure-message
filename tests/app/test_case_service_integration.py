@@ -6,7 +6,7 @@ from flask import json
 class CaseServiceIntegrationTestCase(unittest.TestCase):
     """Test case for toggling between a service and its mock"""
 
-    @unittest.SkipTest
+    # @unittest.SkipTest
     def test_post_data_to_case_service(self):
         """Post data to case_service"""
         sut = case_service
