@@ -1,6 +1,6 @@
 import nose.tools
 from app.application import app
-from app.services.service_toggles import party
+from app.services.service_toggles import party, case_service
 from behave import given, then
 from app.repository import database
 from flask import current_app
@@ -27,6 +27,11 @@ def step_impl_reset_db(context):
 @given("using mock party service")
 def step_impl_use_mock_party_service(context):
     party.use_mock_service()
+
+
+@given("using mock case service")
+def step_impl_use_mock_case_service(service):
+    case_service.use_mock_service()
 
 
 @then("an etag should be sent with the draft")
