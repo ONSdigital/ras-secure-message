@@ -121,7 +121,7 @@ def get_business_details_by_ru(rus):
         if status_code == 200:
             details.append(detail)
         else:
-            raise ExpectationFailed(description="Received an unexpected response from Party service")
+            logger.info("No details found for RU ID {}".format(ru))
 
     return details
 
@@ -137,7 +137,7 @@ def get_details_by_uuids(uuids):
         if status_code == 200:
             respondent_details.append(detail)
         else:
-            raise ExpectationFailed(description="Received an unexpected response from Party service")
+            logger.info("No details found for user {}".format(uuid))
 
     return respondent_details
 
