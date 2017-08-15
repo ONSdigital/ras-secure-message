@@ -2,6 +2,7 @@ Feature: Draft Put Endpoint
 
    Background: Reset database
     Given using mock party service
+     And using mock case service
 
   Scenario: A user edits a previously saved draft
     Given a user edits a previously saved draft

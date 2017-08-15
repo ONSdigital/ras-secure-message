@@ -2,6 +2,7 @@ Feature: Message Send Endpoint
 
  Background: Reset database
     Given using mock party service
+    And using mock case service
 
   Scenario: Submitting a valid message and receiving a 201
     Given a valid message

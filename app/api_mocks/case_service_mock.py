@@ -7,5 +7,5 @@ logger = logging.getLogger(__name__)
 
 class CaseServiceMock:
     @staticmethod
-    def store_case_event(case_id):
-        return Response(response=json.dumps(case_id), status=201, mimetype="text/html")
+    def store_case_event(case_id, user_uuid):
+        return 'OK', 200

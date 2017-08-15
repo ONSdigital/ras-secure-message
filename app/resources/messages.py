@@ -15,7 +15,7 @@ from app.repository.saver import Saver
 from app.resources.drafts import DraftModifyById
 from app.validation.domain import MessageSchema
 from app.authorization.authorizer import Authorizer
-from app.services.service_toggles import party
+from app.services.service_toggles import party, case_service
 from app import constants
 
 
@@ -110,12 +110,16 @@ class MessageSend(Resource):
     @staticmethod
     def _alert_listeners(message):
         """used to alert user and case service once messages have been saved"""
-        MessageSend._inform_case_service(message)
-        MessageSend._try_send_alert_email(message)
+        try:
+            MessageSend._try_send_alert_email(message)
+            MessageSend._inform_case_service(message)
+        except Exception as e:
+            logger.error('Uncaught exception in Message.alert_listeners: {}'.format(e))
 
     @staticmethod
     def _try_send_alert_email(message):
         """Send an email to recipient if appropriate"""
+        party_data=None
         if message.msg_to[0] != constants.BRES_USER:
             party_data, status_code = party.get_user_details(message.msg_to[0])  # todo avoid 2 lookups (see validate)
             if status_code == 200:
@@ -127,10 +131,26 @@ class MessageSend(Resource):
                     logger.error('UserId {0} does not have an emailAddress specified'.format(message.msg_to[0]))
             else:
                 logger.error('UserId {0} not known in party service : alert email not sent but message stored'.format(message.msg_to[0]))
+        return party_data
 
     @staticmethod
     def _inform_case_service(message):
-        pass
+        if message.msg_from == constants.BRES_USER:
+            case_user = constants.BRES_USER
+        else:
+            party_data, status_code = party.get_user_details(message.msg_from)  # todo avoid 2 lookups (see validate)
+            if status_code == 200:
+                first_name = party_data['firstName'] if party_data['firstName'] is not None else ''
+                last_name = party_data['lastName'] if party_data['lastName'] is not None else ''
+                case_user = '{} {}'.format(first_name, last_name).strip()
+                if len(case_user) == 0:
+                    case_user = 'Unknown user'
+                    logger.info('no user names in party data for id {0} Unknown user used in case '.format(party_data['id']))
+            else:
+                logger.info('could not retrieve {} details from party using Unknown user for case'.format(message.msg_from))
+                case_user = 'Unknown user'
+        case_service.store_case_event(message.collection_case, case_user)
+
 
 
 class MessageById(Resource):

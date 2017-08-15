@@ -2,6 +2,7 @@ Feature: Message get by ID Endpoint
 
    Background: Reset database
     Given using mock party service
+     And using mock case service
 
   Scenario Outline: Retrieve a correct message with message ID
     Given there is a message to be retrieved

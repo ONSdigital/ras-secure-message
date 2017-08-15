@@ -55,9 +55,11 @@ class Case(ServiceMockToggle):
     def __init__(self, use_mock=False):
         super().__init__(use_mock, CaseService, CaseServiceMock, 'Case')
 
-    def store_case_event(self, case_id):
-        return self._service.store_case_event(case_id)
+    def store_case_event(self, case_id, user_uuid):
+        return self._service.store_case_event(case_id, user_uuid)
 
 """party is the interface that code should use mocktoggle for the party service """
 party = Party(False)
+
+"""case_service is how code should interact with the case service"""
 case_service = Case(False)
