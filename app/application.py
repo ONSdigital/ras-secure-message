@@ -24,16 +24,21 @@ logger = wrap_logger(logging.getLogger(__name__))
 
 # use cf env to extract Cloud Foundry environment
 cf = ONSCloudFoundry()
+
+
+app = Flask(__name__)
+api = Api(app)
+CORS(app)
+
 if cf.detected:
     protocol = cf.protocol
     cf_database_service = cf.database()
     logger.info('* Cloud Foundry protocol "{}"'.format(protocol))
     logger.info('* Cloud Foundry database service "{}"'.format(cf_database_service))
+    app.config['SQLALCHEMY_DATABASE_URI'] = cf_database_service.credentials['uri']
+else:
+    app.config['SQLALCHEMY_DATABASE_URI'] = connector.get_database_uri()
 
-app = Flask(__name__)
-api = Api(app)
-CORS(app)
-app.config['SQLALCHEMY_DATABASE_URI'] = connector.get_database_uri()
 app.config['SQLALCHEMY_POOL_SIZE'] = settings.SQLALCHEMY_POOL_SIZE
 database.db.init_app(app)
 
