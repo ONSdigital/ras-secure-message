@@ -33,7 +33,7 @@ class ONSCloudFoundry(object):
         return self._cf_env.get_service(tags='database')
 
     def credentials(self):
-        cfreturn self._cf_env.get_credential('uri')
+        return self._cf_env.get_credential('uri')
 
 def my_match(target, pattern):
         """
