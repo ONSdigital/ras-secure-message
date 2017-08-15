@@ -13,6 +13,7 @@ if __name__ == '__main__':
     if cf.detected:
         port = cf.port
         protocol = cf.protocol
+        database = cf.get_service(tags='database')
         logger.info('* Cloud Foundry environment detected.')
         logger.info('* Cloud Foundry port "{}"'.format(port))
         logger.info('* Cloud Foundry protocol "{}'.format(protocol))
