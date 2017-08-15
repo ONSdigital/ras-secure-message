@@ -1,7 +1,13 @@
+import json
 import logging
+from pathlib import Path
+
+from flask import jsonify, make_response
 from flask_restful import Resource
-from flask import jsonify
 from structlog import wrap_logger
+
+from app import settings
+
 
 logger = wrap_logger(logging.getLogger(__name__))
 
@@ -12,11 +18,15 @@ class Info(Resource):
 
     @staticmethod
     def get():
-        details = {'name': 'secure_message',
-                   'version': '0.0.1',
-                   'origin': 'https://github.com/ONSdigital/ras-secure-message.git',
-                   'commit': 'not specified',
-                   'branch': 'not specified',
-                   'built': '01-01-1900 00:00:00.000'}
+        _health_check = {}
+        if Path('git_info').exists():
+            with open('git_info') as io:
+                _health_check = json.loads(io.read())
 
-        return jsonify(details)
+        info = {
+            "name": settings.NAME,
+            "version": settings.VERSION,
+        }
+        info = dict(_health_check, **info)
+
+        return make_response(jsonify(info), 200)
