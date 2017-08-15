@@ -24,10 +24,11 @@ logger = wrap_logger(logging.getLogger(__name__))
 
 # use cf env to extract Cloud Foundry environment
 cf = ONSCloudFoundry()
-protocol = cf.protocol
-cf_database_service = cf.database()
-logger.info('* Cloud Foundry protocol "{}"'.format(protocol))
-logger.info('* Cloud Foundry database service "{}"'.format(cf_database_service))
+if cf.detected:
+    protocol = cf.protocol
+    cf_database_service = cf.database()
+    logger.info('* Cloud Foundry protocol "{}"'.format(protocol))
+    logger.info('* Cloud Foundry database service "{}"'.format(cf_database_service))
 
 app = Flask(__name__)
 api = Api(app)
