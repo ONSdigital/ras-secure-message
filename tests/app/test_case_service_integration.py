@@ -1,12 +1,11 @@
 import unittest
 from app.services.service_toggles import case_service
-from flask import json
 
 
 class CaseServiceIntegrationTestCase(unittest.TestCase):
     """Test case for toggling between a service and its mock"""
 
-    # @unittest.SkipTest
+    @unittest.SkipTest
     def test_requesting_unknown_case_returns_error(self):
         """Post data to case_service"""
         sut = case_service
@@ -19,7 +18,7 @@ class CaseServiceIntegrationTestCase(unittest.TestCase):
         self.assertEqual(status_code, 404)
         self.assertEqual(expected, result)
 
-    # @unittest.SkipTest
+    @unittest.SkipTest
     def test_request_with_no_case_returns_error(self):
         """Post data to case_service"""
         sut = case_service
@@ -32,7 +31,7 @@ class CaseServiceIntegrationTestCase(unittest.TestCase):
         self.assertEqual(status_code, 500)
         self.assertEqual(expected, result)
 
-    # @unittest.SkipTest
+    @unittest.SkipTest
     def test_requesting_known_case_returns_no_error(self):
         """Post data to case_service"""
         sut = case_service
@@ -46,7 +45,7 @@ class CaseServiceIntegrationTestCase(unittest.TestCase):
         self.assertEqual(response_data['createdBy'], 'Fred')
         self.assertEqual(response_data['description'], 'New Secure Message')
 
-    # @unittest.SkipTest
+    @unittest.SkipTest
     def test_createdBy_under_limit(self):
         """Post data to case_service"""
         sut = case_service
@@ -57,7 +56,7 @@ class CaseServiceIntegrationTestCase(unittest.TestCase):
         self.assertEqual(status_code, 201)
         self.assertEqual(response_data['createdBy'], 'FredFredFredFredFredFredFredFredFredFredFredFred')
 
-    # @unittest.SkipTest
+    @unittest.SkipTest
     def test_createdBy_over_limit(self):
         """Post data to case_service"""
         sut = case_service
@@ -67,7 +66,7 @@ class CaseServiceIntegrationTestCase(unittest.TestCase):
                                                           'FredFredFredFredFredFredFredFredFredFredFredFredFred')  # 52 characters
         self.assertEqual(status_code, 400)
 
-    # @unittest.SkipTest
+    @unittest.SkipTest
     def test_createdBy_is_empty(self):
         """Post data to case_service"""
         sut = case_service
@@ -79,7 +78,7 @@ class CaseServiceIntegrationTestCase(unittest.TestCase):
         self.assertEqual(response_data['message'], 'Provided json fails validation.')
         self.assertEqual(status_code, 400)
 
-    # @unittest.SkipTest
+    @unittest.SkipTest
     def test_createdBy_is_None(self):
         """Post data to case_service"""
         sut = case_service

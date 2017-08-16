@@ -6,8 +6,7 @@ from structlog import wrap_logger
 from werkzeug.exceptions import BadRequest
 from app.common.labels import Labels
 from app.constants import DRAFT_LIST_ENDPOINT
-from app.common.utilities import get_options, paginated_list_to_json, generate_etag, \
-    add_to_and_from_details, add_business_details, add_users_and_business_details
+from app.common.utilities import get_options, paginated_list_to_json, generate_etag, add_users_and_business_details
 from app.repository.modifier import Modifier
 from app.repository.retriever import Retriever
 from app.repository.saver import Saver

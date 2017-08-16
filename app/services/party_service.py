@@ -1,5 +1,4 @@
 import logging
-from flask import Response
 from flask import json
 import requests
 import app.settings

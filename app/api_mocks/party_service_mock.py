@@ -1,6 +1,4 @@
 import logging
-from flask import Response
-from flask import json
 from app import constants
 
 logger = logging.getLogger(__name__)
