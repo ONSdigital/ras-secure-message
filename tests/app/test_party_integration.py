@@ -1,6 +1,6 @@
 import unittest
+
 from app.services.service_toggles import party
-from flask import json
 
 
 class PartyServiceIntegrationTestCase(unittest.TestCase):
@@ -20,7 +20,7 @@ class PartyServiceIntegrationTestCase(unittest.TestCase):
         """Using invalid format_for_id gives expected error """
         sut = party
         sut.use_real_service()
-        expected = {'errors': "'14900000000' is not a valid UUID format for property 'id'."}
+        expected = {"errors": "'14900000000' is not a valid UUID format for property 'id'."}
         result, status_code = sut.get_business_details('14900000000')
 
         self.assertEqual(result, expected)
@@ -75,5 +75,5 @@ class PartyServiceIntegrationTestCase(unittest.TestCase):
                     "telephone": "1234",
                     "sampleUnitType": "BI"
                     }
-        result, status_code = sut.get_user_details("db036fd7-ce17-40c2-a8fc-932e7c228397")
+        result, status_code = sut.get_user_details('db036fd7-ce17-40c2-a8fc-932e7c228397')
         self.assertEqual(result, expected)

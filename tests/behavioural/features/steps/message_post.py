@@ -322,7 +322,7 @@ def step_impl_msg_is_sent(context):
     token_data['role'] = 'respondent'
     headers['Authorization'] = update_encrypted_jwt()
     context.response = app.test_client().post(url, data=json.dumps(data), headers=headers)
-    x=0
+
 
 @then('a msg_id in the response')
 def step_impl_msg_id_in_response(context):
