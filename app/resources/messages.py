@@ -119,7 +119,7 @@ class MessageSend(Resource):
     @staticmethod
     def _try_send_alert_email(message):
         """Send an email to recipient if appropriate"""
-        party_data=None
+        party_data = None
         if message.msg_to[0] != constants.BRES_USER:
             party_data, status_code = party.get_user_details(message.msg_to[0])  # todo avoid 2 lookups (see validate)
             if status_code == 200:
@@ -150,7 +150,6 @@ class MessageSend(Resource):
                 logger.info('could not retrieve {} details from party using Unknown user for case'.format(message.msg_from))
                 case_user = 'Unknown user'
         case_service.store_case_event(message.collection_case, case_user)
-
 
 
 class MessageById(Resource):
