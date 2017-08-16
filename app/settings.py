@@ -5,6 +5,9 @@ import os
     It contains a full default configuration
     All configuration may be overridden by setting the appropriate environment variable name. '''
 
+NAME = os.getenv('NAME', 'ras-secure-message')
+VERSION = os.getenv('VERSION', '0.1.0')
+
 SECURE_MESSAGING_DATABASE_URL = os.getenv('SECURE_MESSAGING_DATABASE_URL', 'sqlite:////tmp/messages.db')
 
 ACCESS_CONTROL_ALLOW_ORIGIN = os.getenv('ACCESS_CONTROL_ALLOW_ORIGIN', '*')
