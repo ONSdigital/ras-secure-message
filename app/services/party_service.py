@@ -35,10 +35,11 @@ class PartyService:
                           "telephone": "",
                           "status": "",
                           "sampleUnitType": "BI"}
+            return party_dict, 200
         else:
             url = app.settings.RAS_PARTY_GET_BY_RESPONDENT.format(app.settings.RAS_PARTY_SERVICE, uuid)
             party_data = requests.get(url, verify=False)
             logger.debug('party get user details result => {} {} : {}'.format(party_data.status_code,
                                                                               party_data.reason, party_data.text))
             party_dict = json.loads(party_data.text)
-        return party_dict, party_data.status_code
+            return party_dict, party_data.status_code
