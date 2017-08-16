@@ -41,7 +41,7 @@ class PartyService:
                 logger.debug('party get user details result => {} {} : {}'.format(party_data.status_code,
                                                                                   party_data.reason, party_data.text))
                 party_dict = json.loads(party_data.text)
-            return Response(response=json.dumps(party_dict), status=200, mimetype="text/html")
+            return Response(response=json.dumps(party_dict), status=party_data.status_code, mimetype="text/html")
         except KeyError:
             logger.debug('User ID {} not in mock party service', uuid)
             return Response(response="uuid not valid", status=404, mimetype="text/html")
