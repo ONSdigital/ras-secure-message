@@ -12,8 +12,7 @@ def logger_initial_config(service_name=None,
         log_level = os.getenv('SMS_LOG_LEVEL', 'INFO')
     if not logger_format:
         logger_format = (
-            "%(asctime)s.%(msecs)06dZ|"
-            "%(levelname)s: {}: '%(message)s: file='%(name)s.%(funcName)s:line no.='%(lineno)d"
+            "level='%(levelname)s' service='{}' created=%(asctime)s.%(msecs)06dZ | %(message)s file='%(name)s.%(funcName)s' line_no=%(lineno)d"
             ).format(service_name)
     if not logger_date_format:
         logger_date_format = os.getenv('LOGGING_DATE_FORMAT', "%Y-%m-%dT%H:%M%s")

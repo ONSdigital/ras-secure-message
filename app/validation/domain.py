@@ -4,8 +4,9 @@ from marshmallow import Schema, fields, post_load, validates, ValidationError, p
 from app import constants
 from app.validation.user import User
 from flask import g
+from structlog import wrap_logger
 
-logger = logging.getLogger(__name__)
+logger = wrap_logger(logging.getLogger(__name__))
 
 
 class Message:
@@ -220,5 +221,5 @@ class DraftSchema(Schema):
     @staticmethod
     def validate_field_length(field_name, length, max_field_len, data=None):
         if length > max_field_len:
-            logger.debug("{0} field is too large {1}  max size: {2}".format(field_name, length, max_field_len))
+            logger.debug('Field is too large', field_name=field_name, length=length, max_field_len=max_field_len)
             raise ValidationError('{0} field length must not be greater than {1}.'.format(field_name, max_field_len), field_name, [], data)

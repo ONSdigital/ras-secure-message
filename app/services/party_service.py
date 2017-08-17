@@ -4,8 +4,9 @@ from flask import json
 import requests
 import app.settings
 from app import constants
+from structlog import wrap_logger
 
-logger = logging.getLogger(__name__)
+logger = wrap_logger(logging.getLogger(__name__))
 
 
 class PartyService:
