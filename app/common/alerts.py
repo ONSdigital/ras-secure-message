@@ -22,48 +22,26 @@ class AlertViaGovNotify:
 class AlertUser:
     """Alert goes via gov notify (0) or via logs (1)"""
 
-    NOTIFICATION_LOGGING = settings.NOTIFICATION_LOGGING
-    logger.debug('Notification logging (0=disabled, 1=enabled) : {}'.format(NOTIFICATION_LOGGING))
+    NOTIFY_VIA_LOGGING = settings.NOTIFY_VIA_LOGGING
+    logger.debug('Notification logging (0=disabled, 1=enabled) : {}'.format(NOTIFY_VIA_LOGGING))
     alert_method = AlertViaGovNotify()
 
-    if NOTIFICATION_LOGGING == '1':
-        def __init__(self, alerter=None):
-            if alerter is not None:
-                self.alert_method = alerter
+    def __init__(self, alerter=None):
+        if alerter is not None:
+            self.alert_method = alerter
 
-        def send(self, email, reference):
+    def send(self, email, reference):
+        if self.NOTIFY_VIA_LOGGING == '1':
             try:
                 logger.info('email details {}, {}'.format(email, reference))
             except BaseException as e:
                 logger.exception(e)
             finally:
                 return 201, 'OK'
-    else:
-        def __init__(self, alerter=None):
-            if alerter is not None:
-                self.alert_method = alerter
-
-        def send(self, email, reference):
+        else:
             try:
                 self.alert_method.send(email, reference)
             except BaseException as e:
                 logger.exception(e)
             finally:
                 return 201, 'OK'
-
-
-# class AlertUser:
-#     """Alert User"""
-#     alert_method = AlertViaGovNotify()
-#
-#     def __init__(self, alerter=None):
-#         if alerter is not None:
-#             self.alert_method = alerter
-#
-#     def send(self, email, reference):
-#         try:
-#             self.alert_method.send(email, reference)
-#         except BaseException as e:
-#             logger.exception(e)
-#         finally:
-#             return 201, 'OK'

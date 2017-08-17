@@ -29,7 +29,7 @@ NOTIFICATION_DEV_EMAIL = os.getenv('NOTIFICATION_DEV_EMAIL', 'emilio.ward@ons.go
 
 # LOGGING NOTIFICATION SETTINGS
 
-NOTIFICATION_LOGGING = os.getenv('NOTIFY_VIA_LOGGING', '0')
+NOTIFY_VIA_LOGGING = os.getenv('NOTIFY_VIA_LOGGING', '0')
 
 # SQLAlchemy configuration
 
@@ -37,7 +37,7 @@ SQLALCHEMY_POOL_SIZE = os.getenv('SQLALCHEMY_POOL_SIZE', None)
 
 
 SM_JWT_SECRET = os.getenv('SM_JWT_SECRET', 'vrwgLNWEffe45thh545yuby')
-SM_JWT_ENCRYPT = os.getenv('SM_JWT_ENCRYPT', '0')
+SM_JWT_ENCRYPT = os.getenv('SM_JWT_ENCRYPT', '1')
 
 #  Keys
 SM_USER_AUTHENTICATION_PRIVATE_KEY = open("{0}/jwt-test-keys/sm-user-authentication-encryption-private-key.pem".format(os.getenv('RAS_SM_PATH')))\
