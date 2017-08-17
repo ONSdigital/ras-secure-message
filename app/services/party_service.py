@@ -23,7 +23,6 @@ class PartyService:
 
         return party_dict, party_data.status_code
 
-
     @staticmethod
     def get_user_details(uuid):
         """Return user details , unless user is Bres in which case return constant data"""
