@@ -30,10 +30,10 @@ class CaseServiceTestCase(unittest.TestCase):
     def test_store_case_event_posts_request_with_error_in_dict(self):
         """Test store_case_event sends a request and returns data"""
         sut = CaseService()
-        case_event_data = CaseServiceTestHelper(200, 'OK', '{"error": "TestError"}')
+        case_event_data = CaseServiceTestHelper(200, 'OK', '{"error": {"error1":"TestError"}}')
         requests.post = mock.Mock(name='post', return_value=case_event_data)
 
         result_data, result_status = sut.store_case_event('1234', 'user')
 
-        self.assertEqual(result_data, 'TestError')
+        self.assertEqual(result_data, {"error1": "TestError"})
         self.assertEqual(result_status, 200)
