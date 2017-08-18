@@ -19,11 +19,15 @@ class AlertViaGovNotify:
                                                      reference=reference)
 
 
-class AlertUser:
+class AlertViaLogging:
     """Alert goes via gov notify (0) or via logs (1)"""
 
-    NOTIFY_VIA_LOGGING = settings.NOTIFY_VIA_LOGGING
-    logger.debug('Notification logging (0=disabled, 1=enabled) : {}'.format(NOTIFY_VIA_LOGGING))
+    @staticmethod
+    def send(email, reference):
+        logger.info('email details {}, {}'.format(email, reference))
+
+
+class AlertUser:
     alert_method = AlertViaGovNotify()
 
     def __init__(self, alerter=None):
@@ -31,14 +35,6 @@ class AlertUser:
             self.alert_method = alerter
 
     def send(self, email, reference):
-        if self.NOTIFY_VIA_LOGGING == '1':
-            try:
-                logger.info('email details {}, {}'.format(email, reference))
-            except BaseException as e:
-                logger.exception(e)
-            finally:
-                return 201, 'OK'
-        else:
             try:
                 self.alert_method.send(email, reference)
             except BaseException as e:
