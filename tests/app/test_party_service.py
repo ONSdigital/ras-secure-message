@@ -37,17 +37,17 @@ class PartyTestCase(unittest.TestCase):
         self.assertEqual(result_data, json.loads(business_data.text))
         self.assertEqual(result_status, 200)
 
-    # def test_get_business_details_converts_error_list_to_errors_dictionary(self):
-    #     """Test get business details and returns correctly from a list"""
-    #     sut = PartyService()
-    #     business_data = PartyBusinessTestHelper(200, "OK", '{"something": "else"}')
-    #     requests.get = mock.Mock(name='get', return_value=business_data)
-    #
-    #     result_data, result_status = sut.get_business_details("1234")
-    #
-    #     self.assertEqual(result_data, "['something', 'else]")
-    #     self.assertEqual(result_status, 200)
-    #     pass
+    def test_get_business_details_converts_error_list_to_errors_dictionary(self):
+        """Test get business details and returns correctly from a list"""
+        sut = PartyService()
+        business_data = PartyBusinessTestHelper(200, "OK", '[{"errors": "test"}]')
+        requests.get = mock.Mock(name='get', return_value=business_data)
+
+        result_data, result_status = sut.get_business_details("1234")
+
+        self.assertEqual(result_data, {'errors': {'errors': 'test'}})
+        self.assertEqual(result_status, 200)
+
 
     def test_get_user_details_for_bres_user(self):
         """Test get user details sends a request and receives back data"""

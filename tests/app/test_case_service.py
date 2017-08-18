@@ -1,14 +1,28 @@
+import json
 import unittest
 from unittest import mock
-from app.services.party_service import PartyService
+
+from app.services.case_service import CaseService
 import requests
+
+
+class CaseServiceTestHelper:
+    def __init__(self, status_code, reason, text):
+        self.status_code = status_code
+        self.reason = reason
+        self.text = text
 
 
 class CaseServiceTestCase(unittest.TestCase):
     """Test cases for case service"""
 
     def test_store_case_event_posts_request_to_remote_service(self):
-        pass
+        """Test store_case_event sends a request and returns data"""
+        sut = CaseService()
+        case_event_data = CaseServiceTestHelper(200, 'OK', '{"something": "else"}')
+        requests.post = mock.Mock(name='post', return_value=case_event_data)
 
-    def test_case_service_converts_errors_to_dictionary(self):
-        pass
+        result_data, result_status = sut.store_case_event('1234', 'user')
+
+        self.assertEqual(result_data, json.loads(case_event_data.text))
+        self.assertEqual(result_status, 200)
