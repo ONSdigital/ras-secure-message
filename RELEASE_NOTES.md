@@ -14,7 +14,7 @@ This is the first formal release of the Secure Message Service
 * Improvements to handling 404 from supporting services.
 
  
-Known Issues For Ras-OAuth2-Server
+Known Issues For Secure Message Server
 ==================================
 
 * None 
