@@ -20,3 +20,7 @@ def logger_initial_config(service_name=None,
     logging.basicConfig(level=log_level,
                         format=logger_format,
                         datefmt=logger_date_format)
+
+    oauth_log = logging.getLogger("requests_oauthlib")
+    oauth_log.addHandler(logging.NullHandler())
+    oauth_log.propagate = False

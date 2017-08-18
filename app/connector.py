@@ -25,11 +25,11 @@ def get_database_uri():
         return os.environ.get('SECURE_MESSAGING_DATABASE_URL', 'sqlite:////tmp/messages.db')
 
     for key, value in decoded_config.items():
-        logger.info('Inspecting key: "' + str(key) + '" with value: ' + str(value))
+        logger.info('Inspecting key and value', key=key, value=value)
         if decoded_config[key][0]['name'] == 'secure-message-db':
             creds = decoded_config[key][0]['credentials']
             uri = creds['uri']
-            logger.info('Postgres DATABASE URI: ' + uri)
+            logger.info('Postgres DATABASE URI:', uri=uri)
             return uri
         else:
             logger.info('VCAP_SERVICES defined but no URI credential found')

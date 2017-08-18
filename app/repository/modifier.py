@@ -24,7 +24,7 @@ class Modifier:
             return True
         except Exception as e:
             session.rollback()
-            logger.error(e)
+            logger.error('Error retrieving messages from database', error=e)
             raise InternalServerError(description="Error retrieving messages from database")
 
     @staticmethod
@@ -37,7 +37,7 @@ class Modifier:
             db.get_engine(app=db.get_app()).execute(query)
             return True
         except Exception as e:
-            logger.error(e)
+            logger.error('Error retrieving messages from database', error=e)
             raise InternalServerError(description="Error retrieving messages from database")
 
     @staticmethod
@@ -71,6 +71,7 @@ class Modifier:
         else:
             res = jsonify({'status': 'error'})
             res.status_code = 400
+            logging.debug('Error adding unread label', status_code=res.status_code)
             return res
 
     @staticmethod
@@ -100,7 +101,7 @@ class Modifier:
             db.get_engine(app=db.get_app()).execute(del_draft_msg)
 
         except Exception as e:
-            logger.error(e)
+            logger.error('Error retrieving messages from database', error=e)
             raise InternalServerError(description="Error retrieving messages from database")
 
     @staticmethod
@@ -113,7 +114,7 @@ class Modifier:
             session.commit()
         except Exception as e:
             session.rollback()
-            logger.error(e)
+            logger.error('Error replacing message', error=e)
             raise InternalServerError(description="Error replacing message")
 
         Saver().save_msg_event(draft_id, 'Draft_Saved')
@@ -135,5 +136,5 @@ class Modifier:
             session.commit()
         except Exception as e:
             session.rollback()
-            logger.error(e)
+            logger.error('Error replacing DRAFT_INBOX label', error=e)
             raise InternalServerError(description="Error replacing DRAFT_INBOX label")

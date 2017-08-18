@@ -16,8 +16,7 @@ class PartyService:
         """Retrieves the business details from the party service"""
         url = app.settings.RAS_PARTY_GET_BY_BUSINESS.format(app.settings.RAS_PARTY_SERVICE, ru)
         party_data = requests.get(url, verify=False)
-        logger.debug('party get business details result => {} {} : {}'.format(party_data.status_code, party_data.reason,
-                                                                              party_data.text))
+        logger.debug('Party get business details', status_code=party_data.status_code, reason=party_data.reason, text=party_data.text)
         party_text = json.loads(party_data.text)
         if type(party_text) is list:                    # if id is not a uuid returns a list not a dict
             party_text = {'errors': party_text[0]}
@@ -40,10 +39,9 @@ class PartyService:
             else:
                 url = app.settings.RAS_PARTY_GET_BY_RESPONDENT.format(app.settings.RAS_PARTY_SERVICE, uuid)
                 party_data = requests.get(url, verify=False)
-                logger.debug('party get user details result => {} {} : {}'.format(party_data.status_code,
-                                                                                  party_data.reason, party_data.text))
+                logger.debug('Party get user details', status_code=party_data.status_code, reason=party_data.reason, text=party_data.text)
                 party_dict = json.loads(party_data.text)
                 return Response(response=json.dumps(party_dict), status=party_data.status_code, mimetype="text/html")
         except KeyError:
-            logger.debug('User ID {} not in mock party service', uuid)
+            logger.debug('User ID not in mock party service', uuid=uuid)
             return Response(response="uuid not valid", status=404, mimetype="text/html")

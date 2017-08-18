@@ -48,7 +48,6 @@ class MessageSend(Resource):
 
     def post(self):
         """used to handle POST requests to send a message"""
-        logger.info("Message send POST request.")
         post_data = request.get_json()
         is_draft = False
 
@@ -78,6 +77,7 @@ class MessageSend(Resource):
         else:
             resp = jsonify(message.errors)
             resp.status_code = 400
+            # add debug for error
             return resp
 
     def _message_save(self, message, is_draft, draft_id):
@@ -126,7 +126,9 @@ class MessageById(Resource):
         else:
             result = jsonify({'status': 'error'})
             result.status_code = 403
+            logger.debug('Error getting message by ID', status_code=result.status_code)
             return result
+
 
 class MessageModifyById(Resource):
     """Update message status by id"""
@@ -151,6 +153,7 @@ class MessageModifyById(Resource):
         else:
             res = jsonify({'status': 'error'})
             res.status_code = 400
+            logger.debug('Error updating message', status_code=res.status_code)
         return res
 
     @staticmethod
@@ -177,20 +180,25 @@ class MessageModifyById(Resource):
     def _validate_request(request_data):
         """Used to validate data within request body for ModifyById"""
         if 'label' not in request_data:
+            logger.debug('No label provided')
             raise BadRequest(description="No label provided")
 
         label = request_data["label"]
         if label not in Labels.label_list.value:
+            logger.debug('Invalid label provided', label=label)
             raise BadRequest(description="Invalid label provided: {0}".format(label))
 
         if label not in [Labels.ARCHIVE.value, Labels.UNREAD.value]:
+            logger.debug('Non modifiable label provided', label=label)
             raise BadRequest(description="Non modifiable label provided: {0}".format(label))
 
         if 'action' not in request_data:
+            logger.debug('No action provided')
             raise BadRequest(description="No action provided")
 
         action = request_data["action"]
         if action not in ["add", "remove"]:
+            logger.debug('Invalid action requested', action=action)
             raise BadRequest(description="Invalid action requested: {0}".format(action))
 
         return action, label

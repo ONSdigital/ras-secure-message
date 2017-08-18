@@ -60,7 +60,7 @@ def before_request():
         log_request()
         res = authenticate(request.headers)
         if res != {'status': "ok"}:
-            logger.debug("Failed to authenticate user")
+            logger.debug('Failed to authenticate user')
             return res
 
 
@@ -101,4 +101,4 @@ def log_request():
         args_list.append('arg ' + str(count) + ' = ' + str(key) + ': ' + str(val))
 
     params = ''.join(args_list)
-    logger.debug('Headers: ' + str(headers) + ' Body: ' + str(req_data) + ' Arguments: ' + str(params))
+    logger.debug('Incoming request', headers=headers, req_data=req_data, arguments=params)

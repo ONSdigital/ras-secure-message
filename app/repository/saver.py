@@ -20,7 +20,7 @@ class Saver:
             session.commit()
         except Exception as e:
             session.rollback()
-            logger.error("Message save failed {0}".format(e))
+            logger.error('Message save failed', error=e)
             raise MessageSaveException(e)
 
     @staticmethod
@@ -34,7 +34,7 @@ class Saver:
             session.commit()
         except Exception as e:
             session.rollback()
-            logger.error("Message status save failed {}".format(e))
+            logger.error('Message status save failed', error=e)
             raise MessageSaveException(e)
 
     @staticmethod
@@ -48,7 +48,7 @@ class Saver:
             session.commit()
         except Exception as e:
             session.rollback()
-            logger.error("Message event save failed {}".format(e))
+            logger.error('Message event save failed', error=e)
             raise MessageSaveException(e)
 
     @staticmethod
@@ -61,5 +61,5 @@ class Saver:
             session.commit()
         except Exception as e:
             session.rollback()
-            logger.error("Message audit save failed {}".format(e))
+            logger.error('Message audit save failed', error=e)
             raise MessageSaveException(e)
