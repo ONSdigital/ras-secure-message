@@ -3,6 +3,7 @@ from unittest import mock
 from app.services.party_service import PartyService
 import requests
 import json
+import app.settings
 
 
 class PartyBusinessTestHelper:
@@ -22,9 +23,12 @@ class PartyTestCase(unittest.TestCase):
         business_data = PartyBusinessTestHelper(200, "OK", '{"something": "else"}')
         requests.get = mock.Mock(name='get', return_value=business_data)
 
-        result_data, result_status = sut.get_business_details('1234')
+        ru = '1234'
+        url = app.settings.RAS_PARTY_GET_BY_BUSINESS.format(app.settings.RAS_PARTY_SERVICE, ru)
+        
+        result_data, result_status = sut.get_business_details(ru)
 
-        requests.get.assert_called_with('http://localhost:8001/party-api/v1/businesses/id/1234', verify=False)
+        requests.get.assert_called_with(url, verify=False)
 
     def test_send_request_to_remote_party_service_and_return_details(self):
         """Test get business details sends a request and returns data"""
