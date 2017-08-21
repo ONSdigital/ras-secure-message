@@ -48,9 +48,14 @@ class MessageSend(Resource):
 
     def post(self):
         """used to handle POST requests to send a message"""
-        post_data = request.get_json()
-        is_draft = False
+        logger.info("Message send POST request.")
+        if request.headers['Content-Type'].lower() != 'application/json':
+            # API only returns JSON
+            description = 'Request must set accept content type "application/json" in header.'
+            logger.info(description=description)
+        post_data = request.get_json(force=True)
 
+        is_draft = False
         draft_id = None
         if 'msg_id' in post_data:
             is_draft, returned_draft = Retriever().check_msg_id_is_a_draft(post_data['msg_id'], g.user)
