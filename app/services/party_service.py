@@ -17,11 +17,15 @@ class PartyService:
         party_data = requests.get(url, verify=False)
         logger.debug('party get business details result => {} {} : {}'.format(party_data.status_code, party_data.reason,
                                                                               party_data.text))
-        party_text = json.loads(party_data.text)
-        if type(party_text) is list:                    # if id is not a uuid returns a list not a dict
-            party_text = {'errors': party_text[0]}
-        response = Response(response=json.dumps(party_text), status=party_data.status_code, mimetype="text/html")
-        return response
+        if party_data.status_code ==200:
+            party_text = json.loads(party_data.text)
+            if type(party_text) is list:                    # if id is not a uuid returns a list not a dict
+                party_text = {'errors': party_text[0]}
+            response = Response(response=json.dumps(party_text), status=party_data.status_code, mimetype="text/html")
+            return response
+        else:
+            logger.info(msg='Party (RU) not found {}'.format(ru))
+            return Response(response="uuid not valid", status=404, mimetype="text/html")
 
     @staticmethod
     def get_user_details(uuid):
@@ -41,8 +45,12 @@ class PartyService:
                 party_data = requests.get(url, verify=False)
                 logger.debug('party get user details result => {} {} : {}'.format(party_data.status_code,
                                                                                   party_data.reason, party_data.text))
-                party_dict = json.loads(party_data.text)
-                return Response(response=json.dumps(party_dict), status=party_data.status_code, mimetype="text/html")
+                if party_data.status_code == 200:
+                    party_dict = json.loads(party_data.text)
+                    return Response(response=json.dumps(party_dict), status=party_data.status_code, mimetype="text/html")
+                else:
+                    logger.info(msg='Party (User ID) not found {}'.format(uuid))
+                    return Response(response="uuid not valid", status=404, mimetype="text/html")
         except KeyError:
             logger.debug('User ID {} not in mock party service', uuid)
             return Response(response="uuid not valid", status=404, mimetype="text/html")
