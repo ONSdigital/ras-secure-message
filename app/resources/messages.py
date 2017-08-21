@@ -49,7 +49,7 @@ class MessageSend(Resource):
     def post(self):
         """used to handle POST requests to send a message"""
         logger.info("Message send POST request.")
-        if request.headers['CONTENT_TYPE'].lower() != 'application/json':
+        if request.headers['Content-Type'].lower() != 'application/json':
             # API only returns JSON
             description = 'Request must set accept content type "application/json" in header.'
             logger.info(description=description)
