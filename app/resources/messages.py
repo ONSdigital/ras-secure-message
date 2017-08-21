@@ -3,7 +3,8 @@ from flask import request, jsonify, g, Response
 from flask_restful import Resource
 from structlog import wrap_logger
 from werkzeug.exceptions import BadRequest
-from app.common.alerts import AlertUser
+from app import settings
+from app.common.alerts import AlertUser, AlertViaGovNotify, AlertViaLogging
 from app.common.labels import Labels
 from app.common.utilities import get_options, paginated_list_to_json, add_users_and_business_details
 from app.constants import MESSAGE_LIST_ENDPOINT
@@ -49,9 +50,12 @@ class MessageSend(Resource):
     def post(self):
         """used to handle POST requests to send a message"""
         logger.info("Message send POST request.")
-        post_data = request.get_json()
+        if request.headers['Content-Type'].lower() != 'application/json':
+            # API only returns JSON
+            description = 'Request must set accept content type "application/json" in header.'
+            logger.info(description=description)
+        post_data = request.get_json(force=True)
         is_draft = False
-
         draft_id = None
         if 'msg_id' in post_data:
             is_draft, returned_draft = Retriever().check_msg_id_is_a_draft(post_data['msg_id'], g.user)
@@ -123,7 +127,8 @@ class MessageSend(Resource):
             if status_code == 200:
                 if 'emailAddress' in party_data and len(party_data['emailAddress'].strip()) > 0:
                     recipient_email = party_data['emailAddress'].strip()
-                    alert_user = AlertUser()
+                    alert_method = AlertViaLogging() if settings.NOTIFY_VIA_LOGGING == '1' else AlertViaGovNotify()
+                    alert_user = AlertUser(alert_method)
                     alert_user.send(recipient_email, message.msg_id)
                 else:
                     logger.error('UserId {0} does not have an emailAddress specified'.format(message.msg_to[0]))
