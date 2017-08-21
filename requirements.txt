@@ -11,3 +11,5 @@ cryptography==1.8.1
 notifications_python_client==4.2.0
 flake8==3.3.0
 pylint==1.6.4
+cfenv==0.5.3
+gunicorn==19.7.1

@@ -32,10 +32,10 @@ class ServiceMockTestCase(unittest.TestCase):
     def test_changing_to_non_mocked_party_service_results_calls_logger(self, logger_debug):
         """Validate that the logger is called correctly if real party service is used"""
         party.use_real_service()
-        logger_debug.assert_called_with("event='Non mocked Party service in use'")
+        logger_debug.assert_called()
 
     @patch.object(logging.Logger, 'debug')
     def test_changing_to_mocked_party_service_results_calls_logger(self, logger_debug):
         """Validate that the logger is called correctly if mocked party service is used"""
         party.use_mock_service()
-        logger_debug.assert_called_with("event='Mocked Party service in use'")
+        logger_debug.assert_called()
