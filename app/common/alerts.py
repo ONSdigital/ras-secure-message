@@ -19,8 +19,15 @@ class AlertViaGovNotify:
                                                      reference=reference)
 
 
+class AlertViaLogging:
+    """Alert goes via gov notify (0) or via logs (1)"""
+
+    @staticmethod
+    def send(email, reference):
+        logger.info('email details {}, {}'.format(email, reference))
+
+
 class AlertUser:
-    """Alert User"""
     alert_method = AlertViaGovNotify()
 
     def __init__(self, alerter=None):
@@ -28,9 +35,9 @@ class AlertUser:
             self.alert_method = alerter
 
     def send(self, email, reference):
-        try:
-            self.alert_method.send(email, reference)
-        except BaseException as e:
-            logger.exception(e)
-        finally:
-            return 201, 'OK'
+            try:
+                self.alert_method.send(email, reference)
+            except BaseException as e:
+                logger.exception(e)
+            finally:
+                return 201, 'OK'

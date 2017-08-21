@@ -4,7 +4,7 @@ from flask_restful import Resource
 from structlog import wrap_logger
 from werkzeug.exceptions import BadRequest
 from app import settings
-from app.common.alerts import AlertUser
+from app.common.alerts import AlertUser, AlertViaGovNotify, AlertViaLogging
 from app.common.labels import Labels
 from app.common.utilities import get_options, paginated_list_to_json, \
     add_business_details, add_to_and_from_details,add_users_and_business_details
@@ -108,7 +108,10 @@ class MessageSend(Resource):
     def _alert_recipients(msg_id, thread_id):
         """used to alert user once messages have been saved"""
         recipient_email = settings.NOTIFICATION_DEV_EMAIL  # TODO change this when know more about party service
-        alert_user = AlertUser()
+
+        alert_method = AlertViaLogging() if settings.NOTIFY_VIA_LOGGING == '1' else AlertViaGovNotify()
+        alert_user = AlertUser(alert_method)
+
         alert_status, alert_detail = alert_user.send(recipient_email, msg_id)
         resp = jsonify({'status': '{0}'.format(alert_detail), 'msg_id': msg_id, 'thread_id': thread_id})
         resp.status_code = alert_status
