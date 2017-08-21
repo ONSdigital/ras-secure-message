@@ -1,9 +1,10 @@
 import logging
+from structlog import wrap_logger
 from flask import Response
 from flask import json
 from app import constants
 
-logger = logging.getLogger(__name__)
+logger = wrap_logger(logging.getLogger(__name__))
 
 
 class PartyServiceMock:
@@ -13,7 +14,7 @@ class PartyServiceMock:
         try:
             return Response(response=json.dumps(self._business_details[ru]), status=200, mimetype="text/html")
         except KeyError:
-            logger.debug('RU %s not in mock party service.', ru)
+            logger.debug('RU not in mock party service.', ru=ru)
             return Response(response="ru is not valid", status=404,
                             mimetype="text/html")
 
@@ -22,7 +23,7 @@ class PartyServiceMock:
         try:
             return Response(response=json.dumps(self._respondent_ids[uuid]), status=200, mimetype="text/html")
         except KeyError:
-            logger.debug('User ID %s not in mock party service', uuid)
+            logger.debug('User ID not in mock party service', uuid=uuid)
             return Response(response="uuid not valid", status=404,
                             mimetype="text/html")
 
