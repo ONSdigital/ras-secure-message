@@ -51,9 +51,8 @@ class MessageSend(Resource):
         logger.info("Message send POST request.")
         if request.headers['CONTENT_TYPE'].lower() != 'application/json':
             # API only returns JSON
-            description = 'Request must accept content type "application/json" specified'
+            description = 'Request must set accept content type "application/json" in header.'
             logger.info(description=description)
-            raise BadRequest(description)
         post_data = request.get_json(force=True)
         is_draft = False
         draft_id = None
