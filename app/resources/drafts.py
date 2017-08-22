@@ -23,7 +23,7 @@ class DraftSave(Resource):
         draft = DraftSchema().load(post_data)
 
         if 'msg_id' in post_data:
-            logger.debug('Message cannot include message ID')
+            logger.error('Message cannot include message ID')
             raise BadRequest(description="Message can not include msg_id")
 
         if draft.errors == {}:
@@ -38,7 +38,7 @@ class DraftSave(Resource):
         else:
             res = jsonify(draft.errors)
             res.status_code = 400
-            logger.debug('Failed saving draft', status_code=res.status_code)
+            logger.error('Failed saving draft', status_code=res.status_code)
             return res
 
     @staticmethod
@@ -98,14 +98,14 @@ class DraftModifyById(Resource):
         """Handles modifying of drafts"""
         data = request.get_json()
         if 'msg_id' not in data:
-            logger.debug('Draft put requires message ID')
+            logger.error('Draft put requires message ID')
             raise BadRequest(description="Draft put requires msg_id")
         if data['msg_id'] != draft_id:
-            logger.debug('Conflicting message IDs', draft_id=draft_id, message_id=data['msg_id'])
+            logger.error('Conflicting message IDs', draft_id=draft_id, message_id=data['msg_id'])
             raise BadRequest(description="Conflicting msg_id's")
         is_draft = Retriever().check_msg_id_is_a_draft(draft_id, g.user)
         if is_draft[0] is False:
-            logger.debug('Draft put requires valid draft')
+            logger.error('Draft put requires valid draft')
             raise BadRequest(description="Draft put requires valid draft")
 
         not_modified = self.etag_check(request.headers, is_draft[1])
@@ -130,7 +130,7 @@ class DraftModifyById(Resource):
         else:
             resp = jsonify(draft.errors)
             resp.status_code = 400
-            logger.debug('Error sending draft', status_code=resp.status_code)
+            logger.error('Error sending draft', msg_id=draft_id, status_code=resp.status_code)
             return resp
 
     @staticmethod

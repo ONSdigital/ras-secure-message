@@ -111,7 +111,7 @@ class Retriever:
         try:
             result = db_model.query.filter_by(msg_id=message_id).first()
             if result is None:
-                logger.debug('Message ID not found', message_id=message_id)
+                logger.error('Message ID not found', message_id=message_id)
                 raise NotFound(description="Message with msg_id '{0}' does not exist".format(message_id))
         except SQLAlchemyError as e:
             logger.error('Error retrieving message from database', error=e)
@@ -143,7 +143,7 @@ class Retriever:
                                else_=0).desc(), Events.event.desc())
 
             if result.count() == 0:
-                logger.debug('Tread does not exist', thread_id=thread_id)
+                logger.debug('Thread does not exist', thread_id=thread_id)
                 raise NotFound(description="Conversation with thread_id '{0}' does not exist".format(thread_id))
 
         except SQLAlchemyError as e:
@@ -165,7 +165,7 @@ class Retriever:
             result = SecureMessage.query.filter(SecureMessage.msg_id == message_id)\
                 .filter(SecureMessage.statuses.any(Status.label == Labels.DRAFT.value)).first()
             if result is None:
-                logger.debug('Draft does not exist', message_id=message_id)
+                logger.error('Draft does not exist', message_id=message_id)
                 raise NotFound(description="Draft with msg_id '{0}' does not exist".format(message_id))
         except SQLAlchemyError as e:
             logger.error(e)
@@ -189,7 +189,7 @@ class Retriever:
             database_status['errors'] = str(e)
             resp = jsonify(database_status)
             resp.status_code = 500
-            logger.debug('No connection to database', status_code=resp.status_code, error=e)
+            logger.error('No connection to database', status_code=resp.status_code, error=e)
 
         return resp
 

@@ -33,12 +33,12 @@ def check_jwt(token):
         if JWT_ENCRYPT == '1':
             decrypter = Decrypter()
             decrypted_jwt_token = decrypter.decrypt_token(token)
-            logger.debug('Decrypted JWT.')
+            logger.debug('Decrypted JWT')
             decoded_jwt_token = decode(decrypted_jwt_token)
-            logger.debug("Decoded JWT. User ID: {}".format(decoded_jwt_token.get(constants.USER_IDENTIFIER)))
+            logger.debug("Decoded JWT", user_uuid=decoded_jwt_token.get(constants.USER_IDENTIFIER))
         else:
             decoded_jwt_token = decode(token)
-            logger.debug("Decoded JWT. User ID: {}".format(decoded_jwt_token.get(constants.USER_IDENTIFIER)))
+            logger.debug("Decoded JWT", user_uuid=decoded_jwt_token.get(constants.USER_IDENTIFIER))
 
         if not decoded_jwt_token.get(constants.USER_IDENTIFIER):
             raise BadRequest(description="Missing user_uuid claim,"
@@ -51,6 +51,5 @@ def check_jwt(token):
         return {'status': "ok"}
 
     except JWTError:
-        res = Response(response="Invalid token to access this Microservice Resource", status=400, mimetype="text/html")
-        logger.debug('Failed to decrypt or decode the JWT. Is the JWT Algorithm and Secret setup correctly?')
-        return res
+        logger.error('Failed to decrypt or decode the JWT. Is the JWT Algorithm and Secret setup correctly?')
+        return Response(response="Invalid token to access this Microservice Resource", status=400, mimetype="text/html")
