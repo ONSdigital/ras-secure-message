@@ -52,6 +52,7 @@ class HealthDetails(Resource):
                    'SM JWT ENCRYPT': settings.SM_JWT_ENCRYPT,
                    'RAS PARTY SERVICE HOST': settings.RAS_PARTY_SERVICE_HOST,
                    'RAS PARTY SERVICE PORT': settings.RAS_PARTY_SERVICE_PORT,
-                   'RAS PARTY SERVICE PROTOCOL': settings.RAS_PARTY_SERVICE_PROTOCOL}
+                   'RAS PARTY SERVICE PROTOCOL': settings.RAS_PARTY_SERVICE_PROTOCOL,
+                   'NOTIFY VIA LOGGING': settings.NOTIFY_VIA_LOGGING}
 
         return jsonify(details)
