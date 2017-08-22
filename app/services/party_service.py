@@ -17,28 +17,40 @@ class PartyService:
         party_data = requests.get(url, verify=False)
         logger.debug('party get business details result => {} {} : {}'.format(party_data.status_code, party_data.reason,
                                                                               party_data.text))
-        party_dict = json.loads(party_data.text)
-        if type(party_dict) is list:                    # if id is not a uuid returns a list not a dict
-            party_dict = {'errors': party_dict[0]}
-
-        return party_dict, party_data.status_code
+        if party_data.status_code == 200:
+            party_text = json.loads(party_data.text)
+            if type(party_text) is list:
+                party_text = {'errors': party_text[0]}
+            response = Response(response=json.dumps(party_text), status=party_data.status_code, mimetype="text/html")
+            return response
+        else:
+            logger.info(msg='Party (RU) not found {}'.format(ru))
+            return Response(response="uuid not valid", status=404, mimetype="text/html")
 
     @staticmethod
     def get_user_details(uuid):
         """Return user details , unless user is Bres in which case return constant data"""
-        if uuid == constants.BRES_USER:
-            party_dict = {"id": constants.BRES_USER,
-                          "firstName": "BRES",
-                          "lastName": "",
-                          "emailAddress": "",
-                          "telephone": "",
-                          "status": "",
-                          "sampleUnitType": "BI"}
-            return party_dict, 200
-        else:
-            url = app.settings.RAS_PARTY_GET_BY_RESPONDENT.format(app.settings.RAS_PARTY_SERVICE, uuid)
-            party_data = requests.get(url, verify=False)
-            logger.debug('party get user details result => {} {} : {}'.format(party_data.status_code,
-                                                                              party_data.reason, party_data.text))
-            party_dict = json.loads(party_data.text)
-            return party_dict, party_data.status_code
+        try:
+            if uuid == constants.BRES_USER:
+                party_dict = {"id": constants.BRES_USER,
+                              "firstName": "BRES",
+                              "lastName": "",
+                              "emailAddress": "",
+                              "telephone": "",
+                              "status": "",
+                              "sampleUnitType": "BI"}
+                return Response(response=json.dumps(party_dict), status=200, mimetype="text/html")
+            else:
+                url = app.settings.RAS_PARTY_GET_BY_RESPONDENT.format(app.settings.RAS_PARTY_SERVICE, uuid)
+                party_data = requests.get(url, verify=False)
+                logger.debug('party get user details result => {} {} : {}'.format(party_data.status_code,
+                                                                                  party_data.reason, party_data.text))
+                if party_data.status_code == 200:
+                    party_dict = json.loads(party_data.text)
+                    return Response(response=json.dumps(party_dict), status=party_data.status_code, mimetype="text/html")
+                else:
+                    logger.info(msg='Party (User ID) not found {}'.format(uuid))
+                    return Response(response="uuid not valid", status=404, mimetype="text/html")
+        except KeyError:
+            logger.debug('User ID {} not in mock party service', uuid)
+            return Response(response="uuid not valid", status=404, mimetype="text/html")
