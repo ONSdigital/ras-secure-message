@@ -3,6 +3,7 @@ Module to generate encrypt and decrypt token
 """
 import os
 import base64
+
 from cryptography.hazmat.backends.openssl.backend import backend
 from cryptography.hazmat.primitives.ciphers import Cipher
 from cryptography.hazmat.primitives.ciphers import algorithms

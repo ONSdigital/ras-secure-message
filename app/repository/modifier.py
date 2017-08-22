@@ -1,4 +1,5 @@
 import logging
+
 from flask import jsonify
 from structlog import wrap_logger
 from werkzeug.exceptions import InternalServerError
@@ -95,9 +96,7 @@ class Modifier:
         try:
             db.get_engine(app=db.get_app()).execute(del_draft_status)
             db.get_engine(app=db.get_app()).execute(del_draft_inbox_status)
-
             db.get_engine(app=db.get_app()).execute(del_draft_event)
-
             db.get_engine(app=db.get_app()).execute(del_draft_msg)
 
         except Exception as e:

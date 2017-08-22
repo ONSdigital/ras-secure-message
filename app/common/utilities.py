@@ -1,11 +1,10 @@
 import hashlib
 import logging
+
 from flask import json
 from flask import jsonify
 from structlog import wrap_logger
-from werkzeug.exceptions import ExpectationFailed
 from app.services.service_toggles import party
-
 from app.constants import MESSAGE_BY_ID_ENDPOINT, MESSAGE_LIST_ENDPOINT, MESSAGE_QUERY_LIMIT
 
 logger = wrap_logger(logging.getLogger(__name__))
@@ -75,18 +74,15 @@ def paginated_list_to_json(paginated_list, page, limit, host_url, user, string_q
         messages.append(msg)
 
     links = {'first': {"href": "{0}{1}".format(host_url, endpoint)},
-             'self': {"href": "{0}{1}{2}{3}page={4}&limit={5}".format(host_url, endpoint, arg_joiner,
-                                                                      string_query_args, page, limit)}}
+             'self': {"href": "{0}{1}{2}{3}page={4}&limit={5}".format(host_url, endpoint, arg_joiner, string_query_args, page, limit)}}
 
     if paginated_list.has_next:
         links['next'] = {
-            "href": "{0}{1}{2}{3}page={4}&limit={5}".format(host_url, endpoint, arg_joiner,
-                                                            string_query_args, (page + 1), limit)}
+            "href": "{0}{1}{2}{3}page={4}&limit={5}".format(host_url, endpoint, arg_joiner, string_query_args, (page + 1), limit)}
 
     if paginated_list.has_prev:
         links['prev'] = {
-            "href": "{0}{1}{2}{3}page={4}&limit={5}".format(host_url, endpoint, arg_joiner,
-                                                            string_query_args, (page - 1), limit)}
+            "href": "{0}{1}{2}{3}page={4}&limit={5}".format(host_url, endpoint, arg_joiner, string_query_args, (page - 1), limit)}
     messages = add_users_and_business_details(messages)
     return jsonify({"messages": messages, "_links": links})
 
@@ -104,9 +100,8 @@ def generate_etag(msg_to, msg_id, subject, body):
                     'body': body}
 
     hash_object = hashlib.sha1(str(sorted(data_to_hash.items())).encode())
-    etag = hash_object.hexdigest()
 
-    return etag
+    return hash_object.hexdigest()
 
 
 def get_business_details_by_ru(rus):
@@ -115,7 +110,6 @@ def get_business_details_by_ru(rus):
     details = []
 
     for ru in rus:
-
         detail = party.get_business_details(ru)
 
         if detail.status_code == 200:

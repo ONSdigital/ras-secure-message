@@ -3,6 +3,7 @@ from flask import Response
 from flask import json
 import requests
 import app.settings
+
 from app import constants
 from structlog import wrap_logger
 
@@ -24,8 +25,7 @@ class PartyService:
             party_text = json.loads(party_data.text)
             if type(party_text) is list:                    # if id is not a uuid returns a list not a dict
                 party_text = {'errors': party_text[0]}
-            response = Response(response=json.dumps(party_text), status=party_data.status_code, mimetype="text/html")
-            return response
+            return Response(response=json.dumps(party_text), status=party_data.status_code, mimetype="text/html")
         else:
             logger.info('Party (RU) not found', ru=ru)
             return Response(response="uuid not valid", status=404, mimetype="text/html")

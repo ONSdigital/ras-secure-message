@@ -1,4 +1,5 @@
 import logging
+
 from structlog import wrap_logger
 from flask import jsonify
 from sqlalchemy import and_, case, func, or_
@@ -14,8 +15,7 @@ logger = wrap_logger(logging.getLogger(__name__))
 class Retriever:
     """Created when retrieving messages"""
     @staticmethod
-    def retrieve_message_list(page, limit, user, ru_id=None, survey=None, cc=None, ce=None, label=None,
-                              descend=True):
+    def retrieve_message_list(page, limit, user, ru_id=None, survey=None, cc=None, ce=None, label=None, descend=True):
         """returns list of messages from db"""
         conditions = []
         status_conditions = []
@@ -117,14 +117,11 @@ class Retriever:
             logger.error('Error retrieving message from database', error=e)
             raise InternalServerError(description="Error retrieving message from database")
 
-        message = result.serialize(user)
-
-        return message
+        return result.serialize(user)
 
     @staticmethod
     def retrieve_thread(thread_id, user, _survey=constants.BRES_SURVEY):
         """returns list of messages for thread id"""
-
         status_conditions = []
 
         if user.is_respondent:

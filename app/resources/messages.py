@@ -1,4 +1,5 @@
 import logging
+
 from flask import request, jsonify, g, Response
 from flask_restful import Resource
 from structlog import wrap_logger
@@ -6,8 +7,7 @@ from werkzeug.exceptions import BadRequest
 from app import settings
 from app.common.alerts import AlertUser, AlertViaGovNotify, AlertViaLogging
 from app.common.labels import Labels
-from app.common.utilities import get_options, paginated_list_to_json, \
-    add_business_details, add_to_and_from_details,add_users_and_business_details
+from app.common.utilities import get_options, paginated_list_to_json, add_users_and_business_details
 from app.constants import MESSAGE_LIST_ENDPOINT
 from app.repository.modifier import Modifier
 from app.repository.retriever import Retriever
@@ -15,7 +15,6 @@ from app.repository.saver import Saver
 from app.resources.drafts import DraftModifyById
 from app.validation.domain import MessageSchema
 from app.authorization.authorizer import Authorizer
-
 
 logger = wrap_logger(logging.getLogger(__name__))
 
