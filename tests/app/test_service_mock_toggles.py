@@ -25,9 +25,8 @@ class ServiceMockTestCase(unittest.TestCase):
 
     def test_can_change_type_after_init(self):
         """Test can change after init"""
-        sut = Party(False)
-        sut.use_real_service()
-        sut.use_mock_service()
-        sut.use_real_service()
-        sut.use_mock_service()
-        self.assertTrue(isinstance(sut._service, PartyServiceMock))
+        party.use_real_service()
+        party.use_mock_service()
+        party.use_real_service()
+        party.use_mock_service()
+        self.assertTrue(isinstance(party._service, PartyServiceMock))

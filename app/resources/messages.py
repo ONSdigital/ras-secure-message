@@ -3,7 +3,8 @@ from flask import request, jsonify, g, Response
 from flask_restful import Resource
 from structlog import wrap_logger
 from werkzeug.exceptions import BadRequest
-from app.common.alerts import AlertUser
+from app import settings
+from app.common.alerts import AlertUser, AlertViaGovNotify, AlertViaLogging
 from app.common.labels import Labels
 from app.common.utilities import get_options, paginated_list_to_json, add_users_and_business_details
 from app.constants import MESSAGE_LIST_ENDPOINT
@@ -49,9 +50,12 @@ class MessageSend(Resource):
     def post(self):
         """used to handle POST requests to send a message"""
         logger.info("Message send POST request.")
-        post_data = request.get_json()
+        if request.headers['Content-Type'].lower() != 'application/json':
+            # API only returns JSON
+            description = 'Request must set accept content type "application/json" in header.'
+            logger.info(description=description)
+        post_data = request.get_json(force=True)
         is_draft = False
-
         draft_id = None
         if 'msg_id' in post_data:
             is_draft, returned_draft = Retriever().check_msg_id_is_a_draft(post_data['msg_id'], g.user)
@@ -98,11 +102,17 @@ class MessageSend(Resource):
         if is_draft is True:
             Modifier().del_draft(draft_id)
 
-        # listener errors are logged but still a 201 reported
-        MessageSend._alert_listeners(message.data)
+    @staticmethod
+    def _alert_recipients(msg_id, thread_id):
+        """used to alert user once messages have been saved"""
+        recipient_email = settings.NOTIFICATION_DEV_EMAIL  # TODO change this when know more about party service
 
-        resp = jsonify({'status': '201', 'msg_id': message.data.msg_id, 'thread_id': message.data.thread_id})
-        resp.status_code = 201
+        alert_method = AlertViaLogging() if settings.NOTIFY_VIA_LOGGING == '1' else AlertViaGovNotify()
+        alert_user = AlertUser(alert_method)
+
+        alert_status, alert_detail = alert_user.send(recipient_email, msg_id)
+        resp = jsonify({'status': '{0}'.format(alert_detail), 'msg_id': msg_id, 'thread_id': thread_id})
+        resp.status_code = alert_status
         return resp
 
     @staticmethod
