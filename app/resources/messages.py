@@ -141,8 +141,8 @@ class MessageSend(Resource):
             else:
                 party_data, status_code = party.get_user_details(message.msg_from)  # todo avoid 2 lookups (see validate)
                 if status_code == 200:
-                    first_name = party_data['firstName'] if party_data['firstName'] is not None else ''
-                    last_name = party_data['lastName'] if party_data['lastName'] is not None else ''
+                    first_name = party_data['firstName'] if 'firstName' in party_data else ''
+                    last_name = party_data['lastName'] if 'lastName' in party_data else ''
                     case_user = '{} {}'.format(first_name, last_name).strip()
                     if len(case_user) == 0:
                         case_user = 'Unknown user'
