@@ -55,6 +55,7 @@ class DraftTestCase(unittest.TestCase):
                              'collection_exercise': 'ACollectionExercise',
                              'ru_id': '7fc0e8ab-189c-4794-b8f4-9f05a1db185b',
                              'survey': constants.BRES_SURVEY}
+        settings.NOTIFY_CASE_SERVICE = '1'
 
         with app.app_context():
             database.db.init_app(current_app)

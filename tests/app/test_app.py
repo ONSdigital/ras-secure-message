@@ -1,5 +1,6 @@
 import unittest
 from unittest import mock
+from unittest.mock import patch
 from datetime import datetime, timezone
 from flask import current_app, json
 from sqlalchemy import create_engine, event
@@ -10,6 +11,7 @@ from app.common.alerts import AlertUser, AlertViaGovNotify
 from app.repository import database
 from app.authentication.jwt import encode
 from app.authentication.jwe import Encrypter
+from app.services.service_toggles import case_service
 
 
 class FlaskTestCase(unittest.TestCase):
@@ -355,6 +357,25 @@ class FlaskTestCase(unittest.TestCase):
 
         self.assertTrue(draft_get_data['msg_to'] is not None)
 
+    @patch.object(case_service, 'store_case_event')
+    def test_case_service_not_called_on_sent_if_NotifyCaseService_is_not_set(self, case):
+        """Test case service not called if not set to do so in config"""
+
+        settings.NOTIFY_CASE_SERVICE = '0'
+        url = "http://localhost:5050/message/send"
+        self.app.post(url, data=json.dumps(self.test_message), headers=self.headers)
+        self.assertFalse(case.called)
+
+    @patch.object(case_service, 'store_case_event')
+    def test_case_service_called_on_sent_if_NotifyCaseService_is_set(self, case):
+        """Test case service called if set to do so in config """
+
+        settings.NOTIFY_CASE_SERVICE = '1'
+        url = "http://localhost:5050/message/send"
+        self.app.post(url, data=json.dumps(self.test_message), headers=self.headers)
+        self.assertTrue(case.called)
+
 
 if __name__ == '__main__':
     unittest.main()
+

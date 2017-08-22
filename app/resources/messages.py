@@ -138,22 +138,24 @@ class MessageSend(Resource):
 
     @staticmethod
     def _inform_case_service(message):
-        if message.msg_from == constants.BRES_USER:
-            case_user = constants.BRES_USER
-        else:
-            party_data, status_code = party.get_user_details(message.msg_from)  # todo avoid 2 lookups (see validate)
-            if status_code == 200:
-                first_name = party_data['firstName'] if party_data['firstName'] is not None else ''
-                last_name = party_data['lastName'] if party_data['lastName'] is not None else ''
-                case_user = '{} {}'.format(first_name, last_name).strip()
-                if len(case_user) == 0:
-                    case_user = 'Unknown user'
-                    logger.info('no user names in party data for id {0} Unknown user used in case '.format(party_data['id']))
+        if settings.NOTIFY_CASE_SERVICE == '1':
+            if message.msg_from == constants.BRES_USER:
+                case_user = constants.BRES_USER
             else:
-                logger.info('could not retrieve {} details from party using Unknown user for case'.format(message.msg_from))
-                case_user = 'Unknown user'
-        case_service.store_case_event(message.collection_case, case_user)
-
+                party_data, status_code = party.get_user_details(message.msg_from)  # todo avoid 2 lookups (see validate)
+                if status_code == 200:
+                    first_name = party_data['firstName'] if party_data['firstName'] is not None else ''
+                    last_name = party_data['lastName'] if party_data['lastName'] is not None else ''
+                    case_user = '{} {}'.format(first_name, last_name).strip()
+                    if len(case_user) == 0:
+                        case_user = 'Unknown user'
+                        logger.info('no user names in party data for id {} Unknown user used in case '.format(party_data['id']))
+                else:
+                    logger.info('could not retrieve {} details from party using Unknown user for case'.format(message.msg_from))
+                    case_user = 'Unknown user'
+            case_service.store_case_event(message.collection_case, case_user)
+        else:
+            logger.info('Case service notifications switched off msg_id {}'.format(message.msg_id))
 
 class MessageById(Resource):
     """Get and update message by id"""

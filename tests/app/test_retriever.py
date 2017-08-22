@@ -11,11 +11,13 @@ from app.repository.retriever import Retriever
 from app.constants import MESSAGE_QUERY_LIMIT
 from app.services.service_toggles import party
 from app import constants
+from app import settings
 
 from app.validation.user import User
 
 
 class RetrieverTestCaseHelper:
+
     """Helper class for Retriever Tests"""
     def add_secure_message(self, msg_id, subject="test", body="test", thread_id="ThreadId",
                            collection_case="ACollectionCase", ru_id="f1a5e99c-8edf-489a-9c72-6cabe6c387fc",
@@ -183,6 +185,7 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
         self.user_internal = User('ce12b958-2a5f-44f4-a6da-861e59070a31', 'internal')
         self.user_respondent = User('0a7ad740-10d5-4ecb-b7ca-3c0384afb882', 'respondent')
         party.use_mock_service()
+        settings.NOTIFY_CASE_SERVICE = '1'
 
     @event.listens_for(Engine, "connect")
     def set_sqlite_pragma(dbapi_connection, connection_record):

@@ -10,6 +10,7 @@ from app.exception.exceptions import MessageSaveException
 from app.validation.domain import Message
 from app.repository.database import SecureMessage
 from flask import current_app
+from app import settings
 
 
 class SaverTestCase(unittest.TestCase):
@@ -26,6 +27,7 @@ class SaverTestCase(unittest.TestCase):
             database.db.drop_all()
             database.db.create_all()
             self.db = database.db
+        settings.NOTIFY_CASE_SERVICE = '1'
 
     @event.listens_for(Engine, "connect")
     def set_sqlite_pragma(dbapi_connection, connection_record):
