@@ -1,4 +1,5 @@
 import logging
+
 from flask import g, Response
 from flask import request, jsonify
 from flask_restful import Resource
@@ -6,8 +7,7 @@ from structlog import wrap_logger
 from werkzeug.exceptions import BadRequest
 from app.common.labels import Labels
 from app.constants import DRAFT_LIST_ENDPOINT
-from app.common.utilities import get_options, paginated_list_to_json, generate_etag, \
-    add_to_and_from_details, add_business_details, add_users_and_business_details
+from app.common.utilities import get_options, paginated_list_to_json, generate_etag, add_users_and_business_details
 from app.repository.modifier import Modifier
 from app.repository.retriever import Retriever
 from app.repository.saver import Saver
@@ -111,8 +111,7 @@ class DraftModifyById(Resource):
         not_modified = self.etag_check(request.headers, is_draft[1])
 
         if not_modified is False:
-            res = Response(response="Draft has been modified since last check", status=409, mimetype="text/html")
-            return res
+            return Response(response="Draft has been modified since last check", status=409, mimetype="text/html")
 
         draft = DraftSchema().load(data)
         if draft.errors == {}:

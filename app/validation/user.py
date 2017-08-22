@@ -1,4 +1,3 @@
-from app.api_mocks import party_service_mock
 from app.services.service_toggles import party
 
 

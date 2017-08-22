@@ -1,6 +1,7 @@
+import logging
+
 from app.api_mocks.party_service_mock import PartyServiceMock
 from app.services.party_service import PartyService
-import logging
 from structlog import wrap_logger
 
 #
@@ -46,6 +47,3 @@ class Party(ServiceMockToggle):
 
 """party is the interface that code should use mocktoggle for the party service """
 party = Party(False)
-
-
-

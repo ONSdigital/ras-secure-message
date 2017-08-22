@@ -1,4 +1,5 @@
 import logging
+
 from datetime import datetime, timezone
 from structlog import wrap_logger
 from flask_sqlalchemy import SQLAlchemy
@@ -6,7 +7,6 @@ from sqlalchemy import Column, String, Integer, DateTime, ForeignKey, Index
 from sqlalchemy.orm import relationship
 from app import constants
 from app.common.labels import Labels
-
 
 logger = wrap_logger(logging.getLogger(__name__))
 

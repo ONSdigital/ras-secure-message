@@ -1,4 +1,5 @@
 import logging
+
 from structlog import wrap_logger
 from app import settings, constants
 from app.validation.user import User
@@ -15,9 +16,7 @@ def authenticate(headers):
 
     if headers.get('Authorization'):
         jwt_token = headers.get('Authorization')
-
         res = check_jwt(jwt_token)
-
         return res
 
     else:

@@ -1,4 +1,5 @@
 import logging
+
 from flask_restful import Resource
 from flask import jsonify, current_app
 from app.repository.retriever import Retriever

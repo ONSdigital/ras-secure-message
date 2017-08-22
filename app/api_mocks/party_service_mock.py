@@ -1,4 +1,5 @@
 import logging
+
 from structlog import wrap_logger
 from flask import Response
 from flask import json
@@ -35,51 +36,43 @@ class PartyServiceMock:
                                                                   "name": "Asparagus"},
                          '3b136c4b-7a14-4904-9e01-13364dd7b973': {"ru_id": "3b136c4b-7a14-4904-9e01-13364dd7b973",
                                                                   "business_name": "Bolts & Ratchet Ltd"},
-                         'b3ba864b-7cbc-4f44-84fe-88dc018a1a4c': {
-                                                                 "associations": [
-                                                                     {
-                                                                         "enrolments": [
-                                                                             {
-                                                                                 "enrolmentStatus": "ENABLED",
-                                                                                 "name": "Business Register and Employment Survey",
-                                                                                 "surveyId": "cb0711c3-0ac8-41d3-ae0e-567e5ea1ef87"
-                                                                             }
-                                                                         ],
-                                                                         "partyId": "cd592e0f-8d07-407b-b75d-e01fbdae8233"
-                                                                     }
-                                                                 ],
-                                                                 "ruref": "50012345678",
-                                                                 "checkletter": "A",
-                                                                 "frosic92": "11111",
-                                                                 "rusic92": "11111",
-                                                                 "frosic2007": "11111",
-                                                                 "rusic2007": "11111",
-                                                                 "froempment": 50,
-                                                                 "frotover": 50,
-                                                                 "entref": "1234567890",
-                                                                 "legalstatus": "B",
-                                                                 "entrepmkr": "C",
-                                                                 "region": "DE",
-                                                                 "birthdate": "01/09/1993",
-                                                                 "entname1": "ENTNAME1",
-                                                                 "entname2": "ENTNAME2",
-                                                                 "entname3": "ENTNAME3",
-                                                                 "runame1": "Bolts",
-                                                                 "runame2": "and",
-                                                                 "runame3": "Ratchets Ltd",
-                                                                 "tradstyle1": "TRADSTYLE1",
-                                                                 "tradstyle2": "TRADSTYLE2",
-                                                                 "tradstyle3": "TRADSTYLE3",
-                                                                 "seltype": "F",
-                                                                 "inclexcl": "G",
-                                                                 "cell_no": 1,
-                                                                 "formtype": "0001",
-                                                                 "currency": "H",
-                                                                 "name": "Bolts and Ratchets Ltd",
-                                                                 "id": "b3ba864b-7cbc-4f44-84fe-88dc018a1a4c",
-                                                                 "sampleUnitRef": "50012345678",
-                                                                 "sampleUnitType": "B"
-                                                             }
+                         'b3ba864b-7cbc-4f44-84fe-88dc018a1a4c': {"associations": [
+                                                                     {"enrolments": [
+                                                                             {"enrolmentStatus": "ENABLED",
+                                                                              "name": "Business Register and Employment Survey",
+                                                                              "surveyId": "cb0711c3-0ac8-41d3-ae0e-567e5ea1ef87"}],
+                                                                      "partyId": "cd592e0f-8d07-407b-b75d-e01fbdae8233"}],
+                                                                  "ruref": "50012345678",
+                                                                  "checkletter": "A",
+                                                                  "frosic92": "11111",
+                                                                  "rusic92": "11111",
+                                                                  "frosic2007": "11111",
+                                                                  "rusic2007": "11111",
+                                                                  "froempment": 50,
+                                                                  "frotover": 50,
+                                                                  "entref": "1234567890",
+                                                                  "legalstatus": "B",
+                                                                  "entrepmkr": "C",
+                                                                  "region": "DE",
+                                                                  "birthdate": "01/09/1993",
+                                                                  "entname1": "ENTNAME1",
+                                                                  "entname2": "ENTNAME2",
+                                                                  "entname3": "ENTNAME3",
+                                                                  "runame1": "Bolts",
+                                                                  "runame2": "and",
+                                                                  "runame3": "Ratchets Ltd",
+                                                                  "tradstyle1": "TRADSTYLE1",
+                                                                  "tradstyle2": "TRADSTYLE2",
+                                                                  "tradstyle3": "TRADSTYLE3",
+                                                                  "seltype": "F",
+                                                                  "inclexcl": "G",
+                                                                  "cell_no": 1,
+                                                                  "formtype": "0001",
+                                                                  "currency": "H",
+                                                                  "name": "Bolts and Ratchets Ltd",
+                                                                  "id": "b3ba864b-7cbc-4f44-84fe-88dc018a1a4c",
+                                                                  "sampleUnitRef": "50012345678",
+                                                                  "sampleUnitType": "B"}
                          }
 
     _respondent_ids = {'f62dfda8-73b0-4e0e-97cf-1b06327a6712': {"id": "f62dfda8-73b0-4e0e-97cf-1b06327a6712",
@@ -152,8 +145,7 @@ class PartyServiceMock:
                                                                                        "surveyId": "cb0711c3-0ac8-41d3-ae0e-567e5ea1ef87"
                                                                                        }],
                                                                                        "partyId": "b3ba864b-7cbc-4f44-84fe-88dc018a1a4c",
-                                                                                       "sampleUnitRef": "50012345678"
-                                                                                   }
+                                                                                       "sampleUnitRef": "50012345678"}
                                                                                ],
                                                                 "id": "ab123456-ce17-40c2-a8fc-abcdef123456",
                                                                 "firstName": "Ivor",

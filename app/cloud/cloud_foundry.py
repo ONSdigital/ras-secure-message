@@ -35,12 +35,12 @@ class ONSCloudFoundry(object):
     def credentials(self):
         return self._cf_env.get_credential('uri')
 
+
 def my_match(target, pattern):
         """
         This is a customised version of "match" that also handles matching based
         on 'target' possibly being a list.
         """
-
         if target is None:
             return False
         if isinstance(pattern, RegexType):

@@ -1,4 +1,5 @@
 import logging
+
 from structlog import wrap_logger
 
 logger = wrap_logger(logging.getLogger(__name__))
@@ -17,7 +18,6 @@ class Authorizer:
             If this is a problem we can add a third or whereby the user uuid appears in the business associations as
             a party_id, and the enrolment is valid for the survey
          """
-
         if user.is_internal:
             return True
 
@@ -32,14 +32,3 @@ class Authorizer:
 
         # A user can save a message for a specific ru if their uuid exists in the associations and they are
         # currently enrolled on the survey
-
-
-
-
-
-
-
-
-
-
-
