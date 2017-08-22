@@ -7,6 +7,7 @@ from app.application import app
 from app.common.utilities import get_business_details_by_ru, get_details_by_uuids
 from app.authentication.jwe import Encrypter
 from app.authentication.jwt import encode
+from app.api_mocks.party_service_mock import PartyServiceMock
 
 
 def _generate_encrypted_token():
@@ -426,6 +427,14 @@ class PartyTestCase(unittest.TestCase):
         for draft in drafts:
             self.assertEqual(draft['@ru_id']['name'], "Apple")
 
+    def test_get_user_details_returns_error_if_uuid_not_known(self):
+        user = 'SomeoneWhoClearlyDoesNotExist'
+        sut = PartyServiceMock()
+        expected_status_code = 404
+        expected_data = 'User ID:{} not in mock party service'.format(user)
+        result_data, result_status_code = sut.get_user_details(user)
+        self.assertEqual(result_data, expected_data)
+        self.assertEqual(result_status_code , expected_status_code)
 
 if __name__ == '__main__':
     unittest.main()

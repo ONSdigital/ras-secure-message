@@ -12,6 +12,11 @@ from app.repository import database
 from app.authentication.jwt import encode
 from app.authentication.jwe import Encrypter
 from app.services.service_toggles import case_service
+from app.resources.messages import MessageSend
+from app.resources.messages import logger as message_logger
+from app.common.alerts import AlertViaLogging
+from app.api_mocks.party_service_mock import PartyServiceMock
+from app.api_mocks.case_service_mock import CaseServiceMock
 
 
 class FlaskTestCase(unittest.TestCase):
@@ -33,7 +38,8 @@ class FlaskTestCase(unittest.TestCase):
                               _public_key=settings.SM_USER_AUTHENTICATION_PUBLIC_KEY)
         signed_jwt = encode(token_data)
         encrypted_jwt = encrypter.encrypt_token(signed_jwt)
-        AlertUser.alert_method = mock.Mock(AlertViaGovNotify)
+        AlertUser.alert_method = mock.Mock(AlertViaLogging)
+        settings.NOTIFY_CASE_SERVICE = '1'
 
         self.url = "http://localhost:5050/draft/save"
 
@@ -374,6 +380,82 @@ class FlaskTestCase(unittest.TestCase):
         url = "http://localhost:5050/message/send"
         self.app.post(url, data=json.dumps(self.test_message), headers=self.headers)
         self.assertTrue(case.called)
+
+    @patch.object(message_logger, 'error')
+    @patch.object(MessageSend, '_try_send_alert_email', side_effect=Exception('SomethingBad'))
+    def test_exception_in_alert_listeners_raises_exception_but_returns_201(self, mock_sender, mock_logger):
+        """Test exceptions in alerting do not prevent a response indicating success"""
+        settings.NOTIFY_CASE_SERVICE = '0'
+        url = "http://localhost:5050/message/send"
+        result = self.app.post(url, data=json.dumps(self.test_message), headers=self.headers)
+        self.assertTrue(mock_logger.called)
+        self.assertTrue(result.status_code == 201)
+
+    @patch.object(PartyServiceMock, 'get_user_details', return_value=({"id": "f62dfda8-73b0-4e0e-97cf-1b06327a6712",
+                                                                       "firstName": "Bhavana",
+                                                                       "lastName": "Lincoln",
+                                                                       "telephone": "+443069990888",
+                                                                       "status": "ACTIVE",
+                                                                       "sampleUnitType": "BI"}, 200))
+    @patch.object(AlertViaLogging, 'send')
+    def test_if_user_has_no_email_address_no_email_sent(self, mock_alerter, mock_party):
+        """Test if Email Address is missing no attempt will be made to send email """
+
+        url = "http://localhost:5050/message/send"
+        self.app.post(url, data=json.dumps(self.test_message), headers=self.headers)
+        self.assertFalse(mock_alerter.called)
+
+    @patch.object(PartyServiceMock, 'get_user_details', return_value=({"id": "f62dfda8-73b0-4e0e-97cf-1b06327a6712",
+                                                                       "firstName": "Bhavana",
+                                                                       "emailAddress":"",
+                                                                       "lastName": "Lincoln",
+                                                                       "telephone": "+443069990888",
+                                                                       "status": "ACTIVE",
+                                                                       "sampleUnitType": "BI"}, 200))
+    @patch.object(AlertViaLogging, 'send')
+    def test_if_user_has_zero_length_email_address_no_email_sent(self, mock_alerter, mock_party):
+        """Test if Email Address is zero length no attempt will be made to send email """
+
+        url = "http://localhost:5050/message/send"
+        self.app.post(url, data=json.dumps(self.test_message), headers=self.headers)
+        self.assertFalse(mock_alerter.called)
+
+
+    @patch.object(PartyServiceMock, 'get_user_details', return_value=({"id": "f62dfda8-73b0-4e0e-97cf-1b06327a6712",
+                                                                       "firstName": "Bhavana",
+                                                                       "emailAddress":"   ",
+                                                                       "lastName": "Lincoln",
+                                                                       "telephone": "+443069990888",
+                                                                       "status": "ACTIVE",
+                                                                       "sampleUnitType": "BI"}, 200))
+    @patch.object(AlertViaLogging, 'send')
+    def test_if_user_has_only_whitespace_in_email_address_no_email_sent(self, mock_alerter, mock_party):
+        """Test if Email Address is zero length no attempt will be made to send email """
+
+        url = "http://localhost:5050/message/send"
+        self.app.post(url, data=json.dumps(self.test_message), headers=self.headers)
+        self.assertFalse(mock_alerter.called)
+
+    @patch.object(PartyServiceMock, 'get_user_details', return_value=({"id": "cantFindThis"}, 400))
+    @patch.object(AlertViaLogging, 'send')
+    def test_if_user_unknown_in_party_service_no_email_sent(self, mock_alerter, mock_party):
+        """Test if Email Address is zero length no attempt will be made to send email """
+
+        url = "http://localhost:5050/message/send"
+        self.app.post(url, data=json.dumps(self.test_message), headers=self.headers)
+        self.assertFalse(mock_alerter.called)
+
+    @patch.object(PartyServiceMock, 'get_user_details', return_value=({"id": "f62dfda8-73b0-4e0e-97cf-1b06327a6712",
+                                                                       "emailAddress":"   ",
+                                                                       "lastName": "Lincoln",
+                                                                       "telephone": "+443069990888",
+                                                                       "status": "ACTIVE",
+                                                                       "sampleUnitType": "BI"}, 200))
+    @patch.object(CaseServiceMock, 'store_case_event')
+    def test_if_user_has_no_first_name_or_last_name_then_unknown_user_passed_to_case_service(self,mock_case, mock_party):
+        url = "http://localhost:5050/message/send"
+        self.app.post(url, data=json.dumps(self.test_message), headers=self.headers)
+        mock_case.assert_was_called_with('ACollectionCase', 'Unknown user')
 
 
 if __name__ == '__main__':
