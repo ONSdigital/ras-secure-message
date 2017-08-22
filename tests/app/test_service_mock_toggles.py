@@ -1,6 +1,5 @@
 import unittest
-from unittest.mock import patch
-from app.services.service_toggles import Party, Case
+from app.services.service_toggles import Party
 from app.api_mocks.party_service_mock import PartyServiceMock
 from app.services.party_service import PartyService
 import logging
