@@ -30,7 +30,8 @@ def logger_initial_config(service_name=None,
     logging.basicConfig(level=log_level,
                         format=logger_format)
     configure(processors=[add_log_level,
-                          filter_by_level,
-                          add_service,
-                          TimeStamper(fmt=logger_date_format, utc=True, key="created_at"),
-                          JSONRenderer(indent=1)])
+
+                      filter_by_level,
+                      add_service,
+                      TimeStamper(fmt=logger_date_format, utc=True, key="created_at"),
+                      JSONRenderer(indent=os.getenv('JSON_INDENT_LOGGING', None))])
