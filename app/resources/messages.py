@@ -15,6 +15,8 @@ from app.repository.saver import Saver
 from app.resources.drafts import DraftModifyById
 from app.validation.domain import MessageSchema
 from app.authorization.authorizer import Authorizer
+from app.services.service_toggles import party, case_service
+from app import constants
 
 logger = wrap_logger(logging.getLogger(__name__))
 
@@ -79,8 +81,8 @@ class MessageSend(Resource):
             resp.status_code = 400
             logger.error('Message send failed', errors=message.errors)
             return resp
-
-    def _message_save(self, message, is_draft, draft_id):
+    @staticmethod
+    def _message_save(message, is_draft, draft_id):
         """Saves the message to the database along with the subsequent status and audit"""
         save = Saver()
         save.save_message(message.data)
@@ -97,20 +99,59 @@ class MessageSend(Resource):
 
         if is_draft is True:
             Modifier().del_draft(draft_id)
-        return MessageSend._alert_recipients(message.data.msg_id, message.data.thread_id)
+
+        # listener errors are logged but still a 201 reported
+        MessageSend._alert_listeners(message.data)
+
+        resp = jsonify({'status': '201', 'msg_id': message.data.msg_id, 'thread_id': message.data.thread_id})
+        resp.status_code = 201
+        return resp
 
     @staticmethod
-    def _alert_recipients(msg_id, thread_id):
-        """used to alert user once messages have been saved"""
-        recipient_email = settings.NOTIFICATION_DEV_EMAIL  # TODO change this when know more about party service
+    def _alert_listeners(message):
+        """used to alert user and case service once messages have been saved"""
+        try:
+            MessageSend._try_send_alert_email(message)
+            MessageSend._inform_case_service(message)
+        except Exception as e:
+            logger.error('Uncaught exception in Message.alert_listeners', exception=e)
 
-        alert_method = AlertViaLogging() if settings.NOTIFY_VIA_LOGGING == '1' else AlertViaGovNotify()
-        alert_user = AlertUser(alert_method)
+    @staticmethod
+    def _try_send_alert_email(message):
+        """Send an email to recipient if appropriate"""
+        party_data = None
+        if message.msg_to[0] != constants.BRES_USER:
+            party_data, status_code = party.get_user_details(message.msg_to[0])  # todo avoid 2 lookups (see validate)
+            if status_code == 200:
+                if 'emailAddress' in party_data and len(party_data['emailAddress'].strip()) > 0:
+                    recipient_email = party_data['emailAddress'].strip()
+                    alert_method = AlertViaLogging() if settings.NOTIFY_VIA_LOGGING == '1' else AlertViaGovNotify()
+                    alert_user = AlertUser(alert_method)
+                    alert_user.send(recipient_email, message.msg_id)
+                else:
+                    logger.error('User does not have an emailAddress specified', msg_to=message.msg_to[0])
+            # else not testable as fails validation
+        return party_data
 
-        alert_status, alert_detail = alert_user.send(recipient_email, msg_id)
-        resp = jsonify({'status': '{0}'.format(alert_detail), 'msg_id': msg_id, 'thread_id': thread_id})
-        resp.status_code = alert_status
-        return resp
+    @staticmethod
+    def _inform_case_service(message):
+        if settings.NOTIFY_CASE_SERVICE == '1':
+            if message.msg_from == constants.BRES_USER:
+                case_user = constants.BRES_USER
+            else:
+                party_data, status_code = party.get_user_details(message.msg_from)  # todo avoid 2 lookups (see validate)
+                if status_code == 200:
+                    first_name = party_data['firstName'] if 'firstName' in party_data else ''
+                    last_name = party_data['lastName'] if 'lastName' in party_data else ''
+                    case_user = '{} {}'.format(first_name, last_name).strip()
+                    if len(case_user) == 0:
+                        case_user = 'Unknown user'
+                        logger.info('no user names in party data for id  Unknown user used in case ',
+                                    party_id=party_data['id'])
+                # else not testable , as it fails on validation
+            case_service.store_case_event(message.collection_case, case_user)
+        else:
+            logger.info('Case service notifications switched off, hence not sent', msg_id=message.msg_id)
 
 
 class MessageById(Resource):

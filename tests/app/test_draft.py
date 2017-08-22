@@ -20,6 +20,7 @@ from app.resources.drafts import DraftModifyById, DraftSave
 from app.validation.domain import DraftSchema
 from app.validation.user import User
 from app.constants import MAX_RU_ID_LEN
+from app.services.service_toggles import party, case_service
 
 
 class DraftTestCase(unittest.TestCase):
@@ -54,6 +55,7 @@ class DraftTestCase(unittest.TestCase):
                              'collection_exercise': 'ACollectionExercise',
                              'ru_id': '7fc0e8ab-189c-4794-b8f4-9f05a1db185b',
                              'survey': constants.BRES_SURVEY}
+        settings.NOTIFY_CASE_SERVICE = '1'
 
         with app.app_context():
             database.db.init_app(current_app)
@@ -63,6 +65,8 @@ class DraftTestCase(unittest.TestCase):
 
         self.user_internal = User('ce12b958-2a5f-44f4-a6da-861e59070a31', 'internal')
         self.user_respondent = User('0a7ad740-10d5-4ecb-b7ca-3c0384afb882', 'respondent')
+        case_service.use_mock_service()
+        party.use_mock_service()
 
     @event.listens_for(Engine, "connect")
     def set_sqlite_pragma(dbapi_connection, connection_record):

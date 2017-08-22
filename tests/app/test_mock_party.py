@@ -2,27 +2,27 @@ import unittest
 from flask import json
 from sqlalchemy import create_engine, event
 from sqlalchemy.engine import Engine
-from werkzeug.exceptions import ExpectationFailed
 from app import application, constants, settings
 from app.application import app
 from app.common.utilities import get_business_details_by_ru, get_details_by_uuids
 from app.authentication.jwe import Encrypter
 from app.authentication.jwt import encode
+from app.api_mocks.party_service_mock import PartyServiceMock
+
+
+def _generate_encrypted_token():
+    token_data = {constants.USER_IDENTIFIER: "0a7ad740-10d5-4ecb-b7ca-3c0384afb882",
+                  "role": "respondent"}
+
+    encrypter = Encrypter(_private_key=settings.SM_USER_AUTHENTICATION_PRIVATE_KEY,
+                          _private_key_password=settings.SM_USER_AUTHENTICATION_PRIVATE_KEY_PASSWORD,
+                          _public_key=settings.SM_USER_AUTHENTICATION_PUBLIC_KEY)
+    signed_jwt = encode(token_data)
+    encrypted_jwt = encrypter.encrypt_token(signed_jwt)
+    return encrypted_jwt
 
 
 class PartyTestCase(unittest.TestCase):
-
-    def _generate_encrypted_token(self):
-        token_data = {constants.USER_IDENTIFIER: "0a7ad740-10d5-4ecb-b7ca-3c0384afb882",
-                      "role": "respondent"}
-
-        encrypter = Encrypter(_private_key=settings.SM_USER_AUTHENTICATION_PRIVATE_KEY,
-                              _private_key_password=settings.SM_USER_AUTHENTICATION_PRIVATE_KEY_PASSWORD,
-                              _public_key=settings.SM_USER_AUTHENTICATION_PUBLIC_KEY)
-        signed_jwt = encode(token_data)
-        encrypted_jwt = encrypter.encrypt_token(signed_jwt)
-        return encrypted_jwt
-
     @event.listens_for(Engine, "connect")
     def set_sqlite_pragma(dbapi_connection, connection_record):
         """enable foreign key constraint for tests"""
@@ -115,7 +115,6 @@ class PartyTestCase(unittest.TestCase):
 
         self.assertEqual(user_details[4], expected)
 
-
     # def test_get_user_details_by_invalid_uuid(self):
     #     """Test that function returns error when invalid uuid present"""
     #
@@ -142,7 +141,7 @@ class PartyTestCase(unittest.TestCase):
                 'ru_id': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc',
                 'survey': constants.BRES_SURVEY}
 
-        encrypted_token = self._generate_encrypted_token()
+        encrypted_token = _generate_encrypted_token()
 
         self.headers = {'Content-Type': 'application/json', 'Authorization': encrypted_token}
 
@@ -187,7 +186,7 @@ class PartyTestCase(unittest.TestCase):
 
         self.app = application.app.test_client()
 
-        encrypted_token = self._generate_encrypted_token()
+        encrypted_token = _generate_encrypted_token()
 
         self.headers = {'Content-Type': 'application/json', 'Authorization': encrypted_token}
 
@@ -223,7 +222,7 @@ class PartyTestCase(unittest.TestCase):
 
         self.app = application.app.test_client()
 
-        encrypted_token = self._generate_encrypted_token()
+        encrypted_token = _generate_encrypted_token()
 
         self.headers = {'Content-Type': 'application/json', 'Authorization': encrypted_token}
 
@@ -255,7 +254,7 @@ class PartyTestCase(unittest.TestCase):
 
         self.app = application.app.test_client()
 
-        encrypted_token = self._generate_encrypted_token()
+        encrypted_token = _generate_encrypted_token()
 
         self.headers = {'Content-Type': 'application/json', 'Authorization': encrypted_token}
 
@@ -303,14 +302,12 @@ class PartyTestCase(unittest.TestCase):
                    'b3ba864b-7cbc-4f44-84fe-88dc018a1a4c'
                    ]
 
-
         business_details = get_business_details_by_ru(list_ru)
 
         self.assertEqual(business_details[0]['id'], list_ru[0])
         self.assertEqual(business_details[1]['id'], list_ru[1])
         self.assertEqual(business_details[2]['id'], list_ru[2])
         self.assertEqual(business_details[3]['id'], list_ru[3])
-
 
     def test_get_message_returns_business_details(self):
         """Test get message by id returns business details"""
@@ -325,7 +322,7 @@ class PartyTestCase(unittest.TestCase):
 
         self.app = application.app.test_client()
 
-        encrypted_token = self._generate_encrypted_token()
+        encrypted_token = _generate_encrypted_token()
 
         self.headers = {'Content-Type': 'application/json', 'Authorization': encrypted_token}
 
@@ -354,7 +351,7 @@ class PartyTestCase(unittest.TestCase):
 
         self.app = application.app.test_client()
 
-        encrypted_token = self._generate_encrypted_token()
+        encrypted_token = _generate_encrypted_token()
 
         self.headers = {'Content-Type': 'application/json', 'Authorization': encrypted_token}
 
@@ -384,7 +381,7 @@ class PartyTestCase(unittest.TestCase):
 
         self.app = application.app.test_client()
 
-        encrypted_token = self._generate_encrypted_token()
+        encrypted_token = _generate_encrypted_token()
 
         self.headers = {'Content-Type': 'application/json', 'Authorization': encrypted_token}
 
@@ -413,7 +410,7 @@ class PartyTestCase(unittest.TestCase):
 
         self.app = application.app.test_client()
 
-        encrypted_token = self._generate_encrypted_token()
+        encrypted_token = _generate_encrypted_token()
 
         self.headers = {'Content-Type': 'application/json', 'Authorization': encrypted_token}
 
@@ -430,6 +427,23 @@ class PartyTestCase(unittest.TestCase):
         for draft in drafts:
             self.assertEqual(draft['@ru_id']['name'], "Apple")
 
+    def test_get_user_details_returns_error_if_uuid_not_known(self):
+        user = 'SomeoneWhoClearlyDoesNotExist'
+        sut = PartyServiceMock()
+        expected_status_code = 404
+        expected_data = 'User ID:{} not in mock party service'.format(user)
+        result_data, result_status_code = sut.get_user_details(user)
+        self.assertEqual(result_data, expected_data)
+        self.assertEqual(result_status_code , expected_status_code)
+
+    def test_get_business_details_returns_error_if_ru_not_known(self):
+        uuid = 'ABusinessThatDoesNotExist'
+        sut = PartyServiceMock()
+        expected_status_code = 404
+        expected_data = 'RU:{} not in mock party service.'.format(uuid)
+        result_data, result_status_code = sut.get_business_details(uuid)
+        self.assertEqual(result_data, expected_data)
+        self.assertEqual(result_status_code, expected_status_code)
 
 if __name__ == '__main__':
     unittest.main()
