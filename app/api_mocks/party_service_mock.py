@@ -15,6 +15,7 @@ class PartyServiceMock:
         try:
             return self._business_details[ru], 200
         except KeyError:
+            error = 'RU:{} not in mock party service.'.format(ru)
             logger.error('RU not in mock party service.', ru=ru)
             return error, 404
 
@@ -23,6 +24,7 @@ class PartyServiceMock:
         try:
             return self._respondent_ids[uuid], 200
         except KeyError:
+            error = 'User ID:{} not in mock party service'.format(uuid)
             logger.error('User ID not in mock party service', user_uuid=uuid)
             return error, 404
 

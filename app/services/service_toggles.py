@@ -1,6 +1,7 @@
 import logging
 
 from app.api_mocks.party_service_mock import PartyServiceMock
+from app.api_mocks.case_service_mock import CaseServiceMock
 from app.services.case_service import CaseService
 from app.services.party_service import PartyService
 from structlog import wrap_logger
