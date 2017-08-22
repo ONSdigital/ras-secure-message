@@ -81,8 +81,8 @@ class MessageSend(Resource):
             resp.status_code = 400
             logger.error('Message send failed', errors=message.errors)
             return resp
-
-    def _message_save(self, message, is_draft, draft_id):
+    @staticmethod
+    def _message_save(message, is_draft, draft_id):
         """Saves the message to the database along with the subsequent status and audit"""
         save = Saver()
         save.save_message(message.data)
@@ -114,7 +114,7 @@ class MessageSend(Resource):
             MessageSend._try_send_alert_email(message)
             MessageSend._inform_case_service(message)
         except Exception as e:
-            logger.error('Uncaught exception in Message.alert_listeners: {}'.format(e))
+            logger.error('Uncaught exception in Message.alert_listeners', exception=e)
 
     @staticmethod
     def _try_send_alert_email(message):
@@ -129,9 +129,9 @@ class MessageSend(Resource):
                     alert_user = AlertUser(alert_method)
                     alert_user.send(recipient_email, message.msg_id)
                 else:
-                    logger.error('UserId {0} does not have an emailAddress specified'.format(message.msg_to[0]))
+                    logger.error('User does not have an emailAddress specified', msg_to=message.msg_to[0])
             else:
-                logger.error('UserId {0} not known in party service : alert email not sent but message stored'.format(message.msg_to[0]))
+                logger.error('User not known in party service : alert email not sent but message stored', msg_to=message.msg_to[0])
         return party_data
 
     @staticmethod
@@ -147,13 +147,16 @@ class MessageSend(Resource):
                     case_user = '{} {}'.format(first_name, last_name).strip()
                     if len(case_user) == 0:
                         case_user = 'Unknown user'
-                        logger.info('no user names in party data for id {} Unknown user used in case '.format(party_data['id']))
+                        logger.info('no user names in party data for id  Unknown user used in case ',
+                                    party_id=party_data['id'])
                 else:
-                    logger.info('could not retrieve {} details from party using Unknown user for case'.format(message.msg_from))
+                    logger.info('No party details for from user using Unknown user for case',
+                                msg_from=message.msg_from)
                     case_user = 'Unknown user'
             case_service.store_case_event(message.collection_case, case_user)
         else:
-            logger.info('Case service notifications switched off msg_id {}'.format(message.msg_id))
+            logger.info('Case service notifications switched off, hence not sent', msg_id=message.msg_id)
+
 
 class MessageById(Resource):
     """Get and update message by id"""

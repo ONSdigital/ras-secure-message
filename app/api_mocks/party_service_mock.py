@@ -1,8 +1,5 @@
 import logging
-
 from structlog import wrap_logger
-from flask import Response
-from flask import json
 from app import constants
 
 logger = wrap_logger(logging.getLogger(__name__))
