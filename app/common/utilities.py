@@ -121,7 +121,7 @@ def get_business_details_by_ru(rus):
         if detail.status_code == 200:
             details.append(json.loads(detail.data))
         else:
-            logger.info("No details found for RU ID {}".format(ru))
+            logger.info('No details found for RU ID', ru=ru)
 
     return details
 
@@ -137,7 +137,7 @@ def get_details_by_uuids(uuids):
         if detail.status_code == 200:
             respondent_details.append(json.loads(detail.data))
         else:
-            logger.info("No details found for user {}".format(uuid))
+            logger.info('No details found for user', uuid=uuid)
 
     return respondent_details
 

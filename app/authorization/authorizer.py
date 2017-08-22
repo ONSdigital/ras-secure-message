@@ -27,8 +27,7 @@ class Authorizer:
         if user.user_uuid in message['msg_to']:
             return True
 
-        logger.info('user {} (role:{}) was refused viewing of message id {}'.format(user.user_uuid, user.role,
-                                                                                    message['msg_id']))
+        logger.info('User was refused viewing of message', user_uuid=user.user_uuid, role=user.role, message_id=message['msg_id'])
         return False
 
         # A user can save a message for a specific ru if their uuid exists in the associations and they are
