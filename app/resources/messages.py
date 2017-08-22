@@ -130,8 +130,7 @@ class MessageSend(Resource):
                     alert_user.send(recipient_email, message.msg_id)
                 else:
                     logger.error('User does not have an emailAddress specified', msg_to=message.msg_to[0])
-            else:
-                logger.error('User not known in party service : alert email not sent but message stored', msg_to=message.msg_to[0])
+            # else not testable as fails validation
         return party_data
 
     @staticmethod

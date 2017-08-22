@@ -452,6 +452,25 @@ class FlaskTestCase(unittest.TestCase):
                                                                        "sampleUnitType": "BI"}, 200))
     @patch.object(CaseServiceMock, 'store_case_event')
     def test_if_user_has_no_first_name_or_last_name_then_unknown_user_passed_to_case_service(self,mock_case, mock_party):
+        """Test if party data has no name for the user then a constant of 'Unknown user' is used"""
+        self.test_message.update({'msg_to': [constants.BRES_USER],
+                                  'msg_from': '0a7ad740-10d5-4ecb-b7ca-3c0384afb882',
+                                  'subject': 'MyMessage',
+                                  'body': 'hello',
+                                  'collection_case': 'ACollectionCase',
+                                  'collection_exercise': 'ACollectionExercise',
+                                  'ru_id': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc',
+                                  'survey': constants.BRES_SURVEY})
+
+        token_data = {constants.USER_IDENTIFIER: "0a7ad740-10d5-4ecb-b7ca-3c0384afb882",
+                      "role": "respondent"}
+
+        encrypter = Encrypter(_private_key=settings.SM_USER_AUTHENTICATION_PRIVATE_KEY,
+                              _private_key_password=settings.SM_USER_AUTHENTICATION_PRIVATE_KEY_PASSWORD,
+                              _public_key=settings.SM_USER_AUTHENTICATION_PUBLIC_KEY)
+        signed_jwt = encode(token_data)
+        encrypted_jwt = encrypter.encrypt_token(signed_jwt)
+        self.headers = {'Content-Type': 'application/json', 'Authorization': encrypted_jwt}
         url = "http://localhost:5050/message/send"
         self.app.post(url, data=json.dumps(self.test_message), headers=self.headers)
         mock_case.assert_was_called_with('ACollectionCase', 'Unknown user')
