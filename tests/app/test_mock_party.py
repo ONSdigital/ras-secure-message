@@ -436,5 +436,14 @@ class PartyTestCase(unittest.TestCase):
         self.assertEqual(result_data, expected_data)
         self.assertEqual(result_status_code , expected_status_code)
 
+    def test_get_business_details_returns_error_if_ru_not_known(self):
+        uuid = 'ABusinessThatDoesNotExist'
+        sut = PartyServiceMock()
+        expected_status_code = 404
+        expected_data = 'RU:{} not in mock party service.'.format(uuid)
+        result_data, result_status_code = sut.get_business_details(uuid)
+        self.assertEqual(result_data, expected_data)
+        self.assertEqual(result_status_code, expected_status_code)
+
 if __name__ == '__main__':
     unittest.main()

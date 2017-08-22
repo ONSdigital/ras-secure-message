@@ -149,10 +149,7 @@ class MessageSend(Resource):
                         case_user = 'Unknown user'
                         logger.info('no user names in party data for id  Unknown user used in case ',
                                     party_id=party_data['id'])
-                else:
-                    logger.info('No party details for from user using Unknown user for case',
-                                msg_from=message.msg_from)
-                    case_user = 'Unknown user'
+                # else not testable , as it fails on validation
             case_service.store_case_event(message.collection_case, case_user)
         else:
             logger.info('Case service notifications switched off, hence not sent', msg_id=message.msg_id)

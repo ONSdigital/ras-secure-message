@@ -420,7 +420,6 @@ class FlaskTestCase(unittest.TestCase):
         self.app.post(url, data=json.dumps(self.test_message), headers=self.headers)
         self.assertFalse(mock_alerter.called)
 
-
     @patch.object(PartyServiceMock, 'get_user_details', return_value=({"id": "f62dfda8-73b0-4e0e-97cf-1b06327a6712",
                                                                        "firstName": "Bhavana",
                                                                        "emailAddress":"   ",
@@ -456,7 +455,6 @@ class FlaskTestCase(unittest.TestCase):
         url = "http://localhost:5050/message/send"
         self.app.post(url, data=json.dumps(self.test_message), headers=self.headers)
         mock_case.assert_was_called_with('ACollectionCase', 'Unknown user')
-
 
 if __name__ == '__main__':
     unittest.main()
