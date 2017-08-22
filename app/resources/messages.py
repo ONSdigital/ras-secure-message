@@ -1,4 +1,5 @@
 import logging
+
 from flask import request, jsonify, g, Response
 from flask_restful import Resource
 from structlog import wrap_logger
@@ -16,7 +17,6 @@ from app.validation.domain import MessageSchema
 from app.authorization.authorizer import Authorizer
 from app.services.service_toggles import party, case_service
 from app import constants
-
 
 logger = wrap_logger(logging.getLogger(__name__))
 
@@ -52,9 +52,9 @@ class MessageSend(Resource):
         logger.info("Message send POST request.")
         if request.headers['Content-Type'].lower() != 'application/json':
             # API only returns JSON
-            description = 'Request must set accept content type "application/json" in header.'
-            logger.info(description=description)
+            logger.info('Request must set accept content type "application/json" in header.')
         post_data = request.get_json(force=True)
+
         is_draft = False
         draft_id = None
         if 'msg_id' in post_data:
@@ -71,10 +71,7 @@ class MessageSend(Resource):
 
             last_modified = DraftModifyById.etag_check(request.headers, returned_draft)
             if last_modified is False:
-
-                res = Response(response="Draft has been modified since last check", status=409,
-                               mimetype="text/html")
-                return res
+                return Response(response="Draft has been modified since last check", status=409, mimetype="text/html")
 
         message = MessageSchema().load(post_data)
         if message.errors == {}:
@@ -82,6 +79,7 @@ class MessageSend(Resource):
         else:
             resp = jsonify(message.errors)
             resp.status_code = 400
+            logger.error('Message send failed', errors=message.errors)
             return resp
 
     def _message_save(self, message, is_draft, draft_id):
@@ -173,7 +171,9 @@ class MessageById(Resource):
         else:
             result = jsonify({'status': 'error'})
             result.status_code = 403
+            logger.error('Error getting message by ID', msg_id=message_id, status_code=result.status_code)
             return result
+
 
 class MessageModifyById(Resource):
     """Update message status by id"""
@@ -198,6 +198,7 @@ class MessageModifyById(Resource):
         else:
             res = jsonify({'status': 'error'})
             res.status_code = 400
+            logger.error('Error updating message', msg_id=message_id, status_code=res.status_code)
         return res
 
     @staticmethod
@@ -224,20 +225,25 @@ class MessageModifyById(Resource):
     def _validate_request(request_data):
         """Used to validate data within request body for ModifyById"""
         if 'label' not in request_data:
+            logger.error('No label provided')
             raise BadRequest(description="No label provided")
 
         label = request_data["label"]
         if label not in Labels.label_list.value:
+            logger.error('Invalid label provided', label=label)
             raise BadRequest(description="Invalid label provided: {0}".format(label))
 
         if label not in [Labels.ARCHIVE.value, Labels.UNREAD.value]:
+            logger.error('Non modifiable label provided', label=label)
             raise BadRequest(description="Non modifiable label provided: {0}".format(label))
 
         if 'action' not in request_data:
+            logger.error('No action provided')
             raise BadRequest(description="No action provided")
 
         action = request_data["action"]
         if action not in ["add", "remove"]:
+            logger.error('Invalid action requested', action=action)
             raise BadRequest(description="Invalid action requested: {0}".format(action))
 
         return action, label

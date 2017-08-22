@@ -1,4 +1,5 @@
 import logging
+
 from flask import jsonify
 from structlog import wrap_logger
 from werkzeug.exceptions import InternalServerError
@@ -24,8 +25,8 @@ class Modifier:
             return True
         except Exception as e:
             session.rollback()
-            logger.error(e)
-            raise InternalServerError(description="Error retrieving messages from database")
+            logger.error('Error adding label to database', msg_id=message, label=label, user_uuid=actor, error=e)
+            raise InternalServerError(description="Error adding label to database")
 
     @staticmethod
     def remove_label(label, message, user):
@@ -37,8 +38,8 @@ class Modifier:
             db.get_engine(app=db.get_app()).execute(query)
             return True
         except Exception as e:
-            logger.error(e)
-            raise InternalServerError(description="Error retrieving messages from database")
+            logger.error('Error removing label from database', msg_id=message, label=label, user_uuid=actor, error=e)
+            raise InternalServerError(description="Error removing label from database")
 
     @staticmethod
     def add_archived(message, user):
@@ -71,6 +72,7 @@ class Modifier:
         else:
             res = jsonify({'status': 'error'})
             res.status_code = 400
+            logging.error('Error adding unread label', status_code=res.status_code)
             return res
 
     @staticmethod
@@ -94,14 +96,12 @@ class Modifier:
         try:
             db.get_engine(app=db.get_app()).execute(del_draft_status)
             db.get_engine(app=db.get_app()).execute(del_draft_inbox_status)
-
             db.get_engine(app=db.get_app()).execute(del_draft_event)
-
             db.get_engine(app=db.get_app()).execute(del_draft_msg)
 
         except Exception as e:
-            logger.error(e)
-            raise InternalServerError(description="Error retrieving messages from database")
+            logger.error('Error deleting draft from database', msg_id=draft_id, error=e)
+            raise InternalServerError(description="Error deleting draft from database")
 
     @staticmethod
     def replace_current_draft(draft_id, draft, session=db.session):
@@ -113,7 +113,7 @@ class Modifier:
             session.commit()
         except Exception as e:
             session.rollback()
-            logger.error(e)
+            logger.error('Error replacing message', msg_id=draft_id, error=e)
             raise InternalServerError(description="Error replacing message")
 
         Saver().save_msg_event(draft_id, 'Draft_Saved')
@@ -135,5 +135,5 @@ class Modifier:
             session.commit()
         except Exception as e:
             session.rollback()
-            logger.error(e)
+            logger.error('Error replacing label in database', label=Labels.DRAFT_INBOX.value, msg_id=draft_id, error=e)
             raise InternalServerError(description="Error replacing DRAFT_INBOX label")

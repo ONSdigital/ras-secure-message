@@ -1,4 +1,5 @@
 import logging
+
 from flask import Flask, request
 from flask import jsonify, json
 from flask_restful import Api
@@ -44,6 +45,7 @@ database.db.init_app(app)
 
 logger.info('Starting Secure Message Service ...')
 
+
 def drop_database():
     database.db.drop_all()
 
@@ -74,7 +76,7 @@ def before_request():
         log_request()
         res = authenticate(request.headers)
         if res != {'status': "ok"}:
-            logger.debug("Failed to authenticate user")
+            logger.error('Failed to authenticate user', result=res)
             return res
 
 
@@ -115,4 +117,4 @@ def log_request():
         args_list.append('arg ' + str(count) + ' = ' + str(key) + ': ' + str(val))
 
     params = ''.join(args_list)
-    logger.debug('Headers: ' + str(headers) + ' Body: ' + str(req_data) + ' Arguments: ' + str(params))
+    logger.debug('Incoming request', req_data=req_data, arguments=params)

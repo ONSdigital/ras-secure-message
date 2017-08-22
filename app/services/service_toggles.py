@@ -1,8 +1,8 @@
-from app.api_mocks.case_service_mock import CaseServiceMock
+import logging
+
 from app.api_mocks.party_service_mock import PartyServiceMock
 from app.services.case_service import CaseService
 from app.services.party_service import PartyService
-import logging
 from structlog import wrap_logger
 
 #
@@ -27,13 +27,11 @@ class ServiceMockToggle:
 
     def use_mock_service(self):
         self._service = self._mock_service
-        log_message = "Mocked {0} service in use".format(self._service_name)
-        logger.debug(log_message)
+        logger.debug('Mocked service in use', service_name=self._service_name)
 
     def use_real_service(self):
         self._service = self._real_service
-        log_message = "Non mocked {0} service in use".format(self._service_name)
-        logger.debug(log_message)
+        logger.debug('Non mocked service in use', service_name=self._service_name)
 
 
 class Party(ServiceMockToggle):

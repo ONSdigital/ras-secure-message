@@ -3,9 +3,7 @@ from app.services.service_toggles import Party
 from app.api_mocks.party_service_mock import PartyServiceMock
 from app.services.party_service import PartyService
 import logging
-from structlog import wrap_logger
 
-logger = wrap_logger(logging.getLogger(__name__))
 
 class ServiceMockTestCase(unittest.TestCase):
     """Test case for toggling between a service and its mock"""

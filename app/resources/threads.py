@@ -1,11 +1,11 @@
 import logging
+
 from flask import g, request, jsonify
 from flask_restful import Resource
 from structlog import wrap_logger
 from app.common.utilities import get_options, paginated_list_to_json
 from app.constants import THREAD_LIST_ENDPOINT
 from app.repository.retriever import Retriever
-
 
 logger = wrap_logger(logging.getLogger(__name__))
 
@@ -19,9 +19,8 @@ class ThreadById(Resource):
         # check user is authorised to view message
         message_service = Retriever()
         conversation = message_service.retrieve_thread(thread_id, g.user)
-        resp = jsonify(conversation)
 
-        return resp
+        return jsonify(conversation)
 
 
 class ThreadList(Resource):

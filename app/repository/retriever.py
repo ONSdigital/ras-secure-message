@@ -1,4 +1,5 @@
 import logging
+
 from structlog import wrap_logger
 from flask import jsonify
 from sqlalchemy import and_, case, func, or_
@@ -14,8 +15,7 @@ logger = wrap_logger(logging.getLogger(__name__))
 class Retriever:
     """Created when retrieving messages"""
     @staticmethod
-    def retrieve_message_list(page, limit, user, ru_id=None, survey=None, cc=None, ce=None, label=None,
-                              descend=True):
+    def retrieve_message_list(page, limit, user, ru_id=None, survey=None, cc=None, ce=None, label=None, descend=True):
         """returns list of messages from db"""
         conditions = []
         status_conditions = []
@@ -64,7 +64,7 @@ class Retriever:
                     .order_by(t.c.max_date.asc()).paginate(page, limit, False)
 
         except Exception as e:
-            logger.error(e)
+            logger.error('Error retrieving messages from database', error=e)
             raise InternalServerError(description="Error retrieving messages from database")
 
         return True, result
@@ -98,7 +98,7 @@ class Retriever:
                 .order_by(t.c.max_date.desc()).paginate(page, limit, False)
 
         except Exception as e:
-            logger.error(e)
+            logger.error('Error retrieving messages from database', error=e)
             raise InternalServerError(description="Error retrieving messages from database")
 
         return True, result
@@ -111,19 +111,17 @@ class Retriever:
         try:
             result = db_model.query.filter_by(msg_id=message_id).first()
             if result is None:
+                logger.error('Message ID not found', message_id=message_id)
                 raise NotFound(description="Message with msg_id '{0}' does not exist".format(message_id))
         except SQLAlchemyError as e:
-            logger.error(e)
+            logger.error('Error retrieving message from database', error=e)
             raise InternalServerError(description="Error retrieving message from database")
 
-        message = result.serialize(user)
-
-        return message
+        return result.serialize(user)
 
     @staticmethod
     def retrieve_thread(thread_id, user, _survey=constants.BRES_SURVEY):
         """returns list of messages for thread id"""
-
         status_conditions = []
 
         if user.is_respondent:
@@ -142,10 +140,11 @@ class Retriever:
                                else_=0).desc(), Events.event.desc())
 
             if result.count() == 0:
+                logger.debug('Thread does not exist', thread_id=thread_id)
                 raise NotFound(description="Conversation with thread_id '{0}' does not exist".format(thread_id))
 
         except SQLAlchemyError as e:
-            logger.error(e)
+            logger.error('Error retrieving conversation from database', error=e)
             raise InternalServerError(description="Error retrieving conversation from database")
 
         conversation = []
@@ -163,6 +162,7 @@ class Retriever:
             result = SecureMessage.query.filter(SecureMessage.msg_id == message_id)\
                 .filter(SecureMessage.statuses.any(Status.label == Labels.DRAFT.value)).first()
             if result is None:
+                logger.error('Draft does not exist', message_id=message_id)
                 raise NotFound(description="Draft with msg_id '{0}' does not exist".format(message_id))
         except SQLAlchemyError as e:
             logger.error(e)
@@ -186,6 +186,7 @@ class Retriever:
             database_status['errors'] = str(e)
             resp = jsonify(database_status)
             resp.status_code = 500
+            logger.error('No connection to database', status_code=resp.status_code, error=e)
 
         return resp
 
@@ -196,7 +197,7 @@ class Retriever:
             result = SecureMessage.query.filter(SecureMessage.msg_id == draft_id)\
                 .filter(SecureMessage.statuses.any(Status.label == Labels.DRAFT.value)).first()
         except Exception as e:
-            logger.error(e)
+            logger.error('Error retrieving message from database', error=e)
             raise InternalServerError(description="Error retrieving message from database")
 
         if result is None:

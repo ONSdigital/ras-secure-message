@@ -1,4 +1,5 @@
 import logging
+
 from flask import g, Response
 from flask import request, jsonify
 from flask_restful import Resource
@@ -22,6 +23,7 @@ class DraftSave(Resource):
         draft = DraftSchema().load(post_data)
 
         if 'msg_id' in post_data:
+            logger.error('Message cannot include message ID')
             raise BadRequest(description="Message can not include msg_id")
 
         if draft.errors == {}:
@@ -36,6 +38,7 @@ class DraftSave(Resource):
         else:
             res = jsonify(draft.errors)
             res.status_code = 400
+            logger.error('Failed saving draft', status_code=res.status_code)
             return res
 
     @staticmethod
@@ -95,19 +98,20 @@ class DraftModifyById(Resource):
         """Handles modifying of drafts"""
         data = request.get_json()
         if 'msg_id' not in data:
+            logger.error('Draft put requires message ID')
             raise BadRequest(description="Draft put requires msg_id")
         if data['msg_id'] != draft_id:
+            logger.error('Conflicting message IDs', draft_id=draft_id, message_id=data['msg_id'])
             raise BadRequest(description="Conflicting msg_id's")
         is_draft = Retriever().check_msg_id_is_a_draft(draft_id, g.user)
         if is_draft[0] is False:
+            logger.error('Draft put requires valid draft')
             raise BadRequest(description="Draft put requires valid draft")
 
         not_modified = self.etag_check(request.headers, is_draft[1])
 
         if not_modified is False:
-            res = Response(response="Draft has been modified since last check", status=409,
-                           mimetype="text/html")
-            return res
+            return Response(response="Draft has been modified since last check", status=409, mimetype="text/html")
 
         draft = DraftSchema().load(data)
         if draft.errors == {}:
@@ -125,6 +129,7 @@ class DraftModifyById(Resource):
         else:
             resp = jsonify(draft.errors)
             resp.status_code = 400
+            logger.error('Error sending draft', msg_id=draft_id, status_code=resp.status_code)
             return resp
 
     @staticmethod

@@ -1,4 +1,5 @@
 import logging
+
 from structlog import wrap_logger
 
 logger = wrap_logger(logging.getLogger(__name__))
@@ -17,7 +18,6 @@ class Authorizer:
             If this is a problem we can add a third or whereby the user uuid appears in the business associations as
             a party_id, and the enrolment is valid for the survey
          """
-
         if user.is_internal:
             return True
 
@@ -27,20 +27,8 @@ class Authorizer:
         if user.user_uuid in message['msg_to']:
             return True
 
-        logger.info('user {} (role:{}) was refused viewing of message id {}'.format(user.user_uuid, user.role,
-                                                                                    message['msg_id']))
+        logger.info('User was refused viewing of message', user_uuid=user.user_uuid, role=user.role, message_id=message['msg_id'])
         return False
 
         # A user can save a message for a specific ru if their uuid exists in the associations and they are
         # currently enrolled on the survey
-
-
-
-
-
-
-
-
-
-
-

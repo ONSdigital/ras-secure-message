@@ -3,8 +3,9 @@ from flask import json
 import requests
 import app.settings
 from app import constants
+from structlog import wrap_logger
 
-logger = logging.getLogger(__name__)
+logger = wrap_logger(logging.getLogger(__name__))
 
 
 class PartyService:
@@ -15,8 +16,8 @@ class PartyService:
 
         url = app.settings.RAS_PARTY_GET_BY_BUSINESS.format(app.settings.RAS_PARTY_SERVICE, ru)
         party_data = requests.get(url, verify=False)
-        logger.debug('party get business details result => {} {} : {}'.format(party_data.status_code, party_data.reason,
-                                                                              party_data.text))
+        logger.debug('Party service get business details result', status_code=party_data.status_code, reason=party_data.reason, text=party_data.text,
+                     url=url)
         party_dict = json.loads(party_data.text)
         if type(party_dict) is list:                    # if id is not a uuid returns a list not a dict
             party_dict = {'errors': party_dict[0]}
@@ -38,7 +39,7 @@ class PartyService:
         else:
             url = app.settings.RAS_PARTY_GET_BY_RESPONDENT.format(app.settings.RAS_PARTY_SERVICE, uuid)
             party_data = requests.get(url, verify=False)
-            logger.debug('party get user details result => {} {} : {}'.format(party_data.status_code,
-                                                                              party_data.reason, party_data.text))
+            logger.debug('Party get user details result', status_code=party_data.status_code, reason=party_data.reason, text=party_data.text,
+                         url=url)
             party_dict = json.loads(party_data.text)
             return party_dict, party_data.status_code
