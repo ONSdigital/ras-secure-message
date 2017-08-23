@@ -1,4 +1,5 @@
 import unittest
+
 from flask import current_app, json
 from app import application
 from app.application import app
@@ -49,9 +50,18 @@ class HealthTestCase(unittest.TestCase):
     def test_keys_in_app_details_true(self):
         """sends GET request to the application health details endpoint"""
         response = self.app.get('/health/details')
-        details = {'SMS Log level': '',
+        details = {'Name': '',
+                   'Version': '',
+                   'SMS Log level': '',
                    'APP Log Level': '',
                    'Database URL': '',
-                   'API Functionality': ''}
+                   'API Functionality': '',
+                   'Using party service mock': '',
+                   'SM JWT ENCRYPT': '',
+                   'RAS PARTY SERVICE HOST': '',
+                   'RAS PARTY SERVICE PORT': '',
+                   'RAS PARTY SERVICE PROTOCOL': '',
+                   'NOTIFY VIA LOGGING': '',
+                   'NOTIFY CASE SERVICE': ''}
 
         self.assertEqual(json.loads(response.get_data()).keys(), details.keys())

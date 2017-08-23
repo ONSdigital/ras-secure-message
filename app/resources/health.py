@@ -3,6 +3,7 @@ import logging
 from flask_restful import Resource
 from flask import jsonify, current_app
 from app.repository.retriever import Retriever
+from app.services.service_toggles import party
 from app import settings
 from structlog import wrap_logger
 
@@ -40,9 +41,18 @@ class HealthDetails(Resource):
             if rule.endpoint != 'static':
                 func_list[rule.rule] = application.app.view_functions[rule.endpoint].__doc__
 
-        details = {'SMS Log level': settings.SMS_LOG_LEVEL,
+        details = {'Name': settings.NAME,
+                   'Version': settings.VERSION,
+                   'SMS Log level': settings.SMS_LOG_LEVEL,
                    'APP Log Level': settings.APP_LOG_LEVEL,
                    'Database URL': current_app.config['SQLALCHEMY_DATABASE_URI'],
-                   'API Functionality': func_list}
+                   'API Functionality': func_list,
+                   'Using party service mock': party._use_mock,
+                   'SM JWT ENCRYPT': settings.SM_JWT_ENCRYPT,
+                   'RAS PARTY SERVICE HOST': settings.RAS_PARTY_SERVICE_HOST,
+                   'RAS PARTY SERVICE PORT': settings.RAS_PARTY_SERVICE_PORT,
+                   'RAS PARTY SERVICE PROTOCOL': settings.RAS_PARTY_SERVICE_PROTOCOL,
+                   'NOTIFY VIA LOGGING': settings.NOTIFY_VIA_LOGGING,
+                   'NOTIFY CASE SERVICE': settings.NOTIFY_CASE_SERVICE}
 
         return jsonify(details)

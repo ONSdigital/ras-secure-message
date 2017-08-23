@@ -39,6 +39,7 @@ class Party(ServiceMockToggle):
     """A Party acts as an interface to mocked or real Party Services via its ServiceMockToggle base"""
 
     def __init__(self, use_mock=False):
+        self._use_mock = use_mock
         super().__init__(use_mock, PartyService, PartyServiceMock, 'Party')
 
     def get_business_details(self, ru):
