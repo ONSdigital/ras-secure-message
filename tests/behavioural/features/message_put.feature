@@ -3,6 +3,7 @@ Feature: Checking correct labels for messages are added & deleted
  Background: Reset database
     Given database is reset
     And using mock party service
+    And using mock case service
 
   Scenario: modifying the status of the message to "archived"
     Given a valid message is sent

@@ -1,6 +1,8 @@
 import logging
 
 from app.api_mocks.party_service_mock import PartyServiceMock
+from app.api_mocks.case_service_mock import CaseServiceMock
+from app.services.case_service import CaseService
 from app.services.party_service import PartyService
 from structlog import wrap_logger
 
@@ -46,5 +48,18 @@ class Party(ServiceMockToggle):
     def get_user_details(self, uuid):
         return self._service.get_user_details(uuid)
 
+
+class Case(ServiceMockToggle):
+    """A case service acts as an interface to mocked or real Case Services via its ServiceMockToggle base"""
+
+    def __init__(self, use_mock=False):
+        super().__init__(use_mock, CaseService, CaseServiceMock, 'Case')
+
+    def store_case_event(self, case_id, user_uuid):
+        return self._service.store_case_event(case_id, user_uuid)
+
 """party is the interface that code should use mocktoggle for the party service """
 party = Party(False)
+
+"""case_service is how code should interact with the case service"""
+case_service = Case(False)
