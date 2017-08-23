@@ -1,4 +1,5 @@
 import unittest
+
 from flask import current_app, json
 from app import application
 from app.application import app
@@ -61,6 +62,7 @@ class HealthTestCase(unittest.TestCase):
                    'RAS PARTY SERVICE HOST': '',
                    'RAS PARTY SERVICE PORT': '',
                    'RAS PARTY SERVICE PROTOCOL': '',
-                   'NOTIFY VIA LOGGING': ''}
+                   'NOTIFY VIA LOGGING': '',
+                   'NOTIFY CASE SERVICE': ''}
 
         self.assertEqual(json.loads(response.get_data()).keys(), details.keys())
