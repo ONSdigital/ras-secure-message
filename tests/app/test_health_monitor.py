@@ -57,7 +57,6 @@ class HealthTestCase(unittest.TestCase):
                    'Database URL': '',
                    'API Functionality': '',
                    'Using party service mock': '',
-                   'SM JWT SECRET': '',
                    'SM JWT ENCRYPT': '',
                    'RAS PARTY SERVICE HOST': '',
                    'RAS PARTY SERVICE PORT': '',

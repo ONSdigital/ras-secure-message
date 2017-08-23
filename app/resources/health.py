@@ -48,7 +48,6 @@ class HealthDetails(Resource):
                    'Database URL': current_app.config['SQLALCHEMY_DATABASE_URI'],
                    'API Functionality': func_list,
                    'Using party service mock': party._use_mock,
-                   'SM JWT SECRET': settings.SM_JWT_SECRET,
                    'SM JWT ENCRYPT': settings.SM_JWT_ENCRYPT,
                    'RAS PARTY SERVICE HOST': settings.RAS_PARTY_SERVICE_HOST,
                    'RAS PARTY SERVICE PORT': settings.RAS_PARTY_SERVICE_PORT,
