@@ -19,6 +19,12 @@ def logger_initial_config(service_name=None,
         logger_format = "%(message)s , 'file'='%(name)s', 'line_number'=%(lineno)s"
     if not service_name:
         service_name = os.getenv('NAME', 'ras-frontstage')
+    try:
+        indent = int(os.getenv('JSON_INDENT_LOGGING'))
+    except TypeError:
+        indent = None
+    except ValueError:
+        indent = None
 
     def add_service(logger, method_name, event_dict):
         """
@@ -30,7 +36,7 @@ def logger_initial_config(service_name=None,
     logging.basicConfig(level=log_level,
                         format=logger_format)
     configure(processors=[add_log_level,
-                      filter_by_level,
-                      add_service,
-                      TimeStamper(fmt=logger_date_format, utc=True, key="created_at"),
-                      JSONRenderer(indent=os.getenv('JSON_INDENT_LOGGING', None))])
+              filter_by_level,
+              add_service,
+              TimeStamper(fmt=logger_date_format, utc=True, key="created_at"),
+              JSONRenderer(indent=indent)])
