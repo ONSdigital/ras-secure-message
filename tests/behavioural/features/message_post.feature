@@ -3,6 +3,7 @@ Feature: Message Send Endpoint
  Background: Reset database
     Given using mock party service
     And using mock case service
+    And database is reset
 
   Scenario: Submitting a valid message and receiving a 201
     Given a valid message
@@ -100,10 +101,19 @@ Feature: Message Send Endpoint
     When the message is sent with msg_to string
     Then a bad request status code (400) is returned
 
-  Scenario: Submitting a message to unkonwn user and recieving a
+  Scenario: Submitting a message to unknown user and receiving a
     Given a message to an unknown user is created
     When the created message is sent
     Then a bad request status code (400) is returned
+
+
+  Scenario: Submitting a message with uuid for survey results in uuid not being used as actor
+    Given a message is sent to a respondent with uuid as survey
+    When the respondent wants to see the message
+    Then the message from does not equal the survey id
+    And  the message from equals BRES
+
+
 
 
 

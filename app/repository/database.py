@@ -72,7 +72,8 @@ class SecureMessage(db.Model):
                    'labels': []}
 
         if user.is_internal:
-            actor = self.survey
+            #actor = self.survey
+            actor = constants.BRES_USER
         else:
             actor = user.user_uuid
 

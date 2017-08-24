@@ -6,6 +6,7 @@ from werkzeug.exceptions import InternalServerError
 from app.common.labels import Labels
 from app.repository.database import db, Status, SecureMessage
 from app.repository.saver import Saver
+from app import constants
 
 logger = wrap_logger(logging.getLogger(__name__))
 
@@ -16,7 +17,7 @@ class Modifier:
     @staticmethod
     def add_label(label, message, user, session=db.session):
         """add a label to status table"""
-        actor = user.user_uuid if user.is_respondent else message['survey']
+        actor = user.user_uuid if user.is_respondent else constants.BRES_USER
 
         try:
             status = Status(label=label, msg_id=message['msg_id'], actor=actor)
@@ -31,7 +32,7 @@ class Modifier:
     @staticmethod
     def remove_label(label, message, user):
         """delete a label from status table"""
-        actor = user.user_uuid if user.is_respondent else message['survey']
+        actor = user.user_uuid if user.is_respondent else constants.BRES_USER
         try:
             query = "DELETE FROM status WHERE label = '{0}' and msg_id = '{1}' and actor = '{2}'". \
                 format(label, message['msg_id'], actor)
