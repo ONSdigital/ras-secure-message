@@ -35,7 +35,8 @@ class MessageList(Resource):
 
         message_service = Retriever()
         status, result = message_service.retrieve_message_list(page, limit, g.user,
-                                                               ru_id=ru_id, survey=survey, cc=cc, label=label, descend=desc, ce=ce)
+                                                               ru_id=ru_id, survey=survey, cc=cc, label=label,
+                                                               descend=desc, ce=ce)
 
         if status:
             resp = paginated_list_to_json(result, page, limit, request.host_url,
@@ -81,6 +82,7 @@ class MessageSend(Resource):
             resp.status_code = 400
             logger.error('Message send failed', errors=message.errors)
             return resp
+
     @staticmethod
     def _message_save(message, is_draft, draft_id):
         """Saves the message to the database along with the subsequent status and audit"""
@@ -139,7 +141,7 @@ class MessageSend(Resource):
             if message.msg_from == constants.BRES_USER:
                 case_user = constants.BRES_USER
             else:
-                party_data, status_code = party.get_user_details(message.msg_from)  # todo avoid 2 lookups (see validate)
+                party_data, status_code = party.get_user_details(message.msg_from) # todo avoid 2 lookups(see validate)
                 if status_code == 200:
                     first_name = party_data['firstName'] if 'firstName' in party_data else ''
                     last_name = party_data['lastName'] if 'lastName' in party_data else ''
