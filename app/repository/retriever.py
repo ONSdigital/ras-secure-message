@@ -70,6 +70,16 @@ class Retriever:
         return True, result
 
     @staticmethod
+    def unread_message_count():
+        """Count users unread messages"""
+        try:
+            result = SecureMessage.query.join(Status).filter(Status.label == 'UNREAD').count()
+        except Exception as e:
+            logger.error('Error retrieving messages from database', error=e)
+            raise InternalServerError(description="Error retrieving messages from database")
+        return result
+
+    @staticmethod
     def retrieve_thread_list(page, limit, user):
         """returns list of threads from db"""
         status_conditions = []
