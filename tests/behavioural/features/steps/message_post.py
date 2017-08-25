@@ -362,11 +362,8 @@ def step_impl_created_message_is_sent(context):
 def step_impl_a_message_is_sent(context):
     data['msg_to'] = ['0a7ad740-10d5-4ecb-b7ca-3c0384afb882']
     data['msg_from'] = constants.BRES_USER
-    token_data['user_uuid'] = data['msg_from']
-    token_data['role'] = 'internal'
     data['survey'] = '11111111-2222-4ecb-b7ca-3c0384afb882'
     del data['msg_id']
-    headers['Authorization'] = update_encrypted_jwt()
     response = app.test_client().post("http://localhost:5050/message/send",
                                               data=json.dumps(data), headers=headers)
     msg_resp = json.loads(response.data)

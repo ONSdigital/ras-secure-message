@@ -25,6 +25,7 @@ data = {'msg_to': ['test'],
         'survey': constants.BRES_SURVEY}
 
 
+
 def update_encrypted_jwt():
     encrypter = Encrypter(_private_key=settings.SM_USER_AUTHENTICATION_PRIVATE_KEY,
                           _private_key_password=settings.SM_USER_AUTHENTICATION_PRIVATE_KEY_PASSWORD,

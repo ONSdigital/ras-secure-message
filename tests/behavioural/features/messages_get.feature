@@ -96,6 +96,7 @@ Feature: Get Messages list Endpoint
     Then a success status code (200) is returned
     And  No messages should be returned
 
+
   @ignore
   Scenario Outline: User provides parameters that are invalid
     Given parameter <param> has value <value>
@@ -120,14 +121,4 @@ Feature: Get Messages list Endpoint
     |ru_id         | LongerThan11Chars |
     |labels        | INBOX-SENT-ARCHIVED-DRAFT-INBOX-SENT-ARCHIVED-DRAFT |
 
-  @ignore
-  Scenario: Messages saved with survey id should  not be retrieved by setting actor equal to survey id
-    Given a message is sent to an internal user
-    When the internal user requests message with actor equal to survey
-    Then none should be returned
 
-  @ignore
-  Scenario: Messages saved with survey id should be retrieved by setting survey equal to survey id
-    Given a message is sent to an internal user
-    When the internal user requests message with survey equal to survey_id
-    Then one should be returned

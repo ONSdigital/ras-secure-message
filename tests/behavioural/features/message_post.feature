@@ -108,7 +108,8 @@ Feature: Message Send Endpoint
 
 
   Scenario: Submitting a message with uuid for survey results in uuid not being used as actor
-    Given a message is sent to a respondent with uuid as survey
+    Given the user is internal
+    And  a message is sent to a respondent with uuid as survey
     When the respondent wants to see the message
     Then the message from does not equal the survey id
     And  the message from equals BRES
