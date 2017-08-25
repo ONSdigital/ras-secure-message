@@ -20,4 +20,5 @@ class Labels(Resource):
         if name.lower() == 'unread':
             message_service = Retriever()
             return  message_service.unread_message_count(g.user)
+        logger.debug('Invalid label name', name=name)
         raise BadRequest(description="Invalid label")
