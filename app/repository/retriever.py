@@ -75,8 +75,8 @@ class Retriever:
         try:
             result = SecureMessage.query.join(Status).filter(Status.label == 'UNREAD').count()
         except Exception as e:
-            logger.error('Error retrieving messages from database', error=e)
-            raise InternalServerError(description="Error retrieving messages from database")
+            logger.error('Error retrieving count of unread messages from database', error=e)
+            raise InternalServerError(description="Error retrieving count of unread messages from database")
         return result
 
     @staticmethod
