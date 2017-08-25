@@ -1,7 +1,7 @@
 import logging
 
 from flask_restful import Resource
-from flask import request
+from flask import request, g
 from app.repository.retriever import Retriever
 from structlog import wrap_logger
 from werkzeug.exceptions import BadRequest
@@ -19,5 +19,5 @@ class Labels(Resource):
 
         if name.lower() == 'unread':
             message_service = Retriever()
-            return  message_service.unread_message_count()
+            return  message_service.unread_message_count(g.user)
         raise BadRequest(description="Invalid label")

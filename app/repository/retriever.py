@@ -70,10 +70,12 @@ class Retriever:
         return True, result
 
     @staticmethod
-    def unread_message_count():
+    def unread_message_count(user):
         """Count users unread messages"""
+        status_conditions = []
+        status_conditions.append(Status.actor == str(user.user_uuid))
         try:
-            result = SecureMessage.query.join(Status).filter(Status.label == 'UNREAD').count()
+            result = SecureMessage.query.join(Status).filter(and_(*status_conditions)).filter(Status.label == 'UNREAD').count()
         except Exception as e:
             logger.error('Error retrieving count of unread messages from database', error=e)
             raise InternalServerError(description="Error retrieving count of unread messages from database")
