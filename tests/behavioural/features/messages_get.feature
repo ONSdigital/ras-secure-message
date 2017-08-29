@@ -78,6 +78,25 @@ Feature: Get Messages list Endpoint
     When the Internal user gets their messages
     Then the retrieved messages should not have DRAFT_INBOX labels
   
+
+  Scenario Outline: Respondent gets messages with various labels options
+    Given the user is internal
+    And multiple messages sent to respondent
+    When respondent gets messages with label <labels>
+    Then messages returned should have one of the labels <labels>
+
+  Examples: Parameters
+    |labels  |
+    |INBOX   |
+    |UNREAD  |
+
+  Scenario: A respondent sends multiple messages , Another respondent should not see any
+    Given a Internal user sends multiple messages
+    When A different external user requests all messages
+    Then a success status code (200) is returned
+    And  No messages should be returned
+
+
   @ignore
   Scenario Outline: User provides parameters that are invalid
     Given parameter <param> has value <value>
@@ -102,29 +121,4 @@ Feature: Get Messages list Endpoint
     |ru_id         | LongerThan11Chars |
     |labels        | INBOX-SENT-ARCHIVED-DRAFT-INBOX-SENT-ARCHIVED-DRAFT |
 
-  Scenario Outline: User gets messages with various labels options
-    Given there are multiple messages to retrieve for all labels
-    When respondent gets messages with labels <labels>
-    Then messages returned should have one of the labels <labels>
 
-  Examples: Parameters
-    |labels  |
-    |INBOX   |
-    |SENT    |
-    |ARCHIVED |
-    |DRAFT   |
-    |INBOX-SENT  |
-    |INBOX-SENT-ARCHIVED |
-    |INBOX-SENT-ARCHIVED-DRAFT |
-
-  @ignore
-  Scenario: User gets messages with no labels options
-    Given there are multiple messages to retrieve for all labels
-    When respondent gets messages with labels empty
-    Then all messages should be returned
-
-  Scenario: A respondent sends multiple messages , Another respondent should not see any
-  Given a Internal user sends multiple messages
-  When A different external user requests all messages
-  Then a success status code (200) is returned
-  And  No messages should be returned

@@ -23,10 +23,7 @@ class Retriever:
         if user.is_respondent:
             status_conditions.append(Status.actor == str(user.user_uuid))
         else:
-            if survey is not None:
-                status_conditions.append(Status.actor == str(survey))
-            else:
-                status_conditions.append(Status.actor == constants.BRES_USER)
+            status_conditions.append(Status.actor == constants.BRES_USER)
 
         if label is not None:
             status_conditions.append(Status.label == str(label))
@@ -139,7 +136,7 @@ class Retriever:
         if user.is_respondent:
             status_conditions.append(Status.actor == str(user.user_uuid))
         else:
-            status_conditions.append(Status.actor == str(_survey))
+            status_conditions.append(Status.actor == constants.BRES_USER)
 
         status_conditions.append(Status.label != Labels.DRAFT_INBOX.value)
 
