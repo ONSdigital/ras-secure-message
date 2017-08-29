@@ -356,3 +356,27 @@ def step_impl_created_message_is_sent(context):
     headers['Authorization'] = update_encrypted_jwt()
     context.response = app.test_client().post("http://localhost:5050/message/send", data=json.dumps(context.msg),
                                               headers=headers)
+
+
+@given('a message is sent to a respondent with uuid as survey')
+def step_impl_a_message_is_sent(context):
+    data['msg_to'] = ['0a7ad740-10d5-4ecb-b7ca-3c0384afb882']
+    data['msg_from'] = constants.BRES_USER
+    data['survey'] = '11111111-2222-4ecb-b7ca-3c0384afb882'
+    del data['msg_id']
+    response = app.test_client().post("http://localhost:5050/message/send",
+                                              data=json.dumps(data), headers=headers)
+    msg_resp = json.loads(response.data)
+    context.msg_id = msg_resp['msg_id']
+
+
+@then('the message from does not equal the survey id')
+def step_impl_the_msg_id_does_not_equal_the_survey_id(context):
+    resp = json.loads(context.response.data)
+    nose.tools.assert_not_equals(resp['msg_from'], resp['survey'])
+
+
+@then('the message from equals BRES')
+def step_impl_the_message_from_equals_BRES(context):
+    resp = json.loads(context.response.data)
+    nose.tools.assert_equals(resp['msg_from'], constants.BRES_USER)

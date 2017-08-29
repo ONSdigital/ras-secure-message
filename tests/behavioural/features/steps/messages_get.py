@@ -25,6 +25,7 @@ data = {'msg_to': ['test'],
         'survey': constants.BRES_SURVEY}
 
 
+
 def update_encrypted_jwt():
     encrypter = Encrypter(_private_key=settings.SM_USER_AUTHENTICATION_PRIVATE_KEY,
                           _private_key_password=settings.SM_USER_AUTHENTICATION_PRIVATE_KEY_PASSWORD,
@@ -362,7 +363,7 @@ def step_impl_parameter_survey_is_not_a_survey(context):
 
 @given('parameter labels has value NotALabel')
 def step_impl_parameter_label_has_value_not_a_label(context):
-    context.params = "?labels=NotALabel"
+    context.params = "?label=NotALabel"
 
 
 # Scenario 16: User provides parameters that are too large
@@ -371,53 +372,65 @@ def step_impl_ru_id_equals_longer_than_1_character(context):
     context.params = "?ru_id=LongerThan11Chars"
 
 
-@given('parameter labels has value INBOX-SENT-ARCHIVED-DRAFT-INBOX-SENT-ARCHIVED-DRAFT')
+@given('parameter label has value INBOX-SENT-ARCHIVED-DRAFT-INBOX-SENT-ARCHIVED-DRAFT')
 def step_impl_labels_param_set_to_include_all(context):
-    context.params = "?labels=INBOX-SENT-ARCHIVED-DRAFT-INBOX-SENT-ARCHIVED-DRAFT"
+    context.params = "?label=INBOX-SENT-ARCHIVED-DRAFT-INBOX-SENT-ARCHIVED-DRAFT"
 
 
-# Scenario 17: User gets messages with various labels options
-@when('respondent gets messages with labels INBOX')
+@when('respondent gets messages with label INBOX')
 def step_impl_respondent_gets_message_with_label_inbox(context):
     token_data[constants.USER_IDENTIFIER] = '0a7ad740-10d5-4ecb-b7ca-3c0384afb882'
+    token_data['role'] = 'respondent'
     headers['Authorization'] = update_encrypted_jwt()
-    params = "?labels=INBOX"
+    params = "?label=INBOX"
     url_with_param = "{0}{1}".format(url, params)
-    context.response = app.test_client().get(url_with_param, headers=headers)
+    response = app.test_client().get(url_with_param, headers=headers)
+    context.response = response
 
 
-@when('respondent gets messages with labels SENT')
+@when('respondent gets messages with label UNREAD')
+def step_impl_respondent_gets_message_with_label_unread(context):
+    token_data[constants.USER_IDENTIFIER] = '0a7ad740-10d5-4ecb-b7ca-3c0384afb882'
+    token_data['role'] = 'respondent'
+    headers['Authorization'] = update_encrypted_jwt()
+    params = "?label=UNREAD"
+    url_with_param = "{0}{1}".format(url, params)
+    response = app.test_client().get(url_with_param, headers=headers)
+    context.response = response
+
+
+@when('respondent gets messages with label SENT')
 def step_impl_respondent_gets_messages_with_label_sent(context):
     token_data[constants.USER_IDENTIFIER] = '0a7ad740-10d5-4ecb-b7ca-3c0384afb882'
     headers['Authorization'] = update_encrypted_jwt()
-    params = "?labels=SENT"
+    params = "?label=SENT"
     url_with_param = "{0}{1}".format(url, params)
     context.response = app.test_client().get(url_with_param, headers=headers)
 
 
-@when('respondent gets messages with labels ARCHIVED')
+@when('respondent gets messages with label ARCHIVED')
 def step_impl_respondent_gets_messages_with_label_archived(context):
     token_data[constants.USER_IDENTIFIER] = '0a7ad740-10d5-4ecb-b7ca-3c0384afb882'
     headers['Authorization'] = update_encrypted_jwt()
-    params = "?labels=ARCHIVED"
+    params = "?label=ARCHIVED"
     url_with_param = "{0}{1}".format(url, params)
     context.response = app.test_client().get(url_with_param, headers=headers)
 
 
-@when('respondent gets messages with labels DRAFT')
+@when('respondent gets messages with label DRAFT')
 def step_impl_respondent_gets_messages_with_label_draft(context):
     token_data[constants.USER_IDENTIFIER] = '0a7ad740-10d5-4ecb-b7ca-3c0384afb882'
     headers['Authorization'] = update_encrypted_jwt()
-    params = "?labels=DRAFT"
+    params = "?label=DRAFT"
     url_with_param = "{0}{1}".format(url, params)
     context.response = app.test_client().get(url_with_param, headers=headers)
 
 
-@when('respondent gets messages with labels INBOX-SENT')
+@when('respondent gets messages with label INBOX-SENT')
 def step_impl_respondent_gets_messages_with_labels_inbox_sent(context):
     token_data[constants.USER_IDENTIFIER] = '0a7ad740-10d5-4ecb-b7ca-3c0384afb882'
     headers['Authorization'] = update_encrypted_jwt()
-    params = "?labels=INBOX-SENT"
+    params = "?label=INBOX-SENT"
     url_with_param = "{0}{1}".format(url, params)
     context.response = app.test_client().get(url_with_param, headers=headers)
 
@@ -426,7 +439,7 @@ def step_impl_respondent_gets_messages_with_labels_inbox_sent(context):
 def step_impl_respondent_gets_messages_with_labels_inbox_sent_archived(context):
     token_data[constants.USER_IDENTIFIER] = '0a7ad740-10d5-4ecb-b7ca-3c0384afb882'
     headers['Authorization'] = update_encrypted_jwt()
-    params = "?labels=INBOX-SENT-ARCHIVED"
+    params = "?label=INBOX-SENT-ARCHIVED"
     url_with_param = "{0}{1}".format(url, params)
     context.response = app.test_client().get(url_with_param, headers=headers)
 
@@ -435,7 +448,7 @@ def step_impl_respondent_gets_messages_with_labels_inbox_sent_archived(context):
 def step_impl_respondent_gets_messages_with_labels_inbox_sent_archived_draft(context):
     token_data[constants.USER_IDENTIFIER] = '0a7ad740-10d5-4ecb-b7ca-3c0384afb882'
     headers['Authorization'] = update_encrypted_jwt()
-    params = "?labels=INBOX-SENT-ARCHIVED-DRAFT"
+    params = "?label=INBOX-SENT-ARCHIVED-DRAFT"
     url_with_param = "{0}{1}".format(url, params)
     context.response = app.test_client().get(url_with_param, headers=headers)
 
@@ -444,8 +457,17 @@ def step_impl_respondent_gets_messages_with_labels_inbox_sent_archived_draft(con
 def step_impl_assert_one_message_has_inbox_label(context):
     response = flask.json.loads(context.response.data)
 
-    for x in range(1, len(response['messages'])):
-        nose.tools.assert_true('INBOX' in response['messages'][str(x)]['labels'])
+    nose.tools.assert_true(len(response['messages']) > 0)
+    for message in response['messages']:
+        nose.tools.assert_true('INBOX' in message['labels'])
+
+@then('messages returned should have one of the labels UNREAD')
+def step_impl_assert_one_message_has_unread_label(context):
+    response = flask.json.loads(context.response.data)
+
+    nose.tools.assert_true(len(response['messages']) > 0)
+    for message in response['messages']:
+        nose.tools.assert_true('UNREAD' in message['labels'])
 
 
 @then('messages returned should have one of the labels SENT')
@@ -515,8 +537,6 @@ def step_impl_assert_messages_with_empty_labels(context):
 @then('all messages should be returned')
 def step_impl_assert_all_messages_returned(context):
     response = flask.json.loads(context.response.data)
-    # change number to expected number of messages depending on the
-    # "there are multiple messages to retrieve for all labels" step
     num = 3
     nose.tools.assert_equal(len(response['messages']), num)
 
@@ -572,8 +592,14 @@ def step_impl_respondent_creates_multiple_draft_messages(context):
         context.response = app.test_client().post("http://localhost:5050/draft/save", data=flask.json.dumps(draft),
                                                   headers=headers)
 
+@given('the user is internal')
+def step_impl_set_user_to_internal(context):
+    token_data[constants.USER_IDENTIFIER] = constants.BRES_USER
+    token_data['role'] = 'internal'
+    headers['Authorization'] = update_encrypted_jwt()
 
-@given('there are multiple messages to retrieve for all labels')
+
+@given('multiple messages sent to respondent')
 def step_impl_multiple_messages_for_all_labels(context):
 
     for _ in range(0, 2):
@@ -581,12 +607,6 @@ def step_impl_multiple_messages_for_all_labels(context):
         data['msg_from'] = constants.BRES_USER
         context.response = app.test_client().post("http://localhost:5050/message/send",
                                                   data=flask.json.dumps(data), headers=headers)
-    for _ in range(0, 2):
-        data['msg_to'] = [constants.BRES_USER]
-        data['msg_from'] = '0a7ad740-10d5-4ecb-b7ca-3c0384afb882'
-        context.response = app.test_client().post("http://localhost:5050/message/send",
-                                                  data=flask.json.dumps(data), headers=headers)
-    # need to implement adding draft messages, archived messages and read messages for user 0a7ad740-10d5-4ecb-b7ca-3c0384afb882
 
 
 @when('user gets messages using the parameters')
