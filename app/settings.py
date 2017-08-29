@@ -35,8 +35,8 @@ NOTIFY_VIA_LOGGING = os.getenv('NOTIFY_VIA_LOGGING', '0')
 
 SQLALCHEMY_POOL_SIZE = os.getenv('SQLALCHEMY_POOL_SIZE', None)
 
-
-SM_JWT_SECRET = os.getenv('SM_JWT_SECRET', 'vrwgLNWEffe45thh545yuby')
+SM_JWT_ALGORITHM = os.getenv('JWT_ALGORITHM', 'HS256')
+SM_JWT_SECRET = os.getenv('JWT_SECRET', 'vrwgLNWEffe45thh545yuby')
 SM_JWT_ENCRYPT = os.getenv('SM_JWT_ENCRYPT', '1')
 
 #  Keys
