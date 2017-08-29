@@ -5,7 +5,7 @@ Module to generate jwt token
 from jose import jwt
 from app import settings
 
-JWT_ALGORITHM = 'HS256'
+JWT_ALGORITHM = settings.SM_JWT_ALGORITHM
 JWT_SECRET = settings.SM_JWT_SECRET
 
 
