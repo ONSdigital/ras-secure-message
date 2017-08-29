@@ -376,7 +376,7 @@ def step_impl_searched_for(context):
     context.response = app.test_client().put(url.format(context.msg_id),
                                              data=json.dumps(modify_data), headers=headers)
 
-# Scenario 17: As a user I should receive an error if I attempt to mark a message as read that is not in my inbox
+# Scenario 17: As a user I should receive an error if the message is marked as read that is not in my inbox
 @given("a user has sent a message")
 def step_impl_a_message_is_sent(context):
     data['msg_to'] = [constants.BRES_USER]
@@ -389,12 +389,14 @@ def step_impl_a_message_is_sent(context):
     msg_resp = json.loads(context.response.data)
     context.msg_id = msg_resp['msg_id']
 
-@when("I attempt to mark a message as read")
+
+@when("the message is marked as read")
 def step_impl_a_message_is_marked_as_read(context):
-    modify_data['action'] = 'add'
-    modify_data['label'] = "READ"
+    modify_data['action'] = 'remove'
+    modify_data['label'] = "UNREAD"
     context.response = app.test_client().put(url.format(context.msg_id),
                                              data=flask.json.dumps(modify_data), headers=headers)
+
 
 # Common Steps: used in multiple scenarios
 @given("a valid message is sent")
@@ -422,11 +424,26 @@ def step_impl_a_message_is_sent(context):
     msg_resp = json.loads(context.response.data)
     context.msg_id = msg_resp['msg_id']
 
+
+@given('a message is sent from a respondent')
+def step_impl_a_message_is_sent(context):
+    data['msg_to'] = [constants.BRES_USER]
+    data['msg_from'] = '0a7ad740-10d5-4ecb-b7ca-3c0384afb882'
+    data['survey'] = '11111111-10d5-4ecb-b7ca-3c0384afb882'
+    token_data[constants.USER_IDENTIFIER] = data['msg_from']
+    token_data['role'] = 'respondent'
+    headers['Authorization'] = update_encrypted_jwt()
+    context.response = app.test_client().post("http://localhost:5050/message/send",
+                                              data=flask.json.dumps(data), headers=headers)
+    msg_resp = json.loads(context.response.data)
+    context.msg_id = msg_resp['msg_id']
+
+
 @given('a message is sent from internal')
 def step_impl_a_message_is_sent(context):
     data['msg_to'] = ['0a7ad740-10d5-4ecb-b7ca-3c0384afb882']
     data['msg_from'] = constants.BRES_USER
-    token_data['user_uuid'] = data['msg_from']
+    token_data[constants.USER_IDENTIFIER] = data['msg_from']
     token_data['role'] = 'internal'
     headers['Authorization'] = update_encrypted_jwt()
     context.response = app.test_client().post("http://localhost:5050/message/send",
@@ -435,4 +452,43 @@ def step_impl_a_message_is_sent(context):
     context.msg_id = msg_resp['msg_id']
 
 
+@given('the user is set to internal')
+def step_impl_the_user_is_set_to_internal(context):
+        _step_impl_the_user_is_set_to_internal(context)
+
+
+@when('the user is set to internal')
+def step_impl_the_user_is_set_to_internal(context):
+    _step_impl_the_user_is_set_to_internal(context)
+
+
+def _step_impl_the_user_is_set_to_internal(context):
+    token_data[constants.USER_IDENTIFIER] = constants.BRES_USER
+    token_data['role'] = 'internal'
+    headers['Authorization'] = update_encrypted_jwt()
+
+
+@when('the user is set to respondent')
+@given('the user is set to respondent')
+def step_impl_the_user_is_set_to_respondent(context):
+    token_data[constants.USER_IDENTIFIER] = "ce12b958-2a5f-44f4-a6da-861e59070a31"
+    token_data['role'] = 'respondent'
+    headers['Authorization'] = update_encrypted_jwt()
+
+
+@then('the message should have INBOX label')
+def step_impl_the_message_should_have_inbox_label(context):
+    response_data = json.loads(context.response.data)
+    nose.tools.assert_true("INBOX" in response_data['labels'])
+
+
+@then('the message should have UNREAD label')
+def step_impl_the_message_should_have_unread_label(context):
+    response_data = json.loads(context.response.data)
+    nose.tools.assert_true("UNREAD" in response_data['labels'])
+
+
+@when('the message is read')
+def step_impl_the_put_message_is_read(context):
+    context.response = app.test_client().get("http://localhost:5050/message/{0}".format(context.msg_id), headers=headers)
 

@@ -81,8 +81,17 @@ Feature: Checking correct labels for messages are added & deleted
     When it is searched for
     Then a not found status code (404) is returned
 
-  Scenario: As a user I should receive an error if I attempt to mark a message as read that is not in my inbox
+  Scenario: As a user I should receive an error if the message is marked as read that is not in my inbox
     Given a message is sent from internal
     When the message is marked read
     Then a bad request status code (400) is returned
+
+  Scenario: An internal user updates labels on a received message
+    Given a message is sent from a respondent
+    When  the user is set to internal
+    And   the message is marked as read
+    And   the message is marked unread
+    And   the message is read
+    Then  the message should have INBOX label
+    And   the message should have UNREAD label
 
