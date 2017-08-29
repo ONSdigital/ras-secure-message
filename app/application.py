@@ -9,6 +9,7 @@ from app.exception.exceptions import MessageSaveException
 from app.repository import database
 from app.resources.health import Health, DatabaseHealth, HealthDetails
 from app.resources.info import Info
+from app.resources.labels import Labels
 from app.resources.messages import MessageList, MessageSend, MessageById, MessageModifyById
 from app.authentication.authenticator import authenticate
 from app.resources.drafts import DraftSave, DraftById, DraftModifyById, DraftList
@@ -68,6 +69,7 @@ api.add_resource(DraftById, '/draft/<draft_id>')
 api.add_resource(ThreadById, '/thread/<thread_id>')
 api.add_resource(DraftList, '/drafts')
 api.add_resource(ThreadList, '/threads')
+api.add_resource(Labels, '/labels')
 
 
 @app.before_request
