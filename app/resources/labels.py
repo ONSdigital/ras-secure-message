@@ -16,9 +16,13 @@ class Labels(Resource):
 
         if request.args.get('name'):
             name = str(request.args.get('name'))
+            if name.lower() == 'unread':
+                message_service = Retriever()
+                return jsonify({'name': name, 'total': message_service.unread_message_count(g.user)})
+            else:
+                logger.debug('Invalid label name', name=name, request=request.url)
+                raise BadRequest(description="Invalid label")
+        else:
+            logger.debug('No Name parameter specified in URL', request=request.url)
+            raise BadRequest(description='No Label Name Paramter specified.')
 
-        if name.lower() == 'unread':
-            message_service = Retriever()
-            return jsonify({'name': name, 'total': message_service.unread_message_count(g.user)})
-        logger.debug('Invalid label name', name=name)
-        raise BadRequest(description="Invalid label")
