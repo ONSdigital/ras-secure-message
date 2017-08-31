@@ -45,7 +45,8 @@ headers['Authorization'] = update_encrypted_jwt()
 @then("all messages from that conversation should be received including draft")
 def step_impl_assert_all_messages_from_conversation_are_received(context):
     response = flask.json.loads(context.response.data)
-    nose.tools.assert_equal(len(response), 5)
+    context.resp_data = flask.json.loads(context.response.data)
+    nose.tools.assert_equal(len(context.resp_data['messages']), 5)
 
 
 # Scenario 5: Respondent and internal user have a conversation and internal user retrieves that conversation from multiple conversations
@@ -133,4 +134,5 @@ def step_impl_internal_user_gets_conversation(context):
 @then("all messages from that conversation should be received")
 def step_impl_assert_all_messages_in_conversation_are_received(context):
     response = flask.json.loads(context.response.data)
-    nose.tools.assert_equal(len(response), 4)
+    context.resp_data = flask.json.loads(context.response.data)
+    nose.tools.assert_equal(len(context.resp_data['messages']), 4)
