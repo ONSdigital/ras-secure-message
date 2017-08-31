@@ -66,7 +66,6 @@ class MessageSchema(Schema):
             logger.error('Message to and message from cannot be the same', message_to=data['msg_to'][0], message_from=data['msg_from'])
             raise ValidationError("msg_to and msg_from fields can not be the same.")
 
-    # TODO: Validate UUID with mock party
     @validates("msg_to")
     def validate_to(self, msg_to):
         for item in msg_to:
@@ -166,7 +165,8 @@ class DraftSchema(Schema):
     @validates_schema
     def validate_to_from_not_equal(self, data):
         if 'msg_to' in data.keys() and 'msg_from' in data.keys() and data['msg_to'] == data['msg_from']:
-            logger.error('Message to and message from cannot be the same', message_to=data['msg_to'][0], message_from=data['msg_from'])
+            logger.error('Message to and message from cannot be the same', message_to=data['msg_to'][0],
+                         message_from=data['msg_from'])
             raise ValidationError("msg_to and msg_from fields can not be the same.")
 
     @validates("msg_to")
@@ -174,7 +174,8 @@ class DraftSchema(Schema):
         if msg_to:
             for item in msg_to:
                 self.validate_field_length(msg_to, len(item), constants.MAX_TO_LEN)
-                if len(msg_to) > 0 and msg_to[0] != constants.BRES_USER and not User.is_valid_user(item):
+                if len(msg_to) > 0 and len(msg_to[0]) > 0 and msg_to[0] != constants.BRES_USER \
+                        and not User.is_valid_user(item):
                     logger.error('Not a valid user', user=item)
                     raise ValidationError("{0} is not a valid user.".format(item))
         else:

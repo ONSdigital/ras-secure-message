@@ -1,32 +1,48 @@
 Feature: Draft Put Endpoint
 
    Background: Reset database
-    Given using mock party service
+    Given database is reset
+      And using mock party service
      And using mock case service
 
-  Scenario: A user edits a previously saved draft
-    Given a user edits a previously saved draft
-    When the user saves the draft
-    Then the draft stored includes the new changes
-    And a success status code (200) is returned
 
-  Scenario: A user edits a previously saved draft adding an apostrophe
-    Given a user edits a previously saved draft adding an apostrophe
-    When the user saves the draft
-    Then the draft stored includes the new changes
-    And a success status code (200) is returned
+  Scenario: A Respondent saves and edits a draft
+    Given  new sending from respondent to internal
+      And  new the message is saved as draft
+      And  new the draft is read
+    When new the body is set to 'Some new body text'
+      And new the message is saved as draft
+      And  new the draft is read
+    Then new retrieved message body is as was saved
 
-  Scenario: A user edits a previously saved draft without formatting
-    Given a user edits a previously saved draft without formatting
-    When the user saves the draft
-    Then the draft stored includes the new changes
-    And a success status code (200) is returned
+  Scenario: An internal user saves and edits a draft
+    Given  new sending from internal to respondent
+      And  new the message is saved as draft
+      And  new the draft is read
+    When new the body is set to 'Some new body text'
+      And new the message is saved as draft
+      And  new the draft is read
+    Then new retrieved message body is as was saved
 
-  Scenario: A user edits a previously saved draft without formatting and msg_to
-    Given a user edits a previously saved draft without formatting and msg_to
-    When the user saves the draft
-    Then the draft stored includes the new changes
-    And a success status code (200) is returned
+   Scenario: A Respondent saves and edits a draft with an apostraphe
+    Given  new sending from respondent to internal
+      And  new the message is saved as draft
+      And  new the draft is read
+    When new the body is set to include an apostrophe
+      And new the message is saved as draft
+      And  new the draft is read
+    Then new retrieved message body is as was saved
+
+  Scenario: An internal user saves and edits a draft with an apostraphe
+    Given  new sending from internal to respondent
+      And  new the message is saved as draft
+      And  new the draft is read
+    When new the body is set to include an apostrophe
+      And new the message is saved as draft
+      And  new the draft is read
+    Then new retrieved message body is as was saved
+
+  @ignore
 
   Scenario: A user edits a draft that has not been previously saved
     Given a user edits a non-existing draft

@@ -5,84 +5,189 @@ Feature: Checking correct labels for messages are added & deleted
     And using mock party service
     And using mock case service
 
-  Scenario: modifying the status of the message to "archived"
-    Given a valid message is sent
-    When the message is archived
-    Then check message is marked as archived
+  Scenario: A Respondent  modifies the archive status or a message to archived
+    Given new sending from respondent to internal
+      And  new the message is sent
+      And  new the message is read
+      And  new a label of 'ARCHIVE' is to be added
+    When  new the message labels are modified
+      And  new the message is read
+    Then new the response message has the label 'ARCHIVE'
 
-  Scenario: deleting the "archived" label from a given message
-    Given the message is archived
-    When the message is unarchived
-    Then check message is not marked as archived
+  Scenario: An internal user modifies the archive status or a message to archived
+    Given new sending from internal to respondent
+      And  new the message is sent
+      And  new the message is read
+      And  new a label of 'ARCHIVE' is to be added
+    When  new the message labels are modified
+      And  new the message is read
+    Then new the response message has the label 'ARCHIVE'
 
-  Scenario: Modifying the status of the message to "unread"
-    Given a message has been read
-    When the message is marked unread
-    Then check message is marked unread
+  Scenario: A Respondent removes an archived status from a message
+    Given new sending from respondent to internal
+      And  new the message is sent
+      And  new the message is read
+      And  new a label of 'ARCHIVE' is to be added
+      And  new the message labels are modified
+      And  new the message is read
+    When  new a label of 'ARCHIVE' is to be removed
+      And  new the message labels are modified
+      And  new the message is read
+    Then new the response message does not have the label 'ARCHIVE'
 
-  Scenario: modifying the status of the message so that "unread" is removed
-    Given a valid message is sent
-    When the message is marked read
-    Then check message is not marked unread
-    And message read date should be set
+  Scenario: An internal user removes an archived status from a message
+    Given new sending from internal to respondent
+      And  new the message is sent
+      And  new the message is read
+      And  new a label of 'ARCHIVE' is to be added
+      And  new the message labels are modified
+      And  new the message is read
+    When  new a label of 'ARCHIVE' is to be removed
+      And  new the message labels are modified
+      And  new the message is read
+    Then new the response message does not have the label 'ARCHIVE'
 
-  Scenario: validating a request where there is no label provided
-    Given a message is sent
-    When the label is empty
+   Scenario: A respondent sends a message the internal user marks it as READ
+    Given new sending from respondent to internal
+      And  new the message is sent
+      And  new the user is set as internal
+     When new the message is read
+      And  new a label of 'UNREAD' is to be removed
+      And  new the message labels are modified
+      And  new the message is read
+     Then new the response message does not have the label 'UNREAD'
+
+  Scenario: An internal user sends a message the internal user marks it as READ
+    Given new sending from internal to respondent
+      And  new the message is sent
+      And  new the user is set as respondent
+     When new the message is read
+      And  new a label of 'UNREAD' is to be removed
+      And  new the message labels are modified
+      And  new the message is read
+     Then new the response message does not have the label 'UNREAD'
+
+  Scenario: A respondent sends a message the internal user marks it as READ then UNREAD
+    Given new sending from respondent to internal
+      And  new the message is sent
+      And  new the user is set as internal
+      And  new the message is read
+      And  new a label of 'UNREAD' is to be removed
+      And  new the message labels are modified
+      And  new the message is read
+     When  new a label of 'UNREAD' is to be added
+      And  new the message labels are modified
+      And  new the message is read
+     Then new the response message has the label 'UNREAD'
+      And new the response message has the label 'INBOX'
+      And new the response message should a label count of '2'
+
+
+  Scenario: An internal user sends a message the internal user marks it as READ then UNREAD
+    Given new sending from internal to respondent
+      And  new the message is sent
+      And  new the user is set as respondent
+      And  new the message is read
+      And  new a label of 'UNREAD' is to be removed
+      And  new the message labels are modified
+      And  new the message is read
+     When  new a label of 'UNREAD' is to be added
+      And  new the message labels are modified
+      And  new the message is read
+     Then new the response message has the label 'UNREAD'
+      And new the response message has the label 'INBOX'
+      And new the response message should a label count of '2'
+
+
+
+  Scenario: A respondent sends a message the internal user attempts to modify a label without specifying which label
+    Given new sending from respondent to internal
+      And  new the message is sent
+      And  new the user is set as internal
+      And  new the message is read
+    When new the message labels are modified
     Then a bad request status code (400) is returned
 
-  Scenario: validating a request where there is no action provided
-    Given a message is sent
-    When the action is empty
+
+  Scenario: An internal user sends a message the internal user attempts to modify a label without specifying which label
+    Given new sending from internal to respondent
+      And  new the message is sent
+      And  new the user is set as respondent
+      And  new the message is read
+    When new the message labels are modified
     Then a bad request status code (400) is returned
 
-  Scenario: validating a request where there in an invalid label provided
-    Given a message is sent
-    When an invalid label is provided
+
+  Scenario: A respondent sends a message the internal user attempts to modify a label without an expected action
+    Given new sending from respondent to internal
+      And  new the message is sent
+      And  new the user is set as internal
+      And  new the message is read
+      And new a label of 'INBOX' has unknown action
+    When new the message labels are modified
     Then a bad request status code (400) is returned
 
-  Scenario: validating a request where there in an invalid action provided
-    Given a message is sent
-    When an invalid action is provided
+
+  Scenario: An internal user sends a message the internal user attempts to modify a label without an expected action
+    Given new sending from internal to respondent
+      And  new the message is sent
+      And  new the user is set as respondent
+      And  new the message is read
+      And new a label of 'INBOX' has unknown action
+    When new the message labels are modified
     Then a bad request status code (400) is returned
 
-  Scenario: validating a request where an unmodifiable label is provided
-    Given a message is sent
-    When an unmodifiable label is provided
+   Scenario: A respondent sends a message the internal user attempts to modify a label with an invalid name
+    Given new sending from respondent to internal
+      And  new the message is sent
+      And  new the user is set as internal
+      And  new the message is read
+      And new a label of 'MyMadeUpLabelName' is to be added
+    When new the message labels are modified
     Then a bad request status code (400) is returned
 
-  Scenario: internal - as an internal user I want to be able to change my message from read to unread
-    Given a message with the status read is displayed to an internal user
-    When the internal user chooses to edit the status from read to unread
-    Then the status of that message changes to unread for all internal users that have access to that survey
 
-  Scenario: internal - as an internal user I want to be able to change my message from unread to read
-    Given a message with the status unread is displayed to an internal user
-    When the internal user chooses to edit the status from unread to read
-    Then the status of that message changes to read for all internal users that have access to that survey
+  Scenario: An internal user sends a message the internal user attempts to modify a label with an invalid name
+    Given new sending from internal to respondent
+      And  new the message is sent
+      And  new the user is set as respondent
+      And  new the message is read
+      And new a label of 'MyMadeUpLabelName' is to be added
+    When new the message labels are modified
+    Then a bad request status code (400) is returned
 
-  Scenario: external  - as an external user I want to be able to change my message from read to unread
-    Given a message with the status read is displayed to an external user
-    When the external user chooses to edit the status from read to unread
-    Then the status of that message changes to unread
 
-  Scenario: external - as an external user I want to be able to change my message from unread to read
-    Given a message with the status unread is displayed to an external user
-    When the external user chooses to edit the status from unread to read
-    Then the status of that message changes to read
-
-  Scenario: If an incorrect message id is requested by the user return a 404 error
-    Given a user requests a message with a invalid message id
-    When it is searched for
+  Scenario: A respondent sends a message the internal user attempts to modify a label using an incorrect message id
+    Given new sending from respondent to internal
+      And  new the message is sent
+      And  new the user is set as internal
+      And  new the message is read
+      And new a label of 'UNREAD' is to be removed
+    When  new the message labels are modified on msg id '1234'
     Then a not found status code (404) is returned
 
-  Scenario: If an incorrect message id is requested by the user return a 404 error
-    Given a user requests a message with a invalid message id
-    When it is searched for
-    Then a not found status code (404) is returned
 
-  Scenario: As a user I should receive an error if I attempt to mark a message as read that is not in my inbox
-    Given a message is sent from internal
-    When the message is marked read
-    Then a bad request status code (400) is returned
+  Scenario: An internal user sends a message the internal user attempts to modify a label using an incorrect message id
+    Given new sending from internal to respondent
+      And  new the message is sent
+      And  new the user is set as respondent
+      And  new the message is read
+      And new a label of 'UNREAD' is to be removed
+    When  new the message labels are modified on msg id '1234'
+      Then a not found status code (404) is returned
 
+  Scenario: Respondent sends a message to an internal user an alternative respondent attempts to modify its labels
+      Given new sending from respondent to internal
+        And  new the message is sent
+      When  new the user is set as alternative respondent
+        And new a label of 'UNREAD' is to be removed
+        And new the message labels are modified
+      Then a bad request status code (400) is returned
+
+  Scenario: An internal user sends a mesage to a respondent user an alternative respondent attempts to modify its labels
+      Given new sending from internal to respondent
+        And  new the message is sent
+      When  new the user is set as alternative respondent
+        And new a label of 'UNREAD' is to be removed
+        And new the message labels are modified
+      Then a bad request status code (400) is returned

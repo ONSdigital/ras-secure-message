@@ -5,25 +5,57 @@ Feature: Get draft by id
     And using mock party service
     And using mock case service
 
-  Scenario: User requests draft
-    Given a user requests a valid draft
-    When the user requests the draft
-    Then the draft is returned
-    And a success status code (200) is returned
+  Scenario: A Respondent saves a draft and reads it
+    Given new sending from respondent to internal
+      And  new the message is saved as draft
+    When new the draft is read
+    Then a success status code (200) is returned
 
-  Scenario: User requests draft that does not exist
-    Given a user wants a draft that does not exist
-    When the user requests the draft
+  Scenario: An internal user saves a draft and reads it
+    Given new sending from internal to respondent
+      And  new the message is saved as draft
+    When new the draft is read
+    Then a success status code (200) is returned
+
+  Scenario: A Respondent attempts to read a draft that does not exist
+    Given new sending from respondent to internal
+      And new the msg_id is set to '1234'
+    When new the draft is read
     Then a not found status code (404) is returned
 
-   # Integration only test
-  @ignore
-  Scenario: User requests draft not authorised to view
-    Given a user is not authorised
-    When the user requests the draft
-    Then the user is forbidden from viewing draft
+  Scenario: An internal user attempts to read a draft that does not exist
+    Given new sending from internal to respondent
+      And new the msg_id is set to '1234'
+    When new the draft is read
+    Then a not found status code (404) is returned
 
-  Scenario: User is retrieving the etag from the header
-    Given there is a draft
-    When the user requests the draft
-    Then an etag should be sent with the draft
+  Scenario: Respondent requests draft not authorised to view
+    Given new sending from internal to respondent
+      And   new the message is saved as draft
+      And   new the user is set as alternative respondent
+    When  new the draft is read
+    Then  a forbidden status code (403) is returned
+
+   Scenario: An internal user requests draft not authorised to view
+    Given new sending from respondent to internal
+      And   new the message is saved as draft
+      And   new the user is set as alternative respondent
+    When  new the draft is read
+    Then  a forbidden status code (403) is returned
+
+  Scenario: A Respondent saves a draft and reads it with etag header
+    Given new sending from respondent to internal
+      And  new the message is saved as draft
+    When new an etag is requested
+      And new the draft is read
+    Then a success status code (200) is returned
+      And an etag should be sent with the draft
+
+  Scenario: An internal user saves a draft and reads it with etag header
+    Given new sending from internal to respondent
+      And  new the message is saved as draft
+    When new an etag is requested
+      And new the draft is read
+    Then a success status code (200) is returned
+      And an etag should be sent with the draft
+
