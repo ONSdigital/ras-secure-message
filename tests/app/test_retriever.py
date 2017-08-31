@@ -767,8 +767,8 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
 
         with app.app_context():
             with current_app.test_request_context():
-                response = Retriever().retrieve_thread('ThreadId', self.user_internal, 1, MESSAGE_QUERY_LIMIT)
-                self.assertEqual(len(response), 9)
+                response = Retriever().retrieve_thread('ThreadId', self.user_internal, 1, MESSAGE_QUERY_LIMIT)[1]
+                self.assertEqual(len(response.items), 9)
 
     def test_all_msg_returned_for_thread_id_without_draft(self):
         """retrieves messages for thread_id from database without draft"""
@@ -776,8 +776,8 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
 
         with app.app_context():
             with current_app.test_request_context():
-                response = Retriever().retrieve_thread('ThreadId', self.user_respondent, 1, MESSAGE_QUERY_LIMIT)
-                self.assertEqual(len(response), 6)
+                response = Retriever().retrieve_thread('ThreadId', self.user_respondent, 1, MESSAGE_QUERY_LIMIT)[1]
+                self.assertEqual(len(response.items), 6)
 
     def test_all_msg_returned_for_thread_id_with_draft_inbox(self):
         """retrieves messages for thread_id from database with draft inbox"""
@@ -785,8 +785,8 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
 
         with app.app_context():
             with current_app.test_request_context():
-                response = Retriever().retrieve_thread('ThreadId', self.user_respondent, 1, MESSAGE_QUERY_LIMIT)
-                self.assertEqual(len(response), 6)
+                response = Retriever().retrieve_thread('ThreadId', self.user_respondent, 1, MESSAGE_QUERY_LIMIT)[1]
+                self.assertEqual(len(response.items), 6)
 
     def test_thread_returned_in_desc_order(self):
         """check thread returned in correct order"""
@@ -794,8 +794,8 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
 
         with app.app_context():
             with current_app.test_request_context():
-                response = Retriever().retrieve_thread('ThreadId', self.user_respondent, 1, MESSAGE_QUERY_LIMIT)
-                self.assertEqual(len(response), 6)
+                response = Retriever().retrieve_thread('ThreadId', self.user_respondent, 1, MESSAGE_QUERY_LIMIT)[1]
+                self.assertEqual(len(response.items), 6)
 
                 sent = []
                 for message in response:
@@ -811,8 +811,8 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
 
         with app.app_context():
             with current_app.test_request_context():
-                response = Retriever().retrieve_thread('ThreadId', self.user_internal, 1, MESSAGE_QUERY_LIMIT)
-                self.assertEqual(len(response), 9)
+                response = Retriever().retrieve_thread('ThreadId', self.user_internal, 1, MESSAGE_QUERY_LIMIT)[1]
+                self.assertEqual(len(response.items), 9)
 
                 date = []
                 for message in response:
