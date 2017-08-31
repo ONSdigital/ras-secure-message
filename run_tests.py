@@ -6,8 +6,6 @@ if __name__ == "__main__":
     from behave import __main__ as behave_executable
     behave = behave_executable.main()
 
-    os.environ["NOTIFY_VIA_LOGGING"] = "1"
-
     test_dirs = os.listdir('./tests')
     suites_list = []
     loader = unittest.TestLoader()
