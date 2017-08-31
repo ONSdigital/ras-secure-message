@@ -1,11 +1,38 @@
 Feature: Checking all request pass authorisation
    """ requests to any endpoint all hit the same authorisation point before being passed to the specific endpoint """
 
-  Scenario: GET request without a user in header
-    Given no user uuid is in the header
-    When a GET request is made
+  Background: Reset database
+    Given database is reset
+    And using mock party service
+    And using mock case service
+
+  Scenario: A Respondent requests a message without a user being defined
+    Given new sending from respondent to internal
+      And  new the message is sent
+    When  the user token is set to respondent with no user id
+      And new the message is read
     Then a bad request status code (400) is returned
 
+  Scenario: An internal user requests a message without a user being defined
+    Given new sending from internal to respondent
+      And  new the message is sent
+    When  the user token is set to internal with no user id
+      And new the message is read
+    Then a bad request status code (400) is returned
+
+  Scenario: A Respondent posts a message without a user being defined
+    Given new sending from respondent to internal
+       And  the user token is set to respondent with no user id
+    When new the message is sent
+    Then a bad request status code (400) is returned
+
+  Scenario: An internal user posts a message without a user being defined
+    Given new sending from internal to respondent
+      And the user token is set to internal with no user id
+    When  new the message is sent
+    Then a bad request status code (400) is returned
+
+  @ignore
   Scenario: POST request without a user in header
     Given no user uuid is in the header
     When a POST request is made

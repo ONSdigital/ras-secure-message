@@ -25,6 +25,13 @@ def step_impl_the_message_is_sent(context):
     context.bdd_helper.store_response_data(context.response)
 
 
+@given("new '{message_count}' messages are sent")
+@when("new '{message_count}' messages are sent")
+def step_impl_the_n_messages_are_sent(context, message_count):
+    for i in range(1, message_count):
+        step_impl_the_message_is_sent(context)
+
+
 @given("new the message is saved as draft")
 @when("new the message is saved as draft")
 def step_impl_the_message_is_saved_as_draft(context):

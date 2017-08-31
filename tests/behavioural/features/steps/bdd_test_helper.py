@@ -43,6 +43,7 @@ class BddTestHelper:
         self._draft_put_url = "http://localhost:5050/draft/{0}/modify"
         self._draft_get_url = "http://localhost:5050/draft/{0}"
         self._message_put_url = "http://localhost:5050/message/{}/modify"
+        self._messages_get_url = "http://localhost:5050/messages"
 
     @staticmethod
     def _encrypt_token_data(token_data):
@@ -96,6 +97,10 @@ class BddTestHelper:
     @property
     def message_get_url(self):
         return self._message_get_url
+
+    @property
+    def messages_get_url(self):
+        return self._messages_get_url
 
     @property
     def message_put_url(self):
