@@ -122,19 +122,21 @@ class MessageSchema(Schema):
     def validate_not_present(data, field_name):
         if field_name in data.keys():
             logger.error('Field cannot be set', field_name=field_name)
-            raise ValidationError("{0} can not be set.".format(field_name))
+            raise ValidationError("{0} can not be set".format(field_name))
 
     def validate_non_zero_field_length(self, field_name, length, max_field_len):
         if length <= 0:
             logger.error('Field not populated', field_name=field_name)
-            raise ValidationError('{0} field not populated.'.format(field_name))
+            if field_name == "Body":
+                field_name = "message"
+            raise ValidationError('Please enter a {0}'.format(field_name.lower()))
         self.validate_field_length(field_name, length, max_field_len)
 
     @staticmethod
     def validate_field_length(field_name, length, max_field_len, data=None):
         if length > max_field_len:
             logger.error('Field is too large', field_name=field_name, length=length, max_field_len=max_field_len)
-            raise ValidationError('{0} field length must not be greater than {1}.'.format(field_name, max_field_len), field_name, [], data)
+            raise ValidationError('{0} field length must not be greater than {1}'.format(field_name, max_field_len), field_name, [], data)
 
 
 class DraftSchema(Schema):

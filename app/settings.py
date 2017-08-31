@@ -35,9 +35,15 @@ NOTIFY_VIA_LOGGING = os.getenv('NOTIFY_VIA_LOGGING', '0')
 
 SQLALCHEMY_POOL_SIZE = os.getenv('SQLALCHEMY_POOL_SIZE', None)
 
-
-SM_JWT_SECRET = os.getenv('SM_JWT_SECRET', 'vrwgLNWEffe45thh545yuby')
+# JWT authentication config
+SM_JWT_ALGORITHM = os.getenv('JWT_ALGORITHM', 'HS256')
+SM_JWT_SECRET = os.getenv('JWT_SECRET', 'vrwgLNWEffe45thh545yuby')
 SM_JWT_ENCRYPT = os.getenv('SM_JWT_ENCRYPT', '1')
+
+# Basic auth parameters
+SECURITY_USER_NAME = os.getenv('SECURITY_USER_NAME', 'dummy_user')
+SECURITY_USER_PASSWORD = os.getenv('SECURITY_USER_PASSWORD', 'dummy_password')
+BASIC_AUTH = (SECURITY_USER_NAME, SECURITY_USER_PASSWORD)
 
 #  Keys
 SM_USER_AUTHENTICATION_PRIVATE_KEY = open("{0}/jwt-test-keys/sm-user-authentication-encryption-private-key.pem".format(os.getenv('RAS_SM_PATH')))\

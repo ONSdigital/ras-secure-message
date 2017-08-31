@@ -23,10 +23,7 @@ class Retriever:
         if user.is_respondent:
             status_conditions.append(Status.actor == str(user.user_uuid))
         else:
-            if survey is not None:
-                status_conditions.append(Status.actor == str(survey))
-            else:
-                status_conditions.append(Status.actor == constants.BRES_USER)
+            status_conditions.append(Status.actor == constants.BRES_USER)
 
         if label is not None:
             status_conditions.append(Status.label == str(label))
@@ -68,6 +65,18 @@ class Retriever:
             raise InternalServerError(description="Error retrieving messages from database")
 
         return True, result
+
+    @staticmethod
+    def unread_message_count(user):
+        """Count users unread messages"""
+        status_conditions = []
+        status_conditions.append(Status.actor == str(user.user_uuid))
+        try:
+            result = SecureMessage.query.join(Status).filter(and_(*status_conditions)).filter(Status.label == 'UNREAD').count()
+        except Exception as e:
+            logger.error('Error retrieving count of unread messages from database', error=e)
+            raise InternalServerError(description="Error retrieving count of unread messages from database")
+        return result
 
     @staticmethod
     def retrieve_thread_list(page, limit, user):
@@ -127,7 +136,7 @@ class Retriever:
         if user.is_respondent:
             status_conditions.append(Status.actor == str(user.user_uuid))
         else:
-            status_conditions.append(Status.actor == str(_survey))
+            status_conditions.append(Status.actor == constants.BRES_USER)
 
         status_conditions.append(Status.label != Labels.DRAFT_INBOX.value)
 

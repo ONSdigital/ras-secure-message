@@ -21,7 +21,7 @@ class RetrieverTestCaseHelper:
     """Helper class for Retriever Tests"""
     def add_secure_message(self, msg_id, subject="test", body="test", thread_id="ThreadId",
                            collection_case="ACollectionCase", ru_id="f1a5e99c-8edf-489a-9c72-6cabe6c387fc",
-                           survey=constants.BRES_USER, collection_exercise='CollectionExercise'):
+                           survey=constants.BRES_SURVEY, collection_exercise='CollectionExercise'):
 
         """ Populate the secure_message table"""
 
@@ -106,8 +106,8 @@ class RetrieverTestCaseHelper:
                                         collection_case="AnotherCollectionCase", collection_exercise="AnotherCollectionExercise",
                                         ru_id='0a6018a0-3e67-4407-b120-780932434b36', survey="AnotherSurvey",)
                 self.add_status(label="SENT", msg_id=msg_id, actor="1a7ad740-10d5-4ecb-b7ca-fb8823c0384a")
-                self.add_status(label="INBOX", msg_id=msg_id, actor="AnotherSurvey")
-                self.add_status(label="UNREAD", msg_id=msg_id, actor="AnotherSurvey")
+                self.add_status(label="INBOX", msg_id=msg_id, actor="11111111-10d5-4ecb-b7ca-fb8823c0384a")
+                self.add_status(label="UNREAD", msg_id=msg_id, actor="11111111-10d5-4ecb-b7ca-fb8823c0384a")
                 self.add_event(event="Sent", msg_id=msg_id, date_time=datetime(year, month, day))
 
     def create_threads(self, no_of_threads=1, add_internal_draft=False, add_respondent_draft=False):
