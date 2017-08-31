@@ -798,8 +798,8 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
                 self.assertEqual(len(response.items), 6)
 
                 sent = []
-                for message in response:
-                    sent.append(message['sent_date'])
+                for message in response.items:
+                    sent.append(str(message.events[0].date_time))
 
                 desc_date = sorted(sent, reverse=True)
                 self.assertEqual(len(sent), 6)
@@ -815,11 +815,8 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
                 self.assertEqual(len(response.items), 9)
 
                 date = []
-                for message in response:
-                    if 'sent_date' in message:
-                        date.append(message['sent_date'])
-                    elif 'modified_date' in message:
-                        date.append(message['modified_date'])
+                for message in response.items:
+                    date.append(str(message.events[0].date_time))
 
                 desc_date = sorted(date, reverse=True)
                 self.assertListEqual(desc_date, date)
@@ -1001,10 +998,6 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
 
                 for x in range(0, len(thread_ids)):
                     thread = Retriever().retrieve_thread(thread_ids[x], self.user_respondent, 1, MESSAGE_QUERY_LIMIT)[1]
-                    # if 'sent_date' in thread[0]:
-                    #     self.assertEqual(date[x], thread[0]['sent_date'])
-                    # else:
-                    #     self.assertEqual(date[x], thread[0]['modified_date'])
                     self.assertEqual(date[x], str(thread.items[0].events[0].date_time))
                     self.assertEqual(msg_ids[x], thread.items[0].events[0].msg_id)
 
@@ -1092,12 +1085,6 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
 
                 for x in range(0, len(thread_ids)):
                     thread = Retriever().retrieve_thread(thread_ids[x], self.user_internal, 1, MESSAGE_QUERY_LIMIT)[1]
-                    # if 'sent_date' in thread[0]:
-                    #     self.assertEqual(date[x], thread[0]['sent_date'])
-                    # else:
-                    #     self.assertEqual(date[x], thread[0]['modified_date'])
-                    # self.assertEqual(msg_ids[x], thread[0]['msg_id'])
-
                     self.assertEqual(date[x], str(thread.items[0].events[0].date_time))
                     self.assertEqual(msg_ids[x], thread.items[0].events[0].msg_id)
 
@@ -1127,12 +1114,6 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
 
                 for x in range(0, len(thread_ids)):
                     thread = Retriever().retrieve_thread(thread_ids[x], self.user_respondent, 1, MESSAGE_QUERY_LIMIT)[1]
-                    # if 'sent_date' in thread[0]:
-                    #     self.assertEqual(date[x], thread[0]['sent_date'])
-                    # else:
-                    #     self.assertEqual(date[x], thread[0]['modified_date'])
-                    # self.assertEqual(msg_ids[x], thread[0]['msg_id'])
-
                     self.assertEqual(date[x], str(thread.items[0].events[0].date_time))
                     self.assertEqual(msg_ids[x], thread.items[0].events[0].msg_id)
 
@@ -1162,10 +1143,5 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
 
                 for x in range(0, len(thread_ids)):
                     thread = Retriever().retrieve_thread(thread_ids[x], self.user_internal, 1, MESSAGE_QUERY_LIMIT)[1]
-                    # if 'sent_date' in thread[0]:
-                    #     self.assertEqual(date[x], thread[0]['sent_date'])
-                    # else:
-                    #     self.assertEqual(date[x], thread[0]['modified_date'])
-                    # self.assertEqual(msg_ids[x], thread[0]['msg_id'])
                     self.assertEqual(date[x], str(thread.items[0].events[0].date_time))
                     self.assertEqual(msg_ids[x], thread.items[0].events[0].msg_id)

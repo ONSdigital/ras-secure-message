@@ -127,10 +127,10 @@ class Retriever:
             raise InternalServerError(description="Error retrieving message from database")
 
         return result.serialize(user)
-    # _survey=constants.BRES_SURVEY
+
     @staticmethod
     def retrieve_thread(thread_id, user, page, limit):
-        """returns list of messages for thread id"""
+        """returns paginated list of messages for thread id"""
         status_conditions = []
 
         if user.is_respondent:
