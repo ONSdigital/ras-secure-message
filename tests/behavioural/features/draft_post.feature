@@ -65,7 +65,6 @@ Feature: Draft Save Endpoint
     Given new sending from respondent to internal
       And  new the to is set to empty
     When new the message is saved as draft
-      And A debug step
     Then a created status code (201) is returned
 
   Scenario: Internal user saves a draft with an empty to field , should receive a 201
@@ -211,7 +210,7 @@ Feature: Draft Save Endpoint
     Then a created status code (201) is returned
       And  new the response should include a valid etag
 
-  Scenario: A Respondent saves a draft with an incorrect etag should receive a 400
+  Scenario: A Respondent saves a draft with an incorrect etag should receive a 409
     Given new sending from respondent to internal
       And  new an etag is requested with an empty value
       And  new the message is saved as draft
@@ -220,7 +219,7 @@ Feature: Draft Save Endpoint
     When   new the previously returned draft is modified
     Then   a conflict error status code (409) is returned
 
-  Scenario: An Internal user saves a draft with an incorrect etag should receive a 400
+  Scenario: An Internal user saves a draft with an incorrect etag should receive a 409
     Given  new sending from internal to respondent
       And  new an etag is requested with an empty value
       And  new the message is saved as draft
