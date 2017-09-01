@@ -6,6 +6,7 @@ from flask import current_app, json
 from sqlalchemy.engine import Engine
 from sqlalchemy import event
 from tests.behavioural.features.steps.bdd_test_helper import BddTestHelper
+import nose.tools
 
 
 @event.listens_for(Engine, "connect")
@@ -39,6 +40,11 @@ def step_impl_use_mock_case_service(context):
 @when("new using the '{message_index}' message ")
 def step_impl_reuse_the_nth_sent_message(context, message_index):
     context.bdd_helper.set_message_data_to_a_prior_version(message_index)
+
+
+@then("new '{message_count}' messages are returned")
+def step_impl_n_messages_returned(context, message_count):
+    nose.tools.assert_equal(int(message_count), len(context.bdd_helper.messages_responses_data[0]['messages']))
 
 
 # Feature files do not support breakpoints , but you may add a debug step and put a breakpoint on the pass below

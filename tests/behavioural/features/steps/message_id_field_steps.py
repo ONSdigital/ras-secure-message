@@ -15,3 +15,10 @@ def step_impl_the_msg_id_is_set_to(context, msg_id):
 def step_impl_retrieved_msg_to_is_as_saved(context):
     msg_resp = json.loads(context.response.data)
     nose.tools.assert_equal(msg_resp['msg_to'], context.bdd_helper.last_saved_message_data['msg_to'])
+
+
+@then("new response includes a msg_id")
+def step_impl_response_includes_msg_id(context ):
+    returned_data = json.loads(context.response.data)
+    nose.tools.assert_true('msg_id' in returned_data)
+    nose.tools.assert_true(len(returned_data['msg_id']) == 36)

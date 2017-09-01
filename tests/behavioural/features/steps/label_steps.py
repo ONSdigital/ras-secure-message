@@ -3,10 +3,17 @@ from behave import given, then, when
 from flask import json
 from app import constants
 
+
 @then("new the response message has the label '{label}'")
 def step_impl_the_response_message_should_have_named_label(context, label):
     response = json.loads(context.response.data)
     nose.tools.assert_true(label in response['labels'])
+
+
+@then("new all response messages have the label '{label}'")
+def step_impl_the_response_messages_should_all_have_named_label(context, label):
+    for response in context.bdd_helper.messages_responses_data[0]['messages']:
+        nose.tools.assert_true(label in response['labels'])
 
 
 @then("new the response message does not have the label '{label}'")
