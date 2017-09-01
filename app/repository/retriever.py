@@ -129,8 +129,8 @@ class Retriever:
         return result.serialize(user)
 
     @staticmethod
-    def retrieve_thread(thread_id, user, _survey=constants.BRES_SURVEY):
-        """returns list of messages for thread id"""
+    def retrieve_thread(thread_id, user, page, limit):
+        """returns paginated list of messages for thread id"""
         status_conditions = []
 
         if user.is_respondent:
@@ -146,9 +146,9 @@ class Retriever:
                 .filter(and_(*status_conditions))\
                 .order_by(case([(Events.event == 'Sent', Events.date_time),
                                 (Events.event == 'Draft_Saved', Events.date_time)],
-                               else_=0).desc(), Events.event.desc())
+                               else_= None).desc(), Events.event.desc()).paginate(page, limit, False)
 
-            if result.count() == 0:
+            if len(result.items) == 0:
                 logger.debug('Thread does not exist', thread_id=thread_id)
                 raise NotFound(description="Conversation with thread_id '{0}' does not exist".format(thread_id))
 
@@ -156,12 +156,7 @@ class Retriever:
             logger.error('Error retrieving conversation from database', error=e)
             raise InternalServerError(description="Error retrieving conversation from database")
 
-        conversation = []
-
-        for msg in result:
-            conversation.append(msg.serialize(user))
-
-        return conversation
+        return True, result
 
     @staticmethod
     def retrieve_draft(message_id, user):
