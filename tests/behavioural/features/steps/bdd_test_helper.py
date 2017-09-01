@@ -9,7 +9,13 @@ import copy
 
 
 class BddTestHelper:
+    """The Bdd test helper is used to pass information between steps . In use it is attached to the context
+    The message data holds data that will be sent to an endpoint
+    single_message_responses_data holds responses regarding a specific message
+    messages_responses_data holds responses regarding lists of messages . Both are lists so can hold multiple responses
+    if needed
 
+    """
     __DEFAULT_RU = 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc'
     __ALTERNATE_RU = 'b3ba864b-7cbc-4f44-84fe-88dc018a1a4c'
 
@@ -59,6 +65,7 @@ class BddTestHelper:
         self._draft_get_url = "http://localhost:5050/draft/{0}"
         self._message_put_url = "http://localhost:5050/message/{}/modify"
         self._messages_get_url = "http://localhost:5050/messages"
+        self._drafts_get_url = "http://localhost:5050/drafts"
 
     @staticmethod
     def _encrypt_token_data(token_data):
@@ -132,6 +139,10 @@ class BddTestHelper:
     @property
     def draft_get_url(self):
         return self._draft_get_url
+
+    @property
+    def drafts_get_url(self):
+        return self._drafts_get_url
 
     @property
     def respondent_id(self):

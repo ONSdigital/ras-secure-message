@@ -23,7 +23,7 @@ def step_impl_the_thread_id_is_set_to_the_last_returned_thread_id(context):
     responses = context.bdd_helper.single_message_responses_data
     last_thread_id = responses[len(responses)-1]['thread_id']
     for response in responses:
-        nose.tools.assert_equals(response['thread_id'], last_thread_id)
+        nose.tools.assert_equal(response['thread_id'], last_thread_id)
 
 
 @then("new retrieved message thread id is equal to message id")

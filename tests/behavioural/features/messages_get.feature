@@ -127,35 +127,82 @@ Feature: Get Messages list Endpoint
      And new messages are read using current 'collection_exercise'
     Then  new '5' messages are returned
 
- @ignore
- Scenario: Respondent creates multiple draft messages and Respondent retrieves the list of draft messages 
-    Given a Respondent creates multiple draft messages 
-    When the Respondent gets their draft messages 
-    Then the retrieved messages should all have draft labels
- @ignore
- Scenario: Respondent creates multiple draft messages and Internal user retrieves a list of messages 
-    Given a Respondent creates multiple draft messages 
-    When the Internal user gets their messages
-    Then the retrieved messages should not have DRAFT_INBOX labels
-  
- @ignore
-  Scenario Outline: Respondent gets messages with various labels options
-    Given the user is internal
-    And multiple messages sent to respondent
-    When respondent gets messages with label <labels>
-    Then messages returned should have one of the labels <labels>
 
-  Examples: Parameters
-    |labels  |
-    |INBOX   |
-    |UNREAD  |
- @ignore
-  Scenario: A respondent sends multiple messages , Another respondent should not see any
-    Given a Internal user sends multiple messages
-    When A different external user requests all messages
-    Then a success status code (200) is returned
-    And  No messages should be returned
+   Scenario: A respondent sends multiple messages , An internal user reads one and then gets all UNREAD
+     Given new sending from respondent to internal
+      And  new '5' messages are sent
+      And  new the user is set as internal
+      And  new the message is read
+      And  new a label of 'UNREAD' is to be removed
+      And  new the message labels are modified
+     When  new messages with a label of  'UNREAD' are read
+     Then   new '4' messages are returned
+      And new all response messages have the label 'INBOX'
+      And new all response messages have the label 'UNREAD'
 
+   Scenario: An internal user sends multiple messages , A respondent user reads one and then gets all UNREAD
+     Given new sending from internal to respondent
+      And  new '5' messages are sent
+      And  new the user is set as respondent
+      And  new the message is read
+      And  new a label of 'UNREAD' is to be removed
+      And  new the message labels are modified
+     When  new messages with a label of  'UNREAD' are read
+     Then   new '4' messages are returned
+      And new all response messages have the label 'INBOX'
+      And new all response messages have the label 'UNREAD'
+
+   Scenario: A respondent sends multiple messages , An internal user reads one and then gets all marked as INBOX
+     Given new sending from respondent to internal
+      And  new '5' messages are sent
+      And  new the user is set as internal
+      And  new the message is read
+      And  new a label of 'UNREAD' is to be removed
+      And  new the message labels are modified
+     When  new messages with a label of  'INBOX' are read
+     Then   new '5' messages are returned
+
+
+   Scenario: An internal user sends multiple messages , A respondent user reads one and then gets all marked as INBOX
+     Given new sending from internal to respondent
+      And  new '5' messages are sent
+      And  new the user is set as respondent
+      And  new the message is read
+      And  new a label of 'UNREAD' is to be removed
+      And  new the message labels are modified
+     When  new messages with a label of  'INBOX' are read
+     Then   new '5' messages are returned
+
+
+  Scenario: A respondent sends multiple messages , Another respondent should not be able to read any
+     Given new sending from respondent to internal
+      And  new '5' messages are sent
+      And  new the user is set as alternative respondent
+     When new messages are read
+     Then  a success status code (200) is returned
+      And new '0' messages are returned
+
+  Scenario: An internal user sends multiple messages , Another respondent should not be able to read any
+     Given new sending from internal to respondent
+      And  new '5' messages are sent
+      And  new the user is set as alternative respondent
+     When new messages are read
+     Then  a success status code (200) is returned
+      And new '0' messages are returned
+
+  Scenario: A respondent sends multiple messages then sets the limit to a smaller number and reads messages , assert correct number returned
+     Given new sending from respondent to internal
+      And  new '23' messages are sent
+     When new messages are read with '5' per page requesting page '5'
+     Then  a success status code (200) is returned
+      And new '3' messages are returned
+
+  Scenario: An internal user sends multiple messages then sets the limit to a smaller number and reads messages , assert correct number returned
+     Given new sending from respondent to internal
+      And  new '23' messages are sent
+     When new messages are read with '5' per page requesting page '5'
+     Then  a success status code (200) is returned
+      And new '3' messages are returned
 
   @ignore
   Scenario Outline: User provides parameters that are invalid

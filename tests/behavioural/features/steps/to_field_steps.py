@@ -48,3 +48,9 @@ def step_impl_the_msg_to_is_set_to_respondent_as_string_not_array(context):
 @when("new the to is set to internal user as a string not array")
 def step_impl_the_msg_to_is_set_to_internal_as_string_not_array(context):
     context.bdd_helper.message_data['msg_to'] = context.bdd_helper.internal_id
+
+
+@then("new retrieved message msg_to is as was saved")
+def step_impl_retrieved_msg_to_is_as_saved(context):
+    msg_resp = json.loads(context.response.data)
+    nose.tools.assert_equal(msg_resp['msg_to'], context.bdd_helper.last_saved_message_data['msg_to'])
