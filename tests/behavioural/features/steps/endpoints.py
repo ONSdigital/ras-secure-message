@@ -2,26 +2,19 @@ import nose.tools
 from app.application import app
 from behave import given, then, when
 from flask import json
+import copy
 
 
 @given("new the message is sent")
 @when("new the message is sent")
 def step_impl_the_message_is_sent(context):
-    context.bdd_helper.sent_messages.extend([context.bdd_helper.message_data])
+    context.bdd_helper.sent_messages.extend([copy.deepcopy(context.bdd_helper.message_data)])
     context.response = app.test_client().post(context.bdd_helper.message_post_url,
                                               data=json.dumps(context.bdd_helper.message_data),
                                               headers=context.bdd_helper.headers)
 
     returned_data = json.loads(context.response.data)
-    if 'msg_id' in returned_data:
-        context.msg_id = returned_data['msg_id']
-    else:
-        context.msg_id = "NOT RETURNED"
-
-    if 'thread_id' in returned_data:
-        context.thread_id = returned_data['thread_id']
-    else:
-        context.thread_id = "NOT RETURNED"
+    _try_persist_msg_and_thread_id_to_context(context, returned_data)
     context.bdd_helper.store_last_single_message_response_data(context.response)
 
 
@@ -43,19 +36,12 @@ def step_impl_the_n_messages_are_sent(context, message_count):
 @given("new the message is saved as draft")
 @when("new the message is saved as draft")
 def step_impl_the_message_is_saved_as_draft(context):
-    context.bdd_helper.sent_messages.extend([context.bdd_helper.message_data])
+    context.bdd_helper.sent_messages.extend([copy.deepcopy(context.bdd_helper.message_data)])
     context.response = app.test_client().post(context.bdd_helper.draft_post_url,
                                               data=json.dumps(context.bdd_helper.message_data),
                                               headers=context.bdd_helper.headers)
     returned_data = json.loads(context.response.data)
-    if 'msg_id' in returned_data:
-        context.msg_id = returned_data['msg_id']
-    else:
-        context.msg_id = "NOT RETURNED"
-    if 'thread_id' in returned_data:
-        context.thread_id = returned_data['thread_id']
-    else:
-        context.thread_id = "NOT RETURNED"
+    _try_persist_msg_and_thread_id_to_context(context, returned_data)
     context.bdd_helper.store_last_single_message_response_data(context.response)
 
 
@@ -79,14 +65,7 @@ def step_impl_the_previously_saved_message_is_retrieved(context):
     url = context.bdd_helper.message_get_url.format(context.msg_id)
     context.response = app.test_client().get(url, headers=context.bdd_helper.headers)
     returned_data = json.loads(context.response.data)
-    if 'msg_id' in returned_data:
-        context.msg_id = returned_data['msg_id']
-    else:
-        context.msg_id = "NOT RETURNED"
-    if 'thread_id' in returned_data:
-        context.thread_id = returned_data['thread_id']
-    else:
-        context.thread_id = "NOT RETURNED"
+    _try_persist_msg_and_thread_id_to_context(context, returned_data)
     context.bdd_helper.store_last_single_message_response_data(context.response)
 
 
@@ -145,15 +124,7 @@ def step_impl_the_previously_saved_draft_is_retrieved(context):
     context.response = app.test_client().get(url, headers=context.bdd_helper.headers)
 
     returned_data = json.loads(context.response.data)
-    if 'msg_id' in returned_data:
-        context.msg_id = returned_data['msg_id']
-    else:
-        context.msg_id = "NOT RETURNED"
-
-    if 'thread_id' in returned_data:
-        context.thread_id = returned_data['thread_id']
-    else:
-        context.thread_id = "NOT RETURNED"
+    _try_persist_msg_and_thread_id_to_context(context, returned_data)
     context.bdd_helper.store_last_single_message_response_data(context.response)
 
 
@@ -241,3 +212,39 @@ def step_impl_drafts_are_read_with_filter_of_current_param_value(context, label_
     param = "?label={}".format(label_name)
     url = context.bdd_helper.messages_get_url + param
     _step_impl_get_drafts_with_filter(context, url)
+
+
+@given("new the thread is read")
+@when("new the thread is read")
+def step_impl_the_thread_is_read(context):
+    url = context.bdd_helper.thread_get_url.format(context.thread_id)
+    context.response = app.test_client().get(url, headers=context.bdd_helper.headers)
+
+    returned_data = json.loads(context.response.data)
+    _try_persist_msg_and_thread_id_to_context(context, returned_data)
+
+    context.bdd_helper.store_messages_response_data(context.response.data)
+
+
+def _try_persist_msg_and_thread_id_to_context(context, returned_data):
+    if 'msg_id' in returned_data:
+        context.msg_id = returned_data['msg_id']
+    else:
+        context.msg_id = "NOT RETURNED"
+
+    if 'thread_id' in returned_data:
+        context.thread_id = returned_data['thread_id']
+    else:
+        context.thread_id = "NOT RETURNED"
+
+
+@given("new the threads are read")
+@when("new the threads are read")
+def step_impl_the_threads_are_read(context):
+    url = context.bdd_helper.threads_get_url.format(context.thread_id)
+    context.response = app.test_client().get(url, headers=context.bdd_helper.headers)
+    context.bdd_helper.store_messages_response_data(context.response.data)
+
+
+
+

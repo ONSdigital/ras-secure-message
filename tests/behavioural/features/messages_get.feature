@@ -1,9 +1,7 @@
 Feature: Get Messages list Endpoint
 
   Background: Reset database
-    Given database is reset
-    And using mock party service
-    And using mock case service
+    Given prepare for tests using 'mock' services
 
   Scenario: A Respondent sends multiple messages, Internal user reads them confirm correct count seen
     Given new sending from respondent to internal

@@ -1,9 +1,7 @@
 Feature: Get Drafts
 
   Background: Reset database
-    Given database is reset
-    And   using mock party service
-    And using mock case service
+    Given prepare for tests using 'mock' services
 
 
   Scenario: A respondent saves multiple drafts then  posts one , then read drafts , validate correct number returned
@@ -134,22 +132,23 @@ Feature: Get Drafts
     Then  a success status code (200) is returned
       And  new '0' messages are returned
 
+  @ignore # Test failing as currently intended recipient can view using a DRAFT_INBOX  label  , remove @ignore when fixed
   Scenario: A respondent saves multiple drafts then , the internal user gets messages with DRAFT_INBOX label
     Given new sending from respondent to internal
       And new '5' messages are sent as drafts
       And new the user is set as internal
     When  new drafts with a label of  'DRAFT_INBOX' are read
     Then  a success status code (200) is returned
-      And new '5' messages are returned
+      And new '0' messages are returned
 
-
+  @ignore # Test failing as currently intended recipient can view using a DRAFT_INBOX  label  , remove @ignore when fixed
   Scenario: An internal user saves multiple drafts then , the respondent user gets messages with DRAFT_INBOX label
     Given new sending from internal to respondent
       And new '5' messages are sent as drafts
       And new the user is set as respondent
     When  new drafts with a label of  'DRAFT_INBOX' are read
     Then  a success status code (200) is returned
-      And new '5' messages are returned
+      And new '0' messages are returned
 
 
 

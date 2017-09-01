@@ -9,7 +9,7 @@ import copy
 
 
 class BddTestHelper:
-    """The Bdd test helper is used to pass information between steps . In use it is attached to the context
+    """The test helper is used to pass information between steps . In use it is attached to the context
     The message data holds data that will be sent to an endpoint
     single_message_responses_data holds responses regarding a specific message
     messages_responses_data holds responses regarding lists of messages . Both are lists so can hold multiple responses
@@ -66,6 +66,8 @@ class BddTestHelper:
         self._message_put_url = "http://localhost:5050/message/{}/modify"
         self._messages_get_url = "http://localhost:5050/messages"
         self._drafts_get_url = "http://localhost:5050/drafts"
+        self._thread_get_url = "http://localhost:5050/thread/{0}"
+        self._threads_get_url = "http://localhost:5050/threads"
 
     @staticmethod
     def _encrypt_token_data(token_data):
@@ -143,6 +145,14 @@ class BddTestHelper:
     @property
     def drafts_get_url(self):
         return self._drafts_get_url
+
+    @property
+    def thread_get_url(self):
+        return self._thread_get_url
+
+    @property
+    def threads_get_url(self):
+        return self._threads_get_url
 
     @property
     def respondent_id(self):

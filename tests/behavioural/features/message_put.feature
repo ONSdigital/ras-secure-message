@@ -1,9 +1,7 @@
 Feature: Checking correct labels for messages are added & deleted
 
- Background: Reset database
-    Given database is reset
-    And using mock party service
-    And using mock case service
+  Background: Reset database
+    Given prepare for tests using 'mock' services
 
   Scenario: A Respondent  modifies the archive status or a message to archived
     Given new sending from respondent to internal

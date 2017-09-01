@@ -1,9 +1,7 @@
 Feature: Message get by ID Endpoint
 
-   Background: Reset database
-    Given using mock party service
-     And using mock case service
-     And database is reset
+  Background: Reset database
+    Given prepare for tests using 'mock' services
 
 
   Scenario Outline: Respondent saves and retrieves a message verify the message fields are as sent

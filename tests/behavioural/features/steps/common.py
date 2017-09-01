@@ -17,6 +17,19 @@ def set_sqlite_pragma(dbapi_connection, connection_record):
     cursor.close()
 
 
+@given("prepare for tests using '{service_type}' services")
+def step_impl_prepare_for_tests(context, service_type):
+    """Prepare bdd tests to run against either mock or real external services"""
+    step_impl_reset_db(context)
+    context.bdd_helper = BddTestHelper()
+    if service_type.lower() == 'real':
+        party.use_real_service()
+        case_service.use_real_service()
+    else:
+        party.use_mock_service()
+        case_service.use_mock_service()
+
+
 @given("database is reset")
 def step_impl_reset_db(context):
     with app.app_context():
@@ -36,10 +49,10 @@ def step_impl_use_mock_case_service(context):
     case_service.use_mock_service()
 
 
-@given("new using the '{message_index}' message ")
-@when("new using the '{message_index}' message ")
+@given("new using the '{message_index}' message")
+@when("new using the '{message_index}' message")
 def step_impl_reuse_the_nth_sent_message(context, message_index):
-    context.bdd_helper.set_message_data_to_a_prior_version(message_index)
+    context.bdd_helper.set_message_data_to_a_prior_version(int(message_index))
 
 
 @then("new '{message_count}' messages are returned")

@@ -4,6 +4,7 @@ from flask import json
 from app import constants
 from app.services.service_toggles import party, case_service
 
+
 @then("new retrieved message additional from data matches that from party service")
 def step_impl_verify_additional_from_data_matches_that_from_party_service(context):
     msg_resp = json.loads(context.response.data)
