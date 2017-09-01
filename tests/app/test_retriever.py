@@ -767,8 +767,8 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
 
         with app.app_context():
             with current_app.test_request_context():
-                response = Retriever().retrieve_thread('ThreadId', self.user_internal, _survey=constants.BRES_SURVEY)
-                self.assertEqual(len(response), 9)
+                response = Retriever().retrieve_thread('ThreadId', self.user_internal, 1, MESSAGE_QUERY_LIMIT)[1]
+                self.assertEqual(len(response.items), 9)
 
     def test_all_msg_returned_for_thread_id_without_draft(self):
         """retrieves messages for thread_id from database without draft"""
@@ -776,8 +776,8 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
 
         with app.app_context():
             with current_app.test_request_context():
-                response = Retriever().retrieve_thread('ThreadId', self.user_respondent)
-                self.assertEqual(len(response), 6)
+                response = Retriever().retrieve_thread('ThreadId', self.user_respondent, 1, MESSAGE_QUERY_LIMIT)[1]
+                self.assertEqual(len(response.items), 6)
 
     def test_all_msg_returned_for_thread_id_with_draft_inbox(self):
         """retrieves messages for thread_id from database with draft inbox"""
@@ -785,8 +785,8 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
 
         with app.app_context():
             with current_app.test_request_context():
-                response = Retriever().retrieve_thread('ThreadId', self.user_respondent)
-                self.assertEqual(len(response), 6)
+                response = Retriever().retrieve_thread('ThreadId', self.user_respondent, 1, MESSAGE_QUERY_LIMIT)[1]
+                self.assertEqual(len(response.items), 6)
 
     def test_thread_returned_in_desc_order(self):
         """check thread returned in correct order"""
@@ -794,12 +794,12 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
 
         with app.app_context():
             with current_app.test_request_context():
-                response = Retriever().retrieve_thread('ThreadId', self.user_respondent)
-                self.assertEqual(len(response), 6)
+                response = Retriever().retrieve_thread('ThreadId', self.user_respondent, 1, MESSAGE_QUERY_LIMIT)[1]
+                self.assertEqual(len(response.items), 6)
 
                 sent = []
-                for message in response:
-                    sent.append(message['sent_date'])
+                for message in response.items:
+                    sent.append(str(message.events[0].date_time))
 
                 desc_date = sorted(sent, reverse=True)
                 self.assertEqual(len(sent), 6)
@@ -811,15 +811,12 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
 
         with app.app_context():
             with current_app.test_request_context():
-                response = Retriever().retrieve_thread('ThreadId', self.user_internal, _survey=constants.BRES_SURVEY)
-                self.assertEqual(len(response), 9)
+                response = Retriever().retrieve_thread('ThreadId', self.user_internal, 1, MESSAGE_QUERY_LIMIT)[1]
+                self.assertEqual(len(response.items), 9)
 
                 date = []
-                for message in response:
-                    if 'sent_date' in message:
-                        date.append(message['sent_date'])
-                    elif 'modified_date' in message:
-                        date.append(message['modified_date'])
+                for message in response.items:
+                    date.append(str(message.events[0].date_time))
 
                 desc_date = sorted(date, reverse=True)
                 self.assertListEqual(desc_date, date)
@@ -830,14 +827,14 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
             database.db.drop_all()
             with current_app.test_request_context():
                 with self.assertRaises(InternalServerError):
-                    Retriever().retrieve_thread('ThreadId', self.user_respondent)
+                    Retriever().retrieve_thread('ThreadId', self.user_respondent, 1, MESSAGE_QUERY_LIMIT)
 
     def test_thread_returned_with_thread_id_returns_404(self):
         """retrieves thread using id that doesn't exist"""
         with app.app_context():
             with current_app.test_request_context():
                 with self.assertRaises(NotFound):
-                    Retriever().retrieve_thread('anotherThreadId', self.user_respondent)
+                    Retriever().retrieve_thread('anotherThreadId', self.user_respondent, 1, MESSAGE_QUERY_LIMIT)
 
     def test_retrieve_draft_raises_server_error(self):
         """retrieves draft when db does not exist"""
@@ -971,9 +968,9 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
                 self.assertEqual(len(msg_ids), 5)
 
                 for x in range(0, len(thread_ids)):
-                    thread = Retriever().retrieve_thread(thread_ids[x], user=self.user_internal)
-                    self.assertEqual(date[x], thread[0]['sent_date'])
-                    self.assertEqual(msg_ids[x], thread[0]['msg_id'])
+                    thread = Retriever().retrieve_thread(thread_ids[x], self.user_internal, 1, MESSAGE_QUERY_LIMIT)[1]
+                    self.assertEqual(date[x], str(thread.items[0].events[0].date_time))
+                    self.assertEqual(msg_ids[x], thread.items[0].events[0].msg_id)
 
     def test_latest_message_from_each_thread_chosen_desc_respondent_with_respondent_draft(self):
         """checks the message chosen for each thread is the latest message within that thread
@@ -1000,13 +997,9 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
                 self.assertEqual(len(msg_ids), 5)
 
                 for x in range(0, len(thread_ids)):
-                    thread = Retriever().retrieve_thread(thread_ids[x], user=self.user_respondent)
-                    if 'sent_date' in thread[0]:
-                        self.assertEqual(date[x], thread[0]['sent_date'])
-                    else:
-                        self.assertEqual(date[x], thread[0]['modified_date'])
-
-                    self.assertEqual(msg_ids[x], thread[0]['msg_id'])
+                    thread = Retriever().retrieve_thread(thread_ids[x], self.user_respondent, 1, MESSAGE_QUERY_LIMIT)[1]
+                    self.assertEqual(date[x], str(thread.items[0].events[0].date_time))
+                    self.assertEqual(msg_ids[x], thread.items[0].events[0].msg_id)
 
     def test_latest_message_from_each_thread_chosen_desc_internal_with_respondent_draft(self):
         """checks the message chosen for each thread is the latest message within that thread
@@ -1033,9 +1026,9 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
                 self.assertEqual(len(msg_ids), 5)
 
                 for x in range(0, len(thread_ids)):
-                    thread = Retriever().retrieve_thread(thread_ids[x], user=self.user_internal)
-                    self.assertEqual(date[x], thread[0]['sent_date'])
-                    self.assertEqual(msg_ids[x], thread[0]['msg_id'])
+                    thread = Retriever().retrieve_thread(thread_ids[x], self.user_internal, 1, MESSAGE_QUERY_LIMIT)[1]
+                    self.assertEqual(date[x], str(thread.items[0].events[0].date_time))
+                    self.assertEqual(msg_ids[x], thread.items[0].events[0].msg_id)
 
     def test_latest_message_from_each_thread_chosen_desc_respondent_with_internal_draft(self):
         """checks the message chosen for each thread is the latest message within that thread
@@ -1062,9 +1055,9 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
                 self.assertEqual(len(msg_ids), 5)
 
                 for x in range(0, len(thread_ids)):
-                    thread = Retriever().retrieve_thread(thread_ids[x], user=self.user_respondent)
-                    self.assertEqual(date[x], thread[0]['sent_date'])
-                    self.assertEqual(msg_ids[x], thread[0]['msg_id'])
+                    thread = Retriever().retrieve_thread(thread_ids[x], self.user_respondent, 1, MESSAGE_QUERY_LIMIT)[1]
+                    self.assertEqual(date[x], str(thread.items[0].events[0].date_time))
+                    self.assertEqual(msg_ids[x], thread.items[0].events[0].msg_id)
 
     def test_latest_message_from_each_thread_chosen_desc_internal_with_internal_draft(self):
         """checks the message chosen for each thread is the latest message within that thread
@@ -1091,12 +1084,9 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
                 self.assertEqual(len(msg_ids), 5)
 
                 for x in range(0, len(thread_ids)):
-                    thread = Retriever().retrieve_thread(thread_ids[x], user=self.user_internal)
-                    if 'sent_date' in thread[0]:
-                        self.assertEqual(date[x], thread[0]['sent_date'])
-                    else:
-                        self.assertEqual(date[x], thread[0]['modified_date'])
-                    self.assertEqual(msg_ids[x], thread[0]['msg_id'])
+                    thread = Retriever().retrieve_thread(thread_ids[x], self.user_internal, 1, MESSAGE_QUERY_LIMIT)[1]
+                    self.assertEqual(date[x], str(thread.items[0].events[0].date_time))
+                    self.assertEqual(msg_ids[x], thread.items[0].events[0].msg_id)
 
     def test_latest_message_from_each_thread_chosen_desc_respondent_with_both_users_drafts(self):
         """checks the message chosen for each thread is the latest message within that thread
@@ -1123,12 +1113,9 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
                 self.assertEqual(len(msg_ids), 5)
 
                 for x in range(0, len(thread_ids)):
-                    thread = Retriever().retrieve_thread(thread_ids[x], user=self.user_respondent)
-                    if 'sent_date' in thread[0]:
-                        self.assertEqual(date[x], thread[0]['sent_date'])
-                    else:
-                        self.assertEqual(date[x], thread[0]['modified_date'])
-                    self.assertEqual(msg_ids[x], thread[0]['msg_id'])
+                    thread = Retriever().retrieve_thread(thread_ids[x], self.user_respondent, 1, MESSAGE_QUERY_LIMIT)[1]
+                    self.assertEqual(date[x], str(thread.items[0].events[0].date_time))
+                    self.assertEqual(msg_ids[x], thread.items[0].events[0].msg_id)
 
     def test_latest_message_from_each_thread_chosen_desc_internal_with_both_users_drafts(self):
         """checks the message chosen for each thread is the latest message within that thread
@@ -1155,9 +1142,6 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
                 self.assertEqual(len(msg_ids), 5)
 
                 for x in range(0, len(thread_ids)):
-                    thread = Retriever().retrieve_thread(thread_ids[x], user=self.user_internal)
-                    if 'sent_date' in thread[0]:
-                        self.assertEqual(date[x], thread[0]['sent_date'])
-                    else:
-                        self.assertEqual(date[x], thread[0]['modified_date'])
-                    self.assertEqual(msg_ids[x], thread[0]['msg_id'])
+                    thread = Retriever().retrieve_thread(thread_ids[x], self.user_internal, 1, MESSAGE_QUERY_LIMIT)[1]
+                    self.assertEqual(date[x], str(thread.items[0].events[0].date_time))
+                    self.assertEqual(msg_ids[x], thread.items[0].events[0].msg_id)
