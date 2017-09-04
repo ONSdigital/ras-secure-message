@@ -42,8 +42,8 @@ def check_jwt(token):
         if not decoded_jwt_token.get(constants.USER_IDENTIFIER):
             raise BadRequest(description="Missing user_uuid claim,"
                                          "user_uuid is required to access this Microservice Resource")
-        if not decoded_jwt_token.get('role'):
-            raise BadRequest(description="Missing role claim, role is required to access this Microservice Resource")
+        # if not decoded_jwt_token.get('role'):
+        #     raise BadRequest(description="Missing role claim, role is required to access this Microservice Resource")
 
         g.user = User(decoded_jwt_token.get(constants.USER_IDENTIFIER), decoded_jwt_token.get('role'))
 
