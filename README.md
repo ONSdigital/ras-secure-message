@@ -7,7 +7,7 @@
 ## Setup
 Based on python 3.4
 
-Create a new virtual env for python3 and make sure that it's activated
+Create a virtual env for python3 and make sure that it's activated
 
 ```
 mkvirtual --python=</path/to/python3.4 <your env name>
@@ -53,7 +53,7 @@ python run_tests.py
 Test the response
 -----------------
 
-Now open up a new prompt to test out your API using curl
+Now open up a prompt to test out your API using curl
 ```
 $ curl http://127.0.0.1:5050/health
 {"status": "healthy"}

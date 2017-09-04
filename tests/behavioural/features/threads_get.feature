@@ -1,26 +1,123 @@
 Feature: Get threads list Endpoint
 
   Background: Reset database
-    Given database is reset
+    Given prepare for tests using 'mock' services
 
-  Scenario: Respondent and internal user have multiple conversations and respondent retrieves all conversation
-    Given a respondent and internal user have multiple conversations
-    When the respondent gets all conversations
-    Then most recent message from each conversation is returned
+  Scenario: There are 3 conversations between respondent and internal , respondent attempts to read them
+    Given sending from respondent to internal
+      And the message is sent
+      And the message is sent
+      And the message is sent
+   When the threads are read
+    Then  a success status code (200) is returned
+      And '3' messages are returned
 
-  Scenario: Respondent and internal user have multiple conversations, including a draft, and respondent retrieves all conversation
-    Given a respondent and internal user have multiple conversations
-    And internal user has conversation with a draft
-    When the respondent gets all conversations
-    Then most recent message from each conversation is returned
+  Scenario: There are 3 conversations between respondent and internal , internal attempts to read them
+    Given sending from respondent to internal
+      And '3' messages are sent
+     When   the user is set as internal
+      And the threads are read
+    Then  a success status code (200) is returned
+      And '3' messages are returned
 
-  Scenario: Respondent and internal user have multiple conversations and internal user retrieves all conversation
-    Given a respondent and internal user have multiple conversations
-    When the internal user gets all conversations
-    Then most recent message from each conversation is returned
 
-  Scenario: Respondent and internal user have multiple conversations, including a draft, and internal user retrieves all conversation
-    Given a respondent and internal user have multiple conversations
-    And internal user has conversation with a draft
-    When the internal user gets all conversations
-    Then most recent message from each conversation is returned including draft
+  Scenario: There are 3 conversations between respondent and internal each with 2 messages, respondent attempts to read them
+    Given sending from respondent to internal
+      And the message is sent
+      And   the thread id is set to the last returned thread id
+      And the message is sent
+
+      And   the thread_id is set to empty
+      And the message is sent
+      And   the thread id is set to the last returned thread id
+      And the message is sent
+
+      And   the thread_id is set to empty
+      And the message is sent
+      And   the thread id is set to the last returned thread id
+      And the message is sent
+
+   When the threads are read
+    Then  a success status code (200) is returned
+      And '3' messages are returned
+
+  Scenario: There are 3 conversations between respondent and internal each with 2 messages, internal user attempts to read them
+    Given sending from respondent to internal
+      And the message is sent
+      And   the thread id is set to the last returned thread id
+      And the message is sent
+
+      And   the thread_id is set to empty
+      And the message is sent
+      And   the thread id is set to the last returned thread id
+      And the message is sent
+
+      And   the thread_id is set to empty
+      And the message is sent
+      And   the thread id is set to the last returned thread id
+      And the message is sent
+
+    When  the user is set as internal
+      And the threads are read
+    Then  a success status code (200) is returned
+      And '3' messages are returned
+
+
+  Scenario: There are 3 conversations between respondent and internal each with 2  messages and a draft, validate most recent message returned for each
+    Given sending from respondent to internal
+      And the message is sent
+      And the thread id is set to the last returned thread id
+      And the message is sent
+      And the thread id is set to the last returned thread id
+      And the message is saved as draft
+
+      And the thread_id is set to empty
+      And the message is sent
+      And the thread id is set to the last returned thread id
+      And the message is sent
+      And the thread id is set to the last returned thread id
+      And the message is saved as draft
+
+      And the thread_id is set to empty
+      And the message is sent
+      And the thread id is set to the last returned thread id
+      And the message is sent
+      And the thread id is set to the last returned thread id
+      And the message is saved as draft
+
+   When the threads are read
+    Then  a success status code (200) is returned
+      And  '3' messages are returned
+          # Drafts added last
+      And '3' messages have a 'DRAFT' label
+
+  Scenario: There are 3 conversations between an internal user and respondent each with 2  messages and a draft, validate most recent message returned for each
+    Given sending from internal to respondent
+      And the message is sent
+      And the thread id is set to the last returned thread id
+      And the message is sent
+      And the thread id is set to the last returned thread id
+      And the message is saved as draft
+
+      And the thread_id is set to empty
+      And the message is sent
+      And the thread id is set to the last returned thread id
+      And the message is sent
+      And the thread id is set to the last returned thread id
+      And the message is saved as draft
+
+      And the thread_id is set to empty
+      And the message is sent
+      And the thread id is set to the last returned thread id
+      And the message is sent
+      And the thread id is set to the last returned thread id
+      And the message is saved as draft
+
+   When the threads are read
+    Then  a success status code (200) is returned
+      And  '3' messages are returned
+      # Drafts added last
+      And '3' messages have a 'DRAFT' label
+
+
+

@@ -1,124 +1,205 @@
 Feature: Get Messages list Endpoint
 
   Background: Reset database
-    Given database is reset
+    Given prepare for tests using 'mock' services
 
-  Scenario: Respondent sends multiple messages and retrieves the list of messages with their labels
-    Given a respondent sends multiple messages
-    When the respondent gets their messages
-    Then the retrieved messages should have the correct SENT labels
+  Scenario: A Respondent sends multiple messages, Internal user reads them confirm correct count seen
+    Given sending from respondent to internal
+      And  '5' messages are sent
+    When messages are read
+    Then  '5' messages are returned
 
-  Scenario: Internal user sends multiple messages and retrieves the list of messages with their labels
-    Given a Internal user sends multiple messages
-    When the Internal user gets their messages
-    Then the retrieved messages should have the correct SENT labels
+  Scenario: An internal user sends multiple messages, Internal user reads them confirm correct count seen
+    Given sending from internal to respondent
+    And  '5' messages are sent
+    When messages are read
+    Then  '5' messages are returned
 
-  Scenario: Respondent sends multiple messages and internal user retrieves the list of messages with their labels
-    Given a respondent sends multiple messages
-    When the Internal user gets their messages
-    Then the retrieved messages should have the correct INBOX and UNREAD labels
+  Scenario: A Respondent sends multiple messages and reads them to confirm all have SENT labels
+    Given sending from respondent to internal
+      And  '5' messages are sent
+    When messages are read
+    Then  all response messages have the label 'SENT'
 
-  Scenario: Internal user sends multiple messages and Respondent retrieves the list of messages with their labels
-    Given a Internal user sends multiple messages
-    When the Respondent gets their messages
-    Then the retrieved messages should have the correct INBOX and UNREAD labels
+  Scenario: An internal user sends multiple messages and reads them to confirm all have SENT labels
+    Given sending from internal to respondent
+      And  '5' messages are sent
+    When messages are read
+    Then  all response messages have the label 'SENT'
 
- Scenario: As an external user I would like to be able to view a list of messages
-    Given an external user has multiple messages
-    When the external user requests all messages
-    Then all of that users messages are returned
+  Scenario: A Respondent sends multiple messages, and Internal user reads them confirm all have INBOX and UNREAD  labels
+    Given sending from respondent to internal
+      And  '5' messages are sent
+      And the user is set as internal
+    When messages are read
+    Then  all response messages have the label 'INBOX'
+      And all response messages have the label 'UNREAD'
 
- Scenario: As an internal user I would like to be able to view a list of messages
-    Given an internal user has multiple messages
-    When the internal user requests all messages
-    Then all of that users messages are returned
+  Scenario: An internal user sends multiple messages, and a respondent user reads them confirm all have INBOX and UNREAD  labels
+    Given sending from internal to respondent
+      And  '5' messages are sent
+      And the user is set as respondent
+    When messages are read
+    Then  all response messages have the label 'INBOX'
+      And all response messages have the label 'UNREAD'
 
- Scenario: Respondent and internal user sends multiple messages and Respondent retrieves the list of sent messages 
-    Given a respondent and an Internal user sends multiple messages 
-    When the Respondent gets their sent messages 
-    Then the retrieved messages should all have sent labels
+   Scenario: A Respondent sends multiple messages against two rus, Internal user reads them confirm correct count seen
+    Given sending from respondent to internal
+      And  '5' messages are sent
+      And  ru set to alternate ru
+      And  '3' messages are sent
+    When the user is set as internal
+     And ru set to default ru
+     And messages are read using current 'ru_id'
+    Then  '5' messages are returned
 
- Scenario Outline: As a user I would like to be able to view a list of inbox messages
-    Given a <User> user receives multiple messages 
-    When the <User> user gets their inbox messages 
-    Then the retrieved messages should all have inbox labels
+  Scenario: An internal user sends multiple messages against two rus, Respondent user reads them confirm correct count seen
+    Given sending from internal to respondent
+      And  '5' messages are sent
+      And  ru set to alternate ru
+      And  '3' messages are sent
+    When the user is set as internal
+     And ru set to default ru
+     And messages are read using current 'ru_id'
+    Then  '5' messages are returned
 
-    Examples: Users
-    |User       |
-    |internal   |
-    |respondent |
+   Scenario: A Respondent sends multiple messages against two surveys, Internal user reads them confirm correct count seen
+    Given sending from respondent to internal
+      And  '5' messages are sent
+      And  survey is set to alternate survey
+      And  '3' messages are sent
+    When the user is set as internal
+     And survey set to default survey
+     And messages are read using current 'survey'
+    Then  '5' messages are returned
 
- Scenario: Internal user sends multiple messages and Respondent retrieves the list of messages with particular reporting unit
-    Given a Internal user sends multiple messages with different reporting unit 
-    When the Respondent gets their messages with particular reporting unit 
-    Then the retrieved messages should have the correct reporting unit
+  Scenario: An internal user sends multiple messages against two surveys, respondent reads them confirm correct count seen
+    Given sending from internal to respondent
+      And  '5' messages are sent
+      And  survey is set to alternate survey
+      And  '3' messages are sent
+    When the user is set as respondent
+     And survey set to default survey
+     And messages are read using current 'survey'
+    Then  '5' messages are returned
 
- Scenario: Internal user sends multiple messages and Respondent retrieves the list of messages with particular survey 
-    Given a Internal user sends multiple messages with different survey 
-    When the Respondent gets their messages with particular survey 
-    Then the retrieved messages should have the correct survey
-
- Scenario: Internal user sends multiple messages and Respondent retrieves the list of messages with particular collection case 
-    Given a Internal user sends multiple messages with different collection case 
-    When the Respondent gets their messages with particular collection case 
-    Then the retrieved messages should have the correct collection case
-
- Scenario: Internal user sends multiple messages and Respondent retrieves the list of messages with particular collection exercise 
-    Given a Internal user sends multiple messages with different collection exercise 
-    When the Respondent gets their messages with particular collection exercise 
-    Then the retrieved messages should have the correct collection exercise
-
- Scenario: Respondent creates multiple draft messages and Respondent retrieves the list of draft messages 
-    Given a Respondent creates multiple draft messages 
-    When the Respondent gets their draft messages 
-    Then the retrieved messages should all have draft labels
-
- Scenario: Respondent creates multiple draft messages and Internal user retrieves a list of messages 
-    Given a Respondent creates multiple draft messages 
-    When the Internal user gets their messages
-    Then the retrieved messages should not have DRAFT_INBOX labels
-  
-
-  Scenario Outline: Respondent gets messages with various labels options
-    Given the user is internal
-    And multiple messages sent to respondent
-    When respondent gets messages with label <labels>
-    Then messages returned should have one of the labels <labels>
-
-  Examples: Parameters
-    |labels  |
-    |INBOX   |
-    |UNREAD  |
-
-  Scenario: A respondent sends multiple messages , Another respondent should not see any
-    Given a Internal user sends multiple messages
-    When A different external user requests all messages
-    Then a success status code (200) is returned
-    And  No messages should be returned
+  Scenario: A respondent user sends multiple messages against two collection cases, Internal user  reads them confirm correct count seen
+    Given sending from respondent to internal
+      And  '5' messages are sent
+      And  collection case is set to alternate collection case
+      And  '3' messages are sent
+    When the user is set as internal
+     And collection case set to default collection case
+     And messages are read using current 'collection_case'
+    Then  '5' messages are returned
 
 
-  @ignore
-  Scenario Outline: User provides parameters that are invalid
-    Given parameter <param> has value <value>
-    When user gets messages using the parameters
-    Then a not found status code (404) is returned
+   Scenario: An internal user sends multiple messages against two collection cases, Respondent  reads them confirm correct count seen
+    Given sending from internal to respondent
+      And  '5' messages are sent
+      And  collection case is set to alternate collection case
+      And  '3' messages are sent
+    When the user is set as respondent
+     And collection case set to default collection case
+     And messages are read using current 'collection_case'
+    Then  '5' messages are returned
 
-  Examples: Parameters
-    |param         | value |
-    |limit         | string|
-    |page          | string|
-    |survey        | NotASurvey |
-    |labels        | NotALabel  |
+  Scenario: A respondent user sends multiple messages against two collection exercises, Internal user  reads them confirm correct count seen
+    Given sending from respondent to internal
+      And  '5' messages are sent
+      And  collection exercise is set to alternate collection exercise
+      And  '3' messages are sent
+    When the user is set as internal
+     And collection exercise set to default collection exercise
+     And messages are read using current 'collection_exercise'
+    Then  '5' messages are returned
 
-  @ignore
-  Scenario Outline: User provides parameters that are too large
-    Given parameter <param> has value <value>
-    When user gets messages using the parameters
-    Then a bad request status code (400) is returned
 
-  Examples: Parameters
-    |param         | value |
-    |ru_id         | LongerThan11Chars |
-    |labels        | INBOX-SENT-ARCHIVED-DRAFT-INBOX-SENT-ARCHIVED-DRAFT |
+   Scenario: An internal user sends multiple messages against two collection exercises, Respondent  reads them confirm correct count seen
+    Given sending from internal to respondent
+      And  '5' messages are sent
+      And  collection exercise is set to alternate collection exercise
+      And  '3' messages are sent
+    When the user is set as respondent
+     And collection exercise set to default collection exercise
+     And messages are read using current 'collection_exercise'
+    Then  '5' messages are returned
+
+
+   Scenario: A respondent sends multiple messages , An internal user reads one and then gets all UNREAD
+     Given sending from respondent to internal
+      And  '5' messages are sent
+      And  the user is set as internal
+      And  the message is read
+      And  a label of 'UNREAD' is to be removed
+      And  the message labels are modified
+     When  messages with a label of  'UNREAD' are read
+     Then   '4' messages are returned
+      And all response messages have the label 'INBOX'
+      And all response messages have the label 'UNREAD'
+
+   Scenario: An internal user sends multiple messages , A respondent user reads one and then gets all UNREAD
+     Given sending from internal to respondent
+      And  '5' messages are sent
+      And  the user is set as respondent
+      And  the message is read
+      And  a label of 'UNREAD' is to be removed
+      And  the message labels are modified
+     When  messages with a label of  'UNREAD' are read
+     Then   '4' messages are returned
+      And all response messages have the label 'INBOX'
+      And all response messages have the label 'UNREAD'
+
+   Scenario: A respondent sends multiple messages , An internal user reads one and then gets all marked as INBOX
+     Given sending from respondent to internal
+      And  '5' messages are sent
+      And  the user is set as internal
+      And  the message is read
+      And  a label of 'UNREAD' is to be removed
+      And  the message labels are modified
+     When  messages with a label of  'INBOX' are read
+     Then   '5' messages are returned
+
+
+   Scenario: An internal user sends multiple messages , A respondent user reads one and then gets all marked as INBOX
+     Given sending from internal to respondent
+      And  '5' messages are sent
+      And  the user is set as respondent
+      And  the message is read
+      And  a label of 'UNREAD' is to be removed
+      And  the message labels are modified
+     When  messages with a label of  'INBOX' are read
+     Then   '5' messages are returned
+
+
+  Scenario: A respondent sends multiple messages , Another respondent should not be able to read any
+     Given sending from respondent to internal
+      And  '5' messages are sent
+      And  the user is set as alternative respondent
+     When messages are read
+     Then  a success status code (200) is returned
+      And '0' messages are returned
+
+  Scenario: An internal user sends multiple messages , Another respondent should not be able to read any
+     Given sending from internal to respondent
+      And  '5' messages are sent
+      And  the user is set as alternative respondent
+     When messages are read
+     Then  a success status code (200) is returned
+      And '0' messages are returned
+
+  Scenario: A respondent sends multiple messages then sets the limit to a smaller number and reads messages , assert correct number returned
+     Given sending from respondent to internal
+      And  '23' messages are sent
+     When messages are read with '5' per page requesting page '5'
+     Then  a success status code (200) is returned
+      And '3' messages are returned
+
+  Scenario: An internal user sends multiple messages then sets the limit to a smaller number and reads messages , assert correct number returned
+     Given sending from respondent to internal
+      And  '23' messages are sent
+     When messages are read with '5' per page requesting page '5'
+     Then  a success status code (200) is returned
+      And '3' messages are returned
 
 

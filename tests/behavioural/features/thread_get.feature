@@ -1,37 +1,118 @@
 Feature: Get thread by id Endpoint
 
   Background: Reset database
-    Given database is reset
+    Given prepare for tests using 'mock' services
 
-  Scenario: Respondent and internal user have a conversation and respondent retrieves the conversation
-    Given a respondent and internal user have a conversation
-    When the respondent gets this conversation
-    Then all messages from that conversation should be received
+  Scenario: Respondent and internal user have a conversation and respondent retrieves the conversation, validate respondent sees all messages
+    Given sending from respondent to internal
+      And   the message is sent
+      And   the user is set as internal
+      And   the from is set to internal
+      And   the to is set to respondent
+      And   the message is read
+      And   the thread id is set to the last returned thread id
+      And   the message is sent
+      And   the user is set as respondent
+      And   the from is set to respondent
+      And   the to is set to internal
+      And   the message is read
+      And   the thread id is set to the last returned thread id
+      And   the message is sent
+    When the thread is read
+    Then '3' messages are returned
+      And '2' messages have a 'SENT' label
+      And '1' messages have a 'INBOX' label
 
-  Scenario: Respondent and internal user have a conversation and internal user retrieves the conversation
-    Given a respondent and internal user have a conversation
-    When the internal user gets this conversation
-    Then all messages from that conversation should be received
+  Scenario: Respondent and internal user have a conversation and respondent retrieves the conversation, validate internal user sees all messages
+    Given sending from respondent to internal
+      And   the message is sent
+      And   the user is set as internal
+      And   the from is set to internal
+      And   the to is set to respondent
+      And   the message is read
+      And   the thread id is set to the last returned thread id
+      And   the message is sent
+      And   the user is set as respondent
+      And   the from is set to respondent
+      And   the to is set to internal
+      And   the message is read
+      And   the thread id is set to the last returned thread id
+      And   the message is sent
+      And   the user is set as internal
+    When the thread is read
+    Then '3' messages are returned
+      And '1' messages have a 'SENT' label
+      And '2' messages have a 'INBOX' label
 
-  Scenario: Respondent and internal user have a conversation, including a draft, and respondent retrieves the conversation
-    Given a respondent and internal user have a conversation
-    And internal user creates a draft
-    When the respondent gets this conversation
-    Then all messages from that conversation should be received
+  Scenario: Respondent and internal user have a conversation including drafts and respondent retrieves the conversation, validate respondent sees all messages
+    Given sending from respondent to internal
+      And   the message is sent
+      And   the user is set as internal
+      And   the from is set to internal
+      And   the to is set to respondent
+      And   the message is read
+      And   the thread id is set to the last returned thread id
+      And   the message is sent
+      And   the user is set as respondent
+      And   the from is set to respondent
+      And   the to is set to internal
+      And   the message is read
+      And   the thread id is set to the last returned thread id
+      And   the message is saved as draft
+    When the thread is read
+    Then '3' messages are returned
+      And '1' messages have a 'SENT' label
+      And '1' messages have a 'INBOX' label
+      And '1' messages have a 'DRAFT' label
 
-  Scenario: Respondent and internal user have a conversation, including a draft, and internal user retrieves the conversation
-    Given a respondent and internal user have a conversation
-    And internal user creates a draft
-    When the internal user gets this conversation
-    Then all messages from that conversation should be received including draft
+  Scenario: Respondent and internal user have a conversation including drafts and respondent retrieves the conversation, validate internal does not see draft
+    Given sending from respondent to internal
+      And   the message is sent
+      And   the user is set as internal
+      And   the from is set to internal
+      And   the to is set to respondent
+      And   the message is read
+      And   the thread id is set to the last returned thread id
+      And   the message is sent
+      And   the user is set as respondent
+      And   the from is set to respondent
+      And   the to is set to internal
+      And   the message is read
+      And   the thread id is set to the last returned thread id
+      And   the message is saved as draft
+      And   the user is set as internal
+    When the thread is read
+    Then '2' messages are returned
+      And '1' messages have a 'SENT' label
+      And '1' messages have a 'INBOX' label
+      And '0' messages have a 'DRAFT_INBOX' label
 
-  Scenario: Respondent and internal user have a conversation and internal user retrieves that conversation from multiple conversations
-    Given a respondent and internal user have a conversation
-    And internal user has multiple conversations
-    When the internal user gets this conversation
-    Then all messages from that conversation should be received
+    # 3 messages in first conversation , 2 in second
+  Scenario: Respondent and internal user have two conversations respondent retrieves one conversation, validate respondent sees correct messages
+    Given sending from respondent to internal
+      And   the message is sent
+      And   the thread id is set to the last returned thread id
+      And   the message is sent
+      And   the thread id is set to the last returned thread id
+      And   the message is sent
+      And   the thread_id is set to empty
+      And   the message is sent
+      And   the thread id is set to the last returned thread id
+      And   the message is sent
+      And   the thread id is set to that from response '0'
+      And   the thread is read
+    Then '3' messages are returned
+      And '3' messages have a 'SENT' label
 
-  Scenario: User tries to retrieve a conversation that does not exist
-    Given a respondent picks a conversation that does not exist
-    When the respondent gets this conversation
+
+  Scenario:Respondent tries to retrieve a conversation that does not exist
+    Given sending from respondent to internal
+    When the thread_id is set to 'DoesNotExist'
+     And  the thread is read
+    Then a not found status code (404) is returned
+
+  Scenario:Internal user tries to retrieve a conversation that does not exist
+    Given sending from internal to respondent
+    When the thread_id is set to 'DoesNotExist'
+     And  the thread is read
     Then a not found status code (404) is returned

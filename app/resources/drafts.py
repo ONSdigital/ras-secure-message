@@ -5,6 +5,8 @@ from flask import request, jsonify
 from flask_restful import Resource
 from structlog import wrap_logger
 from werkzeug.exceptions import BadRequest
+
+from app.authorization.authorizer import Authorizer
 from app.common.labels import Labels
 from app.constants import DRAFT_LIST_ENDPOINT
 from app.common.utilities import get_options, paginated_list_to_json, generate_etag, add_users_and_business_details
@@ -18,7 +20,7 @@ logger = wrap_logger(logging.getLogger(__name__))
 
 class DraftSave(Resource):
     def post(self):
-        """Handles saving of new draft"""
+        """Handles saving of draft"""
         post_data = request.get_json()
         draft = DraftSchema().load(post_data)
 
@@ -62,14 +64,23 @@ class DraftById(Resource):
     def get(draft_id):
         """Get draft by id"""
         # check user is authorised to view message
+
         message_service = Retriever()
         draft_data = message_service.retrieve_draft(draft_id, g.user)
-        etag = generate_etag(draft_data['msg_to'], draft_data['msg_id'], draft_data['subject'], draft_data['body'])
-        draft_data = add_users_and_business_details([draft_data])[0]
-        resp = jsonify(draft_data)
-        resp.headers['ETag'] = etag
 
-        return resp
+        if Authorizer().can_user_view_message(g.user, draft_data):
+            etag = generate_etag(draft_data['msg_to'], draft_data['msg_id'], draft_data['subject'], draft_data['body'])
+            draft_data = add_users_and_business_details([draft_data])[0]
+            resp = jsonify(draft_data)
+            resp.headers['ETag'] = etag
+            return resp
+        else:
+            result = jsonify({'status': 'error'})
+            result.status_code = 403
+            logger.error('Error getting message by ID', msg_id=draft_id, status_code=result.status_code)
+            return result
+
+
 
 
 class DraftList(Resource):

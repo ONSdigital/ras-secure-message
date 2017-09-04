@@ -205,7 +205,7 @@ class MessageModifyById(Resource):
     @staticmethod
     def _modify_label(action, message, user, label):
         """Adds or deletes a label"""
-        label_exists = label in message
+        label_exists = label in message['labels']
         if action == 'add' and not label_exists:
             return Modifier.add_label(label, message, user)
         if label_exists:
