@@ -47,7 +47,7 @@ Feature: Get draft by id
     When new an etag is requested
       And new the draft is read
     Then a success status code (200) is returned
-      And an etag should be sent with the draft
+      And new the response should include a valid etag
 
   Scenario: An internal user saves a draft and reads it with etag header
     Given new sending from internal to respondent
@@ -55,5 +55,5 @@ Feature: Get draft by id
     When new an etag is requested
       And new the draft is read
     Then a success status code (200) is returned
-      And an etag should be sent with the draft
+      And new the response should include a valid etag
 

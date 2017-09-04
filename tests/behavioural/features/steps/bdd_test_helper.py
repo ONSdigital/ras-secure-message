@@ -9,11 +9,14 @@ import copy
 
 
 class BddTestHelper:
-    """The test helper is used to pass information between steps . In use it is attached to the context
+    """The bdd test helper is used to pass information between steps . In use it is attached to the context so that we know
+    that the data cannot leak between steps as it can if we use variables declared independently from the context
+
     The message data holds data that will be sent to an endpoint
     single_message_responses_data holds responses regarding a specific message
-    messages_responses_data holds responses regarding lists of messages . Both are lists so can hold multiple responses
-    if needed
+    messages_responses_data holds responses regarding lists of messages . Both are lists and can hold multiple responses
+
+    The dunder constants are used to specify constants for use in steps in a single place
 
     """
     __DEFAULT_RU = 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc'
@@ -37,6 +40,8 @@ class BddTestHelper:
     __ALTERNATIVE_RESPONDENT_USER_TOKEN = {constants.USER_IDENTIFIER: __ALTERNATIVE_RESPONDENT_USER_ID,
                                            "role": "respondent"}
 
+    __BASE_URL = "http://localhost:5050"
+
     __default_message_data = data = {'msg_to': ['0a7ad740-10d5-4ecb-b7ca-3c0384afb882'],
                                      'msg_from': '01b51fcc-ed43-4cdb-ad1c-450f9986859b',
                                      'subject': 'Hello World',
@@ -47,8 +52,6 @@ class BddTestHelper:
                                      'ru_id': __DEFAULT_RU,
                                      'survey': __DEFAULT_SURVEY}
 
-
-
     def __init__(self):
         self._token_data = {}
         self._headers = {'Content-Type': 'application/json', 'Authorization': ''}
@@ -58,19 +61,24 @@ class BddTestHelper:
         self._single_message_responses_data = []
         self._messages_responses_data = []
         self._last_saved_message_data = None
-        self._message_post_url = 'http://localhost:5050/message/send'   # todo get these from settings
-        self._message_get_url = 'http://localhost:5050/message/{0}'
-        self._draft_post_url = "http://localhost:5050/draft/save"
-        self._draft_put_url = "http://localhost:5050/draft/{0}/modify"
-        self._draft_get_url = "http://localhost:5050/draft/{0}"
-        self._message_put_url = "http://localhost:5050/message/{}/modify"
-        self._messages_get_url = "http://localhost:5050/messages"
-        self._drafts_get_url = "http://localhost:5050/drafts"
-        self._thread_get_url = "http://localhost:5050/thread/{0}"
-        self._threads_get_url = "http://localhost:5050/threads"
+
+        # Urls
+
+        self._message_post_url = BddTestHelper.__BASE_URL + "/message/send"
+        self._message_get_url = BddTestHelper.__BASE_URL + "/message/{0}"
+        self._draft_post_url = BddTestHelper.__BASE_URL + "/draft/save"
+        self._draft_put_url = BddTestHelper.__BASE_URL + "/draft/{0}/modify"
+        self._draft_get_url = BddTestHelper.__BASE_URL + "/draft/{0}"
+        self._message_put_url = BddTestHelper.__BASE_URL + "/message/{}/modify"
+        self._messages_get_url = BddTestHelper.__BASE_URL + "/messages"
+        self._drafts_get_url = BddTestHelper.__BASE_URL + "/drafts"
+        self._thread_get_url = BddTestHelper.__BASE_URL + "/thread/{0}"
+        self._threads_get_url = BddTestHelper.__BASE_URL + "/threads"
+
 
     @staticmethod
     def _encrypt_token_data(token_data):
+        """encrypts the token data"""
         encrypter = Encrypter(_private_key=settings.SM_USER_AUTHENTICATION_PRIVATE_KEY,
                               _private_key_password=settings.SM_USER_AUTHENTICATION_PRIVATE_KEY_PASSWORD,
                               _public_key=settings.SM_USER_AUTHENTICATION_PUBLIC_KEY)
@@ -83,6 +91,7 @@ class BddTestHelper:
 
     @token_data.setter         # headers property automatically updated each time token_data changed
     def token_data(self, value):
+        """Token data setter that makes sure that the headers are updated if the token data changes"""
         self._token_data = value
         self._headers['Authorization'] = self._encrypt_token_data(self._token_data)
 
@@ -183,6 +192,7 @@ class BddTestHelper:
         return self._single_message_responses_data
 
     def store_last_single_message_response_data(self, response):
+        """stores the response from a request regarding a single mesage or draft"""
         response_data = json.loads(response.data)
         self._single_message_responses_data.append(response_data)
 
@@ -191,13 +201,16 @@ class BddTestHelper:
         return self._messages_responses_data
 
     def store_messages_response_data(self, response):
+        """stores the response from a request regarding multiple messages"""
         response_data = json.loads(response)  # Handle the fact that get mesages returns data differently
         self._messages_responses_data.append(response_data)
 
     def set_message_data_to_a_prior_version(self, message_index):
+        """extracts the data from a previoulsy sent request"""
         self._message_data = copy.deepcopy(self.sent_messages[message_index])
 
     def get_etag(self, message_data):
+        """generates an etag based on current message data"""
         if 'msg_to' in self._message_data:
             return utilities.generate_etag(message_data['msg_to'],
                                            message_data['msg_id'],

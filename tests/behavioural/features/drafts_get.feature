@@ -6,7 +6,7 @@ Feature: Get Drafts
 
   Scenario: A respondent saves multiple drafts then  posts one , then read drafts , validate correct number returned
     Given new sending from respondent to internal
-      And new '5' messages are sent as drafts
+      And new '5' drafts are sent
       And new the message is read
       And new the draft is sent as a message
     When  new drafts are read
@@ -15,7 +15,7 @@ Feature: Get Drafts
 
   Scenario: An internal user saves multiple drafts then  posts one , then read drafts , validate correct number returned
     Given new sending from internal to respondent
-      And new '5' messages are sent as drafts
+      And new '5' drafts are sent
       And new the message is read
       And new the draft is sent as a message
     When  new drafts are read
@@ -24,7 +24,7 @@ Feature: Get Drafts
 
   Scenario: A respondent saves multiple drafts then  posts one , then reads messages , validate correct number returned
     Given new sending from respondent to internal
-      And new '5' messages are sent as drafts
+      And new '5' drafts are sent
       And new the message is read
       And new the draft is sent as a message
     When  new messages are read
@@ -35,7 +35,7 @@ Feature: Get Drafts
 
   Scenario: An internal user saves multiple drafts then  posts one , then reads messages , validate correct number returned
     Given new sending from internal to respondent
-      And new '5' messages are sent as drafts
+      And new '5' drafts are sent
       And new the message is read
       And new the draft is sent as a message
     When  new messages are read
@@ -135,7 +135,7 @@ Feature: Get Drafts
   @ignore # Test failing as currently intended recipient can view using a DRAFT_INBOX  label  , remove @ignore when fixed
   Scenario: A respondent saves multiple drafts then , the internal user gets messages with DRAFT_INBOX label
     Given new sending from respondent to internal
-      And new '5' messages are sent as drafts
+      And new '5' drafts are sent
       And new the user is set as internal
     When  new drafts with a label of  'DRAFT_INBOX' are read
     Then  a success status code (200) is returned
@@ -144,7 +144,7 @@ Feature: Get Drafts
   @ignore # Test failing as currently intended recipient can view using a DRAFT_INBOX  label  , remove @ignore when fixed
   Scenario: An internal user saves multiple drafts then , the respondent user gets messages with DRAFT_INBOX label
     Given new sending from internal to respondent
-      And new '5' messages are sent as drafts
+      And new '5' drafts are sent
       And new the user is set as respondent
     When  new drafts with a label of  'DRAFT_INBOX' are read
     Then  a success status code (200) is returned
