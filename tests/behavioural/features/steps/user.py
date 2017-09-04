@@ -1,7 +1,7 @@
 from behave import given, when
-from tests.behavioural.features.steps.from_field_steps import step_impl_the_msg_from_is_set_to_respondent,\
+from tests.behavioural.features.steps.from_field import step_impl_the_msg_from_is_set_to_respondent,\
                                                               step_impl_the_msg_from_is_set_to_internal
-from tests.behavioural.features.steps.to_field_steps import step_impl_the_msg_to_is_set_to_internal,\
+from tests.behavioural.features.steps.to_field import step_impl_the_msg_to_is_set_to_internal,\
                                                               step_impl_the_msg_to_is_set_to_respondent
 from app import constants
 

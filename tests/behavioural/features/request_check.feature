@@ -2,9 +2,7 @@ Feature: Checking all request pass authorisation
    """ requests to any endpoint all hit the same authorisation point before being passed to the specific endpoint """
 
   Background: Reset database
-    Given database is reset
-    And using mock party service
-    And using mock case service
+    Given prepare for tests using 'mock' services
 
   Scenario: A Respondent requests a message without a user being defined
     Given new sending from respondent to internal

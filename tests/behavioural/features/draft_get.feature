@@ -1,9 +1,7 @@
 Feature: Get draft by id
 
   Background: Reset database
-    Given database is reset
-    And using mock party service
-    And using mock case service
+    Given prepare for tests using 'mock' services
 
   Scenario: A Respondent saves a draft and reads it
     Given new sending from respondent to internal

@@ -1,9 +1,7 @@
 Feature: Message Send Endpoint
 
- Background: Reset database
-    Given using mock party service
-    And using mock case service
-    And database is reset
+  Background: Reset database
+    Given prepare for tests using 'mock' services
 
   Scenario: Respondent sending a valid message and receiving a 201
     Given new sending from respondent to internal

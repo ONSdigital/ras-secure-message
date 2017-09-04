@@ -9,6 +9,24 @@ import copy
 
 
 class BddTestHelper:
+    """The test helper is used to pass information between steps . In use it is attached to the context
+    The message data holds data that will be sent to an endpoint
+    single_message_responses_data holds responses regarding a specific message
+    messages_responses_data holds responses regarding lists of messages . Both are lists so can hold multiple responses
+    if needed
+
+    """
+    __DEFAULT_RU = 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc'
+    __ALTERNATE_RU = 'b3ba864b-7cbc-4f44-84fe-88dc018a1a4c'
+
+    __DEFAULT_SURVEY = constants.BRES_SURVEY
+    __ALTERNATE_SURVEY = '11111111-22222-3333-4444-88dc018a1a4c'
+
+    __DEFAULT_COLLECTION_CASE = 'collection case1'
+    __ALTERNATE_COLLECTION_CASE = 'AnotherCollectionCase'
+
+    __DEFAULT_COLLECTION_EXERCISE = 'collection exercise1'
+    __ALTERNATE_COLLECTION_EXERCISE = 'AnotherCollectionExercise'
 
     __INTERNAL_USER_TOKEN = {constants.USER_IDENTIFIER: "BRES", "role": "internal"}
 
@@ -24,10 +42,10 @@ class BddTestHelper:
                                      'subject': 'Hello World',
                                      'body': 'Test',
                                      'thread_id': '',
-                                     'collection_case': 'collection case1',
-                                     'collection_exercise': 'collection exercise1',
-                                     'ru_id': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc',
-                                     'survey': constants.BRES_SURVEY}
+                                     'collection_case': __DEFAULT_COLLECTION_CASE,
+                                     'collection_exercise': __DEFAULT_COLLECTION_EXERCISE,
+                                     'ru_id': __DEFAULT_RU,
+                                     'survey': __DEFAULT_SURVEY}
 
     def __init__(self):
         self._token_data = {}
@@ -35,7 +53,8 @@ class BddTestHelper:
         self.token_data = BddTestHelper.__INTERNAL_USER_TOKEN  # use attribute to set headers
         self._message_data = copy.deepcopy(BddTestHelper.__default_message_data)
         self._sent_messages = []
-        self._responses_data = []
+        self._single_message_responses_data = []
+        self._messages_responses_data = []
         self._last_saved_message_data = None
         self._message_post_url = 'http://localhost:5050/message/send'   # todo get these from settings
         self._message_get_url = 'http://localhost:5050/message/{0}'
@@ -47,6 +66,10 @@ class BddTestHelper:
         self._health_endpoint = "http://localhost:5050/health"
         self._health_db_endpoint = "http://localhost:5050/health/db"
         self._health_details_endpoint = "http://localhost:5050/health/details"
+        self._drafts_get_url = "http://localhost:5050/drafts"
+        self._thread_get_url = "http://localhost:5050/thread/{0}"
+        self._threads_get_url = "http://localhost:5050/threads"
+
 
     @staticmethod
     def _encrypt_token_data(token_data):
@@ -122,6 +145,18 @@ class BddTestHelper:
         return self._draft_get_url
 
     @property
+    def drafts_get_url(self):
+        return self._drafts_get_url
+
+    @property
+    def thread_get_url(self):
+        return self._thread_get_url
+
+    @property
+    def threads_get_url(self):
+        return self._threads_get_url
+
+    @property
     def respondent_id(self):
         return copy.copy(BddTestHelper.__RESPONDENT_USER_ID)
 
@@ -146,12 +181,20 @@ class BddTestHelper:
         return self._sent_messages   # allows direct access
 
     @property
-    def responses_data(self):
-        return self._responses_data
+    def single_message_responses_data(self):
+        return self._single_message_responses_data
 
-    def store_response_data(self, response):
+    def store_last_single_message_response_data(self, response):
         response_data = json.loads(response.data)
-        self._responses_data.append(response_data)
+        self._single_message_responses_data.append(response_data)
+
+    @property
+    def messages_responses_data(self):
+        return self._messages_responses_data
+
+    def store_messages_response_data(self, response):
+        response_data = json.loads(response)  # Handle the fact that get mesages returns data differently
+        self._messages_responses_data.append(response_data)
 
     def set_message_data_to_a_prior_version(self, message_index):
         self._message_data = copy.deepcopy(self.sent_messages[message_index])
@@ -174,3 +217,27 @@ class BddTestHelper:
     @property
     def health_details_endpoint(self):
         return self._health_details_endpoint
+
+    def use_alternate_ru(self):
+        self._message_data['ru_id'] = BddTestHelper.__ALTERNATE_RU
+
+    def use_default_ru(self):
+        self._message_data['ru_id'] = BddTestHelper.__DEFAULT_RU
+
+    def use_alternate_survey(self):
+        self._message_data['survey'] = BddTestHelper.__ALTERNATE_SURVEY
+
+    def use_default_survey(self):
+        self._message_data['survey'] = BddTestHelper.__DEFAULT_SURVEY
+
+    def use_alternate_collection_case(self):
+        self._message_data['collection_case'] = BddTestHelper.__ALTERNATE_COLLECTION_CASE
+
+    def use_default_collection_case(self):
+        self._message_data['collection_case'] = BddTestHelper.__DEFAULT_COLLECTION_CASE
+
+    def use_alternate_collection_exercise(self):
+        self._message_data['collection_exercise'] = BddTestHelper.__ALTERNATE_COLLECTION_EXERCISE
+
+    def use_default_collection_exercise(self):
+        self._message_data['collection_exercise'] = BddTestHelper.__DEFAULT_COLLECTION_EXERCISE

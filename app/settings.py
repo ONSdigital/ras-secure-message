@@ -1,5 +1,8 @@
 import os
+import logging
+from structlog import wrap_logger
 
+logger = wrap_logger(logging.getLogger(__name__))
 
 ''' This file is the main configuration for the Secure Messaging Service.
     It contains a full default configuration
@@ -21,10 +24,29 @@ SMS_WERKZEUG_LOG_LEVEL = os.getenv('SMS_WERKZEUG_LOG_LEVEL', 'INFO')
 
 # EMAIL NOTIFICATION SETTINGS
 
-NOTIFICATION_SERVICE_ID = os.getenv('SERVICE_ID', 'ce3674b1-7b08-4377-a6a7-05b5722d4ea5')
-NOTIFICATION_API_KEY = os.getenv('NOTIFICATION_API_KEY', 'c711009f-17d8-44a9-a2be-2cc8c23cdfd4')
+SERVICE_ID='SERVICE_ID'
+if SERVICE_ID in os.environ:
+    NOTIFICATION_SERVICE_ID = os.getenv(SERVICE_ID)
+else:
+    logger.error('Email notification variable not set', variable=SERVICE_ID)
+    NOTIFICATION_SERVICE_ID='SETME'
+
+API_KEY='NOTIFICATION_API_KEY'
+if API_KEY in os.environ:
+    NOTIFICATION_API_KEY = os.getenv(API_KEY)
+else:
+    logger.error('Email notification API KEY variable not set', variable=API_KEY)
+    NOTIFICATION_API_KEY='SETME'
+
 NOTIFICATION_COMBINED_KEY = 'key-name-{}-{}'.format(NOTIFICATION_SERVICE_ID, NOTIFICATION_API_KEY)
-NOTIFICATION_TEMPLATE_ID = 'f6404844-a994-428c-a5d7-45a4e1cfff4b'
+
+TEMPLATE_ID='NOTIFICATION_TEMPLATE_ID'
+if TEMPLATE_ID in os.environ:
+    NOTIFICATION_TEMPLATE_ID = os.getenv(TEMPLATE_ID)
+else:
+    logger.error('Email notification template variable not set', variable=TEMPLATE_ID)
+    NOTIFICATION_TEMPLATE_ID='SETME'
+
 NOTIFICATION_DEV_EMAIL = os.getenv('NOTIFICATION_DEV_EMAIL', 'emilio.ward@ons.gov.uk')
 
 # LOGGING NOTIFICATION SETTINGS

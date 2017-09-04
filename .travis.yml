@@ -15,6 +15,7 @@ install:
 
 script:
     - export RAS_SM_PATH=./
+    - export NOTIFY_VIA_LOGGING=1
     - coverage run run_tests.py
 
 after_success:

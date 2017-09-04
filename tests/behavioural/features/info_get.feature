@@ -1,7 +1,7 @@
 Feature: Get info
 
   Background: Reset database
-    Given database is reset
+    Given prepare for tests using 'mock' services
 
   Scenario: User requests draft
     Given the user requests endpoint info
