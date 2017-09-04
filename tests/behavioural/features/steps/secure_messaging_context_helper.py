@@ -8,7 +8,7 @@ from app.common import utilities
 import copy
 
 
-class BddTestHelper:
+class SecureMessagingContextHelper:
     """The bdd test helper is used to pass information between steps . In use it is attached to the context so that we know
     that the data cannot leak between steps as it can if we use variables declared independently from the context
 
@@ -55,8 +55,8 @@ class BddTestHelper:
     def __init__(self):
         self._token_data = {}
         self._headers = {'Content-Type': 'application/json', 'Authorization': ''}
-        self.token_data = BddTestHelper.__INTERNAL_USER_TOKEN  # use attribute to set headers
-        self._message_data = copy.deepcopy(BddTestHelper.__default_message_data)
+        self.token_data = SecureMessagingContextHelper.__INTERNAL_USER_TOKEN  # use attribute to set headers
+        self._message_data = copy.deepcopy(SecureMessagingContextHelper.__default_message_data)
         self._sent_messages = []
         self._single_message_responses_data = []
         self._messages_responses_data = []
@@ -64,19 +64,19 @@ class BddTestHelper:
 
         # Urls
 
-        self._message_post_url = BddTestHelper.__BASE_URL + "/message/send"
-        self._message_get_url = BddTestHelper.__BASE_URL + "/message/{0}"
-        self._draft_post_url = BddTestHelper.__BASE_URL + "/draft/save"
-        self._draft_put_url = BddTestHelper.__BASE_URL + "/draft/{0}/modify"
-        self._draft_get_url = BddTestHelper.__BASE_URL + "/draft/{0}"
-        self._message_put_url = BddTestHelper.__BASE_URL + "/message/{}/modify"
-        self._messages_get_url = BddTestHelper.__BASE_URL + "/messages"
-        self._drafts_get_url = BddTestHelper.__BASE_URL + "/drafts"
-        self._thread_get_url = BddTestHelper.__BASE_URL + "/thread/{0}"
-        self._threads_get_url = BddTestHelper.__BASE_URL + "/threads"
-        self._health_endpoint = BddTestHelper.__BASE_URL + "/health"
-        self._health_db_endpoint = BddTestHelper.__BASE_URL + "/health/db"
-        self._health_details_endpoint = BddTestHelper.__BASE_URL + "/health/details"
+        self._message_post_url = SecureMessagingContextHelper.__BASE_URL + "/message/send"
+        self._message_get_url = SecureMessagingContextHelper.__BASE_URL + "/message/{0}"
+        self._draft_post_url = SecureMessagingContextHelper.__BASE_URL + "/draft/save"
+        self._draft_put_url = SecureMessagingContextHelper.__BASE_URL + "/draft/{0}/modify"
+        self._draft_get_url = SecureMessagingContextHelper.__BASE_URL + "/draft/{0}"
+        self._message_put_url = SecureMessagingContextHelper.__BASE_URL + "/message/{}/modify"
+        self._messages_get_url = SecureMessagingContextHelper.__BASE_URL + "/messages"
+        self._drafts_get_url = SecureMessagingContextHelper.__BASE_URL + "/drafts"
+        self._thread_get_url = SecureMessagingContextHelper.__BASE_URL + "/thread/{0}"
+        self._threads_get_url = SecureMessagingContextHelper.__BASE_URL + "/threads"
+        self._health_endpoint = SecureMessagingContextHelper.__BASE_URL + "/health"
+        self._health_db_endpoint = SecureMessagingContextHelper.__BASE_URL + "/health/db"
+        self._health_details_endpoint = SecureMessagingContextHelper.__BASE_URL + "/health/details"
 
 
     @staticmethod
@@ -116,15 +116,15 @@ class BddTestHelper:
 
     @property       # return an internal user that the client is free to change
     def internal_user_token(self):
-        return copy.deepcopy(BddTestHelper.__INTERNAL_USER_TOKEN)
+        return copy.deepcopy(SecureMessagingContextHelper.__INTERNAL_USER_TOKEN)
 
     @property       # return an external user that the client is free to change
     def respondent_user_token(self):
-        return copy.deepcopy(BddTestHelper.__RESPONDENT_USER_TOKEN)
+        return copy.deepcopy(SecureMessagingContextHelper.__RESPONDENT_USER_TOKEN)
 
     @property
     def alternative_respondent_user_token(self):
-        return copy.deepcopy(BddTestHelper.__ALTERNATIVE_RESPONDENT_USER_TOKEN)
+        return copy.deepcopy(SecureMessagingContextHelper.__ALTERNATIVE_RESPONDENT_USER_TOKEN)
 
     @property
     def message_post_url(self):
@@ -168,11 +168,11 @@ class BddTestHelper:
 
     @property
     def respondent_id(self):
-        return copy.copy(BddTestHelper.__RESPONDENT_USER_ID)
+        return copy.copy(SecureMessagingContextHelper.__RESPONDENT_USER_ID)
 
     @property
     def alternative_respondent_id(self):
-        return copy.copy(BddTestHelper.__ALTERNATIVE_RESPONDENT_USER_ID)
+        return copy.copy(SecureMessagingContextHelper.__ALTERNATIVE_RESPONDENT_USER_ID)
 
     @property
     def internal_id(self):
@@ -233,25 +233,25 @@ class BddTestHelper:
         return self._health_details_endpoint
 
     def use_alternate_ru(self):
-        self._message_data['ru_id'] = BddTestHelper.__ALTERNATE_RU
+        self._message_data['ru_id'] = SecureMessagingContextHelper.__ALTERNATE_RU
 
     def use_default_ru(self):
-        self._message_data['ru_id'] = BddTestHelper.__DEFAULT_RU
+        self._message_data['ru_id'] = SecureMessagingContextHelper.__DEFAULT_RU
 
     def use_alternate_survey(self):
-        self._message_data['survey'] = BddTestHelper.__ALTERNATE_SURVEY
+        self._message_data['survey'] = SecureMessagingContextHelper.__ALTERNATE_SURVEY
 
     def use_default_survey(self):
-        self._message_data['survey'] = BddTestHelper.__DEFAULT_SURVEY
+        self._message_data['survey'] = SecureMessagingContextHelper.__DEFAULT_SURVEY
 
     def use_alternate_collection_case(self):
-        self._message_data['collection_case'] = BddTestHelper.__ALTERNATE_COLLECTION_CASE
+        self._message_data['collection_case'] = SecureMessagingContextHelper.__ALTERNATE_COLLECTION_CASE
 
     def use_default_collection_case(self):
-        self._message_data['collection_case'] = BddTestHelper.__DEFAULT_COLLECTION_CASE
+        self._message_data['collection_case'] = SecureMessagingContextHelper.__DEFAULT_COLLECTION_CASE
 
     def use_alternate_collection_exercise(self):
-        self._message_data['collection_exercise'] = BddTestHelper.__ALTERNATE_COLLECTION_EXERCISE
+        self._message_data['collection_exercise'] = SecureMessagingContextHelper.__ALTERNATE_COLLECTION_EXERCISE
 
     def use_default_collection_exercise(self):
-        self._message_data['collection_exercise'] = BddTestHelper.__DEFAULT_COLLECTION_EXERCISE
+        self._message_data['collection_exercise'] = SecureMessagingContextHelper.__DEFAULT_COLLECTION_EXERCISE

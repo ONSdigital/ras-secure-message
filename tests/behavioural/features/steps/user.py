@@ -6,29 +6,29 @@ from tests.behavioural.features.steps.to_field import step_impl_the_msg_to_is_se
 from app import constants
 
 
-@given("new the user is set as internal")
-@when("new the user is set as internal")
+@given("the user is set as internal")
+@when("the user is set as internal")
 def step_impl_the_user_is_internal(context):
     """Set the user to the internal user"""
     context.bdd_helper.token_data = context.bdd_helper.internal_user_token
 
 
-@given("new the user is set as alternative respondent")
-@when("new the user is set as alternative respondent")
+@given("the user is set as alternative respondent")
+@when("the user is set as alternative respondent")
 def step_impl_the_user_is_set_as_alternative_respondent(context):
     """ Set the user to the alternative respondent as set in the helper"""
     context.bdd_helper.token_data = context.bdd_helper.alternative_respondent_user_token
 
 
-@given("new the user is set as respondent")
-@when("new the user is set as respondent")
+@given("the user is set as respondent")
+@when("the user is set as respondent")
 def step_impl_the_user_is_set_as_respondent(context):
     """set the user to the default respondent as saved in the helper"""
     context.bdd_helper.token_data = context.bdd_helper.respondent_user_token
 
 
-@given("new sending from respondent to internal")
-@when("new sending from respondent to internal")
+@given("sending from respondent to internal")
+@when("sending from respondent to internal")
 def step_impl_prepare_to_send_from_respondent(context):
     """set the message from to the internal user as defined in the helper"""
     step_impl_the_user_is_set_as_respondent(context)
@@ -36,8 +36,8 @@ def step_impl_prepare_to_send_from_respondent(context):
     step_impl_the_msg_to_is_set_to_internal(context)
 
 
-@given("new sending from internal to respondent")
-@when("new sending from internal to respondent")
+@given("sending from internal to respondent")
+@when("sending from internal to respondent")
 def step_impl_prepare_to_send_from_respondent(context):
     """ set the from to the repondent as set in the helper"""
     step_impl_the_user_is_internal(context)

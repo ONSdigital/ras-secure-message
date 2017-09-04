@@ -20,7 +20,7 @@ logger = wrap_logger(logging.getLogger(__name__))
 
 class DraftSave(Resource):
     def post(self):
-        """Handles saving of new draft"""
+        """Handles saving of draft"""
         post_data = request.get_json()
         draft = DraftSchema().load(post_data)
 

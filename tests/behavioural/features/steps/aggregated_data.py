@@ -4,7 +4,7 @@ from flask import json
 from app.services.service_toggles import party
 
 
-@then("new retrieved message additional from data matches that from party service")
+@then("retrieved message additional from data matches that from party service")
 def step_impl_verify_additional_from_data_matches_that_from_party_service(context):
     """validate that the additional @msg_from data matches that obtained from the party service"""
     msg_resp = json.loads(context.response.data)
@@ -12,7 +12,7 @@ def step_impl_verify_additional_from_data_matches_that_from_party_service(contex
     nose.tools.assert_equal(msg_resp['@msg_from'], party_data)
 
 
-@then("new retrieved message additional to data matches that from party service")
+@then("retrieved message additional to data matches that from party service")
 def step_impl_verify_additional_to_data_matches_that_from_party_service(context):
     """validate that the additional @msg_to data matches that obtained from the party service"""
     msg_resp = json.loads(context.response.data)
@@ -20,7 +20,7 @@ def step_impl_verify_additional_to_data_matches_that_from_party_service(context)
     nose.tools.assert_equal(msg_resp['@msg_to'][0], party_data)
 
 
-@then("new retrieved message additional ru_id data matches that from party service")
+@then("retrieved message additional ru_id data matches that from party service")
 def step_impl_verify_additional_to_data_matches_that_from_party_service(context):
     """validate that the additional @ru_id data matches that obtained from the party service"""
     msg_resp = json.loads(context.response.data)

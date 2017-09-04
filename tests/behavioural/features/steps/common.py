@@ -5,7 +5,9 @@ from app.repository import database
 from flask import current_app
 from sqlalchemy.engine import Engine
 from sqlalchemy import event
-from tests.behavioural.features.steps.bdd_test_helper import BddTestHelper
+from tests.behavioural.features.steps.secure_messaging_context_helper import SecureMessagingContextHelper
+
+
 import nose.tools
 
 
@@ -21,7 +23,7 @@ def set_sqlite_pragma(dbapi_connection, connection_record):
 def step_impl_prepare_for_tests(context, service_type):
     """Prepare bdd tests to run against either mock or real external services"""
     step_impl_reset_db(context)
-    context.bdd_helper = BddTestHelper()
+    context.bdd_helper = SecureMessagingContextHelper()
     if service_type.lower() == 'real':
         party.use_real_service()
         case_service.use_real_service()
@@ -37,7 +39,7 @@ def step_impl_reset_db(context):
         database.db.init_app(current_app)
         database.db.drop_all()
         database.db.create_all()
-    context.bdd_helper = BddTestHelper()
+    context.sm_context_helper = SecureMessagingContextHelper()
 
 
 @given("using mock party service")
@@ -52,14 +54,14 @@ def step_impl_use_mock_case_service(context):
     case_service.use_mock_service()
 
 
-@given("new using the '{message_index}' message")
-@when("new using the '{message_index}' message")
+@given("using the '{message_index}' message")
+@when("using the '{message_index}' message")
 def step_impl_reuse_the_nth_sent_message(context, message_index):
     """ switch to using the data from a previously sent message """
     context.bdd_helper.set_message_data_to_a_prior_version(int(message_index))
 
 
-@then("new '{message_count}' messages are returned")
+@then("'{message_count}' messages are returned")
 def step_impl_n_messages_returned(context, message_count):
     """ validate that the correct number of messages was returned"""
     nose.tools.assert_equal(int(message_count), len(context.bdd_helper.messages_responses_data[0]['messages']))
