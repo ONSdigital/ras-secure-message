@@ -16,20 +16,20 @@ Feature: Checking all request pass authorisation
     When a PUT request is made
     Then a bad request status code (400) is returned
 
-  Scenario: GET request without a role in header
-    Given no role is in the header
-    When a GET request is made
-    Then a bad request status code (400) is returned
-
-  Scenario: POST request without a role in header
-    Given no role is in the header
-    When a POST request is made
-    Then a bad request status code (400) is returned
-
-  Scenario: PUT request without a role in header
-    Given no role is in the header
-    When a PUT request is made
-    Then a bad request status code (400) is returned
+#  Scenario: GET request without a role in header
+#    Given no role is in the header
+#    When a GET request is made
+#    Then a bad request status code (400) is returned
+#
+#  Scenario: POST request without a role in header
+#    Given no role is in the header
+#    When a POST request is made
+#    Then a bad request status code (400) is returned
+#
+#  Scenario: PUT request without a role in header
+#    Given no role is in the header
+#    When a PUT request is made
+#    Then a bad request status code (400) is returned
 
   Scenario Outline: User tries to use endpoint with the wrong method
     Given user wants to use <endpoint> endpoint
