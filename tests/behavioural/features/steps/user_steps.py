@@ -52,3 +52,13 @@ def step_impl_set_token_directly(context):
     context.bdd_helper.token_data = {constants.USER_IDENTIFIER: "", "role": "internal"}
 
 
+@given("the user token is set to a respondent with no role associated")
+@when("the user token is set to a respondent with no role associated")
+def step_impl_set_token_with_no_role(context):
+    context.bdd_helper.token_data = {constants.USER_IDENTIFIER: context.bdd_helper.respondent_id, "role": ""}
+
+
+@given("the user token is set to a internal user with no role associated")
+@when("the user token is set to a internal user with no role associated")
+def step_impl_set_token_with_no_role(context):
+    context.bdd_helper.token_data = {constants.USER_IDENTIFIER: context.bdd_helper.internal_id, "role": ""}

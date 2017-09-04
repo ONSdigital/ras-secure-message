@@ -44,6 +44,9 @@ class BddTestHelper:
         self._draft_get_url = "http://localhost:5050/draft/{0}"
         self._message_put_url = "http://localhost:5050/message/{}/modify"
         self._messages_get_url = "http://localhost:5050/messages"
+        self._health_endpoint = "http://localhost:5050/health"
+        self._health_db_endpoint = "http://localhost:5050/health/db"
+        self._health_details_endpoint = "http://localhost:5050/health/details"
 
     @staticmethod
     def _encrypt_token_data(token_data):
@@ -160,3 +163,14 @@ class BddTestHelper:
                                            message_data['subject'],
                                            message_data['body'])
 
+    @property
+    def health_endpoint(self):
+        return self._health_endpoint
+
+    @property
+    def health_db_endpoint(self):
+        return self._health_db_endpoint
+
+    @property
+    def health_details_endpoint(self):
+        return self._health_details_endpoint
