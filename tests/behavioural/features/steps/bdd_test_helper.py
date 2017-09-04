@@ -74,6 +74,9 @@ class BddTestHelper:
         self._drafts_get_url = BddTestHelper.__BASE_URL + "/drafts"
         self._thread_get_url = BddTestHelper.__BASE_URL + "/thread/{0}"
         self._threads_get_url = BddTestHelper.__BASE_URL + "/threads"
+        self._health_endpoint = BddTestHelper.__BASE_URL + "/health"
+        self._health_db_endpoint = BddTestHelper.__BASE_URL + "/health/db"
+        self._health_details_endpoint = BddTestHelper.__BASE_URL + "/health/details"
 
 
     @staticmethod
@@ -217,6 +220,18 @@ class BddTestHelper:
                                            message_data['subject'],
                                            message_data['body'])
 
+    @property
+    def health_endpoint(self):
+        return self._health_endpoint
+
+    @property
+    def health_db_endpoint(self):
+        return self._health_db_endpoint
+
+    @property
+    def health_details_endpoint(self):
+        return self._health_details_endpoint
+
     def use_alternate_ru(self):
         self._message_data['ru_id'] = BddTestHelper.__ALTERNATE_RU
 
@@ -240,4 +255,3 @@ class BddTestHelper:
 
     def use_default_collection_exercise(self):
         self._message_data['collection_exercise'] = BddTestHelper.__DEFAULT_COLLECTION_EXERCISE
-

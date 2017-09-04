@@ -266,6 +266,98 @@ def step_impl_the_threads_are_read(context):
     context.response = app.test_client().get(url, headers=context.bdd_helper.headers)
     context.bdd_helper.store_messages_response_data(context.response.data)
 
+@when("new user accesses the /draft/save endpoint with using the PUT method")
+def step_impl_access_endpoint_with_wrong_method(context):
+    context.bdd_helper.sent_messages.extend([context.bdd_helper.message_data])
+    context.response = app.test_client().put(context.bdd_helper.draft_post_url,
+                                              data=json.dumps(context.bdd_helper.message_data),
+                                              headers=context.bdd_helper.headers)
+
+
+@when("new user accesses the /health endpoint with using the POST method")
+def step_impl_access_endpoint_with_wrong_method(context):
+    context.response = app.test_client().post(context.bdd_helper.health_endpoint)
+
+
+@when("new user accesses the /health endpoint with using the PUT method")
+def step_impl_access_endpoint_with_wrong_method(context):
+    context.response = app.test_client().put(context.bdd_helper.health_endpoint)
+
+
+@when("new user accesses the /health/db endpoint with using the POST method")
+def step_impl_access_endpoint_with_wrong_method(context):
+    context.response = app.test_client().post(context.bdd_helper.health_db_endpoint)
+
+
+@when("new user accesses the /health/db endpoint with using the PUT method")
+def step_impl_access_endpoint_with_wrong_method(context):
+    context.response = app.test_client().put(context.bdd_helper.health_db_endpoint)
+
+
+@when("new user accesses the /health/details endpoint with using the PUT method")
+def step_impl_access_endpoint_with_wrong_method(context):
+    context.response = app.test_client().put(context.bdd_helper.health_details_endpoint)
+
+
+@when("new user accesses the /health/details endpoint with using the POST method")
+def step_impl_access_endpoint_with_wrong_method(context):
+    context.response = app.test_client().post(context.bdd_helper.health_details_endpoint)
+
+
+@when("new user accesses the /message/id endpoint with using the POST method")
+def step_impl_access_endpoint_with_wrong_method(context):
+    context.bdd_helper.sent_messages.extend([context.bdd_helper.message_data])
+    context.response = app.test_client().post(context.bdd_helper.message_get_url,
+                                              data=json.dumps(context.bdd_helper.message_data),
+                                              headers=context.bdd_helper.headers)
+
+
+@when("new user accesses the /message/id endpoint with using the PUT method")
+def step_impl_access_endpoint_with_wrong_method(context):
+    context.bdd_helper.sent_messages.extend([context.bdd_helper.message_data])
+    context.response = app.test_client().put(context.bdd_helper.message_get_url,
+                                              data=json.dumps(context.bdd_helper.message_data),
+                                              headers=context.bdd_helper.headers)
+
+
+@when("new user accesses the /message/id/modify endpoint with using the GET method")
+def step_impl_access_endpoint_with_wrong_method(context):
+    context.bdd_helper.sent_messages.extend([context.bdd_helper.message_data])
+    context.response = app.test_client().get(context.bdd_helper.message_put_url,
+                                              data=json.dumps(context.bdd_helper.message_data),
+                                              headers=context.bdd_helper.headers)
+
+
+@when("new user accesses the /message/id/modify endpoint with using the POST method")
+def step_impl_access_endpoint_with_wrong_method(context):
+    context.bdd_helper.sent_messages.extend([context.bdd_helper.message_data])
+    context.response = app.test_client().post(context.bdd_helper.message_put_url,
+                                              data=json.dumps(context.bdd_helper.message_data),
+                                              headers=context.bdd_helper.headers)
+
+
+@when("new user accesses the /message/send endpoint with using the PUT method")
+def step_impl_access_endpoint_with_wrong_method(context):
+    context.bdd_helper.sent_messages.extend([context.bdd_helper.message_data])
+    context.response = app.test_client().put(context.bdd_helper.message_post_url,
+                                              data=json.dumps(context.bdd_helper.message_data),
+                                              headers=context.bdd_helper.headers)
+
+
+@when("new user accesses the /messages endpoint with using the PUT method")
+def step_impl_access_endpoint_with_wrong_method(context):
+    context.bdd_helper.sent_messages.extend([context.bdd_helper.message_data])
+    context.response = app.test_client().put(context.bdd_helper.messages_get_url,
+                                             data=json.dumps(context.bdd_helper.message_data),
+                                             headers=context.bdd_helper.headers)
+
+
+@when("new user accesses the /messages endpoint with using the POST method")
+def step_impl_access_endpoint_with_wrong_method(context):
+    context.bdd_helper.sent_messages.extend([context.bdd_helper.message_data])
+    context.response = app.test_client().post(context.bdd_helper.messages_get_url,
+                                             data=json.dumps(context.bdd_helper.message_data),
+                                             headers=context.bdd_helper.headers)
 
 
 

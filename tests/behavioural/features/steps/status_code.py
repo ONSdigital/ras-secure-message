@@ -32,6 +32,11 @@ def step_impl_conflict_returned(context):
     nose.tools.assert_equal(context.response.status_code, 404)
 
 
+@then("a not allowed status code (405) is returned")
+def step_impl_conflict_returned(context):
+    nose.tools.assert_equal(context.response.status_code, 405)
+
+
 @then("a conflict error status code (409) is returned")
 def step_impl_conflict_returned(context):
     """validate that the status code was 409"""
