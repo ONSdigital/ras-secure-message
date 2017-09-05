@@ -48,10 +48,10 @@ class DraftSave(Resource):
         saver.save_message(draft.data)
 
         if draft.data.msg_to is not None and len(draft.data.msg_to) != 0:
-            uuid_to = draft.data.msg_to[0] if g.user.is_internal else draft.data.survey
+            uuid_to = draft.data.msg_to[0]
             saver.save_msg_status(uuid_to, draft.data.msg_id, Labels.DRAFT_INBOX.value)
 
-        uuid_from = draft.data.msg_from if g.user.is_respondent else draft.data.survey
+        uuid_from = draft.data.msg_from
         saver.save_msg_status(uuid_from, draft.data.msg_id, Labels.DRAFT.value)
 
         saver.save_msg_event(draft.data.msg_id, 'Draft_Saved')

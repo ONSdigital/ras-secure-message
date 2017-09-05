@@ -15,7 +15,7 @@ from app.validation.domain import DraftSchema
 from app.validation.user import User
 from app.repository.database import SecureMessage
 from app import constants
-
+from tests.app import test_utilities
 
 class ModifyTestCaseHelper:
     """Helper class for Modify Tests"""
@@ -254,7 +254,7 @@ class ModifyTestCase(unittest.TestCase, ModifyTestCaseHelper):
                                      'collection_case': 'ACollectionCase',
                                      'collection_exercise': 'ACollectionExercise',
                                      'ru_id': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc',
-                                     'survey': constants.BRES_SURVEY}
+                                     'survey': test_utilities.BRES_SURVEY}
 
                 modifier = Modifier()
 
@@ -296,7 +296,7 @@ class ModifyTestCase(unittest.TestCase, ModifyTestCaseHelper):
                                      'collection_case': 'ACollectionCase',
                                      'collection_exercise': 'ACollectionExercise',
                                      'ru_id': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc',
-                                     'survey': constants.BRES_SURVEY}
+                                     'survey': test_utilities.BRES_SURVEY}
 
                 modifier = Modifier()
                 with self.engine.connect() as con:
@@ -333,7 +333,7 @@ class ModifyTestCase(unittest.TestCase, ModifyTestCaseHelper):
                                      'collection_case': 'ACollectionCase',
                                      'collection_exercise': 'ACollectionExercise',
                                      'ru_id': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc',
-                                     'survey': constants.BRES_SURVEY}
+                                     'survey': test_utilities.BRES_SURVEY}
 
                 Saver().save_message(SecureMessage(msg_id=self.test_message['msg_id'],
                                                    body=self.test_message['body'],
@@ -416,7 +416,7 @@ class ModifyTestCase(unittest.TestCase, ModifyTestCaseHelper):
                  'collection_case': 'ACollectionCase',
                  'collection_exercise': 'ACollectionExercise',
                  'ru_id': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc',
-                 'survey': constants.BRES_SURVEY}
+                 'survey': test_utilities.BRES_SURVEY}
 
         with app.app_context():
             database.db.drop_all()

@@ -17,6 +17,7 @@ from app.resources.messages import logger as message_logger
 from app.common.alerts import AlertViaLogging
 from app.api_mocks.party_service_mock import PartyServiceMock
 from app.api_mocks.case_service_mock import CaseServiceMock
+from tests.app import test_utilities
 
 
 class FlaskTestCase(unittest.TestCase):
@@ -53,7 +54,7 @@ class FlaskTestCase(unittest.TestCase):
                              'collection_case': 'ACollectionCase',
                              'collection_exercise': 'ACollectionExercise',
                              'ru_id': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc',
-                             'survey': constants.BRES_SURVEY}
+                             'survey': test_utilities.BRES_SURVEY}
 
         with app.app_context():
             database.db.init_app(current_app)
@@ -155,7 +156,7 @@ class FlaskTestCase(unittest.TestCase):
                         'collection_case': 'ACollectionCase',
                         'collection_exercise': 'ACollectionExercise',
                         'ru_id': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc',
-                        'survey': constants.BRES_SURVEY}
+                        'survey': test_utilities.BRES_SURVEY}
         try:
             self.app.post(url, data=json.dumps(test_message), headers=self.headers)
             self.assertTrue(True)  # i.e no exception
@@ -206,7 +207,7 @@ class FlaskTestCase(unittest.TestCase):
                   'thread_id': '',
                   'collection_case': 'ACollectionCase',
                   'ru_id': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc',
-                  'survey': constants.BRES_SURVEY})
+                  'survey': test_utilities.BRES_SURVEY})
 
         response = self.app.post('http://localhost:5050/message/send', data=json.dumps(draft),
                                  headers=self.headers)
@@ -280,7 +281,7 @@ class FlaskTestCase(unittest.TestCase):
                                   'collection_case': 'ACollectionCase',
                                   'collection_exercise': 'ACollectionExercise',
                                   'ru_id': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc',
-                                  'survey': constants.BRES_SURVEY})
+                                  'survey': test_utilities.BRES_SURVEY})
 
         self.app.post("http://localhost:5050/message/send", data=json.dumps(self.test_message), headers=self.headers)
 
@@ -300,7 +301,7 @@ class FlaskTestCase(unittest.TestCase):
                                   'collection_case': 'ACollectionCase',
                                   'collection_exercise': 'ACollectionExercise',
                                   'ru_id': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc',
-                                  'survey': constants.BRES_SURVEY})
+                                  'survey': test_utilities.BRES_SURVEY})
 
         token_data = {constants.USER_IDENTIFIER: "0a7ad740-10d5-4ecb-b7ca-3c0384afb882",
                       "role": "respondent"}
@@ -342,7 +343,7 @@ class FlaskTestCase(unittest.TestCase):
                                   'collection_case': 'ACollectionCase',
                                   'collection_exercise': 'ACollectionExercise',
                                   'ru_id': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc',
-                                  'survey': constants.BRES_SURVEY})
+                                  'survey': test_utilities.BRES_SURVEY})
 
         token_data = {constants.USER_IDENTIFIER: "0a7ad740-10d5-4ecb-b7ca-3c0384afb882",
                       "role": "respondent"}
@@ -461,7 +462,7 @@ class FlaskTestCase(unittest.TestCase):
                                   'collection_case': 'ACollectionCase',
                                   'collection_exercise': 'ACollectionExercise',
                                   'ru_id': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc',
-                                  'survey': constants.BRES_SURVEY})
+                                  'survey': test_utilities.BRES_SURVEY})
 
         token_data = {constants.USER_IDENTIFIER: "0a7ad740-10d5-4ecb-b7ca-3c0384afb882",
                       "role": "respondent"}

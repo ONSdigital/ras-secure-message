@@ -14,6 +14,7 @@ from app import constants
 from app import settings
 
 from app.validation.user import User
+from tests.app import test_utilities
 
 
 class RetrieverTestCaseHelper:
@@ -21,7 +22,7 @@ class RetrieverTestCaseHelper:
     """Helper class for Retriever Tests"""
     def add_secure_message(self, msg_id, subject="test", body="test", thread_id="ThreadId",
                            collection_case="ACollectionCase", ru_id="f1a5e99c-8edf-489a-9c72-6cabe6c387fc",
-                           survey=constants.BRES_SURVEY, collection_exercise='CollectionExercise'):
+                           survey=test_utilities.BRES_SURVEY, collection_exercise='CollectionExercise'):
 
         """ Populate the secure_message table"""
 
@@ -242,7 +243,7 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
         with app.app_context():
             with current_app.test_request_context():
                 result = Retriever().retrieve_message_list(1, MESSAGE_QUERY_LIMIT, self.user_internal,
-                                                           survey=constants.BRES_SURVEY)[1]
+                                                           survey=test_utilities.BRES_SURVEY)[1]
                 msg = []
                 for message in result.items:
                     serialized_message = message.serialize(self.user_internal)
@@ -372,7 +373,7 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
         with app.app_context():
             with current_app.test_request_context():
                 response = Retriever().retrieve_message_list(1, MESSAGE_QUERY_LIMIT,
-                                                             self.user_internal, survey=constants.BRES_SURVEY, label='DRAFT')[1]
+                                                             self.user_internal, survey=test_utilities.BRES_SURVEY, label='DRAFT')[1]
                 msg = []
                 for message in response.items:
                     serialized_msg = message.serialize(self.user_internal)
@@ -402,7 +403,7 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
         with app.app_context():
             with current_app.test_request_context():
                 response = Retriever().retrieve_message_list(1, MESSAGE_QUERY_LIMIT, self.user_internal,
-                                                             label="INBOX", survey=constants.BRES_SURVEY)[1]
+                                                             label="INBOX", survey=test_utilities.BRES_SURVEY)[1]
                 msg = []
                 for message in response.items:
                     serialized_msg = message.serialize(self.user_internal)
@@ -462,12 +463,12 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
         with app.app_context():
             with current_app.test_request_context():
                 response = Retriever().retrieve_message_list(1, MESSAGE_QUERY_LIMIT, self.user_respondent,
-                                                             survey=constants.BRES_SURVEY)[1]
+                                                             survey=test_utilities.BRES_SURVEY)[1]
                 msg = []
                 for message in response.items:
                     serialized_msg = message.serialize(self.user_respondent)
                     msg.append(serialized_msg)
-                    self.assertTrue(serialized_msg['survey'] == constants.BRES_SURVEY)
+                    self.assertTrue(serialized_msg['survey'] == test_utilities.BRES_SURVEY)
                 self.assertEqual(len(msg), 5)
 
     def test_no_message_returned_with_survey_option(self):
@@ -592,7 +593,7 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
         with app.app_context():
             with current_app.test_request_context():
                 response = Retriever().retrieve_message_list(1, MESSAGE_QUERY_LIMIT, self.user_internal,
-                                                             survey=constants.BRES_SURVEY,
+                                                             survey=test_utilities.BRES_SURVEY,
                                                              descend=False)[1]
 
                 date = []
@@ -614,7 +615,7 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
         with app.app_context():
             with current_app.test_request_context():
                 response = Retriever().retrieve_message_list(1, MESSAGE_QUERY_LIMIT, self.user_internal,
-                                                             survey=constants.BRES_SURVEY,
+                                                             survey=test_utilities.BRES_SURVEY,
                                                              descend=True)[1]
 
                 date = []

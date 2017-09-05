@@ -22,7 +22,7 @@ class SecureMessagingContextHelper:
     __DEFAULT_RU = 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc'
     __ALTERNATE_RU = 'b3ba864b-7cbc-4f44-84fe-88dc018a1a4c'
 
-    __DEFAULT_SURVEY = constants.BRES_SURVEY
+    __DEFAULT_SURVEY = '33333333-22222-3333-4444-88dc018a1a4c'
     __ALTERNATE_SURVEY = '11111111-22222-3333-4444-88dc018a1a4c'
 
     __DEFAULT_COLLECTION_CASE = 'collection case1'
