@@ -24,7 +24,7 @@ class Authorizer:
         if user.user_uuid == message['msg_from']:
             return True
 
-        if user.user_uuid in message['msg_to']:
+        if user.user_uuid in message['msg_to'] and 'DRAFT_INBOX' not in message['labels']:
             return True
 
         logger.info('User was refused viewing of message', user_uuid=user.user_uuid, role=user.role, message_id=message['msg_id'])
