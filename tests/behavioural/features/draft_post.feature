@@ -299,9 +299,9 @@ Feature: Draft Save Endpoint
 
   Scenario: An Internal user saves a message and a respondent replies , the thread id should not equal the message id
     Given sending from internal to respondent
-      And  the message is saved as draft
+      And  the message is sent
       And  the user is set as respondent
-      And  the draft is read
+      And  the message is read
       And  the from is set to respondent
       And  the to is set to internal
       And  the body is set to '--New body--'
