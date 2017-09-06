@@ -71,7 +71,6 @@ Feature: Draft Save Endpoint
     When the message is saved as draft
     Then a created status code (201) is returned
 
-
   Scenario: Respondent saves a draft from too long should receive a 400
     Given sending from respondent to internal
       And  the from is too long
@@ -299,9 +298,9 @@ Feature: Draft Save Endpoint
 
   Scenario: An Internal user saves a message and a respondent replies , the thread id should not equal the message id
     Given sending from internal to respondent
-      And  the message is saved as draft
+      And  the message is sent
       And  the user is set as respondent
-      And  the draft is read
+      And  the message is read
       And  the from is set to respondent
       And  the to is set to internal
       And  the body is set to '--New body--'
@@ -325,7 +324,6 @@ Feature: Draft Save Endpoint
     Then  a created status code (201) is returned
       And  retrieved message thread id is not equal to message id
       And  the thread id is equal in all responses
-
 
     Scenario: An internal user sends a message and a respondent saves draft then sends as reply validate thread id is correct
     Given sending from internal to respondent

@@ -57,3 +57,11 @@ Feature: Get draft by id
     Then a success status code (200) is returned
       And the response should include a valid etag
 
+  Scenario: An internal user saves a draft and the respondent is not authorized to read it
+    Given sending from internal to respondent
+      And  the message is saved as draft
+      And  the user is set as respondent
+      And  the draft is read
+    Then  a forbidden status code (403) is returned
+
+
