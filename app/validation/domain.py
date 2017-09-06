@@ -189,7 +189,7 @@ class DraftSchema(Schema):
             logger.error('Internal user not authorised to save a draft on behalf of user or work group', message_from=msg_from)
             raise ValidationError('You are not authorised to save a draft on behalf of user or work group {0}'.format(msg_from))
         if g.user.is_respondent and msg_from != g.user.user_uuid:
-            logger.error('Respondent not authorised to save a draft on behalf of user or work group', message_from=msg_from, user_id=g.user.user_uuid, msg_from=msg_from)
+            logger.error('Respondent not authorised to save a draft on behalf of user or work group', message_from=msg_from, user_id=g.user.user_uuid)
             raise ValidationError('You are not authorised to save a draft on behalf of user or work group {0}'.format(msg_from))
 
     @validates("body")
