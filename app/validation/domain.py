@@ -9,7 +9,6 @@ from structlog import wrap_logger
 
 logger = wrap_logger(logging.getLogger(__name__))
 
-
 class Message:
 
     """Class to hold message attributes"""
@@ -78,10 +77,10 @@ class MessageSchema(Schema):
     def validate_from(self, msg_from):
         self.validate_non_zero_field_length("msg_from", len(msg_from), constants.MAX_FROM_LEN)
         if g.user.is_internal and msg_from != constants.BRES_USER:
-            logger.error('Not authorised to send a message on behalf of user or work group', message_from=msg_from)
+            logger.error('Internal user not authorised to send a message on behalf of user or work group', message_from=msg_from)
             raise ValidationError('You are not authorised to send a message on behalf of user or work group {0}'.format(msg_from))
         if g.user.is_respondent and msg_from != g.user.user_uuid:
-            logger.error('Not authorised to send a message on behalf of user or work group', message_from=msg_from)
+            logger.error('Respondent not authorised to send a message on behalf of user or work group', message_from=msg_from, user_uuid=g.user.user_uuid, msg_from=msg_from)
             raise ValidationError('You are not authorised to send a message on behalf of user or work group {0}'.format(msg_from))
 
     @validates("body")
@@ -187,10 +186,10 @@ class DraftSchema(Schema):
     def validate_from(self, msg_from):
         self.validate_field_length(msg_from, len(msg_from), constants.MAX_FROM_LEN)
         if g.user.is_internal and msg_from != constants.BRES_USER:
-            logger.error('Not authorised to save a draft on behalf of user or work group', message_from=msg_from)
+            logger.error('Internal user not authorised to save a draft on behalf of user or work group', message_from=msg_from)
             raise ValidationError('You are not authorised to save a draft on behalf of user or work group {0}'.format(msg_from))
         if g.user.is_respondent and msg_from != g.user.user_uuid:
-            logger.error('Not authorised to save a draft on behalf of user or work group', message_from=msg_from)
+            logger.error('Respondent not authorised to save a draft on behalf of user or work group', message_from=msg_from, user_id=g.user.user_uuid, msg_from=msg_from)
             raise ValidationError('You are not authorised to save a draft on behalf of user or work group {0}'.format(msg_from))
 
     @validates("body")
