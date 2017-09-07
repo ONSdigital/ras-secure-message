@@ -15,9 +15,9 @@ install:
     - pip install coverage
 
 env:
-    - RAS_SM_PATH=./
+    - RAS_SM_PATH="./"
     - NOTIFY_VIA_LOGGING=1
-    - NOTIFICATION_DEV_EMAIL=eward@ons.gov.uk
+    - NOTIFICATION_DEV_EMAIL="eward@ons.gov.uk"
     - JWT_SECRET=abcd
     - SECURITY_USER_NAME=dummy_user
     - SECURITY_USER_PASSWORD=dummy_password
