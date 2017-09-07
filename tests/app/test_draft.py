@@ -21,7 +21,7 @@ from app.validation.domain import DraftSchema
 from app.validation.user import User
 from app.constants import MAX_RU_ID_LEN
 from app.services.service_toggles import party, case_service
-
+from tests.app import test_utilities
 
 class DraftTestCase(unittest.TestCase):
     """Test case for draft saving"""
@@ -54,7 +54,7 @@ class DraftTestCase(unittest.TestCase):
                              'collection_case': 'ACollectionCase',
                              'collection_exercise': 'ACollectionExercise',
                              'ru_id': '7fc0e8ab-189c-4794-b8f4-9f05a1db185b',
-                             'survey': constants.BRES_SURVEY}
+                             'survey': test_utilities.BRES_SURVEY}
         settings.NOTIFY_CASE_SERVICE = '1'
 
         with app.app_context():
@@ -173,7 +173,7 @@ class DraftTestCase(unittest.TestCase):
 
             for row in label_request:
                 self.assertEqual(row['msg_id'], self.msg_id)
-                self.assertEqual(row['actor'], self.test_message['survey'])
+                self.assertEqual(row['actor'], self.test_message['msg_from'])
                 self.assertEqual(row['label'], Labels.DRAFT.value)
 
     def test_draft_correct_labels_saved_to_status_with_to(self):
@@ -224,7 +224,7 @@ class DraftTestCase(unittest.TestCase):
                                   'collection_case': 'ACollectionCase',
                                   'collection_exercise': 'ACollectionExercise',
                                   'ru_id': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc',
-                                  'survey': constants.BRES_SURVEY})
+                                  'survey': test_utilities.BRES_SURVEY})
 
         response = self.app.post('http://localhost:5050/message/send', data=json.dumps(self.test_message),
                                  headers=self.headers)
@@ -272,7 +272,7 @@ class DraftTestCase(unittest.TestCase):
                    'collection_case': 'ACollectionCase',
                    'collection_exercise': 'ACollectionExercise',
                    'ru_id': '7fc0e8ab-189c-4794-b8f4-9f05a1db185b',
-                   'survey': constants.BRES_SURVEY,
+                   'survey': test_utilities.BRES_SURVEY,
                    '_links': '',
                    'labels': ['DRAFT']}
 
@@ -292,7 +292,7 @@ class DraftTestCase(unittest.TestCase):
                    'collection_case': 'ACollectionCase',
                    'collection_exercise': 'ACollectionExercise',
                    'ru_id': '7fc0e8ab-189c-4794-b8f4-9f05a1db185b',
-                   'survey': constants.BRES_SURVEY,
+                   'survey': test_utilities.BRES_SURVEY,
                    '_links': '',
                    'labels': ['DRAFT']}
 
@@ -311,7 +311,7 @@ class DraftTestCase(unittest.TestCase):
                    'collection_case': 'ACollectionCase',
                    'collection_exercise': 'ACollectionExercise',
                    'ru_id': '7fc0e8ab-189c-4794-b8f4-9f05a1db185b',
-                   'survey': constants.BRES_SURVEY,
+                   'survey': test_utilities.BRES_SURVEY,
                    '_links': '',
                    'labels': ['DRAFT']}
 
@@ -330,7 +330,7 @@ class DraftTestCase(unittest.TestCase):
                    'collection_case': 'ACollectionCase',
                    'collection_exercise': 'ACollectionExercise',
                    'ru_id': '7fc0e8ab-189c-4794-b8f4-9f05a1db185b',
-                   'survey': constants.BRES_SURVEY,
+                   'survey': test_utilities.BRES_SURVEY,
                    '_links': '',
                    'labels': ['DRAFT']}
 
@@ -349,7 +349,7 @@ class DraftTestCase(unittest.TestCase):
                    'collection_case': 'ACollectionCase',
                    'collection_exercise': 'ACollectionExercise',
                    'ru_id': '7fc0e8ab-189c-4794-b8f4-9f05a1db185b',
-                   'survey': constants.BRES_SURVEY,
+                   'survey': test_utilities.BRES_SURVEY,
                    '_links': '',
                    'labels': ['DRAFT']}
 
