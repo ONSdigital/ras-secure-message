@@ -47,7 +47,7 @@ else:
     logger.error('Email notification template variable not set', variable=TEMPLATE_ID)
     NOTIFICATION_TEMPLATE_ID='SETME'
 
-NOTIFICATION_DEV_EMAIL = os.getenv('NOTIFICATION_DEV_EMAIL', 'emilio.ward@ons.gov.uk')
+NOTIFICATION_DEV_EMAIL = os.getenv('NOTIFICATION_DEV_EMAIL')
 
 # LOGGING NOTIFICATION SETTINGS
 
@@ -59,12 +59,12 @@ SQLALCHEMY_POOL_SIZE = os.getenv('SQLALCHEMY_POOL_SIZE', None)
 
 # JWT authentication config
 SM_JWT_ALGORITHM = os.getenv('JWT_ALGORITHM', 'HS256')
-SM_JWT_SECRET = os.getenv('JWT_SECRET', 'vrwgLNWEffe45thh545yuby')
+SM_JWT_SECRET = os.getenv('JWT_SECRET')
 SM_JWT_ENCRYPT = os.getenv('SM_JWT_ENCRYPT', '1')
 
 # Basic auth parameters
-SECURITY_USER_NAME = os.getenv('SECURITY_USER_NAME', 'dummy_user')
-SECURITY_USER_PASSWORD = os.getenv('SECURITY_USER_PASSWORD', 'dummy_password')
+SECURITY_USER_NAME = os.getenv('SECURITY_USER_NAME')
+SECURITY_USER_PASSWORD = os.getenv('SECURITY_USER_PASSWORD')
 BASIC_AUTH = (SECURITY_USER_NAME, SECURITY_USER_PASSWORD)
 
 #  Keys
