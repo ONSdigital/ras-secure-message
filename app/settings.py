@@ -31,7 +31,7 @@ else:
     logger.error('Email notification variable not set', variable=SERVICE_ID)
     NOTIFICATION_SERVICE_ID='SETME'
 
-API_KEY='NOTIFICATION_API_KEY'
+API_KEY = 'NOTIFICATION_API_KEY'
 if API_KEY in os.environ:
     NOTIFICATION_API_KEY = os.getenv(API_KEY)
 else:
