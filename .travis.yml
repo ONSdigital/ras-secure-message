@@ -7,6 +7,7 @@ python: '3.4'
 
 cache:
     - pip
+
 install:
     - pip install -r requirements.txt
     - pip install -r requirements-test.txt
@@ -14,8 +15,6 @@ install:
     - pip install coverage
 
 script:
-    - export RAS_SM_PATH=./
-    - export NOTIFY_VIA_LOGGING=1
     - coverage run run_tests.py
 
 after_success:
