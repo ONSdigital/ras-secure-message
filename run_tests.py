@@ -3,6 +3,10 @@ import os
 import sys
 
 if __name__ == "__main__":
+    os.environ['JWT_SECRET'] = 'vrwgLNWEffe45thh545yuby'
+    os.environ['SECURITY_USER_NAME'] = 'dummy_user'
+    os.environ['SECURITY_USER_PASSWORD'] = 'dummy_password'
+
     from behave import __main__ as behave_executable
     behave = behave_executable.main()
 
