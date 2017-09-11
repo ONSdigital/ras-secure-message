@@ -1,6 +1,10 @@
 import logging
+import os
+import sys
 
 from structlog import wrap_logger
+
+from app import settings
 
 """Specialised exceptions for secure messages"""
 
@@ -24,3 +28,10 @@ class MessageSaveException(Exception):
         rv = dict(self.payload or ())
         rv['message'] = self.message
         return rv
+
+
+class MissingEnvironmentVariable(Exception):
+    def __init__(self):
+        missing_env_variables = [var for var in settings.NON_DEFAULT_VARIABLES if not os.environ.get(var)]
+        logger.error('Missing environment variables', variables=missing_env_variables)
+        sys.exit("Application failed to start")
