@@ -5,8 +5,10 @@ from flask import Flask, request
 from flask import jsonify, json
 from flask_restful import Api
 from flask_cors import CORS
+from structlog import wrap_logger
+
 from app import settings
-from app.exception.exceptions import MessageSaveException
+from app.exception.exceptions import MessageSaveException, MissingEnvironmentVariable
 from app.repository import database
 from app.resources.health import Health, DatabaseHealth, HealthDetails
 from app.resources.info import Info
@@ -18,16 +20,14 @@ from app.resources.threads import ThreadById, ThreadList
 from app.cloud.cloud_foundry import ONSCloudFoundry
 from app import connector
 from app.logger_config import logger_initial_config
-from structlog import wrap_logger
 
 
 logger_initial_config(service_name='ras-secure-message')
-
 logger = wrap_logger(logging.getLogger(__name__))
 
 for var in settings.NON_DEFAULT_VARIABLES:
     if not os.getenv(var):
-        logger.error('No {} set'.format(var))
+        raise MissingEnvironmentVariable
 
 # use cf env to extract Cloud Foundry environment
 cf = ONSCloudFoundry()
