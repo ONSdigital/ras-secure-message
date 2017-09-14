@@ -2,7 +2,7 @@
 import os
 
 os.environ['JWT_SECRET'] = os.getenv('JWT_SECRET', 'vrwgLNWEffe45thh545yuby')
-os.environ['JWT_ALGORITHM'] = os.getenv('JWT_ALGORITHM, ''HS256')
+os.environ['JWT_ALGORITHM'] = os.getenv('JWT_ALGORITHM', 'HS256')
 os.environ['SECURITY_USER_NAME'] = os.getenv('SECURITY_USER_NAME', 'test_user')
 os.environ['SECURITY_USER_PASSWORD'] = os.getenv('SECURITY_USER_PASSWORD', 'test_password')
 os.environ['NOTIFY_VIA_LOGGING'] = os.getenv('NOTIFY_VIA_LOGGING', '1')
