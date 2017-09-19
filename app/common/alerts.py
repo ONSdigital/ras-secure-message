@@ -1,6 +1,7 @@
 import logging
 
 from app import settings
+from flask import g
 from notifications_python_client import NotificationsAPIClient
 from structlog import wrap_logger
 
@@ -18,7 +19,7 @@ class AlertViaGovNotify:
                                                      template_id=settings.NOTIFICATION_TEMPLATE_ID,
                                                      personalisation=None,
                                                      reference=reference)
-        logger.info('Sent secure message email notification')
+        logger.info('Sent secure message email notification', user=g.user.user_uuid)
 
 
 class AlertViaLogging:
