@@ -19,7 +19,7 @@ class AlertViaGovNotify:
                                                      template_id=settings.NOTIFICATION_TEMPLATE_ID,
                                                      personalisation=None,
                                                      reference=reference)
-        logger.info('Sent secure message email notification', user=g.user.user_uuid)
+        logger.info('Sent secure message email notification', user_uuid=g.user.user_uuid)
 
 
 class AlertViaLogging:
