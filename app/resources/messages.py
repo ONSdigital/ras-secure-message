@@ -127,7 +127,7 @@ class MessageSend(Resource):
             if status_code == 200:
                 if 'emailAddress' in party_data and len(party_data['emailAddress'].strip()) > 0:
                     recipient_email = party_data['emailAddress'].strip()
-                    alert_method = AlertViaLogging() if settings.NOTIFY_VIA_LOGGING == '1' else AlertViaGovNotify()
+                    alert_method = AlertViaLogging() if settings.NOTIFY_VIA_GOV_NOTIFY == '0' else AlertViaGovNotify()
                     alert_user = AlertUser(alert_method)
                     alert_user.send(recipient_email, message.msg_id)
                 else:

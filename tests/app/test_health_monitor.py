@@ -61,7 +61,7 @@ class HealthTestCase(unittest.TestCase):
                    'RAS PARTY SERVICE HOST': '',
                    'RAS PARTY SERVICE PORT': '',
                    'RAS PARTY SERVICE PROTOCOL': '',
-                   'NOTIFY VIA LOGGING': '',
+                   'NOTIFY VIA GOV NOTIFY': '',
                    'NOTIFY CASE SERVICE': ''}
 
         self.assertEqual(json.loads(response.get_data()).keys(), details.keys())

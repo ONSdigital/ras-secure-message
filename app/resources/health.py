@@ -52,7 +52,7 @@ class HealthDetails(Resource):
                    'RAS PARTY SERVICE HOST': settings.RAS_PARTY_SERVICE_HOST,
                    'RAS PARTY SERVICE PORT': settings.RAS_PARTY_SERVICE_PORT,
                    'RAS PARTY SERVICE PROTOCOL': settings.RAS_PARTY_SERVICE_PROTOCOL,
-                   'NOTIFY VIA LOGGING': settings.NOTIFY_VIA_LOGGING,
+                   'NOTIFY VIA GOV NOTIFY': settings.NOTIFY_VIA_GOV_NOTIFY,
                    'NOTIFY CASE SERVICE': settings.NOTIFY_CASE_SERVICE}
 
         return jsonify(details)

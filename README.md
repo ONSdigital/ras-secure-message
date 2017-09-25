@@ -58,3 +58,38 @@ Now open up a prompt to test out your API using curl
 $ curl http://127.0.0.1:5050/health
 {"status": "healthy"}
 ```
+
+## Configuration
+
+Environment variables available for configuration are listed below:
+
+| Environment Variable            | Description                                        | Default
+|---------------------------------|----------------------------------------------------|-------------------------------
+| NAME                            | Name of application                                | 'ras-frontstage'
+| VERSION                         | Version number of application                      | '0.1.0' (manually update as application updates)
+| SECURITY_USER_NAME              | Username for basic auth                            | N/A
+| SECURITY_USER_PASSWORD          | Password for basic auth                            | N/A
+| JWT_ALGORITHM                   | Algotithm used to code JWT                         | 'HS256'
+| JWT_SECRET                      | SECRET used to code JWT                            | N/A
+| SECURE_MESSAGING_DATABASE_URL   | Database URI                                       | sqlite:////tmp/messages.db
+| NOTIFICATION_SERVICE_ID         | Service id to use Gov Notify service               | N/A
+| NOTIFICATION_API_KEY            | API key to use Gov Notify service                  | N/A
+| NOTIFICATION_TEMPLATE_ID        | Template id for Gov Notify service                 | N/A
+| NOTIFY_VIA_GOV_NOTIFY           | Toggle for using Gov Notify for notifications      | '1' (enable Gov Notify email notifications)
+| SM_JWT_ENCRYPT                  | Toggle to use encrypted tokens                     | '1' (enable encrypted tokens)
+| NOTIFY_CASE_SERVICE             | Toggle to notify case service                      | '1' (enable notifying case service)
+
+For each external application which frontstage communicates with there are 3 environment variables e.g. for the RM case service:
+
+| Environment Variable            | Description                       | Default
+|---------------------------------|-----------------------------------|-------------------------------
+| RM_CASE_SERVICE_HOST            | Host address for RM case service  | 'http'
+| RM_CASE_SERVICE_PORT            | Port for RM case service          | 'localhost'
+| RM_CASE_SERVICE_PROTOCOL        | Protocol used for RM case service | '8171'
+
+The services these variables exist for are listed below with the beginnings of their variables and their github links:
+
+| Service                         | Start of variables          | Github
+|---------------------------------|-----------------------------|-----------------------------
+| Case service                    | RM_CASE_SERVICE             | https://github.com/ONSdigital/rm-case-service
+| Party service                   | RAS_PARTY_SERVICE           | https://github.com/ONSdigital/ras-party
