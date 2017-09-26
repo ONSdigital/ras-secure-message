@@ -7,7 +7,7 @@ if __name__ == "__main__":
     os.environ['JWT_ALGORITHM'] = 'HS256'
     os.environ['SECURITY_USER_NAME'] = 'test_user'
     os.environ['SECURITY_USER_PASSWORD'] = 'test_password'
-    os.environ['NOTIFY_VIA_LOGGING'] = '1'
+    os.environ['NOTIFY_VIA_GOV_NOTIFY'] = '0'
     os.environ['NOTIFICATION_API_KEY'] = 'test_notification_api_key'
     os.environ['SERVICE_ID'] = 'test_service_id'
     os.environ['NOTIFICATION_TEMPLATE_ID'] = 'test_notification_template_id'
