@@ -4,7 +4,7 @@ from datetime import datetime, timezone
 from structlog import wrap_logger
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import Column, String, Integer, DateTime, ForeignKey, Index
-from sqlalchemy.orm import relationship
+from sqlalchemy.orm import relationship, backref
 from app import constants
 from app.common.labels import Labels
 
@@ -27,8 +27,8 @@ class SecureMessage(db.Model):
     ru_id = Column("ru_id", String(constants.MAX_RU_ID_LEN+1))
     collection_exercise = Column("collection_exercise", String(constants.MAX_COLLECTION_EXERCISE_LEN+1))
     survey = Column("survey", String(constants.MAX_SURVEY_LEN+1))
-    statuses = relationship('Status', backref='secure_message')
-    events = relationship('Events', backref='secure_message', order_by='Events.date_time')
+    statuses = relationship('Status', backref='secure_message', lazy="dynamic")
+    events = relationship('Events', backref='secure_message', order_by='Events.date_time', lazy="dynamic")
 
     __table_args__ = (Index("idx_ru_survey_cc", "ru_id", "survey", "collection_case", "collection_exercise"), )
 
@@ -56,13 +56,13 @@ class SecureMessage(db.Model):
         self.survey = domain_model.survey
         self.collection_exercise = domain_model.collection_exercise
 
-    def serialize(self, user):
+    def serialize(self, user, body_summary=False):
         """Return object data in easily serializeable format"""
         message = {'msg_to': [],
                    'msg_from': '',
                    'msg_id': self.msg_id,
                    'subject': self.subject,
-                   'body': self.body,
+                   'body': self.body[:100] if body_summary else self.body,
                    'thread_id': self.thread_id,
                    'collection_case': self.collection_case,
                    'ru_id': self.ru_id,
