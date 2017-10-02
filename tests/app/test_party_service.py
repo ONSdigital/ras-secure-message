@@ -37,7 +37,7 @@ class PartyTestCase(unittest.TestCase):
         mock_request.get(business_data_url, status_code=200, reason="OK", text='[{"errors": "test"}]')
         result_data, result_status = sut.get_business_details(ru)
 
-        self.assertEqual(result_data, {'errors': {'errors': 'test'}})
+        self.assertEqual(result_data, [{"errors": "test"}])
         self.assertEqual(result_status, 200)
 
     @requests_mock.mock()
