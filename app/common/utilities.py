@@ -69,7 +69,7 @@ def paginated_list_to_json(paginated_list, page, limit, host_url, user, string_q
 
     for message in paginated_list.items:
         msg_count += 1
-        msg = message.serialize(user)
+        msg = message.serialize(user, body_summary=True)
         msg['_links'] = {"self": {"href": "{0}{1}/{2}".format(host_url, MESSAGE_BY_ID_ENDPOINT, msg['msg_id'])}}
         messages.append(msg)
 
