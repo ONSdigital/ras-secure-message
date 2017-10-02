@@ -37,8 +37,20 @@ class PartyTestCase(unittest.TestCase):
         mock_request.get(business_data_url, status_code=200, reason="OK", text='[{"errors": "test"}]')
         result_data, result_status = sut.get_business_details(ru)
 
-        self.assertEqual(result_data, {'errors': {'errors': 'test'}})
+        self.assertEqual(result_data, [{"errors": "test"}])
         self.assertEqual(result_status, 200)
+
+    @requests_mock.mock()
+    def test_get_business_details_fails(self, mock_request):
+        """Test get business details and returns correctly from a list"""
+        ru = "1234"
+        business_data_url = app.settings.RAS_PARTY_GET_BY_BUSINESS.format(app.settings.RAS_PARTY_SERVICE, ru)
+        sut = PartyService()
+        mock_request.get(business_data_url, status_code=401, reason="unauthorised", text='Unauthorized Access')
+        result_data, result_status = sut.get_business_details(ru)
+
+        self.assertEqual(result_data, "Unauthorized Access")
+        self.assertEqual(result_status, 401)
 
     @requests_mock.mock()
     def test_get_user_details_for_bres_user(self, mock_request):
@@ -73,3 +85,15 @@ class PartyTestCase(unittest.TestCase):
 
         self.assertEqual(result_data, {"Test": "test"})
         self.assertEqual(result_status, 200)
+
+    @requests_mock.mock()
+    def test_get_user_details_calls_party_service_for_respondent_unauthorised(self, mock_request):
+        """Test get user details sends a request and receives back data"""
+        sut = PartyService()
+        user_data_url = app.settings.RAS_PARTY_GET_BY_RESPONDENT.format(app.settings.RAS_PARTY_SERVICE, 'NotBres')
+        mock_request.get(user_data_url, status_code=401, reason="unauthorised", text="Unauthorized access")
+
+        result_data, result_status = sut.get_user_details('NotBres')
+
+        self.assertEqual(result_data, "Unauthorized access")
+        self.assertEqual(result_status, 401)

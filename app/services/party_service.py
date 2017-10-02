@@ -22,11 +22,12 @@ class PartyService:
                      text=party_data.text,
                      url=url)
 
-        party_dict = json.loads(party_data.text)
-        if type(party_dict) is list:  # if id is not a uuid returns a list not a dict
-            party_dict = {'errors': party_dict[0]}
-
-        return party_dict, party_data.status_code
+        if party_data.status_code == 200:
+            party_dict = json.loads(party_data.text)
+            return party_dict, party_data.status_code
+        else:
+            logger.error('Party service failed', status_code=party_data.status_code, text=party_data.text, ru=ru)
+            return party_data.text, party_data.status_code
 
     @staticmethod
     def get_user_details(uuid):
@@ -52,5 +53,9 @@ class PartyService:
                          text=party_data.text,
                          url=url)
 
-            party_dict = json.loads(party_data.text)
-            return party_dict, party_data.status_code
+            if party_data.status_code == 200:
+                party_dict = json.loads(party_data.text)
+                return party_dict, party_data.status_code
+            else:
+                logger.error('Party service failed', status_code=party_data.status_code, text=party_data.text, uuid=uuid)
+                return party_data.text, party_data.status_code
