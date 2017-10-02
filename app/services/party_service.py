@@ -24,8 +24,6 @@ class PartyService:
 
         if party_data.status_code == 200:
             party_dict = json.loads(party_data.text)
-            if type(party_dict) is list:  # if id is not a uuid returns a list not a dict
-                party_dict = {'errors': party_dict[0]}
             return party_dict, party_data.status_code
         else:
             logger.error('Party service failed', status_code=party_data.status_code, text=party_data.text, ru=ru)
