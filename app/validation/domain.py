@@ -89,7 +89,7 @@ class MessageSchema(Schema):
 
     @validates("subject")
     def validate_subject(self, subject):
-        self.validate_non_zero_field_length("Subject", len(subject), constants.MAX_SUBJECT_LEN)
+        self.validate_non_zero_field_length("Subject", len(subject.strip()), constants.MAX_SUBJECT_LEN)
 
     @validates("thread_id")
     def validate_thread(self, thread_id):
