@@ -398,3 +398,19 @@
     "total": 39
 }
 ```
+
+* `GET /threads`
+
+### Example JSON Response
+
+```json
+
+```
+
+* `GET /thread/{thread_id}`
+
+### Example JSON Response
+
+```json
+
+```
