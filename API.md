@@ -98,7 +98,7 @@
 
 * `POST /message/send`
 
-### Example JSON DATA for put
+### Example JSON DATA for post
 
 ```json
 {
@@ -276,7 +276,7 @@
 
 * `POST /draft/save`
 
-### Example JSON DATA for put
+### Example JSON DATA for post
 
 ```json
 {
@@ -368,6 +368,7 @@
 ```json
 {
   "msg_to": ["ef7737df-2097-4a73-a530-e98dba7bf28f"],
+  "msg_id": "30c68b01-7aff-49a9-9bb8-cd78c68ffb74",
   "msg_from": "BRES",
   "subject": "Test uuid",
   "body": "Save message",
