@@ -98,6 +98,21 @@
 
 * `POST /message/send`
 
+### Example JSON DATA for put
+
+```json
+{
+  "msg_to": ["ef7737df-2097-4a73-a530-e98dba7bf28f"],
+  "msg_from": "BRES",
+  "subject": "Test uuid",
+  "body": "Test uuid",
+  "thread_id": "",
+  "ru_id": "f1a5e99c-8edf-489a-9c72-6cabe6c387fc",
+  "collection_case": "ACollectionCase",
+  "survey": "BRES" 
+}
+```
+
 ### Example JSON Response
 
 ```json
@@ -242,6 +257,21 @@
 
 * `POST /draft/save`
 
+### Example JSON DATA for put
+
+```json
+{
+  "msg_to": ["ef7737df-2097-4a73-a530-e98dba7bf28f"],
+  "msg_from": "BRES",
+  "subject": "Test uuid",
+  "body": "Save message",
+  "thread_id": "",
+  "ru_id": "f1a5e99c-8edf-489a-9c72-6cabe6c387fc",
+  "collection_case": "ACollectionCase",
+  "survey": "BRES" 
+}
+```
+
 ### Example JSON Response
 
 ```json
@@ -314,6 +344,21 @@
 
 * `PUT /draft/{id}/modify`
 
+### Example JSON DATA for put
+
+```json
+{
+  "msg_to": ["ef7737df-2097-4a73-a530-e98dba7bf28f"],
+  "msg_from": "BRES",
+  "subject": "Test uuid",
+  "body": "Save message",
+  "thread_id": "",
+  "ru_id": "f1a5e99c-8edf-489a-9c72-6cabe6c387fc",
+  "collection_case": "ACollectionCase",
+  "survey": "BRES" 
+}
+```
+
 ### Example JSON Response
 
 ```json
@@ -323,3 +368,13 @@
 }
 ```
 
+* `GET /labels?name=unread`
+
+### Example JSON Response
+
+```json
+{
+    "name": "unread",
+    "total": 39
+}
+```
