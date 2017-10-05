@@ -179,6 +179,25 @@
     }
 ```
 
+* `PUT message/{id}/modify`
+
+### Example JSON DATA for put
+
+```json
+{
+"action" : "add",
+"label" : "UNREAD"
+}
+```
+
+### Example JSON Response
+
+```json
+{
+    "status": "ok"
+}
+```
+
 * `GET /drafts`
 
 ### Example JSON Response
