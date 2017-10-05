@@ -132,6 +132,26 @@ class MessageSchemaTestCase(unittest.TestCase):
             errors = schema.load(self.json_message)[1]
         self.assertTrue(errors == {'subject': ['Missing data for required field.']})
 
+    def test_empty_subject_fails_validation(self):
+        """marshalling message with no subject field """
+        self.json_message['subject'] = ''
+        self.json_message['msg_to'] = ["01b51fcc-ed43-4cdb-ad1c-450f9986859b"]
+        with app.app_context():
+            g.user = User(self.json_message['msg_from'], 'respondent')
+            schema = MessageSchema()
+            errors = schema.load(self.json_message)[1]
+        self.assertTrue(errors == {'subject': ['Please enter a subject']})
+
+    def test_subject_with_only_spaces_fails_validation(self):
+        """marshalling message with no subject field """
+        self.json_message['subject'] = '  '
+        self.json_message['msg_to'] = ["01b51fcc-ed43-4cdb-ad1c-450f9986859b"]
+        with app.app_context():
+            g.user = User(self.json_message['msg_from'], 'respondent')
+            schema = MessageSchema()
+            errors = schema.load(self.json_message)[1]
+        self.assertTrue(errors == {'subject': ['Please enter a subject']})
+
     def test_subject_field_too_long_causes_error(self):
         """marshalling message with subject field too long"""
         self.json_message['subject'] = "x" * (MAX_SUBJECT_LEN + 1)
