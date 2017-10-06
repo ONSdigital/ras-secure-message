@@ -96,7 +96,7 @@ class Retriever:
                 .join(Events).join(Status) \
                 .filter(and_(*status_conditions))\
                 .filter(or_(Events.event == 'Sent', Events.event == 'Draft_Saved'))\
-                .group_by(SecureMessage.thread_id).subquery('t')
+                .group_by(SecureMessage.thread_id, SecureMessage.msg_id).subquery('t')
 
             conditions.append(SecureMessage.msg_id == t.c.msg_id)
             conditions.append(Events.date_time == t.c.max_date)
@@ -143,10 +143,13 @@ class Retriever:
         try:
             result = SecureMessage.query.join(Events).join(Status)\
                 .filter(SecureMessage.thread_id == thread_id)\
-                .filter(and_(*status_conditions))\
-                .order_by(case([(Events.event == 'Sent', Events.date_time),
-                                (Events.event == 'Draft_Saved', Events.date_time)],
-                               else_= None).desc(), Events.event.desc()).paginate(page, limit, False)
+                .filter(and_(*status_conditions)) \
+                .filter(or_(Events.event == 'Sent', Events.event == 'Draft_Saved')) \
+                .order_by(Events.event.desc(), Events.date_time.desc()) \
+                .filter(Events.date_time).paginate(page, limit, False)
+                # .order_by(case([(Events.event == 'Sent', Events.date_time),
+                #                 (Events.event == 'Draft_Saved', Events.date_time)],
+                #                else_= None).desc(), Events.date_time.desc()).paginate(page, limit, False)
 
             if len(result.items) == 0:
                 logger.debug('Thread does not exist', thread_id=thread_id)

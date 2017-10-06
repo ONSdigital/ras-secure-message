@@ -18,8 +18,8 @@ class SaverTestCase(unittest.TestCase):
     def setUp(self):
         """setup test environment"""
         app.testing = True
-        app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:////tmp/messages.db'
-        self.engine = create_engine('sqlite:////tmp/messages.db')
+        app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://rhi:password@localhost:5432/sms'
+        self.engine = create_engine('postgresql://rhi:password@localhost:5432/sms')
         self.test_message = Message(**{'msg_to': 'tej', 'msg_from': 'gemma', 'subject': 'MyMessage',
                                        'body': 'hello', 'thread_id': ""})
         with app.app_context():
@@ -29,12 +29,12 @@ class SaverTestCase(unittest.TestCase):
             self.db = database.db
         settings.NOTIFY_CASE_SERVICE = '1'
 
-    @event.listens_for(Engine, "connect")
-    def set_sqlite_pragma(dbapi_connection, connection_record):
-        """enable foreign key constraint for tests"""
-        cursor = dbapi_connection.cursor()
-        cursor.execute("PRAGMA foreign_keys=ON")
-        cursor.close()
+    # @event.listens_for(Engine, "connect")
+    # def set_sqlite_pragma(dbapi_connection, connection_record):
+    #     """enable foreign key constraint for tests"""
+    #     cursor = dbapi_connection.cursor()
+    #     cursor.execute("PRAGMA foreign_keys=ON")
+    #     cursor.close()
 
     def test_save_message_raises_message_save_exception_on_db_error(self):
         """Tests exception is logged if message save fails"""

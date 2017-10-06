@@ -27,9 +27,9 @@ class RetrieverTestCaseHelper:
         """ Populate the secure_message table"""
 
         with self.engine.connect() as con:
-            query = 'INSERT INTO secure_message(msg_id, subject, body, thread_id,' \
-                    ' collection_case, ru_id, survey, collection_exercise) VALUES ("{0}", "{1}","{2}",' \
-                    '"{3}", "{4}", "{5}", "{6}", "{7}")'.format(msg_id, subject, body, thread_id, collection_case,
+            query = "INSERT INTO secure_message(msg_id, subject, body, thread_id," \
+                    "collection_case, ru_id, survey, collection_exercise) VALUES ('{0}', '{1}','{2}'," \
+                    "'{3}', '{4}', '{5}', '{6}', '{7}')".format(msg_id, subject, body, thread_id, collection_case,
                                                                 ru_id, survey, collection_exercise)
             con.execute(query)
 
@@ -37,7 +37,7 @@ class RetrieverTestCaseHelper:
         """ Populate the status table"""
 
         with self.engine.connect() as con:
-            query = 'INSERT INTO status(label, msg_id, actor) VALUES("{0}", "{1}", "{2}")'.format(
+            query = "INSERT INTO status(label, msg_id, actor) VALUES('{0}', '{1}', '{2}')".format(
                 label, msg_id, actor)
             con.execute(query)
 
@@ -45,7 +45,7 @@ class RetrieverTestCaseHelper:
         """ Populate the event table"""
 
         with self.engine.connect() as con:
-            query = 'INSERT INTO events(event, msg_id, date_time) VALUES("{0}", "{1}", "{2}")'.format(
+            query = "INSERT INTO events(event, msg_id, date_time) VALUES('{0}', '{1}', '{2}')".format(
                 event, msg_id, date_time)
             con.execute(query)
 
@@ -53,7 +53,7 @@ class RetrieverTestCaseHelper:
         """ Delete a specific row from status table"""
 
         with self.engine.connect() as con:
-            query = 'DELETE FROM status WHERE label = "{0}" AND msg_id = "{1}" AND actor = "{2}"'.format(
+            query = "DELETE FROM status WHERE label = '{0}' AND msg_id = '{1}' AND actor = '{2}'".format(
                 label, msg_id, actor)
             con.execute(query)
 
@@ -173,8 +173,8 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
     def setUp(self):
         """setup test environment"""
         app.testing = True
-        app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:////tmp/messages.db'
-        self.engine = create_engine('sqlite:////tmp/messages.db')
+        app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://rhi:password@localhost:5432/sms'
+        self.engine = create_engine('postgresql://rhi:password@localhost:5432/sms')
         self.MESSAGE_LIST_ENDPOINT = "http://localhost:5050/messages"
         self.MESSAGE_BY_ID_ENDPOINT = "http://localhost:5050/message/"
         with app.app_context():
@@ -188,12 +188,12 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
         party.use_mock_service()
         settings.NOTIFY_CASE_SERVICE = '1'
 
-    @event.listens_for(Engine, "connect")
-    def set_sqlite_pragma(dbapi_connection, connection_record):
-        """enable foreign key constraint for tests"""
-        cursor = dbapi_connection.cursor()
-        cursor.execute("PRAGMA foreign_keys=ON")
-        cursor.close()
+    # @event.listens_for(Engine, "connect")
+    # def set_sqlite_pragma(dbapi_connection, connection_record):
+    #     """enable foreign key constraint for tests"""
+    #     cursor = dbapi_connection.cursor()
+    #     cursor.execute("PRAGMA foreign_keys=ON")
+    #     cursor.close()
 
     def test_0_msg_returned_when_db_empty_true(self):
         """retrieves messages from empty database"""
@@ -291,7 +291,7 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
 
     def test_msg_returned_with_msg_id_returns_404(self):
         """retrieves message using id that doesn't exist"""
-        message_id = 1
+        message_id = "1"
         with app.app_context():
             with current_app.test_request_context():
                 with self.assertRaises(NotFound):
@@ -299,7 +299,7 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
 
     def test_msg_returned_with_msg_id_msg_not_in_database(self):
         """retrieves message using id"""
-        message_id = 21
+        message_id = "21"
         self.populate_database(20)
         with app.app_context():
             with current_app.test_request_context():
@@ -683,8 +683,8 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
         """retrieves message using id and checks the read date returned"""
         self.populate_database(1, add_reply=True)
         with self.engine.connect() as con:
-            query = 'SELECT secure_message.msg_id FROM secure_message ' \
-                    'JOIN events ON secure_message.msg_id = events.msg_id WHERE events.event = "Read" LIMIT 1'
+            query = "SELECT secure_message.msg_id FROM secure_message " \
+                    "JOIN events ON secure_message.msg_id = events.msg_id WHERE events.event = 'Read' LIMIT 1"
             query_x = con.execute(query)
             names = []
             for row in query_x:

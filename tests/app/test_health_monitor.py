@@ -15,19 +15,19 @@ class HealthTestCase(unittest.TestCase):
         """setup test environment"""
         self.app = application.app.test_client()
         app.testing = True
-        app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:////tmp/messages.db'
+        app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://rhi:password@localhost:5432/sms'
         with app.app_context():
             database.db.init_app(current_app)
             database.db.drop_all()
             database.db.create_all()
             self.db = database.db
 
-    @event.listens_for(Engine, "connect")
-    def set_sqlite_pragma(dbapi_connection, connection_record):
-        """enable foreign key constraint for tests"""
-        cursor = dbapi_connection.cursor()
-        cursor.execute("PRAGMA foreign_keys=ON")
-        cursor.close()
+    # @event.listens_for(Engine, "connect")
+    # def set_sqlite_pragma(dbapi_connection, connection_record):
+    #     """enable foreign key constraint for tests"""
+    #     cursor = dbapi_connection.cursor()
+    #     cursor.execute("PRAGMA foreign_keys=ON")
+    #     cursor.close()
 
     def test_health_status(self):
         """sends GET request to the application health monitor endpoint"""
