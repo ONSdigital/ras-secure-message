@@ -1,7 +1,7 @@
 # Secure Messaging API
 
 
-* `GET /messages`
+## `GET /messages`
 
 &mdash; When a list of messages is requested this returns a generic representation of the list of messages available.
 
@@ -9,18 +9,18 @@
 
 | `**Variable**` | `**Type**` | `**Example Value**` |
 | :---: | :---: | :---: |
-| cc (collection_case) | `string` | ACollectionCase |
+| cc (collection_case) | `string` | 0000000000000000 |
 | ru_id | `string` | (not implemented)
 | survey | `string` | BRES |
 | label | `string` | INBOX/DRAFT/SENT |
-| ce (collection_exercise) | `string`| ACollectionExercise |
+| ce (collection_exercise) | `string`| aaa1aa1a-1aa1-1111-aa11-11a11aa111aa |
 | desc (descending) | `boolean` | True/False
 | limit | `int` | 2 |
 
    * An example of using one the above would be: `GET /messages?limit=2` 
    * Using multiple parameters: `GET /messages?limit=2&label=INBOX`
 
-### Example JSON Response
+#### Example JSON Response
 
 ```json
 {
@@ -96,9 +96,9 @@
 ]}
 ```
 
-* `POST /message/send`
+## `POST /message/send`
 
-### Example JSON DATA for post
+#### Example JSON DATA for post
 
 ```json
 {
@@ -113,7 +113,7 @@
 }
 ```
 
-### Example JSON Response
+#### Example JSON Response
 
 ```json
 {
@@ -123,11 +123,11 @@
 }
 ```
 
-* `GET /message/{id}`
+## `GET /message/{id}`
 
 &mdash; When an individual message is requested by message id, it returns the specific message by the message id.
 
-### Example JSON Response
+#### Example JSON Response
 
 ```json
 { "@msg_from": {
@@ -179,9 +179,9 @@
     }
 ```
 
-* `PUT message/{id}/modify`
+## `PUT message/{id}/modify`
 
-### Example JSON DATA for put
+#### Example JSON DATA for put
 
 ```json
 {
@@ -190,7 +190,7 @@
 }
 ```
 
-### Example JSON Response
+#### Example JSON Response
 
 ```json
 {
@@ -198,9 +198,9 @@
 }
 ```
 
-* `GET /drafts`
+## `GET /drafts`
 
-### Example JSON Response
+#### Example JSON Response
 
 ```json
 {
@@ -274,9 +274,9 @@
 }
 ```
 
-* `POST /draft/save`
+## `POST /draft/save`
 
-### Example JSON DATA for post
+#### Example JSON DATA for post
 
 ```json
 {
@@ -291,7 +291,7 @@
 }
 ```
 
-### Example JSON Response
+#### Example JSON Response
 
 ```json
 {
@@ -301,9 +301,9 @@
 }
 ```
 
-* `GET /draft/{id}`
+## `GET /draft/{id}`
 
-### Example JSON Response
+#### Example JSON Response
 
 ```json
 {
@@ -361,9 +361,9 @@
 }
 ```
 
-* `PUT /draft/{id}/modify`
+## `PUT /draft/{id}/modify`
 
-### Example JSON DATA for put
+#### Example JSON DATA for put
 
 ```json
 {
@@ -379,7 +379,7 @@
 }
 ```
 
-### Example JSON Response
+#### Example JSON Response
 
 ```json
 {
@@ -388,9 +388,9 @@
 }
 ```
 
-* `GET /labels?name=unread`
+## `GET /labels?name=unread`
 
-### Example JSON Response
+#### Example JSON Response
 
 ```json
 {
@@ -399,17 +399,19 @@
 }
 ```
 
-* `GET /threads` ** Currently not implemented **
+## `GET /threads` 
+###** Currently not implemented **
 
-### Example JSON Response
+#### Example JSON Response
 
 ```json
 
 ```
 
-* `GET /thread/{thread_id}` ** Currently not implemented **
+## `GET /thread/{thread_id}` 
+### ** Currently not implemented **
 
-### Example JSON Response
+#### Example JSON Response
 
 ```json
 
