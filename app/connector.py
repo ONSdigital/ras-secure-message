@@ -23,7 +23,7 @@ def get_database_uri():
         decoded_config = json.loads(os.environ['VCAP_SERVICES'])
     else:
         logger.info('VCAP_SERVICES NOT found in environment')
-        return os.environ.get('SECURE_MESSAGING_DATABASE_URL', 'postgresql://postgres:postgres@localhost:5432')
+        return os.environ.get('SECURE_MESSAGING_DATABASE_URL', 'postgresql://rhi:password@localhost:5432/sms')
 
     for key, value in decoded_config.items():
         logger.info('VCAP SERVICES environment variable', key=key, value=value)
@@ -33,4 +33,4 @@ def get_database_uri():
             return uri
         else:
             logger.info('VCAP_SERVICES defined but no URI credential found')
-            return os.environ.get('SECURE_MESSAGING_DATABASE_URL', 'postgresql://postgres:postgres@localhost:5432')
+            return os.environ.get('SECURE_MESSAGING_DATABASE_URL', 'postgresql://rhi:password@localhost:5432/sms')

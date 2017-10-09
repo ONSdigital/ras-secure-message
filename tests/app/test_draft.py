@@ -1,5 +1,7 @@
 import uuid
 import unittest
+import testing.postgresql
+
 from unittest import mock
 from flask import g
 from flask import current_app, json
@@ -24,6 +26,7 @@ from app.services.service_toggles import party, case_service
 from tests.app import test_utilities
 
 
+@testing.postgresql.skipIfNotInstalled
 class DraftTestCase(unittest.TestCase):
     """Test case for draft saving"""
 
@@ -68,13 +71,6 @@ class DraftTestCase(unittest.TestCase):
         self.user_respondent = User('0a7ad740-10d5-4ecb-b7ca-3c0384afb882', 'respondent')
         case_service.use_mock_service()
         party.use_mock_service()
-
-    # @event.listens_for(Engine, "connect")
-    # def set_sqlite_pragma(dbapi_connection, connection_record):
-    #     """enable foreign key constraint for tests"""
-    #     cursor = dbapi_connection.cursor()
-    #     cursor.execute("PRAGMA foreign_keys=ON")
-    #     cursor.close()
 
     def test_draft_call_saver(self):
         """Test saver called as expected to save draft"""

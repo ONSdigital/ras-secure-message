@@ -1,4 +1,6 @@
 import unittest
+import testing.postgresql
+
 from unittest import mock
 from sqlalchemy import create_engine, event
 from sqlalchemy.engine import Engine
@@ -13,6 +15,7 @@ from flask import current_app
 from app import settings
 
 
+@testing.postgresql.skipIfNotInstalled
 class SaverTestCase(unittest.TestCase):
     """Test case for message saving"""
     def setUp(self):
@@ -28,13 +31,6 @@ class SaverTestCase(unittest.TestCase):
             database.db.create_all()
             self.db = database.db
         settings.NOTIFY_CASE_SERVICE = '1'
-
-    # @event.listens_for(Engine, "connect")
-    # def set_sqlite_pragma(dbapi_connection, connection_record):
-    #     """enable foreign key constraint for tests"""
-    #     cursor = dbapi_connection.cursor()
-    #     cursor.execute("PRAGMA foreign_keys=ON")
-    #     cursor.close()
 
     def test_save_message_raises_message_save_exception_on_db_error(self):
         """Tests exception is logged if message save fails"""

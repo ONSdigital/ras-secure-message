@@ -1,4 +1,6 @@
 import unittest
+import testing.postgresql
+
 from flask import json
 from sqlalchemy import create_engine, event
 from sqlalchemy.engine import Engine
@@ -23,13 +25,8 @@ def _generate_encrypted_token():
     return encrypted_jwt
 
 
+@testing.postgresql.skipIfNotInstalled
 class PartyTestCase(unittest.TestCase):
-    # @event.listens_for(Engine, "connect")
-    # def set_sqlite_pragma(dbapi_connection, connection_record):
-    #     """enable foreign key constraint for tests"""
-    #     cursor = dbapi_connection.cursor()
-    #     cursor.execute("PRAGMA foreign_keys=ON")
-    #     cursor.close()
 
     def test_get_user_details_by_uuid(self):
         """Test that user details are returned using uuids"""

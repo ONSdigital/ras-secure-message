@@ -1,4 +1,6 @@
 import unittest
+import testing.postgresql
+
 from unittest import mock
 from unittest.mock import patch
 from datetime import datetime, timezone
@@ -20,6 +22,7 @@ from app.api_mocks.case_service_mock import CaseServiceMock
 from tests.app import test_utilities
 
 
+@testing.postgresql.skipIfNotInstalled
 class FlaskTestCase(unittest.TestCase):
     """Test case for application endpoints"""
 
@@ -60,13 +63,6 @@ class FlaskTestCase(unittest.TestCase):
             database.db.drop_all()
             database.db.create_all()
             self.db = database.db
-
-    # @event.listens_for(Engine, "connect")
-    # def set_sqlite_pragma(dbapi_connection, connection_record):
-    #     """enable foreign key constraint for tests"""
-    #     cursor = dbapi_connection.cursor()
-    #     cursor.execute("PRAGMA foreign_keys=ON")
-    #     cursor.close()
 
     def test_that_checks_post_request_is_within_database(self):
         """check messages from messageSend endpoint saved in database correctly"""

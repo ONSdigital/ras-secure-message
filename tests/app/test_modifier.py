@@ -1,5 +1,7 @@
 import unittest
 import uuid
+import testing.postgresql
+
 from datetime import datetime, timezone
 from flask import current_app, g
 from sqlalchemy import create_engine, event
@@ -17,6 +19,8 @@ from app.repository.database import SecureMessage
 from app import constants
 from tests.app import test_utilities
 
+
+@testing.postgresql.skipIfNotInstalled
 class ModifyTestCaseHelper:
     """Helper class for Modify Tests"""
 
@@ -47,6 +51,7 @@ class ModifyTestCaseHelper:
                 con.execute(query)
 
 
+@testing.postgresql.skipIfNotInstalled
 class ModifyTestCase(unittest.TestCase, ModifyTestCaseHelper):
     """Test case for message retrieval"""
 
@@ -64,13 +69,6 @@ class ModifyTestCase(unittest.TestCase, ModifyTestCaseHelper):
 
         self.user_internal = User('ce12b958-2a5f-44f4-a6da-861e59070a31', 'internal')
         self.user_respondent = User('0a7ad740-10d5-4ecb-b7ca-3c0384afb882', 'respondent')
-
-    # @event.listens_for(Engine, "connect")
-    # def set_sqlite_pragma(dbapi_connection, connection_record):
-    #     """enable foreign key constraint for tests"""
-    #     cursor = dbapi_connection.cursor()
-    #     cursor.execute("PRAGMA foreign_keys=ON")
-    #     cursor.close()
 
     def test_archived_label_is_added_to_message(self):
         """testing message is added to database with archived label attached"""

@@ -8,7 +8,6 @@ from app.constants import MAX_SUBJECT_LEN, MAX_BODY_LEN, MAX_THREAD_LEN
 from flask import g
 
 
-
 class MessageTestCase(unittest.TestCase):
     """Test case for Messages"""
 

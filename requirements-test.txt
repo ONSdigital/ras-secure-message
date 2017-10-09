@@ -4,4 +4,4 @@ pylint==1.6.4
 pylint-mccabe==0.1.3
 testfixtures==5.1.1
 requests_mock==1.1
-
+testing.postgresql==1.3.0

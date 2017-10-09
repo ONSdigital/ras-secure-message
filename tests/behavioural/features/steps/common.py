@@ -11,14 +11,6 @@ from tests.behavioural.features.steps.secure_messaging_context_helper import Sec
 import nose.tools
 
 
-# @event.listens_for(Engine, "connect")
-# def set_sqlite_pragma(dbapi_connection, connection_record):
-#     """enable foreign key constraint for tests"""
-#     cursor = dbapi_connection.cursor()
-#     cursor.execute("PRAGMA foreign_keys=ON")
-#     cursor.close()
-
-
 @given("prepare for tests using '{service_type}' services")
 def step_impl_prepare_for_tests(context, service_type):
     """Prepare bdd tests to run against either mock or real external services"""
