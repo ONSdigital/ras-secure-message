@@ -1,10 +1,11 @@
 import unittest
 import uuid
+from werkzeug.exceptions import InternalServerError
+
 from datetime import datetime, timezone
 from flask import current_app, g
-from sqlalchemy import create_engine, event
-from sqlalchemy.engine import Engine
-from werkzeug.exceptions import InternalServerError
+from sqlalchemy import create_engine
+
 from app.application import app
 from app.common.labels import Labels
 from app.repository import database
@@ -17,6 +18,7 @@ from app.repository.database import SecureMessage
 from app import constants
 from tests.app import test_utilities
 
+
 class ModifyTestCaseHelper:
     """Helper class for Modify Tests"""
 
@@ -25,24 +27,24 @@ class ModifyTestCaseHelper:
         with self.engine.connect() as con:
             for i in range(record_count):
                 msg_id = str(uuid.uuid4())
-                query = 'INSERT INTO secure_message(id, msg_id, subject, body, thread_id,' \
-                        ' collection_case, ru_id, collection_exercise, survey) VALUES ({0}, "{1}", "test","test","", ' \
-                        ' "ACollectionCase", "f1a5e99c-8edf-489a-9c72-6cabe6c387fc", "ACollectionExercise",' \
-                        '"BRES")'.format(i, msg_id)
+                query = "INSERT INTO secure_message(id, msg_id, subject, body, thread_id," \
+                        " collection_case, ru_id, collection_exercise, survey) VALUES ({0}, '{1}', 'test','test','', " \
+                        " 'ACollectionCase', 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc', 'ACollectionExercise'," \
+                        "'BRES')".format(i, msg_id)
                 con.execute(query)
-                query = 'INSERT INTO status(label, msg_id, actor) VALUES("SENT", "{0}", ' \
-                        '"0a7ad740-10d5-4ecb-b7ca-3c0384afb882")'.format(msg_id)
+                query = "INSERT INTO status(label, msg_id, actor) VALUES('SENT', '{0}', " \
+                        "'0a7ad740-10d5-4ecb-b7ca-3c0384afb882')".format(msg_id)
                 con.execute(query)
-                query = 'INSERT INTO status(label, msg_id, actor) VALUES("INBOX", "{0}", "BRES")'.format(
+                query = "INSERT INTO status(label, msg_id, actor) VALUES('INBOX', '{0}', 'BRES')".format(
                     msg_id)
                 con.execute(query)
-                query = 'INSERT INTO status(label, msg_id, actor) VALUES("UNREAD", "{0}", "BRES")'.format(
+                query = "INSERT INTO status(label, msg_id, actor) VALUES('UNREAD', '{0}', 'BRES')".format(
                     msg_id)
                 con.execute(query)
-                query = 'INSERT INTO events(event, msg_id, date_time) VALUES("Sent", "{0}", "{1}")'.format(
+                query = "INSERT INTO events(event, msg_id, date_time) VALUES('Sent', '{0}', '{1}')".format(
                     msg_id, "2017-02-03 00:00:00")
                 con.execute(query)
-                query = 'INSERT INTO events(event, msg_id, date_time) VALUES("Read", "{0}", "{1}")'.format(
+                query = "INSERT INTO events(event, msg_id, date_time) VALUES('Read', '{0}', '{1}')".format(
                     msg_id, "2017-02-03 00:00:00")
                 con.execute(query)
 
@@ -53,8 +55,7 @@ class ModifyTestCase(unittest.TestCase, ModifyTestCaseHelper):
     def setUp(self):
         """setup test environment"""
         app.testing = True
-        app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:////tmp/messages.db'
-        self.engine = create_engine('sqlite:////tmp/messages.db')
+        self.engine = create_engine(app.config['SQLALCHEMY_DATABASE_URI'])
         self.MESSAGE_LIST_ENDPOINT = "http://localhost:5050/messages"
         self.MESSAGE_BY_ID_ENDPOINT = "http://localhost:5050/message/"
         with app.app_context():
@@ -65,13 +66,6 @@ class ModifyTestCase(unittest.TestCase, ModifyTestCaseHelper):
 
         self.user_internal = User('ce12b958-2a5f-44f4-a6da-861e59070a31', 'internal')
         self.user_respondent = User('0a7ad740-10d5-4ecb-b7ca-3c0384afb882', 'respondent')
-
-    @event.listens_for(Engine, "connect")
-    def set_sqlite_pragma(dbapi_connection, connection_record):
-        """enable foreign key constraint for tests"""
-        cursor = dbapi_connection.cursor()
-        cursor.execute("PRAGMA foreign_keys=ON")
-        cursor.close()
 
     def test_archived_label_is_added_to_message(self):
         """testing message is added to database with archived label attached"""

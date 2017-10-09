@@ -20,7 +20,7 @@ Feature: Get threads list Endpoint
     Then  a success status code (200) is returned
       And '3' messages are returned
 
-
+  @ignore # threads not implemented yet
   Scenario: There are 3 conversations between respondent and internal each with 2 messages, respondent attempts to read them
     Given sending from respondent to internal
       And the message is sent
@@ -41,6 +41,7 @@ Feature: Get threads list Endpoint
     Then  a success status code (200) is returned
       And '3' messages are returned
 
+  @ignore # threads not implemented yet
   Scenario: There are 3 conversations between respondent and internal each with 2 messages, internal user attempts to read them
     Given sending from respondent to internal
       And the message is sent
@@ -63,6 +64,7 @@ Feature: Get threads list Endpoint
       And '3' messages are returned
 
 
+  @ignore # threads not implemented yet
   Scenario: There are 3 conversations between respondent and internal each with 2  messages and a draft, validate most recent message returned for each
     Given sending from respondent to internal
       And the message is sent
@@ -91,6 +93,7 @@ Feature: Get threads list Endpoint
           # Drafts added last
       And '3' messages have a 'DRAFT' label
 
+  @ignore # threads not implemented yet
   Scenario: There are 3 conversations between an internal user and respondent each with 2  messages and a draft, validate most recent message returned for each
     Given sending from internal to respondent
       And the message is sent

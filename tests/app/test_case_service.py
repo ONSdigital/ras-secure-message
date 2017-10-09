@@ -1,9 +1,9 @@
 import json
+import requests
 import unittest
 from unittest import mock
 
 from app.services.case_service import CaseService
-import requests
 
 
 class CaseServiceTestHelper:

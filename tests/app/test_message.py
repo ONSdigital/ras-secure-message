@@ -1,12 +1,13 @@
 import unittest
 from datetime import datetime, timezone
+
+from flask import g
+
 from app import constants
 from app.validation.domain import Message, MessageSchema, DraftSchema
 from app.validation.user import User
 from app.application import app
 from app.constants import MAX_SUBJECT_LEN, MAX_BODY_LEN, MAX_THREAD_LEN
-from flask import g
-
 
 
 class MessageTestCase(unittest.TestCase):

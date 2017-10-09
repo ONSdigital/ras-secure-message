@@ -5,8 +5,7 @@ import logging
 from structlog import wrap_logger
 
 conn = None
-# uri = 'postgres://postgres:password@host.pcfdev.io:5431/postgres'
-uri = None
+uri = os.environ.get('SECURE_MESSAGING_DATABASE_URL', 'postgresql://postgres:postgres@localhost:5432')
 
 
 # Extract the database URI value from VCAP_SERVICES
@@ -23,7 +22,7 @@ def get_database_uri():
         decoded_config = json.loads(os.environ['VCAP_SERVICES'])
     else:
         logger.info('VCAP_SERVICES NOT found in environment')
-        return os.environ.get('SECURE_MESSAGING_DATABASE_URL', 'sqlite:////tmp/messages.db')
+        return uri
 
     for key, value in decoded_config.items():
         logger.info('VCAP SERVICES environment variable', key=key, value=value)
@@ -33,4 +32,4 @@ def get_database_uri():
             return uri
         else:
             logger.info('VCAP_SERVICES defined but no URI credential found')
-            return os.environ.get('SECURE_MESSAGING_DATABASE_URL', 'sqlite:////tmp/messages.db')
+            return uri

@@ -1,11 +1,12 @@
 import uuid
 import unittest
 from unittest import mock
+from werkzeug.exceptions import InternalServerError
+
 from flask import g
 from flask import current_app, json
-from sqlalchemy import create_engine, event
-from sqlalchemy.engine import Engine
-from werkzeug.exceptions import InternalServerError
+from sqlalchemy import create_engine
+
 from app import application, settings, constants
 from app.application import app
 from app.authentication.jwe import Encrypter
@@ -23,14 +24,15 @@ from app.constants import MAX_RU_ID_LEN
 from app.services.service_toggles import party, case_service
 from tests.app import test_utilities
 
+
 class DraftTestCase(unittest.TestCase):
     """Test case for draft saving"""
 
     def setUp(self):
         """setup test environment"""
         self.app = application.app.test_client()
-        app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:////tmp/messages.db'
-        self.engine = create_engine('sqlite:////tmp/messages.db')
+
+        self.engine = create_engine(app.config['SQLALCHEMY_DATABASE_URI'])
         token_data = {
             constants.USER_IDENTIFIER: constants.BRES_USER,
             "role": "internal"
@@ -67,13 +69,6 @@ class DraftTestCase(unittest.TestCase):
         self.user_respondent = User('0a7ad740-10d5-4ecb-b7ca-3c0384afb882', 'respondent')
         case_service.use_mock_service()
         party.use_mock_service()
-
-    @event.listens_for(Engine, "connect")
-    def set_sqlite_pragma(dbapi_connection, connection_record):
-        """enable foreign key constraint for tests"""
-        cursor = dbapi_connection.cursor()
-        cursor.execute("PRAGMA foreign_keys=ON")
-        cursor.close()
 
     def test_draft_call_saver(self):
         """Test saver called as expected to save draft"""
@@ -235,16 +230,16 @@ class DraftTestCase(unittest.TestCase):
 
         with self.engine.connect() as con:
             msg_id = str(uuid.uuid4())
-            query = 'INSERT INTO secure_message(msg_id, subject, body, thread_id,' \
-                    ' collection_case, ru_id, survey) VALUES ("{0}", "test","test","", ' \
-                    ' "ACollectionCase", "f1a5e99c-8edf-489a-9c72-6cabe6c387fc", "ACollectionExercise"' \
-                    '"BRES")'.format(msg_id)
+            query = "INSERT INTO secure_message(msg_id, subject, body, thread_id," \
+                    " collection_case, ru_id, survey) VALUES ('{0}', 'test','test','', " \
+                    " 'ACollectionCase', 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc', 'ACollectionExercise'" \
+                    "'BRES')".format(msg_id)
             con.execute(query)
-            query = 'INSERT INTO status(label, msg_id, actor) VALUES("DRAFT", "{0}", ' \
-                    '"0a7ad740-10d5-4ecb-b7ca-3c0384afb882")'.format(msg_id)
+            query = "INSERT INTO status(label, msg_id, actor) VALUES('DRAFT', '{0}', " \
+                    "'0a7ad740-10d5-4ecb-b7ca-3c0384afb882')".format(msg_id)
             con.execute(query)
-            query = 'INSERT INTO status(label, msg_id, actor) VALUES("DRAFT_INBOX", "{0}",' \
-                    ' "SurveyType")'.format(msg_id)
+            query = "INSERT INTO status(label, msg_id, actor) VALUES('DRAFT_INBOX', '{0}'," \
+                    " 'SurveyType')".format(msg_id)
             con.execute(query)
 
         with app.app_context():

@@ -1,7 +1,8 @@
 import unittest
+
 from flask import json
-from sqlalchemy import create_engine, event
-from sqlalchemy.engine import Engine
+from sqlalchemy import create_engine
+
 from app import application, constants, settings
 from app.application import app
 from app.common.utilities import get_business_details_by_ru, get_details_by_uuids
@@ -9,6 +10,7 @@ from app.authentication.jwe import Encrypter
 from app.authentication.jwt import encode
 from app.api_mocks.party_service_mock import PartyServiceMock
 from tests.app import test_utilities
+
 
 def _generate_encrypted_token():
     token_data = {constants.USER_IDENTIFIER: "0a7ad740-10d5-4ecb-b7ca-3c0384afb882",
@@ -23,12 +25,6 @@ def _generate_encrypted_token():
 
 
 class PartyTestCase(unittest.TestCase):
-    @event.listens_for(Engine, "connect")
-    def set_sqlite_pragma(dbapi_connection, connection_record):
-        """enable foreign key constraint for tests"""
-        cursor = dbapi_connection.cursor()
-        cursor.execute("PRAGMA foreign_keys=ON")
-        cursor.close()
 
     def test_get_user_details_by_uuid(self):
         """Test that user details are returned using uuids"""
@@ -147,8 +143,7 @@ class PartyTestCase(unittest.TestCase):
 
         self.app = application.app.test_client()
 
-        app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:////tmp/messages.db'
-        self.engine = create_engine('sqlite:////tmp/messages.db')
+        self.engine = create_engine(app.config['SQLALCHEMY_DATABASE_URI'])
 
         resp = self.app.post("http://localhost:5050/message/send", data=json.dumps(data), headers=self.headers)
         resp_data = json.loads(resp.data)
@@ -190,8 +185,7 @@ class PartyTestCase(unittest.TestCase):
 
         self.headers = {'Content-Type': 'application/json', 'Authorization': encrypted_token}
 
-        app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:////tmp/messages.db'
-        self.engine = create_engine('sqlite:////tmp/messages.db')
+        self.engine = create_engine(app.config['SQLALCHEMY_DATABASE_URI'])
 
         self.app.post("http://localhost:5050/message/send", data=json.dumps(data), headers=self.headers)
         self.app.post("http://localhost:5050/message/send", data=json.dumps(data), headers=self.headers)
@@ -226,8 +220,7 @@ class PartyTestCase(unittest.TestCase):
 
         self.headers = {'Content-Type': 'application/json', 'Authorization': encrypted_token}
 
-        app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:////tmp/messages.db'
-        self.engine = create_engine('sqlite:////tmp/messages.db')
+        self.engine = create_engine(app.config['SQLALCHEMY_DATABASE_URI'])
 
         draft_resp = self.app.post("http://localhost:5050/draft/save", data=json.dumps(data), headers=self.headers)
         draft_details = json.loads(draft_resp.data)
@@ -258,8 +251,7 @@ class PartyTestCase(unittest.TestCase):
 
         self.headers = {'Content-Type': 'application/json', 'Authorization': encrypted_token}
 
-        app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:////tmp/messages.db'
-        self.engine = create_engine('sqlite:////tmp/messages.db')
+        self.engine = create_engine(app.config['SQLALCHEMY_DATABASE_URI'])
 
         self.app.post("http://localhost:5050/draft/save", data=json.dumps(data), headers=self.headers)
         self.app.post("http://localhost:5050/draft/save", data=json.dumps(data), headers=self.headers)
@@ -326,8 +318,7 @@ class PartyTestCase(unittest.TestCase):
 
         self.headers = {'Content-Type': 'application/json', 'Authorization': encrypted_token}
 
-        app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:////tmp/messages.db'
-        self.engine = create_engine('sqlite:////tmp/messages.db')
+        self.engine = create_engine(app.config['SQLALCHEMY_DATABASE_URI'])
 
         message_post = self.app.post("http://localhost:5050/message/send", data=json.dumps(data), headers=self.headers)
         message_data = json.loads(message_post.data)
@@ -355,8 +346,7 @@ class PartyTestCase(unittest.TestCase):
 
         self.headers = {'Content-Type': 'application/json', 'Authorization': encrypted_token}
 
-        app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:////tmp/messages.db'
-        self.engine = create_engine('sqlite:////tmp/messages.db')
+        self.engine = create_engine(app.config['SQLALCHEMY_DATABASE_URI'])
 
         self.app.post("http://localhost:5050/message/send", data=json.dumps(data), headers=self.headers)
         self.app.post("http://localhost:5050/message/send", data=json.dumps(data), headers=self.headers)
@@ -385,8 +375,7 @@ class PartyTestCase(unittest.TestCase):
 
         self.headers = {'Content-Type': 'application/json', 'Authorization': encrypted_token}
 
-        app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:////tmp/messages.db'
-        self.engine = create_engine('sqlite:////tmp/messages.db')
+        self.engine = create_engine(app.config['SQLALCHEMY_DATABASE_URI'])
 
         draft_save = self.app.post("http://localhost:5050/draft/save", data=json.dumps(data), headers=self.headers)
         draft_data = json.loads(draft_save.data)
@@ -414,8 +403,7 @@ class PartyTestCase(unittest.TestCase):
 
         self.headers = {'Content-Type': 'application/json', 'Authorization': encrypted_token}
 
-        app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:////tmp/messages.db'
-        self.engine = create_engine('sqlite:////tmp/messages.db')
+        self.engine = create_engine(app.config['SQLALCHEMY_DATABASE_URI'])
 
         self.app.post("http://localhost:5050/draft/save", data=json.dumps(data), headers=self.headers)
         self.app.post("http://localhost:5050/draft/save", data=json.dumps(data), headers=self.headers)

@@ -1,5 +1,7 @@
 import unittest
+
 import requests_mock
+
 from app.services.party_service import PartyService
 import app.settings
 from app import constants

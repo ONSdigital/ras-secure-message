@@ -2,6 +2,7 @@ import unittest
 import os
 import sys
 
+
 if __name__ == "__main__":
     os.environ['JWT_SECRET'] = 'testsecret'
     os.environ['JWT_ALGORITHM'] = 'HS256'

@@ -17,9 +17,15 @@ install:
 script:
     - coverage run run_tests.py
 
+services:
+    - postgresql
+
 after_success:
     - codecov
 
 branches:
     only:
         - master
+
+addons:
+  postgresql: "9.6"
