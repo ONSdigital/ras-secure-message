@@ -399,7 +399,7 @@
 }
 ```
 
-* `GET /threads`
+* `GET /threads` ** Currently not implemented **
 
 ### Example JSON Response
 
@@ -407,7 +407,7 @@
 
 ```
 
-* `GET /thread/{thread_id}`
+* `GET /thread/{thread_id}` ** Currently not implemented **
 
 ### Example JSON Response
 
