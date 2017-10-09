@@ -1,5 +1,4 @@
 import unittest
-import testing.postgresql
 
 from flask import current_app, json
 from app import application, settings, constants
@@ -10,7 +9,6 @@ from app.repository import database
 from sqlalchemy import create_engine
 
 
-@testing.postgresql.skipIfNotInstalled
 class LabelTestCase(unittest.TestCase):
     """ Test cases for label endpoint"""
 

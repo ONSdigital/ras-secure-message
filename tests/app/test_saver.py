@@ -1,5 +1,4 @@
 import unittest
-import testing.postgresql
 
 from unittest import mock
 from sqlalchemy import create_engine, event
@@ -15,7 +14,6 @@ from flask import current_app
 from app import settings
 
 
-@testing.postgresql.skipIfNotInstalled
 class SaverTestCase(unittest.TestCase):
     """Test case for message saving"""
     def setUp(self):

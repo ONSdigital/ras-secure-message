@@ -1,5 +1,4 @@
 import unittest
-import testing.postgresql
 
 from flask import json
 from sqlalchemy import create_engine, event
@@ -25,7 +24,6 @@ def _generate_encrypted_token():
     return encrypted_jwt
 
 
-@testing.postgresql.skipIfNotInstalled
 class PartyTestCase(unittest.TestCase):
 
     def test_get_user_details_by_uuid(self):

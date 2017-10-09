@@ -1,6 +1,5 @@
 import unittest
 import uuid
-import testing.postgresql
 
 from datetime import datetime, timezone
 from flask import current_app, g
@@ -20,7 +19,6 @@ from app import constants
 from tests.app import test_utilities
 
 
-@testing.postgresql.skipIfNotInstalled
 class ModifyTestCaseHelper:
     """Helper class for Modify Tests"""
 
@@ -51,7 +49,6 @@ class ModifyTestCaseHelper:
                 con.execute(query)
 
 
-@testing.postgresql.skipIfNotInstalled
 class ModifyTestCase(unittest.TestCase, ModifyTestCaseHelper):
     """Test case for message retrieval"""
 

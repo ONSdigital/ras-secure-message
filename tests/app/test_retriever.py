@@ -1,6 +1,5 @@
 import unittest
 import uuid
-import testing.postgresql
 
 from datetime import datetime
 from flask import current_app
@@ -19,7 +18,6 @@ from app.validation.user import User
 from tests.app import test_utilities
 
 
-@testing.postgresql.skipIfNotInstalled
 class RetrieverTestCaseHelper:
 
     """Helper class for Retriever Tests"""
@@ -171,7 +169,6 @@ class RetrieverTestCaseHelper:
         return threads
 
 
-@testing.postgresql.skipIfNotInstalled
 class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
     """Test case for message retrieval"""
     def setUp(self):

@@ -1,5 +1,4 @@
 import unittest
-import testing.postgresql
 
 from flask import current_app, json
 from app import application
@@ -10,7 +9,6 @@ from sqlalchemy.engine import Engine
 from sqlalchemy import event
 
 
-@testing.postgresql.skipIfNotInstalled
 class HealthTestCase(unittest.TestCase):
     """Test case for application health monitor"""
     def setUp(self):

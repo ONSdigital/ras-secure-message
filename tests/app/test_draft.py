@@ -1,6 +1,5 @@
 import uuid
 import unittest
-import testing.postgresql
 
 from unittest import mock
 from flask import g
@@ -26,7 +25,6 @@ from app.services.service_toggles import party, case_service
 from tests.app import test_utilities
 
 
-@testing.postgresql.skipIfNotInstalled
 class DraftTestCase(unittest.TestCase):
     """Test case for draft saving"""
 

@@ -1,5 +1,4 @@
 import unittest
-import testing.postgresql
 
 from unittest import mock
 from unittest.mock import patch
@@ -22,7 +21,6 @@ from app.api_mocks.case_service_mock import CaseServiceMock
 from tests.app import test_utilities
 
 
-@testing.postgresql.skipIfNotInstalled
 class FlaskTestCase(unittest.TestCase):
     """Test case for application endpoints"""
 

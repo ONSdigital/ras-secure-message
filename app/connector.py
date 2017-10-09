@@ -5,7 +5,7 @@ import logging
 from structlog import wrap_logger
 
 conn = None
-uri = os.environ.get('SECURE_MESSAGING_DATABASE_URL', 'postgresql://rhi:password@localhost:5432/sms')
+uri = os.environ.get('SECURE_MESSAGING_DATABASE_URL', 'postgresql://postgres:postgres@localhost:5432')
 
 
 # Extract the database URI value from VCAP_SERVICES
