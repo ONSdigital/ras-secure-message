@@ -1,12 +1,11 @@
 import unittest
 
 from flask import current_app, json
+
 from app import application
 from app.application import app
 from app.repository import database
 from app.repository.retriever import Retriever
-from sqlalchemy.engine import Engine
-from sqlalchemy import event
 
 
 class HealthTestCase(unittest.TestCase):

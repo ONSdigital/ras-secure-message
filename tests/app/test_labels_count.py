@@ -1,12 +1,13 @@
 import unittest
 
 from flask import current_app, json
+from sqlalchemy import create_engine
+
 from app import application, settings, constants
 from app.application import app
 from app.authentication.jwe import Encrypter
 from app.authentication.jwt import encode
 from app.repository import database
-from sqlalchemy import create_engine
 
 
 class LabelTestCase(unittest.TestCase):

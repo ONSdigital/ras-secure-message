@@ -1,8 +1,8 @@
 import unittest
+
 from app.services.service_toggles import Party
 from app.api_mocks.party_service_mock import PartyServiceMock
 from app.services.party_service import PartyService
-import logging
 
 
 class ServiceMockTestCase(unittest.TestCase):

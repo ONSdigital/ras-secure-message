@@ -1,8 +1,8 @@
 import unittest
 
 from flask import json
-from sqlalchemy import create_engine, event
-from sqlalchemy.engine import Engine
+from sqlalchemy import create_engine
+
 from app import application, constants, settings
 from app.application import app
 from app.common.utilities import get_business_details_by_ru, get_details_by_uuids

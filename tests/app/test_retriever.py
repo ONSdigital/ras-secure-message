@@ -1,11 +1,11 @@
 import unittest
 import uuid
-
 from datetime import datetime
-from flask import current_app
-from sqlalchemy import create_engine, event
-from sqlalchemy.engine import Engine
 from werkzeug.exceptions import NotFound, InternalServerError
+
+from flask import current_app
+from sqlalchemy import create_engine
+
 from app.application import app
 from app.repository import database
 from app.repository.retriever import Retriever
@@ -13,7 +13,6 @@ from app.constants import MESSAGE_QUERY_LIMIT
 from app.services.service_toggles import party
 from app import constants
 from app import settings
-
 from app.validation.user import User
 from tests.app import test_utilities
 

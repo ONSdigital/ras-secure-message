@@ -1,4 +1,5 @@
 import unittest
+
 from app.exception.exceptions import MessageSaveException
 
 

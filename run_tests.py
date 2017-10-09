@@ -28,5 +28,3 @@ if __name__ == "__main__":
             i = len(result.failures) + len(result.errors)
             if i != 0 or behave == 1:
                 sys.exit(1)
-
-

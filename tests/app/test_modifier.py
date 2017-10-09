@@ -1,11 +1,11 @@
 import unittest
 import uuid
+from werkzeug.exceptions import InternalServerError
 
 from datetime import datetime, timezone
 from flask import current_app, g
-from sqlalchemy import create_engine, event
-from sqlalchemy.engine import Engine
-from werkzeug.exceptions import InternalServerError
+from sqlalchemy import create_engine
+
 from app.application import app
 from app.common.labels import Labels
 from app.repository import database

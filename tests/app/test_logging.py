@@ -2,12 +2,15 @@ import sys
 import unittest
 from unittest import mock
 from io import StringIO
+
+from flask import g
+
 from app.validation.domain import MessageSchema
 from app import application
 from app.application import app
 from app.logger_config import logger_initial_config
 from app.validation.user import User
-from flask import g
+
 
 sys.path.append('../../ras-secure-message')
 

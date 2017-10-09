@@ -1,8 +1,9 @@
 import unittest
-
 from unittest import mock
-from sqlalchemy import create_engine, event
-from sqlalchemy.engine import Engine
+
+from flask import current_app
+from sqlalchemy import create_engine
+
 from app.repository.saver import Saver
 from app.repository import database
 from app.repository.database import db
@@ -10,7 +11,6 @@ from app.application import app
 from app.exception.exceptions import MessageSaveException
 from app.validation.domain import Message
 from app.repository.database import SecureMessage
-from flask import current_app
 from app import settings
 
 

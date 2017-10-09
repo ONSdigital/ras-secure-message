@@ -1,12 +1,12 @@
 import uuid
 import unittest
-
 from unittest import mock
+from werkzeug.exceptions import InternalServerError
+
 from flask import g
 from flask import current_app, json
-from sqlalchemy import create_engine, event
-from sqlalchemy.engine import Engine
-from werkzeug.exceptions import InternalServerError
+from sqlalchemy import create_engine
+
 from app import application, settings, constants
 from app.application import app
 from app.authentication.jwe import Encrypter

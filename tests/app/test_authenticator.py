@@ -1,12 +1,14 @@
 import unittest
 from unittest.mock import patch
+from werkzeug.exceptions import BadRequest
+
+from flask import Response
+
 from app.authentication.authenticator import check_jwt, authenticate
 from app.authentication.jwt import encode, decode
 from app.authentication.jwe import Encrypter
 from app.application import app
 from app import settings, constants
-from werkzeug.exceptions import BadRequest
-from flask import Response
 
 
 @patch('app.settings.SM_JWT_ENCRYPT', "0")

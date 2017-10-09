@@ -1,11 +1,11 @@
 import unittest
-
 from unittest import mock
 from unittest.mock import patch
 from datetime import datetime, timezone
+
 from flask import current_app, json
-from sqlalchemy import create_engine, event
-from sqlalchemy.engine import Engine
+from sqlalchemy import create_engine
+
 from app import application, settings, constants
 from app.application import app
 from app.common.alerts import AlertUser, AlertViaGovNotify

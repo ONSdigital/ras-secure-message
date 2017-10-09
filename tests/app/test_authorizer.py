@@ -1,4 +1,5 @@
 import unittest
+
 from app.validation.user import User
 from app.authorization.authorizer import Authorizer
 from app import constants
