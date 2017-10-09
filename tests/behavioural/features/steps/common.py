@@ -57,14 +57,3 @@ def step_impl_reuse_the_nth_sent_message(context, message_index):
 def step_impl_n_messages_returned(context, message_count):
     """ validate that the correct number of messages was returned"""
     nose.tools.assert_equal(int(message_count), len(context.bdd_helper.messages_responses_data[0]['messages']))
-
-
-# Feature files do not support breakpoints , but you may add a debug step and put a breakpoint on the pass below
-
-
-@given("A debug step")
-@when("A debug step")
-@then("A debug step")
-def step_impl_no_op(context):
-    """Useful in debugging feature files"""
-    pass
