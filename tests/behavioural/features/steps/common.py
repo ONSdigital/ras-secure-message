@@ -11,14 +11,6 @@ from tests.behavioural.features.steps.secure_messaging_context_helper import Sec
 import nose.tools
 
 
-@event.listens_for(Engine, "connect")
-def set_sqlite_pragma(dbapi_connection, connection_record):
-    """enable foreign key constraint for tests"""
-    cursor = dbapi_connection.cursor()
-    cursor.execute("PRAGMA foreign_keys=ON")
-    cursor.close()
-
-
 @given("prepare for tests using '{service_type}' services")
 def step_impl_prepare_for_tests(context, service_type):
     """Prepare bdd tests to run against either mock or real external services"""
@@ -65,14 +57,3 @@ def step_impl_reuse_the_nth_sent_message(context, message_index):
 def step_impl_n_messages_returned(context, message_count):
     """ validate that the correct number of messages was returned"""
     nose.tools.assert_equal(int(message_count), len(context.bdd_helper.messages_responses_data[0]['messages']))
-
-
-# Feature files do not support breakpoints , but you may add a debug step and put a breakpoint on the pass below
-
-
-@given("A debug step")
-@when("A debug step")
-@then("A debug step")
-def step_impl_no_op(context):
-    """Useful in debugging feature files"""
-    pass
