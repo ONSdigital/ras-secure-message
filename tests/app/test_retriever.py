@@ -173,8 +173,7 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
     def setUp(self):
         """setup test environment"""
         app.testing = True
-        app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://rhi:password@localhost:5432/sms'
-        self.engine = create_engine('postgresql://rhi:password@localhost:5432/sms')
+        self.engine = create_engine(app.config['SQLALCHEMY_DATABASE_URI'])
         self.MESSAGE_LIST_ENDPOINT = "http://localhost:5050/messages"
         self.MESSAGE_BY_ID_ENDPOINT = "http://localhost:5050/message/"
         with app.app_context():

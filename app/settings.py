@@ -11,7 +11,7 @@ logger = wrap_logger(logging.getLogger(__name__))
 NAME = os.getenv('NAME', 'ras-secure-message')
 VERSION = os.getenv('VERSION', '0.1.0')
 
-SECURE_MESSAGING_DATABASE_URL = os.getenv('SECURE_MESSAGING_DATABASE_URL', 'sqlite:////tmp/messages.db')
+SECURE_MESSAGING_DATABASE_URL = os.getenv('SECURE_MESSAGING_DATABASE_URL', 'postgresql://postgres:postgres@localhost:5432')
 
 # LOGGING SETTINGS
 SMS_LOG_LEVEL = os.getenv('SMS_LOG_LEVEL', 'INFO')

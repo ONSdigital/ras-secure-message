@@ -18,8 +18,8 @@ class SaverTestCase(unittest.TestCase):
     def setUp(self):
         """setup test environment"""
         app.testing = True
-        app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://rhi:password@localhost:5432/sms'
-        self.engine = create_engine('postgresql://rhi:password@localhost:5432/sms')
+
+        self.engine = create_engine(app.config['SQLALCHEMY_DATABASE_URI'])
         self.test_message = Message(**{'msg_to': 'tej', 'msg_from': 'gemma', 'subject': 'MyMessage',
                                        'body': 'hello', 'thread_id': ""})
         with app.app_context():

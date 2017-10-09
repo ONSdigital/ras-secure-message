@@ -148,8 +148,7 @@ class PartyTestCase(unittest.TestCase):
 
         self.app = application.app.test_client()
 
-        app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://rhi:password@localhost:5432/sms'
-        self.engine = create_engine('postgresql://rhi:password@localhost:5432/sms')
+        self.engine = create_engine(app.config['SQLALCHEMY_DATABASE_URI'])
 
         resp = self.app.post("http://localhost:5050/message/send", data=json.dumps(data), headers=self.headers)
         resp_data = json.loads(resp.data)
@@ -191,8 +190,7 @@ class PartyTestCase(unittest.TestCase):
 
         self.headers = {'Content-Type': 'application/json', 'Authorization': encrypted_token}
 
-        app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://rhi:password@localhost:5432/sms'
-        self.engine = create_engine('postgresql://rhi:password@localhost:5432/sms')
+        self.engine = create_engine(app.config['SQLALCHEMY_DATABASE_URI'])
 
         self.app.post("http://localhost:5050/message/send", data=json.dumps(data), headers=self.headers)
         self.app.post("http://localhost:5050/message/send", data=json.dumps(data), headers=self.headers)
@@ -227,8 +225,7 @@ class PartyTestCase(unittest.TestCase):
 
         self.headers = {'Content-Type': 'application/json', 'Authorization': encrypted_token}
 
-        app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://rhi:password@localhost:5432/sms'
-        self.engine = create_engine('postgresql://rhi:password@localhost:5432/sms')
+        self.engine = create_engine(app.config['SQLALCHEMY_DATABASE_URI'])
 
         draft_resp = self.app.post("http://localhost:5050/draft/save", data=json.dumps(data), headers=self.headers)
         draft_details = json.loads(draft_resp.data)
@@ -259,8 +256,7 @@ class PartyTestCase(unittest.TestCase):
 
         self.headers = {'Content-Type': 'application/json', 'Authorization': encrypted_token}
 
-        app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://rhi:password@localhost:5432/sms'
-        self.engine = create_engine('postgresql://rhi:password@localhost:5432/sms')
+        self.engine = create_engine(app.config['SQLALCHEMY_DATABASE_URI'])
 
         self.app.post("http://localhost:5050/draft/save", data=json.dumps(data), headers=self.headers)
         self.app.post("http://localhost:5050/draft/save", data=json.dumps(data), headers=self.headers)
@@ -327,8 +323,7 @@ class PartyTestCase(unittest.TestCase):
 
         self.headers = {'Content-Type': 'application/json', 'Authorization': encrypted_token}
 
-        app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://rhi:password@localhost:5432/sms'
-        self.engine = create_engine('postgresql://rhi:password@localhost:5432/sms')
+        self.engine = create_engine(app.config['SQLALCHEMY_DATABASE_URI'])
 
         message_post = self.app.post("http://localhost:5050/message/send", data=json.dumps(data), headers=self.headers)
         message_data = json.loads(message_post.data)
@@ -356,8 +351,7 @@ class PartyTestCase(unittest.TestCase):
 
         self.headers = {'Content-Type': 'application/json', 'Authorization': encrypted_token}
 
-        app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://rhi:password@localhost:5432/sms'
-        self.engine = create_engine('postgresql://rhi:password@localhost:5432/sms')
+        self.engine = create_engine(app.config['SQLALCHEMY_DATABASE_URI'])
 
         self.app.post("http://localhost:5050/message/send", data=json.dumps(data), headers=self.headers)
         self.app.post("http://localhost:5050/message/send", data=json.dumps(data), headers=self.headers)
@@ -386,8 +380,7 @@ class PartyTestCase(unittest.TestCase):
 
         self.headers = {'Content-Type': 'application/json', 'Authorization': encrypted_token}
 
-        app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://rhi:password@localhost:5432/sms'
-        self.engine = create_engine('postgresql://rhi:password@localhost:5432/sms')
+        self.engine = create_engine(app.config['SQLALCHEMY_DATABASE_URI'])
 
         draft_save = self.app.post("http://localhost:5050/draft/save", data=json.dumps(data), headers=self.headers)
         draft_data = json.loads(draft_save.data)
@@ -415,8 +408,7 @@ class PartyTestCase(unittest.TestCase):
 
         self.headers = {'Content-Type': 'application/json', 'Authorization': encrypted_token}
 
-        app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://rhi:password@localhost:5432/sms'
-        self.engine = create_engine('postgresql://rhi:password@localhost:5432/sms')
+        self.engine = create_engine(app.config['SQLALCHEMY_DATABASE_URI'])
 
         self.app.post("http://localhost:5050/draft/save", data=json.dumps(data), headers=self.headers)
         self.app.post("http://localhost:5050/draft/save", data=json.dumps(data), headers=self.headers)

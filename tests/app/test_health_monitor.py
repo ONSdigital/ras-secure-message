@@ -15,7 +15,6 @@ class HealthTestCase(unittest.TestCase):
         """setup test environment"""
         self.app = application.app.test_client()
         app.testing = True
-        app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://rhi:password@localhost:5432/sms'
         with app.app_context():
             database.db.init_app(current_app)
             database.db.drop_all()

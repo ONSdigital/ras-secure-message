@@ -16,8 +16,7 @@ class LabelTestCase(unittest.TestCase):
     def setUp(self):
         """setup test environment"""
         self.app = application.app.test_client()
-        app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://rhi:password@localhost:5432/sms'
-        self.engine = create_engine('postgresql://rhi:password@localhost:5432/sms')
+        self.engine = create_engine(app.config['SQLALCHEMY_DATABASE_URI'])
         token_data = {
             constants.USER_IDENTIFIER: constants.BRES_USER,
             "role": "internal"
