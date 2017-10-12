@@ -36,12 +36,11 @@ app = Flask(__name__)
 api = Api(app)
 CORS(app)
 
-uri = os.environ.get('SECURE_MESSAGING_DATABASE_URL', 'postgresql://postgres:postgres@localhost:5432')
 if cf.detected:
     logger.info('Cloud Foundry environment identified.', protocol=cf.protocol, database=cf.database())
     app.config['SQLALCHEMY_DATABASE_URI'] = cf.credentials()
 else:
-    app.config['SQLALCHEMY_DATABASE_URI'] = uri
+    app.config['SQLALCHEMY_DATABASE_URI'] = settings.SECURE_MESSAGING_DATABASE_URL
 
 app.config['SQLALCHEMY_POOL_SIZE'] = settings.SQLALCHEMY_POOL_SIZE
 database.db.init_app(app)
