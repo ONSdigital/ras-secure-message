@@ -18,7 +18,6 @@ from app.authentication.authenticator import authenticate
 from app.resources.drafts import DraftSave, DraftById, DraftModifyById, DraftList
 from app.resources.threads import ThreadById, ThreadList
 from app.cloud.cloud_foundry import ONSCloudFoundry
-from app import connector
 from app.logger_config import logger_initial_config
 
 
@@ -38,13 +37,10 @@ api = Api(app)
 CORS(app)
 
 if cf.detected:
-    protocol = cf.protocol
-    cf_database_service = cf.database()
-    logger.info('* Cloud Foundry protocol "{}"'.format(protocol))
-    logger.info('* Cloud Foundry database service "{}"'.format(cf_database_service))
+    logger.info('Cloud Foundry environment identified.', protocol=cf.protocol, database=cf.database())
     app.config['SQLALCHEMY_DATABASE_URI'] = cf.credentials()
 else:
-    app.config['SQLALCHEMY_DATABASE_URI'] = connector.get_database_uri()
+    app.config['SQLALCHEMY_DATABASE_URI'] = settings.SECURE_MESSAGING_DATABASE_URL
 
 app.config['SQLALCHEMY_POOL_SIZE'] = settings.SQLALCHEMY_POOL_SIZE
 database.db.init_app(app)
