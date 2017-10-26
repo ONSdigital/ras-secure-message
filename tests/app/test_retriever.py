@@ -781,7 +781,6 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
                 response = Retriever().retrieve_thread('ThreadId', self.user_respondent, 1, MESSAGE_QUERY_LIMIT)[1]
                 self.assertEqual(len(response.items), 6)
 
-    @unittest.skip("tread not implemented")
     def test_thread_returned_in_desc_order(self):
         """check thread returned in correct order"""
         self.populate_database(3, add_reply=True)

@@ -141,12 +141,27 @@ class Retriever:
         status_conditions.append(Status.label != Labels.DRAFT_INBOX.value)
 
         try:
-            result = SecureMessage.query.join(Events).join(Status) \
-                .filter(SecureMessage.thread_id == thread_id) \
+            t = db.session.query(SecureMessage.msg_id, func.max(Events.date_time).label('max_date')) \
+                .join(Events).join(Status) \
                 .filter(and_(*status_conditions)) \
-                .order_by(case([(Events.event == 'Sent', Events.date_time),
-                                (Events.event == 'Draft_Saved', Events.date_time)],
-                               else_=None).desc(), Events.event.desc()).paginate(page, limit, False)
+                .filter(or_(Events.event == 'Sent', Events.event == 'Draft_Saved')) \
+                .group_by(SecureMessage.msg_id).subquery('t')
+
+            result = SecureMessage.query \
+                .filter(SecureMessage.msg_id == t.c.msg_id) \
+                .order_by(t.c.max_date.desc()).paginate(page, limit, False)
+            #
+            # else:
+            #     result = SecureMessage.query \
+            #         .filter(SecureMessage.msg_id == t.c.msg_id) \
+            #         .order_by(t.c.max_date.asc()).paginate(page, limit, False)
+
+            # result = SecureMessage.query.join(Events).join(Status) \
+            #     .filter(SecureMessage.thread_id == thread_id) \
+            #     .filter(and_(*status_conditions)) \
+            #     .order_by(case([(Events.event == 'Sent', Events.date_time),
+            #                     (Events.event == 'Draft_Saved', Events.date_time)],
+            #                    else_=None).desc()).paginate(page, limit, False)
 
             if len(result.items) == 0:
                 logger.debug('Thread does not exist', thread_id=thread_id)
