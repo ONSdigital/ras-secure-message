@@ -1,9 +1,8 @@
 import unittest
 from unittest.mock import Mock
-from unittest.mock import patch
+import mock
 from app import settings
 from app.common.alerts import AlertUser, AlertViaGovNotify
-from notifications_python_client import errors
 
 
 class AlertsTestCase(unittest.TestCase):
@@ -26,22 +25,16 @@ class AlertsTestCase(unittest.TestCase):
         sut = AlertUser()
         self.assertTrue(isinstance(sut.alert_method, AlertViaGovNotify))
 
-    @patch.object(AlertViaGovNotify, 'send')
-    def test_when_alert_method_throws_an_exception_the_http_status_is_201(self, mock_alerter):
-        """test an exception other than http exception returns a 201"""
-        mock_alerter.send.side_effect = Exception('Oh Dear')
-        sut = AlertUser(mock_alerter)
+    @mock.patch('requests.post')
+    def test_post_to_notify_gateway_with_correct_params(self, mock_notify_gateway):
+        mock_notify_gateway.return_value = {"id": 1}
+        alert_user = AlertUser(AlertViaGovNotify)
+        alert_user.send('test@email.com', 'myReference')
 
-        resp = sut.send("MyEmail", "MyRef")
-        self.assertTrue(resp[0] == 201)
-
-    @patch.object(AlertViaGovNotify, 'send')
-    def test_when_alert_method_throws_a_http_exception_the_http_status_is_201(self, mock_alerter):
-        """test given a http exception the http error code is returned"""
-        mock_alerter.send.side_effect = errors.HTTPError()
-        sut = AlertUser(mock_alerter)
-        resp = sut.send("MyEmail", "MyRef")
-        self.assertTrue(resp[0] == 201)
+        mock_notify_gateway.assert_called_once_with(
+            'http://notifygatewaysvc-dev.apps.devtest.onsclofo.uk/emails/test_notification_template_id',
+            auth= ("test_user", "test_password"), json={ "emailAddress": "test@email.com", "reference": "myReference"},
+            timeout=20)
 
 
 if __name__ == '__main__':
