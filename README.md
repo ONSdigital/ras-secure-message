@@ -5,56 +5,63 @@
 
 
 ## Setup
-Based on python 3.4
 
-Create a virtual env for python3 and make sure that it's activated
+[Install Docker](https://docs.docker.com/engine/installation/)
+
+Install postgresql
+```bash
+brew install postgresql
+```
+
+Install pipenv
+```bash
+pip install pipenv
+```
+
+Use pipenv to create a virtualenv and install dependencies
+```bash
+pipenv install
+```
+
+Set environmental variables. Replace $SOURCE_ROOT with the parent directory of the project.
 
 ```
-mkvirtual --python=</path/to/python3.4 <your env name>
-```
-
-Install dependencies for the application using pip
-
-```
-pip install -r requirements.txt
-```
-The next step is to set the environment variables.
-This can be done either by setting it in the terminal, in the IDE (PyCharm or whichever one is being used)
-or by setting it in the source file. For example '.zshrc' '.bashrc' etc
-
-```
-export RAS_SM_PATH=/Users/user/projects/secure-messaging/ras-secure-message
-```
-```
+RAS_SM_PATH=$SOURCE_ROOT/ras-secure-message
 SM_JWT_ENCRYPT = 1
 SMS_LOG_LEVEL = DEBUG
 ```
 
 Run the application
 -------------------
-```
-$ python run.py
+```bash
+docker run -d -p 5432:5432 --name postgres -e POSTGRES_PASSWORD=postgres -e POSTGRES_DB=postgres -d postgres
+pipenv run python run.py
  * Running on http://127.0.0.1:5050/
  * Restarting with reloader
 ```
+or
+```bash
+docker-compose up
+```
+
 
 Test the application
 --------------------
-Install dependencies for the tests using pip
+Ensure dev dependencies have been installed
+```bash
+pipenv install --dev
+```
 
-```
-pip install -r requirements-test.txt
-```
-Once these have been installed the tests can be run from the ras-secure-message directory using the following
-```
-python run_tests.py
+```bash
+docker run -d -p 5432:5432 --name postgres -e POSTGRES_PASSWORD=postgres -e POSTGRES_DB=postgres -d postgres
+pipenv run coverage run run_tests.py
 ```
 
 Test the response
 -----------------
 
 Now open up a prompt to test out your API using curl
-```
+```bash
 $ curl http://127.0.0.1:5050/health
 {"status": "healthy"}
 ```

@@ -5,6 +5,6 @@ WORKDIR /app
 COPY . /app
 EXPOSE 5050
 RUN apt-get update && apt-get install -y $RUNTIME_PACKAGES $BUILD_PACKAGES
-RUN pip3 install -r requirements.txt
+RUN pip3 install pipenv==8.3.1 && pipenv install --system --deploy
 ENTRYPOINT ["python3"]
 CMD ["run.py"]
