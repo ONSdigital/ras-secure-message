@@ -150,18 +150,6 @@ class Retriever:
             result = SecureMessage.query \
                 .filter(SecureMessage.msg_id == t.c.msg_id) \
                 .order_by(t.c.max_date.desc()).paginate(page, limit, False)
-            #
-            # else:
-            #     result = SecureMessage.query \
-            #         .filter(SecureMessage.msg_id == t.c.msg_id) \
-            #         .order_by(t.c.max_date.asc()).paginate(page, limit, False)
-
-            # result = SecureMessage.query.join(Events).join(Status) \
-            #     .filter(SecureMessage.thread_id == thread_id) \
-            #     .filter(and_(*status_conditions)) \
-            #     .order_by(case([(Events.event == 'Sent', Events.date_time),
-            #                     (Events.event == 'Draft_Saved', Events.date_time)],
-            #                    else_=None).desc()).paginate(page, limit, False)
 
             if len(result.items) == 0:
                 logger.debug('Thread does not exist', thread_id=thread_id)
