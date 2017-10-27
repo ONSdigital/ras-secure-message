@@ -104,6 +104,7 @@ class Retriever:
             result = SecureMessage.query.join(Events).join(Status) \
                 .filter(or_(Events.event == 'Sent', Events.event == 'Draft_Saved')) \
                 .filter(and_(*conditions)) \
+                .filter(and_(*status_conditions)) \
                 .order_by(t.c.max_date.desc()).paginate(page, limit, False)
 
         except Exception as e:

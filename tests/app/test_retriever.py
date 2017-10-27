@@ -163,7 +163,7 @@ class RetrieverTestCaseHelper:
                 self.add_secure_message(msg_id=msg_id, thread_id=thread_id, survey=constants.BRES_USER)
                 self.add_status(label="DRAFT_INBOX", msg_id=msg_id, actor=constants.BRES_USER)
                 self.add_status(label="DRAFT", msg_id=msg_id, actor="0a7ad740-10d5-4ecb-b7ca-3c0384afb882")
-                self.add_event(event="Draft_Saved", msg_id=msg_id, date_time=datetime(year, month, day + 2, 1))
+                self.add_event(event="Draft_Saved", msg_id=msg_id, date_time=datetime(year, month, day + 2))
 
         return threads
 
