@@ -1092,8 +1092,8 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
     def test_latest_message_from_each_thread_chosen_desc_respondent_with_both_users_drafts(self):
         """checks the message chosen for each thread is the latest message within that thread
          for respondent with drafts from both users"""
-        self.create_threads(1, add_internal_draft=True, add_respondent_draft=True)
-        # self.populate_database(5, single=False, multiple_users=True)
+        self.create_threads(5, add_internal_draft=True, add_respondent_draft=True)
+        self.populate_database(5, single=False, multiple_users=True)
 
         with app.app_context():
             with current_app.test_request_context():
@@ -1111,7 +1111,7 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
                     thread_ids.append(serialized_msg['thread_id'])
                     msg_ids.append(serialized_msg['msg_id'])
 
-                self.assertEqual(len(msg_ids), 1)
+                self.assertEqual(len(msg_ids), 5)
 
                 for x in range(0, len(thread_ids)):
                     thread = Retriever().retrieve_thread(thread_ids[x], self.user_respondent, 1, MESSAGE_QUERY_LIMIT)[1]
