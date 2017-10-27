@@ -21,7 +21,7 @@ def step_impl_the_thread_id_is_set_to(context):
 @given("the thread id is set to the last returned thread id")
 @when("the thread id is set to the last returned thread id")
 def step_impl_the_thread_id_is_set_to_the_last_returned_thread_id(context):
-    """ set the thread id in the message data to be the same as thelast retrieved thread id"""
+    """ set the thread id in the message data to be the same as the last retrieved thread id"""
     responses = context.bdd_helper.single_message_responses_data
     thread_id = responses[len(responses)-1]['thread_id']
     context.bdd_helper.message_data['thread_id'] = thread_id
