@@ -1,7 +1,7 @@
 language: python
 sudo: required
 dist: trusty
-python: '3.4'
+python: '3.5'
 
 # before_install:
 
@@ -9,10 +9,8 @@ cache:
     - pip
 
 install:
-    - pip install -r requirements.txt
-    - pip install -r requirements-test.txt
-    - pip install codecov
-    - pip install coverage
+    - pip install pipenv
+    - pipenv install --dev
 
 script:
     - coverage run run_tests.py

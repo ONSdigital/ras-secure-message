@@ -5,27 +5,21 @@
 
 
 ## Setup
-Based on python 3.4
 
-Create a virtual env for python3 and make sure that it's activated
-
-```
-mkvirtual --python=</path/to/python3.4 <your env name>
+Install pipenv
+```bash
+pip install pipenv
 ```
 
-Install dependencies for the application using pip
+Use pipenv to create a virtualenv and install dependencies
+```bash
+pipenv --python 3.5 install --dev
+```
+
+Set environmental variables. Replace $SOURCE_ROOT with the parent directory of the project.
 
 ```
-pip install -r requirements.txt
-```
-The next step is to set the environment variables.
-This can be done either by setting it in the terminal, in the IDE (PyCharm or whichever one is being used)
-or by setting it in the source file. For example '.zshrc' '.bashrc' etc
-
-```
-export RAS_SM_PATH=/Users/user/projects/secure-messaging/ras-secure-message
-```
-```
+RAS_SM_PATH=$SOURCE_ROOT/ras-secure-message
 SM_JWT_ENCRYPT = 1
 SMS_LOG_LEVEL = DEBUG
 ```
@@ -40,14 +34,10 @@ $ python run.py
 
 Test the application
 --------------------
-Install dependencies for the tests using pip
-
+[Install Docker](https://docs.docker.com/engine/installation/)
 ```
-pip install -r requirements-test.txt
-```
-Once these have been installed the tests can be run from the ras-secure-message directory using the following
-```
-python run_tests.py
+docker run -d -p 5432:5432 --name postgres -e POSTGRES_PASSWORD=postgres -e POSTGRES_DB=postgres -d postgres
+coverage run run_tests.py
 ```
 
 Test the response
