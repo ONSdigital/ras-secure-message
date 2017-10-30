@@ -30,6 +30,10 @@ class MessageSaveException(Exception):
         return rv
 
 
+class RasNotifyException(MessageSaveException):
+    pass
+
+
 class MissingEnvironmentVariable(Exception):
     def __init__(self):
         missing_env_variables = [var for var in settings.NON_DEFAULT_VARIABLES if not os.environ.get(var)]

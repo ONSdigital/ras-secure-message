@@ -2,6 +2,7 @@ import unittest
 from unittest.mock import Mock
 import mock
 from app import settings
+from app.exception.exceptions import RasNotifyException
 from app.common.alerts import AlertUser, AlertViaGovNotify
 
 
@@ -30,6 +31,19 @@ class AlertsTestCase(unittest.TestCase):
         mock_notify_gateway.return_value = {"id": 1}
         alert_user = AlertUser(AlertViaGovNotify)
         alert_user.send('test@email.com', 'myReference')
+
+        mock_notify_gateway.assert_called_once_with(
+            'http://notifygatewaysvc-dev.apps.devtest.onsclofo.uk/emails/test_notification_template_id',
+            auth= ("test_user", "test_password"), json={ "emailAddress": "test@email.com", "reference": "myReference"},
+            timeout=20)
+
+    @mock.patch('requests.post')
+    def test_post_to_notify_gateway_throws_exception(self, mock_notify_gateway):
+        mock_notify_gateway.side_effect = Exception
+        alert_user = AlertUser(AlertViaGovNotify)
+
+        with self.assertRaises(RasNotifyException):
+            alert_user.send('test@email.com', 'myReference')
 
         mock_notify_gateway.assert_called_once_with(
             'http://notifygatewaysvc-dev.apps.devtest.onsclofo.uk/emails/test_notification_template_id',

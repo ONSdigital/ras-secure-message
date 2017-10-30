@@ -3,6 +3,7 @@ import logging
 from app import settings
 from structlog import wrap_logger
 from urllib import parse as urlparse
+from app.exception.exceptions import RasNotifyException
 import requests
 
 logger = wrap_logger(logging.getLogger(__name__))
@@ -29,8 +30,9 @@ class AlertViaGovNotify:
                         message_id=response.json()["id"])
 
         except Exception as e:
-            logger.error('There was a problem sending a notification via RM Notify-Gateway to GOV.UK Notify',
-                         exception=e)
+            msg = 'There was a problem sending a notification via RM Notify-Gateway to GOV.UK Notify'
+            logger.error(msg, exception=e)
+            raise RasNotifyException(msg + str(e), status_code=500)
 
 
 class AlertViaLogging:
