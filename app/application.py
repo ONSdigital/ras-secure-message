@@ -2,7 +2,7 @@ import logging
 import os
 
 from flask import Flask, request
-from flask import json, make_response
+from flask import json, jsonify
 from flask_restful import Api
 from flask_cors import CORS
 from structlog import wrap_logger
@@ -92,7 +92,9 @@ def _request_requires_authentication():
 
 @app.errorhandler(Exception)
 def handle_exception(error):
-    return make_response("", 500)
+    response = jsonify({"error": "Unknown internal error"})
+    response.status_code = 500
+    return response
 
 
 def log_request():
