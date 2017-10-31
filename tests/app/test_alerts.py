@@ -1,6 +1,6 @@
 import unittest
+from unittest import mock
 from unittest.mock import Mock
-import mock
 from app import settings
 from app.exception.exceptions import RasNotifyException
 from app.common.alerts import AlertUser, AlertViaGovNotify
@@ -27,27 +27,34 @@ class AlertsTestCase(unittest.TestCase):
         self.assertTrue(isinstance(sut.alert_method, AlertViaGovNotify))
 
     @mock.patch('requests.post')
-    def test_post_to_notify_gateway_with_correct_params(self, mock_notify_gateway):
-        mock_notify_gateway.return_value = {"id": 1}
+    def test_post_to_notify_gateway_with_correct_params(self, mock_notify_gateway_post):
+        mock_response = mock.Mock()
+        mock_response.status_code = 201
+        mock_response.json.return_value = {"id": 1}
+        mock_notify_gateway_post.return_value = mock_response
+
         alert_user = AlertUser(AlertViaGovNotify)
         alert_user.send('test@email.com', 'myReference')
 
-        mock_notify_gateway.assert_called_once_with(
+        mock_notify_gateway_post.assert_called_once_with(
             'http://notifygatewaysvc-dev.apps.devtest.onsclofo.uk/emails/test_notification_template_id',
-            auth= ("test_user", "test_password"), json={ "emailAddress": "test@email.com", "reference": "myReference"},
+            auth=("test_user", "test_password"), json={"emailAddress": "test@email.com", "reference": "myReference"},
             timeout=20)
 
     @mock.patch('requests.post')
-    def test_post_to_notify_gateway_throws_exception(self, mock_notify_gateway):
-        mock_notify_gateway.side_effect = Exception
+    def test_post_to_notify_gateway_throws_exception(self, mock_notify_gateway_post):
+        mock_response = mock.MagicMock()
+        mock_response.status_code = 500
+        mock_notify_gateway_post.return_value = mock_response
+
         alert_user = AlertUser(AlertViaGovNotify)
 
         with self.assertRaises(RasNotifyException):
             alert_user.send('test@email.com', 'myReference')
 
-        mock_notify_gateway.assert_called_once_with(
+        mock_notify_gateway_post.assert_called_once_with(
             'http://notifygatewaysvc-dev.apps.devtest.onsclofo.uk/emails/test_notification_template_id',
-            auth= ("test_user", "test_password"), json={ "emailAddress": "test@email.com", "reference": "myReference"},
+            auth=("test_user", "test_password"), json={"emailAddress": "test@email.com", "reference": "myReference"},
             timeout=20)
 
 

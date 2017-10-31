@@ -15,24 +15,21 @@ class AlertViaGovNotify:
     @staticmethod
     def send(email, reference):
 
-        try:
-            notification = {
-                "emailAddress": email,
-                "reference": reference
-            }
+        notification = {
+            "emailAddress": email,
+            "reference": reference
+        }
 
-            url = urlparse.urljoin(settings.RM_NOTIFY_GATEWAY_URL, settings.NOTIFICATION_TEMPLATE_ID)
+        url = urlparse.urljoin(settings.RM_NOTIFY_GATEWAY_URL, settings.NOTIFICATION_TEMPLATE_ID)
 
-            response = requests.post(url, auth=settings.BASIC_AUTH, timeout=settings.REQUESTS_POST_TIMEOUT,
-                                     json=notification)
+        response = requests.post(url, auth=settings.BASIC_AUTH, timeout=settings.REQUESTS_POST_TIMEOUT,
+                                 json=notification)
 
+        if response.status_code != 201:
+            raise RasNotifyException(code=500)
+        else:
             logger.info('Sent secure message email notification, via RM Notify-Gateway to GOV.UK Notify.',
                         message_id=response.json()["id"])
-
-        except Exception as e:
-            msg = 'There was a problem sending a notification via RM Notify-Gateway to GOV.UK Notify'
-            logger.error(msg, exception=e)
-            raise RasNotifyException(msg + str(e), status_code=500)
 
 
 class AlertViaLogging:

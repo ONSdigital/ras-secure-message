@@ -22,7 +22,7 @@ class Saver:
         except Exception as e:
             session.rollback()
             logger.error('Message save failed', error=e)
-            raise MessageSaveException(e)
+            raise MessageSaveException('Message save failed')
 
     @staticmethod
     def save_msg_status(actor, msg_id, label, session=db.session):
@@ -36,7 +36,7 @@ class Saver:
         except Exception as e:
             session.rollback()
             logger.error('Message status save failed', error=e)
-            raise MessageSaveException(e)
+            raise MessageSaveException('Message save failed')
 
     @staticmethod
     def save_msg_event(msg_id, event, session=db.session):
@@ -49,7 +49,7 @@ class Saver:
         except Exception as e:
             session.rollback()
             logger.error('Message event save failed', error=e)
-            raise MessageSaveException(e)
+            raise MessageSaveException('Message save failed')
 
     @staticmethod
     def save_msg_audit(msg_id, msg_urn, session=db.session):
@@ -63,4 +63,4 @@ class Saver:
         except Exception as e:
             session.rollback()
             logger.error('Message audit save failed', error=e)
-            raise MessageSaveException(e)
+            raise MessageSaveException('Message save failed')

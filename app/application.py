@@ -2,13 +2,13 @@ import logging
 import os
 
 from flask import Flask, request
-from flask import jsonify, json
+from flask import json, make_response
 from flask_restful import Api
 from flask_cors import CORS
 from structlog import wrap_logger
 
 from app import settings
-from app.exception.exceptions import MessageSaveException, MissingEnvironmentVariable, RasNotifyException
+from app.exception.exceptions import MissingEnvironmentVariable
 from app.repository import database
 from app.resources.health import Health, DatabaseHealth, HealthDetails
 from app.resources.info import Info
@@ -91,14 +91,8 @@ def _request_requires_authentication():
 
 
 @app.errorhandler(Exception)
-def handle_error(error):
-    if isinstance(error, MessageSaveException) or isinstance(error, RasNotifyException):
-        response = jsonify(error.to_dict())
-        response.status_code = error.status_code
-    else:
-        response = jsonify({'errors': [str(error)]})
-        response.status_code = 500
-    return response
+def handle_exception(error):
+    return make_response("", 500)
 
 
 def log_request():
