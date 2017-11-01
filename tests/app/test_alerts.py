@@ -1,9 +1,9 @@
 import unittest
+from unittest import mock
 from unittest.mock import Mock
-from unittest.mock import patch
 from app import settings
+from app.exception.exceptions import RasNotifyException
 from app.common.alerts import AlertUser, AlertViaGovNotify
-from notifications_python_client import errors
 
 
 class AlertsTestCase(unittest.TestCase):
@@ -26,22 +26,36 @@ class AlertsTestCase(unittest.TestCase):
         sut = AlertUser()
         self.assertTrue(isinstance(sut.alert_method, AlertViaGovNotify))
 
-    @patch.object(AlertViaGovNotify, 'send')
-    def test_when_alert_method_throws_an_exception_the_http_status_is_201(self, mock_alerter):
-        """test an exception other than http exception returns a 201"""
-        mock_alerter.send.side_effect = Exception('Oh Dear')
-        sut = AlertUser(mock_alerter)
+    @mock.patch('requests.post')
+    def test_post_to_notify_gateway_with_correct_params(self, mock_notify_gateway_post):
+        mock_response = mock.Mock()
+        mock_response.status_code = 201
+        mock_response.json.return_value = {"id": 1}
+        mock_notify_gateway_post.return_value = mock_response
 
-        resp = sut.send("MyEmail", "MyRef")
-        self.assertTrue(resp[0] == 201)
+        alert_user = AlertUser(AlertViaGovNotify)
+        alert_user.send('test@email.com', 'myReference')
 
-    @patch.object(AlertViaGovNotify, 'send')
-    def test_when_alert_method_throws_a_http_exception_the_http_status_is_201(self, mock_alerter):
-        """test given a http exception the http error code is returned"""
-        mock_alerter.send.side_effect = errors.HTTPError()
-        sut = AlertUser(mock_alerter)
-        resp = sut.send("MyEmail", "MyRef")
-        self.assertTrue(resp[0] == 201)
+        mock_notify_gateway_post.assert_called_once_with(
+            'http://notifygatewaysvc-dev.apps.devtest.onsclofo.uk/emails/test_notification_template_id',
+            auth=("test_user", "test_password"), json={"emailAddress": "test@email.com", "reference": "myReference"},
+            timeout=20)
+
+    @mock.patch('requests.post')
+    def test_post_to_notify_gateway_throws_exception(self, mock_notify_gateway_post):
+        mock_response = mock.MagicMock()
+        mock_response.status_code = 500
+        mock_notify_gateway_post.return_value = mock_response
+
+        alert_user = AlertUser(AlertViaGovNotify)
+
+        with self.assertRaises(RasNotifyException):
+            alert_user.send('test@email.com', 'myReference')
+
+        mock_notify_gateway_post.assert_called_once_with(
+            'http://notifygatewaysvc-dev.apps.devtest.onsclofo.uk/emails/test_notification_template_id',
+            auth=("test_user", "test_password"), json={"emailAddress": "test@email.com", "reference": "myReference"},
+            timeout=20)
 
 
 if __name__ == '__main__':

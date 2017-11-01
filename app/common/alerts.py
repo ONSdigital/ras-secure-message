@@ -1,10 +1,10 @@
 import logging
 
 from app import settings
-from flask import g
-from notifications_python_client import NotificationsAPIClient
 from structlog import wrap_logger
-
+from urllib import parse as urlparse
+from app.exception.exceptions import RasNotifyException
+import requests
 
 logger = wrap_logger(logging.getLogger(__name__))
 
@@ -14,12 +14,22 @@ class AlertViaGovNotify:
 
     @staticmethod
     def send(email, reference):
-        notifications_client = NotificationsAPIClient(settings.NOTIFICATION_COMBINED_KEY)
-        notifications_client.send_email_notification(email_address=email,
-                                                     template_id=settings.NOTIFICATION_TEMPLATE_ID,
-                                                     personalisation=None,
-                                                     reference=reference)
-        logger.info('Sent secure message email notification', user_uuid=g.user.user_uuid)
+
+        notification = {
+            "emailAddress": email,
+            "reference": reference
+        }
+
+        url = urlparse.urljoin(settings.RM_NOTIFY_GATEWAY_URL, settings.NOTIFICATION_TEMPLATE_ID)
+
+        response = requests.post(url, auth=settings.BASIC_AUTH, timeout=settings.REQUESTS_POST_TIMEOUT,
+                                 json=notification)
+
+        if response.status_code != 201:
+            raise RasNotifyException(code=500)
+        else:
+            logger.info('Sent secure message email notification, via RM Notify-Gateway to GOV.UK Notify.',
+                        message_id=response.json()["id"])
 
 
 class AlertViaLogging:
@@ -38,9 +48,5 @@ class AlertUser:
             self.alert_method = alerter
 
     def send(self, email, reference):
-            try:
-                self.alert_method.send(email, reference)
-            except BaseException as e:
-                logger.exception(e)
-            finally:
-                return 201, 'OK'
+        self.alert_method.send(email, reference)
+

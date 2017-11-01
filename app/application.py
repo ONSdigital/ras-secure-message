@@ -2,13 +2,13 @@ import logging
 import os
 
 from flask import Flask, request
-from flask import jsonify, json
+from flask import json, jsonify
 from flask_restful import Api
 from flask_cors import CORS
 from structlog import wrap_logger
 
 from app import settings
-from app.exception.exceptions import MessageSaveException, MissingEnvironmentVariable
+from app.exception.exceptions import MissingEnvironmentVariable
 from app.repository import database
 from app.resources.health import Health, DatabaseHealth, HealthDetails
 from app.resources.info import Info
@@ -90,10 +90,10 @@ def _request_requires_authentication():
            and request.method != 'OPTIONS'
 
 
-@app.errorhandler(MessageSaveException)
-def handle_save_exception(error):
-    response = jsonify(error.to_dict())
-    response.status_code = error.status_code
+@app.errorhandler(Exception)
+def handle_exception(error):
+    response = jsonify({"error": "Unknown internal error"})
+    response.status_code = 500
     return response
 
 

@@ -3,6 +3,7 @@ import os
 import sys
 
 from structlog import wrap_logger
+from werkzeug.exceptions import HTTPException
 
 from app import settings
 
@@ -11,23 +12,24 @@ from app import settings
 logger = wrap_logger(logging.getLogger(__name__))
 
 
-class MessageSaveException(Exception):
+class MessageSaveException(HTTPException):
 
     """ This exception is used when the service fails to save a secure message"""
 
-    status_code = 500
+    code = 500
 
-    def __init__(self, message, status_code=None, payload=None):
-        Exception.__init__(self)
-        self.message = message
-        if status_code is not None:
-            self.status_code = status_code
-        self.payload = payload
+    def __init__(self, message, code=None):
+        HTTPException.__init__(self)
+        self.description = message
+        if code is not None:
+            self.code = code
 
-    def to_dict(self):
-        rv = dict(self.payload or ())
-        rv['message'] = self.message
-        return rv
+
+class RasNotifyException(MessageSaveException):
+    def __init__(self, code=500):
+        MessageSaveException.__init__(self, 'There was a problem sending a notification via RM Notify-Gateway to '
+                                            'GOV.UK Notify', code=code)
+        logger.error(self.description)
 
 
 class MissingEnvironmentVariable(Exception):

@@ -3,12 +3,11 @@ Flask-RESTful==0.3.5
 Flask-SQLAlchemy==2.1
 flask-cors==3.0.2
 marshmallow==2.13.1
-psycopg2==2.6.2
+psycopg2==2.7.1
 SQLAlchemy==1.1.5
 python-jose==1.2.0
 structlog==16.1.0
 cryptography==1.8.1
-notifications_python_client==4.2.0
 flake8==3.3.0
 pylint==1.6.4
 cfenv==0.5.3
