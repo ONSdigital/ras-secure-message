@@ -781,7 +781,6 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
                 response = Retriever().retrieve_thread('ThreadId', self.user_respondent, 1, MESSAGE_QUERY_LIMIT)[1]
                 self.assertEqual(len(response.items), 6)
 
-    @unittest.skip("tread not implemented")
     def test_thread_returned_in_desc_order(self):
         """check thread returned in correct order"""
         self.populate_database(3, add_reply=True)
@@ -791,15 +790,12 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
                 response = Retriever().retrieve_thread('ThreadId', self.user_respondent, 1, MESSAGE_QUERY_LIMIT)[1]
                 self.assertEqual(len(response.items), 6)
 
-                sent = []
-                for message in response.items:
-                    sent.append(str(message.events[0].date_time))
+                sent = [str(message.events[0].date_time) for message in response.items]
 
                 desc_date = sorted(sent, reverse=True)
                 self.assertEqual(len(sent), 6)
                 self.assertListEqual(desc_date, sent)
 
-    @unittest.skip("treads list not implemented")
     def test_thread_returned_in_desc_order_with_draft(self):
         """check thread returned in correct order with draft"""
         self.populate_database(3, add_reply=True, add_draft=True)
@@ -809,9 +805,7 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
                 response = Retriever().retrieve_thread('ThreadId', self.user_internal, 1, MESSAGE_QUERY_LIMIT)[1]
                 self.assertEqual(len(response.items), 9)
 
-                date = []
-                for message in response.items:
-                    date.append(str(message.events[0].date_time))
+                date = [str(message.events[0].date_time) for message in response.items]
 
                 desc_date = sorted(date, reverse=True)
                 self.assertListEqual(desc_date, date)
@@ -847,7 +841,6 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
                 with self.assertRaises(InternalServerError):
                     Retriever().retrieve_thread_list(1, MESSAGE_QUERY_LIMIT, self.user_respondent)
 
-    @unittest.skip("treads list not implemented")
     def test_thread_list_returned_in_descending_order_respondent(self):
         """retrieves threads from database in desc sent_date order for respondent"""
         self.create_threads(5)
@@ -869,7 +862,6 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
                 self.assertEqual(len(date), 5)
                 self.assertListEqual(desc_date, date)
 
-    @unittest.skip("treads list not implemented")
     def test_thread_list_returned_in_descending_order_internal(self):
         """retrieves threads from database in desc sent_date order for internal user"""
         self.create_threads(5)
@@ -891,7 +883,6 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
                 self.assertEqual(len(date), 5)
                 self.assertListEqual(desc_date, date)
 
-    @unittest.skip("treads list not implemented")
     def test_thread_list_returned_in_descending_order_respondent_with_draft(self):
         """retrieves threads from database in desc sent_date order for respondent with draft"""
         self.create_threads(5, add_respondent_draft=True)
@@ -901,8 +892,6 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
             with current_app.test_request_context():
                 response = Retriever().retrieve_thread_list(1, MESSAGE_QUERY_LIMIT, self.user_respondent)[1]
 
-                sent = []
-                modified = []
                 date = []
                 for message in response.items:
                     serialized_msg = message.serialize(self.user_respondent)
@@ -911,17 +900,10 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
                     elif 'modified_date' in serialized_msg:
                         date.append(serialized_msg['modified_date'])
 
-                for x in range(0, len(sent)):
-                    if sent[x] != 'N/A':
-                        date.append(sent[x])
-                    else:
-                        date.append(modified[x])
-
                 desc_date = sorted(date, reverse=True)
                 self.assertEqual(len(date), 5)
                 self.assertListEqual(desc_date, date)
 
-    @unittest.skip("treads list not implemented")
     def test_thread_list_returned_in_descending_order_internal_with_draft(self):
         """retrieves threads from database in desc sent_date order for internal user with draft"""
         self.create_threads(5, add_internal_draft=True)
@@ -943,7 +925,6 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
                 self.assertEqual(len(date), 5)
                 self.assertListEqual(desc_date, date)
 
-    @unittest.skip("treads list not implemented")
     def test_latest_message_from_each_thread_chosen_desc(self):
         """checks the message chosen for each thread is the latest message within that thread"""
         self.create_threads(5)
@@ -972,7 +953,6 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
                     self.assertEqual(date[x], str(thread.items[0].events[0].date_time))
                     self.assertEqual(msg_ids[x], thread.items[0].events[0].msg_id)
 
-    @unittest.skip("treads list not implemented")
     def test_latest_message_from_each_thread_chosen_desc_respondent_with_respondent_draft(self):
         """checks the message chosen for each thread is the latest message within that thread
          for respondent with respondent drafts"""
@@ -1002,7 +982,6 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
                     self.assertEqual(date[x], str(thread.items[0].events[0].date_time))
                     self.assertEqual(msg_ids[x], thread.items[0].events[0].msg_id)
 
-    @unittest.skip("treads list not implemented")
     def test_latest_message_from_each_thread_chosen_desc_internal_with_respondent_draft(self):
         """checks the message chosen for each thread is the latest message within that thread
         for internal user with respondent drafts"""
@@ -1032,7 +1011,6 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
                     self.assertEqual(date[x], str(thread.items[0].events[0].date_time))
                     self.assertEqual(msg_ids[x], thread.items[0].events[0].msg_id)
 
-    @unittest.skip("treads list not implemented")
     def test_latest_message_from_each_thread_chosen_desc_respondent_with_internal_draft(self):
         """checks the message chosen for each thread is the latest message within that thread
          for respondent with internal drafts"""
@@ -1062,7 +1040,6 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
                     self.assertEqual(date[x], str(thread.items[0].events[0].date_time))
                     self.assertEqual(msg_ids[x], thread.items[0].events[0].msg_id)
 
-    @unittest.skip("treads list not implemented")
     def test_latest_message_from_each_thread_chosen_desc_internal_with_internal_draft(self):
         """checks the message chosen for each thread is the latest message within that thread
         for internal user with internal drafts"""
@@ -1092,7 +1069,6 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
                     self.assertEqual(date[x], str(thread.items[0].events[0].date_time))
                     self.assertEqual(msg_ids[x], thread.items[0].events[0].msg_id)
 
-    @unittest.skip("treads list not implemented")
     def test_latest_message_from_each_thread_chosen_desc_respondent_with_both_users_drafts(self):
         """checks the message chosen for each thread is the latest message within that thread
          for respondent with drafts from both users"""
@@ -1122,7 +1098,6 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
                     self.assertEqual(date[x], str(thread.items[0].events[0].date_time))
                     self.assertEqual(msg_ids[x], thread.items[0].events[0].msg_id)
 
-    @unittest.skip("treads list not implemented")
     def test_latest_message_from_each_thread_chosen_desc_internal_with_both_users_drafts(self):
         """checks the message chosen for each thread is the latest message within that thread
         for internal user with drafts from both users"""
