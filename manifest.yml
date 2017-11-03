@@ -1,6 +1,5 @@
 applications:
 - name: ras_secure_message
-  buildpack: https://github.com/cloudfoundry/python-buildpack.git
   services:
   - secure-message-db
   env:
