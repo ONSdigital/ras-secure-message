@@ -6,6 +6,7 @@ from flask import json, jsonify
 from flask_restful import Api
 from flask_cors import CORS
 from structlog import wrap_logger
+from sqlalchemy import event, DDL
 
 from app import settings
 from app.exception.exceptions import MissingEnvironmentVariable
@@ -53,6 +54,7 @@ def drop_database():
 
 
 with app.app_context():
+    event.listen(database.db.metadata, 'before_create', DDL("CREATE SCHEMA IF NOT EXISTS securemessage"))
     database.db.create_all()
     database.db.session.commit()
 
