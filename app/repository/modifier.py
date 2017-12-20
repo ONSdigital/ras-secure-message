@@ -34,7 +34,7 @@ class Modifier:
         """delete a label from status table"""
         actor = user.user_uuid if user.is_respondent else constants.BRES_USER
         try:
-            query = "DELETE FROM status WHERE label = '{0}' and msg_id = '{1}' and actor = '{2}'". \
+            query = "DELETE FROM securemessage.status WHERE label = '{0}' and msg_id = '{1}' and actor = '{2}'". \
                 format(label, message['msg_id'], actor)
             db.get_engine(app=db.get_app()).execute(query)
             return True
@@ -89,10 +89,10 @@ class Modifier:
     @staticmethod
     def del_draft(draft_id):
         """Remove draft from status table and secure message table"""
-        del_draft_status = "DELETE FROM status WHERE msg_id='{0}' AND label='{1}'".format(draft_id, Labels.DRAFT.value)
-        del_draft_event = "DELETE FROM events WHERE msg_id='{0}'".format(draft_id)
-        del_draft_inbox_status = "DELETE FROM status WHERE msg_id='{0}' AND label='{1}'".format(draft_id, Labels.DRAFT_INBOX.value)
-        del_draft_msg = "DELETE FROM secure_message WHERE msg_id='{0}'".format(draft_id)
+        del_draft_status = "DELETE FROM securemessage.status WHERE msg_id='{0}' AND label='{1}'".format(draft_id, Labels.DRAFT.value)
+        del_draft_event = "DELETE FROM securemessage.events WHERE msg_id='{0}'".format(draft_id)
+        del_draft_inbox_status = "DELETE FROM securemessage.status WHERE msg_id='{0}' AND label='{1}'".format(draft_id, Labels.DRAFT_INBOX.value)
+        del_draft_msg = "DELETE FROM securemessage.secure_message WHERE msg_id='{0}'".format(draft_id)
 
         try:
             db.get_engine(app=db.get_app()).execute(del_draft_status)
@@ -125,7 +125,7 @@ class Modifier:
     @staticmethod
     def replace_current_recipient_status(draft_id, draft_to, session=db.session):
         """used to replace the draft INBOX_DRAFT label"""
-        del_current_status = "DELETE FROM status WHERE msg_id='{0}' AND label='{1}'" \
+        del_current_status = "DELETE FROM securemessage.status WHERE msg_id='{0}' AND label='{1}'" \
             .format(draft_id, Labels.DRAFT_INBOX.value)
         # TODO: Only handling first item in list.
         new_status = Status(msg_id=draft_id, actor=draft_to[0], label=Labels.DRAFT_INBOX.value)

@@ -27,7 +27,7 @@ class RetrieverTestCaseHelper:
         """ Populate the secure_message table"""
 
         with self.engine.connect() as con:
-            query = "INSERT INTO secure_message(msg_id, subject, body, thread_id," \
+            query = "INSERT INTO securemessage.secure_message(msg_id, subject, body, thread_id," \
                     "collection_case, ru_id, survey, collection_exercise) VALUES ('{0}', '{1}','{2}'," \
                     "'{3}', '{4}', '{5}', '{6}', '{7}')".format(msg_id, subject, body, thread_id, collection_case,
                                                                 ru_id, survey, collection_exercise)
@@ -37,7 +37,7 @@ class RetrieverTestCaseHelper:
         """ Populate the status table"""
 
         with self.engine.connect() as con:
-            query = "INSERT INTO status(label, msg_id, actor) VALUES('{0}', '{1}', '{2}')".format(
+            query = "INSERT INTO securemessage.status(label, msg_id, actor) VALUES('{0}', '{1}', '{2}')".format(
                 label, msg_id, actor)
             con.execute(query)
 
@@ -45,7 +45,7 @@ class RetrieverTestCaseHelper:
         """ Populate the event table"""
 
         with self.engine.connect() as con:
-            query = "INSERT INTO events(event, msg_id, date_time) VALUES('{0}', '{1}', '{2}')".format(
+            query = "INSERT INTO securemessage.events(event, msg_id, date_time) VALUES('{0}', '{1}', '{2}')".format(
                 event, msg_id, date_time)
             con.execute(query)
 
@@ -53,7 +53,7 @@ class RetrieverTestCaseHelper:
         """ Delete a specific row from status table"""
 
         with self.engine.connect() as con:
-            query = "DELETE FROM status WHERE label = '{0}' AND msg_id = '{1}' AND actor = '{2}'".format(
+            query = "DELETE FROM securemessage.status WHERE label = '{0}' AND msg_id = '{1}' AND actor = '{2}'".format(
                 label, msg_id, actor)
             con.execute(query)
 
@@ -270,7 +270,7 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
         """retrieves message using id"""
         self.populate_database(20)
         with self.engine.connect() as con:
-            query = 'SELECT msg_id FROM secure_message LIMIT 1'
+            query = 'SELECT msg_id FROM securemessage.secure_message LIMIT 1'
             query_x = con.execute(query)
             names = []
             for row in query_x:
@@ -302,7 +302,7 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
         """retrieves message using id and checks the labels are correct"""
         self.populate_database(1)
         with self.engine.connect() as con:
-            query = 'SELECT msg_id FROM secure_message LIMIT 1'
+            query = 'SELECT msg_id FROM securemessage.secure_message LIMIT 1'
             query_x = con.execute(query)
             names = []
             for row in query_x:
@@ -319,7 +319,7 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
         """retrieves message using id and checks the labels are correct"""
         self.populate_database(1)
         with self.engine.connect() as con:
-            query = 'SELECT msg_id FROM secure_message LIMIT 1'
+            query = 'SELECT msg_id FROM securemessage.secure_message LIMIT 1'
             query_x = con.execute(query)
             names = []
             for row in query_x:
@@ -336,7 +336,7 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
         """retrieves message using id and checks the to and from urns are correct"""
         self.populate_database(1)
         with self.engine.connect() as con:
-            query = 'SELECT msg_id FROM secure_message LIMIT 1'
+            query = 'SELECT msg_id FROM securemessage.secure_message LIMIT 1'
             query_x = con.execute(query)
             names = []
             for row in query_x:
@@ -627,7 +627,7 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
 
         self.populate_database(1, single=False, add_draft=True)
         with self.engine.connect() as con:
-            query = 'SELECT msg_id FROM secure_message LIMIT 1'
+            query = 'SELECT msg_id FROM securemessage.secure_message LIMIT 1'
             query_x = con.execute(query)
             names = []
             for row in query_x:
@@ -642,7 +642,7 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
         """retrieves draft using id and checks the modified dates returned"""
         self.populate_database(1, single=False, add_draft=True)
         with self.engine.connect() as con:
-            query = 'SELECT msg_id FROM secure_message LIMIT 1'
+            query = 'SELECT msg_id FROM securemessage.secure_message LIMIT 1'
             query_x = con.execute(query)
             names = []
             for row in query_x:
@@ -659,7 +659,7 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
         """retrieves message using id and checks the sent date returned"""
         self.populate_database(1)
         with self.engine.connect() as con:
-            query = 'SELECT msg_id FROM secure_message LIMIT 1'
+            query = 'SELECT msg_id FROM securemessage.secure_message LIMIT 1'
             query_x = con.execute(query)
             names = []
             for row in query_x:
@@ -675,8 +675,9 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
         """retrieves message using id and checks the read date returned"""
         self.populate_database(1, add_reply=True)
         with self.engine.connect() as con:
-            query = "SELECT secure_message.msg_id FROM secure_message " \
-                    "JOIN events ON secure_message.msg_id = events.msg_id WHERE events.event = 'Read' LIMIT 1"
+            query = "SELECT securemessage.secure_message.msg_id FROM securemessage.secure_message " \
+                    "JOIN securemessage.events ON securemessage.secure_message.msg_id = securemessage.events.msg_id " \
+                    "WHERE securemessage.events.event = 'Read' LIMIT 1"
             query_x = con.execute(query)
             names = []
             for row in query_x:
@@ -692,7 +693,7 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
         """retrieves draft using id of an existing message"""
         self.populate_database(1, single=True)
         with self.engine.connect() as con:
-            query = 'SELECT msg_id FROM secure_message LIMIT 1'
+            query = 'SELECT msg_id FROM securemessage.secure_message LIMIT 1'
             query_x = con.execute(query)
             names = []
             for row in query_x:
@@ -716,7 +717,7 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
         """retrieves draft using id and checks the labels are correct"""
         self.populate_database(1, single=False, add_draft=True)
         with self.engine.connect() as con:
-            query = 'SELECT msg_id FROM secure_message LIMIT 1'
+            query = 'SELECT msg_id FROM securemessage.secure_message LIMIT 1'
             query_x = con.execute(query)
             names = []
             for row in query_x:
@@ -733,7 +734,7 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
         """retrieves draft using id and checks the to and from urns are correct"""
         self.populate_database(1, single=False, add_draft=True)
         with self.engine.connect() as con:
-            query = 'SELECT msg_id FROM secure_message LIMIT 1'
+            query = 'SELECT msg_id FROM securemessage.secure_message LIMIT 1'
             query_x = con.execute(query)
             names = []
             for row in query_x:

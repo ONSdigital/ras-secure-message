@@ -48,7 +48,7 @@ class SaverTestCase(unittest.TestCase):
                 Saver().save_msg_status(message_status['actor'], message_status['msg_id'], 'INBOX, UNREAD')
 
         with self.engine.connect() as con:
-            request = con.execute('SELECT * FROM status')
+            request = con.execute('SELECT * FROM securemessage.status')
             for row in request:
                 self.assertTrue(row is not None)
 
@@ -90,7 +90,7 @@ class SaverTestCase(unittest.TestCase):
                 Saver().save_msg_event(message_event['msg_id'], message_event['event'])
 
         with self.engine.connect() as con:
-            request = con.execute('SELECT * FROM events')
+            request = con.execute('SELECT * FROM securemessage.events')
             for row in request:
                 self.assertTrue(row is not None)
                 self.assertTrue(row[1] == message_event['event'])
@@ -136,7 +136,7 @@ class SaverTestCase(unittest.TestCase):
                 Saver().save_message(self.test_message)
 
         with self.engine.connect() as con:
-            request = con.execute('SELECT COUNT(secure_message.id) FROM secure_message')
+            request = con.execute('SELECT COUNT(securemessage.secure_message.id) FROM securemessage.secure_message')
             for row in request:
                 self.assertTrue(row._row[0] == 1)
 
