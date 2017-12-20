@@ -80,7 +80,7 @@ class FlaskTestCase(unittest.TestCase):
         self.app.post(url, data=json.dumps(data), headers=self.headers)
 
         with self.engine.connect() as con:
-            request = con.execute('SELECT * FROM secure_message WHERE id = (SELECT MAX(id) FROM secure_message)')
+            request = con.execute('SELECT * FROM securemessage.secure_message WHERE id = (SELECT MAX(id) FROM securemessage.secure_message)')
             for row in request:
                 data = {"subject": row['subject'], "body": row['body']}
                 self.assertEqual({'subject': 'MyMessage', 'body': 'hello'}, data)
@@ -93,7 +93,7 @@ class FlaskTestCase(unittest.TestCase):
         self.app.post(url, data=json.dumps(self.test_message), headers=self.headers)
         engine = create_engine(settings.SECURE_MESSAGING_DATABASE_URL, echo=True)
         with engine.connect() as con:
-            request = con.execute('SELECT * FROM secure_message WHERE id = (SELECT MAX(id) FROM secure_message)')
+            request = con.execute('SELECT * FROM securemessage.secure_message WHERE id = (SELECT MAX(id) FROM securemessage.secure_message)')
 
             for row in request:
                 self.assertEqual(len(row['msg_id']), 36)
@@ -110,7 +110,7 @@ class FlaskTestCase(unittest.TestCase):
 
         engine = create_engine(settings.SECURE_MESSAGING_DATABASE_URL, echo=True)
         with engine.connect() as con:
-            request = con.execute('SELECT * FROM secure_message WHERE id = (SELECT MAX(id) FROM secure_message)')
+            request = con.execute('SELECT * FROM securemessage.secure_message WHERE id = (SELECT MAX(id) FROM securemessage.secure_message)')
             for row in request:
                 self.test_message['thread_id'] = row['thread_id']
 
@@ -120,7 +120,7 @@ class FlaskTestCase(unittest.TestCase):
         # Now read back the two messages
         original_msg_id = original_thread_id = reply_msg_id = reply_thread_id = ''
         with engine.connect() as con:
-            request = con.execute('SELECT * FROM secure_message ORDER BY id DESC')
+            request = con.execute('SELECT * FROM securemessage.secure_message ORDER BY id DESC')
             for row in request:
                 if row[0] == 1:
                     original_msg_id = row['msg_id']
@@ -164,7 +164,7 @@ class FlaskTestCase(unittest.TestCase):
         data = json.loads(response.data)
 
         with self.engine.connect() as con:
-            request = con.execute("SELECT * FROM status WHERE label='SENT' AND msg_id='{0}' AND actor='{1}'"
+            request = con.execute("SELECT * FROM securemessage.status WHERE label='SENT' AND msg_id='{0}' AND actor='{1}'"
                                   .format(data['msg_id'], self.test_message['survey']))
             for row in request:
                 self.assertTrue(row is not None)
@@ -177,7 +177,7 @@ class FlaskTestCase(unittest.TestCase):
         data = json.loads(response.data)
 
         with self.engine.connect() as con:
-            request = con.execute("SELECT * FROM events WHERE event='Sent' AND msg_id='{0}'"
+            request = con.execute("SELECT * FROM securemessage.events WHERE event='Sent' AND msg_id='{0}'"
                                   .format(data['msg_id']))
             for row in request:
                 self.assertTrue(row is not None)
@@ -188,7 +188,7 @@ class FlaskTestCase(unittest.TestCase):
         self.app.post("http://localhost:5050/draft/save", data=json.dumps(self.test_message), headers=self.headers)
 
         with self.engine.connect() as con:
-            request = con.execute("SELECT * FROM secure_message LIMIT 1")
+            request = con.execute("SELECT * FROM securemessage.secure_message LIMIT 1")
             for row in request:
                 self.msg_id = row['msg_id']
 
@@ -208,12 +208,12 @@ class FlaskTestCase(unittest.TestCase):
         data = json.loads(response.data)
 
         with self.engine.connect() as con:
-            request = con.execute("SELECT * FROM events WHERE event='Sent' AND msg_id='{0}'"
+            request = con.execute("SELECT * FROM securemessage.events WHERE event='Sent' AND msg_id='{0}'"
                                   .format(data['msg_id']))
             for row in request:
                 self.assertTrue(row is not None)
 
-            request = con.execute("SELECT * FROM events WHERE event='Draft_Saved' AND msg_id='{0}'"
+            request = con.execute("SELECT * FROM securemessage.events WHERE event='Draft_Saved' AND msg_id='{0}'"
                                   .format(data['msg_id']))
             for row in request:
                 self.assertTrue(row is None)
@@ -226,7 +226,7 @@ class FlaskTestCase(unittest.TestCase):
         data = json.loads(response.data)
         # dereferencing msg_to for purpose of test
         with self.engine.connect() as con:
-            request = con.execute("SELECT * FROM status WHERE label='INBOX' OR label='UNREAD' AND msg_id='{0}'"
+            request = con.execute("SELECT * FROM securemessage.status WHERE label='INBOX' OR label='UNREAD' AND msg_id='{0}'"
                                   " AND actor='{1}'".format(data['msg_id'], self.test_message['msg_to'][0]))
             for row in request:
                 self.assertTrue(row is not None)
@@ -239,7 +239,7 @@ class FlaskTestCase(unittest.TestCase):
         data = json.loads(response.data)
 
         with self.engine.connect() as con:
-            request = con.execute("SELECT * FROM status WHERE msg_id='{0}' AND actor='{1}' AND label='SENT'"
+            request = con.execute("SELECT * FROM securemessage.status WHERE msg_id='{0}' AND actor='{1}' AND label='SENT'"
                                   .format(data['msg_id'], self.test_message['survey']))
             for row in request:
                 self.assertTrue(row is not None)
@@ -253,7 +253,7 @@ class FlaskTestCase(unittest.TestCase):
         data = json.loads(response.data)
 
         with self.engine.connect() as con:
-            request = con.execute("SELECT * FROM internal_sent_audit WHERE msg_id='{0}' AND internal_user='{1}'"
+            request = con.execute("SELECT * FROM securemessage.internal_sent_audit WHERE msg_id='{0}' AND internal_user='{1}'"
                                   .format(data['msg_id'], self.test_message['msg_from']))
 
             for row in request:
@@ -279,7 +279,7 @@ class FlaskTestCase(unittest.TestCase):
         self.app.post("http://localhost:5050/message/send", data=json.dumps(self.test_message), headers=self.headers)
 
         with self.engine.connect() as con:
-            request = con.execute("SELECT * FROM status WHERE msg_id='{0}'".format(msg_id))
+            request = con.execute("SELECT * FROM securemessage.status WHERE msg_id='{0}'".format(msg_id))
 
             for row in request:
                 self.assertNotEqual(row['label'], 'DRAFT_INBOX')
@@ -474,4 +474,3 @@ class FlaskTestCase(unittest.TestCase):
 
 if __name__ == '__main__':
     unittest.main()
-

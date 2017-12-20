@@ -157,12 +157,12 @@ class DraftTestCase(unittest.TestCase):
         self.app.post(self.url, data=json.dumps(self.test_message), headers=self.headers)
 
         with self.engine.connect() as con:
-            request = con.execute("SELECT * FROM secure_message ORDER BY id DESC LIMIT 1")
+            request = con.execute("SELECT * FROM securemessage.secure_message ORDER BY id DESC LIMIT 1")
 
             for row in request:
                 self.msg_id = row['msg_id']
 
-            label_request = con.execute("SELECT * FROM status")
+            label_request = con.execute("SELECT * FROM securemessage.status")
 
             self.assertTrue(label_request is not None)
 
@@ -177,7 +177,7 @@ class DraftTestCase(unittest.TestCase):
         self.app.post(self.url, data=json.dumps(self.test_message), headers=self.headers)
 
         with self.engine.connect() as con:
-            request = con.execute("SELECT * FROM secure_message ORDER BY id DESC LIMIT 1")
+            request = con.execute("SELECT * FROM securemessage.secure_message ORDER BY id DESC LIMIT 1")
 
             for row in request:
                 self.msg_id = row['msg_id']
@@ -197,7 +197,7 @@ class DraftTestCase(unittest.TestCase):
         self.app.post(self.url, data=json.dumps(self.test_message), headers=self.headers)
 
         with self.engine.connect() as con:
-            request = con.execute("SELECT * FROM secure_message LIMIT 1")
+            request = con.execute("SELECT * FROM securemessage.secure_message LIMIT 1")
             self.assertTrue(request is not None)
 
     def test_draft_sent_successfully_return_201(self):
@@ -206,7 +206,7 @@ class DraftTestCase(unittest.TestCase):
         self.app.post(self.url, data=json.dumps(self.test_message), headers=self.headers)
 
         with self.engine.connect() as con:
-            request = con.execute("SELECT * FROM secure_message LIMIT 1")
+            request = con.execute("SELECT * FROM securemessage.secure_message LIMIT 1")
             for row in request:
                 self.msg_id = row['msg_id']
 
@@ -230,15 +230,15 @@ class DraftTestCase(unittest.TestCase):
 
         with self.engine.connect() as con:
             msg_id = str(uuid.uuid4())
-            query = "INSERT INTO secure_message(msg_id, subject, body, thread_id," \
+            query = "INSERT INTO securemessage.secure_message(msg_id, subject, body, thread_id," \
                     " collection_case, ru_id, survey) VALUES ('{0}', 'test','test','', " \
                     " 'ACollectionCase', 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc', 'ACollectionExercise'" \
                     "'BRES')".format(msg_id)
             con.execute(query)
-            query = "INSERT INTO status(label, msg_id, actor) VALUES('DRAFT', '{0}', " \
+            query = "INSERT INTO securemessage.status(label, msg_id, actor) VALUES('DRAFT', '{0}', " \
                     "'0a7ad740-10d5-4ecb-b7ca-3c0384afb882')".format(msg_id)
             con.execute(query)
-            query = "INSERT INTO status(label, msg_id, actor) VALUES('DRAFT_INBOX', '{0}'," \
+            query = "INSERT INTO securemessage.status(label, msg_id, actor) VALUES('DRAFT_INBOX', '{0}'," \
                     " 'SurveyType')".format(msg_id)
             con.execute(query)
 

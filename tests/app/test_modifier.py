@@ -27,24 +27,24 @@ class ModifyTestCaseHelper:
         with self.engine.connect() as con:
             for i in range(record_count):
                 msg_id = str(uuid.uuid4())
-                query = "INSERT INTO secure_message(id, msg_id, subject, body, thread_id," \
+                query = "INSERT INTO securemessage.secure_message(id, msg_id, subject, body, thread_id," \
                         " collection_case, ru_id, collection_exercise, survey) VALUES ({0}, '{1}', 'test','test','', " \
                         " 'ACollectionCase', 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc', 'ACollectionExercise'," \
                         "'BRES')".format(i, msg_id)
                 con.execute(query)
-                query = "INSERT INTO status(label, msg_id, actor) VALUES('SENT', '{0}', " \
+                query = "INSERT INTO securemessage.status(label, msg_id, actor) VALUES('SENT', '{0}', " \
                         "'0a7ad740-10d5-4ecb-b7ca-3c0384afb882')".format(msg_id)
                 con.execute(query)
-                query = "INSERT INTO status(label, msg_id, actor) VALUES('INBOX', '{0}', 'BRES')".format(
+                query = "INSERT INTO securemessage.status(label, msg_id, actor) VALUES('INBOX', '{0}', 'BRES')".format(
                     msg_id)
                 con.execute(query)
-                query = "INSERT INTO status(label, msg_id, actor) VALUES('UNREAD', '{0}', 'BRES')".format(
+                query = "INSERT INTO securemessage.status(label, msg_id, actor) VALUES('UNREAD', '{0}', 'BRES')".format(
                     msg_id)
                 con.execute(query)
-                query = "INSERT INTO events(event, msg_id, date_time) VALUES('Sent', '{0}', '{1}')".format(
+                query = "INSERT INTO securemessage.events(event, msg_id, date_time) VALUES('Sent', '{0}', '{1}')".format(
                     msg_id, "2017-02-03 00:00:00")
                 con.execute(query)
-                query = "INSERT INTO events(event, msg_id, date_time) VALUES('Read', '{0}', '{1}')".format(
+                query = "INSERT INTO securemessage.events(event, msg_id, date_time) VALUES('Read', '{0}', '{1}')".format(
                     msg_id, "2017-02-03 00:00:00")
                 con.execute(query)
 
@@ -71,7 +71,7 @@ class ModifyTestCase(unittest.TestCase, ModifyTestCaseHelper):
         """testing message is added to database with archived label attached"""
         self.populate_database(1)
         with self.engine.connect() as con:
-            query = 'SELECT msg_id FROM secure_message LIMIT 1'
+            query = 'SELECT msg_id FROM securemessage.secure_message LIMIT 1'
             query_x = con.execute(query)
             names = []
             for row in query_x:
@@ -90,7 +90,7 @@ class ModifyTestCase(unittest.TestCase, ModifyTestCaseHelper):
         """testing message is added to database with archived label removed and inbox and read is added instead"""
         self.populate_database(1)
         with self.engine.connect() as con:
-            query = 'SELECT msg_id FROM secure_message LIMIT 1'
+            query = 'SELECT msg_id FROM securemessage.secure_message LIMIT 1'
             query_x = con.execute(query)
             names = []
             for row in query_x:
@@ -111,7 +111,7 @@ class ModifyTestCase(unittest.TestCase, ModifyTestCaseHelper):
         """testing message is added to database with archived label removed and inbox and read is added instead"""
         self.populate_database(1)
         with self.engine.connect() as con:
-            query = 'SELECT msg_id FROM secure_message LIMIT 1'
+            query = 'SELECT msg_id FROM securemessage.secure_message LIMIT 1'
             query_x = con.execute(query)
             names = []
             for row in query_x:
@@ -130,7 +130,7 @@ class ModifyTestCase(unittest.TestCase, ModifyTestCaseHelper):
         """testing message is added to database with archived label removed and inbox and read is added instead"""
         self.populate_database(1)
         with self.engine.connect() as con:
-            query = 'SELECT msg_id FROM secure_message LIMIT 1'
+            query = 'SELECT msg_id FROM securemessage.secure_message LIMIT 1'
             query_x = con.execute(query)
             names = []
             for row in query_x:
@@ -151,7 +151,7 @@ class ModifyTestCase(unittest.TestCase, ModifyTestCaseHelper):
         """testing duplicate message labels are not added to the database"""
         self.populate_database(1)
         with self.engine.connect() as con:
-            query = 'SELECT msg_id FROM secure_message LIMIT 1'
+            query = 'SELECT msg_id FROM securemessage.secure_message LIMIT 1'
             query_x = con.execute(query)
             names = []
             for row in query_x:
@@ -165,7 +165,7 @@ class ModifyTestCase(unittest.TestCase, ModifyTestCaseHelper):
                 modifier.add_unread(message, self.user_internal)
                 modifier.add_unread(message, self.user_internal)
         with self.engine.connect() as con:
-            query = "SELECT count(label) FROM status WHERE msg_id = '{}' AND label = 'UNREAD'".format(msg_id)
+            query = "SELECT count(label) FROM securemessage.status WHERE msg_id = '{}' AND label = 'UNREAD'".format(msg_id)
             query_x = con.execute(query)
             unread_label_total = []
             for row in query_x:
@@ -176,7 +176,7 @@ class ModifyTestCase(unittest.TestCase, ModifyTestCaseHelper):
         """testing message is added to database with archived label attached"""
         self.populate_database(1)
         with self.engine.connect() as con:
-            query = 'SELECT msg_id FROM secure_message LIMIT 1'
+            query = 'SELECT msg_id FROM securemessage.secure_message LIMIT 1'
             query_x = con.execute(query)
             names = []
             for row in query_x:
@@ -196,7 +196,7 @@ class ModifyTestCase(unittest.TestCase, ModifyTestCaseHelper):
         """testing message read_date is set when unread label is removed"""
         self.populate_database(1)
         with self.engine.connect() as con:
-            query = 'SELECT msg_id FROM secure_message LIMIT 1'
+            query = 'SELECT msg_id FROM securemessage.secure_message LIMIT 1'
             query_x = con.execute(query)
             names = []
             for row in query_x:
@@ -215,7 +215,7 @@ class ModifyTestCase(unittest.TestCase, ModifyTestCaseHelper):
         """testing message read_date is not reset when unread label is removed again"""
         self.populate_database(1)
         with self.engine.connect() as con:
-            query = 'SELECT msg_id FROM secure_message LIMIT 1'
+            query = 'SELECT msg_id FROM securemessage.secure_message LIMIT 1'
             query_x = con.execute(query)
             names = []
             for row in query_x:
@@ -253,7 +253,7 @@ class ModifyTestCase(unittest.TestCase, ModifyTestCaseHelper):
                 modifier = Modifier()
 
                 with self.engine.connect() as con:
-                    add_message = "INSERT INTO secure_message (msg_id, body, subject, thread_id, collection_case, ru_id, " \
+                    add_message = "INSERT INTO securemessage.secure_message (msg_id, body, subject, thread_id, collection_case, ru_id, " \
                             "survey, collection_exercise) VALUES ('{0}', '{1}', '{2}', '{3}', '{4}', '{5}', '{6}', '{7}')" \
                             .format(self.test_message['msg_id'], self.test_message['body'], self.test_message['subject'],
                                     self.test_message['thread_id'],
@@ -262,14 +262,14 @@ class ModifyTestCase(unittest.TestCase, ModifyTestCaseHelper):
                     con.execute(add_message)
 
                 with self.engine.connect() as con:
-                    add_draft = ("INSERT INTO status (label, msg_id, actor) "
+                    add_draft = ("INSERT INTO securemessage.status (label, msg_id, actor) "
                                  "VALUES ('{0}', 'test123', '0a7ad740-10d5-4ecb-b7ca-3c0384afb882')")\
                         .format(Labels.DRAFT.value)
                     con.execute(add_draft)
                 modifier.del_draft(self.test_message['msg_id'])
 
                 with self.engine.connect() as con:
-                    request = con.execute("SELECT * FROM status WHERE msg_id='{0}' AND actor='{1}'"
+                    request = con.execute("SELECT * FROM securemessage.status WHERE msg_id='{0}' AND actor='{1}'"
                                           .format('test123', '0a7ad740-10d5-4ecb-b7ca-3c0384afb882'))
                     for row in request:
                         self.assertTrue(row is None)
@@ -294,10 +294,10 @@ class ModifyTestCase(unittest.TestCase, ModifyTestCaseHelper):
 
                 modifier = Modifier()
                 with self.engine.connect() as con:
-                    add_draft_event = ("INSERT INTO events (event, msg_id, date_time) "
+                    add_draft_event = ("INSERT INTO securemessage.events (event, msg_id, date_time) "
                                        "VALUES ('{0}', 'test123', '{1}')").format('Draft_Saved',
                                                                                   datetime.now(timezone.utc))
-                    add_draft = "INSERT INTO secure_message (msg_id, body, subject, thread_id, collection_case, ru_id, " \
+                    add_draft = "INSERT INTO securemessage.secure_message (msg_id, body, subject, thread_id, collection_case, ru_id, " \
                                 "survey, collection_exercise) VALUES ('{0}', '{1}', '{2}', '{3}', '{4}', '{5}', '{6}', '{7}')" \
                         .format(self.test_message['msg_id'], self.test_message['body'], self.test_message['subject'],
                                 self.test_message['thread_id'],
@@ -309,7 +309,7 @@ class ModifyTestCase(unittest.TestCase, ModifyTestCaseHelper):
                 modifier.del_draft(self.test_message['msg_id'])
 
                 with self.engine.connect() as con:
-                    request = con.execute("SELECT * FROM events WHERE msg_id='{0}'"
+                    request = con.execute("SELECT * FROM securemessage.events WHERE msg_id='{0}'"
                                           .format('test123'))
                     for row in request:
                         self.assertTrue(row is None)
@@ -354,7 +354,7 @@ class ModifyTestCase(unittest.TestCase, ModifyTestCaseHelper):
         """testing archive label is removed after being added to both respondent and internal"""
         self.populate_database(2)
         with self.engine.connect() as con:
-            query = 'SELECT msg_id FROM secure_message LIMIT 1'
+            query = 'SELECT msg_id FROM securemessage.secure_message LIMIT 1'
             query_x = con.execute(query)
             names = []
             for row in query_x:
@@ -378,8 +378,6 @@ class ModifyTestCase(unittest.TestCase, ModifyTestCaseHelper):
                 self.assertCountEqual(message['labels'], ['UNREAD', 'INBOX'])
 
     def test_exception_for_add_label_raises(self):
-        # mock_session = mock.Mock(db.session)
-        # mock_session.commit.side_effect = Exception("Error retrieving messages from database")
         with app.app_context():
             database.db.drop_all()
             with current_app.test_request_context():
