@@ -182,7 +182,7 @@ class DraftTestCase(unittest.TestCase):
             for row in request:
                 self.msg_id = row['msg_id']
 
-            label_request = con.execute("SELECT * FROM status")
+            label_request = con.execute("SELECT * FROM securemessage.status")
 
             self.assertTrue(label_request is not None)
 

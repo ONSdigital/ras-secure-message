@@ -48,7 +48,7 @@ class SaverTestCase(unittest.TestCase):
                 Saver().save_msg_status(message_status['actor'], message_status['msg_id'], 'INBOX, UNREAD')
 
         with self.engine.connect() as con:
-            request = con.execute('SELECT * FROM status')
+            request = con.execute('SELECT * FROM securemessage.status')
             for row in request:
                 self.assertTrue(row is not None)
 
