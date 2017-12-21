@@ -6,18 +6,18 @@ from datetime import datetime, timezone
 from flask import current_app, json
 from sqlalchemy import create_engine
 
-from app import application, settings, constants
-from app.application import app
-from app.common.alerts import AlertUser, AlertViaGovNotify
-from app.repository import database
-from app.authentication.jwt import encode
-from app.authentication.jwe import Encrypter
-from app.services.service_toggles import case_service
-from app.resources.messages import MessageSend
-from app.resources.messages import logger as message_logger
-from app.common.alerts import AlertViaLogging
-from app.api_mocks.party_service_mock import PartyServiceMock
-from app.api_mocks.case_service_mock import CaseServiceMock
+from secure_message import application, settings, constants
+from secure_message.application import app
+from secure_message.common.alerts import AlertUser, AlertViaGovNotify
+from secure_message.repository import database
+from secure_message.authentication.jwt import encode
+from secure_message.authentication.jwe import Encrypter
+from secure_message.services.service_toggles import case_service
+from secure_message.resources.messages import MessageSend
+from secure_message.resources.messages import logger as message_logger
+from secure_message.common.alerts import AlertViaLogging
+from secure_message.api_mocks.party_service_mock import PartyServiceMock
+from secure_message.api_mocks.case_service_mock import CaseServiceMock
 from tests.app import test_utilities
 
 

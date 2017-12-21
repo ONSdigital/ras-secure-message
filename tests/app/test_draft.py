@@ -7,21 +7,21 @@ from flask import g
 from flask import current_app, json
 from sqlalchemy import create_engine
 
-from app import application, settings, constants
-from app.application import app
-from app.authentication.jwe import Encrypter
-from app.authentication.jwt import encode
-from app.common import utilities
-from app.common.alerts import AlertUser, AlertViaGovNotify
-from app.common.labels import Labels
-from app.repository import database
-from app.repository.retriever import Retriever
-from app.repository.saver import Saver
-from app.resources.drafts import DraftModifyById, DraftSave
-from app.validation.domain import DraftSchema
-from app.validation.user import User
-from app.constants import MAX_RU_ID_LEN
-from app.services.service_toggles import party, case_service
+from secure_message import application, settings, constants
+from secure_message.application import app
+from secure_message.authentication.jwe import Encrypter
+from secure_message.authentication.jwt import encode
+from secure_message.common import utilities
+from secure_message.common.alerts import AlertUser, AlertViaGovNotify
+from secure_message.common.labels import Labels
+from secure_message.repository import database
+from secure_message.repository.retriever import Retriever
+from secure_message.repository.saver import Saver
+from secure_message.resources.drafts import DraftModifyById, DraftSave
+from secure_message.validation.domain import DraftSchema
+from secure_message.validation.user import User
+from secure_message.constants import MAX_RU_ID_LEN
+from secure_message.services.service_toggles import party, case_service
 from tests.app import test_utilities
 
 

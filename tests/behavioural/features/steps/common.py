@@ -1,7 +1,7 @@
-from app.application import app
-from app.services.service_toggles import party, case_service
+from secure_message.application import app
+from secure_message.services.service_toggles import party, case_service
 from behave import given, then, when
-from app.repository import database
+from secure_message.repository import database
 from flask import current_app
 from sqlalchemy.engine import Engine
 from sqlalchemy import event

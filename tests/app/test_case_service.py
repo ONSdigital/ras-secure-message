@@ -3,7 +3,7 @@ import requests
 import unittest
 from unittest import mock
 
-from app.services.case_service import CaseService
+from secure_message.services.case_service import CaseService
 
 
 class CaseServiceTestHelper:

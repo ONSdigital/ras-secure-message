@@ -1,6 +1,6 @@
 import unittest
 
-from app.validation.user import User
+from secure_message.validation.user import User
 
 
 class UserTestCase(unittest.TestCase):

@@ -3,11 +3,11 @@ import unittest
 from flask import current_app, json
 from sqlalchemy import create_engine
 
-from app import application, settings, constants
-from app.application import app
-from app.authentication.jwe import Encrypter
-from app.authentication.jwt import encode
-from app.repository import database
+from secure_message import application, settings, constants
+from secure_message.application import app
+from secure_message.authentication.jwe import Encrypter
+from secure_message.authentication.jwt import encode
+from secure_message.repository import database
 
 
 class LabelTestCase(unittest.TestCase):

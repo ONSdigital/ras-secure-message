@@ -1,4 +1,4 @@
-from app.application import app
+from secure_message.application import app
 from behave import given, when
 from flask import json
 import copy

@@ -1,7 +1,7 @@
 import nose.tools
 from behave import then
 from flask import json
-from app.services.service_toggles import party
+from secure_message.services.service_toggles import party
 
 
 @then("retrieved message additional from data matches that from party service")

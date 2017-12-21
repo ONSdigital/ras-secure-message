@@ -3,12 +3,12 @@ import unittest
 from flask import json
 from sqlalchemy import create_engine
 
-from app import application, constants, settings
-from app.application import app
-from app.common.utilities import get_business_details_by_ru, get_details_by_uuids
-from app.authentication.jwe import Encrypter
-from app.authentication.jwt import encode
-from app.api_mocks.party_service_mock import PartyServiceMock
+from secure_message import application, constants, settings
+from secure_message.application import app
+from secure_message.common.utilities import get_business_details_by_ru, get_details_by_uuids
+from secure_message.authentication.jwe import Encrypter
+from secure_message.authentication.jwt import encode
+from secure_message.api_mocks.party_service_mock import PartyServiceMock
 from tests.app import test_utilities
 
 

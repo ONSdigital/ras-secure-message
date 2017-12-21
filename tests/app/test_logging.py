@@ -5,11 +5,11 @@ from io import StringIO
 
 from flask import g
 
-from app.validation.domain import MessageSchema
-from app import application
-from app.application import app
-from app.logger_config import logger_initial_config
-from app.validation.user import User
+from secure_message.validation.domain import MessageSchema
+from secure_message import application
+from secure_message.application import app
+from secure_message.logger_config import logger_initial_config
+from secure_message.validation.user import User
 
 
 sys.path.append('../../ras-secure-message')

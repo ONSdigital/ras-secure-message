@@ -6,16 +6,16 @@ from datetime import datetime, timezone
 from flask import current_app, g
 from sqlalchemy import create_engine
 
-from app.application import app
-from app.common.labels import Labels
-from app.repository import database
-from app.repository.modifier import Modifier
-from app.repository.retriever import Retriever
-from app.repository.saver import Saver
-from app.validation.domain import DraftSchema
-from app.validation.user import User
-from app.repository.database import SecureMessage
-from app import constants
+from secure_message.application import app
+from secure_message.common.labels import Labels
+from secure_message.repository import database
+from secure_message.repository.modifier import Modifier
+from secure_message.repository.retriever import Retriever
+from secure_message.repository.saver import Saver
+from secure_message.validation.domain import DraftSchema
+from secure_message.validation.user import User
+from secure_message.repository.database import SecureMessage
+from secure_message import constants
 from tests.app import test_utilities
 
 

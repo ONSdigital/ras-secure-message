@@ -4,14 +4,14 @@ from unittest import mock
 from flask import current_app
 from sqlalchemy import create_engine
 
-from app.repository.saver import Saver
-from app.repository import database
-from app.repository.database import db
-from app.application import app
-from app.exception.exceptions import MessageSaveException
-from app.validation.domain import Message
-from app.repository.database import SecureMessage
-from app import settings
+from secure_message.repository.saver import Saver
+from secure_message.repository import database
+from secure_message.repository.database import db
+from secure_message.application import app
+from secure_message.exception.exceptions import MessageSaveException
+from secure_message.validation.domain import Message
+from secure_message.repository.database import SecureMessage
+from secure_message import settings
 
 
 class SaverTestCase(unittest.TestCase):

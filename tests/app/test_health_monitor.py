@@ -2,10 +2,10 @@ import unittest
 
 from flask import current_app, json
 
-from app import application
-from app.application import app
-from app.repository import database
-from app.repository.retriever import Retriever
+from secure_message import application
+from secure_message.application import app
+from secure_message.repository import database
+from secure_message.repository.retriever import Retriever
 
 
 class HealthTestCase(unittest.TestCase):

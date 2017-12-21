@@ -1,5 +1,5 @@
 import unittest
-from app.services.service_toggles import case_service
+from secure_message.services.service_toggles import case_service
 
 
 class CaseServiceIntegrationTestCase(unittest.TestCase):

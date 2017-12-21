@@ -3,7 +3,7 @@ from tests.behavioural.features.steps.from_field import step_impl_the_msg_from_i
                                                               step_impl_the_msg_from_is_set_to_internal
 from tests.behavioural.features.steps.to_field import step_impl_the_msg_to_is_set_to_internal,\
                                                               step_impl_the_msg_to_is_set_to_respondent
-from app import constants
+from secure_message import constants
 
 
 @given("the user is set as internal")

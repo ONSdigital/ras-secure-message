@@ -6,14 +6,14 @@ from werkzeug.exceptions import NotFound, InternalServerError
 from flask import current_app
 from sqlalchemy import create_engine
 
-from app.application import app
-from app.repository import database
-from app.repository.retriever import Retriever
-from app.constants import MESSAGE_QUERY_LIMIT
-from app.services.service_toggles import party
-from app import constants
-from app import settings
-from app.validation.user import User
+from secure_message.application import app
+from secure_message.repository import database
+from secure_message.repository.retriever import Retriever
+from secure_message.constants import MESSAGE_QUERY_LIMIT
+from secure_message.services.service_toggles import party
+from secure_message import constants
+from secure_message import settings
+from secure_message.validation.user import User
 from tests.app import test_utilities
 
 

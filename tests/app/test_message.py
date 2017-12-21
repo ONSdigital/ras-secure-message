@@ -3,11 +3,11 @@ from datetime import datetime, timezone
 
 from flask import g
 
-from app import constants
-from app.validation.domain import Message, MessageSchema, DraftSchema
-from app.validation.user import User
-from app.application import app
-from app.constants import MAX_SUBJECT_LEN, MAX_BODY_LEN, MAX_THREAD_LEN
+from secure_message import constants
+from secure_message.validation.domain import Message, MessageSchema, DraftSchema
+from secure_message.validation.user import User
+from secure_message.application import app
+from secure_message.constants import MAX_SUBJECT_LEN, MAX_BODY_LEN, MAX_THREAD_LEN
 
 
 class MessageTestCase(unittest.TestCase):

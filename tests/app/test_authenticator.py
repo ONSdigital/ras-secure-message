@@ -4,14 +4,14 @@ from werkzeug.exceptions import BadRequest
 
 from flask import Response
 
-from app.authentication.authenticator import check_jwt, authenticate
-from app.authentication.jwt import encode, decode
-from app.authentication.jwe import Encrypter
-from app.application import app
-from app import settings, constants
+from secure_message.authentication.authenticator import check_jwt, authenticate
+from secure_message.authentication.jwt import encode, decode
+from secure_message.authentication.jwe import Encrypter
+from secure_message.application import app
+from secure_message import settings, constants
 
 
-@patch('app.settings.SM_JWT_ENCRYPT', "0")
+@patch('secure_message.settings.SM_JWT_ENCRYPT', "0")
 def test_authentication_non_encrypted_jwt_pass(self):
     """Authenticate request using an un-ecrypted JWT"""
     expected_res = {'status': "ok"}

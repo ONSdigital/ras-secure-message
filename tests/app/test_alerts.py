@@ -1,9 +1,9 @@
 import unittest
 from unittest import mock
 from unittest.mock import Mock
-from app import settings
-from app.exception.exceptions import RasNotifyException
-from app.common.alerts import AlertUser, AlertViaGovNotify
+from secure_message import settings
+from secure_message.exception.exceptions import RasNotifyException
+from secure_message.common.alerts import AlertUser, AlertViaGovNotify
 
 
 class AlertsTestCase(unittest.TestCase):

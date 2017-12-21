@@ -1,7 +1,7 @@
 import nose
 from behave import given, then
 from flask import json
-from app.application import app
+from secure_message.application import app
 
 
 # Scenario 1: User requests info

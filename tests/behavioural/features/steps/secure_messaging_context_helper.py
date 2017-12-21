@@ -1,10 +1,10 @@
 from flask import json
 
-from app.authentication.jwe import Encrypter
-from app.authentication.jwt import encode
-from app import settings
-from app import constants
-from app.common import utilities
+from secure_message.authentication.jwe import Encrypter
+from secure_message.authentication.jwt import encode
+from secure_message import settings
+from secure_message import constants
+from secure_message.common import utilities
 import copy
 
 
