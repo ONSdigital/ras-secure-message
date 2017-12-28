@@ -1,13 +1,14 @@
 import logging
 
+from flask import Response, g, current_app
+from jose import JWTError
 from structlog import wrap_logger
-from secure_message import settings, constants
+from werkzeug.exceptions import BadRequest
+
+from secure_message import constants
 from secure_message.validation.user import User
 from secure_message.authentication.jwt import decode
 from secure_message.authentication.jwe import Decrypter
-from flask import Response, g
-from jose import JWTError
-from werkzeug.exceptions import BadRequest
 
 logger = wrap_logger(logging.getLogger(__name__))
 
@@ -26,7 +27,7 @@ def authenticate(headers):
 
 
 def check_jwt(token):
-    JWT_ENCRYPT = settings.SM_JWT_ENCRYPT
+    JWT_ENCRYPT = current_app.config['SM_JWT_ENCRYPT']
     logger.debug('JWT Encryption (0=disabled, 1=enabled)', JWT_ENCRYPT=JWT_ENCRYPT)
     try:
         if JWT_ENCRYPT == '1':

@@ -6,7 +6,7 @@ from flask import g
 from secure_message import constants
 from secure_message.validation.domain import Message, MessageSchema, DraftSchema
 from secure_message.validation.user import User
-from secure_message.application import app
+from secure_message.application import create_app
 from secure_message.constants import MAX_SUBJECT_LEN, MAX_BODY_LEN, MAX_THREAD_LEN
 
 
@@ -83,11 +83,13 @@ class MessageSchemaTestCase(unittest.TestCase):
                              'thread_id': "", 'ru_id': "7fc0e8ab-189c-4794-b8f4-9f05a1db185b", 'survey': "RSI"}
         self.now = datetime.now(timezone.utc)
 
+        self.app = create_app()
+
     def test_valid_message_passes_validation(self):
         """marshaling a valid message"""
         self.json_message['msg_to'] = ["01b51fcc-ed43-4cdb-ad1c-450f9986859b"]
         schema = MessageSchema()
-        with app.app_context():
+        with self.app.app_context():
             g.user = User(self.json_message['msg_from'], 'respondent')
             result = schema.load(self.json_message)
         self.assertTrue(result.errors == {})
@@ -105,7 +107,7 @@ class MessageSchemaTestCase(unittest.TestCase):
         self.json_message['body'] = "x" * (MAX_BODY_LEN + 1)
         expected_error = 'Body field length must not be greater than {0}'.format(MAX_BODY_LEN)
 
-        with app.app_context():
+        with self.app.app_context():
             g.user = User(self.json_message['msg_from'], 'respondent')
             schema = MessageSchema()
             sut = schema.load(self.json_message)
@@ -117,7 +119,7 @@ class MessageSchemaTestCase(unittest.TestCase):
         message = {'msg_to': ['01b51fcc-ed43-4cdb-ad1c-450f9986859b'], 'msg_from': 'torrance', 'body': '', 'survey': 'RSI', 'subject': 'MyMessage',
                    'ru_id': '7fc0e8ab-189c-4794-b8f4-9f05a1db185b'}
 
-        with app.app_context():
+        with self.app.app_context():
             g.user = User(message['msg_from'], 'respondent')
             schema = MessageSchema()
             errors = schema.load(message)[1]
@@ -127,7 +129,7 @@ class MessageSchemaTestCase(unittest.TestCase):
         """marshalling message with no subject field """
         self.json_message.pop('subject', 'MyMessage')
         self.json_message['msg_to'] = ["01b51fcc-ed43-4cdb-ad1c-450f9986859b"]
-        with app.app_context():
+        with self.app.app_context():
             g.user = User(self.json_message['msg_from'], 'respondent')
             schema = MessageSchema()
             errors = schema.load(self.json_message)[1]
@@ -137,7 +139,7 @@ class MessageSchemaTestCase(unittest.TestCase):
         """marshalling message with no subject field """
         self.json_message['subject'] = ''
         self.json_message['msg_to'] = ["01b51fcc-ed43-4cdb-ad1c-450f9986859b"]
-        with app.app_context():
+        with self.app.app_context():
             g.user = User(self.json_message['msg_from'], 'respondent')
             schema = MessageSchema()
             errors = schema.load(self.json_message)[1]
@@ -147,7 +149,7 @@ class MessageSchemaTestCase(unittest.TestCase):
         """marshalling message with no subject field """
         self.json_message['subject'] = '  '
         self.json_message['msg_to'] = ["01b51fcc-ed43-4cdb-ad1c-450f9986859b"]
-        with app.app_context():
+        with self.app.app_context():
             g.user = User(self.json_message['msg_from'], 'respondent')
             schema = MessageSchema()
             errors = schema.load(self.json_message)[1]
@@ -157,7 +159,7 @@ class MessageSchemaTestCase(unittest.TestCase):
         """marshalling message with subject field too long"""
         self.json_message['subject'] = "x" * (MAX_SUBJECT_LEN + 1)
         expected_error = 'Subject field length must not be greater than {0}'.format(MAX_SUBJECT_LEN)
-        with app.app_context():
+        with self.app.app_context():
             g.user = User(self.json_message['msg_from'], 'respondent')
             schema = MessageSchema()
             sut = schema.load(self.json_message)
@@ -167,7 +169,7 @@ class MessageSchemaTestCase(unittest.TestCase):
         """marshalling message with no thread_id field"""
         self.json_message['msg_to'] = ["01b51fcc-ed43-4cdb-ad1c-450f9986859b"]
         self.json_message.pop('thread_id', "")
-        with app.app_context():
+        with self.app.app_context():
             g.user = User(self.json_message['msg_from'], 'respondent')
             schema = MessageSchema()
             errors = schema.load(self.json_message)[1]
@@ -177,7 +179,7 @@ class MessageSchemaTestCase(unittest.TestCase):
         """marshalling message with thread_id field too long"""
         self.json_message['thread_id'] = "x" * (MAX_THREAD_LEN + 1)
         expected_error = 'Thread field length must not be greater than {0}'.format(MAX_THREAD_LEN)
-        with app.app_context():
+        with self.app.app_context():
             g.user = User(self.json_message['msg_from'], 'respondent')
             schema = MessageSchema()
             sut = schema.load(self.json_message)
@@ -187,7 +189,7 @@ class MessageSchemaTestCase(unittest.TestCase):
         """Missing msg_id causes a uuid is used"""
         self.json_message['msg_id'] = ''
         self.json_message['msg_to'] = ['01b51fcc-ed43-4cdb-ad1c-450f9986859b']
-        with app.app_context():
+        with self.app.app_context():
             g.user = User(self.json_message['msg_from'], 'respondent')
             schema = MessageSchema()
             sut = schema.load(self.json_message)
@@ -198,7 +200,7 @@ class MessageSchemaTestCase(unittest.TestCase):
         message = {'msg_to': ['torrance'], 'msg_from': 'someone', 'body': 'hello', 'subject': 'subject',
                    'read_date': self.now}
 
-        with app.app_context():
+        with self.app.app_context():
             g.user = User(message['msg_from'], 'respondent')
             schema = MessageSchema()
             errors = schema.load(message)[1]
@@ -209,7 +211,7 @@ class MessageSchemaTestCase(unittest.TestCase):
         """marshalling message with no survey field"""
         self.json_message['msg_to'] = ["01b51fcc-ed43-4cdb-ad1c-450f9986859b"]
         self.json_message['survey'] = ''
-        with app.app_context():
+        with self.app.app_context():
             g.user = User(self.json_message['msg_from'], 'respondent')
             schema = MessageSchema()
             errors = schema.load(self.json_message)[1]
@@ -219,7 +221,7 @@ class MessageSchemaTestCase(unittest.TestCase):
         """marshalling message with same to and from field"""
         self.json_message['msg_from'] = "01b51fcc-ed43-4cdb-ad1c-450f9986859b"
         self.json_message['msg_to'] = ["01b51fcc-ed43-4cdb-ad1c-450f9986859b"]
-        with app.app_context():
+        with self.app.app_context():
             g.user = User(self.json_message['msg_from'], 'respondent')
             schema = MessageSchema()
             errors = schema.load(self.json_message)[1]
@@ -229,7 +231,7 @@ class MessageSchemaTestCase(unittest.TestCase):
     def test_msg_to_list_of_string(self):
         """marshalling message where msg_to field is list of strings"""
         self.json_message['msg_to'] = ["01b51fcc-ed43-4cdb-ad1c-450f9986859b"]
-        with app.app_context():
+        with self.app.app_context():
             g.user = User(self.json_message['msg_from'], 'respondent')
             schema = MessageSchema()
             errors = schema.load(self.json_message)[1]
@@ -239,7 +241,7 @@ class MessageSchemaTestCase(unittest.TestCase):
     def test_msg_to_string(self):
         """marshalling message where msg_to field is string"""
         self.json_message['msg_to'] = ["01b51fcc-ed43-4cdb-ad1c-450f9986859b"]
-        with app.app_context():
+        with self.app.app_context():
             g.user = User(self.json_message['msg_from'], 'respondent')
             schema = MessageSchema()
             errors = schema.load(self.json_message)[1]
@@ -250,7 +252,7 @@ class MessageSchemaTestCase(unittest.TestCase):
         """marshalling message where msg_from field is string"""
         self.json_message['msg_to'] = [constants.BRES_USER]
         self.json_message['msg_from'] = "01b51fcc-ed43-4cdb-ad1c-450f9986859b"
-        with app.app_context():
+        with self.app.app_context():
             g.user = User(self.json_message['msg_from'], 'respondent')
             schema = MessageSchema()
             errors = schema.load(self.json_message)[1]
@@ -261,7 +263,7 @@ class MessageSchemaTestCase(unittest.TestCase):
         """marshalling message where msg_from field is an internal user and the 'uuid' is not BRES"""
         self.json_message['msg_to'] = ["01b51fcc-ed43-4cdb-ad1c-450f9986859b"]
         self.json_message['msg_from'] = "SomeOtherWorkGroup"
-        with app.app_context():
+        with self.app.app_context():
             g.user = User(constants.BRES_USER, 'internal')
             schema = DraftSchema()
             errors = schema.load(self.json_message)[1]
@@ -273,7 +275,7 @@ class MessageSchemaTestCase(unittest.TestCase):
         """marshalling message where msg_from field is a respondent and msg_from is not equal to uuid in token"""
         self.json_message['msg_to'] = [constants.BRES_USER]
         self.json_message['msg_from'] = "6779kgh83-ed43-474b-ad1c-500f5287439a"
-        with app.app_context():
+        with self.app.app_context():
             g.user = User("01b51fcc-ed43-4cdb-ad1c-450f9986859b", 'respondent')
             schema = DraftSchema()
             errors = schema.load(self.json_message)[1]
@@ -285,7 +287,7 @@ class MessageSchemaTestCase(unittest.TestCase):
         """marshalling message where msg_to field is a invalid user"""
         self.json_message['msg_to'] = ["NotAValidUser"]
         self.json_message['msg_from'] = "01b51fcc-ed43-4cdb-ad1c-450f9986859b"
-        with app.app_context():
+        with self.app.app_context():
             g.user = User("01b51fcc-ed43-4cdb-ad1c-450f9986859b", 'respondent')
             schema = DraftSchema()
             errors = schema.load(self.json_message)[1]

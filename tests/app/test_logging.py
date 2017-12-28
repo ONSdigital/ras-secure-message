@@ -6,8 +6,7 @@ from io import StringIO
 from flask import g
 
 from secure_message.validation.domain import MessageSchema
-from secure_message import application
-from secure_message.application import app
+from secure_message.application import create_app
 from secure_message.logger_config import logger_initial_config
 from secure_message.validation.user import User
 
@@ -21,7 +20,7 @@ class LoggingTestCase(unittest.TestCase):
     """Test case for logging"""
     def setUp(self):
         """creates a test client"""
-        self.app = application.app.test_client()
+        self.app = create_app()
 
     def test_logging_message_endpoint(self):
         """logging message endpoint"""
@@ -29,7 +28,7 @@ class LoggingTestCase(unittest.TestCase):
         sys.stdout = out
         message = {'msg_to': 'richard', 'msg_from': 'torrance', 'subject': 'hello', 'body': 'hello world',
                    'thread_id': ''}
-        with app.app_context():
+        with self.app.app_context():
             g.user = User('torrence', 'respondent')
             schema = MessageSchema()
             schema.load(message)

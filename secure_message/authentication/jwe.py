@@ -10,9 +10,8 @@ from cryptography.hazmat.primitives.ciphers import algorithms
 from cryptography.hazmat.primitives.ciphers import modes
 from cryptography.hazmat.primitives.asymmetric import padding
 from cryptography.hazmat.primitives import hashes
-from secure_message import settings
+from flask import json, current_app
 from werkzeug.exceptions import BadRequest
-from flask import json
 
 IV_EXPECTED_LENGTH = 12
 CEK_EXPECT_LENGTH = 32
@@ -20,10 +19,15 @@ CEK_EXPECT_LENGTH = 32
 
 class Encrypter:
 
-    def __init__(self, _private_key=settings.SM_USER_AUTHENTICATION_PRIVATE_KEY,
-                 _private_key_password=settings.SM_USER_AUTHENTICATION_PRIVATE_KEY_PASSWORD,
-                 _public_key=settings.SM_USER_AUTHENTICATION_PUBLIC_KEY):
+    def __init__(self, _private_key=None, _private_key_password=None, _public_key=None):
         """ initialise encrypter with correct keys, the ability to change default keys for tests"""
+
+        if _private_key is None:
+            _private_key = current_app.config['SM_USER_AUTHENTICATION_PRIVATE_KEY']
+        if _private_key_password is None:
+            _private_key = current_app.config['SM_USER_AUTHENTICATION_PRIVATE_KEY_PASSWORD']
+        if _public_key is None:
+            _private_key = current_app.config['SM_USER_AUTHENTICATION_PUBLIC_KEY']
 
         self._load_keys(_private_key, _private_key_password, _public_key)
 
@@ -78,9 +82,9 @@ class Encrypter:
 class Decrypter:
 
     def __init__(self):
-        private_key = settings.SM_USER_AUTHENTICATION_PRIVATE_KEY
-        private_key_password = settings.SM_USER_AUTHENTICATION_PRIVATE_KEY_PASSWORD
-        public_key = settings.SM_USER_AUTHENTICATION_PUBLIC_KEY
+        private_key = current_app.config['SM_USER_AUTHENTICATION_PRIVATE_KEY']
+        private_key_password = current_app.config['SM_USER_AUTHENTICATION_PRIVATE_KEY_PASSWORD']
+        public_key = current_app.config['SM_USER_AUTHENTICATION_PUBLIC_KEY']
 
         self._load_keys(private_key, private_key_password, public_key)
 

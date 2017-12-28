@@ -11,7 +11,8 @@ os.environ['SERVICE_ID'] = os.getenv('SERVICE_ID', 'test_service_id')
 os.environ['NOTIFICATION_TEMPLATE_ID'] = os.getenv('NOTIFICATION_TEMPLATE_ID', 'test_notification_template_id')
 os.environ['RAS_SM_PATH'] = os.getenv('RAS_SM_PATH', './')
 
-from secure_message.application import app
+from secure_message.application import create_app
 
 DEV_PORT = os.getenv('DEV_PORT', 5050)
+app = create_app()
 app.run(debug=True, host='0.0.0.0', port=int(DEV_PORT))

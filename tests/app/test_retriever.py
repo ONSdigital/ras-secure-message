@@ -1,18 +1,17 @@
 import unittest
 import uuid
 from datetime import datetime
-from werkzeug.exceptions import NotFound, InternalServerError
 
 from flask import current_app
 from sqlalchemy import create_engine
+from werkzeug.exceptions import NotFound, InternalServerError
 
-from secure_message.application import app
+from secure_message.application import create_app
 from secure_message.repository import database
 from secure_message.repository.retriever import Retriever
 from secure_message.constants import MESSAGE_QUERY_LIMIT
 from secure_message.services.service_toggles import party
 from secure_message import constants
-from secure_message import settings
 from secure_message.validation.user import User
 from tests.app import test_utilities
 
@@ -172,6 +171,7 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
     """Test case for message retrieval"""
     def setUp(self):
         """setup test environment"""
+        app = create_app()
         app.testing = True
         self.engine = create_engine(app.config['SQLALCHEMY_DATABASE_URI'])
         self.MESSAGE_LIST_ENDPOINT = "http://localhost:5050/messages"
@@ -185,11 +185,12 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
         self.user_internal = User('ce12b958-2a5f-44f4-a6da-861e59070a31', 'internal')
         self.user_respondent = User('0a7ad740-10d5-4ecb-b7ca-3c0384afb882', 'respondent')
         party.use_mock_service()
-        settings.NOTIFY_CASE_SERVICE = '1'
+        app.config['NOTIFY_CASE_SERVICE'] = '1'
+        self.app = app
 
     def test_0_msg_returned_when_db_empty_true(self):
         """retrieves messages from empty database"""
-        with app.app_context():
+        with self.app.app_context():
             with current_app.test_request_context():
                 response = Retriever().retrieve_message_list(1, MESSAGE_QUERY_LIMIT, self.user_respondent)[1]
                 msg = []
@@ -199,7 +200,7 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
 
     def test_retrieve_message_list_raises_error(self):
         """retrieves messages from when db does not exist"""
-        with app.app_context():
+        with self.app.app_context():
             database.db.drop_all()
             with current_app.test_request_context():
                 with self.assertRaises(InternalServerError):
@@ -209,7 +210,7 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
         """retrieves messages from database with less entries than retrieval amount"""
         self.populate_database(5)
 
-        with app.app_context():
+        with self.app.app_context():
             with current_app.test_request_context():
                 response = Retriever().retrieve_message_list(1, MESSAGE_QUERY_LIMIT, self.user_respondent)[1]
                 msg = []
@@ -220,7 +221,7 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
     def test_msg_limit_returned_when_db_greater_than_limit(self):
         """retrieves x messages when database has greater than x entries"""
         self.populate_database(MESSAGE_QUERY_LIMIT+5)
-        with app.app_context():
+        with self.app.app_context():
             with current_app.test_request_context():
                 result = Retriever().retrieve_message_list(1, MESSAGE_QUERY_LIMIT, self.user_respondent)[1]
                 msg = []
@@ -232,7 +233,7 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
     def test_msg_and_drafts_returned(self):
         """retrieves messages and drafts"""
         self.populate_database(5, add_draft=True)
-        with app.app_context():
+        with self.app.app_context():
             with current_app.test_request_context():
                 result = Retriever().retrieve_message_list(1, MESSAGE_QUERY_LIMIT, self.user_internal,
                                                            survey=test_utilities.BRES_SURVEY)[1]
@@ -245,7 +246,7 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
     def test_msg_limit_returned_when_db_greater_than_limit_with_replies(self):
         """retrieves x messages when database has greater than x entries and database has reply messages"""
         self.populate_database(MESSAGE_QUERY_LIMIT+5, multiple_users=True, add_reply=True)
-        with app.app_context():
+        with self.app.app_context():
             with current_app.test_request_context():
                 result = Retriever().retrieve_message_list(1, MESSAGE_QUERY_LIMIT, self.user_respondent)[1]
                 msg = []
@@ -257,7 +258,7 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
     def test_msg_limit_returned_when_db_greater_than_limit_with_replies_drafts(self):
         """retrieves x messages when database has greater than x entries and database has reply messages and drafts"""
         self.populate_database(MESSAGE_QUERY_LIMIT+5, multiple_users=True, add_reply=True, add_draft=True)
-        with app.app_context():
+        with self.app.app_context():
             with current_app.test_request_context():
                 result = Retriever().retrieve_message_list(1, MESSAGE_QUERY_LIMIT, self.user_respondent)[1]
                 msg = []
@@ -275,7 +276,7 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
             names = []
             for row in query_x:
                 names.append(row[0])
-            with app.app_context():
+            with self.app.app_context():
                 with current_app.test_request_context():
                     msg_id = str(names[0])
                     response = Retriever().retrieve_message(msg_id, self.user_internal)
@@ -284,7 +285,7 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
     def test_msg_returned_with_msg_id_returns_404(self):
         """retrieves message using id that doesn't exist"""
         message_id = "1"
-        with app.app_context():
+        with self.app.app_context():
             with current_app.test_request_context():
                 with self.assertRaises(NotFound):
                     Retriever().retrieve_message(message_id, self.user_internal)
@@ -293,7 +294,7 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
         """retrieves message using id"""
         message_id = "21"
         self.populate_database(20)
-        with app.app_context():
+        with self.app.app_context():
             with current_app.test_request_context():
                 with self.assertRaises(NotFound):
                     Retriever().retrieve_message(message_id, self.user_internal)
@@ -308,7 +309,7 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
             for row in query_x:
                 names.append(row[0])
 
-            with app.app_context():
+            with self.app.app_context():
                 with current_app.test_request_context():
                     msg_id = str(names[0])
                     response = Retriever().retrieve_message(msg_id, self.user_internal)
@@ -325,7 +326,7 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
             for row in query_x:
                 names.append(row[0])
 
-            with app.app_context():
+            with self.app.app_context():
                 with current_app.test_request_context():
                     msg_id = str(names[0])
                     response = Retriever().retrieve_message(msg_id, self.user_respondent)
@@ -342,7 +343,7 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
             for row in query_x:
                 names.append(row[0])
 
-            with app.app_context():
+            with self.app.app_context():
                 with current_app.test_request_context():
                     msg_id = str(names[0])
                     response = Retriever().retrieve_message(msg_id, self.user_respondent)
@@ -352,7 +353,7 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
 
     def test_retrieve_message_raises_error(self):
         """retrieves message from when db does not exist"""
-        with app.app_context():
+        with self.app.app_context():
             database.db.drop_all()
             with current_app.test_request_context():
                 with self.assertRaises(InternalServerError):
@@ -362,7 +363,7 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
         """retrieves messages from database with label DRAFT for user"""
         self.populate_database(5, add_draft=True)
 
-        with app.app_context():
+        with self.app.app_context():
             with current_app.test_request_context():
                 response = Retriever().retrieve_message_list(1, MESSAGE_QUERY_LIMIT,
                                                              self.user_internal, survey=test_utilities.BRES_SURVEY, label='DRAFT')[1]
@@ -377,7 +378,7 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
         """retrieves messages from database with label SENT for user"""
         self.populate_database(5, add_reply=True)
 
-        with app.app_context():
+        with self.app.app_context():
             with current_app.test_request_context():
                 response = Retriever().retrieve_message_list(1, MESSAGE_QUERY_LIMIT, self.user_respondent,
                                                              label="SENT")[1]
@@ -392,7 +393,7 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
         """retrieves messages from database with label SENT for user"""
         self.populate_database(5, add_reply=True)
 
-        with app.app_context():
+        with self.app.app_context():
             with current_app.test_request_context():
                 response = Retriever().retrieve_message_list(1, MESSAGE_QUERY_LIMIT, self.user_internal,
                                                              label="INBOX", survey=test_utilities.BRES_SURVEY)[1]
@@ -407,7 +408,7 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
         """retrieves all messages from database for user with no messages with label DRAFT_INBOX"""
         self.populate_database(5, add_draft=True)
 
-        with app.app_context():
+        with self.app.app_context():
             with current_app.test_request_context():
                 response = Retriever().retrieve_message_list(1, MESSAGE_QUERY_LIMIT, self.user_respondent)[1]
 
@@ -422,7 +423,7 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
         """retrieves all messages from database for user with ru option"""
         self.populate_database(5, multiple_users=True)
 
-        with app.app_context():
+        with self.app.app_context():
             with current_app.test_request_context():
                 response = Retriever().retrieve_message_list(1, MESSAGE_QUERY_LIMIT, self.user_respondent,
                                                              ru_id='f1a5e99c-8edf-489a-9c72-6cabe6c387fc')[1]
@@ -437,7 +438,7 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
         """retrieves no messages from database for user with ru option"""
         self.populate_database(5, multiple_users=True)
 
-        with app.app_context():
+        with self.app.app_context():
             with current_app.test_request_context():
                 response = Retriever().retrieve_message_list(1, MESSAGE_QUERY_LIMIT, self.user_respondent,
                                                              ru_id='0a6018a0-3e67-4407-b120-780932434b36')[1]
@@ -467,7 +468,7 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
         """retrieves no messages from database for user with survey option"""
         self.populate_database(5, multiple_users=True)
 
-        with app.app_context():
+        with self.app.app_context():
             with current_app.test_request_context():
                 response = Retriever().retrieve_message_list(1, MESSAGE_QUERY_LIMIT, self.user_respondent,
                                                              survey='AnotherSurvey')[1]
@@ -482,7 +483,7 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
         """retrieves all messages from database for user with cc option"""
         self.populate_database(5)
 
-        with app.app_context():
+        with self.app.app_context():
             with current_app.test_request_context():
                 response = Retriever().retrieve_message_list(1, MESSAGE_QUERY_LIMIT, self.user_respondent,
                                                              cc='ACollectionCase')[1]
@@ -497,7 +498,7 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
         """retrieves no messages from database for user with cc option"""
         self.populate_database(5)
 
-        with app.app_context():
+        with self.app.app_context():
             with current_app.test_request_context():
                 response = Retriever().retrieve_message_list(1, MESSAGE_QUERY_LIMIT, self.user_respondent,
                                                              cc='AnotherCollectionCase')[1]
@@ -512,7 +513,7 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
         """retrieves all messages from database for user with ce option"""
         self.populate_database(5)
 
-        with app.app_context():
+        with self.app.app_context():
             with current_app.test_request_context():
                 response = Retriever().retrieve_message_list(1, MESSAGE_QUERY_LIMIT, self.user_respondent,
                                                              ce='CollectionExercise')[1]
@@ -527,7 +528,7 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
         """retrieves no messages from database for user with ce option"""
         self.populate_database(5)
 
-        with app.app_context():
+        with self.app.app_context():
             with current_app.test_request_context():
                 response = Retriever().retrieve_message_list(1, MESSAGE_QUERY_LIMIT, self.user_respondent,
                                                              ce='AnotherCollectionExercise')[1]
@@ -542,7 +543,7 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
         """retrieves messages from database in desc sent_date order"""
         self.populate_database(5)
 
-        with app.app_context():
+        with self.app.app_context():
             with current_app.test_request_context():
                 response = Retriever().retrieve_message_list(1, MESSAGE_QUERY_LIMIT, self.user_respondent,
                                                              descend=True)[1]
@@ -562,7 +563,7 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
         """retrieves messages from database in asc sent_date order"""
         self.populate_database(5)
 
-        with app.app_context():
+        with self.app.app_context():
             with current_app.test_request_context():
                 response = Retriever().retrieve_message_list(1, MESSAGE_QUERY_LIMIT, self.user_respondent,
                                                              descend=False)[1]
@@ -582,7 +583,7 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
         """retrieves messages and drafts from database in asc sent_date order"""
         self.populate_database(5, add_draft=True)
 
-        with app.app_context():
+        with self.app.app_context():
             with current_app.test_request_context():
                 response = Retriever().retrieve_message_list(1, MESSAGE_QUERY_LIMIT, self.user_internal,
                                                              survey=test_utilities.BRES_SURVEY,
@@ -604,7 +605,7 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
         """retrieves messages and drafts from database in desc sent_date order"""
         self.populate_database(5, add_draft=True)
 
-        with app.app_context():
+        with self.app.app_context():
             with current_app.test_request_context():
                 response = Retriever().retrieve_message_list(1, MESSAGE_QUERY_LIMIT, self.user_internal,
                                                              survey=test_utilities.BRES_SURVEY,
@@ -632,7 +633,7 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
             names = []
             for row in query_x:
                 names.append(row[0])
-            with app.app_context():
+            with self.app.app_context():
                 with current_app.test_request_context():
                     msg_id = str(names[0])
                     response = Retriever().retrieve_draft(msg_id, self.user_internal)
@@ -647,7 +648,7 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
             names = []
             for row in query_x:
                 names.append(row[0])
-            with app.app_context():
+            with self.app.app_context():
                 with current_app.test_request_context():
                     msg_id = str(names[0])
                     response = Retriever().retrieve_draft(msg_id, self.user_internal)
@@ -664,7 +665,7 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
             names = []
             for row in query_x:
                 names.append(row[0])
-            with app.app_context():
+            with self.app.app_context():
                 with current_app.test_request_context():
                     msg_id = str(names[0])
                     response = Retriever().retrieve_message(msg_id, self.user_internal)
@@ -682,7 +683,7 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
             names = []
             for row in query_x:
                 names.append(row[0])
-            with app.app_context():
+            with self.app.app_context():
                 with current_app.test_request_context():
                     msg_id = str(names[0])
                     response = Retriever().retrieve_message(msg_id, self.user_internal)
@@ -698,7 +699,7 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
             names = []
             for row in query_x:
                 names.append(row[0])
-            with app.app_context():
+            with self.app.app_context():
                 with current_app.test_request_context():
                     message_id = str(names[0])
                     with self.assertRaises(NotFound):
@@ -708,7 +709,7 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
         """retrieves draft using id where draft not in database"""
         message_id = str(uuid.uuid4())
         self.populate_database(1, single=False, add_draft=True)
-        with app.app_context():
+        with self.app.app_context():
             with current_app.test_request_context():
                 with self.assertRaises(NotFound):
                     Retriever().retrieve_message(message_id, self.user_internal)
@@ -723,7 +724,7 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
             for row in query_x:
                 names.append(row[0])
 
-            with app.app_context():
+            with self.app.app_context():
                 with current_app.test_request_context():
                     msg_id = str(names[0])
                     response = Retriever().retrieve_message(msg_id, self.user_internal)
@@ -740,7 +741,7 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
             for row in query_x:
                 names.append(row[0])
 
-            with app.app_context():
+            with self.app.app_context():
                 with current_app.test_request_context():
                     msg_id = str(names[0])
                     response = Retriever().retrieve_message(msg_id, self.user_internal)
@@ -749,7 +750,7 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
 
     def test_retrieve_draft_raises_error(self):
         """retrieves draft from when db does not exist"""
-        with app.app_context():
+        with self.app.app_context():
             database.db.drop_all()
             with current_app.test_request_context():
                 with self.assertRaises(InternalServerError):
@@ -759,7 +760,7 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
         """retrieves messages for thread_id from database with draft """
         self.populate_database(3, add_reply=True, add_draft=True)
 
-        with app.app_context():
+        with self.app.app_context():
             with current_app.test_request_context():
                 response = Retriever().retrieve_thread('ThreadId', self.user_internal, 1, MESSAGE_QUERY_LIMIT)[1]
                 self.assertEqual(len(response.items), 9)
@@ -768,7 +769,7 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
         """retrieves messages for thread_id from database without draft"""
         self.populate_database(3, add_reply=True)
 
-        with app.app_context():
+        with self.app.app_context():
             with current_app.test_request_context():
                 response = Retriever().retrieve_thread('ThreadId', self.user_respondent, 1, MESSAGE_QUERY_LIMIT)[1]
                 self.assertEqual(len(response.items), 6)
@@ -777,7 +778,7 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
         """retrieves messages for thread_id from database with draft inbox"""
         self.populate_database(3, add_reply=True, add_draft=True)
 
-        with app.app_context():
+        with self.app.app_context():
             with current_app.test_request_context():
                 response = Retriever().retrieve_thread('ThreadId', self.user_respondent, 1, MESSAGE_QUERY_LIMIT)[1]
                 self.assertEqual(len(response.items), 6)
@@ -786,7 +787,7 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
         """check thread returned in correct order"""
         self.populate_database(3, add_reply=True)
 
-        with app.app_context():
+        with self.app.app_context():
             with current_app.test_request_context():
                 response = Retriever().retrieve_thread('ThreadId', self.user_respondent, 1, MESSAGE_QUERY_LIMIT)[1]
                 self.assertEqual(len(response.items), 6)
@@ -801,7 +802,7 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
         """check thread returned in correct order with draft"""
         self.populate_database(3, add_reply=True, add_draft=True)
 
-        with app.app_context():
+        with self.app.app_context():
             with current_app.test_request_context():
                 response = Retriever().retrieve_thread('ThreadId', self.user_internal, 1, MESSAGE_QUERY_LIMIT)[1]
                 self.assertEqual(len(response.items), 9)
@@ -813,7 +814,7 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
 
     def test_retrieve_thread_raises_server_error(self):
         """retrieves messages when db does not exist"""
-        with app.app_context():
+        with self.app.app_context():
             database.db.drop_all()
             with current_app.test_request_context():
                 with self.assertRaises(InternalServerError):
@@ -821,14 +822,14 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
 
     def test_thread_returned_with_thread_id_returns_404(self):
         """retrieves thread using id that doesn't exist"""
-        with app.app_context():
+        with self.app.app_context():
             with current_app.test_request_context():
                 with self.assertRaises(NotFound):
                     Retriever().retrieve_thread('anotherThreadId', self.user_respondent, 1, MESSAGE_QUERY_LIMIT)
 
     def test_retrieve_draft_raises_server_error(self):
         """retrieves draft when db does not exist"""
-        with app.app_context():
+        with self.app.app_context():
             database.db.drop_all()
             with current_app.test_request_context():
                 with self.assertRaises(InternalServerError):
@@ -836,7 +837,7 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
 
     def test_retrieve_thread_list_raises_server_error(self):
         """retrieves threads when db does not exist"""
-        with app.app_context():
+        with self.app.app_context():
             database.db.drop_all()
             with current_app.test_request_context():
                 with self.assertRaises(InternalServerError):
@@ -847,7 +848,7 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
         self.create_threads(5)
         self.populate_database(5, single=False, multiple_users=True)
 
-        with app.app_context():
+        with self.app.app_context():
             with current_app.test_request_context():
                 response = Retriever().retrieve_thread_list(1, MESSAGE_QUERY_LIMIT, self.user_respondent)[1]
 
@@ -868,7 +869,7 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
         self.create_threads(5)
         self.populate_database(5, single=False, multiple_users=True)
 
-        with app.app_context():
+        with self.app.app_context():
             with current_app.test_request_context():
                 response = Retriever().retrieve_thread_list(1, MESSAGE_QUERY_LIMIT, self.user_internal)[1]
 
@@ -889,7 +890,7 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
         self.create_threads(5, add_respondent_draft=True)
         self.populate_database(5, single=False, multiple_users=True)
 
-        with app.app_context():
+        with self.app.app_context():
             with current_app.test_request_context():
                 response = Retriever().retrieve_thread_list(1, MESSAGE_QUERY_LIMIT, self.user_respondent)[1]
 
@@ -910,7 +911,7 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
         self.create_threads(5, add_internal_draft=True)
         self.populate_database(5, single=False, multiple_users=True)
 
-        with app.app_context():
+        with self.app.app_context():
             with current_app.test_request_context():
                 response = Retriever().retrieve_thread_list(1, MESSAGE_QUERY_LIMIT, self.user_internal)[1]
 
@@ -931,7 +932,7 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
         self.create_threads(5)
         self.populate_database(5, single=False, multiple_users=True)
 
-        with app.app_context():
+        with self.app.app_context():
             with current_app.test_request_context():
                 response = Retriever().retrieve_thread_list(1, MESSAGE_QUERY_LIMIT, self.user_internal)[1]
 
@@ -960,7 +961,7 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
         self.create_threads(5, add_respondent_draft=True)
         self.populate_database(5, single=False, multiple_users=True)
 
-        with app.app_context():
+        with self.app.app_context():
             with current_app.test_request_context():
                 response = Retriever().retrieve_thread_list(1, MESSAGE_QUERY_LIMIT, self.user_respondent)[1]
 
@@ -989,7 +990,7 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
         self.create_threads(5, add_respondent_draft=True)
         self.populate_database(5, single=False, multiple_users=True)
 
-        with app.app_context():
+        with self.app.app_context():
             with current_app.test_request_context():
                 response = Retriever().retrieve_thread_list(1, MESSAGE_QUERY_LIMIT, self.user_internal)[1]
 
@@ -1018,7 +1019,7 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
         self.create_threads(5, add_internal_draft=True)
         self.populate_database(5, single=False, multiple_users=True)
 
-        with app.app_context():
+        with self.app.app_context():
             with current_app.test_request_context():
                 response = Retriever().retrieve_thread_list(1, MESSAGE_QUERY_LIMIT, self.user_respondent)[1]
 
@@ -1047,7 +1048,7 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
         self.create_threads(5, add_internal_draft=True)
         self.populate_database(5, single=False, multiple_users=True)
 
-        with app.app_context():
+        with self.app.app_context():
             with current_app.test_request_context():
                 response = Retriever().retrieve_thread_list(1, MESSAGE_QUERY_LIMIT, self.user_internal)[1]
 
@@ -1076,7 +1077,7 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
         self.create_threads(5, add_internal_draft=True, add_respondent_draft=True)
         self.populate_database(5, single=False, multiple_users=True)
 
-        with app.app_context():
+        with self.app.app_context():
             with current_app.test_request_context():
                 response = Retriever().retrieve_thread_list(1, MESSAGE_QUERY_LIMIT, self.user_respondent)[1]
 
@@ -1105,7 +1106,7 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
         self.create_threads(5, add_internal_draft=True, add_respondent_draft=True)
         self.populate_database(5, single=False, multiple_users=True)
 
-        with app.app_context():
+        with self.app.app_context():
             with current_app.test_request_context():
                 response = Retriever().retrieve_thread_list(1, MESSAGE_QUERY_LIMIT, self.user_internal)[1]
 

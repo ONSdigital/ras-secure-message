@@ -1,11 +1,12 @@
-from flask import json
+import copy
 
+from flask import current_app, json
+
+from secure_message.application import create_app
 from secure_message.authentication.jwe import Encrypter
 from secure_message.authentication.jwt import encode
-from secure_message import settings
 from secure_message import constants
 from secure_message.common import utilities
-import copy
 
 
 class SecureMessagingContextHelper:
@@ -82,9 +83,9 @@ class SecureMessagingContextHelper:
     @staticmethod
     def _encrypt_token_data(token_data):
         """encrypts the token data"""
-        encrypter = Encrypter(_private_key=settings.SM_USER_AUTHENTICATION_PRIVATE_KEY,
-                              _private_key_password=settings.SM_USER_AUTHENTICATION_PRIVATE_KEY_PASSWORD,
-                              _public_key=settings.SM_USER_AUTHENTICATION_PUBLIC_KEY)
+        encrypter = Encrypter(_private_key=current_app.config['SM_USER_AUTHENTICATION_PRIVATE_KEY'],
+                              _private_key_password=current_app.config['SM_USER_AUTHENTICATION_PRIVATE_KEY_PASSWORD'],
+                              _public_key=current_app.config['SM_USER_AUTHENTICATION_PUBLIC_KEY'])
         signed_jwt = encode(token_data)
         return encrypter.encrypt_token(signed_jwt)
 

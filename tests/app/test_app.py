@@ -6,8 +6,7 @@ from datetime import datetime, timezone
 from flask import current_app, json
 from sqlalchemy import create_engine
 
-from secure_message import application, settings, constants
-from secure_message.application import app
+from secure_message import application, constants
 from secure_message.common.alerts import AlertUser, AlertViaGovNotify
 from secure_message.repository import database
 from secure_message.authentication.jwt import encode
@@ -26,21 +25,25 @@ class FlaskTestCase(unittest.TestCase):
 
     def setUp(self):
         """setup test environment"""
-        self.app = application.app.test_client()
-        self.engine = create_engine(app.config['SQLALCHEMY_DATABASE_URI'])
+        self.app = application.create_app()
+        self.client = self.app.test_client()
+        self.engine = create_engine(self.app.config['SQLALCHEMY_DATABASE_URI'])
 
         AlertUser.alert_method = mock.Mock(AlertViaGovNotify)
 
         token_data = {constants.USER_IDENTIFIER: constants.BRES_USER,
                       "role": "internal"}
 
-        encrypter = Encrypter(_private_key=settings.SM_USER_AUTHENTICATION_PRIVATE_KEY,
-                              _private_key_password=settings.SM_USER_AUTHENTICATION_PRIVATE_KEY_PASSWORD,
-                              _public_key=settings.SM_USER_AUTHENTICATION_PUBLIC_KEY)
-        signed_jwt = encode(token_data)
-        encrypted_jwt = encrypter.encrypt_token(signed_jwt)
+        encrypter = Encrypter(_private_key=self.app.config['SM_USER_AUTHENTICATION_PRIVATE_KEY'],
+                              _private_key_password=self.app.config['SM_USER_AUTHENTICATION_PRIVATE_KEY_PASSWORD'],
+                              _public_key=self.app.config['SM_USER_AUTHENTICATION_PUBLIC_KEY'])
+
+        with self.app.app_context():
+            signed_jwt = encode(token_data)
+            encrypted_jwt = encrypter.encrypt_token(signed_jwt)
+
         AlertUser.alert_method = mock.Mock(AlertViaLogging)
-        settings.NOTIFY_CASE_SERVICE = '1'
+        self.app.config['NOTIFY_CASE_SERVICE'] = '1'
 
         self.url = "http://localhost:5050/draft/save"
 
@@ -56,7 +59,7 @@ class FlaskTestCase(unittest.TestCase):
                              'ru_id': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc',
                              'survey': test_utilities.BRES_SURVEY}
 
-        with app.app_context():
+        with self.app.app_context():
             database.db.init_app(current_app)
             database.db.drop_all()
             database.db.create_all()
@@ -77,7 +80,7 @@ class FlaskTestCase(unittest.TestCase):
                 'create_date': datetime.now(timezone.utc),
                 'read_date': datetime.now(timezone.utc)}
 
-        self.app.post(url, data=json.dumps(data), headers=self.headers)
+        self.client.post(url, data=json.dumps(data), headers=self.headers)
 
         with self.engine.connect() as con:
             request = con.execute('SELECT * FROM securemessage.secure_message WHERE id = (SELECT MAX(id) FROM securemessage.secure_message)')
@@ -90,8 +93,8 @@ class FlaskTestCase(unittest.TestCase):
         # post json message written up in the ui
         url = "http://localhost:5050/message/send"
 
-        self.app.post(url, data=json.dumps(self.test_message), headers=self.headers)
-        engine = create_engine(settings.SECURE_MESSAGING_DATABASE_URL, echo=True)
+        self.client.post(url, data=json.dumps(self.test_message), headers=self.headers)
+        engine = create_engine(self.app.config['SECURE_MESSAGING_DATABASE_URL'], echo=True)
         with engine.connect() as con:
             request = con.execute('SELECT * FROM securemessage.secure_message WHERE id = (SELECT MAX(id) FROM securemessage.secure_message)')
 
@@ -104,18 +107,18 @@ class FlaskTestCase(unittest.TestCase):
 
         url = "http://localhost:5050/message/send"
 
-        self.app.post(url, data=json.dumps(self.test_message), headers=self.headers)
+        self.client.post(url, data=json.dumps(self.test_message), headers=self.headers)
 
         # Now read back the message to get the thread ID
 
-        engine = create_engine(settings.SECURE_MESSAGING_DATABASE_URL, echo=True)
+        engine = create_engine(self.app.config['SECURE_MESSAGING_DATABASE_URL'], echo=True)
         with engine.connect() as con:
             request = con.execute('SELECT * FROM securemessage.secure_message WHERE id = (SELECT MAX(id) FROM securemessage.secure_message)')
             for row in request:
                 self.test_message['thread_id'] = row['thread_id']
 
         # Now submit a new message as a reply , Message Id empty , thread id same as last one
-        self.app.post(url, data=json.dumps(self.test_message), headers=self.headers)
+        self.client.post(url, data=json.dumps(self.test_message), headers=self.headers)
 
         # Now read back the two messages
         original_msg_id = original_thread_id = reply_msg_id = reply_thread_id = ''
@@ -151,7 +154,7 @@ class FlaskTestCase(unittest.TestCase):
                         'ru_id': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc',
                         'survey': test_utilities.BRES_SURVEY}
         try:
-            self.app.post(url, data=json.dumps(test_message), headers=self.headers)
+            self.client.post(url, data=json.dumps(test_message), headers=self.headers)
             self.assertTrue(True)  # i.e no exception
         except Exception as e:
             self.fail("post raised unexpected exception: {0}".format(e))
@@ -160,7 +163,7 @@ class FlaskTestCase(unittest.TestCase):
         """posts to message send end point to ensure labels are saved as expected"""
         url = "http://localhost:5050/message/send"
 
-        response = self.app.post(url, data=json.dumps(self.test_message), headers=self.headers)
+        response = self.client.post(url, data=json.dumps(self.test_message), headers=self.headers)
         data = json.loads(response.data)
 
         with self.engine.connect() as con:
@@ -173,7 +176,7 @@ class FlaskTestCase(unittest.TestCase):
         """posts to message send end point to ensure events are saved as expected"""
         url = "http://localhost:5050/message/send"
 
-        response = self.app.post(url, data=json.dumps(self.test_message), headers=self.headers)
+        response = self.client.post(url, data=json.dumps(self.test_message), headers=self.headers)
         data = json.loads(response.data)
 
         with self.engine.connect() as con:
@@ -185,7 +188,7 @@ class FlaskTestCase(unittest.TestCase):
     def test_message_post_stores_events_correctly_for_draft(self):
         """posts to message send end point to ensure events are saved as expected for draft"""
 
-        self.app.post("http://localhost:5050/draft/save", data=json.dumps(self.test_message), headers=self.headers)
+        self.client.post("http://localhost:5050/draft/save", data=json.dumps(self.test_message), headers=self.headers)
 
         with self.engine.connect() as con:
             request = con.execute("SELECT * FROM securemessage.secure_message LIMIT 1")
@@ -202,7 +205,7 @@ class FlaskTestCase(unittest.TestCase):
                   'ru_id': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc',
                   'survey': test_utilities.BRES_SURVEY})
 
-        response = self.app.post('http://localhost:5050/message/send', data=json.dumps(draft),
+        response = self.client.post('http://localhost:5050/message/send', data=json.dumps(draft),
                                  headers=self.headers)
 
         data = json.loads(response.data)
@@ -222,7 +225,7 @@ class FlaskTestCase(unittest.TestCase):
         """posts to message send end point to ensure labels are saved as expected"""
         url = "http://localhost:5050/message/send"
 
-        response = self.app.post(url, data=json.dumps(self.test_message), headers=self.headers)
+        response = self.client.post(url, data=json.dumps(self.test_message), headers=self.headers)
         data = json.loads(response.data)
         # dereferencing msg_to for purpose of test
         with self.engine.connect() as con:
@@ -235,7 +238,7 @@ class FlaskTestCase(unittest.TestCase):
         """posts to message send end point to ensure survey is saved for internal user"""
         url = "http://localhost:5050/message/send"
 
-        response = self.app.post(url, data=json.dumps(self.test_message), headers=self.headers)
+        response = self.client.post(url, data=json.dumps(self.test_message), headers=self.headers)
         data = json.loads(response.data)
 
         with self.engine.connect() as con:
@@ -249,7 +252,7 @@ class FlaskTestCase(unittest.TestCase):
 
         url = "http://localhost:5050/message/send"
 
-        response = self.app.post(url, data=json.dumps(self.test_message), headers=self.headers)
+        response = self.client.post(url, data=json.dumps(self.test_message), headers=self.headers)
         data = json.loads(response.data)
 
         with self.engine.connect() as con:
@@ -262,7 +265,7 @@ class FlaskTestCase(unittest.TestCase):
     def test_draft_inbox_labels_removed_on_draft_send(self):
         """Test that draft inbox labels are removed on draft send"""
 
-        response = self.app.post("http://localhost:5050/draft/save", data=json.dumps(self.test_message), headers=self.headers)
+        response = self.client.post("http://localhost:5050/draft/save", data=json.dumps(self.test_message), headers=self.headers)
         resp_data = json.loads(response.data)
         msg_id = resp_data['msg_id']
 
@@ -276,7 +279,7 @@ class FlaskTestCase(unittest.TestCase):
                                   'ru_id': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc',
                                   'survey': test_utilities.BRES_SURVEY})
 
-        self.app.post("http://localhost:5050/message/send", data=json.dumps(self.test_message), headers=self.headers)
+        self.client.post("http://localhost:5050/message/send", data=json.dumps(self.test_message), headers=self.headers)
 
         with self.engine.connect() as con:
             request = con.execute("SELECT * FROM securemessage.status WHERE msg_id='{0}'".format(msg_id))
@@ -299,28 +302,34 @@ class FlaskTestCase(unittest.TestCase):
         token_data = {constants.USER_IDENTIFIER: "0a7ad740-10d5-4ecb-b7ca-3c0384afb882",
                       "role": "respondent"}
 
-        encrypter = Encrypter(_private_key=settings.SM_USER_AUTHENTICATION_PRIVATE_KEY,
-                              _private_key_password=settings.SM_USER_AUTHENTICATION_PRIVATE_KEY_PASSWORD,
-                              _public_key=settings.SM_USER_AUTHENTICATION_PUBLIC_KEY)
-        signed_jwt = encode(token_data)
-        encrypted_jwt = encrypter.encrypt_token(signed_jwt)
+        encrypter = Encrypter(_private_key=self.app.config['SM_USER_AUTHENTICATION_PRIVATE_KEY'],
+                              _private_key_password=self.app.config['SM_USER_AUTHENTICATION_PRIVATE_KEY_PASSWORD'],
+                              _public_key=self.app.config['SM_USER_AUTHENTICATION_PUBLIC_KEY'])
+
+        with self.app.app_context():
+            signed_jwt = encode(token_data)
+            encrypted_jwt = encrypter.encrypt_token(signed_jwt)
+
         self.headers = {'Content-Type': 'application/json', 'Authorization': encrypted_jwt}
 
-        resp = self.app.post("http://localhost:5050/draft/save", data=json.dumps(self.test_message), headers=self.headers)
+        resp = self.client.post("http://localhost:5050/draft/save", data=json.dumps(self.test_message), headers=self.headers)
         save_data = json.loads(resp.data)
         msg_id = save_data['msg_id']
 
         token_data = {constants.USER_IDENTIFIER: constants.BRES_USER,
                       "role": "internal"}
 
-        encrypter = Encrypter(_private_key=settings.SM_USER_AUTHENTICATION_PRIVATE_KEY,
-                              _private_key_password=settings.SM_USER_AUTHENTICATION_PRIVATE_KEY_PASSWORD,
-                              _public_key=settings.SM_USER_AUTHENTICATION_PUBLIC_KEY)
-        signed_jwt = encode(token_data)
-        encrypted_jwt = encrypter.encrypt_token(signed_jwt)
+        encrypter = Encrypter(_private_key=self.app.config['SM_USER_AUTHENTICATION_PRIVATE_KEY'],
+                              _private_key_password=self.app.config['SM_USER_AUTHENTICATION_PRIVATE_KEY_PASSWORD'],
+                              _public_key=self.app.config['SM_USER_AUTHENTICATION_PUBLIC_KEY'])
+
+        with self.app.app_context():
+            signed_jwt = encode(token_data)
+            encrypted_jwt = encrypter.encrypt_token(signed_jwt)
+
         self.headers = {'Content-Type': 'application/json', 'Authorization': encrypted_jwt}
 
-        response = self.app.get("http://localhost:5050/messages?survey=BRES&label=DRAFT", headers=self.headers)
+        response = self.client.get("http://localhost:5050/messages?survey=BRES&label=DRAFT", headers=self.headers)
         resp_data = json.loads(response.data)
 
         for x in range(1, len(resp_data['messages'])):
@@ -341,18 +350,21 @@ class FlaskTestCase(unittest.TestCase):
         token_data = {constants.USER_IDENTIFIER: "0a7ad740-10d5-4ecb-b7ca-3c0384afb882",
                       "role": "respondent"}
 
-        encrypter = Encrypter(_private_key=settings.SM_USER_AUTHENTICATION_PRIVATE_KEY,
-                              _private_key_password=settings.SM_USER_AUTHENTICATION_PRIVATE_KEY_PASSWORD,
-                              _public_key=settings.SM_USER_AUTHENTICATION_PUBLIC_KEY)
-        signed_jwt = encode(token_data)
-        encrypted_jwt = encrypter.encrypt_token(signed_jwt)
+        encrypter = Encrypter(_private_key=self.app.config['SM_USER_AUTHENTICATION_PRIVATE_KEY'],
+                              _private_key_password=self.app.config['SM_USER_AUTHENTICATION_PRIVATE_KEY_PASSWORD'],
+                              _public_key=self.app.config['SM_USER_AUTHENTICATION_PUBLIC_KEY'])
+
+        with self.app.app_context():
+            signed_jwt = encode(token_data)
+            encrypted_jwt = encrypter.encrypt_token(signed_jwt)
+
         self.headers = {'Content-Type': 'application/json', 'Authorization': encrypted_jwt}
 
-        draft_save = self.app.post("http://localhost:5050/draft/save", data=json.dumps(self.test_message), headers=self.headers)
+        draft_save = self.client.post("http://localhost:5050/draft/save", data=json.dumps(self.test_message), headers=self.headers)
         draft_save_data = json.loads(draft_save.data)
         draft_id = draft_save_data['msg_id']
 
-        draft_get = self.app.get("http://localhost:5050/draft/{0}".format(draft_id), headers=self.headers)
+        draft_get = self.client.get("http://localhost:5050/draft/{0}".format(draft_id), headers=self.headers)
         draft_get_data = json.loads(draft_get.data)
 
         self.assertTrue(draft_get_data['msg_to'] is not None)
@@ -361,27 +373,27 @@ class FlaskTestCase(unittest.TestCase):
     def test_case_service_not_called_on_sent_if_NotifyCaseService_is_not_set(self, case):
         """Test case service not called if not set to do so in config"""
 
-        settings.NOTIFY_CASE_SERVICE = '0'
+        self.app.config['NOTIFY_CASE_SERVICE'] = '0'
         url = "http://localhost:5050/message/send"
-        self.app.post(url, data=json.dumps(self.test_message), headers=self.headers)
+        self.client.post(url, data=json.dumps(self.test_message), headers=self.headers)
         self.assertFalse(case.called)
 
     @patch.object(case_service, 'store_case_event')
     def test_case_service_called_on_sent_if_NotifyCaseService_is_set(self, case):
         """Test case service called if set to do so in config """
 
-        settings.NOTIFY_CASE_SERVICE = '1'
+        self.app.config['NOTIFY_CASE_SERVICE'] = '1'
         url = "http://localhost:5050/message/send"
-        self.app.post(url, data=json.dumps(self.test_message), headers=self.headers)
+        self.client.post(url, data=json.dumps(self.test_message), headers=self.headers)
         self.assertTrue(case.called)
 
     @patch.object(message_logger, 'error')
     @patch.object(MessageSend, '_try_send_alert_email', side_effect=Exception('SomethingBad'))
     def test_exception_in_alert_listeners_raises_exception_but_returns_201(self, mock_sender, mock_logger):
         """Test exceptions in alerting do not prevent a response indicating success"""
-        settings.NOTIFY_CASE_SERVICE = '0'
+        self.app.config['NOTIFY_CASE_SERVICE'] = '0'
         url = "http://localhost:5050/message/send"
-        result = self.app.post(url, data=json.dumps(self.test_message), headers=self.headers)
+        result = self.client.post(url, data=json.dumps(self.test_message), headers=self.headers)
         self.assertTrue(mock_logger.called)
         self.assertTrue(result.status_code == 201)
 
@@ -396,7 +408,7 @@ class FlaskTestCase(unittest.TestCase):
         """Test if Email Address is missing no attempt will be made to send email """
 
         url = "http://localhost:5050/message/send"
-        self.app.post(url, data=json.dumps(self.test_message), headers=self.headers)
+        self.client.post(url, data=json.dumps(self.test_message), headers=self.headers)
         self.assertFalse(mock_alerter.called)
 
     @patch.object(PartyServiceMock, 'get_user_details', return_value=({"id": "f62dfda8-73b0-4e0e-97cf-1b06327a6712",
@@ -411,7 +423,7 @@ class FlaskTestCase(unittest.TestCase):
         """Test if Email Address is zero length no attempt will be made to send email """
 
         url = "http://localhost:5050/message/send"
-        self.app.post(url, data=json.dumps(self.test_message), headers=self.headers)
+        self.client.post(url, data=json.dumps(self.test_message), headers=self.headers)
         self.assertFalse(mock_alerter.called)
 
     @patch.object(PartyServiceMock, 'get_user_details', return_value=({"id": "f62dfda8-73b0-4e0e-97cf-1b06327a6712",
@@ -426,7 +438,7 @@ class FlaskTestCase(unittest.TestCase):
         """Test if Email Address is zero length no attempt will be made to send email """
 
         url = "http://localhost:5050/message/send"
-        self.app.post(url, data=json.dumps(self.test_message), headers=self.headers)
+        self.client.post(url, data=json.dumps(self.test_message), headers=self.headers)
         self.assertFalse(mock_alerter.called)
 
     @patch.object(PartyServiceMock, 'get_user_details', return_value=({"id": "cantFindThis"}, 400))
@@ -435,7 +447,7 @@ class FlaskTestCase(unittest.TestCase):
         """Test if Email Address is zero length no attempt will be made to send email """
 
         url = "http://localhost:5050/message/send"
-        self.app.post(url, data=json.dumps(self.test_message), headers=self.headers)
+        self.client.post(url, data=json.dumps(self.test_message), headers=self.headers)
         self.assertFalse(mock_alerter.called)
 
     @patch.object(PartyServiceMock, 'get_user_details', return_value=({"id": "f62dfda8-73b0-4e0e-97cf-1b06327a6712",
@@ -460,14 +472,17 @@ class FlaskTestCase(unittest.TestCase):
         token_data = {constants.USER_IDENTIFIER: "0a7ad740-10d5-4ecb-b7ca-3c0384afb882",
                       "role": "respondent"}
 
-        encrypter = Encrypter(_private_key=settings.SM_USER_AUTHENTICATION_PRIVATE_KEY,
-                              _private_key_password=settings.SM_USER_AUTHENTICATION_PRIVATE_KEY_PASSWORD,
-                              _public_key=settings.SM_USER_AUTHENTICATION_PUBLIC_KEY)
-        signed_jwt = encode(token_data)
-        encrypted_jwt = encrypter.encrypt_token(signed_jwt)
+        encrypter = Encrypter(_private_key=self.app.config['SM_USER_AUTHENTICATION_PRIVATE_KEY'],
+                              _private_key_password=self.app.config['SM_USER_AUTHENTICATION_PRIVATE_KEY_PASSWORD'],
+                              _public_key=self.app.config['SM_USER_AUTHENTICATION_PUBLIC_KEY'])
+
+        with self.app.app_context():
+            signed_jwt = encode(token_data)
+            encrypted_jwt = encrypter.encrypt_token(signed_jwt)
+
         self.headers = {'Content-Type': 'application/json', 'Authorization': encrypted_jwt}
         url = "http://localhost:5050/message/send"
-        self.app.post(url, data=json.dumps(self.test_message), headers=self.headers)
+        self.client.post(url, data=json.dumps(self.test_message), headers=self.headers)
         mock_case.assert_called_with('ACollectionCase', 'Unknown user')
         mock_logger.assert_called_with('no user names in party data for id  Unknown user used in case ',
                                            party_id='f62dfda8-73b0-4e0e-97cf-1b06327a6712')

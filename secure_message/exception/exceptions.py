@@ -2,10 +2,9 @@ import logging
 import os
 import sys
 
+from flask import current_app
 from structlog import wrap_logger
 from werkzeug.exceptions import HTTPException
-
-from secure_message import settings
 
 """Specialised exceptions for secure messages"""
 
@@ -33,7 +32,7 @@ class RasNotifyException(MessageSaveException):
 
 
 class MissingEnvironmentVariable(Exception):
-    def __init__(self):
-        missing_env_variables = [var for var in settings.NON_DEFAULT_VARIABLES if not os.environ.get(var)]
+    def __init__(self, defaults):
+        missing_env_variables = [var for var in defaults if not os.environ.get(var)]
         logger.error('Missing environment variables', variables=missing_env_variables)
         sys.exit("Application failed to start")

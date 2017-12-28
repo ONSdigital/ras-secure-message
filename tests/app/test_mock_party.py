@@ -1,10 +1,10 @@
 import unittest
 
-from flask import json
+from flask import current_app, json
 from sqlalchemy import create_engine
 
-from secure_message import application, constants, settings
-from secure_message.application import app
+from secure_message import constants
+from secure_message.application import create_app
 from secure_message.common.utilities import get_business_details_by_ru, get_details_by_uuids
 from secure_message.authentication.jwe import Encrypter
 from secure_message.authentication.jwt import encode
@@ -16,15 +16,19 @@ def _generate_encrypted_token():
     token_data = {constants.USER_IDENTIFIER: "0a7ad740-10d5-4ecb-b7ca-3c0384afb882",
                   "role": "respondent"}
 
-    encrypter = Encrypter(_private_key=settings.SM_USER_AUTHENTICATION_PRIVATE_KEY,
-                          _private_key_password=settings.SM_USER_AUTHENTICATION_PRIVATE_KEY_PASSWORD,
-                          _public_key=settings.SM_USER_AUTHENTICATION_PUBLIC_KEY)
+    encrypter = Encrypter(_private_key=current_app.config['SM_USER_AUTHENTICATION_PRIVATE_KEY'],
+                          _private_key_password=current_app.config['SM_USER_AUTHENTICATION_PRIVATE_KEY_PASSWORD'],
+                          _public_key=current_app.config['SM_USER_AUTHENTICATION_PUBLIC_KEY'])
     signed_jwt = encode(token_data)
     encrypted_jwt = encrypter.encrypt_token(signed_jwt)
     return encrypted_jwt
 
 
 class PartyTestCase(unittest.TestCase):
+
+    def setUp(self):
+        self.app = create_app()
+        self.client = self.app.test_client()
 
     def test_get_user_details_by_uuid(self):
         """Test that user details are returned using uuids"""
@@ -37,7 +41,8 @@ class PartyTestCase(unittest.TestCase):
                     "telephone": "+443069990888",
                     "status": "ACTIVE",
                     "sampleUnitType": "BI"}
-        user_details = get_details_by_uuids(list_uuids)
+        with self.app.app_context():
+            user_details = get_details_by_uuids(list_uuids)
         result = user_details[0]
         self.assertTrue(result == expected)
 
@@ -51,7 +56,8 @@ class PartyTestCase(unittest.TestCase):
                       '654321ab-ce17-40c2-a8fc-abcdef123456'
                      ]
 
-        user_details = get_details_by_uuids(list_uuids)
+        with self.app.app_context():
+            user_details = get_details_by_uuids(list_uuids)
 
         self.assertEqual(user_details[0], {"id": "f62dfda8-73b0-4e0e-97cf-1b06327a6712",
                                            "firstName": "Bhavana",
@@ -137,19 +143,18 @@ class PartyTestCase(unittest.TestCase):
                 'ru_id': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc',
                 'survey': test_utilities.BRES_SURVEY}
 
-        encrypted_token = _generate_encrypted_token()
+        with self.app.app_context():
+            encrypted_token = _generate_encrypted_token()
 
         self.headers = {'Content-Type': 'application/json', 'Authorization': encrypted_token}
 
-        self.app = application.app.test_client()
+        self.engine = create_engine(self.app.config['SQLALCHEMY_DATABASE_URI'])
 
-        self.engine = create_engine(app.config['SQLALCHEMY_DATABASE_URI'])
-
-        resp = self.app.post("http://localhost:5050/message/send", data=json.dumps(data), headers=self.headers)
+        resp = self.client.post("http://localhost:5050/message/send", data=json.dumps(data), headers=self.headers)
         resp_data = json.loads(resp.data)
         msg_id = resp_data['msg_id']
 
-        message_resp = self.app.get("http://localhost:5050/message/{}".format(msg_id), headers=self.headers)
+        message_resp = self.client.get(f'http://localhost:5050/message/{msg_id}', headers=self.headers)
         message = json.loads(message_resp.data)
 
         self.assertEqual(message['@msg_from'], {'telephone': '+443069990289',
@@ -179,18 +184,17 @@ class PartyTestCase(unittest.TestCase):
                 'ru_id': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc',
                 'survey': test_utilities.BRES_SURVEY}
 
-        self.app = application.app.test_client()
-
-        encrypted_token = _generate_encrypted_token()
+        with self.app.app_context():
+            encrypted_token = _generate_encrypted_token()
 
         self.headers = {'Content-Type': 'application/json', 'Authorization': encrypted_token}
 
-        self.engine = create_engine(app.config['SQLALCHEMY_DATABASE_URI'])
+        self.engine = create_engine(self.app.config['SQLALCHEMY_DATABASE_URI'])
 
-        self.app.post("http://localhost:5050/message/send", data=json.dumps(data), headers=self.headers)
-        self.app.post("http://localhost:5050/message/send", data=json.dumps(data), headers=self.headers)
+        self.client.post("http://localhost:5050/message/send", data=json.dumps(data), headers=self.headers)
+        self.client.post("http://localhost:5050/message/send", data=json.dumps(data), headers=self.headers)
 
-        messages_get = self.app.get("http://localhost:5050/messages", headers=self.headers)
+        messages_get = self.client.get("http://localhost:5050/messages", headers=self.headers)
         get_return = json.loads(messages_get.data)
         messages = get_return['messages']
 
@@ -214,19 +218,18 @@ class PartyTestCase(unittest.TestCase):
                 'ru_id': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc',
                 'survey': test_utilities.BRES_SURVEY}
 
-        self.app = application.app.test_client()
-
-        encrypted_token = _generate_encrypted_token()
+        with self.app.app_context():
+            encrypted_token = _generate_encrypted_token()
 
         self.headers = {'Content-Type': 'application/json', 'Authorization': encrypted_token}
 
-        self.engine = create_engine(app.config['SQLALCHEMY_DATABASE_URI'])
+        self.engine = create_engine(self.app.config['SQLALCHEMY_DATABASE_URI'])
 
-        draft_resp = self.app.post("http://localhost:5050/draft/save", data=json.dumps(data), headers=self.headers)
+        draft_resp = self.client.post("http://localhost:5050/draft/save", data=json.dumps(data), headers=self.headers)
         draft_details = json.loads(draft_resp.data)
         draft_id = draft_details['msg_id']
 
-        draft_get = self.app.get("http://localhost:5050/draft/{}".format(draft_id), headers=self.headers)
+        draft_get = self.client.get(f'http://localhost:5050/draft/{draft_id}', headers=self.headers)
         draft = json.loads(draft_get.data)
 
         self.assertEqual(draft['@msg_from'], {'telephone': '+443069990289', 'firstName': 'Vana',
@@ -245,18 +248,17 @@ class PartyTestCase(unittest.TestCase):
                 'ru_id': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc',
                 'survey': test_utilities.BRES_SURVEY}
 
-        self.app = application.app.test_client()
-
-        encrypted_token = _generate_encrypted_token()
+        with self.app.app_context():
+            encrypted_token = _generate_encrypted_token()
 
         self.headers = {'Content-Type': 'application/json', 'Authorization': encrypted_token}
 
-        self.engine = create_engine(app.config['SQLALCHEMY_DATABASE_URI'])
+        self.engine = create_engine(self.app.config['SQLALCHEMY_DATABASE_URI'])
 
-        self.app.post("http://localhost:5050/draft/save", data=json.dumps(data), headers=self.headers)
-        self.app.post("http://localhost:5050/draft/save", data=json.dumps(data), headers=self.headers)
+        self.client.post("http://localhost:5050/draft/save", data=json.dumps(data), headers=self.headers)
+        self.client.post("http://localhost:5050/draft/save", data=json.dumps(data), headers=self.headers)
 
-        drafts_get = self.app.get("http://localhost:5050/drafts", headers=self.headers)
+        drafts_get = self.client.get("http://localhost:5050/drafts", headers=self.headers)
         drafts_data = json.loads(drafts_get.data)
         drafts = drafts_data['messages']
 
@@ -312,19 +314,18 @@ class PartyTestCase(unittest.TestCase):
                 'ru_id': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc',
                 'survey': test_utilities.BRES_SURVEY}
 
-        self.app = application.app.test_client()
-
-        encrypted_token = _generate_encrypted_token()
+        with self.app.app_context():
+            encrypted_token = _generate_encrypted_token()
 
         self.headers = {'Content-Type': 'application/json', 'Authorization': encrypted_token}
 
-        self.engine = create_engine(app.config['SQLALCHEMY_DATABASE_URI'])
+        self.engine = create_engine(self.app.config['SQLALCHEMY_DATABASE_URI'])
 
-        message_post = self.app.post("http://localhost:5050/message/send", data=json.dumps(data), headers=self.headers)
+        message_post = self.client.post("http://localhost:5050/message/send", data=json.dumps(data), headers=self.headers)
         message_data = json.loads(message_post.data)
         msg_id = message_data['msg_id']
 
-        message_get = self.app.get("http://localhost:5050/message/{}".format(msg_id), headers=self.headers)
+        message_get = self.client.get("http://localhost:5050/message/{}".format(msg_id), headers=self.headers)
         message = json.loads(message_get.data)
 
         self.assertEqual(message['@ru_id']['name'], "Apple")
@@ -340,18 +341,17 @@ class PartyTestCase(unittest.TestCase):
                 'ru_id': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc',
                 'survey': test_utilities.BRES_SURVEY}
 
-        self.app = application.app.test_client()
-
-        encrypted_token = _generate_encrypted_token()
+        with self.app.app_context():
+            encrypted_token = _generate_encrypted_token()
 
         self.headers = {'Content-Type': 'application/json', 'Authorization': encrypted_token}
 
-        self.engine = create_engine(app.config['SQLALCHEMY_DATABASE_URI'])
+        self.engine = create_engine(self.app.config['SQLALCHEMY_DATABASE_URI'])
 
-        self.app.post("http://localhost:5050/message/send", data=json.dumps(data), headers=self.headers)
-        self.app.post("http://localhost:5050/message/send", data=json.dumps(data), headers=self.headers)
+        self.client.post("http://localhost:5050/message/send", data=json.dumps(data), headers=self.headers)
+        self.client.post("http://localhost:5050/message/send", data=json.dumps(data), headers=self.headers)
 
-        messages_get = self.app.get("http://localhost:5050/messages", headers=self.headers)
+        messages_get = self.client.get("http://localhost:5050/messages", headers=self.headers)
         get_return = json.loads(messages_get.data)
         messages = get_return['messages']
 
@@ -369,19 +369,18 @@ class PartyTestCase(unittest.TestCase):
                 'ru_id': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc',
                 'survey': test_utilities.BRES_SURVEY}
 
-        self.app = application.app.test_client()
-
-        encrypted_token = _generate_encrypted_token()
+        with self.app.app_context():
+            encrypted_token = _generate_encrypted_token()
 
         self.headers = {'Content-Type': 'application/json', 'Authorization': encrypted_token}
 
-        self.engine = create_engine(app.config['SQLALCHEMY_DATABASE_URI'])
+        self.engine = create_engine(self.app.config['SQLALCHEMY_DATABASE_URI'])
 
-        draft_save = self.app.post("http://localhost:5050/draft/save", data=json.dumps(data), headers=self.headers)
+        draft_save = self.client.post("http://localhost:5050/draft/save", data=json.dumps(data), headers=self.headers)
         draft_data = json.loads(draft_save.data)
         draft_id = draft_data['msg_id']
 
-        message_get = self.app.get("http://localhost:5050/draft/{}".format(draft_id), headers=self.headers)
+        message_get = self.client.get(f'http://localhost:5050/draft/{draft_id}', headers=self.headers)
         message = json.loads(message_get.data)
 
         self.assertEqual(message['@ru_id']['name'], "Apple")
@@ -397,18 +396,17 @@ class PartyTestCase(unittest.TestCase):
                 'ru_id': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc',
                 'survey': test_utilities.BRES_SURVEY}
 
-        self.app = application.app.test_client()
-
-        encrypted_token = _generate_encrypted_token()
+        with self.app.app_context():
+            encrypted_token = _generate_encrypted_token()
 
         self.headers = {'Content-Type': 'application/json', 'Authorization': encrypted_token}
 
-        self.engine = create_engine(app.config['SQLALCHEMY_DATABASE_URI'])
+        self.engine = create_engine(self.app.config['SQLALCHEMY_DATABASE_URI'])
 
-        self.app.post("http://localhost:5050/draft/save", data=json.dumps(data), headers=self.headers)
-        self.app.post("http://localhost:5050/draft/save", data=json.dumps(data), headers=self.headers)
+        self.client.post("http://localhost:5050/draft/save", data=json.dumps(data), headers=self.headers)
+        self.client.post("http://localhost:5050/draft/save", data=json.dumps(data), headers=self.headers)
 
-        drafts_get = self.app.get("http://localhost:5050/drafts", headers=self.headers)
+        drafts_get = self.client.get("http://localhost:5050/drafts", headers=self.headers)
         drafts_data = json.loads(drafts_get.data)
         drafts = drafts_data['messages']
 
@@ -432,6 +430,7 @@ class PartyTestCase(unittest.TestCase):
         result_data, result_status_code = sut.get_business_details(uuid)
         self.assertEqual(result_data, expected_data)
         self.assertEqual(result_status_code, expected_status_code)
+
 
 if __name__ == '__main__':
     unittest.main()

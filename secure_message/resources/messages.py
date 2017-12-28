@@ -1,10 +1,10 @@
 import logging
 
-from flask import request, jsonify, g, Response
+from flask import request, jsonify, g, Response, current_app
 from flask_restful import Resource
 from structlog import wrap_logger
 from werkzeug.exceptions import BadRequest
-from secure_message import settings
+
 from secure_message.common.alerts import AlertUser, AlertViaGovNotify, AlertViaLogging
 from secure_message.common.labels import Labels
 from secure_message.common.utilities import get_options, paginated_list_to_json, add_users_and_business_details
@@ -127,7 +127,7 @@ class MessageSend(Resource):
             if status_code == 200:
                 if 'emailAddress' in party_data and len(party_data['emailAddress'].strip()) > 0:
                     recipient_email = party_data['emailAddress'].strip()
-                    alert_method = AlertViaLogging() if settings.NOTIFY_VIA_GOV_NOTIFY == '0' else AlertViaGovNotify()
+                    alert_method = AlertViaLogging() if current_app.config['NOTIFY_VIA_GOV_NOTIFY'] == '0' else AlertViaGovNotify()
                     alert_user = AlertUser(alert_method)
                     alert_user.send(recipient_email, message.msg_id)
                 else:
@@ -137,7 +137,7 @@ class MessageSend(Resource):
 
     @staticmethod
     def _inform_case_service(message):
-        if settings.NOTIFY_CASE_SERVICE == '1':
+        if current_app.config['NOTIFY_CASE_SERVICE'] == '1':
             if message.msg_from == constants.BRES_USER:
                 case_user = constants.BRES_USER
             else:

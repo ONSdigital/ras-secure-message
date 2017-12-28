@@ -1,9 +1,10 @@
 import logging
-from flask import json
+
+from flask import current_app, json
 import requests
-import secure_message.settings
-from secure_message import constants, settings
 from structlog import wrap_logger
+
+from secure_message import constants
 
 logger = wrap_logger(logging.getLogger(__name__))
 
@@ -13,8 +14,8 @@ class PartyService:
     def get_business_details(ru):
         """Retrieves the business details from the party service"""
 
-        url = secure_message.settings.RAS_PARTY_GET_BY_BUSINESS.format(secure_message.settings.RAS_PARTY_SERVICE, ru)
-        party_data = requests.get(url, auth=settings.BASIC_AUTH, verify=False)
+        url = current_app.config['RAS_PARTY_GET_BY_BUSINESS'].format(current_app.config['RAS_PARTY_SERVICE'], ru)
+        party_data = requests.get(url, auth=current_app.config['BASIC_AUTH'], verify=False)
 
         logger.debug('Party service get business details result',
                      status_code=party_data.status_code,
@@ -42,9 +43,9 @@ class PartyService:
                           "sampleUnitType": "BI"}
             return party_dict, 200
         else:
-            url = secure_message.settings.RAS_PARTY_GET_BY_RESPONDENT.format(secure_message.settings.RAS_PARTY_SERVICE, uuid)
+            url = current_app.config['RAS_PARTY_GET_BY_RESPONDENT'].format(current_app.config['RAS_PARTY_SERVICE'], uuid)
             party_data = requests.get(url,
-                                      auth=settings.BASIC_AUTH,
+                                      auth=current_app.config['BASIC_AUTH'],
                                       verify=False)
 
             logger.debug('Party get user details result',

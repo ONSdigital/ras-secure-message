@@ -1,9 +1,9 @@
 import unittest
 
+from flask import current_app
 import requests_mock
 
 from secure_message.services.party_service import PartyService
-import secure_message.settings
 from secure_message import constants
 
 
@@ -21,7 +21,7 @@ class PartyTestCase(unittest.TestCase):
     def test_results_returned_from_get_business_details_returned_as_expected(self, mock_request):
         """Test get business details sends a request and returns data"""
         ru = "1234"
-        business_data_url = secure_message.settings.RAS_PARTY_GET_BY_BUSINESS.format(secure_message.settings.RAS_PARTY_SERVICE, ru)
+        business_data_url = current_app.config['RAS_PARTY_GET_BY_BUSINESS'].format(current_app.config['RAS_PARTY_SERVICE'], ru)
         mock_request.get(business_data_url, status_code=200, reason="OK", text='{"something": "else"}')
         sut = PartyService()
 
@@ -34,7 +34,7 @@ class PartyTestCase(unittest.TestCase):
     def test_get_business_details_converts_error_list_to_errors_dictionary(self,  mock_request):
         """Test get business details and returns correctly from a list"""
         ru = "1234"
-        business_data_url = secure_message.settings.RAS_PARTY_GET_BY_BUSINESS.format(secure_message.settings.RAS_PARTY_SERVICE, ru)
+        business_data_url = current_app.config['RAS_PARTY_GET_BY_BUSINESS'].format(current_app.config['RAS_PARTY_SERVICE'], ru)
         sut = PartyService()
         mock_request.get(business_data_url, status_code=200, reason="OK", text='[{"errors": "test"}]')
         result_data, result_status = sut.get_business_details(ru)
@@ -46,7 +46,7 @@ class PartyTestCase(unittest.TestCase):
     def test_get_business_details_fails(self, mock_request):
         """Test get business details and returns correctly from a list"""
         ru = "1234"
-        business_data_url = secure_message.settings.RAS_PARTY_GET_BY_BUSINESS.format(secure_message.settings.RAS_PARTY_SERVICE, ru)
+        business_data_url = current_app.config['RAS_PARTY_GET_BY_BUSINESS'].format(current_app.config['RAS_PARTY_SERVICE'], ru)
         sut = PartyService()
         mock_request.get(business_data_url, status_code=401, reason="unauthorised", text='Unauthorized Access')
         result_data, result_status = sut.get_business_details(ru)
@@ -58,7 +58,7 @@ class PartyTestCase(unittest.TestCase):
     def test_get_user_details_for_bres_user(self, mock_request):
         """Test get user details sends a request and receives back data"""
         sut = PartyService()
-        user_data_url = secure_message.settings.RAS_PARTY_GET_BY_RESPONDENT.format(secure_message.settings.RAS_PARTY_SERVICE,
+        user_data_url = current_app.config['RAS_PARTY_GET_BY_RESPONDENT'].format(current_app.config['RAS_PARTY_SERVICE'],
                                                                                    constants.BRES_USER)
 
         expected_result = {'emailAddress': '',
@@ -80,7 +80,7 @@ class PartyTestCase(unittest.TestCase):
     def test_get_user_details_calls_party_service_for_respondent(self, mock_request):
         """Test get user details sends a request and receives back data"""
         sut = PartyService()
-        user_data_url = secure_message.settings.RAS_PARTY_GET_BY_RESPONDENT.format(secure_message.settings.RAS_PARTY_SERVICE, 'NotBres')
+        user_data_url = current_app.config['RAS_PARTY_GET_BY_RESPONDENT'].format(current_app.config['RAS_PARTY_SERVICE'], 'NotBres')
         mock_request.get(user_data_url, status_code=200, reason="OK", text='{"Test": "test"}')
 
         result_data, result_status = sut.get_user_details('NotBres')
@@ -92,7 +92,7 @@ class PartyTestCase(unittest.TestCase):
     def test_get_user_details_calls_party_service_for_respondent_unauthorised(self, mock_request):
         """Test get user details sends a request and receives back data"""
         sut = PartyService()
-        user_data_url = secure_message.settings.RAS_PARTY_GET_BY_RESPONDENT.format(secure_message.settings.RAS_PARTY_SERVICE, 'NotBres')
+        user_data_url = current_app.config['RAS_PARTY_GET_BY_RESPONDENT'].format(current_app.config['RAS_PARTY_SERVICE'], 'NotBres')
         mock_request.get(user_data_url, status_code=401, reason="unauthorised", text="Unauthorized access")
 
         result_data, result_status = sut.get_user_details('NotBres')

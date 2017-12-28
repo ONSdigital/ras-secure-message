@@ -1,21 +1,22 @@
-from secure_message.application import app
-from secure_message.services.service_toggles import party, case_service
 from behave import given, then, when
-from secure_message.repository import database
 from flask import current_app
+import nose.tools
 from sqlalchemy.engine import Engine
 from sqlalchemy import event
+
+from secure_message.application import create_app
+from secure_message.services.service_toggles import party, case_service
+from secure_message.repository import database
 from tests.behavioural.features.steps.secure_messaging_context_helper import SecureMessagingContextHelper
-
-
-import nose.tools
 
 
 @given("prepare for tests using '{service_type}' services")
 def step_impl_prepare_for_tests(context, service_type):
     """Prepare bdd tests to run against either mock or real external services"""
+    context.app = create_app()
     step_impl_reset_db(context)
-    context.bdd_helper = SecureMessagingContextHelper()
+    with context.app.app_context():
+        context.bdd_helper = SecureMessagingContextHelper()
     if service_type.lower() == 'real':
         party.use_real_service()
         case_service.use_real_service()
@@ -27,11 +28,10 @@ def step_impl_prepare_for_tests(context, service_type):
 @given("database is reset")
 def step_impl_reset_db(context):
     """ reset database and use the context test helper"""
-    with app.app_context():
+    with context.app.app_context():
         database.db.init_app(current_app)
         database.db.drop_all()
         database.db.create_all()
-    context.sm_context_helper = SecureMessagingContextHelper()
 
 
 @given("using mock party service")

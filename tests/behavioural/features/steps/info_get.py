@@ -1,15 +1,13 @@
 import nose
 from behave import given, then
 from flask import json
-from secure_message.application import app
-
 
 # Scenario 1: User requests info
 
 
 @given('the user requests endpoint info')
 def step_impl_requests_endpoint_info(context):
-    context.response = app.test_client().get('/info')
+    context.response = context.app.test_client().get('/info')
 
 
 @then('the endpoint info is returned')

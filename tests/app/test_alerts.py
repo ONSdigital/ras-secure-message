@@ -1,7 +1,7 @@
 import unittest
 from unittest import mock
 from unittest.mock import Mock
-from secure_message import settings
+
 from secure_message.exception.exceptions import RasNotifyException
 from secure_message.common.alerts import AlertUser, AlertViaGovNotify
 
@@ -13,8 +13,8 @@ class AlertsTestCase(unittest.TestCase):
     def test_alert_user_send_if_forwarded_to_alert_method():
         """sending email notification"""
         sut = AlertUser(Mock(AlertViaGovNotify))
-        sut.send(settings.NOTIFICATION_DEV_EMAIL, None)
-        sut.alert_method.send.assert_called_with(settings.NOTIFICATION_DEV_EMAIL, None)
+        sut.send(current_app.config['NOTIFICATION_DEV_EMAIL'], None)
+        sut.alert_method.send.assert_called_with(current_app.config['NOTIFICATION_DEV_EMAIL'], None)
 
     def test_init_with_alerter_params_sets_alert_method(self):
         """test uses alert_method from constructor if provided"""

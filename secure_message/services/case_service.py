@@ -1,7 +1,6 @@
 import logging
-from flask import json
+from flask import json, current_app
 import requests
-from secure_message import settings
 from structlog import wrap_logger
 
 logger = wrap_logger(logging.getLogger(__name__))
@@ -17,8 +16,8 @@ class CaseService:
                      "createdBy": user_name
                      }
 
-        url = settings.RM_CASE_POST.format(settings.RM_CASE_SERVICE, case_id)
-        case_service_data = requests.post(url, auth=settings.BASIC_AUTH, json=json_data, verify=False)
+        url = current_app.config['RM_CASE_POST'].format(current_app.config['RM_CASE_SERVICE'], case_id)
+        case_service_data = requests.post(url, auth=current_app.config['BASIC_AUTH'], json=json_data, verify=False)
         logger.debug('case service post result', status_code=case_service_data.status_code,
                      reason=case_service_data.reason, text=case_service_data.text)
         case_service_dict = json.loads(case_service_data.text)

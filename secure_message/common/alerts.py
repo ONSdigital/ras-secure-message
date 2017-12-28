@@ -1,10 +1,11 @@
 import logging
-
-from secure_message import settings
-from structlog import wrap_logger
 from urllib import parse as urlparse
-from secure_message.exception.exceptions import RasNotifyException
+
+from flask import current_app
 import requests
+from structlog import wrap_logger
+
+from secure_message.exception.exceptions import RasNotifyException
 
 logger = wrap_logger(logging.getLogger(__name__))
 
@@ -20,9 +21,9 @@ class AlertViaGovNotify:
             "reference": reference
         }
 
-        url = urlparse.urljoin(settings.RM_NOTIFY_GATEWAY_URL, settings.NOTIFICATION_TEMPLATE_ID)
+        url = urlparse.urljoin(current_app.config['RM_NOTIFY_GATEWAY_URL'], current_app.config['NOTIFICATION_TEMPLATE_ID'])
 
-        response = requests.post(url, auth=settings.BASIC_AUTH, timeout=settings.REQUESTS_POST_TIMEOUT,
+        response = requests.post(url, auth=current_app.config['BASIC_AUTH'], timeout=current_app.config['REQUESTS_POST_TIMEOUT'],
                                  json=notification)
 
         if response.status_code != 201:
@@ -37,7 +38,7 @@ class AlertViaLogging:
 
     @staticmethod
     def send(email, reference):
-        logger.info('email details {}, {}'.format(email, reference))
+        logger.info(f'email details {email}, {reference}')
 
 
 class AlertUser:

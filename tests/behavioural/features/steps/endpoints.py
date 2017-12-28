@@ -1,4 +1,3 @@
-from secure_message.application import app
 from behave import given, when
 from flask import json
 import copy
@@ -11,7 +10,7 @@ import copy
 def step_impl_the_message_is_sent(context):
     """sends the current message data to the message send endpoint"""
     context.bdd_helper.sent_messages.extend([copy.deepcopy(context.bdd_helper.message_data)])
-    context.response = app.test_client().post(context.bdd_helper.message_post_url,
+    context.response = context.app.test_client().post(context.bdd_helper.message_post_url,
                                               data=json.dumps(context.bdd_helper.message_data),
                                               headers=context.bdd_helper.headers)
 
@@ -42,7 +41,7 @@ def step_impl_the_n_messages_are_sent(context, message_count):
 def step_impl_the_message_is_saved_as_draft(context):
     """saves the current message data as a draft via  draft post """
     context.bdd_helper.sent_messages.extend([copy.deepcopy(context.bdd_helper.message_data)])
-    context.response = app.test_client().post(context.bdd_helper.draft_post_url,
+    context.response = context.app.test_client().post(context.bdd_helper.draft_post_url,
                                               data=json.dumps(context.bdd_helper.message_data),
                                               headers=context.bdd_helper.headers)
     returned_data = json.loads(context.response.data)
@@ -63,7 +62,7 @@ def step_impl_the_n_drafts_are_sent(context, draft_count):
 def step_impl_the_previously_saved_message_is_retrieved(context):
     """reads message with the id saved in the context via the message get endpoint"""
     url = context.bdd_helper.message_get_url.format(context.msg_id)
-    context.response = app.test_client().get(url, headers=context.bdd_helper.headers)
+    context.response = context.app.test_client().get(url, headers=context.bdd_helper.headers)
     returned_data = json.loads(context.response.data)
     _try_persist_msg_and_thread_id_to_context(context, returned_data)
     context.bdd_helper.store_last_single_message_response_data(context.response)
@@ -74,7 +73,7 @@ def step_impl_the_previously_saved_message_is_retrieved(context):
 def step_impl_the_specific_message_id_is_retrieved(context, msg_id):
     """retrieve a message with a specific id (e.g one that does not exist)"""
     url = context.bdd_helper.message_get_url.format(msg_id)
-    context.response = app.test_client().get(url, headers=context.bdd_helper.headers)
+    context.response = context.app.test_client().get(url, headers=context.bdd_helper.headers)
     context.bdd_helper.store_last_single_message_response_data(context.response)
 
 
@@ -91,7 +90,7 @@ def step_impl_the_specific_message_id_is_retrieved_on_specific_msg_id(context, m
     """modify the labels on a specified message id"""
     url = context.bdd_helper.message_put_url.format(msg_id)
 
-    context.response = app.test_client().put(url, data=json.dumps(context.bdd_helper.message_data),
+    context.response = context.app.test_client().put(url, data=json.dumps(context.bdd_helper.message_data),
                                              headers=context.bdd_helper.headers)
     context.bdd_helper.store_last_single_message_response_data(context.response)
 
@@ -116,7 +115,7 @@ def _update_draft_message_with_specific_data_msg_id(context, msg_id):
     sent_data = context.bdd_helper.message_data
     sent_data['msg_id'] = msg_id           #usually context.msg_id
     context.bdd_helper.sent_messages.extend([sent_data])
-    context.response = app.test_client().put(url,
+    context.response = context.app.test_client().put(url,
                                              data=json.dumps(sent_data),
                                              headers=context.bdd_helper.headers)
     if context.response.status_code == 200:
@@ -128,7 +127,7 @@ def _update_draft_message_with_specific_data_msg_id(context, msg_id):
 def step_impl_the_previously_saved_draft_is_retrieved(context):
     """read a draft"""
     url = context.bdd_helper.draft_get_url.format(context.msg_id)
-    context.response = app.test_client().get(url, headers=context.bdd_helper.headers)
+    context.response = context.app.test_client().get(url, headers=context.bdd_helper.headers)
 
     returned_data = json.loads(context.response.data)
     _try_persist_msg_and_thread_id_to_context(context, returned_data)
@@ -140,7 +139,7 @@ def step_impl_the_previously_saved_draft_is_retrieved(context):
 def step_impl_messages_are_read(context):
     """get a message list"""
     url = context.bdd_helper.messages_get_url
-    context.response = app.test_client().get(url, headers=context.bdd_helper.headers)
+    context.response = context.app.test_client().get(url, headers=context.bdd_helper.headers)
     response_data = context.response.data
     context.bdd_helper.store_messages_response_data(response_data)
 
@@ -177,7 +176,7 @@ def step_impl_messages_are_read_with_filter_of_current_param_value(context, labe
 
 def _step_impl_get_messages_with_filter(context, url):
     """helper function to get messages"""
-    context.response = app.test_client().get(url, headers=context.bdd_helper.headers)
+    context.response = context.app.test_client().get(url, headers=context.bdd_helper.headers)
     context.bdd_helper.store_messages_response_data(context.response.data)
 
 
@@ -200,7 +199,7 @@ def step_impl_drafts_read_with_specific_limit_per_page_requesting_specific_page(
 
 def _step_impl_drafts_are_read(context, url):
     """ common function to read drafts"""
-    context.response = app.test_client().get(url, headers=context.bdd_helper.headers)
+    context.response = context.app.test_client().get(url, headers=context.bdd_helper.headers)
     response_data = context.response.data
     context.bdd_helper.store_messages_response_data(response_data)
 
@@ -219,7 +218,7 @@ def step_impl_drafts_are_read_with_filter_of_current_param_value(context, param_
 
 def _step_impl_get_drafts_with_filter(context, url):
     """common function to get grafts"""
-    context.response = app.test_client().get(url, headers=context.bdd_helper.headers)
+    context.response = context.app.test_client().get(url, headers=context.bdd_helper.headers)
     context.bdd_helper.store_messages_response_data(context.response.data)
 
 
@@ -237,7 +236,7 @@ def step_impl_drafts_are_read_with_filter_of_current_param_value(context, label_
 def step_impl_the_thread_is_read(context):
     """read a specific thread based on context thread id"""
     url = context.bdd_helper.thread_get_url.format(context.thread_id)
-    context.response = app.test_client().get(url, headers=context.bdd_helper.headers)
+    context.response = context.app.test_client().get(url, headers=context.bdd_helper.headers)
 
     returned_data = json.loads(context.response.data)
     _try_persist_msg_and_thread_id_to_context(context, returned_data)
@@ -263,51 +262,51 @@ def _try_persist_msg_and_thread_id_to_context(context, returned_data):
 def step_impl_the_threads_are_read(context):
     """reads a list of threads"""
     url = context.bdd_helper.threads_get_url.format(context.thread_id)
-    context.response = app.test_client().get(url, headers=context.bdd_helper.headers)
+    context.response = context.app.test_client().get(url, headers=context.bdd_helper.headers)
     context.bdd_helper.store_messages_response_data(context.response.data)
 
 @when("user accesses the /draft/save endpoint with using the PUT method")
 def step_impl_access_endpoint_with_wrong_method(context):
     context.bdd_helper.sent_messages.extend([context.bdd_helper.message_data])
-    context.response = app.test_client().put(context.bdd_helper.draft_post_url,
+    context.response = context.app.test_client().put(context.bdd_helper.draft_post_url,
                                               data=json.dumps(context.bdd_helper.message_data),
                                               headers=context.bdd_helper.headers)
 
 
 @when("user accesses the /health endpoint with using the POST method")
 def step_impl_access_endpoint_with_wrong_method(context):
-    context.response = app.test_client().post(context.bdd_helper.health_endpoint)
+    context.response = context.app.test_client().post(context.bdd_helper.health_endpoint)
 
 
 @when("user accesses the /health endpoint with using the PUT method")
 def step_impl_access_endpoint_with_wrong_method(context):
-    context.response = app.test_client().put(context.bdd_helper.health_endpoint)
+    context.response = context.app.test_client().put(context.bdd_helper.health_endpoint)
 
 
 @when("user accesses the /health/db endpoint with using the POST method")
 def step_impl_access_endpoint_with_wrong_method(context):
-    context.response = app.test_client().post(context.bdd_helper.health_db_endpoint)
+    context.response = context.app.test_client().post(context.bdd_helper.health_db_endpoint)
 
 
 @when("user accesses the /health/db endpoint with using the PUT method")
 def step_impl_access_endpoint_with_wrong_method(context):
-    context.response = app.test_client().put(context.bdd_helper.health_db_endpoint)
+    context.response = context.app.test_client().put(context.bdd_helper.health_db_endpoint)
 
 
 @when("user accesses the /health/details endpoint with using the PUT method")
 def step_impl_access_endpoint_with_wrong_method(context):
-    context.response = app.test_client().put(context.bdd_helper.health_details_endpoint)
+    context.response = context.app.test_client().put(context.bdd_helper.health_details_endpoint)
 
 
 @when("user accesses the /health/details endpoint with using the POST method")
 def step_impl_access_endpoint_with_wrong_method(context):
-    context.response = app.test_client().post(context.bdd_helper.health_details_endpoint)
+    context.response = context.app.test_client().post(context.bdd_helper.health_details_endpoint)
 
 
 @when("user accesses the /message/id endpoint with using the POST method")
 def step_impl_access_endpoint_with_wrong_method(context):
     context.bdd_helper.sent_messages.extend([context.bdd_helper.message_data])
-    context.response = app.test_client().post(context.bdd_helper.message_get_url,
+    context.response = context.app.test_client().post(context.bdd_helper.message_get_url,
                                               data=json.dumps(context.bdd_helper.message_data),
                                               headers=context.bdd_helper.headers)
 
@@ -315,7 +314,7 @@ def step_impl_access_endpoint_with_wrong_method(context):
 @when("user accesses the /message/id endpoint with using the PUT method")
 def step_impl_access_endpoint_with_wrong_method(context):
     context.bdd_helper.sent_messages.extend([context.bdd_helper.message_data])
-    context.response = app.test_client().put(context.bdd_helper.message_get_url,
+    context.response = context.app.test_client().put(context.bdd_helper.message_get_url,
                                               data=json.dumps(context.bdd_helper.message_data),
                                               headers=context.bdd_helper.headers)
 
@@ -323,7 +322,7 @@ def step_impl_access_endpoint_with_wrong_method(context):
 @when("user accesses the /message/id/modify endpoint with using the GET method")
 def step_impl_access_endpoint_with_wrong_method(context):
     context.bdd_helper.sent_messages.extend([context.bdd_helper.message_data])
-    context.response = app.test_client().get(context.bdd_helper.message_put_url,
+    context.response = context.app.test_client().get(context.bdd_helper.message_put_url,
                                               data=json.dumps(context.bdd_helper.message_data),
                                               headers=context.bdd_helper.headers)
 
@@ -331,7 +330,7 @@ def step_impl_access_endpoint_with_wrong_method(context):
 @when("user accesses the /message/id/modify endpoint with using the POST method")
 def step_impl_access_endpoint_with_wrong_method(context):
     context.bdd_helper.sent_messages.extend([context.bdd_helper.message_data])
-    context.response = app.test_client().post(context.bdd_helper.message_put_url,
+    context.response = context.app.test_client().post(context.bdd_helper.message_put_url,
                                               data=json.dumps(context.bdd_helper.message_data),
                                               headers=context.bdd_helper.headers)
 
@@ -339,7 +338,7 @@ def step_impl_access_endpoint_with_wrong_method(context):
 @when("user accesses the /message/send endpoint with using the PUT method")
 def step_impl_access_endpoint_with_wrong_method(context):
     context.bdd_helper.sent_messages.extend([context.bdd_helper.message_data])
-    context.response = app.test_client().put(context.bdd_helper.message_post_url,
+    context.response = context.app.test_client().put(context.bdd_helper.message_post_url,
                                               data=json.dumps(context.bdd_helper.message_data),
                                               headers=context.bdd_helper.headers)
 
@@ -347,7 +346,7 @@ def step_impl_access_endpoint_with_wrong_method(context):
 @when("user accesses the /messages endpoint with using the PUT method")
 def step_impl_access_endpoint_with_wrong_method(context):
     context.bdd_helper.sent_messages.extend([context.bdd_helper.message_data])
-    context.response = app.test_client().put(context.bdd_helper.messages_get_url,
+    context.response = context.app.test_client().put(context.bdd_helper.messages_get_url,
                                              data=json.dumps(context.bdd_helper.message_data),
                                              headers=context.bdd_helper.headers)
 
@@ -355,7 +354,7 @@ def step_impl_access_endpoint_with_wrong_method(context):
 @when("user accesses the /messages endpoint with using the POST method")
 def step_impl_access_endpoint_with_wrong_method(context):
     context.bdd_helper.sent_messages.extend([context.bdd_helper.message_data])
-    context.response = app.test_client().post(context.bdd_helper.messages_get_url,
+    context.response = context.app.test_client().post(context.bdd_helper.messages_get_url,
                                              data=json.dumps(context.bdd_helper.message_data),
                                              headers=context.bdd_helper.headers)
 

@@ -2,12 +2,14 @@ import logging
 import uuid
 
 from marshmallow import Schema, fields, post_load, validates, ValidationError, pre_load, validates_schema
-from secure_message import constants
-from secure_message.validation.user import User
 from flask import g
 from structlog import wrap_logger
 
+from secure_message import constants
+from secure_message.validation.user import User
+
 logger = wrap_logger(logging.getLogger(__name__))
+
 
 class Message:
 
@@ -28,9 +30,9 @@ class Message:
         self.survey = survey
 
     def __repr__(self):
-        return '<Message(msg_id={self.msg_id} msg_to={self.msg_to} msg_from={self.msg_from} subject={self.subject} body={self.body} ' \
-               'thread_id={self.thread_id} collection_case={self.collection_case} ru_id={self.ru_id} collection_exercise={self.collection_exercise} '\
-               'survey={self.survey})>'.format(self=self)
+        return f'<Message(msg_id={self.msg_id} msg_to={self.msg_to} msg_from={self.msg_from} subject={self.subject} body={self.body} ' \
+               f'thread_id={self.thread_id} collection_case={self.collection_case} ru_id={self.ru_id} collection_exercise={self.collection_exercise} '\
+               f'survey={self.survey})>'
 
     def __eq__(self, other):
         if isinstance(other, Message):
