@@ -2,6 +2,7 @@ import unittest
 from unittest import mock
 from unittest.mock import Mock
 
+from secure_message.application import create_app
 from secure_message.exception.exceptions import RasNotifyException
 from secure_message.common.alerts import AlertUser, AlertViaGovNotify
 
@@ -9,12 +10,16 @@ from secure_message.common.alerts import AlertUser, AlertViaGovNotify
 class AlertsTestCase(unittest.TestCase):
     """Test case for Alerts"""
 
-    @staticmethod
-    def test_alert_user_send_if_forwarded_to_alert_method():
+    def setUp(self):
+        """setup test environment"""
+        self.app = create_app()
+        self.app.testing = True
+
+    def test_alert_user_send_if_forwarded_to_alert_method(self):
         """sending email notification"""
         sut = AlertUser(Mock(AlertViaGovNotify))
-        sut.send(current_app.config['NOTIFICATION_DEV_EMAIL'], None)
-        sut.alert_method.send.assert_called_with(current_app.config['NOTIFICATION_DEV_EMAIL'], None)
+        sut.send(self.app.config['NOTIFICATION_DEV_EMAIL'], None)
+        sut.alert_method.send.assert_called_with(self.app.config['NOTIFICATION_DEV_EMAIL'], None)
 
     def test_init_with_alerter_params_sets_alert_method(self):
         """test uses alert_method from constructor if provided"""
@@ -34,7 +39,8 @@ class AlertsTestCase(unittest.TestCase):
         mock_notify_gateway_post.return_value = mock_response
 
         alert_user = AlertUser(AlertViaGovNotify)
-        alert_user.send('test@email.com', 'myReference')
+        with self.app.app_context():
+            alert_user.send('test@email.com', 'myReference')
 
         mock_notify_gateway_post.assert_called_once_with(
             'http://notifygatewaysvc-dev.apps.devtest.onsclofo.uk/emails/test_notification_template_id',
@@ -49,7 +55,7 @@ class AlertsTestCase(unittest.TestCase):
 
         alert_user = AlertUser(AlertViaGovNotify)
 
-        with self.assertRaises(RasNotifyException):
+        with self.app.app_context(), self.assertRaises(RasNotifyException):
             alert_user.send('test@email.com', 'myReference')
 
         mock_notify_gateway_post.assert_called_once_with(

@@ -171,12 +171,12 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
     """Test case for message retrieval"""
     def setUp(self):
         """setup test environment"""
-        app = create_app()
-        app.testing = True
-        self.engine = create_engine(app.config['SQLALCHEMY_DATABASE_URI'])
+        self.app = create_app()
+        self.app.testing = True
+        self.engine = create_engine(self.app.config['SQLALCHEMY_DATABASE_URI'])
         self.MESSAGE_LIST_ENDPOINT = "http://localhost:5050/messages"
         self.MESSAGE_BY_ID_ENDPOINT = "http://localhost:5050/message/"
-        with app.app_context():
+        with self.app.app_context():
             database.db.init_app(current_app)
             database.db.drop_all()
             database.db.create_all()
@@ -185,8 +185,7 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
         self.user_internal = User('ce12b958-2a5f-44f4-a6da-861e59070a31', 'internal')
         self.user_respondent = User('0a7ad740-10d5-4ecb-b7ca-3c0384afb882', 'respondent')
         party.use_mock_service()
-        app.config['NOTIFY_CASE_SERVICE'] = '1'
-        self.app = app
+        self.app.config['NOTIFY_CASE_SERVICE'] = '1'
 
     def test_0_msg_returned_when_db_empty_true(self):
         """retrieves messages from empty database"""
@@ -201,7 +200,7 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
     def test_retrieve_message_list_raises_error(self):
         """retrieves messages from when db does not exist"""
         with self.app.app_context():
-            database.db.drop_all()
+            self.db.drop_all()
             with current_app.test_request_context():
                 with self.assertRaises(InternalServerError):
                     Retriever().retrieve_message_list(1, MESSAGE_QUERY_LIMIT, self.user_respondent)
@@ -354,7 +353,7 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
     def test_retrieve_message_raises_error(self):
         """retrieves message from when db does not exist"""
         with self.app.app_context():
-            database.db.drop_all()
+            self.db.drop_all()
             with current_app.test_request_context():
                 with self.assertRaises(InternalServerError):
                     Retriever().retrieve_message(1, self.user_internal)
@@ -453,7 +452,7 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
         """retrieves all messages from database for user with survey option"""
         self.populate_database(5)
 
-        with app.app_context():
+        with self.app.app_context():
             with current_app.test_request_context():
                 response = Retriever().retrieve_message_list(1, MESSAGE_QUERY_LIMIT, self.user_respondent,
                                                              survey=test_utilities.BRES_SURVEY)[1]
@@ -751,7 +750,7 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
     def test_retrieve_draft_raises_error(self):
         """retrieves draft from when db does not exist"""
         with self.app.app_context():
-            database.db.drop_all()
+            self.db.drop_all()
             with current_app.test_request_context():
                 with self.assertRaises(InternalServerError):
                     Retriever().retrieve_message(1, self.user_internal)
@@ -815,7 +814,7 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
     def test_retrieve_thread_raises_server_error(self):
         """retrieves messages when db does not exist"""
         with self.app.app_context():
-            database.db.drop_all()
+            self.db.drop_all()
             with current_app.test_request_context():
                 with self.assertRaises(InternalServerError):
                     Retriever().retrieve_thread('ThreadId', self.user_respondent, 1, MESSAGE_QUERY_LIMIT)
@@ -830,7 +829,7 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
     def test_retrieve_draft_raises_server_error(self):
         """retrieves draft when db does not exist"""
         with self.app.app_context():
-            database.db.drop_all()
+            self.db.drop_all()
             with current_app.test_request_context():
                 with self.assertRaises(InternalServerError):
                     Retriever().retrieve_draft('draftId', self.user_respondent)
@@ -838,7 +837,7 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
     def test_retrieve_thread_list_raises_server_error(self):
         """retrieves threads when db does not exist"""
         with self.app.app_context():
-            database.db.drop_all()
+            self.db.drop_all()
             with current_app.test_request_context():
                 with self.assertRaises(InternalServerError):
                     Retriever().retrieve_thread_list(1, MESSAGE_QUERY_LIMIT, self.user_respondent)
@@ -1128,3 +1127,7 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
                     thread = Retriever().retrieve_thread(thread_ids[x], self.user_internal, 1, MESSAGE_QUERY_LIMIT)[1]
                     self.assertEqual(date[x], str(thread.items[0].events[0].date_time))
                     self.assertEqual(msg_ids[x], thread.items[0].events[0].msg_id)
+
+
+if __name__ == '__main__':
+    unittest.main()
