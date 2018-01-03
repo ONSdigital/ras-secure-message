@@ -1,4 +1,5 @@
 import logging
+import os
 
 from flask import Flask, request
 from flask import json, jsonify
@@ -22,15 +23,16 @@ logger_initial_config(service_name='ras-secure-message')
 logger = wrap_logger(logging.getLogger(__name__))
 
 
-def create_app(config_path='config.Config'):
+def create_app(config=None):
     app = Flask(__name__)
-    app.config.from_object(config_path)
+    app_config = f"config.{config or os.getenv('APP_SETTINGS', 'Config')}"
+    app.config.from_object(app_config)
     api = Api(app)
     CORS(app)
 
     database.db.init_app(app)
 
-    logger.info('Starting Secure Message Service...')
+    logger.info('Starting Secure Message Service...', config=app_config)
 
     with app.app_context():
         event.listen(database.db.metadata, 'before_create', DDL("CREATE SCHEMA IF NOT EXISTS securemessage"))

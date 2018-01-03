@@ -85,6 +85,32 @@ class Config:
                              'NOTIFICATION_API_KEY', 'SERVICE_ID', 'NOTIFICATION_TEMPLATE_ID']
 
 
+class DevConfig(Config):
+
+    JWT_SECRET = os.getenv('JWT_SECRET', 'vrwgLNWEffe45thh545yuby')
+    JWT_ALGORITHM = os.getenv('JWT_ALGORITHM', 'HS256')
+    NOTIFY_VIA_GOV_NOTIFY = os.getenv('NOTIFY_VIA_GOV_NOTIFY', '0')
+    NOTIFICATION_API_KEY = os.getenv('NOTIFICATION_API_KEY', 'test_notification_api_key')
+    NOTIFICATION_TEMPLATE_ID = os.getenv('NOTIFICATION_TEMPLATE_ID', 'test_notification_template_id')
+    RAS_SM_PATH = os.getenv('NOTIFICATION_TEMPLATE_ID', 'test_notification_template_id')
+    SECURITY_USER_NAME = os.getenv('SECURITY_USER_NAME', 'admin')
+    SECURITY_USER_PASSWORD = os.getenv('SECURITY_USER_PASSWORD', 'secret')
+    SERVICE_ID = os.getenv('SERVICE_ID', 'test_service_id')
+
+
+class TestConfig(Config):
+
+    JWT_SECRET = 'vrwgLNWEffe45thh545yuby'
+    JWT_ALGORITHM = 'HS256'
+    NOTIFY_VIA_GOV_NOTIFY = '0'
+    NOTIFICATION_API_KEY = 'test_notification_api_key'
+    NOTIFICATION_TEMPLATE_ID = 'test_notification_template_id'
+    RAS_SM_PATH = './'
+    SECURITY_USER_NAME = 'admin'
+    SECURITY_USER_PASSWORD = 'secret'
+    SERVICE_ID = 'test_service_id'
+
+
 for var in Config.NON_DEFAULT_VARIABLES:
     if not os.getenv(var):
         raise MissingEnvironmentVariable(Config.NON_DEFAULT_VARIABLES)

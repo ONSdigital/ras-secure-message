@@ -2,7 +2,6 @@ import copy
 
 from flask import current_app, json
 
-from secure_message.application import create_app
 from secure_message.authentication.jwe import Encrypter
 from secure_message.authentication.jwt import encode
 from secure_message import constants
