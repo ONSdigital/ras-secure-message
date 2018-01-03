@@ -44,7 +44,7 @@ class AlertsTestCase(unittest.TestCase):
 
         mock_notify_gateway_post.assert_called_once_with(
             'http://notifygatewaysvc-dev.apps.devtest.onsclofo.uk/emails/test_notification_template_id',
-            auth=("test_user", "test_password"), json={"emailAddress": "test@email.com", "reference": "myReference"},
+            auth=("admin", "secret"), json={"emailAddress": "test@email.com", "reference": "myReference"},
             timeout=20)
 
     @mock.patch('requests.post')
@@ -60,7 +60,7 @@ class AlertsTestCase(unittest.TestCase):
 
         mock_notify_gateway_post.assert_called_once_with(
             'http://notifygatewaysvc-dev.apps.devtest.onsclofo.uk/emails/test_notification_template_id',
-            auth=("test_user", "test_password"), json={"emailAddress": "test@email.com", "reference": "myReference"},
+            auth=("admin", "secret"), json={"emailAddress": "test@email.com", "reference": "myReference"},
             timeout=20)
 
 

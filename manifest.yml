@@ -9,6 +9,6 @@ applications:
     SMS_LOG_LEVEL: DEBUG
     APP_LOG_LEVEL: DEBUG
     RAS_SM_PATH: /home/vcap/app
-    DEV_PORT: 8080
+    DEV_PORT: 5050
   services:
    - secure-message-db
