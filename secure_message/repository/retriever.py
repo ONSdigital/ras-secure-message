@@ -2,7 +2,7 @@ import logging
 
 from structlog import wrap_logger
 from flask import jsonify
-from sqlalchemy import and_, case, func, or_
+from sqlalchemy import and_, func, or_
 from sqlalchemy.exc import SQLAlchemyError
 from werkzeug.exceptions import InternalServerError, NotFound
 from secure_message.common.labels import Labels
@@ -186,7 +186,7 @@ class Retriever:
 
         try:
             SecureMessage().query.limit(1).all()
-        except Exception as e:
+        except Exception as e:  # NOQA
             database_status['status'] = "unhealthy"
             database_status['errors'] = str(e)
             resp = jsonify(database_status)
@@ -207,5 +207,4 @@ class Retriever:
 
         if result is None:
             return False, result
-        else:
-            return True, result.serialize(user)
+        return True, result.serialize(user)

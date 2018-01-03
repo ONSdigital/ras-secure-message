@@ -67,14 +67,12 @@ class Modifier:
             if unread in message['labels']:
                 # Unread label already exists
                 return True
-            else:
-                Modifier.add_label(unread, message, user)
-                return True
-        else:
-            res = jsonify({'status': 'error'})
-            res.status_code = 400
-            logging.error('Error adding unread label', status_code=res.status_code)
-            return res
+            Modifier.add_label(unread, message, user)
+            return True
+        res = jsonify({'status': 'error'})
+        res.status_code = 400
+        logging.error('Error adding unread label', status_code=res.status_code)
+        return res
 
     @staticmethod
     def del_unread(message, user):

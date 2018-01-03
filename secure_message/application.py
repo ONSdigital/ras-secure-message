@@ -1,5 +1,4 @@
 import logging
-import os
 
 from flask import Flask, request
 from flask import json, jsonify
@@ -36,7 +35,7 @@ def create_app(config_path='config.Config'):
     with app.app_context():
         event.listen(database.db.metadata, 'before_create', DDL("CREATE SCHEMA IF NOT EXISTS securemessage"))
         database.db.create_all()
-        database.db.session.commit()
+        database.db.session.commit()  # NOQA
 
     api.add_resource(Health, '/health')
     api.add_resource(DatabaseHealth, '/health/db')
@@ -55,7 +54,7 @@ def create_app(config_path='config.Config'):
     api.add_resource(Labels, '/labels')
 
     @app.before_request
-    def before_request():
+    def before_request():  # NOQA
         if _request_requires_authentication():
             log_request()
             res = authenticate(request.headers)
@@ -64,7 +63,7 @@ def create_app(config_path='config.Config'):
                 return res
 
     @app.errorhandler(Exception)
-    def handle_exception(error):
+    def handle_exception(error):  # NOQA
         logger.exception(error=error)
         response = jsonify({"error": "Unknown internal error"})
         response.status_code = 500
@@ -103,4 +102,4 @@ def log_request():
         args_list.append('arg ' + str(count) + ' = ' + str(key) + ': ' + str(val))
 
     params = ''.join(args_list)
-    logger.debug('Incoming request', req_data=req_data, arguments=params)
+    logger.debug('Incoming request', headers=headers, req_data=req_data, arguments=params)

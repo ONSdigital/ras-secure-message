@@ -1,7 +1,7 @@
 
 import logging
 
-from flask import g, request, jsonify
+from flask import g, request
 from flask_restful import Resource
 from structlog import wrap_logger
 from secure_message.common.utilities import get_options, paginated_list_to_json

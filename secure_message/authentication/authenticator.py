@@ -20,10 +20,9 @@ def authenticate(headers):
         res = check_jwt(jwt_token)
         return res
 
-    else:
-        res = Response(response="Authorization header required.", status=400, mimetype="text/html")
-        logger.debug('Authorization header not supplied.')
-        return res
+    res = Response(response="Authorization header required.", status=400, mimetype="text/html")
+    logger.debug('Authorization header not supplied.')
+    return res
 
 
 def check_jwt(token):

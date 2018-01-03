@@ -1,5 +1,7 @@
-import cfenv
 import re
+
+import cfenv
+
 
 RegexType = type(re.compile(''))
 
@@ -37,14 +39,14 @@ class ONSCloudFoundry(object):
 
 
 def my_match(target, pattern):
-        """
-        This is a customised version of "match" that also handles matching based
-        on 'target' possibly being a list.
-        """
-        if target is None:
-            return False
-        if isinstance(pattern, RegexType):
-            return pattern.search(target)
-        if isinstance(target, list):
-            return pattern in target
-        return pattern == target
+    """
+    This is a customised version of "match" that also handles matching based
+    on 'target' possibly being a list.
+    """
+    if target is None:
+        return False
+    if isinstance(pattern, RegexType):
+        return pattern.search(target)
+    if isinstance(target, list):
+        return pattern in target
+    return pattern == target

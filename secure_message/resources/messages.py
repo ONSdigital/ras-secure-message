@@ -77,11 +77,10 @@ class MessageSend(Resource):
         message = MessageSchema().load(post_data)
         if message.errors == {}:
             return self._message_save(message, is_draft, draft_id)
-        else:
-            resp = jsonify(message.errors)
-            resp.status_code = 400
-            logger.error('Message send failed', errors=message.errors)
-            return resp
+        resp = jsonify(message.errors)
+        resp.status_code = 400
+        logger.error('Message send failed', errors=message.errors)
+        return resp
 
     @staticmethod
     def _message_save(message, is_draft, draft_id):
@@ -115,7 +114,7 @@ class MessageSend(Resource):
         try:
             MessageSend._try_send_alert_email(message)
             MessageSend._inform_case_service(message)
-        except Exception as e:
+        except Exception as e:  # NOQA
             logger.error('Uncaught exception in Message.alert_listeners', exception=e)
 
     @staticmethod
@@ -123,7 +122,7 @@ class MessageSend(Resource):
         """Send an email to recipient if appropriate"""
         party_data = None
         if message.msg_to[0] != constants.BRES_USER:
-            party_data, status_code = party.get_user_details(message.msg_to[0])  # todo avoid 2 lookups (see validate)
+            party_data, status_code = party.get_user_details(message.msg_to[0])  # TODO avoid 2 lookups (see validate)
             if status_code == 200:
                 if 'emailAddress' in party_data and len(party_data['emailAddress'].strip()) > 0:
                     recipient_email = party_data['emailAddress'].strip()
@@ -141,7 +140,7 @@ class MessageSend(Resource):
             if message.msg_from == constants.BRES_USER:
                 case_user = constants.BRES_USER
             else:
-                party_data, status_code = party.get_user_details(message.msg_from) # todo avoid 2 lookups(see validate)
+                party_data, status_code = party.get_user_details(message.msg_from)  # TODO avoid 2 lookups(see validate)
                 if status_code == 200:
                     first_name = party_data['firstName'] if 'firstName' in party_data else ''
                     last_name = party_data['lastName'] if 'lastName' in party_data else ''
@@ -169,11 +168,10 @@ class MessageById(Resource):
         message = add_users_and_business_details([message])[0]
         if Authorizer().can_user_view_message(g.user, message):
             return jsonify(message)
-        else:
-            result = jsonify({'status': 'error'})
-            result.status_code = 403
-            logger.error('Error getting message by ID', msg_id=message_id, status_code=result.status_code)
-            return result
+        result = jsonify({'status': 'error'})
+        result.status_code = 403
+        logger.error('Error getting message by ID', msg_id=message_id, status_code=result.status_code)
+        return result
 
 
 class MessageModifyById(Resource):
@@ -210,8 +208,7 @@ class MessageModifyById(Resource):
             return Modifier.add_label(label, message, user)
         if label_exists:
             return Modifier.remove_label(label, message, user)
-        else:
-            return False
+        return False
 
     @staticmethod
     def _try_modify_unread(action, message, user):

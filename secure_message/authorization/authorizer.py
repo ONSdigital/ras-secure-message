@@ -9,7 +9,7 @@ class Authorizer:
 
     @staticmethod
     def can_user_view_message(user, message):
-        """ 
+        """
             A user can view message if
             a) The user is internal ( currently no restrictions )
             or b) The user uuid is either the from or the to

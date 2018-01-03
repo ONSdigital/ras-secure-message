@@ -2,7 +2,6 @@ import logging
 import os
 import sys
 
-from flask import current_app
 from structlog import wrap_logger
 from werkzeug.exceptions import HTTPException
 

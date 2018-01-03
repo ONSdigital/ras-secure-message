@@ -37,11 +37,11 @@ class DraftSave(Resource):
             resp.status_code = 201
 
             return resp
-        else:
-            res = jsonify(draft.errors)
-            res.status_code = 400
-            logger.error('Failed saving draft', status_code=res.status_code)
-            return res
+
+        res = jsonify(draft.errors)
+        res.status_code = 400
+        logger.error('Failed saving draft', status_code=res.status_code)
+        return res
 
     @staticmethod
     def _save_draft(draft, saver=Saver()):
@@ -74,13 +74,11 @@ class DraftById(Resource):
             resp = jsonify(draft_data)
             resp.headers['ETag'] = etag
             return resp
-        else:
-            result = jsonify({'status': 'error'})
-            result.status_code = 403
-            logger.error('Error getting message by ID', msg_id=draft_id, status_code=result.status_code)
-            return result
 
-
+        result = jsonify({'status': 'error'})
+        result.status_code = 403
+        logger.error('Error getting message by ID', msg_id=draft_id, status_code=result.status_code)
+        return result
 
 
 class DraftList(Resource):
@@ -90,7 +88,7 @@ class DraftList(Resource):
     def get():
         """Get message list with options"""
 
-        string_query_args, page, limit, ru_id, survey, cc, label, desc, ce = get_options(request.args)
+        string_query_args, page, limit, _, _, _, _, _, _ = get_options(request.args)
 
         message_service = Retriever()
         status, result = message_service.retrieve_message_list(page, limit, g.user, label=Labels.DRAFT.value)
@@ -137,11 +135,11 @@ class DraftModifyById(Resource):
             resp.headers['ETag'] = etag
             resp.status_code = 200
             return resp
-        else:
-            resp = jsonify(draft.errors)
-            resp.status_code = 400
-            logger.error('Error sending draft', msg_id=draft_id, status_code=resp.status_code)
-            return resp
+
+        resp = jsonify(draft.errors)
+        resp.status_code = 400
+        logger.error('Error sending draft', msg_id=draft_id, status_code=resp.status_code)
+        return resp
 
     @staticmethod
     def etag_check(headers, current_draft):

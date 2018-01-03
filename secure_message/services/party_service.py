@@ -26,9 +26,9 @@ class PartyService:
         if party_data.status_code == 200:
             party_dict = json.loads(party_data.text)
             return party_dict, party_data.status_code
-        else:
-            logger.error('Party service failed', status_code=party_data.status_code, text=party_data.text, ru=ru)
-            return party_data.text, party_data.status_code
+
+        logger.error('Party service failed', status_code=party_data.status_code, text=party_data.text, ru=ru)
+        return party_data.text, party_data.status_code
 
     @staticmethod
     def get_user_details(uuid):
@@ -42,21 +42,21 @@ class PartyService:
                           "status": "",
                           "sampleUnitType": "BI"}
             return party_dict, 200
-        else:
-            url = current_app.config['RAS_PARTY_GET_BY_RESPONDENT'].format(current_app.config['RAS_PARTY_SERVICE'], uuid)
-            party_data = requests.get(url,
-                                      auth=current_app.config['BASIC_AUTH'],
-                                      verify=False)
 
-            logger.debug('Party get user details result',
-                         status_code=party_data.status_code,
-                         reason=party_data.reason,
-                         text=party_data.text,
-                         url=url)
+        url = current_app.config['RAS_PARTY_GET_BY_RESPONDENT'].format(current_app.config['RAS_PARTY_SERVICE'], uuid)
+        party_data = requests.get(url,
+                                  auth=current_app.config['BASIC_AUTH'],
+                                  verify=False)
 
-            if party_data.status_code == 200:
-                party_dict = json.loads(party_data.text)
-                return party_dict, party_data.status_code
-            else:
-                logger.error('Party service failed', status_code=party_data.status_code, text=party_data.text, uuid=uuid)
-                return party_data.text, party_data.status_code
+        logger.debug('Party get user details result',
+                     status_code=party_data.status_code,
+                     reason=party_data.reason,
+                     text=party_data.text,
+                     url=url)
+
+        if party_data.status_code == 200:
+            party_dict = json.loads(party_data.text)
+            return party_dict, party_data.status_code
+
+        logger.error('Party service failed', status_code=party_data.status_code, text=party_data.text, uuid=uuid)
+        return party_data.text, party_data.status_code

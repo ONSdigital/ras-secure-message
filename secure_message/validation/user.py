@@ -18,5 +18,5 @@ class User:
 
     @staticmethod
     def is_valid_user(uuid):
-        response, status_code = party.get_user_details(uuid)
+        _, status_code = party.get_user_details(uuid)
         return status_code == 200

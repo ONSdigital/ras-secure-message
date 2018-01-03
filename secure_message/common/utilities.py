@@ -1,7 +1,6 @@
 import hashlib
 import logging
 
-from flask import json
 from flask import jsonify
 from structlog import wrap_logger
 from secure_message.services.service_toggles import party
@@ -53,9 +52,8 @@ def get_options(args):
 def add_string_query_args(string_query_args, arg, val):
     """Create query string for get messages options"""
     if string_query_args == '?':
-        return '{0}{1}={2}'.format(string_query_args, arg, val)
-    else:
-        return '{0}&{1}={2}'.format(string_query_args, arg, val)
+        return f'{string_query_args}{arg}={val}'
+    return f'{string_query_args}&{arg}={val}'
 
 
 def paginated_list_to_json(paginated_list, page, limit, host_url, user, string_query_args,
@@ -70,19 +68,19 @@ def paginated_list_to_json(paginated_list, page, limit, host_url, user, string_q
     for message in paginated_list.items:
         msg_count += 1
         msg = message.serialize(user, body_summary=True)
-        msg['_links'] = {"self": {"href": "{0}{1}/{2}".format(host_url, MESSAGE_BY_ID_ENDPOINT, msg['msg_id'])}}
+        msg['_links'] = {"self": {"href": f"{host_url}{MESSAGE_BY_ID_ENDPOINT}/{msg['msg_id']}"}}
         messages.append(msg)
 
-    links = {'first': {"href": "{0}{1}".format(host_url, endpoint)},
-             'self': {"href": "{0}{1}{2}{3}page={4}&limit={5}".format(host_url, endpoint, arg_joiner, string_query_args, page, limit)}}
+    links = {'first': {"href": f"{host_url}{endpoint}"},
+             'self': {"href": f"{host_url}{endpoint}{arg_joiner}{string_query_args}page={page}&limit={limit}"}}
 
     if paginated_list.has_next:
         links['next'] = {
-            "href": "{0}{1}{2}{3}page={4}&limit={5}".format(host_url, endpoint, arg_joiner, string_query_args, (page + 1), limit)}
+            "href": f"{host_url}{endpoint}{arg_joiner}{string_query_args}page={page + 1}&limit={limit}"}
 
     if paginated_list.has_prev:
         links['prev'] = {
-            "href": "{0}{1}{2}{3}page={4}&limit={5}".format(host_url, endpoint, arg_joiner, string_query_args, (page - 1), limit)}
+            "href": f"{host_url}{endpoint}{arg_joiner}{string_query_args}page={page - 1}&limit={limit}"}
     messages = add_users_and_business_details(messages)
     return jsonify({"messages": messages, "_links": links})
 
