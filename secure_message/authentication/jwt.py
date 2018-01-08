@@ -10,17 +10,17 @@ def encode(data):
     """
     Function to encode python dict data
     """
-    JWT_ALGORITHM = current_app.config['SM_JWT_ALGORITHM']
-    JWT_SECRET = current_app.config['SM_JWT_SECRET']
+    jwt_algorithm = current_app.config['SM_JWT_ALGORITHM']
+    jwt_secret = current_app.config['SM_JWT_SECRET']
 
-    return jwt.encode(data, JWT_SECRET, algorithm=JWT_ALGORITHM, headers={"alg": JWT_ALGORITHM, 'typ': 'jwt'})
+    return jwt.encode(data, jwt_secret, algorithm=jwt_algorithm, headers={"alg": jwt_algorithm, 'typ': 'jwt'})
 
 
 def decode(token):
     """
     Function to decode python dict data
     """
-    JWT_ALGORITHM = current_app.config['SM_JWT_ALGORITHM']
-    JWT_SECRET = current_app.config['SM_JWT_SECRET']
+    jwt_algorithm = current_app.config['SM_JWT_ALGORITHM']
+    jwt_secret = current_app.config['SM_JWT_SECRET']
 
-    return jwt.decode(token, JWT_SECRET, algorithms=[JWT_ALGORITHM])
+    return jwt.decode(token, jwt_secret, algorithms=[jwt_algorithm])

@@ -22,12 +22,9 @@ class Encrypter:
     def __init__(self, _private_key=None, _private_key_password=None, _public_key=None):
         """ initialise encrypter with correct keys, the ability to change default keys for tests"""
 
-        if _private_key is None:
-            _private_key = current_app.config['SM_USER_AUTHENTICATION_PRIVATE_KEY']
-        if _private_key_password is None:
-            _private_key = current_app.config['SM_USER_AUTHENTICATION_PRIVATE_KEY_PASSWORD']
-        if _public_key is None:
-            _private_key = current_app.config['SM_USER_AUTHENTICATION_PUBLIC_KEY']
+        _private_key = _private_key or current_app.config['SM_USER_AUTHENTICATION_PRIVATE_KEY']
+        _private_key_password = _private_key_password or current_app.config['SM_USER_AUTHENTICATION_PRIVATE_KEY_PASSWORD']
+        _public_key = _public_key or current_app.config['SM_USER_AUTHENTICATION_PUBLIC_KEY']
 
         self._load_keys(_private_key, _private_key_password, _public_key)
 
