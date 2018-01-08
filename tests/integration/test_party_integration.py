@@ -1,6 +1,6 @@
 import unittest
 
-from app.services.service_toggles import party
+from secure_message.services.service_toggles import party
 
 
 class PartyServiceIntegrationTestCase(unittest.TestCase):

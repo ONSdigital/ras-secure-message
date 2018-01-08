@@ -1,6 +1,6 @@
 import unittest
 
-from app.exception.exceptions import MessageSaveException, RasNotifyException
+from secure_message.exception.exceptions import MessageSaveException, RasNotifyException
 
 
 class ExceptionsTestCase(unittest.TestCase):

@@ -1,8 +1,8 @@
 import unittest
 
-from app.validation.user import User
-from app.authorization.authorizer import Authorizer
-from app import constants
+from secure_message.validation.user import User
+from secure_message.authorization.authorizer import Authorizer
+from secure_message import constants
 
 
 class AuthorizerTestCase(unittest.TestCase):

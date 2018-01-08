@@ -1,7 +1,8 @@
 import nose.tools
 from behave import given, then, when
 from flask import json
-from app import constants
+
+from secure_message import constants
 
 
 @given("the from is set to '{msg_from}'")

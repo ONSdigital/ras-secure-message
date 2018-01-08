@@ -6,16 +6,16 @@ from datetime import datetime, timezone
 from flask import current_app, g
 from sqlalchemy import create_engine
 
-from app.application import app
-from app.common.labels import Labels
-from app.repository import database
-from app.repository.modifier import Modifier
-from app.repository.retriever import Retriever
-from app.repository.saver import Saver
-from app.validation.domain import DraftSchema
-from app.validation.user import User
-from app.repository.database import SecureMessage
-from app import constants
+from secure_message.application import create_app
+from secure_message.common.labels import Labels
+from secure_message.repository import database
+from secure_message.repository.modifier import Modifier
+from secure_message.repository.retriever import Retriever
+from secure_message.repository.saver import Saver
+from secure_message.validation.domain import DraftSchema
+from secure_message.validation.user import User
+from secure_message.repository.database import SecureMessage
+from secure_message import constants
 from tests.app import test_utilities
 
 
@@ -54,11 +54,12 @@ class ModifyTestCase(unittest.TestCase, ModifyTestCaseHelper):
 
     def setUp(self):
         """setup test environment"""
-        app.testing = True
-        self.engine = create_engine(app.config['SQLALCHEMY_DATABASE_URI'])
+        self.app = create_app()
+        self.app.testing = True
+        self.engine = create_engine(self.app.config['SQLALCHEMY_DATABASE_URI'])
         self.MESSAGE_LIST_ENDPOINT = "http://localhost:5050/messages"
         self.MESSAGE_BY_ID_ENDPOINT = "http://localhost:5050/message/"
-        with app.app_context():
+        with self.app.app_context():
             database.db.init_app(current_app)
             database.db.drop_all()
             database.db.create_all()
@@ -76,7 +77,7 @@ class ModifyTestCase(unittest.TestCase, ModifyTestCaseHelper):
             names = []
             for row in query_x:
                 names.append(row[0])
-        with app.app_context():
+        with self.app.app_context():
             with current_app.test_request_context():
                 msg_id = str(names[0])
                 message_service = Retriever()
@@ -95,7 +96,7 @@ class ModifyTestCase(unittest.TestCase, ModifyTestCaseHelper):
             names = []
             for row in query_x:
                 names.append(row[0])
-        with app.app_context():
+        with self.app.app_context():
             with current_app.test_request_context():
                 msg_id = str(names[0])
                 message_service = Retriever()
@@ -116,7 +117,7 @@ class ModifyTestCase(unittest.TestCase, ModifyTestCaseHelper):
             names = []
             for row in query_x:
                 names.append(row[0])
-        with app.app_context():
+        with self.app.app_context():
             with current_app.test_request_context():
                 msg_id = str(names[0])
                 message_service = Retriever()
@@ -135,7 +136,7 @@ class ModifyTestCase(unittest.TestCase, ModifyTestCaseHelper):
             names = []
             for row in query_x:
                 names.append(row[0])
-        with app.app_context():
+        with self.app.app_context():
             with current_app.test_request_context():
                 msg_id = str(names[0])
                 message_service = Retriever()
@@ -156,7 +157,7 @@ class ModifyTestCase(unittest.TestCase, ModifyTestCaseHelper):
             names = []
             for row in query_x:
                 names.append(row[0])
-        with app.app_context():
+        with self.app.app_context():
             with current_app.test_request_context():
                 msg_id = str(names[0])
                 message_service = Retriever()
@@ -181,7 +182,7 @@ class ModifyTestCase(unittest.TestCase, ModifyTestCaseHelper):
             names = []
             for row in query_x:
                 names.append(row[0])
-        with app.app_context():
+        with self.app.app_context():
             with current_app.test_request_context():
                 msg_id = str(names[0])
                 message_service = Retriever()
@@ -201,7 +202,7 @@ class ModifyTestCase(unittest.TestCase, ModifyTestCaseHelper):
             names = []
             for row in query_x:
                 names.append(row[0])
-        with app.app_context():
+        with self.app.app_context():
             with current_app.test_request_context():
                 msg_id = str(names[0])
                 message_service = Retriever()
@@ -220,7 +221,7 @@ class ModifyTestCase(unittest.TestCase, ModifyTestCaseHelper):
             names = []
             for row in query_x:
                 names.append(row[0])
-        with app.app_context():
+        with self.app.app_context():
             with current_app.test_request_context():
                 msg_id = str(names[0])
                 message_service = Retriever()
@@ -237,7 +238,7 @@ class ModifyTestCase(unittest.TestCase, ModifyTestCaseHelper):
 
     def test_draft_label_is_deleted(self):
         """Check draft label is deleted for message"""
-        with app.app_context():
+        with self.app.app_context():
             with current_app.test_request_context():
                 self.test_message = {'msg_id': 'test123',
                                      'msg_to': [constants.BRES_USER],
@@ -279,7 +280,7 @@ class ModifyTestCase(unittest.TestCase, ModifyTestCaseHelper):
 
     def test_draft_event_is_deleted(self):
         """Check draft event is deleted for message"""
-        with app.app_context():
+        with self.app.app_context():
             with current_app.test_request_context():
                 self.test_message = {'msg_id': 'test123',
                                      'msg_to': ['richard'],
@@ -316,7 +317,7 @@ class ModifyTestCase(unittest.TestCase, ModifyTestCaseHelper):
 
     def test_replace_current_draft(self):
         """Check current draft is replaced when modified"""
-        with app.app_context():
+        with self.app.app_context():
             with current_app.test_request_context():
                 self.test_message = {'msg_id': 'test123',
                                      'msg_to': [constants.BRES_USER],
@@ -359,7 +360,7 @@ class ModifyTestCase(unittest.TestCase, ModifyTestCaseHelper):
             names = []
             for row in query_x:
                 names.append(row[0])
-        with app.app_context():
+        with self.app.app_context():
             with current_app.test_request_context():
                 msg_id = str(names[0])
                 message_service = Retriever()
@@ -378,21 +379,21 @@ class ModifyTestCase(unittest.TestCase, ModifyTestCaseHelper):
                 self.assertCountEqual(message['labels'], ['UNREAD', 'INBOX'])
 
     def test_exception_for_add_label_raises(self):
-        with app.app_context():
+        with self.app.app_context():
             database.db.drop_all()
             with current_app.test_request_context():
                 with self.assertRaises(InternalServerError):
                     Modifier.add_label('UNREAD', {'survey': 'survey'}, self.user_internal)
 
     def test_exception_for_remove_label_raises(self):
-        with app.app_context():
+        with self.app.app_context():
             database.db.drop_all()
             with current_app.test_request_context():
                 with self.assertRaises(InternalServerError):
                     Modifier.remove_label('UNREAD', {'survey': 'survey'}, self.user_internal)
 
     def test_replace_current_recipient_status_raises(self):
-        with app.app_context():
+        with self.app.app_context():
             database.db.drop_all()
             with current_app.test_request_context():
                 with self.assertRaises(InternalServerError):
@@ -410,8 +411,12 @@ class ModifyTestCase(unittest.TestCase, ModifyTestCaseHelper):
                  'ru_id': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc',
                  'survey': test_utilities.BRES_SURVEY}
 
-        with app.app_context():
+        with self.app.app_context():
             database.db.drop_all()
             with current_app.test_request_context():
                 with self.assertRaises(InternalServerError):
                     Modifier.replace_current_draft(2, draft)
+
+
+if __name__ == '__main__':
+    unittest.main()
