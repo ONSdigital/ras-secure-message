@@ -46,7 +46,6 @@ class HealthTestCase(unittest.TestCase):
                    'Version': '',
                    'SMS Log level': '',
                    'APP Log Level': '',
-                   'Database URL': '',
                    'API Functionality': '',
                    'Using party service mock': '',
                    'SM JWT ENCRYPT': '',
