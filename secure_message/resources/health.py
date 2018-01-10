@@ -44,7 +44,6 @@ class HealthDetails(Resource):
                    'Version': current_app.config['VERSION'],
                    'SMS Log level': current_app.config['SMS_LOG_LEVEL'],
                    'APP Log Level': current_app.config['APP_LOG_LEVEL'],
-                   'Database URL': current_app.config['SQLALCHEMY_DATABASE_URI'],
                    'API Functionality': func_list,
                    'Using party service mock': party._use_mock,
                    'SM JWT ENCRYPT': current_app.config['SM_JWT_ENCRYPT'],
