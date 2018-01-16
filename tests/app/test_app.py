@@ -206,7 +206,7 @@ class FlaskTestCase(unittest.TestCase):
                   'survey': test_utilities.BRES_SURVEY})
 
         response = self.client.post('http://localhost:5050/message/send', data=json.dumps(draft),
-                                 headers=self.headers)
+                                    headers=self.headers)
 
         data = json.loads(response.data)
 
@@ -413,7 +413,7 @@ class FlaskTestCase(unittest.TestCase):
 
     @patch.object(PartyServiceMock, 'get_user_details', return_value=({"id": "f62dfda8-73b0-4e0e-97cf-1b06327a6712",
                                                                        "firstName": "Bhavana",
-                                                                       "emailAddress":"",
+                                                                       "emailAddress": "",
                                                                        "lastName": "Lincoln",
                                                                        "telephone": "+443069990888",
                                                                        "status": "ACTIVE",
@@ -428,7 +428,7 @@ class FlaskTestCase(unittest.TestCase):
 
     @patch.object(PartyServiceMock, 'get_user_details', return_value=({"id": "f62dfda8-73b0-4e0e-97cf-1b06327a6712",
                                                                        "firstName": "Bhavana",
-                                                                       "emailAddress":"   ",
+                                                                       "emailAddress": "   ",
                                                                        "lastName": "Lincoln",
                                                                        "telephone": "+443069990888",
                                                                        "status": "ACTIVE",
@@ -451,14 +451,15 @@ class FlaskTestCase(unittest.TestCase):
         self.assertFalse(mock_alerter.called)
 
     @patch.object(PartyServiceMock, 'get_user_details', return_value=({"id": "f62dfda8-73b0-4e0e-97cf-1b06327a6712",
-                                                                       "emailAddress":"   ",
+                                                                       "emailAddress": "   ",
                                                                        "lastName": "",
                                                                        "telephone": "+443069990888",
                                                                        "status": "ACTIVE",
                                                                        "sampleUnitType": "BI"}, 200))
     @patch.object(CaseServiceMock, 'store_case_event')
     @patch.object(message_logger, 'info')
-    def test_if_user_has_no_first_name_or_last_name_then_unknown_user_passed_to_case_service(self,mock_logger, mock_case, mock_party):
+    def test_if_user_has_no_first_name_or_last_name_then_unknown_user_passed_to_case_service(self, mock_logger,
+                                                                                             mock_case, mock_party):
         """Test if party data has no name for the user then a constant of 'Unknown user' is used"""
         self.test_message.update({'msg_to': [constants.BRES_USER],
                                   'msg_from': '0a7ad740-10d5-4ecb-b7ca-3c0384afb882',
@@ -485,7 +486,8 @@ class FlaskTestCase(unittest.TestCase):
         self.client.post(url, data=json.dumps(self.test_message), headers=self.headers)
         mock_case.assert_called_with('ACollectionCase', 'Unknown user')
         mock_logger.assert_called_with('no user names in party data for id  Unknown user used in case ',
-                                           party_id='f62dfda8-73b0-4e0e-97cf-1b06327a6712')
+                                       party_id='f62dfda8-73b0-4e0e-97cf-1b06327a6712')
+
 
 if __name__ == '__main__':
     unittest.main()

@@ -47,7 +47,7 @@ class DraftSave(Resource):
     def _save_draft(draft, saver=Saver()):
         saver.save_message(draft.data)
 
-        if draft.data.msg_to is not None and len(draft.data.msg_to) != 0:
+        if draft.data.msg_to is not None and draft.data.msg_to:
             uuid_to = draft.data.msg_to[0]
             saver.save_msg_status(uuid_to, draft.data.msg_id, Labels.DRAFT_INBOX.value)
 

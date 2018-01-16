@@ -13,8 +13,7 @@ class CaseService:
 
         json_data = {"description": "New Secure Message",
                      "category": "SECURE_MESSAGE_SENT",
-                     "createdBy": user_name
-                     }
+                     "createdBy": user_name}
 
         url = current_app.config['RM_CASE_POST'].format(current_app.config['RM_CASE_SERVICE'], case_id)
         case_service_data = requests.post(url, auth=current_app.config['BASIC_AUTH'], json=json_data, verify=False)

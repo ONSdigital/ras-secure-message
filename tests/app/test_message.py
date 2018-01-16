@@ -19,7 +19,6 @@ class MessageTestCase(unittest.TestCase):
 
     def test_message(self):
         """creating Message object"""
-        now_string = self.now.__str__()
         sut = Message('from', 'subject', 'body', ['to'], '5', 'AMsgId', 'ACollectionCase',
                       'ASurveyType', 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc', 'CollectionExercise')
         sut_str = repr(sut)

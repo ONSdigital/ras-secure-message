@@ -43,8 +43,8 @@ class DraftTestCase(unittest.TestCase):
                               _public_key=self.app.config['SM_USER_AUTHENTICATION_PUBLIC_KEY'])
 
         with self.app.app_context():
-          signed_jwt = encode(token_data)
-          encrypted_jwt = encrypter.encrypt_token(signed_jwt)
+            signed_jwt = encode(token_data)
+            encrypted_jwt = encrypter.encrypt_token(signed_jwt)
 
         AlertUser.alert_method = mock.Mock(AlertViaGovNotify)
 
@@ -226,7 +226,7 @@ class DraftTestCase(unittest.TestCase):
                                   'survey': test_utilities.BRES_SURVEY})
 
         response = self.client.post('http://localhost:5050/message/send', data=json.dumps(self.test_message),
-                                 headers=self.headers)
+                                    headers=self.headers)
         self.assertEqual(response.status_code, 201)
 
     def test_draft_modified_since_last_read_true(self):

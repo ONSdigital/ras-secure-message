@@ -61,6 +61,4 @@ class AuthorizerTestCase(unittest.TestCase):
         expected = False
 
         result = sut.can_user_view_message(user, message)
-
         self.assertTrue(expected == result)
-

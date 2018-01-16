@@ -5,8 +5,6 @@ import sys
 from structlog import wrap_logger
 from werkzeug.exceptions import HTTPException
 
-"""Specialised exceptions for secure messages"""
-
 logger = wrap_logger(logging.getLogger(__name__))
 
 
@@ -31,7 +29,7 @@ class RasNotifyException(MessageSaveException):
 
 
 class MissingEnvironmentVariable(Exception):
-    def __init__(self, defaults):
+    def __init__(self, defaults):      # pylint:disable=super-init-not-called
         missing_env_variables = [var for var in defaults if not os.environ.get(var)]
         logger.error('Missing environment variables', variables=missing_env_variables)
         sys.exit("Application failed to start")

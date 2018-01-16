@@ -13,7 +13,7 @@ def step_impl_the_body_is_set_to(context, body):
 
 @given("the body is set to include an apostrophe")
 @when("the body is set to include an apostrophe")
-def step_impl_the_body_is_set_to(context):
+def step_impl_the_body_is_set_to_include_apostraphe(context):
     """create a body that includes an apostrophe"""
     context.bdd_helper.message_data['body'] = "A body including ' an apostrophe"
 

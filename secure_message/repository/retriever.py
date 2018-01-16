@@ -43,7 +43,8 @@ class Retriever:
             conditions.append(SecureMessage.collection_exercise == str(ce))
 
         try:
-            t = db.session.query(SecureMessage.msg_id, func.max(Events.date_time).label('max_date')) \
+            t = db.session.query(SecureMessage.msg_id, func.max(Events.date_time)  # pylint:disable=no-member
+                                 .label('max_date'))\
                 .join(Events).join(Status) \
                 .filter(and_(*conditions)) \
                 .filter(and_(*status_conditions)) \
@@ -92,7 +93,8 @@ class Retriever:
         status_conditions.append(Status.label != Labels.DRAFT_INBOX.value)
 
         try:
-            t = db.session.query(SecureMessage.thread_id, func.max(Events.date_time).label('max_date')) \
+            t = db.session.query(SecureMessage.thread_id, func.max(Events.date_time)  # pylint:disable=no-member
+                                 .label('max_date')) \
                 .join(Events).join(Status) \
                 .filter(and_(*status_conditions)) \
                 .filter(or_(Events.event == 'Sent', Events.event == 'Draft_Saved')) \
@@ -149,7 +151,7 @@ class Retriever:
                 .filter(or_(Events.event == 'Sent', Events.event == 'Draft_Saved')) \
                 .order_by(Events.date_time.desc()).paginate(page, limit, False)
 
-            if len(result.items) == 0:
+            if not result.items:
                 logger.debug('Thread does not exist', thread_id=thread_id)
                 raise NotFound(description="Conversation with thread_id '{0}' does not exist".format(thread_id))
 
@@ -186,7 +188,7 @@ class Retriever:
 
         try:
             SecureMessage().query.limit(1).all()
-        except Exception as e:  # NOQA
+        except Exception as e:  # NOQA pylint:disable=broad-except
             database_status['status'] = "unhealthy"
             database_status['errors'] = str(e)
             resp = jsonify(database_status)

@@ -117,7 +117,7 @@ class Modifier:
 
         Saver().save_msg_event(draft_id, 'Draft_Saved')
 
-        if draft.msg_to is not None and len(draft.msg_to) != 0:
+        if draft.msg_to is not None and draft.msg_to:
             Modifier.replace_current_recipient_status(draft_id, draft.msg_to)
 
     @staticmethod
@@ -125,7 +125,7 @@ class Modifier:
         """used to replace the draft INBOX_DRAFT label"""
         del_current_status = "DELETE FROM securemessage.status WHERE msg_id='{0}' AND label='{1}'" \
             .format(draft_id, Labels.DRAFT_INBOX.value)
-        # TODO: Only handling first item in list.
+        # NOQA TODO: Only handling first item in list.
         new_status = Status(msg_id=draft_id, actor=draft_to[0], label=Labels.DRAFT_INBOX.value)
 
         try:

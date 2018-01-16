@@ -18,10 +18,9 @@ class LabelTestCase(unittest.TestCase):
         self.app = create_app()
         self.client = self.app.test_client()
         self.engine = create_engine(self.app.config['SQLALCHEMY_DATABASE_URI'])
-        token_data = {
-            constants.USER_IDENTIFIER: constants.BRES_USER,
-            "role": "internal"
-            }
+        token_data = {constants.USER_IDENTIFIER: constants.BRES_USER,
+                      "role": "internal"}
+
         encrypter = Encrypter(_private_key=self.app.config['SM_USER_AUTHENTICATION_PRIVATE_KEY'],
                               _private_key_password=self.app.config['SM_USER_AUTHENTICATION_PRIVATE_KEY_PASSWORD'],
                               _public_key=self.app.config['SM_USER_AUTHENTICATION_PUBLIC_KEY'])

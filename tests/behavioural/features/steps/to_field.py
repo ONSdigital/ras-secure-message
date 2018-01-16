@@ -21,7 +21,7 @@ def step_impl_the_msg_to_is_set_to_empty(context):
 @given("the to field is too long")
 def step_impl_the_msg_to_is_set_too_long(context):
     """set the message to field of the message data to be too long"""
-    context.bdd_helper.message_data['msg_to'][0] = "x" * (constants.MAX_TO_LEN+1)
+    context.bdd_helper.message_data['msg_to'][0] = "x" * (constants.MAX_TO_LEN + 1)
 
 
 @given("the to is set to respondent")

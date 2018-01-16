@@ -18,8 +18,8 @@ class Message:
     def __init__(self, msg_from, subject, body, msg_to='', thread_id=None, msg_id='', collection_case='',
                  survey='', ru_id='', collection_exercise=''):
 
-        self.msg_id = str(uuid.uuid4()) if len(msg_id) == 0 else msg_id  # If empty msg_id assign to a uuid
-        self.msg_to = None if len(msg_to) == 0 else msg_to
+        self.msg_id = str(uuid.uuid4()) if not msg_id else msg_id  # If empty msg_id assign to a uuid
+        self.msg_to = None if not msg_to else msg_to
         self.msg_from = msg_from
         self.subject = subject
         self.body = body
@@ -30,9 +30,9 @@ class Message:
         self.survey = survey
 
     def __repr__(self):
-        return f'<Message(msg_id={self.msg_id} msg_to={self.msg_to} msg_from={self.msg_from} subject={self.subject} body={self.body} ' \
-               f'thread_id={self.thread_id} collection_case={self.collection_case} ru_id={self.ru_id} collection_exercise={self.collection_exercise} '\
-               f'survey={self.survey})>'
+        return f'<Message(msg_id={self.msg_id} msg_to={self.msg_to} msg_from={self.msg_from} subject={self.subject}' \
+               f' body={self.body} thread_id={self.thread_id} collection_case={self.collection_case} ru_id={self.ru_id}' \
+               f' collection_exercise={self.collection_exercise} survey={self.survey})>'
 
     def __eq__(self, other):
         if isinstance(other, Message):
@@ -61,7 +61,7 @@ class MessageSchema(Schema):
         return data
 
     @validates_schema
-    def validate_to_from_not_equal(self, data):
+    def validate_to_from_not_equal(self, data):   # NOQA pylint:disable=no-self-use
         if 'msg_to' in data.keys() and 'msg_from' in data.keys() and data['msg_to'][0] == data['msg_from']:
             logger.error('Message to and message from cannot be the same', message_to=data['msg_to'][0], message_from=data['msg_from'])
             raise ValidationError("msg_to and msg_from fields can not be the same.")
@@ -81,7 +81,8 @@ class MessageSchema(Schema):
             logger.error('Internal user not authorised to send a message on behalf of user or work group', message_from=msg_from)
             raise ValidationError('You are not authorised to send a message on behalf of user or work group {0}'.format(msg_from))
         if g.user.is_respondent and msg_from != g.user.user_uuid:
-            logger.error('Respondent not authorised to send a message on behalf of user or work group', message_from=msg_from, user_uuid=g.user.user_uuid)
+            logger.error('Respondent not authorised to send a message on behalf of user or work group',
+                         message_from=msg_from, user_uuid=g.user.user_uuid)
             raise ValidationError('You are not authorised to send a message on behalf of user or work group {0}'.format(msg_from))
 
     @validates("body")
@@ -114,7 +115,7 @@ class MessageSchema(Schema):
         self.validate_field_length("collection_exercise", len(collection_exercise), constants.MAX_COLLECTION_EXERCISE_LEN)
 
     @post_load
-    def make_message(self, data):
+    def make_message(self, data):  # NOQA pylint:disable=no-self-use
         logger.debug('Build message', data=data)
         return Message(**data)
 
@@ -154,18 +155,18 @@ class DraftSchema(Schema):
     collection_exercise = fields.Str(allow_none=True)
 
     @pre_load
-    def check_variables_set_and_not_set(self, data):
+    def check_variables_set_and_not_set(self, data):   # NOQA pylint:disable=no-self-use
         """Check sent and read date not set and that from and survey are set"""
-        if 'msg_from' not in data or len(data['msg_from']) == 0:
+        if 'msg_from' not in data or not data['msg_from']:
             logger.error('Field missing', field='msg_from')
             raise ValidationError("{0} Missing".format('msg_from'))
-        if 'survey' not in data or len(data['survey']) == 0:
+        if 'survey' not in data or not data['survey']:
             logger.error('Field missing', field='survey')
             raise ValidationError("{0} Missing".format('survey'))
         return data
 
     @validates_schema
-    def validate_to_from_not_equal(self, data):
+    def validate_to_from_not_equal(self, data):     # NOQA pylint:disable=no-self-use
         if 'msg_to' in data.keys() and 'msg_from' in data.keys() and data['msg_to'] == data['msg_from']:
             logger.error('Message to and message from cannot be the same', message_to=data['msg_to'][0],
                          message_from=data['msg_from'])
@@ -176,7 +177,7 @@ class DraftSchema(Schema):
         if msg_to:
             for item in msg_to:
                 self.validate_field_length(msg_to, len(item), constants.MAX_TO_LEN)
-                if len(msg_to) > 0 and len(msg_to[0]) > 0 and msg_to[0] != constants.BRES_USER \
+                if msg_to and msg_to[0] and msg_to[0] != constants.BRES_USER \
                         and not User.is_valid_user(item):
                     logger.error('Not a valid user', user=item)
                     raise ValidationError("{0} is not a valid user.".format(item))
@@ -225,7 +226,7 @@ class DraftSchema(Schema):
         self.validate_field_length("ru_id", len(ru_id), constants.MAX_RU_ID_LEN)
 
     @post_load
-    def make_draft(self, data):
+    def make_draft(self, data):    # NOQA pylint:disable=no-self-use
         return Message(**data)
 
     @staticmethod

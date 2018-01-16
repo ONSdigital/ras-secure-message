@@ -2,7 +2,6 @@ import unittest
 
 from flask import current_app, json
 
-from secure_message import application
 from secure_message.application import create_app
 from secure_message.repository import database
 from secure_message.repository.retriever import Retriever

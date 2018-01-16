@@ -54,7 +54,7 @@ class PartyTestCase(unittest.TestCase):
                       'dd5a38ff-1ecb-4634-94c8-2358df33e614',
                       'ab123456-ce17-40c2-a8fc-abcdef123456',
                       '654321ab-ce17-40c2-a8fc-abcdef123456'
-                     ]
+                      ]
 
         with self.app.app_context():
             user_details = get_details_by_uuids(list_uuids)
@@ -80,40 +80,30 @@ class PartyTestCase(unittest.TestCase):
                                            "telephone": "+443069990250",
                                            "status": "ACTIVE",
                                            "sampleUnitType": "BI"})
-        expected = {"associations": [
-                                           {"enrolments": [
-                                               {
-                                                   "enrolmentStatus": "ENABLED",
-                                                   "name": "Business Register and Employment Survey",
-                                                   "surveyId": "cb0711c3-0ac8-41d3-ae0e-567e5ea1ef87"
-                                               }
-
-                                           ],
-                                            "partyId": "b3ba864b-7cbc-4f44-84fe-88dc018a1a4c",
-                                            "sampleUnitRef": "50012345678"
-                                            }
-                                        ],
-                                        "id": "ab123456-ce17-40c2-a8fc-abcdef123456",
-                                        "firstName": "Ivor",
-                                        "lastName": "Bres",
-                                        "emailAddress": "ivor.bres@hostmail.com",
-                                        "telephone": "+447894056785",
-                                        "status": "ACTIVE",
-                                        "sampleUnitType": "BI"}
+        expected = {"associations": [{"enrolments": [{"enrolmentStatus": "ENABLED",
+                                                      "name": "Business Register and Employment Survey",
+                                                      "surveyId": "cb0711c3-0ac8-41d3-ae0e-567e5ea1ef87"
+                                                      }],
+                                      "partyId": "b3ba864b-7cbc-4f44-84fe-88dc018a1a4c",
+                                      "sampleUnitRef": "50012345678"
+                                      }],
+                    "id": "ab123456-ce17-40c2-a8fc-abcdef123456",
+                    "firstName": "Ivor",
+                    "lastName": "Bres",
+                    "emailAddress": "ivor.bres@hostmail.com",
+                    "telephone": "+447894056785",
+                    "status": "ACTIVE",
+                    "sampleUnitType": "BI"}
         self.assertEqual(user_details[3], expected)
-        expected = {"associations": [
-                                                                   {"enrolments": [],
-                                                                    "partyId": "b3ba864b-7cbc-4f44-84fe-88dc018a1a4c",
-                                                                    "sampleUnitRef": "50012345678"
-                                                                    }
-                                                               ],
-                                                                   "id": "654321ab-ce17-40c2-a8fc-abcdef123456",
-                                                                   "firstName": "IvorNot",
-                                                                   "lastName": "Bres",
-                                                                   "emailAddress": "ivorNot.bres@hostmail.com",
-                                                                   "telephone": "+447894056786",
-                                                                   "status": "ACTIVE",
-                                                                   "sampleUnitType": "BI"}
+        expected = {"associations": [{"enrolments": [], "partyId": "b3ba864b-7cbc-4f44-84fe-88dc018a1a4c",
+                                      "sampleUnitRef": "50012345678"}],
+                    "id": "654321ab-ce17-40c2-a8fc-abcdef123456",
+                    "firstName": "IvorNot",
+                    "lastName": "Bres",
+                    "emailAddress": "ivorNot.bres@hostmail.com",
+                    "telephone": "+447894056786",
+                    "status": "ACTIVE",
+                    "sampleUnitType": "BI"}
 
         self.assertEqual(user_details[4], expected)
 
@@ -420,7 +410,7 @@ class PartyTestCase(unittest.TestCase):
         expected_data = 'User ID:{} not in mock party service'.format(user)
         result_data, result_status_code = sut.get_user_details(user)
         self.assertEqual(result_data, expected_data)
-        self.assertEqual(result_status_code , expected_status_code)
+        self.assertEqual(result_status_code, expected_status_code)
 
     def test_get_business_details_returns_error_if_ru_not_known(self):
         uuid = 'ABusinessThatDoesNotExist'
