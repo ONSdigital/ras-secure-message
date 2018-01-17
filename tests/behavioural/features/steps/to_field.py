@@ -61,6 +61,6 @@ def step_impl_the_msg_to_is_set_to_internal_as_string_not_array(context):
 
 @then("retrieved message msg_to is as was saved")
 def step_impl_retrieved_msg_to_is_as_saved(context):
-    """validate that the message to field in the response is teh same aswas saved"""
+    """validate that the message to field in the response is the same as was saved"""
     msg_resp = json.loads(context.response.data)
     nose.tools.assert_equal(msg_resp['msg_to'], context.bdd_helper.last_saved_message_data['msg_to'])

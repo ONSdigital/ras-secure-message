@@ -31,16 +31,17 @@ class MessageList(Resource):
     def get():
         """Get message list with options"""
 
-        string_query_args, page, limit, ru_id, survey, cc, label, desc, ce = get_options(request.args)
+        message_args = get_options(request.args)
 
         message_service = Retriever()
-        status, result = message_service.retrieve_message_list(page, limit, g.user,
-                                                               ru_id=ru_id, survey=survey, cc=cc, label=label,
-                                                               descend=desc, ce=ce)
+        status, result = message_service.retrieve_message_list(message_args.page, message_args.limit, g.user,
+                                                               ru_id=message_args.ru_id, survey=message_args.survey,
+                                                               cc=message_args.cc, label=message_args.label,
+                                                               descend=message_args.desc, ce=message_args.ce)
 
         if status:
-            resp = paginated_list_to_json(result, page, limit, request.host_url,
-                                          g.user, string_query_args, MESSAGE_LIST_ENDPOINT)
+            resp = paginated_list_to_json(result, message_args.page, message_args.limit, request.host_url,
+                                          g.user, message_args.string_query_args, MESSAGE_LIST_ENDPOINT)
             resp.status_code = 200
             return resp
 

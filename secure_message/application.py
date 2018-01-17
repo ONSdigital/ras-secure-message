@@ -75,7 +75,7 @@ def create_app(config=None):
 
 
 def _request_requires_authentication():
-    return request.endpoint is not None and 'health' not in request.endpoint and request.endpoint != 'info'and request.method != 'OPTIONS'
+    return request.endpoint is not None and 'health' not in request.endpoint and request.endpoint != 'info' and request.method != 'OPTIONS'
 
 
 def log_request():

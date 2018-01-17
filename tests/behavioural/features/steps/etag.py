@@ -20,7 +20,7 @@ def step_impl_etag_is_requested_with_empty_value(context):
 @given("an etag is requested with a value of '{etag}'")
 @when("an etag is requested with a value of '{etag}'")
 def step_impl_etag_is_requested_with_specific_value(context, etag):
-    """specify an etag ofa specificvalue"""
+    """specify an etag of a specific value"""
     context.bdd_helper.headers["Etag"] = etag
 
 
