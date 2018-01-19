@@ -37,7 +37,7 @@ def create_app(config=None):
     with app.app_context():
         event.listen(database.db.metadata, 'before_create', DDL("CREATE SCHEMA IF NOT EXISTS securemessage"))
         database.db.create_all()
-        database.db.session.commit()  # NOQA
+        database.db.session.commit()  # NOQA pylint:disable=no-member
 
     api.add_resource(Health, '/health')
     api.add_resource(DatabaseHealth, '/health/db')
@@ -56,7 +56,7 @@ def create_app(config=None):
     api.add_resource(Labels, '/labels')
 
     @app.before_request
-    def before_request():  # NOQA
+    def before_request():  # NOQA pylint:disable=unused-variable
         if _request_requires_authentication():
             log_request()
             res = authenticate(request.headers)
@@ -65,7 +65,7 @@ def create_app(config=None):
                 return res
 
     @app.errorhandler(Exception)
-    def handle_exception(error):  # NOQA
+    def handle_exception(error):  # NOQA pylint:disable=unused-variable
         logger.exception(error=error)
         response = jsonify({"error": "Unknown internal error"})
         response.status_code = 500
@@ -75,10 +75,7 @@ def create_app(config=None):
 
 
 def _request_requires_authentication():
-    return request.endpoint is not None and \
-           'health' not in request.endpoint \
-           and request.endpoint != 'info' \
-           and request.method != 'OPTIONS'
+    return request.endpoint is not None and 'health' not in request.endpoint and request.endpoint != 'info' and request.method != 'OPTIONS'
 
 
 def log_request():
@@ -90,7 +87,7 @@ def log_request():
     headers = ''.join(header_list)
 
     req_data = request.data
-    if req_data is None or req_data is b'':
+    if req_data is None or req_data is b'':    # pylint:disable=literal-comparison
         req_data = 'Empty'
     else:
         req_data = json.loads(req_data)

@@ -35,12 +35,11 @@ class PartyServiceMock:
                                                                   "name": "Asparagus"},
                          '3b136c4b-7a14-4904-9e01-13364dd7b973': {"ru_id": "3b136c4b-7a14-4904-9e01-13364dd7b973",
                                                                   "business_name": "Bolts & Ratchet Ltd"},
-                         'b3ba864b-7cbc-4f44-84fe-88dc018a1a4c': {"associations": [
-                                                                     {"enrolments": [
-                                                                             {"enrolmentStatus": "ENABLED",
-                                                                              "name": "Business Register and Employment Survey",
-                                                                              "surveyId": "cb0711c3-0ac8-41d3-ae0e-567e5ea1ef87"}],
-                                                                      "partyId": "cd592e0f-8d07-407b-b75d-e01fbdae8233"}],
+                         'b3ba864b-7cbc-4f44-84fe-88dc018a1a4c': {"associations": [{"enrolments":
+                                                                                    [{"enrolmentStatus": "ENABLED",
+                                                                                      "name": "Business Register and Employment Survey",
+                                                                                      "surveyId": "cb0711c3-0ac8-41d3-ae0e-567e5ea1ef87"}],
+                                                                                    "partyId": "cd592e0f-8d07-407b-b75d-e01fbdae8233"}],
                                                                   "ruref": "50012345678",
                                                                   "checkletter": "A",
                                                                   "frosic92": "11111",
@@ -71,9 +70,7 @@ class PartyServiceMock:
                                                                   "name": "Bolts and Ratchets Ltd",
                                                                   "id": "b3ba864b-7cbc-4f44-84fe-88dc018a1a4c",
                                                                   "sampleUnitRef": "50012345678",
-                                                                  "sampleUnitType": "B"}
-                         }
-
+                                                                  "sampleUnitType": "B"}}
     _respondent_ids = {'f62dfda8-73b0-4e0e-97cf-1b06327a6712': {"id": "f62dfda8-73b0-4e0e-97cf-1b06327a6712",
                                                                 "firstName": "Bhavana",
                                                                 "lastName": "Lincoln",
@@ -109,20 +106,20 @@ class PartyServiceMock:
                                                                 "telephone": "+443069990250",
                                                                 "status": "ACTIVE",
                                                                 "sampleUnitType": "BI"},
-                       constants.BRES_USER:                     {"id": "BRES",
-                                                                 "firstName": "BRES",
-                                                                 "lastName": "",
-                                                                 "emailAddress": "",
-                                                                 "telephone": "",
-                                                                 "status": "",
-                                                                 "sampleUnitType": "BI"},
-                       'AnotherSurvey':                        {"id": "AnotherSurvey",
-                                                                "firstName": "AnotherSurvey",
-                                                                "lastName": "",
-                                                                "emailAddress": "",
-                                                                "telephone": "",
-                                                                "status": "",
-                                                                "sampleUnitType": "BI"},
+                       constants.BRES_USER: {"id": "BRES",
+                                             "firstName": "BRES",
+                                             "lastName": "",
+                                             "emailAddress": "",
+                                             "telephone": "",
+                                             "status": "",
+                                             "sampleUnitType": "BI"},
+                       'AnotherSurvey': {"id": "AnotherSurvey",
+                                         "firstName": "AnotherSurvey",
+                                         "lastName": "",
+                                         "emailAddress": "",
+                                         "telephone": "",
+                                         "status": "",
+                                         "sampleUnitType": "BI"},
                        'ce12b958-2a5f-44f4-a6da-861e59070a32': {"id": "ce12b958-2a5f-44f4-a6da-861e59070a32",
                                                                 "firstName": "Liz",
                                                                 "lastName": "Larkin",
@@ -137,15 +134,12 @@ class PartyServiceMock:
                                                                 "telephone": "+447894056785",
                                                                 "status": "ACTIVE",
                                                                 "sampleUnitType": "BI"},
-                       'ab123456-ce17-40c2-a8fc-abcdef123456': {"associations": [
-                                                                                   {"enrolments": [{
-                                                                                       "enrolmentStatus": "ENABLED",
-                                                                                       "name": "Business Register and Employment Survey",
-                                                                                       "surveyId": "cb0711c3-0ac8-41d3-ae0e-567e5ea1ef87"
-                                                                                       }],
-                                                                                       "partyId": "b3ba864b-7cbc-4f44-84fe-88dc018a1a4c",
-                                                                                       "sampleUnitRef": "50012345678"}
-                                                                               ],
+                       'ab123456-ce17-40c2-a8fc-abcdef123456': {"associations": [{"enrolments":
+                                                                                  [{"enrolmentStatus": "ENABLED",
+                                                                                    "name": "Business Register and Employment Survey",
+                                                                                    "surveyId": "cb0711c3-0ac8-41d3-ae0e-567e5ea1ef87"}],
+                                                                                  "partyId": "b3ba864b-7cbc-4f44-84fe-88dc018a1a4c",
+                                                                                  "sampleUnitRef": "50012345678"}],
                                                                 "id": "ab123456-ce17-40c2-a8fc-abcdef123456",
                                                                 "firstName": "Ivor",
                                                                 "lastName": "Bres",
@@ -153,19 +147,12 @@ class PartyServiceMock:
                                                                 "telephone": "+447894056785",
                                                                 "status": "ACTIVE",
                                                                 "sampleUnitType": "BI"},
-                       '654321ab-ce17-40c2-a8fc-abcdef123456': {"associations": [
-                                                                                   {"enrolments": [],
-                                                                                    "partyId": "b3ba864b-7cbc-4f44-84fe-88dc018a1a4c",
-                                                                                    "sampleUnitRef": "50012345678"
-                                                                                    }
-                                                                               ],
+                       '654321ab-ce17-40c2-a8fc-abcdef123456': {"associations": [{"enrolments": [], "partyId": "b3ba864b-7cbc-4f44-84fe-88dc018a1a4c",
+                                                                                  "sampleUnitRef": "50012345678"}],
                                                                 "id": "654321ab-ce17-40c2-a8fc-abcdef123456",
                                                                 "firstName": "IvorNot",
                                                                 "lastName": "Bres",
                                                                 "emailAddress": "ivorNot.bres@hostmail.com",
                                                                 "telephone": "+447894056786",
                                                                 "status": "ACTIVE",
-                                                                "sampleUnitType": "BI"}
-                       }
-
-
+                                                                "sampleUnitType": "BI"}}

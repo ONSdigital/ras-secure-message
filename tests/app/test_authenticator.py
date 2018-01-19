@@ -1,5 +1,4 @@
 import unittest
-from unittest.mock import patch
 
 from flask import Response
 from werkzeug.exceptions import BadRequest

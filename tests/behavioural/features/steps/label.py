@@ -25,7 +25,7 @@ def step_impl_the_response_message_should_not_have_named_label(context, label):
 
 
 @then("the response message should a label count of '{label_count}'")
-def step_impl_the_response_message_should_have_named_label(context, label_count):
+def step_impl_the_response_message_should_have_specific_label_count(context, label_count):
     """validate that the label count in the response matches a specific number"""
     response = json.loads(context.response.data)
     nose.tools.assert_equal(len(response['labels']), int(label_count))
@@ -47,7 +47,7 @@ def step_impl_a_named_label_is_to_be_removed(context, label):
 
 @given("a label of '{label}' has unknown action")
 @when("a label of '{label}' has unknown action")
-def step_impl_a_named_label_is_to_be_removed(context, label):
+def step_impl_a_named_label_has_unknown_action(context, label):
     """specify a label action that is not 'add' or 'remove' """
     context.bdd_helper.message_data = {"action": "some_unknown_action", "label": label}
 

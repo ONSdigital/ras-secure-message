@@ -21,7 +21,7 @@ def step_impl_verify_additional_to_data_matches_that_from_party_service(context)
 
 
 @then("retrieved message additional ru_id data matches that from party service")
-def step_impl_verify_additional_to_data_matches_that_from_party_service(context):
+def step_impl_verify_additional_ru_id_to_data_matches_that_from_party_service(context):
     """validate that the additional @ru_id data matches that obtained from the party service"""
     msg_resp = json.loads(context.response.data)
     party_data, party_status = party.get_business_details(msg_resp['ru_id'])

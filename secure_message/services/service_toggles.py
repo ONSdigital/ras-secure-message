@@ -24,7 +24,7 @@ class ServiceMockToggle:
         self._service_name = service_name
         self._real_service = real_service()
         self._mock_service = mock_service()
-        self.use_mock_service() if use_mock else self.use_real_service()
+        self.use_mock_service() if use_mock else self.use_real_service()  # pylint:disable=expression-not-assigned
 
     def use_mock_service(self):
         self._service = self._mock_service
@@ -34,12 +34,15 @@ class ServiceMockToggle:
         self._service = self._real_service
         logger.debug('Non mocked service in use', service_name=self._service_name)
 
+    @property
+    def using_mock(self):
+        return self._service == self._mock_service
+
 
 class Party(ServiceMockToggle):
     """A Party acts as an interface to mocked or real Party Services via its ServiceMockToggle base"""
 
     def __init__(self, use_mock=False):
-        self._use_mock = use_mock
         super().__init__(use_mock, PartyService, PartyServiceMock, 'Party')
 
     def get_business_details(self, ru):
@@ -59,8 +62,7 @@ class Case(ServiceMockToggle):
         return self._service.store_case_event(case_id, user_uuid)
 
 
-"""party is the interface that code should use mocktoggle for the party service"""
 party = Party(False)
 
-"""case_service is how code should interact with the case service"""
+
 case_service = Case(False)

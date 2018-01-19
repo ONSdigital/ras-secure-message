@@ -25,4 +25,3 @@ class Labels(Resource):
         else:
             logger.debug('No Name parameter specified in URL', request=request.url)
             raise BadRequest(description='No Label Name Paramter specified.')
-

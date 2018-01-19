@@ -26,7 +26,7 @@ def logger_initial_config(service_name=None,
     except ValueError:
         indent = None
 
-    def add_service(logger, method_name, event_dict):
+    def add_service(_1, _2, event_dict):
         """
         Add the service name to the event dict.
         """

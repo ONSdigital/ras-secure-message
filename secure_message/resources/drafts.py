@@ -47,7 +47,7 @@ class DraftSave(Resource):
     def _save_draft(draft, saver=Saver()):
         saver.save_message(draft.data)
 
-        if draft.data.msg_to is not None and len(draft.data.msg_to) != 0:
+        if draft.data.msg_to is not None and draft.data.msg_to:
             uuid_to = draft.data.msg_to[0]
             saver.save_msg_status(uuid_to, draft.data.msg_id, Labels.DRAFT_INBOX.value)
 
@@ -88,14 +88,14 @@ class DraftList(Resource):
     def get():
         """Get message list with options"""
 
-        string_query_args, page, limit, _, _, _, _, _, _ = get_options(request.args)
+        message_args = get_options(request.args)
 
         message_service = Retriever()
-        status, result = message_service.retrieve_message_list(page, limit, g.user, label=Labels.DRAFT.value)
+        status, result = message_service.retrieve_message_list(message_args.page, message_args.limit, g.user, label=Labels.DRAFT.value)
 
         if status:
-            resp = paginated_list_to_json(result, page, limit, request.host_url,
-                                          g.user, string_query_args, DRAFT_LIST_ENDPOINT)
+            resp = paginated_list_to_json(result, message_args.page, message_args.limit, request.host_url,
+                                          g.user, message_args.string_query_args, DRAFT_LIST_ENDPOINT)
             resp.status_code = 200
             return resp
 

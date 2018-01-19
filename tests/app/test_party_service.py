@@ -1,6 +1,5 @@
 import unittest
 
-from flask import current_app
 import requests_mock
 
 from secure_message import constants
@@ -38,7 +37,7 @@ class PartyTestCase(unittest.TestCase):
         self.assertEqual(result_status, 200)
 
     @requests_mock.mock()
-    def test_get_business_details_converts_error_list_to_errors_dictionary(self,  mock_request):
+    def test_get_business_details_converts_error_list_to_errors_dictionary(self, mock_request):
         """Test get business details and returns correctly from a list"""
         ru = "1234"
         business_data_url = self.app.config['RAS_PARTY_GET_BY_BUSINESS'].format(self.app.config['RAS_PARTY_SERVICE'], ru)
@@ -70,7 +69,7 @@ class PartyTestCase(unittest.TestCase):
         """Test get user details sends a request and receives back data"""
         sut = PartyService()
         user_data_url = self.app.config['RAS_PARTY_GET_BY_RESPONDENT'].format(self.app.config['RAS_PARTY_SERVICE'],
-                                                                                   constants.BRES_USER)
+                                                                              constants.BRES_USER)
 
         expected_result = {'emailAddress': '',
                            'firstName': constants.BRES_USER,

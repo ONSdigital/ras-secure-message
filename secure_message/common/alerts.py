@@ -50,4 +50,3 @@ class AlertUser:
 
     def send(self, email, reference):
         self.alert_method.send(email, reference)
-

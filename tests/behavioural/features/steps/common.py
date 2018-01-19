@@ -1,8 +1,6 @@
 from behave import given, then, when
 from flask import current_app
 import nose.tools
-from sqlalchemy.engine import Engine
-from sqlalchemy import event
 
 from secure_message.application import create_app
 from secure_message.services.service_toggles import party, case_service

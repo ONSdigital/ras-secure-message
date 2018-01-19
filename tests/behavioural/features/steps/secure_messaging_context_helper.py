@@ -78,7 +78,6 @@ class SecureMessagingContextHelper:
         self._health_db_endpoint = SecureMessagingContextHelper.__BASE_URL + "/health/db"
         self._health_details_endpoint = SecureMessagingContextHelper.__BASE_URL + "/health/details"
 
-
     @staticmethod
     def _encrypt_token_data(token_data):
         """encrypts the token data"""
@@ -180,7 +179,7 @@ class SecureMessagingContextHelper:
 
     @property
     def last_saved_message_data(self):
-        return copy.deepcopy(self.sent_messages[len(self.sent_messages)-1])
+        return copy.deepcopy(self.sent_messages[len(self.sent_messages) - 1])
 
     @last_saved_message_data.setter
     def last_saved_message_data(self, value):

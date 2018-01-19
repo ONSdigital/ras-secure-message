@@ -31,16 +31,17 @@ class MessageList(Resource):
     def get():
         """Get message list with options"""
 
-        string_query_args, page, limit, ru_id, survey, cc, label, desc, ce = get_options(request.args)
+        message_args = get_options(request.args)
 
         message_service = Retriever()
-        status, result = message_service.retrieve_message_list(page, limit, g.user,
-                                                               ru_id=ru_id, survey=survey, cc=cc, label=label,
-                                                               descend=desc, ce=ce)
+        status, result = message_service.retrieve_message_list(message_args.page, message_args.limit, g.user,
+                                                               ru_id=message_args.ru_id, survey=message_args.survey,
+                                                               cc=message_args.cc, label=message_args.label,
+                                                               descend=message_args.desc, ce=message_args.ce)
 
         if status:
-            resp = paginated_list_to_json(result, page, limit, request.host_url,
-                                          g.user, string_query_args, MESSAGE_LIST_ENDPOINT)
+            resp = paginated_list_to_json(result, message_args.page, message_args.limit, request.host_url,
+                                          g.user, message_args.string_query_args, MESSAGE_LIST_ENDPOINT)
             resp.status_code = 200
             return resp
 
@@ -114,7 +115,7 @@ class MessageSend(Resource):
         try:
             MessageSend._try_send_alert_email(message)
             MessageSend._inform_case_service(message)
-        except Exception as e:  # NOQA
+        except Exception as e:  # NOQA pylint:disable=broad-except
             logger.error('Uncaught exception in Message.alert_listeners', exception=e)
 
     @staticmethod
@@ -122,9 +123,9 @@ class MessageSend(Resource):
         """Send an email to recipient if appropriate"""
         party_data = None
         if message.msg_to[0] != constants.BRES_USER:
-            party_data, status_code = party.get_user_details(message.msg_to[0])  # TODO avoid 2 lookups (see validate)
+            party_data, status_code = party.get_user_details(message.msg_to[0])  # NOQA TODO avoid 2 lookups (see validate)
             if status_code == 200:
-                if 'emailAddress' in party_data and len(party_data['emailAddress'].strip()) > 0:
+                if 'emailAddress' in party_data and party_data['emailAddress'].strip():
                     recipient_email = party_data['emailAddress'].strip()
                     alert_method = AlertViaLogging() if current_app.config['NOTIFY_VIA_GOV_NOTIFY'] == '0' else AlertViaGovNotify()
                     alert_user = AlertUser(alert_method)
@@ -140,12 +141,12 @@ class MessageSend(Resource):
             if message.msg_from == constants.BRES_USER:
                 case_user = constants.BRES_USER
             else:
-                party_data, status_code = party.get_user_details(message.msg_from)  # TODO avoid 2 lookups(see validate)
+                party_data, status_code = party.get_user_details(message.msg_from)  # NOQA TODO avoid 2 lookups(see validate)
                 if status_code == 200:
                     first_name = party_data['firstName'] if 'firstName' in party_data else ''
                     last_name = party_data['lastName'] if 'lastName' in party_data else ''
                     case_user = '{} {}'.format(first_name, last_name).strip()
-                    if len(case_user) == 0:
+                    if not case_user:
                         case_user = 'Unknown user'
                         logger.info('no user names in party data for id  Unknown user used in case ',
                                     party_id=party_data['id'])
@@ -227,7 +228,7 @@ class MessageModifyById(Resource):
             raise BadRequest(description="No label provided")
 
         label = request_data["label"]
-        if label not in Labels.label_list.value:
+        if label not in Labels.label_list.value:  # NOQA pylint:disable=unsupported-membership-test
             logger.error('Invalid label provided', label=label)
             raise BadRequest(description="Invalid label provided: {0}".format(label))
 

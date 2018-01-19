@@ -31,8 +31,7 @@ class PartyServiceIntegrationTestCase(unittest.TestCase):
         sut = party
         sut.use_real_service()
 
-        expected = {
-                    'region': 'DE',
+        expected = {'region': 'DE',
                     'formtype': '0001',
                     'runame3': 'Ratchets 00 Ltd',
                     'runame1': 'Bolts',
@@ -70,7 +69,7 @@ class PartyServiceIntegrationTestCase(unittest.TestCase):
                                             {'surveyId': 'cb0711c3-0ac8-41d3-ae0e-567e5ea1ef87',
                                              'enrolmentStatus': 'ENABLED',
                                              'name': 'Business Register and Employment Survey'
-                                            }
+                                             }
                                         ]
                                      },
                                     {'partyId': '4dbf6572-bdd6-4739-829d-b43e7663dfb6',
@@ -152,7 +151,7 @@ class PartyServiceIntegrationTestCase(unittest.TestCase):
         result, status_code = sut.get_user_details('0a6018a0-3e67-4407-b120-780932434b36')
         self.assertEqual(result, expected)
 
-    #@unittest.SkipTest
+    @unittest.SkipTest
     def test_calling_get_respondent_data_with_expected_test_data_returns_expected_message(self):
         """Test expected test user data returned when requested"""
         sut = party

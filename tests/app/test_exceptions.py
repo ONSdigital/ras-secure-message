@@ -7,7 +7,7 @@ class ExceptionsTestCase(unittest.TestCase):
     """Test case for checking custom exceptions"""
     def test_defaults_in_message_save_exception(self):
         save_exception = MessageSaveException("Test")
-        self.assertEqual(save_exception.description,"Test")
+        self.assertEqual(save_exception.description, "Test")
         self.assertEqual(save_exception.code, 500)
 
     def test_defaults_in_notify_exception(self):

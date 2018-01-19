@@ -32,6 +32,7 @@ def step_impl_collection_exercise_set_to_default(context):
     """set the collection exercise to the previously defined default value"""
     context.bdd_helper.use_default_collection_exercise()
 
+
 @given("the collection exercise is too long")
 def step_impl_the_msg_collection_exercise_is_set_too_long(context):
     """set the collection exercise to a value that is too long"""

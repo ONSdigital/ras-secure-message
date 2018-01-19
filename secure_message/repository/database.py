@@ -21,13 +21,13 @@ class SecureMessage(db.Model):
 
     id = Column("id", Integer(), primary_key=True)
     msg_id = Column("msg_id", String(constants.MAX_MSG_ID_LEN), unique=True, index=True)
-    subject = Column("subject", String(constants.MAX_SUBJECT_LEN+1))
-    body = Column("body", String(constants.MAX_BODY_LEN+1))
+    subject = Column("subject", String(constants.MAX_SUBJECT_LEN + 1))
+    body = Column("body", String(constants.MAX_BODY_LEN + 1))
     thread_id = Column("thread_id", String(constants.MAX_THREAD_LEN + 1), index=True)
-    collection_case = Column("collection_case", String(constants.MAX_COLLECTION_CASE_LEN+1))
-    ru_id = Column("ru_id", String(constants.MAX_RU_ID_LEN+1))
-    collection_exercise = Column("collection_exercise", String(constants.MAX_COLLECTION_EXERCISE_LEN+1))
-    survey = Column("survey", String(constants.MAX_SURVEY_LEN+1))
+    collection_case = Column("collection_case", String(constants.MAX_COLLECTION_CASE_LEN + 1))
+    ru_id = Column("ru_id", String(constants.MAX_RU_ID_LEN + 1))
+    collection_exercise = Column("collection_exercise", String(constants.MAX_COLLECTION_EXERCISE_LEN + 1))
+    survey = Column("survey", String(constants.MAX_SURVEY_LEN + 1))
     statuses = relationship('Status', backref='secure_message', lazy="dynamic")
     events = relationship('Events', backref='secure_message', order_by='Events.date_time', lazy="dynamic")
 
@@ -57,7 +57,7 @@ class SecureMessage(db.Model):
         self.survey = domain_model.survey
         self.collection_exercise = domain_model.collection_exercise
 
-    def serialize(self, user, body_summary=False):
+    def serialize(self, user, body_summary=False):  # pylint:disable=too-complex
         """Return object data in easily serializeable format"""
         message = {'msg_to': [],
                    'msg_from': '',

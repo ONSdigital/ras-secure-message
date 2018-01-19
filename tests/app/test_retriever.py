@@ -91,7 +91,7 @@ class RetrieverTestCaseHelper:
                 self.add_status(label="SENT", msg_id=msg_id, actor=constants.BRES_USER)
                 self.add_status(label="INBOX", msg_id=msg_id, actor="0a7ad740-10d5-4ecb-b7ca-3c0384afb882")
                 self.add_status(label="UNREAD", msg_id=msg_id, actor="0a7ad740-10d5-4ecb-b7ca-3c0384afb882")
-                self.add_event(event="Sent", msg_id=msg_id, date_time=datetime(year, month, day+1))
+                self.add_event(event="Sent", msg_id=msg_id, date_time=datetime(year, month, day + 1))
 
             if add_draft:
                 msg_id = str(uuid.uuid4())
@@ -151,7 +151,7 @@ class RetrieverTestCaseHelper:
                 self.add_secure_message(msg_id=msg_id, thread_id=thread_id, survey=constants.BRES_USER)
                 self.add_status(label="DRAFT_INBOX", msg_id=msg_id, actor="0a7ad740-10d5-4ecb-b7ca-3c0384afb882")
                 self.add_status(label="DRAFT", msg_id=msg_id, actor=constants.BRES_USER)
-                self.add_event(event="Draft_Saved", msg_id=msg_id, date_time=datetime(year, month, day+2))
+                self.add_event(event="Draft_Saved", msg_id=msg_id, date_time=datetime(year, month, day + 2))
 
             if add_respondent_draft:  # adds draft from respondent
 
@@ -219,7 +219,7 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
 
     def test_msg_limit_returned_when_db_greater_than_limit(self):
         """retrieves x messages when database has greater than x entries"""
-        self.populate_database(MESSAGE_QUERY_LIMIT+5)
+        self.populate_database(MESSAGE_QUERY_LIMIT + 5)
         with self.app.app_context():
             with current_app.test_request_context():
                 result = Retriever().retrieve_message_list(1, MESSAGE_QUERY_LIMIT, self.user_respondent)[1]
@@ -244,7 +244,7 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
 
     def test_msg_limit_returned_when_db_greater_than_limit_with_replies(self):
         """retrieves x messages when database has greater than x entries and database has reply messages"""
-        self.populate_database(MESSAGE_QUERY_LIMIT+5, multiple_users=True, add_reply=True)
+        self.populate_database(MESSAGE_QUERY_LIMIT + 5, multiple_users=True, add_reply=True)
         with self.app.app_context():
             with current_app.test_request_context():
                 result = Retriever().retrieve_message_list(1, MESSAGE_QUERY_LIMIT, self.user_respondent)[1]
@@ -256,7 +256,7 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
 
     def test_msg_limit_returned_when_db_greater_than_limit_with_replies_drafts(self):
         """retrieves x messages when database has greater than x entries and database has reply messages and drafts"""
-        self.populate_database(MESSAGE_QUERY_LIMIT+5, multiple_users=True, add_reply=True, add_draft=True)
+        self.populate_database(MESSAGE_QUERY_LIMIT + 5, multiple_users=True, add_reply=True, add_draft=True)
         with self.app.app_context():
             with current_app.test_request_context():
                 result = Retriever().retrieve_message_list(1, MESSAGE_QUERY_LIMIT, self.user_respondent)[1]

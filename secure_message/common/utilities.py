@@ -1,3 +1,4 @@
+import collections
 import hashlib
 import logging
 
@@ -9,8 +10,12 @@ from secure_message.constants import MESSAGE_BY_ID_ENDPOINT, MESSAGE_LIST_ENDPOI
 logger = wrap_logger(logging.getLogger(__name__))
 
 
+MessageArgs = collections.namedtuple('MessageArgs', 'string_query_args page limit ru_id survey cc label desc ce')
+
+
 def get_options(args):
     """extract options"""
+
     string_query_args = '?'
     page = 1
     limit = MESSAGE_QUERY_LIMIT
@@ -46,7 +51,8 @@ def get_options(args):
         desc = False if args.get('desc') == 'false' else True
         string_query_args = add_string_query_args(string_query_args, 'desc', args.get('desc'))
 
-    return string_query_args, page, limit, ru_id, survey, cc, label, desc, ce
+    return MessageArgs(string_query_args=string_query_args, page=page, limit=limit, ru_id=ru_id, survey=survey,
+                       cc=cc, label=label, desc=desc, ce=ce)
 
 
 def add_string_query_args(string_query_args, arg, val):
