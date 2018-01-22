@@ -21,10 +21,12 @@ class Config:
     NAME = os.getenv('NAME', 'ras-secure-message')
     VERSION = os.getenv('VERSION', '0.1.0')
 
-    SECURE_MESSAGING_DATABASE_URL = os.getenv('SECURE_MESSAGING_DATABASE_URL', 'postgresql://postgres:postgres@localhost:5432')
+    SECURE_MESSAGING_DATABASE_URL = os.getenv(
+        'SECURE_MESSAGING_DATABASE_URL', 'postgresql://postgres:postgres@localhost:5432')
 
     if cf.detected:
-        logger.info('Cloud Foundry environment identified.', protocol=cf.protocol, database=cf.database())
+        logger.info('Cloud Foundry environment identified.',
+                    protocol=cf.protocol, database=cf.database())
         SQLALCHEMY_DATABASE_URI = cf.credentials()
     else:
         SQLALCHEMY_DATABASE_URI = SECURE_MESSAGING_DATABASE_URL
@@ -41,7 +43,8 @@ class Config:
     NOTIFICATION_TEMPLATE_ID = os.getenv('NOTIFICATION_TEMPLATE_ID')
     NOTIFICATION_DEV_EMAIL = os.getenv('NOTIFICATION_DEV_EMAIL', 'notanemail@email.com')
     NOTIFY_VIA_GOV_NOTIFY = os.getenv('NOTIFY_VIA_GOV_NOTIFY', '1')
-    RM_NOTIFY_GATEWAY_URL = os.getenv('RM_NOTIFY_GATEWAY_URL', "http://notifygatewaysvc-dev.apps.devtest.onsclofo.uk/emails/")
+    RM_NOTIFY_GATEWAY_URL = os.getenv(
+        'RM_NOTIFY_GATEWAY_URL', "http://notifygatewaysvc-dev.apps.devtest.onsclofo.uk/emails/")
     REQUESTS_POST_TIMEOUT = os.getenv('REQUESTS_POST_TIMEOUT', 20)
 
     # SQLAlchemy configuration
@@ -54,8 +57,10 @@ class Config:
 
     # Keys
     RAS_SM_PATH = os.getenv('RAS_SM_PATH', './')
-    SM_USER_AUTHENTICATION_PRIVATE_KEY = open(f"{RAS_SM_PATH}/jwt-test-keys/sm-user-authentication-encryption-private-key.pem").read()
-    SM_USER_AUTHENTICATION_PUBLIC_KEY = open(f"{RAS_SM_PATH}/jwt-test-keys/sm-user-authentication-encryption-public-key.pem").read()
+    SM_USER_AUTHENTICATION_PRIVATE_KEY = open(
+        f"{RAS_SM_PATH}/jwt-test-keys/sm-user-authentication-encryption-private-key.pem").read()
+    SM_USER_AUTHENTICATION_PUBLIC_KEY = open(
+        f"{RAS_SM_PATH}/jwt-test-keys/sm-user-authentication-encryption-public-key.pem").read()
 
     # Basic auth parameters
     SECURITY_USER_NAME = os.getenv('SECURITY_USER_NAME')
@@ -91,7 +96,8 @@ class DevConfig(Config):
     JWT_ALGORITHM = os.getenv('JWT_ALGORITHM', 'HS256')
     NOTIFY_VIA_GOV_NOTIFY = os.getenv('NOTIFY_VIA_GOV_NOTIFY', '0')
     NOTIFICATION_API_KEY = os.getenv('NOTIFICATION_API_KEY', 'test_notification_api_key')
-    NOTIFICATION_TEMPLATE_ID = os.getenv('NOTIFICATION_TEMPLATE_ID', 'test_notification_template_id')
+    NOTIFICATION_TEMPLATE_ID = os.getenv(
+        'NOTIFICATION_TEMPLATE_ID', 'test_notification_template_id')
     SECURITY_USER_NAME = os.getenv('SECURITY_USER_NAME', 'admin')
     SECURITY_USER_PASSWORD = os.getenv('SECURITY_USER_PASSWORD', 'secret')
     SERVICE_ID = os.getenv('SERVICE_ID', 'test_service_id')
@@ -105,8 +111,10 @@ class TestConfig(Config):
     NOTIFICATION_API_KEY = 'test_notification_api_key'
     NOTIFICATION_TEMPLATE_ID = 'test_notification_template_id'
     RAS_SM_PATH = './'
-    SM_USER_AUTHENTICATION_PRIVATE_KEY = open("./jwt-test-keys/sm-user-authentication-encryption-private-key.pem").read()
-    SM_USER_AUTHENTICATION_PUBLIC_KEY = open("./jwt-test-keys/sm-user-authentication-encryption-public-key.pem").read()
+    SM_USER_AUTHENTICATION_PRIVATE_KEY = open(
+        "./jwt-test-keys/sm-user-authentication-encryption-private-key.pem").read()
+    SM_USER_AUTHENTICATION_PUBLIC_KEY = open(
+        "./jwt-test-keys/sm-user-authentication-encryption-public-key.pem").read()
     SECURITY_USER_NAME = 'admin'
     SECURITY_USER_PASSWORD = 'secret'
     SERVICE_ID = 'test_service_id'
