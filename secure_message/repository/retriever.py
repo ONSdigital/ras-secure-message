@@ -171,8 +171,8 @@ class Retriever:
             if result is None:
                 logger.error('Draft does not exist', message_id=message_id)
                 raise NotFound(description="Draft with msg_id '{0}' does not exist".format(message_id))
-        except SQLAlchemyError as e:
-            logger.error(e)
+        except SQLAlchemyError:
+            logger.exception("SQLAlchemy error occurred while retrieving draft")
             raise InternalServerError(description="Error retrieving draft from database")
 
         message = result.serialize(user)
