@@ -6,6 +6,7 @@ from structlog import wrap_logger
 from werkzeug.exceptions import BadRequest
 
 from secure_message.common.alerts import AlertUser, AlertViaGovNotify, AlertViaLogging
+from secure_message.common.events import Events
 from secure_message.common.labels import Labels
 from secure_message.common.utilities import get_options, paginated_list_to_json, add_users_and_business_details
 from secure_message.constants import MESSAGE_LIST_ENDPOINT
@@ -88,7 +89,7 @@ class MessageSend(Resource):
         """Saves the message to the database along with the subsequent status and audit"""
         save = Saver()
         save.save_message(message.data)
-        save.save_msg_event(message.data.msg_id, 'Sent')
+        save.save_msg_event(message.data.msg_id, Events.SENT.value)
         if g.user.is_respondent:
             save.save_msg_status(message.data.msg_from, message.data.msg_id, Labels.SENT.value)
             save.save_msg_status(constants.BRES_USER, message.data.msg_id, Labels.INBOX.value)
