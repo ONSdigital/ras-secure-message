@@ -76,9 +76,9 @@ Environment variables available for configuration are listed below:
 | VERSION                         | Version number of application                      | '0.1.0' (manually update as application updates)
 | SECURITY_USER_NAME              | Username for basic auth                            | N/A
 | SECURITY_USER_PASSWORD          | Password for basic auth                            | N/A
-| JWT_ALGORITHM                   | Algotithm used to code JWT                         | 'HS256'
+| JWT_ALGORITHM                   | Algorithm used to code JWT                         | 'HS256'
 | JWT_SECRET                      | SECRET used to code JWT                            | N/A
-| SECURE_MESSAGING_DATABASE_URL   | Database URI                                       | sqlite:////tmp/messages.db
+| SECURE_MESSAGING_DATABASE_URL   | Database URI                                       | postgresql://postgres:postgres@localhost:5432
 | NOTIFICATION_SERVICE_ID         | Service id to use Gov Notify service               | N/A
 | NOTIFICATION_API_KEY            | API key to use Gov Notify service                  | N/A
 | NOTIFICATION_TEMPLATE_ID        | Template id for Gov Notify service                 | N/A
