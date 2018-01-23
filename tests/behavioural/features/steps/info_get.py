@@ -14,7 +14,7 @@ def step_impl_requests_endpoint_info(context):
 def step_impl_endpoint_info_is_returned(context):
     response = json.loads(context.response.data)
     nose.tools.assert_equal(response['name'], 'ras-secure-message')
-    nose.tools.assert_equal(response['version'], '0.1.1')
+    nose.tools.assert_equal(response['version'], context.app.config['VERSION'])
     # nose.tools.assert_equal(response['origin'], 'https://github.com/ONSdigital/ras-secure-message.git')
     # nose.tools.assert_equal(response['commit'], 'not specified')
     # nose.tools.assert_equal(response['branch'], 'not specified')
