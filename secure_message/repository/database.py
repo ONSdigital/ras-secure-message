@@ -6,6 +6,7 @@ from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import Column, String, Integer, DateTime, ForeignKey, Index, MetaData
 from sqlalchemy.orm import relationship
 from secure_message import constants
+from secure_message.common.events import Events
 from secure_message.common.labels import Labels
 
 logger = wrap_logger(logging.getLogger(__name__))
@@ -91,11 +92,11 @@ class SecureMessage(db.Model):
                 message['msg_to'].append(row.actor)
 
         for row in self.events:
-            if row.event == 'Sent':
+            if row.event == Events.SENT.value:
                 message['sent_date'] = str(row.date_time)
-            elif row.event == 'Draft_Saved':
+            elif row.event == Events.DRAFT_SAVED.value:
                 message['modified_date'] = str(row.date_time)
-            elif row.event == 'Read':
+            elif row.event == Events.READ.value:
                 message['read_date'] = str(row.date_time)
 
         return message
