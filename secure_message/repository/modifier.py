@@ -3,8 +3,6 @@ import logging
 from flask import jsonify
 from structlog import wrap_logger
 from werkzeug.exceptions import InternalServerError
-
-from secure_message.common import events
 from secure_message.common.events import Events
 from secure_message.common.labels import Labels
 from secure_message.repository.database import db, Status, SecureMessage

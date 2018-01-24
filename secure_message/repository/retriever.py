@@ -48,7 +48,7 @@ class Retriever:
                 .join(Events).join(Status) \
                 .filter(and_(*conditions)) \
                 .filter(and_(*status_conditions)) \
-                .filter(or_(Events.event == 'Sent', Events.event == 'Draft_Saved')) \
+                .filter(or_(Events.event == Events.SENT.value, Events.event == Events.DRAFT_SAVED.value)) \
                 .group_by(SecureMessage.msg_id).subquery('t')
 
             if descend:
@@ -97,14 +97,14 @@ class Retriever:
                                  .label('max_date')) \
                 .join(Events).join(Status) \
                 .filter(and_(*status_conditions)) \
-                .filter(or_(Events.event == 'Sent', Events.event == 'Draft_Saved')) \
+                .filter(or_(Events.event == Events.SENT.value, Events.event == Events.DRAFT_SAVED.value)) \
                 .group_by(SecureMessage.thread_id).subquery('t')
 
             conditions.append(SecureMessage.thread_id == t.c.thread_id)
             conditions.append(Events.date_time == t.c.max_date)
 
             result = SecureMessage.query.join(Events).join(Status) \
-                .filter(or_(Events.event == 'Sent', Events.event == 'Draft_Saved')) \
+                .filter(or_(Events.event == Events.SENT.value, Events.event == Events.DRAFT_SAVED.value)) \
                 .filter(and_(*conditions)) \
                 .filter(and_(*status_conditions)) \
                 .order_by(t.c.max_date.desc()).paginate(page, limit, False)
@@ -148,7 +148,7 @@ class Retriever:
             result = SecureMessage.query.join(Events).join(Status) \
                 .filter(SecureMessage.thread_id == thread_id) \
                 .filter(and_(*status_conditions)) \
-                .filter(or_(Events.event == 'Sent', Events.event == 'Draft_Saved')) \
+                .filter(or_(Events.event == Events.SENT.value, Events.event == Events.DRAFT_SAVED.value)) \
                 .order_by(Events.date_time.desc()).paginate(page, limit, False)
 
             if not result.items:
