@@ -8,6 +8,7 @@ from flask_cors import CORS
 from structlog import wrap_logger
 from sqlalchemy import event, DDL
 
+from secure_message.exception.exceptions import MissingEnvironmentVariable
 from secure_message.repository import database
 from secure_message.resources.health import Health, DatabaseHealth, HealthDetails
 from secure_message.resources.info import Info
@@ -27,6 +28,13 @@ def create_app(config=None):
     app = Flask(__name__)
     app_config = f"config.{config or os.getenv('APP_SETTINGS', 'Config')}"
     app.config.from_object(app_config)
+
+    missing_vars = [var for var in app.config['NON_DEFAULT_VARIABLES']
+                    if app.config.get(var) == None]
+
+    if missing_vars:
+        raise MissingEnvironmentVariable(missing_vars)
+
     api = Api(app)
     CORS(app)
 
@@ -35,7 +43,8 @@ def create_app(config=None):
     logger.info('Starting Secure Message Service...', config=app_config)
 
     with app.app_context():
-        event.listen(database.db.metadata, 'before_create', DDL("CREATE SCHEMA IF NOT EXISTS securemessage"))
+        event.listen(database.db.metadata, 'before_create', DDL(
+            "CREATE SCHEMA IF NOT EXISTS securemessage"))
         database.db.create_all()
         database.db.session.commit()  # NOQA pylint:disable=no-member
 

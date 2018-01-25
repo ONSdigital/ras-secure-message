@@ -89,6 +89,16 @@ class Config:
     NON_DEFAULT_VARIABLES = ['JWT_SECRET', 'SECURITY_USER_NAME', 'SECURITY_USER_PASSWORD',
                              'NOTIFICATION_API_KEY', 'SERVICE_ID', 'NOTIFICATION_TEMPLATE_ID']
 
+    # These should always be set in the environment on prod
+    JWT_SECRET = os.getenv('JWT_SECRET')
+    JWT_ALGORITHM = os.getenv('JWT_ALGORITHM')
+    NOTIFY_VIA_GOV_NOTIFY = os.getenv('NOTIFY_VIA_GOV_NOTIFY')
+    NOTIFICATION_API_KEY = os.getenv('NOTIFICATION_API_KEY')
+    NOTIFICATION_TEMPLATE_ID = os.getenv('NOTIFICATION_TEMPLATE_ID')
+    SECURITY_USER_NAME = os.getenv('SECURITY_USER_NAME')
+    SECURITY_USER_PASSWORD = os.getenv('SECURITY_USER_PASSWORD')
+    SERVICE_ID = os.getenv('SERVICE_ID')
+
 
 class DevConfig(Config):
 
@@ -118,8 +128,3 @@ class TestConfig(Config):
     SECURITY_USER_NAME = 'admin'
     SECURITY_USER_PASSWORD = 'secret'
     SERVICE_ID = 'test_service_id'
-
-
-for var in Config.NON_DEFAULT_VARIABLES:
-    if not os.getenv(var):
-        raise MissingEnvironmentVariable(Config.NON_DEFAULT_VARIABLES)
