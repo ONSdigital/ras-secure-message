@@ -54,4 +54,5 @@ def step_impl_reuse_the_nth_sent_message(context, message_index):
 @then("'{message_count}' messages are returned")
 def step_impl_n_messages_returned(context, message_count):
     """ validate that the correct number of messages was returned"""
-    nose.tools.assert_equal(int(message_count), len(context.bdd_helper.messages_responses_data[0]['messages']))
+    nose.tools.assert_equal(int(message_count), len(
+        context.bdd_helper.messages_responses_data[0]['messages']))
