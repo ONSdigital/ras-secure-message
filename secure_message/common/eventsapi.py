@@ -1,7 +1,7 @@
 from enum import Enum
 
 
-class Events(Enum):
+class EventsApi(Enum):
     """Includes all event for the api"""
 
     SENT = "Sent"
