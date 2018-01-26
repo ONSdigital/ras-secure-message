@@ -8,7 +8,7 @@ from sqlalchemy import create_engine
 
 from secure_message import application, constants
 from secure_message.common.alerts import AlertUser, AlertViaGovNotify
-from secure_message.common.events import Events
+from secure_message.common.eventsapi import EventsApi
 from secure_message.repository import database
 from secure_message.authentication.jwt import encode
 from secure_message.authentication.jwe import Encrypter
@@ -217,7 +217,7 @@ class FlaskTestCase(unittest.TestCase):
             for row in request:
                 self.assertTrue(row is not None)
 
-            request = con.execute("SELECT * FROM securemessage.events WHERE event='" + Events.DRAFT_SAVED.value +
+            request = con.execute("SELECT * FROM securemessage.events WHERE event='" + EventsApi.DRAFT_SAVED.value +
                                   "' AND msg_id='{0}'".format(data['msg_id']))
             for row in request:
                 self.assertTrue(row is None)

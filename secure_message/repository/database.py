@@ -6,7 +6,7 @@ from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import Column, String, Integer, DateTime, ForeignKey, Index, MetaData
 from sqlalchemy.orm import relationship
 from secure_message import constants
-from secure_message.common.events import Events
+from secure_message.common.eventsapi import EventsApi
 from secure_message.common.labels import Labels
 
 logger = wrap_logger(logging.getLogger(__name__))
