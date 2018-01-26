@@ -52,7 +52,7 @@ class Config:
 
     # JWT authentication config
     SM_JWT_ALGORITHM = os.getenv('JWT_ALGORITHM', 'HS256')
-    SM_JWT_SECRET = os.getenv('JWT_SECRET')
+    JWT_SECRET = os.getenv('JWT_SECRET')
     SM_JWT_ENCRYPT = os.getenv('SM_JWT_ENCRYPT', '1')
 
     # Keys
@@ -81,7 +81,7 @@ class Config:
 
     NOTIFY_CASE_SERVICE = os.getenv('NOTIFY_CASE_SERVICE', '1')
 
-    NON_DEFAULT_VARIABLES = ['SM_JWT_SECRET', 'SECURITY_USER_NAME', 'SECURITY_USER_PASSWORD',
+    NON_DEFAULT_VARIABLES = ['JWT_SECRET', 'SECURITY_USER_NAME', 'SECURITY_USER_PASSWORD',
                              'NOTIFICATION_API_KEY', 'SERVICE_ID', 'NOTIFICATION_TEMPLATE_ID']
 
     # These should always be set in the environment on prod
@@ -99,7 +99,7 @@ class Config:
 
 class DevConfig(Config):
 
-    SM_JWT_SECRET = os.getenv('JWT_SECRET', 'vrwgLNWEffe45thh545yuby')
+    JWT_SECRET = os.getenv('JWT_SECRET', 'vrwgLNWEffe45thh545yuby')
     JWT_ALGORITHM = os.getenv('JWT_ALGORITHM', 'HS256')
     NOTIFY_VIA_GOV_NOTIFY = os.getenv('NOTIFY_VIA_GOV_NOTIFY', '0')
     NOTIFICATION_API_KEY = os.getenv('NOTIFICATION_API_KEY', 'test_notification_api_key')
@@ -113,7 +113,7 @@ class DevConfig(Config):
 
 class TestConfig(Config):
 
-    SM_JWT_SECRET = 'testsecret'
+    JWT_SECRET = 'testsecret'
     JWT_ALGORITHM = 'HS256'
     NOTIFY_VIA_GOV_NOTIFY = '0'
     NOTIFICATION_API_KEY = 'test_notification_api_key'
