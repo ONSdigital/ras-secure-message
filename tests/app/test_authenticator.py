@@ -28,6 +28,7 @@ def test_authentication_non_encrypted_jwt_pass(self):
 
 class AuthenticationTestCase(unittest.TestCase):
     """Test case for request authentication"""
+
     def setUp(self):
         """setup test environment"""
         self.app = create_app()

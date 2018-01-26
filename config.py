@@ -62,11 +62,6 @@ class Config:
     SM_USER_AUTHENTICATION_PUBLIC_KEY = open(
         f"{RAS_SM_PATH}/jwt-test-keys/sm-user-authentication-encryption-public-key.pem").read()
 
-    # Basic auth parameters
-    SECURITY_USER_NAME = os.getenv('SECURITY_USER_NAME')
-    SECURITY_USER_PASSWORD = os.getenv('SECURITY_USER_PASSWORD')
-    BASIC_AUTH = (SECURITY_USER_NAME, SECURITY_USER_PASSWORD)
-
     #  password
     SM_USER_AUTHENTICATION_PRIVATE_KEY_PASSWORD = "digitaleq"
 
@@ -95,9 +90,12 @@ class Config:
     NOTIFY_VIA_GOV_NOTIFY = os.getenv('NOTIFY_VIA_GOV_NOTIFY')
     NOTIFICATION_API_KEY = os.getenv('NOTIFICATION_API_KEY')
     NOTIFICATION_TEMPLATE_ID = os.getenv('NOTIFICATION_TEMPLATE_ID')
+    SERVICE_ID = os.getenv('SERVICE_ID')
+
+    # Basic auth parameters
     SECURITY_USER_NAME = os.getenv('SECURITY_USER_NAME')
     SECURITY_USER_PASSWORD = os.getenv('SECURITY_USER_PASSWORD')
-    SERVICE_ID = os.getenv('SERVICE_ID')
+    BASIC_AUTH = (SECURITY_USER_NAME, SECURITY_USER_PASSWORD)
 
 
 class DevConfig(Config):
@@ -110,12 +108,13 @@ class DevConfig(Config):
         'NOTIFICATION_TEMPLATE_ID', 'test_notification_template_id')
     SECURITY_USER_NAME = os.getenv('SECURITY_USER_NAME', 'admin')
     SECURITY_USER_PASSWORD = os.getenv('SECURITY_USER_PASSWORD', 'secret')
+    BASIC_AUTH = (SECURITY_USER_NAME, SECURITY_USER_PASSWORD)
     SERVICE_ID = os.getenv('SERVICE_ID', 'test_service_id')
 
 
 class TestConfig(Config):
 
-    JWT_SECRET = 'vrwgLNWEffe45thh545yuby'
+    JWT_SECRET = 'testsecret'
     JWT_ALGORITHM = 'HS256'
     NOTIFY_VIA_GOV_NOTIFY = '0'
     NOTIFICATION_API_KEY = 'test_notification_api_key'
@@ -127,4 +126,5 @@ class TestConfig(Config):
         "./jwt-test-keys/sm-user-authentication-encryption-public-key.pem").read()
     SECURITY_USER_NAME = 'admin'
     SECURITY_USER_PASSWORD = 'secret'
+    BASIC_AUTH = (SECURITY_USER_NAME, SECURITY_USER_PASSWORD)
     SERVICE_ID = 'test_service_id'

@@ -7,12 +7,7 @@ if __name__ == "__main__":
     os.environ['APP_SETTINGS'] = 'TestConfig'
 
     # NB: the following are set to avoid MissingEnvironmentVariable being raised in config.py
-    os.environ['JWT_SECRET'] = 'testsecret'
-    os.environ['SECURITY_USER_NAME'] = 'admin'
     os.environ['SECURITY_USER_PASSWORD'] = 'secret'
-    os.environ['NOTIFICATION_API_KEY'] = 'test_notification_api_key'
-    os.environ['NOTIFICATION_TEMPLATE_ID'] = 'test_notification_template_id'
-    os.environ['SERVICE_ID'] = 'test_service_id'
 
     from behave import __main__ as behave_executable
     behave = behave_executable.main()
