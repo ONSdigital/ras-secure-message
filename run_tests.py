@@ -6,9 +6,6 @@ import sys
 if __name__ == "__main__":
     os.environ['APP_SETTINGS'] = 'TestConfig'
 
-    # NB: the following are set to avoid MissingEnvironmentVariable being raised in config.py
-    os.environ['SECURITY_USER_PASSWORD'] = 'secret'
-
     from behave import __main__ as behave_executable
     behave = behave_executable.main()
 
