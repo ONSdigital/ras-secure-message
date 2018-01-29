@@ -89,13 +89,13 @@ class MessageSend(Resource):
         save = Saver()
         save.save_message(message.data)
         save.save_msg_event(message.data.msg_id, 'Sent')
+        save.save_msg_actors(message.data.msg_id, message.data.msg_from, message.data.msg_to[0], g.user.is_internal)
         if g.user.is_respondent:
             save.save_msg_status(message.data.msg_from, message.data.msg_id, Labels.SENT.value)
             save.save_msg_status(constants.BRES_USER, message.data.msg_id, Labels.INBOX.value)
             save.save_msg_status(constants.BRES_USER, message.data.msg_id, Labels.UNREAD.value)
         else:
             save.save_msg_status(constants.BRES_USER, message.data.msg_id, Labels.SENT.value)
-            save.save_msg_audit(message.data.msg_id, message.data.msg_from)
             save.save_msg_status(message.data.msg_to[0], message.data.msg_id, Labels.INBOX.value)
             save.save_msg_status(message.data.msg_to[0], message.data.msg_id, Labels.UNREAD.value)
 

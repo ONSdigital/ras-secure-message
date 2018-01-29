@@ -202,10 +202,32 @@ Scenario: Respondent sends message and internal user retrieves the same message 
       And   the message is read
     Then a forbidden status code (403) is returned
 
+  Scenario: Internal user sends message and retrieves it , should be marked as sent_from_internal True
+    Given sending from internal to respondent
+    When the message is sent
+      And the message is read
+    Then a success status code (200) is returned
+      And sent from internal is 'True'
 
+  Scenario: Internal user sends message and external user retrieves it , should be marked as sent_from_internal True
+    Given sending from internal to respondent
+    When the message is sent
+      And the user is set as respondent
+      And the message is read
+    Then a success status code (200) is returned
+      And sent from internal is 'True'
 
+    Scenario: External user sends message and retrieves it , should be marked as sent_from_internal False
+    Given sending from respondent to internal
+    When the message is sent
+      And the message is read
+    Then a success status code (200) is returned
+      And sent from internal is 'False'
 
-
-
-
-
+  Scenario: External user sends message and internal user retrieves it , should be marked as sent_from_internal False
+    Given sending from respondent to internal
+    When the message is sent
+      And the user is set as internal
+      And the message is read
+    Then a success status code (200) is returned
+      And sent from internal is 'False'

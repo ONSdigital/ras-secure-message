@@ -11,7 +11,7 @@ from secure_message.common.alerts import AlertUser, AlertViaGovNotify
 from secure_message.repository import database
 from secure_message.authentication.jwt import encode
 from secure_message.authentication.jwe import Encrypter
-from secure_message.services.service_toggles import case_service
+from secure_message.services.service_toggles import case_service, party
 from secure_message.resources.messages import MessageSend
 from secure_message.resources.messages import logger as message_logger
 from secure_message.common.alerts import AlertViaLogging
@@ -64,6 +64,9 @@ class FlaskTestCase(unittest.TestCase):
             database.db.drop_all()
             database.db.create_all()
             self.db = database.db
+
+        party.use_mock_service()
+        case_service.use_mock_service()
 
     def test_that_checks_post_request_is_within_database(self):
         """check messages from messageSend endpoint saved in database correctly"""

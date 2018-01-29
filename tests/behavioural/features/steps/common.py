@@ -55,3 +55,11 @@ def step_impl_reuse_the_nth_sent_message(context, message_index):
 def step_impl_n_messages_returned(context, message_count):
     """ validate that the correct number of messages was returned"""
     nose.tools.assert_equal(int(message_count), len(context.bdd_helper.messages_responses_data[0]['messages']))
+
+
+@given("debug step")
+@when("debug step")
+@then("debug step")
+def step_impl_debug_step(context):
+    """Allows a debug step to be set in a feature file by breakpointing the pass below"""
+    pass

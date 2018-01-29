@@ -2,7 +2,7 @@ import logging
 
 from structlog import wrap_logger
 from secure_message.exception.exceptions import MessageSaveException
-from secure_message.repository.database import db, SecureMessage, Status, Events, InternalSentAudit
+from secure_message.repository.database import Actors, db, SecureMessage, Status, Events, InternalSentAudit
 
 logger = wrap_logger(logging.getLogger(__name__))
 
@@ -63,4 +63,17 @@ class Saver:
         except Exception as e:
             session.rollback()
             logger.error('Message audit save failed', error=e)
+            raise MessageSaveException('Message save failed')
+
+    @staticmethod
+    def save_msg_actors(msg_id, from_actor, to_actor, sent_from_internal, session=db.session):
+        """Save actor information data to database"""
+        actor = Actors(msg_id, from_actor, to_actor, sent_from_internal)
+
+        try:
+            session.add(actor)
+            session.commit()
+        except Exception as e:
+            session.rollback()
+            logger.error('Message actor save failed', error=e)
             raise MessageSaveException('Message save failed')
