@@ -92,11 +92,11 @@ class SecureMessage(db.Model):
                 message['msg_to'].append(row.actor)
 
         for row in self.events:
-            if row.event == Events.SENT.value:
+            if row.event == EventsApi.SENT.value:
                 message['sent_date'] = str(row.date_time)
-            elif row.event == Events.DRAFT_SAVED.value:
+            elif row.event == EventsApi.DRAFT_SAVED.value:
                 message['modified_date'] = str(row.date_time)
-            elif row.event == Events.READ.value:
+            elif row.event == EventsApi.READ.value:
                 message['read_date'] = str(row.date_time)
 
         return message
