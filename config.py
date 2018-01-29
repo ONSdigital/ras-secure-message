@@ -99,7 +99,7 @@ class Config:
 
 class DevConfig(Config):
 
-    JWT_SECRET = os.getenv('JWT_SECRET', 'vrwgLNWEffe45thh545yuby')
+    JWT_SECRET = os.getenv('JWT_SECRET', 'testsecret')
     JWT_ALGORITHM = os.getenv('JWT_ALGORITHM', 'HS256')
     NOTIFY_VIA_GOV_NOTIFY = os.getenv('NOTIFY_VIA_GOV_NOTIFY', '0')
     NOTIFICATION_API_KEY = os.getenv('NOTIFICATION_API_KEY', 'test_notification_api_key')
