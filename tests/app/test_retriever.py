@@ -678,7 +678,7 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
         with self.engine.connect() as con:
             query = "SELECT securemessage.secure_message.msg_id FROM securemessage.secure_message " \
                     "JOIN securemessage.events ON securemessage.secure_message.msg_id = securemessage.events.msg_id " \
-                    "WHERE securemessage.events.event = '" + EventsApi.READ.valueRead + "' LIMIT 1"
+                    "WHERE securemessage.events.event = '" + EventsApi.READ.value + "' LIMIT 1"
             query_x = con.execute(query)
             names = []
             for row in query_x:

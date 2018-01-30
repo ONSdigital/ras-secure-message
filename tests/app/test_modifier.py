@@ -47,7 +47,7 @@ class ModifyTestCaseHelper:
                     msg_id, "2017-02-03 00:00:00")
                 con.execute(query)
                 query = "INSERT INTO securemessage.events(event, msg_id, date_time) " \
-                        "VALUES('" + EventsApi.READ.valueRead + "', '{0}', '{1}')".format(
+                        "VALUES('" + EventsApi.READ.value + "', '{0}', '{1}')".format(
                     msg_id, "2017-02-03 00:00:00")
                 con.execute(query)
 
