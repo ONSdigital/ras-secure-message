@@ -58,7 +58,7 @@ class SecureMessage(db.Model):
         self.survey = domain_model.survey
         self.collection_exercise = domain_model.collection_exercise
 
-    def serialize(self, user, body_summary=False):  # pylint:disable=too-complex, too-many-branches
+    def serialize(self, user, body_summary=False):
         """Return object data in easily serializeable format"""
         message = {'msg_to': [],
                    'msg_from': '',
@@ -78,6 +78,28 @@ class SecureMessage(db.Model):
         else:
             actor = user.user_uuid
 
+        self._populate_to_and_from(actor, message)
+
+        self._populate_events(message)
+
+        self._populate_actors(message)
+
+        return message
+
+    def _populate_actors(self, message):
+        for row in self.actors:
+            message['sent_from_internal'] = row.sent_from_internal
+
+    def _populate_events(self, message):
+        for row in self.events:
+            if row.event == 'Sent':
+                message['sent_date'] = str(row.date_time)
+            elif row.event == 'Draft_Saved':
+                message['modified_date'] = str(row.date_time)
+            elif row.event == 'Read':
+                message['read_date'] = str(row.date_time)
+
+    def _populate_to_and_from(self, actor, message):
         for row in self.statuses:
             if row.actor == actor:
                 message['labels'].append(row.label)
@@ -90,19 +112,6 @@ class SecureMessage(db.Model):
                 message['msg_from'] = row.actor
             elif row.label == Labels.DRAFT_INBOX.value:
                 message['msg_to'].append(row.actor)
-
-        for row in self.events:
-            if row.event == 'Sent':
-                message['sent_date'] = str(row.date_time)
-            elif row.event == 'Draft_Saved':
-                message['modified_date'] = str(row.date_time)
-            elif row.event == 'Read':
-                message['read_date'] = str(row.date_time)
-
-        for row in self.actors:
-            message['sent_from_internal'] = row.sent_from_internal
-
-        return message
 
 
 class Status(db.Model):

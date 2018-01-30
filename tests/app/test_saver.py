@@ -3,6 +3,7 @@ from unittest import mock
 
 from flask import current_app
 from sqlalchemy import create_engine
+from sqlalchemy.exc import SQLAlchemyError
 
 from secure_message.repository.saver import Saver
 from secure_message.repository import database
@@ -34,7 +35,7 @@ class SaverTestCase(unittest.TestCase):
     def test_save_message_raises_message_save_exception_on_db_error(self):
         """Tests exception is logged if message save fails"""
         mock_session = mock.Mock(db.session)
-        mock_session.commit.side_effect = Exception("Not Saved")
+        mock_session.commit.side_effect = SQLAlchemyError("Not Saved")
         with self.app.app_context():
             with current_app.test_request_context():
                 with self.assertRaises(MessageSaveException):
@@ -56,7 +57,7 @@ class SaverTestCase(unittest.TestCase):
     def test_save_msg_status_raises_message_save_exception_on_db_error(self):
         """Tests MessageSaveException generated if db commit fails saving message"""
         mock_session = mock.Mock(db.session)
-        mock_session.commit.side_effect = Exception("Not Saved")
+        mock_session.commit.side_effect = SQLAlchemyError("Not Saved")
         message_status = {'msg_id': 'AMsgId', 'actor': 'Tej'}
         with self.app.app_context():
             with current_app.test_request_context():
@@ -75,7 +76,7 @@ class SaverTestCase(unittest.TestCase):
     def test_save_msg_audit_raises_message_save_exception_on_db_error(self):
         """Tests MessageSaveException generated if db commit fails saving message audit"""
         mock_session = mock.Mock(db.session)
-        mock_session.commit.side_effect = Exception("Not Saved")
+        mock_session.commit.side_effect = SQLAlchemyError("Not Saved")
         message_audit = {'msg_id': 'MsgId', 'msg_urn': 'Tej'}
         with self.app.app_context():
             with current_app.test_request_context():
@@ -94,7 +95,7 @@ class SaverTestCase(unittest.TestCase):
     def test_save_actors_raises_message_save_exception_on_db_error(self):
         """Tests MessageSaveException generated if db commit fails saving message actors"""
         mock_session = mock.Mock(db.session)
-        mock_session.commit.side_effect = Exception("Not Saved")
+        mock_session.commit.side_effect = SQLAlchemyError("Not Saved")
         message = {'msg_id': 'MsgId', 'msg_to': 'Tej', 'msg_from': 'someone'}
         with self.app.app_context():
             with current_app.test_request_context():
@@ -141,7 +142,7 @@ class SaverTestCase(unittest.TestCase):
     def test_save_event_raises_message_save_exception_on_db_error(self):
         """Tests MessageSaveException generated if db commit fails saving message event"""
         mock_session = mock.Mock(db.session)
-        mock_session.commit.side_effect = Exception("Not Saved")
+        mock_session.commit.side_effect = SQLAlchemyError("Not Saved")
 
         message_event = {'msg_id': 'AMsgId', 'event': 'Draft_Saved', 'date_time': ''}
         with self.app.app_context():

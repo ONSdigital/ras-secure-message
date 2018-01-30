@@ -1,5 +1,6 @@
 import logging
 
+from sqlalchemy.exc import SQLAlchemyError
 from structlog import wrap_logger
 from secure_message.exception.exceptions import MessageSaveException
 from secure_message.repository.database import Actors, db, SecureMessage, Status, Events, InternalSentAudit
@@ -19,9 +20,9 @@ class Saver:
         try:
             session.add(db_message)
             session.commit()
-        except Exception as e:
+        except SQLAlchemyError:
             session.rollback()
-            logger.error('Message save failed', error=e)
+            logger.exception('Secure message save failed')
             raise MessageSaveException('Message save failed')
 
     @staticmethod
@@ -33,9 +34,9 @@ class Saver:
         try:
             session.add(db_status_to)
             session.commit()
-        except Exception as e:
+        except SQLAlchemyError:
             session.rollback()
-            logger.error('Message status save failed', error=e)
+            logger.exception('Message status save failed')
             raise MessageSaveException('Message save failed')
 
     @staticmethod
@@ -46,9 +47,9 @@ class Saver:
         try:
             session.add(event)
             session.commit()
-        except Exception as e:
+        except SQLAlchemyError:
             session.rollback()
-            logger.error('Message event save failed', error=e)
+            logger.exception('Message event save failed')
             raise MessageSaveException('Message save failed')
 
     @staticmethod
@@ -60,9 +61,9 @@ class Saver:
         try:
             session.add(db_audit)
             session.commit()
-        except Exception as e:
+        except SQLAlchemyError:
             session.rollback()
-            logger.error('Message audit save failed', error=e)
+            logger.exception('Message audit save failed')
             raise MessageSaveException('Message save failed')
 
     @staticmethod
@@ -73,7 +74,7 @@ class Saver:
         try:
             session.add(actor)
             session.commit()
-        except Exception as e:
+        except SQLAlchemyError:
             session.rollback()
-            logger.error('Message actor save failed', error=e)
+            logger.exception('Message actor save failed')
             raise MessageSaveException('Message save failed')
