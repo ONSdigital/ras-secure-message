@@ -17,7 +17,7 @@ class PartyService:
     @staticmethod
     def get_url(api_param, code):
         """
-        :param api_param:  is the key configuration that represent part or the URI .
+        :param api_param: is the key configuration that represents part of the URI.
         :param code: is the code to use in the url ( uuid or ru )
         :return: a formatted url
         """
@@ -30,6 +30,7 @@ class PartyService:
         """Retrieves the business details from the party service"""
 
         if ru not in self.__business_details_cache:
+            logger.info("Party Service: retrieve party data using", ru=ru)
             party_data = requests.get(PartyService.get_url('RAS_PARTY_GET_BY_BUSINESS', ru),
                                       auth=current_app.config['BASIC_AUTH'], verify=False)
             self.__business_details_cache.update(ru, party_data)
@@ -59,7 +60,7 @@ class PartyService:
             return party_dict, 200
 
         if uuid not in self.__users_cache:
-            logger.info("Executing call to the  party service ")
+            logger.info("Party Service: retrieve party data using", uuid=uuid)
             party_data = requests.get(PartyService.get_url('RAS_PARTY_GET_BY_RESPONDENT', uuid),
                                       auth=current_app.config['BASIC_AUTH'], verify=False)
             self.__users_cache.update(uuid, party_data)
