@@ -11,8 +11,8 @@ logger = wrap_logger(logging.getLogger(__name__))
 
 class PartyService:
 
-    users_cache = dict()
-    business_details_cache = dict()
+    __users_cache = dict()
+    __business_details_cache = dict()
 
     @staticmethod
     def get_url(api_param, code):
@@ -29,12 +29,12 @@ class PartyService:
     def get_business_details(self, ru):
         """Retrieves the business details from the party service"""
 
-        if ru not in self.business_details_cache:
+        if ru not in self.__business_details_cache:
             party_data = requests.get(PartyService.get_url('RAS_PARTY_GET_BY_BUSINESS', ru),
                                       auth=current_app.config['BASIC_AUTH'], verify=False)
-            self.users_cache.update(ru, party_data)
+            self.__business_details_cache.update(ru, party_data)
         else:
-            party_data = self.users_cache.get(ru)
+            party_data = self.__business_details_cache.get(ru)
 
         if party_data.status_code == 200:
             party_dict = json.loads(party_data.text)
@@ -58,13 +58,13 @@ class PartyService:
                           "sampleUnitType": "BI"}
             return party_dict, 200
 
-        if uuid not in self.users_cache:
+        if uuid not in self.__users_cache:
             logger.info("Executing call to the  party service ")
             party_data = requests.get(PartyService.get_url('RAS_PARTY_GET_BY_RESPONDENT', uuid),
                                       auth=current_app.config['BASIC_AUTH'], verify=False)
-            self.users_cache.update(uuid, party_data)
+            self.__users_cache.update(uuid, party_data)
         else:
-            party_data = self.users_cache.get(uuid)
+            party_data = self.__users_cache.get(uuid)
 
         if party_data.status_code == 200:
             party_dict = json.loads(party_data.text)
