@@ -17,13 +17,14 @@ class PartyService:
     @staticmethod
     def get_url(api_param, code):
         """
-        :param api_param:  is the key configuration that that represent part or the URI .
+        :param api_param:  is the key configuration that represent part or the URI .
         :param code: is the code to use in the url ( uuid or ru )
         :return: a formatted url
         """
-        if current_app.config[api_param] is None or current_app.config['RAS_PARTY_SERVICE'] is None:
-            raise KeyError("%s not present" % api_param)
-        return current_app.config[api_param].format(current_app.config['RAS_PARTY_SERVICE'], code)
+        try:
+            current_app.config[api_param].format(current_app.config['RAS_PARTY_SERVICE'], code)
+        except KeyError:
+            raise KeyError(f"{api_param} not present")
 
     def get_business_details(self, ru):
         """Retrieves the business details from the party service"""
@@ -55,7 +56,6 @@ class PartyService:
                           "telephone": "",
                           "status": "",
                           "sampleUnitType": "BI"}
-            logger.info("UUID is BRES")
             return party_dict, 200
 
         if uuid not in self.users_cache:
