@@ -16,11 +16,6 @@ class PartyService:
 
     @staticmethod
     def get_url(api_param, code):
-        """
-        :param api_param: is the key configuration that represents part of the URI.
-        :param code: is the code to use in the url ( uuid or ru )
-        :return: a formatted url
-        """
         try:
             current_app.config[api_param].format(current_app.config['RAS_PARTY_SERVICE'], code)
         except KeyError:
@@ -45,10 +40,6 @@ class PartyService:
         return party_data.text, party_data.status_code
 
     def get_user_details(self, uuid):
-        """
-        :param uuid:
-        :return: Return user details , unless user is Bres in which case return constant data
-        """
         if uuid == constants.BRES_USER:
             party_dict = {"id": constants.BRES_USER,
                           "firstName": "BRES",
