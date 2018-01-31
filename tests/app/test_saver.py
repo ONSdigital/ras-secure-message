@@ -115,7 +115,7 @@ class SaverTestCase(unittest.TestCase):
                     Saver().save_msg_actors(message['msg_id'], message['msg_from'], message['msg_to'], message['sent_from_internal'])
         with self.engine.connect() as con:
             for message in messages:
-                query = "SELECT * FROM securemessage.actors WHERE msg_id='{}'".format(message['msg_id'])
+                query = f"SELECT * FROM securemessage.actors WHERE msg_id='{message['msg_id']}'"
                 request = con.execute(query)
                 for row in request:
                     self.assertTrue(row[1] == message['msg_id'])

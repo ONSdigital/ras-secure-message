@@ -230,11 +230,11 @@ class MessageModifyById(Resource):
         label = request_data["label"]
         if label not in Labels.label_list.value:  # NOQA pylint:disable=unsupported-membership-test
             logger.error('Invalid label provided', label=label)
-            raise BadRequest(description="Invalid label provided: {0}".format(label))
+            raise BadRequest(description=f"Invalid label provided: {label}")
 
         if label not in [Labels.ARCHIVE.value, Labels.UNREAD.value]:
             logger.error('Non modifiable label provided', label=label)
-            raise BadRequest(description="Non modifiable label provided: {0}".format(label))
+            raise BadRequest(description=f"Non modifiable label provided: {label}")
 
         if 'action' not in request_data:
             logger.error('No action provided')
@@ -243,6 +243,6 @@ class MessageModifyById(Resource):
         action = request_data["action"]
         if action not in ["add", "remove"]:
             logger.error('Invalid action requested', action=action)
-            raise BadRequest(description="Invalid action requested: {0}".format(action))
+            raise BadRequest(description=f"Invalid action requested: {action}")
 
         return action, label

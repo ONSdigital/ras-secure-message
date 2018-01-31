@@ -12,7 +12,7 @@ class PartyServiceMock:
         try:
             return self._business_details[ru], 200
         except KeyError:
-            error = 'RU:{} not in mock party service.'.format(ru)
+            error = f'RU:{ru} not in mock party service.'
             logger.error('RU not in mock party service.', ru=ru)
             return error, 404
 
