@@ -1,18 +1,16 @@
 import logging
-
 from flask import current_app, json
 import requests
 from structlog import wrap_logger
-
 from secure_message import constants
-
 logger = wrap_logger(logging.getLogger(__name__))
 
 
 class PartyService:
 
-    __users_cache = dict()
-    __business_details_cache = dict()
+    def __init__(self):
+        self._users_cache = {}
+        self._business_details_cache = {}
 
     @staticmethod
     def get_url(api_param, code):
@@ -24,13 +22,13 @@ class PartyService:
     def get_business_details(self, ru):
         """Retrieves the business details from the party service"""
 
-        if ru not in self.__business_details_cache:
-            logger.info("Party Service: retrieve party data using", ru=ru)
+        if ru not in self._business_details_cache:
             party_data = requests.get(PartyService.get_url('RAS_PARTY_GET_BY_BUSINESS', ru),
                                       auth=current_app.config['BASIC_AUTH'], verify=False)
-            self.__business_details_cache[ru] = party_data
+            logger.debug("Party data retrieved for", ru=ru)
+            self._business_details_cache[ru] = party_data
         else:
-            party_data = self.__business_details_cache.get(ru)
+            party_data = self._business_details_cache.get(ru)
 
         if party_data.status_code == 200:
             party_dict = json.loads(party_data.text)
@@ -50,13 +48,13 @@ class PartyService:
                           "sampleUnitType": "BI"}
             return party_dict, 200
 
-        if uuid not in self.__users_cache:
+        if uuid not in self._users_cache:
             logger.info("Party Service: retrieve party data using", uuid=uuid)
             party_data = requests.get(PartyService.get_url('RAS_PARTY_GET_BY_RESPONDENT', uuid),
                                       auth=current_app.config['BASIC_AUTH'], verify=False)
-            self.__users_cache[uuid] = party_data
+            self._users_cache[uuid] = party_data
         else:
-            party_data = self.__users_cache.get(uuid)
+            party_data = self._users_cache.get(uuid)
 
         if party_data.status_code == 200:
             party_dict = json.loads(party_data.text)
