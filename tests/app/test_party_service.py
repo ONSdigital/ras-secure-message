@@ -1,7 +1,6 @@
 import unittest
 
 import requests_mock
-
 from secure_message import constants
 from secure_message.application import create_app
 from secure_message.services.party_service import PartyService
@@ -21,6 +20,41 @@ class PartyTestCase(unittest.TestCase):
         """setup test environment"""
         self.app = create_app()
         self.app.testing = True
+
+    @requests_mock.mock()
+    def test_results_returned_from_get_business_get_executed_just_once_for_the_same_ru(self, mock_request):
+        """Test get business details sends a request and returns data"""
+        ru = "1234"
+        business_data_url = self.app.config['RAS_PARTY_GET_BY_BUSINESS'].format(self.app.config['RAS_PARTY_SERVICE'],
+                                                                                ru)
+        mock_request.get(business_data_url, status_code=200, reason="OK", text='{"something": "else"}')
+        sut = PartyService()
+
+        for retries in range(0, 2):
+
+            with self.app.app_context():
+                sut.get_business_details(ru)
+
+        self.assertTrue(mock_request.call_count == 1)
+
+    @requests_mock.mock()
+    def test_results_returned_from_get_business_get_executed_twice_for_different_ru(self, mock_request):
+        """Test get business details sends a request and returns data"""
+        ru = "1234"
+
+        sut = PartyService()
+        count = 0
+        for retries in range(0, 2):
+            count += 1
+            ru += str(count)
+            business_data_url = self.app.config['RAS_PARTY_GET_BY_BUSINESS'].format(
+                self.app.config['RAS_PARTY_SERVICE'], ru)
+            mock_request.get(business_data_url, status_code=200, reason="OK", text='{"something": "else"}')
+
+            with self.app.app_context():
+                sut.get_business_details(ru)
+
+        self.assertTrue(mock_request.call_count == 2)
 
     @requests_mock.mock()
     def test_results_returned_from_get_business_details_returned_as_expected(self, mock_request):
