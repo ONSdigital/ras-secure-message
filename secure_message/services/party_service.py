@@ -17,7 +17,7 @@ class PartyService:
     @staticmethod
     def get_url(api_param, code):
         try:
-            current_app.config[api_param].format(current_app.config['RAS_PARTY_SERVICE'], code)
+            return current_app.config[api_param].format(current_app.config['RAS_PARTY_SERVICE'], code)
         except KeyError:
             raise KeyError(f"{api_param} not present")
 
@@ -28,7 +28,7 @@ class PartyService:
             logger.info("Party Service: retrieve party data using", ru=ru)
             party_data = requests.get(PartyService.get_url('RAS_PARTY_GET_BY_BUSINESS', ru),
                                       auth=current_app.config['BASIC_AUTH'], verify=False)
-            self.__business_details_cache.update(ru, party_data)
+            self.__business_details_cache[ru] = party_data
         else:
             party_data = self.__business_details_cache.get(ru)
 
@@ -54,7 +54,7 @@ class PartyService:
             logger.info("Party Service: retrieve party data using", uuid=uuid)
             party_data = requests.get(PartyService.get_url('RAS_PARTY_GET_BY_RESPONDENT', uuid),
                                       auth=current_app.config['BASIC_AUTH'], verify=False)
-            self.__users_cache.update(uuid, party_data)
+            self.__users_cache[uuid] = party_data
         else:
             party_data = self.__users_cache.get(uuid)
 

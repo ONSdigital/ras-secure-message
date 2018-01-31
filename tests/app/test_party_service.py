@@ -1,7 +1,6 @@
 import unittest
 
 import requests_mock
-
 from secure_message import constants
 from secure_message.application import create_app
 from secure_message.services.party_service import PartyService
@@ -22,11 +21,59 @@ class PartyTestCase(unittest.TestCase):
         self.app = create_app()
         self.app.testing = True
 
+    def url_exists(url):
+        r = requests_mock.get(url)
+        if r.status_code == 200:
+            return True
+
+        elif r.status_code == 404:
+            return False
+
+    @requests_mock.mock()
+    def test_results_returned_from_get_business_get_executed_just_once_for_the_same_ru(self, mock_request):
+        """Test get business details sends a request and returns data"""
+        ru = "1234"
+        business_data_url = self.app.config['RAS_PARTY_GET_BY_BUSINESS'].format(self.app.config['RAS_PARTY_SERVICE'],
+                                                                                ru)
+        mock_request.get(business_data_url, status_code=200, reason="OK", text='{"something": "else"}')
+        sut = PartyService()
+
+        for retries in range(0, 2):
+
+            with self.app.app_context():
+                result_data, result_status = sut.get_business_details(ru)
+
+        self.assertEqual(result_data, {"something": "else"})
+        self.assertEqual(result_status, 200)
+        self.assertTrue(mock_request.call_count == 1)
+
+    @requests_mock.mock()
+    def test_results_returned_from_get_business_get_executed_twice_for_different_ru(self, mock_request):
+        """Test get business details sends a request and returns data"""
+        ru = "1234"
+
+        sut = PartyService()
+        count = 0
+        for retries in range(0, 2):
+            count += 1
+            ru += str(count)
+            business_data_url = self.app.config['RAS_PARTY_GET_BY_BUSINESS'].format(
+                self.app.config['RAS_PARTY_SERVICE'], ru)
+            mock_request.get(business_data_url, status_code=200, reason="OK", text='{"something": "else"}')
+
+            with self.app.app_context():
+                result_data, result_status = sut.get_business_details(ru)
+
+        self.assertEqual(result_data, {"something": "else"})
+        self.assertEqual(result_status, 200)
+        self.assertTrue(mock_request.call_count == 2)
+
     @requests_mock.mock()
     def test_results_returned_from_get_business_details_returned_as_expected(self, mock_request):
         """Test get business details sends a request and returns data"""
         ru = "1234"
-        business_data_url = self.app.config['RAS_PARTY_GET_BY_BUSINESS'].format(self.app.config['RAS_PARTY_SERVICE'], ru)
+        business_data_url = self.app.config['RAS_PARTY_GET_BY_BUSINESS'].\
+            format(self.app.config['RAS_PARTY_SERVICE'], ru)
         mock_request.get(business_data_url, status_code=200, reason="OK", text='{"something": "else"}')
         sut = PartyService()
 
@@ -40,7 +87,8 @@ class PartyTestCase(unittest.TestCase):
     def test_get_business_details_converts_error_list_to_errors_dictionary(self, mock_request):
         """Test get business details and returns correctly from a list"""
         ru = "1234"
-        business_data_url = self.app.config['RAS_PARTY_GET_BY_BUSINESS'].format(self.app.config['RAS_PARTY_SERVICE'], ru)
+        business_data_url = self.app.config['RAS_PARTY_GET_BY_BUSINESS'].\
+            format(self.app.config['RAS_PARTY_SERVICE'], ru)
         sut = PartyService()
         mock_request.get(business_data_url, status_code=200, reason="OK", text='[{"errors": "test"}]')
 
@@ -54,7 +102,8 @@ class PartyTestCase(unittest.TestCase):
     def test_get_business_details_fails(self, mock_request):
         """Test get business details and returns correctly from a list"""
         ru = "1234"
-        business_data_url = self.app.config['RAS_PARTY_GET_BY_BUSINESS'].format(self.app.config['RAS_PARTY_SERVICE'], ru)
+        business_data_url = self.app.config['RAS_PARTY_GET_BY_BUSINESS'].\
+            format(self.app.config['RAS_PARTY_SERVICE'], ru)
         sut = PartyService()
         mock_request.get(business_data_url, status_code=401, reason="unauthorised", text='Unauthorized Access')
 
@@ -91,7 +140,8 @@ class PartyTestCase(unittest.TestCase):
     def test_get_user_details_calls_party_service_for_respondent(self, mock_request):
         """Test get user details sends a request and receives back data"""
         sut = PartyService()
-        user_data_url = self.app.config['RAS_PARTY_GET_BY_RESPONDENT'].format(self.app.config['RAS_PARTY_SERVICE'], 'NotBres')
+        user_data_url = self.app.config['RAS_PARTY_GET_BY_RESPONDENT'].\
+            format(self.app.config['RAS_PARTY_SERVICE'], 'NotBres')
         mock_request.get(user_data_url, status_code=200, reason="OK", text='{"Test": "test"}')
 
         with self.app.app_context():
@@ -104,7 +154,8 @@ class PartyTestCase(unittest.TestCase):
     def test_get_user_details_calls_party_service_for_respondent_unauthorised(self, mock_request):
         """Test get user details sends a request and receives back data"""
         sut = PartyService()
-        user_data_url = self.app.config['RAS_PARTY_GET_BY_RESPONDENT'].format(self.app.config['RAS_PARTY_SERVICE'], 'NotBres')
+        user_data_url = self.app.config['RAS_PARTY_GET_BY_RESPONDENT'].\
+            format(self.app.config['RAS_PARTY_SERVICE'], 'NotBres')
         mock_request.get(user_data_url, status_code=401, reason="unauthorised", text="Unauthorized access")
 
         with self.app.app_context():
