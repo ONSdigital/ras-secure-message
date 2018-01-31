@@ -3,6 +3,7 @@ import logging
 from flask import jsonify
 from structlog import wrap_logger
 from werkzeug.exceptions import InternalServerError
+from secure_message.common.eventsapi import EventsApi
 from secure_message.common.labels import Labels
 from secure_message.repository.database import db, Status, SecureMessage
 from secure_message.repository.saver import Saver
@@ -80,7 +81,7 @@ class Modifier:
         inbox = Labels.INBOX.value
         unread = Labels.UNREAD.value
         if inbox in message['labels'] and unread in message['labels'] and 'read_date' not in message:
-            Saver().save_msg_event(message['msg_id'], 'Read')
+            Saver().save_msg_event(message['msg_id'], EventsApi.READ.value)
         Modifier.remove_label(unread, message, user)
         return True
 
@@ -115,7 +116,7 @@ class Modifier:
             logger.error('Error replacing message', msg_id=draft_id, error=e)
             raise InternalServerError(description="Error replacing message")
 
-        Saver().save_msg_event(draft_id, 'Draft_Saved')
+        Saver().save_msg_event(draft_id, EventsApi.DRAFT_SAVED.value)
 
         if draft.msg_to is not None and draft.msg_to:
             Modifier.replace_current_recipient_status(draft_id, draft.msg_to)

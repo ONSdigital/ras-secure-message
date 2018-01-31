@@ -7,6 +7,7 @@ from structlog import wrap_logger
 from werkzeug.exceptions import BadRequest
 
 from secure_message.authorization.authorizer import Authorizer
+from secure_message.common.eventsapi import EventsApi
 from secure_message.common.labels import Labels
 from secure_message.constants import DRAFT_LIST_ENDPOINT
 from secure_message.common.utilities import get_options, paginated_list_to_json, generate_etag, add_users_and_business_details
@@ -54,7 +55,7 @@ class DraftSave(Resource):
         uuid_from = draft.data.msg_from
         saver.save_msg_status(uuid_from, draft.data.msg_id, Labels.DRAFT.value)
 
-        saver.save_msg_event(draft.data.msg_id, 'Draft_Saved')
+        saver.save_msg_event(draft.data.msg_id, EventsApi.DRAFT_SAVED.value)
 
 
 class DraftById(Resource):
