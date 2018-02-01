@@ -7,6 +7,7 @@ from flask import current_app, g
 from sqlalchemy import create_engine
 
 from secure_message.application import create_app
+from secure_message.common.eventsapi import EventsApi
 from secure_message.common.labels import Labels
 from secure_message.repository import database
 from secure_message.repository.modifier import Modifier
@@ -41,10 +42,12 @@ class ModifyTestCaseHelper:
                 query = "INSERT INTO securemessage.status(label, msg_id, actor) VALUES('UNREAD', '{0}', 'BRES')".format(
                     msg_id)
                 con.execute(query)
-                query = "INSERT INTO securemessage.events(event, msg_id, date_time) VALUES('Sent', '{0}', '{1}')".format(
+                query = "INSERT INTO securemessage.events(event, msg_id, date_time)" \
+                        " VALUES('" + EventsApi.SENT.value + "', '{0}', '{1}')".format(
                     msg_id, "2017-02-03 00:00:00")
                 con.execute(query)
-                query = "INSERT INTO securemessage.events(event, msg_id, date_time) VALUES('Read', '{0}', '{1}')".format(
+                query = "INSERT INTO securemessage.events(event, msg_id, date_time) " \
+                        "VALUES('" + EventsApi.READ.value + "', '{0}', '{1}')".format(
                     msg_id, "2017-02-03 00:00:00")
                 con.execute(query)
 
@@ -296,7 +299,7 @@ class ModifyTestCase(unittest.TestCase, ModifyTestCaseHelper):
                 modifier = Modifier()
                 with self.engine.connect() as con:
                     add_draft_event = ("INSERT INTO securemessage.events (event, msg_id, date_time) "
-                                       "VALUES ('{0}', 'test123', '{1}')").format('Draft_Saved',
+                                       "VALUES ('{0}', 'test123', '{1}')").format(EventsApi.DRAFT_SAVED.value,
                                                                                   datetime.now(timezone.utc))
                     add_draft = "INSERT INTO securemessage.secure_message (msg_id, body, subject, thread_id, collection_case, ru_id, " \
                                 "survey, collection_exercise) VALUES ('{0}', '{1}', '{2}', '{3}', '{4}', '{5}', '{6}', '{7}')" \

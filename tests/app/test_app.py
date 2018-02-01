@@ -8,6 +8,7 @@ from sqlalchemy import create_engine
 
 from secure_message import application, constants
 from secure_message.common.alerts import AlertUser, AlertViaGovNotify
+from secure_message.common.eventsapi import EventsApi
 from secure_message.repository import database
 from secure_message.authentication.jwt import encode
 from secure_message.authentication.jwe import Encrypter
@@ -219,8 +220,8 @@ class FlaskTestCase(unittest.TestCase):
             for row in request:
                 self.assertTrue(row is not None)
 
-            request = con.execute("SELECT * FROM securemessage.events WHERE event='Draft_Saved' AND msg_id='{0}'"
-                                  .format(data['msg_id']))
+            request = con.execute("SELECT * FROM securemessage.events WHERE event='" + EventsApi.DRAFT_SAVED.value +
+                                  "' AND msg_id='{0}'".format(data['msg_id']))
             for row in request:
                 self.assertTrue(row is None)
 
@@ -232,7 +233,8 @@ class FlaskTestCase(unittest.TestCase):
         data = json.loads(response.data)
         # dereferencing msg_to for purpose of test
         with self.engine.connect() as con:
-            request = con.execute("SELECT * FROM securemessage.status WHERE label='INBOX' OR label='UNREAD' AND msg_id='{0}'"
+            request = con.execute("SELECT * FROM securemessage.status WHERE "
+                                  "label='INBOX' OR label='UNREAD' AND msg_id='{0}'"
                                   " AND actor='{1}'".format(data['msg_id'], self.test_message['msg_to'][0]))
             for row in request:
                 self.assertTrue(row is not None)
@@ -245,7 +247,8 @@ class FlaskTestCase(unittest.TestCase):
         data = json.loads(response.data)
 
         with self.engine.connect() as con:
-            request = con.execute("SELECT * FROM securemessage.status WHERE msg_id='{0}' AND actor='{1}' AND label='SENT'"
+            request = con.execute("SELECT * FROM securemessage.status WHERE "
+                                  "msg_id='{0}' AND actor='{1}' AND label='SENT'"
                                   .format(data['msg_id'], self.test_message['survey']))
             for row in request:
                 self.assertTrue(row is not None)
@@ -259,7 +262,8 @@ class FlaskTestCase(unittest.TestCase):
         data = json.loads(response.data)
 
         with self.engine.connect() as con:
-            request = con.execute("SELECT * FROM securemessage.internal_sent_audit WHERE msg_id='{0}' AND internal_user='{1}'"
+            request = con.execute("SELECT * FROM securemessage.internal_sent_audit WHERE"
+                                  " msg_id='{0}' AND internal_user='{1}'"
                                   .format(data['msg_id'], self.test_message['msg_from']))
 
             for row in request:
@@ -268,7 +272,8 @@ class FlaskTestCase(unittest.TestCase):
     def test_draft_inbox_labels_removed_on_draft_send(self):
         """Test that draft inbox labels are removed on draft send"""
 
-        response = self.client.post("http://localhost:5050/draft/save", data=json.dumps(self.test_message), headers=self.headers)
+        response = self.client.post("http://localhost:5050/draft/save",
+                                    data=json.dumps(self.test_message), headers=self.headers)
         resp_data = json.loads(response.data)
         msg_id = resp_data['msg_id']
 

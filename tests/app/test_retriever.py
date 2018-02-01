@@ -7,6 +7,7 @@ from sqlalchemy import create_engine
 from werkzeug.exceptions import NotFound, InternalServerError
 
 from secure_message.application import create_app
+from secure_message.common.eventsapi import EventsApi
 from secure_message.repository import database
 from secure_message.repository.retriever import Retriever
 from secure_message.constants import MESSAGE_QUERY_LIMIT
@@ -80,25 +81,25 @@ class RetrieverTestCaseHelper:
                 self.add_status(label="SENT", msg_id=msg_id, actor="0a7ad740-10d5-4ecb-b7ca-3c0384afb882")
                 self.add_status(label="INBOX", msg_id=msg_id, actor=constants.BRES_USER)
                 self.add_status(label="UNREAD", msg_id=msg_id, actor=constants.BRES_USER)
-                self.add_event(event="Sent", msg_id=msg_id, date_time=datetime(year, month, day))
+                self.add_event(event=EventsApi.SENT.value, msg_id=msg_id, date_time=datetime(year, month, day))
 
             if add_reply:
                 self.del_status(label="UNREAD", msg_id=msg_id, actor=constants.BRES_USER)
-                self.add_event(event="Read", msg_id=msg_id, date_time=datetime(year, month, day + 1))
+                self.add_event(event=EventsApi.READ.value, msg_id=msg_id, date_time=datetime(year, month, day + 1))
 
                 msg_id = str(uuid.uuid4())
                 self.add_secure_message(msg_id=msg_id)
                 self.add_status(label="SENT", msg_id=msg_id, actor=constants.BRES_USER)
                 self.add_status(label="INBOX", msg_id=msg_id, actor="0a7ad740-10d5-4ecb-b7ca-3c0384afb882")
                 self.add_status(label="UNREAD", msg_id=msg_id, actor="0a7ad740-10d5-4ecb-b7ca-3c0384afb882")
-                self.add_event(event="Sent", msg_id=msg_id, date_time=datetime(year, month, day + 1))
+                self.add_event(event=EventsApi.SENT.value, msg_id=msg_id, date_time=datetime(year, month, day + 1))
 
             if add_draft:
                 msg_id = str(uuid.uuid4())
                 self.add_secure_message(msg_id=msg_id)
                 self.add_status(label="DRAFT_INBOX", msg_id=msg_id, actor="0a7ad740-10d5-4ecb-b7ca-3c0384afb882")
                 self.add_status(label="DRAFT", msg_id=msg_id, actor=constants.BRES_USER)
-                self.add_event(event="Draft_Saved", msg_id=msg_id, date_time=datetime(year, month, day))
+                self.add_event(event=EventsApi.DRAFT_SAVED.value, msg_id=msg_id, date_time=datetime(year, month, day))
 
             if multiple_users:
                 msg_id = str(uuid.uuid4())
@@ -108,7 +109,7 @@ class RetrieverTestCaseHelper:
                 self.add_status(label="SENT", msg_id=msg_id, actor="1a7ad740-10d5-4ecb-b7ca-fb8823c0384a")
                 self.add_status(label="INBOX", msg_id=msg_id, actor="11111111-10d5-4ecb-b7ca-fb8823c0384a")
                 self.add_status(label="UNREAD", msg_id=msg_id, actor="11111111-10d5-4ecb-b7ca-fb8823c0384a")
-                self.add_event(event="Sent", msg_id=msg_id, date_time=datetime(year, month, day))
+                self.add_event(event=EventsApi.SENT.value, msg_id=msg_id, date_time=datetime(year, month, day))
 
     def create_threads(self, no_of_threads=1, add_internal_draft=False, add_respondent_draft=False):
         """ Populate the db with a specified number of messages and optionally replies , multiple users"""
@@ -134,15 +135,15 @@ class RetrieverTestCaseHelper:
             self.add_secure_message(msg_id=msg_id, thread_id=thread_id, survey=constants.BRES_USER)
             self.add_status(label="SENT", msg_id=msg_id, actor="0a7ad740-10d5-4ecb-b7ca-3c0384afb882")
             self.add_status(label="INBOX", msg_id=msg_id, actor=constants.BRES_USER)
-            self.add_event(event="Sent", msg_id=msg_id, date_time=datetime(year, month, day))
-            self.add_event(event="Read", msg_id=msg_id, date_time=datetime(year, month, day + 1))
+            self.add_event(event=EventsApi.SENT.value, msg_id=msg_id, date_time=datetime(year, month, day))
+            self.add_event(event=EventsApi.READ.value, msg_id=msg_id, date_time=datetime(year, month, day + 1))
 
             msg_id = str(uuid.uuid4())
             self.add_secure_message(msg_id=msg_id, thread_id=thread_id, survey=constants.BRES_USER)
             self.add_status(label="SENT", msg_id=msg_id, actor=constants.BRES_USER)
             self.add_status(label="UNREAD", msg_id=msg_id, actor="0a7ad740-10d5-4ecb-b7ca-3c0384afb882")
             self.add_status(label="INBOX", msg_id=msg_id, actor="0a7ad740-10d5-4ecb-b7ca-3c0384afb882")
-            self.add_event(event="Sent", msg_id=msg_id, date_time=datetime(year, month, day + 1))
+            self.add_event(event=EventsApi.SENT.value, msg_id=msg_id, date_time=datetime(year, month, day + 1))
 
             last_msg_id = msg_id
 
@@ -151,18 +152,18 @@ class RetrieverTestCaseHelper:
                 self.add_secure_message(msg_id=msg_id, thread_id=thread_id, survey=constants.BRES_USER)
                 self.add_status(label="DRAFT_INBOX", msg_id=msg_id, actor="0a7ad740-10d5-4ecb-b7ca-3c0384afb882")
                 self.add_status(label="DRAFT", msg_id=msg_id, actor=constants.BRES_USER)
-                self.add_event(event="Draft_Saved", msg_id=msg_id, date_time=datetime(year, month, day + 2))
+                self.add_event(event=EventsApi.DRAFT_SAVED.value, msg_id=msg_id, date_time=datetime(year, month, day + 2))
 
             if add_respondent_draft:  # adds draft from respondent
 
                 self.del_status(label="UNREAD", msg_id=last_msg_id, actor="0a7ad740-10d5-4ecb-b7ca-3c0384afb882")
-                self.add_event(event="Read", msg_id=last_msg_id, date_time=datetime(year, month, day + 1))
+                self.add_event(event=EventsApi.READ.value, msg_id=last_msg_id, date_time=datetime(year, month, day + 1))
 
                 msg_id = str(uuid.uuid4())
                 self.add_secure_message(msg_id=msg_id, thread_id=thread_id, survey=constants.BRES_USER)
                 self.add_status(label="DRAFT_INBOX", msg_id=msg_id, actor=constants.BRES_USER)
                 self.add_status(label="DRAFT", msg_id=msg_id, actor="0a7ad740-10d5-4ecb-b7ca-3c0384afb882")
-                self.add_event(event="Draft_Saved", msg_id=msg_id, date_time=datetime(year, month, day + 2))
+                self.add_event(event=EventsApi.DRAFT_SAVED.value, msg_id=msg_id, date_time=datetime(year, month, day + 2))
 
         return threads
 
@@ -677,7 +678,7 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
         with self.engine.connect() as con:
             query = "SELECT securemessage.secure_message.msg_id FROM securemessage.secure_message " \
                     "JOIN securemessage.events ON securemessage.secure_message.msg_id = securemessage.events.msg_id " \
-                    "WHERE securemessage.events.event = 'Read' LIMIT 1"
+                    "WHERE securemessage.events.event = '" + EventsApi.READ.value + "' LIMIT 1"
             query_x = con.execute(query)
             names = []
             for row in query_x:
