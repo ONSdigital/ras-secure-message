@@ -70,9 +70,12 @@ class SaverTestCase(unittest.TestCase):
         message_audit = {'msg_id': 'MsgId', 'msg_urn': 'Tej'}
         with self.app.app_context():
             with current_app.test_request_context():
-                Saver().save_message(SecureMessage(msg_id='MsgId'))
-                Saver().save_msg_audit(message_audit['msg_id'], message_audit['msg_urn'])
-                self.assertTrue(True)
+                try:
+                    Saver().save_message(SecureMessage(msg_id='MsgId'))
+                    Saver().save_msg_audit(message_audit['msg_id'], message_audit['msg_urn'])
+                    self.assertTrue(True)
+                except Exception:
+                    self.fail("Audit save raised exception")
 
     def test_save_msg_audit_raises_message_save_exception_on_db_error(self):
         """Tests MessageSaveException generated if db commit fails saving message audit"""
@@ -89,9 +92,12 @@ class SaverTestCase(unittest.TestCase):
         message = {'msg_id': 'MsgId', 'msg_to': 'Tej', 'msg_from': 'some survey'}
         with self.app.app_context():
             with current_app.test_request_context():
-                Saver().save_message(SecureMessage(msg_id=message['msg_id']))
-                Saver().save_msg_actors(message['msg_id'], message['msg_to'], message['msg_from'], False)
-                self.assertTrue(True)
+                try:
+                    Saver().save_message(SecureMessage(msg_id=message['msg_id']))
+                    Saver().save_msg_actors(message['msg_id'], message['msg_to'], message['msg_from'], False)
+                    self.assertTrue(True)
+                except Exception:
+                    self.fail("Audit save raised exception")
 
     def test_save_actors_raises_message_save_exception_on_db_error(self):
         """Tests MessageSaveException generated if db commit fails saving message actors"""
