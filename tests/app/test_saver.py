@@ -104,7 +104,6 @@ class SaverTestCase(unittest.TestCase):
 
     def test_save_actors_saves_expected_information(self):
         """Simple read write validation of actor table"""
-        pass
         messages = [{'msg_id': 'MsgId1', 'msg_to': 'Tej', 'msg_from': 'some survey', 'sent_from_internal': True},
                     {'msg_id': 'MsgId2', 'msg_to': '', 'msg_from': 'someone', 'sent_from_internal': False},
                     {'msg_id': 'MsgId3', 'msg_to': 'aperson', 'msg_from': '', 'sent_from_internal': False}]
