@@ -8,7 +8,7 @@ from werkzeug.exceptions import InternalServerError, NotFound
 
 from secure_message.common.eventsapi import EventsApi
 from secure_message.common.labels import Labels
-from secure_message.repository.database import SecureMessage, Status, Events, db
+from secure_message.repository.database import Actors, db, Events, SecureMessage, Status
 from secure_message import constants
 
 logger = wrap_logger(logging.getLogger(__name__))
@@ -47,7 +47,7 @@ class Retriever:
         try:
             t = db.session.query(SecureMessage.msg_id, func.max(Events.date_time)  # pylint:disable=no-member
                                  .label('max_date'))\
-                .join(Events).join(Status) \
+                .join(Events).join(Status).outerjoin(Actors) \
                 .filter(and_(*conditions)) \
                 .filter(and_(*status_conditions)) \
                 .filter(or_(Events.event == EventsApi.SENT.value, Events.event == EventsApi.DRAFT_SAVED.value)) \

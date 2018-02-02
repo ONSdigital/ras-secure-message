@@ -4,8 +4,6 @@ import logging
 from structlog import wrap_logger
 
 from secure_message.cloud.cloud_foundry import ONSCloudFoundry
-from secure_message.exception.exceptions import MissingEnvironmentVariable
-
 
 # use cf env to extract Cloud Foundry environment
 cf = ONSCloudFoundry()

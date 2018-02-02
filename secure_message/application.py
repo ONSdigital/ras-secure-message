@@ -30,7 +30,7 @@ def create_app(config=None):
     app.config.from_object(app_config)
 
     missing_vars = [var for var in app.config['NON_DEFAULT_VARIABLES']
-                    if app.config.get(var) == None]
+                    if app.config.get(var) is None]
 
     if missing_vars:
         raise MissingEnvironmentVariable(missing_vars)

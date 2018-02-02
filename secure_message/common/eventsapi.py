@@ -8,4 +8,3 @@ class EventsApi(Enum):
     READ = "Read"
     DRAFT_SAVED = "Draft_Saved"
     event_list = [SENT, READ, DRAFT_SAVED]
-

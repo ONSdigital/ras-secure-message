@@ -202,4 +202,16 @@ Feature: Get Messages list Endpoint
      Then  a success status code (200) is returned
       And '3' messages are returned
 
+  Scenario: An internal user sends multiple messages , all should be returned with sent from internal True
+    Given sending from internal to respondent
+      And '7' messages are sent
+    When messages are read
+      Then a success status code (200) is returned
+      And '7' messages are returned with sent from internal
 
+  Scenario: An external user sends multiple messages , no messages should be returned with sent from internal true
+    Given sending from respondent to internal
+      And '7' messages are sent
+    When messages are read
+      Then a success status code (200) is returned
+      And '0' messages are returned with sent from internal

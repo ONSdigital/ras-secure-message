@@ -3,7 +3,7 @@ import logging
 from datetime import datetime, timezone
 from structlog import wrap_logger
 from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy import Column, String, Integer, DateTime, ForeignKey, Index, MetaData
+from sqlalchemy import Boolean, Column, String, Integer, DateTime, ForeignKey, Index, MetaData
 from sqlalchemy.orm import relationship
 from secure_message import constants
 from secure_message.common.eventsapi import EventsApi
@@ -31,6 +31,7 @@ class SecureMessage(db.Model):
     survey = Column("survey", String(constants.MAX_SURVEY_LEN + 1))
     statuses = relationship('Status', backref='secure_message', lazy="dynamic")
     events = relationship('Events', backref='secure_message', order_by='Events.date_time', lazy="dynamic")
+    actors = relationship('Actors', backref='secure_message', lazy="dynamic")
 
     __table_args__ = (Index("idx_ru_survey_cc", "ru_id", "survey", "collection_case", "collection_exercise"), )
 
@@ -58,7 +59,7 @@ class SecureMessage(db.Model):
         self.survey = domain_model.survey
         self.collection_exercise = domain_model.collection_exercise
 
-    def serialize(self, user, body_summary=False):  # pylint:disable=too-complex
+    def serialize(self, user, body_summary=False):
         """Return object data in easily serializeable format"""
         message = {'msg_to': [],
                    'msg_from': '',
@@ -78,6 +79,28 @@ class SecureMessage(db.Model):
         else:
             actor = user.user_uuid
 
+        self._populate_to_and_from(actor, message)
+
+        self._populate_events(message)
+
+        self._populate_actors(message)
+
+        return message
+
+    def _populate_actors(self, message):
+        for row in self.actors:
+            message['sent_from_internal'] = row.sent_from_internal
+
+    def _populate_events(self, message):
+        for row in self.events:
+            if row.event == EventsApi.SENT.value:
+                message['sent_date'] = str(row.date_time)
+            elif row.event == EventsApi.DRAFT_SAVED.value:
+                message['modified_date'] = str(row.date_time)
+            elif row.event == EventsApi.READ.value:
+                message['read_date'] = str(row.date_time)
+
+    def _populate_to_and_from(self, actor, message):
         for row in self.statuses:
             if row.actor == actor:
                 message['labels'].append(row.label)
@@ -90,16 +113,6 @@ class SecureMessage(db.Model):
                 message['msg_from'] = row.actor
             elif row.label == Labels.DRAFT_INBOX.value:
                 message['msg_to'].append(row.actor)
-
-        for row in self.events:
-            if row.event == EventsApi.SENT.value:
-                message['sent_date'] = str(row.date_time)
-            elif row.event == EventsApi.DRAFT_SAVED.value:
-                message['modified_date'] = str(row.date_time)
-            elif row.event == EventsApi.READ.value:
-                message['read_date'] = str(row.date_time)
-
-        return message
 
 
 class Status(db.Model):
@@ -154,6 +167,37 @@ class InternalSentAudit(db.Model):
         """Return object data in easily serializeable format"""
         data = {'msg_id': self.msg_id,
                 'internal_user': self.internal_user}
+
+        return data
+
+
+class Actors(db.Model):
+    """Label Assignment table model"""
+    __tablename__ = "actors"
+
+    id = Column("id", Integer(), primary_key=True)
+    msg_id = Column('msg_id', String(constants.MAX_MSG_ID_LEN + 1), ForeignKey('secure_message.msg_id'), index=True)
+    from_actor = Column('from_actor', String(constants.MAX_STATUS_ACTOR_LEN + 1))
+    to_actor = Column('to_actor', String(constants.MAX_STATUS_ACTOR_LEN + 1))
+    sent_from_internal = Column('sent_from_internal', Boolean())
+
+    def __init__(self, msg_id, from_actor, to_actor, sent_from_internal):
+        self.set_from_domain_model(msg_id, from_actor, to_actor, sent_from_internal)
+
+    def set_from_domain_model(self, msg_id, from_actor, to_actor, sent_from_internal):
+        """Set actors values"""
+        self.msg_id = msg_id
+        self.from_actor = from_actor
+        self.to_actor = to_actor
+        self.sent_from_internal = sent_from_internal
+
+    @property
+    def serialize(self):
+        """Return object data in easily serializeable format"""
+        data = {'msg_id': self.msg_id,
+                'from_actor': self.from_actor,
+                'to_actor': self.to_actor,
+                'sent_from_internal': self.sent_from_internal}
 
         return data
 

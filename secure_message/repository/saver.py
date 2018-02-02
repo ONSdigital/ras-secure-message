@@ -1,8 +1,9 @@
 import logging
 
+from sqlalchemy.exc import SQLAlchemyError
 from structlog import wrap_logger
 from secure_message.exception.exceptions import MessageSaveException
-from secure_message.repository.database import db, SecureMessage, Status, Events, InternalSentAudit
+from secure_message.repository.database import Actors, db, SecureMessage, Status, Events, InternalSentAudit
 
 logger = wrap_logger(logging.getLogger(__name__))
 
@@ -19,9 +20,9 @@ class Saver:
         try:
             session.add(db_message)
             session.commit()
-        except Exception as e:
+        except SQLAlchemyError:
             session.rollback()
-            logger.error('Message save failed', error=e)
+            logger.exception('Secure message save failed')
             raise MessageSaveException('Message save failed')
 
     @staticmethod
@@ -33,9 +34,9 @@ class Saver:
         try:
             session.add(db_status_to)
             session.commit()
-        except Exception as e:
+        except SQLAlchemyError:
             session.rollback()
-            logger.error('Message status save failed', error=e)
+            logger.exception('Message status save failed')
             raise MessageSaveException('Message save failed')
 
     @staticmethod
@@ -46,9 +47,9 @@ class Saver:
         try:
             session.add(event)
             session.commit()
-        except Exception as e:
+        except SQLAlchemyError:
             session.rollback()
-            logger.error('Message event save failed', error=e)
+            logger.exception('Message event save failed')
             raise MessageSaveException('Message save failed')
 
     @staticmethod
@@ -60,7 +61,20 @@ class Saver:
         try:
             session.add(db_audit)
             session.commit()
-        except Exception as e:
+        except SQLAlchemyError:
             session.rollback()
-            logger.error('Message audit save failed', error=e)
+            logger.exception('Message audit save failed')
+            raise MessageSaveException('Message save failed')
+
+    @staticmethod
+    def save_msg_actors(msg_id, from_actor, to_actor, sent_from_internal, session=db.session):
+        """Save actor information data to database"""
+        actor = Actors(msg_id, from_actor, to_actor, sent_from_internal)
+
+        try:
+            session.add(actor)
+            session.commit()
+        except SQLAlchemyError:
+            session.rollback()
+            logger.exception('Message actor save failed')
             raise MessageSaveException('Message save failed')

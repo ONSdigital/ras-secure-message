@@ -89,6 +89,7 @@ class MessageSend(Resource):
         """Saves the message to the database along with the subsequent status and audit"""
         save = Saver()
         save.save_message(message.data)
+        save.save_msg_actors(message.data.msg_id, message.data.msg_from, message.data.msg_to[0], g.user.is_internal)
         save.save_msg_event(message.data.msg_id, EventsApi.SENT.value)
         if g.user.is_respondent:
             save.save_msg_status(message.data.msg_from, message.data.msg_id, Labels.SENT.value)
@@ -96,7 +97,6 @@ class MessageSend(Resource):
             save.save_msg_status(constants.BRES_USER, message.data.msg_id, Labels.UNREAD.value)
         else:
             save.save_msg_status(constants.BRES_USER, message.data.msg_id, Labels.SENT.value)
-            save.save_msg_audit(message.data.msg_id, message.data.msg_from)
             save.save_msg_status(message.data.msg_to[0], message.data.msg_id, Labels.INBOX.value)
             save.save_msg_status(message.data.msg_to[0], message.data.msg_id, Labels.UNREAD.value)
 
@@ -231,11 +231,11 @@ class MessageModifyById(Resource):
         label = request_data["label"]
         if label not in Labels.label_list.value:  # NOQA pylint:disable=unsupported-membership-test
             logger.error('Invalid label provided', label=label)
-            raise BadRequest(description="Invalid label provided: {0}".format(label))
+            raise BadRequest(description=f"Invalid label provided: {label}")
 
         if label not in [Labels.ARCHIVE.value, Labels.UNREAD.value]:
             logger.error('Non modifiable label provided', label=label)
-            raise BadRequest(description="Non modifiable label provided: {0}".format(label))
+            raise BadRequest(description=f"Non modifiable label provided: {label}")
 
         if 'action' not in request_data:
             logger.error('No action provided')
@@ -244,6 +244,6 @@ class MessageModifyById(Resource):
         action = request_data["action"]
         if action not in ["add", "remove"]:
             logger.error('Invalid action requested', action=action)
-            raise BadRequest(description="Invalid action requested: {0}".format(action))
+            raise BadRequest(description=f"Invalid action requested: {action}")
 
         return action, label
