@@ -6,15 +6,15 @@ logger = wrap_logger(logging.getLogger(__name__))
 
 
 class InternalUserServiceMock:
-    @staticmethod
-    def get_user_details(uuid):
+    def __init__(self):
+        self.internal_user_dict = {"Someuuid": {"id": "Someuuid",
+                                                "firstName": "fred",
+                                                "lastName": "flinstone",
+                                                "emailAddress": "mock@email.com"}}
+
+    def get_user_details(self, uuid):
         """gets the user details from the internal user service"""
         logger.debug("getting mock user details for uaa")
         if uuid:
-            internal_user_dict = {uuid: {"id": uuid,
-                                         "firstName": "fred",
-                                         "lastName": "flinstone",
-                                         "emailAddress": "mock@email.com"}}
-            return internal_user_dict[uuid], 200
-        else:
-            return "error retrieving details"
+            return self.internal_user_dict[uuid], 200
+        return "error retrieving details"
