@@ -11,10 +11,10 @@ class InternalUserServiceMock:
         """gets the user details from the internal user service"""
         logger.debug("getting mock user details for uaa")
         if uuid:
-            internal_user_dict = {"id": uuid,
-                                  "firstName": "fred",
-                                  "lastName": "flinstone",
-                                  "emailAddress": "mock@email.com"}
-            return internal_user_dict, 200
+            internal_user_dict = {uuid: {"id": uuid,
+                                         "firstName": "fred",
+                                         "lastName": "flinstone",
+                                         "emailAddress": "mock@email.com"}}
+            return internal_user_dict[uuid], 200
         else:
             return "error retrieving details"
