@@ -121,6 +121,20 @@ Feature: Draft Save Endpoint
     When the message is saved as draft
     Then a bad request status code (400) is returned
 
+  Scenario: Respondent saves a draft with not their id is not in the from field should receive a 400 error
+    Given the user is set as respondent
+      And the from is set to alternative respondent
+      And the to is set to internal
+    When the message is saved as draft
+    Then a bad request status code (400) is returned
+
+  Scenario: Internal User saves a draft with not their id is not in the from field should receive a 400 error
+    Given the user is set as internal
+      And the from is set to alternative internal
+      And the to is set to respondent
+    When the message is saved as draft
+    Then a bad request status code (400) is returned
+
   Scenario: Respondent saves a draft with an empty survey field and receive a 400 error
     Given sending from respondent to internal
       And  the survey is set to empty

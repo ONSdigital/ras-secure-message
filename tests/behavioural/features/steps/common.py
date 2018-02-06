@@ -23,9 +23,9 @@ def step_impl_prepare_for_tests(context, service_type):
         case_service.use_mock_service()
 
 
-@given("database is reset")
+@given("repository is reset")
 def step_impl_reset_db(context):
-    """ reset database and use the context test helper"""
+    """ reset repository and use the context test helper"""
     with context.app.app_context():
         database.db.init_app(current_app)
         database.db.drop_all()

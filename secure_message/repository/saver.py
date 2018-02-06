@@ -13,7 +13,7 @@ class Saver:
 
     @staticmethod
     def save_message(domain_message, session=db.session):
-        """save message to database"""
+        """save message to repository"""
         db_message = SecureMessage()
         db_message.set_from_domain_model(domain_message)
 
@@ -27,7 +27,7 @@ class Saver:
 
     @staticmethod
     def save_msg_status(actor, msg_id, label, session=db.session):
-        """save message status to database"""
+        """save message status to repository"""
         db_status_to = Status()
         db_status_to.set_from_domain_model(msg_id, actor, label)
 
@@ -41,7 +41,7 @@ class Saver:
 
     @staticmethod
     def save_msg_event(msg_id, event, session=db.session):
-        """save message events to events database"""
+        """save message events to events repository"""
         event = Events(msg_id=msg_id, event=event)
 
         try:
@@ -54,7 +54,7 @@ class Saver:
 
     @staticmethod
     def save_msg_audit(msg_id, msg_urn, session=db.session):
-        """Save Sent Audit data to database"""
+        """Save Sent Audit data to repository"""
         db_audit = InternalSentAudit()
         db_audit.set_from_domain_model(msg_id, msg_urn)
 
@@ -68,7 +68,7 @@ class Saver:
 
     @staticmethod
     def save_msg_actors(msg_id, from_actor, to_actor, sent_from_internal, session=db.session):
-        """Save actor information data to database"""
+        """Save actor information data to repository"""
         actor = Actors(msg_id, from_actor, to_actor, sent_from_internal)
 
         try:

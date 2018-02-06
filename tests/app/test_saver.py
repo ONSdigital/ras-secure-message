@@ -43,7 +43,7 @@ class SaverTestCase(unittest.TestCase):
                     Saver().save_message(self.test_message, mock_session)
 
     def test_saved_msg_status_has_been_saved(self):
-        """retrieves message status from database"""
+        """retrieves message status from repository"""
         message_status = {'msg_id': 'AMsgId', 'actor': 'Tej'}
         with self.app.app_context():
             with current_app.test_request_context():
@@ -66,7 +66,7 @@ class SaverTestCase(unittest.TestCase):
                     Saver().save_msg_status(message_status['actor'], message_status['msg_id'], 'INBOX', mock_session)
 
     def test_save_msg_audit_does_not_raise_exception_on_successful_save(self):
-        """Tests message audit is saved to database"""
+        """Tests message audit is saved to repository"""
         message_audit = {'msg_id': 'MsgId', 'msg_urn': 'Tej'}
         with self.app.app_context():
             with current_app.test_request_context():
@@ -88,7 +88,7 @@ class SaverTestCase(unittest.TestCase):
                     Saver().save_msg_audit(message_audit['msg_id'], message_audit['msg_urn'], mock_session)
 
     def test_save_actors_does_not_raise_exception_on_successful_save(self):
-        """Tests message actors is saved to database"""
+        """Tests message actors is saved to repository"""
         message = {'msg_id': 'MsgId', 'msg_to': 'Tej', 'msg_from': 'some survey'}
         with self.app.app_context():
             with current_app.test_request_context():
@@ -130,7 +130,7 @@ class SaverTestCase(unittest.TestCase):
                     self.assertTrue(row[4] == message['sent_from_internal'])
 
     def test_saved_msg_event_has_been_saved(self):
-        """retrieves message event from database"""
+        """retrieves message event from repository"""
         message_event = {'msg_id': 'AMsgId', 'event': EventsApi.DRAFT_SAVED.value, 'date_time': ''}
         with self.app.app_context():
             with current_app.test_request_context():

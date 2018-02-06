@@ -21,7 +21,7 @@ class Health(Resource):
 
 class DatabaseHealth(Resource):
 
-    """Rest endpoint to provide application database health"""
+    """Rest endpoint to provide application repository health"""
 
     @staticmethod
     def get():

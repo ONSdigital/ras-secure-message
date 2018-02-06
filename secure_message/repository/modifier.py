@@ -27,8 +27,8 @@ class Modifier:
             return True
         except Exception as e:
             session.rollback()
-            logger.error('Error adding label to database', msg_id=message, label=label, user_uuid=actor, error=e)
-            raise InternalServerError(description="Error adding label to database")
+            logger.error('Error adding label to repository', msg_id=message, label=label, user_uuid=actor, error=e)
+            raise InternalServerError(description="Error adding label to repository")
 
     @staticmethod
     def remove_label(label, message, user):
@@ -40,8 +40,8 @@ class Modifier:
             db.get_engine(app=db.get_app()).execute(query)
             return True
         except Exception as e:
-            logger.error('Error removing label from database', msg_id=message, label=label, user_uuid=actor, error=e)
-            raise InternalServerError(description="Error removing label from database")
+            logger.error('Error removing label from repository', msg_id=message, label=label, user_uuid=actor, error=e)
+            raise InternalServerError(description="Error removing label from repository")
 
     @staticmethod
     def add_archived(message, user):
@@ -100,8 +100,8 @@ class Modifier:
             db.get_engine(app=db.get_app()).execute(del_draft_msg)
 
         except Exception as e:
-            logger.error('Error deleting draft from database', msg_id=draft_id, error=e)
-            raise InternalServerError(description="Error deleting draft from database")
+            logger.error('Error deleting draft from repository', msg_id=draft_id, error=e)
+            raise InternalServerError(description="Error deleting draft from repository")
 
     @staticmethod
     def replace_current_draft(draft_id, draft, session=db.session):
@@ -135,5 +135,5 @@ class Modifier:
             session.commit()
         except Exception as e:
             session.rollback()
-            logger.error('Error replacing label in database', label=Labels.DRAFT_INBOX.value, msg_id=draft_id, error=e)
+            logger.error('Error replacing label in repository', label=Labels.DRAFT_INBOX.value, msg_id=draft_id, error=e)
             raise InternalServerError(description="Error replacing DRAFT_INBOX label")

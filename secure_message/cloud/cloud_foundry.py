@@ -32,7 +32,7 @@ class ONSCloudFoundry(object):
         return self._protocol
 
     def database(self):
-        return self._cf_env.get_service(tags='database')
+        return self._cf_env.get_service(tags='repository')
 
     def credentials(self):
         return self._cf_env.get_credential('uri')

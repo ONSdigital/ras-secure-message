@@ -86,7 +86,7 @@ class MessageSend(Resource):
 
     @staticmethod
     def _message_save(message, is_draft, draft_id):
-        """Saves the message to the database along with the subsequent status and audit"""
+        """Saves the message to the repository along with the subsequent status and audit"""
         save = Saver()
         save.save_message(message.data)
         save.save_msg_actors(message.data.msg_id, message.data.msg_from, message.data.msg_to[0], g.user.is_internal)

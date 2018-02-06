@@ -16,7 +16,9 @@ class User:
     def is_respondent(self):
         return bool(self.role == 'respondent')
 
-    @staticmethod
-    def is_valid_user(uuid):
-        _, status_code = party.get_user_details(uuid)
+    def is_valid_user(self, uuid):
+        if self.is_internal:
+            status_code = 200       # Todo add internal userlookup
+        else:
+            _, status_code = party.get_user_details(uuid)
         return status_code == 200

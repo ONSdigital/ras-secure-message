@@ -25,7 +25,7 @@ class Retriever:
         if user.is_respondent:
             status_conditions.append(Status.actor == str(user.user_uuid))
         else:
-            status_conditions.append(Status.actor == constants.BRES_USER)
+            status_conditions.append(Status.actor == str(user.user_uuid) or Status.actor == constants.BRES_USER or Status.actor == constants.NON_SPECIFIC_INTERNAL_USER)
 
         if label is not None:
             status_conditions.append(Status.label == str(label))
@@ -64,8 +64,8 @@ class Retriever:
                     .order_by(t.c.max_date.asc()).paginate(page, limit, False)
 
         except Exception as e:
-            logger.error('Error retrieving messages from database', error=e)
-            raise InternalServerError(description="Error retrieving messages from database")
+            logger.error('Error retrieving messages from repository', error=e)
+            raise InternalServerError(description="Error retrieving messages from repository")
 
         return True, result
 
@@ -77,8 +77,8 @@ class Retriever:
         try:
             result = SecureMessage.query.join(Status).filter(and_(*status_conditions)).filter(Status.label == 'UNREAD').count()
         except Exception as e:
-            logger.error('Error retrieving count of unread messages from database', error=e)
-            raise InternalServerError(description="Error retrieving count of unread messages from database")
+            logger.error('Error retrieving count of unread messages from repository', error=e)
+            raise InternalServerError(description="Error retrieving count of unread messages from repository")
         return result
 
     @staticmethod
@@ -90,7 +90,8 @@ class Retriever:
         if user.is_respondent:
             status_conditions.append(Status.actor == str(user.user_uuid))
         else:
-            status_conditions.append(Status.actor == constants.BRES_USER)
+            status_conditions.append(Status.actor == str(user.user_uuid)
+                                     or Status.actor == constants.BRES_USER or Status.actor == constants.NON_SPECIFIC_INTERNAL_USER)
 
         status_conditions.append(Status.label != Labels.DRAFT_INBOX.value)
 
@@ -112,8 +113,8 @@ class Retriever:
                 .order_by(t.c.max_date.desc()).paginate(page, limit, False)
 
         except Exception as e:
-            logger.error('Error retrieving messages from database', error=e)
-            raise InternalServerError(description="Error retrieving messages from database")
+            logger.error('Error retrieving messages from repository', error=e)
+            raise InternalServerError(description="Error retrieving messages from repository")
 
         return True, result
 
@@ -128,8 +129,8 @@ class Retriever:
                 logger.error('Message ID not found', message_id=message_id)
                 raise NotFound(description="Message with msg_id '{0}' does not exist".format(message_id))
         except SQLAlchemyError as e:
-            logger.error('Error retrieving message from database', error=e)
-            raise InternalServerError(description="Error retrieving message from database")
+            logger.error('Error retrieving message from repository', error=e)
+            raise InternalServerError(description="Error retrieving message from repository")
 
         return result.serialize(user)
 
@@ -141,7 +142,8 @@ class Retriever:
         if user.is_respondent:
             status_conditions.append(Status.actor == str(user.user_uuid))
         else:
-            status_conditions.append(Status.actor == constants.BRES_USER)
+            status_conditions.append(Status.actor == str(
+                user.user_uuid) or Status.actor == constants.BRES_USER or Status.actor == constants.NON_SPECIFIC_INTERNAL_USER)
 
         status_conditions.append(Status.label != Labels.DRAFT_INBOX.value)
 
@@ -158,8 +160,8 @@ class Retriever:
                 raise NotFound(description="Conversation with thread_id '{0}' does not exist".format(thread_id))
 
         except SQLAlchemyError as e:
-            logger.error('Error retrieving conversation from database', error=e)
-            raise InternalServerError(description="Error retrieving conversation from database")
+            logger.error('Error retrieving conversation from repository', error=e)
+            raise InternalServerError(description="Error retrieving conversation from repository")
 
         return True, result
 
@@ -175,7 +177,7 @@ class Retriever:
                 raise NotFound(description="Draft with msg_id '{0}' does not exist".format(message_id))
         except SQLAlchemyError:
             logger.exception("SQLAlchemy error occurred while retrieving draft")
-            raise InternalServerError(description="Error retrieving draft from database")
+            raise InternalServerError(description="Error retrieving draft from repository")
 
         message = result.serialize(user)
 
@@ -195,7 +197,7 @@ class Retriever:
             database_status['errors'] = str(e)
             resp = jsonify(database_status)
             resp.status_code = 500
-            logger.error('No connection to database', status_code=resp.status_code, error=e)
+            logger.error('No connection to repository', status_code=resp.status_code, error=e)
 
         return resp
 
@@ -206,8 +208,8 @@ class Retriever:
             result = SecureMessage.query.filter(SecureMessage.msg_id == draft_id)\
                 .filter(SecureMessage.statuses.any(Status.label == Labels.DRAFT.value)).first()
         except Exception as e:
-            logger.error('Error retrieving message from database', error=e)
-            raise InternalServerError(description="Error retrieving message from database")
+            logger.error('Error retrieving message from repository', error=e)
+            raise InternalServerError(description="Error retrieving message from repository")
 
         if result is None:
             return False, result
