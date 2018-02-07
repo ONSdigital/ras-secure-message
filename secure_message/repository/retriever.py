@@ -17,15 +17,21 @@ logger = wrap_logger(logging.getLogger(__name__))
 class Retriever:
     """Created when retrieving messages"""
     @staticmethod
-    def retrieve_message_list(page, limit, user, ru_id=None, survey=None, cc=None, ce=None, label=None, descend=True):
+    def retrieve_message_list(page, limit, user, ru_id=None, survey=None, cc=None, ce=None, label=None, descend=True, sent_from_internal=False):
         """returns list of messages from db"""
-        conditions = []
-        status_conditions = []
 
         if user.is_respondent:
-            status_conditions.append(Status.actor == str(user.user_uuid))
+            return Retriever._retrieve_message_list_respondent(page, limit, user=user, ru_id=ru_id, survey=survey,
+                                                               cc=cc, ce=ce, label=label, descend=descend)
         else:
-            status_conditions.append(Status.actor == str(user.user_uuid) or Status.actor == constants.BRES_USER or Status.actor == constants.NON_SPECIFIC_INTERNAL_USER)
+            return Retriever._retrieve_message_list_internal(page, limit, user=user, ru_id=ru_id, survey=survey,
+                                                             cc=cc, ce=ce, label=label, descend=descend, sent_from_internal=sent_from_internal)
+
+    @staticmethod
+    def _retrieve_message_list_respondent(page, limit, user, ru_id, survey, cc, ce, label, descend):
+        """returns list of messages from db"""
+        conditions = []
+        status_conditions = [Status.actor == str(user.user_uuid)]
 
         if label is not None:
             status_conditions.append(Status.label == str(label))
@@ -46,7 +52,7 @@ class Retriever:
 
         try:
             t = db.session.query(SecureMessage.msg_id, func.max(Events.date_time)  # pylint:disable=no-member
-                                 .label('max_date'))\
+                                 .label('max_date')) \
                 .join(Events).join(Status).outerjoin(Actors) \
                 .filter(and_(*conditions)) \
                 .filter(and_(*status_conditions)) \
@@ -54,7 +60,7 @@ class Retriever:
                 .group_by(SecureMessage.msg_id).subquery('t')
 
             if descend:
-                result = SecureMessage.query\
+                result = SecureMessage.query \
                     .filter(SecureMessage.msg_id == t.c.msg_id) \
                     .order_by(t.c.max_date.desc()).paginate(page, limit, False)
 
@@ -68,6 +74,63 @@ class Retriever:
             raise InternalServerError(description="Error retrieving messages from repository")
 
         return True, result
+
+    @staticmethod
+    def _retrieve_message_list_internal(page, limit, user, ru_id, survey,  cc, ce, label, descend, sent_from_internal):
+        """returns list of messages from db"""
+        conditions = []
+        status_conditions = []
+        valid_statuses = []
+
+        if label is not None:
+            status_conditions.append(Status.label == str(label))
+            if label in [Labels.INBOX.value, Labels.ARCHIVE.value, Labels.UNREAD.value]:
+                status_conditions.append(Actors.sent_from_internal == False)
+            if label in [Labels.DRAFT.value, Labels.SENT.value]:
+                status_conditions.append(Actors.sent_from_internal == True)
+        else:
+            status_conditions.append(Status.label != Labels.DRAFT_INBOX.value)
+            conditions.append(Actors.sent_from_internal == sent_from_internal)
+            valid_statuses=[Labels.INBOX.value]
+
+        if ru_id is not None:
+            conditions.append(SecureMessage.ru_id == str(ru_id))
+
+        if survey is not None:
+            conditions.append(SecureMessage.survey == str(survey))
+
+        if cc is not None:
+            conditions.append(SecureMessage.collection_case == str(cc))
+
+        if ce is not None:
+            conditions.append(SecureMessage.collection_exercise == str(ce))
+
+        try:
+            t = db.session.query(SecureMessage.msg_id, func.max(Events.date_time)  # pylint:disable=no-member
+                                 .label('max_date')) \
+                .join(Events).join(Status).outerjoin(Actors) \
+                .filter(and_(*conditions)) \
+                .filter(and_(*status_conditions)) \
+                .filter(Status.label.in_(*valid_statuses)) \
+                .filter(or_(Events.event == EventsApi.SENT.value, Events.event == EventsApi.DRAFT_SAVED.value)) \
+                .group_by(SecureMessage.msg_id).subquery('t')
+
+            if descend:
+                result = SecureMessage.query \
+                    .filter(SecureMessage.msg_id == t.c.msg_id) \
+                    .order_by(t.c.max_date.desc()).paginate(page, limit, False)
+
+            else:
+                result = SecureMessage.query \
+                    .filter(SecureMessage.msg_id == t.c.msg_id) \
+                    .order_by(t.c.max_date.asc()).paginate(page, limit, False)
+
+        except Exception as e:
+            logger.error('Error retrieving messages from repository', error=e)
+            raise InternalServerError(description="Error retrieving messages from repository")
+
+        return True, result
+
 
     @staticmethod
     def unread_message_count(user):

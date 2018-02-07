@@ -291,7 +291,7 @@ class MessageSchemaTestCase(unittest.TestCase):
             schema = DraftSchema()
             errors = schema.load(self.json_message)[1]
 
-        self.assertTrue(errors == {'msg_to': ['NotAValidUser is not a valid user.']})
+        self.assertTrue(errors == {'msg_to': ['NotAValidUser is not a valid internal user.']})
 
 
 if __name__ == '__main__':

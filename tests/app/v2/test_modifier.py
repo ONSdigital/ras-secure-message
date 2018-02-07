@@ -59,7 +59,7 @@ class ModifyTestCaseHelper:
                         "VALUES('" + EventsApi.READ.value + "', '{0}', '{1}')".format(msg_id, "2017-02-03 00:00:00")
                 con.execute(query)
 
-@unittest.skip()
+
 class ModifyTestCaseV2(unittest.TestCase, ModifyTestCaseHelper):
     """Test case for message retrieval"""
 
@@ -79,6 +79,7 @@ class ModifyTestCaseV2(unittest.TestCase, ModifyTestCaseHelper):
         self.user_internal = User('ce12b958-2a5f-44f4-a6da-861e59070a31', 'internal')
         self.user_respondent = User('0a7ad740-10d5-4ecb-b7ca-3c0384afb882', 'respondent')
 
+    @unittest.skip("Do Later")
     def test_archived_label_is_added_to_message(self):
         """testing message is added to repository with archived label attached"""
         self.populate_database(1)
@@ -98,6 +99,7 @@ class ModifyTestCaseV2(unittest.TestCase, ModifyTestCaseHelper):
                 message = message_service.retrieve_message(msg_id, self.user_respondent)
                 self.assertCountEqual(message['labels'], ['SENT', 'ARCHIVE'])
 
+    @unittest.skip("Do Later")
     def test_archived_label_is_removed_from_message(self):
         """testing message is added to repository with archived label removed and inbox and read is added instead"""
         self.populate_database(1)
@@ -119,6 +121,7 @@ class ModifyTestCaseV2(unittest.TestCase, ModifyTestCaseHelper):
                 message = message_service.retrieve_message(msg_id, self.user_respondent)
                 self.assertCountEqual(message['labels'], ['SENT'])
 
+    @unittest.skip("Do Later")
     def test_unread_label_is_removed_from_message(self):
         """testing message is added to repository with archived label removed and inbox and read is added instead"""
         self.populate_database(1)
@@ -138,6 +141,7 @@ class ModifyTestCaseV2(unittest.TestCase, ModifyTestCaseHelper):
                 message = message_service.retrieve_message(msg_id, self.user_internal)
                 self.assertCountEqual(message['labels'], ['INBOX'])
 
+    @unittest.skip("Do Later")
     def test_unread_label_is_added_to_message(self):
         """testing message is added to repository with archived label removed and inbox and read is added instead"""
         self.populate_database(1)
@@ -159,6 +163,7 @@ class ModifyTestCaseV2(unittest.TestCase, ModifyTestCaseHelper):
                 message = message_service.retrieve_message(msg_id, self.user_internal)
                 self.assertCountEqual(message['labels'], ['UNREAD', 'INBOX'])
 
+    @unittest.skip("Do Later")
     def test_two_unread_labels_are_added_to_message(self):
         """testing duplicate message labels are not added to the repository"""
         self.populate_database(1)
@@ -184,6 +189,7 @@ class ModifyTestCaseV2(unittest.TestCase, ModifyTestCaseHelper):
                 unread_label_total.append(row[0])
             self.assertTrue(unread_label_total[0] == 1)
 
+    @unittest.skip("Do Later")
     def test_add_archive_is_added_to_internal(self):
         """testing message is added to repository with archived label attached"""
         self.populate_database(1)
@@ -204,6 +210,7 @@ class ModifyTestCaseV2(unittest.TestCase, ModifyTestCaseHelper):
                 message = message_service.retrieve_message(msg_id, self.user_internal)
                 self.assertCountEqual(message['labels'], ['UNREAD', 'INBOX', 'ARCHIVE'])
 
+    @unittest.skip("Do Later")
     def test_read_date_is_set(self):
         """testing message read_date is set when unread label is removed"""
         self.populate_database(1)
@@ -223,6 +230,7 @@ class ModifyTestCaseV2(unittest.TestCase, ModifyTestCaseHelper):
                 message = message_service.retrieve_message(msg_id, self.user_internal)
                 self.assertIsNotNone(message['read_date'])
 
+    @unittest.skip("Do Later")
     def test_read_date_is_not_reset(self):
         """testing message read_date is not reset when unread label is removed again"""
         self.populate_database(1)
@@ -247,6 +255,7 @@ class ModifyTestCaseV2(unittest.TestCase, ModifyTestCaseHelper):
                 message = message_service.retrieve_message(msg_id, self.user_internal)
                 self.assertEqual(message['read_date'], read_date_set)
 
+    @unittest.skip("Do Later")
     def test_draft_label_is_deleted(self):
         """Check draft label is deleted for message"""
         with self.app.app_context():
@@ -289,6 +298,7 @@ class ModifyTestCaseV2(unittest.TestCase, ModifyTestCaseHelper):
                     else:
                         pass
 
+    @unittest.skip("Do Later")
     def test_draft_event_is_deleted(self):
         """Check draft event is deleted for message"""
         with self.app.app_context():
@@ -326,6 +336,7 @@ class ModifyTestCaseV2(unittest.TestCase, ModifyTestCaseHelper):
                     for row in request:
                         self.assertTrue(row is None)
 
+    @unittest.skip("Do Later")
     def test_replace_current_draft(self):
         """Check current draft is replaced when modified"""
         with self.app.app_context():
@@ -362,6 +373,7 @@ class ModifyTestCaseV2(unittest.TestCase, ModifyTestCaseHelper):
                 self.assertEqual(retrieved_data["body"], 'not hello')
                 self.assertEqual(retrieved_data["subject"], 'not MyMessage')
 
+    @unittest.skip("Do Later")
     def test_archive_is_removed_for_both_respondent_and_internal(self):
         """testing archive label is removed after being added to both respondent and internal"""
         self.populate_database(2)
@@ -389,6 +401,7 @@ class ModifyTestCaseV2(unittest.TestCase, ModifyTestCaseHelper):
                 message = message_service.retrieve_message(msg_id, self.user_internal)
                 self.assertCountEqual(message['labels'], ['UNREAD', 'INBOX'])
 
+    @unittest.skip("Do Later")
     def test_exception_for_add_label_raises(self):
         with self.app.app_context():
             database.db.drop_all()
@@ -396,6 +409,7 @@ class ModifyTestCaseV2(unittest.TestCase, ModifyTestCaseHelper):
                 with self.assertRaises(InternalServerError):
                     ModifierV2.add_label('UNREAD', {'survey': 'survey'}, self.user_internal)
 
+    @unittest.skip("Do Later")
     def test_exception_for_remove_label_raises(self):
         with self.app.app_context():
             database.db.drop_all()
@@ -403,6 +417,7 @@ class ModifyTestCaseV2(unittest.TestCase, ModifyTestCaseHelper):
                 with self.assertRaises(InternalServerError):
                     ModifierV2.remove_label('UNREAD', {'survey': 'survey'}, self.user_internal)
 
+    @unittest.skip("Do Later")
     def test_replace_current_recipient_status_raises(self):
         with self.app.app_context():
             database.db.drop_all()
@@ -410,6 +425,7 @@ class ModifyTestCaseV2(unittest.TestCase, ModifyTestCaseHelper):
                 with self.assertRaises(InternalServerError):
                     ModifierV2.replace_current_recipient_status(self.user_internal, 'Torrance')
 
+    @unittest.skip("Do Later")
     def test_exception_for_replace_current_draft_raises(self):
         draft = {'msg_id': 'test123',
                  'msg_to': ['richard'],
