@@ -79,19 +79,21 @@ class Retriever:
     def _retrieve_message_list_internal(page, limit, user, ru_id, survey,  cc, ce, label, descend, sent_from_internal):
         """returns list of messages from db"""
         conditions = []
-        status_conditions = []
+        status_reject_conditions = []
         valid_statuses = []
+        actor_conditions = []
 
         if label is not None:
-            status_conditions.append(Status.label == str(label))
+            valid_statuses.append(label)
             if label in [Labels.INBOX.value, Labels.ARCHIVE.value, Labels.UNREAD.value]:
-                status_conditions.append(Actors.sent_from_internal == False)
+                actor_conditions.append(Actors.sent_from_internal == False)
             if label in [Labels.DRAFT.value, Labels.SENT.value]:
-                status_conditions.append(Actors.sent_from_internal == True)
+                actor_conditions.append(Actors.sent_from_internal == True)
         else:
-            status_conditions.append(Status.label != Labels.DRAFT_INBOX.value)
+            status_reject_conditions.append(Labels.DRAFT_INBOX.value)
             conditions.append(Actors.sent_from_internal == sent_from_internal)
-            valid_statuses=[Labels.INBOX.value]
+            valid_statuses = [Labels.INBOX.value, Labels.DRAFT.value]
+            actor_conditions.append(True)   # todo . clean this - cludgy
 
         if ru_id is not None:
             conditions.append(SecureMessage.ru_id == str(ru_id))
@@ -110,8 +112,9 @@ class Retriever:
                                  .label('max_date')) \
                 .join(Events).join(Status).outerjoin(Actors) \
                 .filter(and_(*conditions)) \
-                .filter(and_(*status_conditions)) \
-                .filter(Status.label.in_(*valid_statuses)) \
+                .filter(or_(*actor_conditions)) \
+                .filter(~Status.label.in_(status_reject_conditions)) \
+                .filter(Status.label.in_(valid_statuses)) \
                 .filter(or_(Events.event == EventsApi.SENT.value, Events.event == EventsApi.DRAFT_SAVED.value)) \
                 .group_by(SecureMessage.msg_id).subquery('t')
 

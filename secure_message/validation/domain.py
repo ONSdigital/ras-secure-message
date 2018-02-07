@@ -70,11 +70,16 @@ class MessageSchema(Schema):
     def validate_to(self, msg_to):
         for item in msg_to:
             self.validate_non_zero_field_length("msg_to", len(item), constants.MAX_TO_LEN)
-            if  msg_to != constants.BRES_USER \
-                    and not msg_to != constants.NON_SPECIFIC_INTERNAL_USER \
-                    and not User.is_valid_user(item):
-                logger.error('Not a valid user', user=item)
-                raise ValidationError("{0} is not a valid user.".format(item))
+            if g.user.is_internal:  # internal user must be sending to a respondent
+                if not g.user.is_valid_respondent(item):
+                    logger.error('Not a valid respondent', user=item)
+                    raise ValidationError("{0} is not a valid respondent.".format(item))
+            else:  # Respondent sending to internal
+                if not (msg_to[0] == constants.BRES_USER
+                        or msg_to[0] == constants.NON_SPECIFIC_INTERNAL_USER
+                        or g.user.is_valid_internal_user(msg_to[0])):
+                    logger.error('Not a valid internal user', user=item)
+                    raise ValidationError("{0} is not a valid internal user.".format(item))
 
     @validates("msg_from")
     def validate_from(self, msg_from):
@@ -180,13 +185,13 @@ class DraftSchema(Schema):
             for item in msg_to:
                 self.validate_field_length(msg_to, len(item), constants.MAX_TO_LEN)
                 if g.user.is_internal:  # internal user must be sending to a respondent
-                    if not g.user.is_valid_user(item):
+                    if not g.user.is_valid_respondent(item):
                         logger.error('Not a valid respondent', user=item)
                         raise ValidationError("{0} is not a valid respondent.".format(item))
                 else:  # Respondent sending to internal
                     if not (msg_to[0] == constants.BRES_USER
                             or msg_to[0] == constants.NON_SPECIFIC_INTERNAL_USER
-                            or g.user.is_valid_user(msg_to[0])):
+                            or g.user.is_valid_internal_user(msg_to[0])):
                                 logger.error('Not a valid internal user', user=item)
                                 raise ValidationError("{0} is not a valid internal user.".format(item))
         else:
