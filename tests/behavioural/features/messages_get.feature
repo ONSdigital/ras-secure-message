@@ -205,7 +205,6 @@ Feature: Get Messages list Endpoint
   Scenario: An internal user sends multiple messages , all should be returned with sent from internal True
     Given sending from internal to respondent
       And '7' messages are sent
-          And debug step
     When messages with a label of  'SENT' are read
       Then a success status code (200) is returned
       And '7' messages are returned with sent from internal

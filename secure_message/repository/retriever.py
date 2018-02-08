@@ -24,9 +24,8 @@ class Retriever:
         if user.is_respondent:
             return Retriever._retrieve_message_list_respondent(page, limit, user=user, ru_id=ru_id, survey=survey,
                                                                cc=cc, ce=ce, label=label, descend=descend)
-        else:
-            return Retriever._retrieve_message_list_internal(page, limit, ru_id=ru_id, survey=survey,
-                                                             cc=cc, ce=ce, label=label, descend=descend)
+        return Retriever._retrieve_message_list_internal(page, limit, ru_id=ru_id, survey=survey,
+                                                         cc=cc, ce=ce, label=label, descend=descend)
 
     @staticmethod
     def _retrieve_message_list_respondent(page, limit, user, ru_id, survey, cc, ce, label, descend):
@@ -87,9 +86,9 @@ class Retriever:
         if label is not None:
             valid_statuses.append(label)
             if label in [Labels.INBOX.value, Labels.ARCHIVE.value, Labels.UNREAD.value]:
-                actor_conditions.append(Actors.sent_from_internal == False)
+                actor_conditions.append(Actors.sent_from_internal == False)  # NOQA pylint:disable=singleton-comparison
             if label in [Labels.DRAFT.value, Labels.SENT.value]:
-                actor_conditions.append(Actors.sent_from_internal == True)
+                actor_conditions.append(Actors.sent_from_internal == True)  # NOQA pylint:disable=singleton-comparison
         else:
             status_reject_conditions.append(Labels.DRAFT_INBOX.value)
             valid_statuses = [Labels.INBOX.value, Labels.DRAFT.value]

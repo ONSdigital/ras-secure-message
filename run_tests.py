@@ -18,5 +18,5 @@ if __name__ == "__main__":
             suite = loader.discover(test_path)
             suites_list.append(suite)
             result = unittest.TextTestRunner(verbosity=2).run(suite)
-            if result.failures or result.errors:
+            if result.failures or result.errors or behave_errors:
                 sys.exit(1)
