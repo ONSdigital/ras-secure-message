@@ -70,8 +70,8 @@ class FlaskTestCase(unittest.TestCase):
         case_service.use_mock_service()
 
     def test_that_checks_post_request_is_within_database(self):
-        """check messages from messageSend endpoint saved in repository correctly"""
-        # check if json message is inside the repository
+        """check messages from messageSend endpoint saved in database correctly"""
+        # check if json message is inside the database
 
         url = "http://localhost:5050/message/send"
 

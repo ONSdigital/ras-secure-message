@@ -31,7 +31,7 @@ class HealthTestCase(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
 
     def test_db_connection_test_fails(self):
-        """runs check_db_connection function after dropping repository"""
+        """runs check_db_connection function after dropping database"""
         with self.app.app_context():
             database.db.drop_all()
             with current_app.test_request_context():

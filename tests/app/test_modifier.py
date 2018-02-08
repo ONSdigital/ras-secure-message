@@ -72,7 +72,7 @@ class ModifyTestCase(unittest.TestCase, ModifyTestCaseHelper):
         self.user_respondent = User('0a7ad740-10d5-4ecb-b7ca-3c0384afb882', 'respondent')
 
     def test_archived_label_is_added_to_message(self):
-        """testing message is added to repository with archived label attached"""
+        """testing message is added to database with archived label attached"""
         self.populate_database(1)
         with self.engine.connect() as con:
             query = 'SELECT msg_id FROM securemessage.secure_message LIMIT 1'
@@ -91,7 +91,7 @@ class ModifyTestCase(unittest.TestCase, ModifyTestCaseHelper):
                 self.assertCountEqual(message['labels'], ['SENT', 'ARCHIVE'])
 
     def test_archived_label_is_removed_from_message(self):
-        """testing message is added to repository with archived label removed and inbox and read is added instead"""
+        """testing message is added to database with archived label removed and inbox and read is added instead"""
         self.populate_database(1)
         with self.engine.connect() as con:
             query = 'SELECT msg_id FROM securemessage.secure_message LIMIT 1'
@@ -112,7 +112,7 @@ class ModifyTestCase(unittest.TestCase, ModifyTestCaseHelper):
                 self.assertCountEqual(message['labels'], ['SENT'])
 
     def test_unread_label_is_removed_from_message(self):
-        """testing message is added to repository with archived label removed and inbox and read is added instead"""
+        """testing message is added to database with archived label removed and inbox and read is added instead"""
         self.populate_database(1)
         with self.engine.connect() as con:
             query = 'SELECT msg_id FROM securemessage.secure_message LIMIT 1'
@@ -131,7 +131,7 @@ class ModifyTestCase(unittest.TestCase, ModifyTestCaseHelper):
                 self.assertCountEqual(message['labels'], ['INBOX'])
 
     def test_unread_label_is_added_to_message(self):
-        """testing message is added to repository with archived label removed and inbox and read is added instead"""
+        """testing message is added to database with archived label removed and inbox and read is added instead"""
         self.populate_database(1)
         with self.engine.connect() as con:
             query = 'SELECT msg_id FROM securemessage.secure_message LIMIT 1'
@@ -152,7 +152,7 @@ class ModifyTestCase(unittest.TestCase, ModifyTestCaseHelper):
                 self.assertCountEqual(message['labels'], ['UNREAD', 'INBOX'])
 
     def test_two_unread_labels_are_added_to_message(self):
-        """testing duplicate message labels are not added to the repository"""
+        """testing duplicate message labels are not added to the database"""
         self.populate_database(1)
         with self.engine.connect() as con:
             query = 'SELECT msg_id FROM securemessage.secure_message LIMIT 1'
@@ -177,7 +177,7 @@ class ModifyTestCase(unittest.TestCase, ModifyTestCaseHelper):
             self.assertTrue(unread_label_total[0] == 1)
 
     def test_add_archive_is_added_to_internal(self):
-        """testing message is added to repository with archived label attached"""
+        """testing message is added to database with archived label attached"""
         self.populate_database(1)
         with self.engine.connect() as con:
             query = 'SELECT msg_id FROM securemessage.secure_message LIMIT 1'

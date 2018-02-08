@@ -16,7 +16,7 @@ db = SQLAlchemy(metadata=metadata)
 
 
 class SecureMessage(db.Model):
-    """Secure messaging repository model"""
+    """Secure messaging database model"""
 
     __tablename__ = "secure_message"
 

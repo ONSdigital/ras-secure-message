@@ -220,7 +220,7 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
         self.app.config['NOTIFY_CASE_SERVICE'] = '1'
 
     def test_0_msg_returned_when_db_empty_true(self):
-        """retrieves messages from empty repository"""
+        """retrieves messages from empty database"""
         with self.app.app_context():
             with current_app.test_request_context():
                 response = Retriever().retrieve_message_list(1, MESSAGE_QUERY_LIMIT, self.user_respondent)[1]
@@ -238,7 +238,7 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
                     Retriever().retrieve_message_list(1, MESSAGE_QUERY_LIMIT, self.user_respondent)
 
     def test_all_msg_returned_when_db_less_than_limit(self):
-        """retrieves messages from repository with less entries than retrieval amount"""
+        """retrieves messages from database with less entries than retrieval amount"""
         self.populate_database(5)
 
         with self.app.app_context():
@@ -250,7 +250,7 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
                 self.assertEqual(len(msg), 5)
 
     def test_msg_limit_returned_when_db_greater_than_limit(self):
-        """retrieves x messages when repository has greater than x entries"""
+        """retrieves x messages when database has greater than x entries"""
         self.populate_database(MESSAGE_QUERY_LIMIT + 5)
         with self.app.app_context():
             with current_app.test_request_context():
@@ -275,7 +275,7 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
                 self.assertEqual(len(msg), 10)
 
     def test_msg_limit_returned_when_db_greater_than_limit_with_replies(self):
-        """retrieves x messages when repository has greater than x entries and repository has reply messages"""
+        """retrieves x messages when database has greater than x entries and database has reply messages"""
         self.populate_database(MESSAGE_QUERY_LIMIT + 5, multiple_users=True, add_reply=True)
         with self.app.app_context():
             with current_app.test_request_context():
@@ -287,7 +287,7 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
                 self.assertEqual(len(msg), MESSAGE_QUERY_LIMIT)
 
     def test_msg_limit_returned_when_db_greater_than_limit_with_replies_drafts(self):
-        """retrieves x messages when repository has greater than x entries and repository has reply messages and drafts"""
+        """retrieves x messages when database has greater than x entries and database has reply messages and drafts"""
         self.populate_database(MESSAGE_QUERY_LIMIT + 5, multiple_users=True, add_reply=True, add_draft=True)
         with self.app.app_context():
             with current_app.test_request_context():
@@ -408,7 +408,7 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
                     Retriever().retrieve_message(1, self.user_internal)
 
     def test_all_draft_message_returned(self):
-        """retrieves messages from repository with label DRAFT for user"""
+        """retrieves messages from database with label DRAFT for user"""
         self.populate_database(5, add_draft=True)
 
         with self.app.app_context():
@@ -423,7 +423,7 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
                 self.assertEqual(len(msg), 5)
 
     def test_all_sent_message_returned(self):
-        """retrieves messages from repository with label SENT for user"""
+        """retrieves messages from database with label SENT for user"""
         self.populate_database(5, add_reply=True)
 
         with self.app.app_context():
@@ -438,7 +438,7 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
                 self.assertEqual(len(msg), 5)
 
     def test_all_inbox_message_returned(self):
-        """retrieves messages from repository with label SENT for user"""
+        """retrieves messages from database with label SENT for user"""
         self.populate_database(5, add_reply=True)
 
         with self.app.app_context():
@@ -453,7 +453,7 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
                 self.assertEqual(len(msg), 5)
 
     def test_all_message_returned_no_label_option(self):
-        """retrieves all messages from repository for user with no messages with label DRAFT_INBOX"""
+        """retrieves all messages from database for user with no messages with label DRAFT_INBOX"""
         self.populate_database(5, add_draft=True)
 
         with self.app.app_context():
@@ -468,7 +468,7 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
                 self.assertEqual(len(msg), 5)
 
     def test_all_message_returned_with_ru_option(self):
-        """retrieves all messages from repository for user with ru option"""
+        """retrieves all messages from database for user with ru option"""
         self.populate_database(5, multiple_users=True)
 
         with self.app.app_context():
@@ -483,7 +483,7 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
                 self.assertEqual(len(msg), 5)
 
     def test_no_message_returned_with_ru_option(self):
-        """retrieves no messages from repository for user with ru option"""
+        """retrieves no messages from database for user with ru option"""
         self.populate_database(5, multiple_users=True)
 
         with self.app.app_context():
@@ -498,7 +498,7 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
                 self.assertEqual(len(msg), 0)
 
     def test_all_message_returned_with_survey_option(self):
-        """retrieves all messages from repository for user with survey option"""
+        """retrieves all messages from database for user with survey option"""
         self.populate_database(5)
 
         with self.app.app_context():
@@ -513,7 +513,7 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
                 self.assertEqual(len(msg), 5)
 
     def test_no_message_returned_with_survey_option(self):
-        """retrieves no messages from repository for user with survey option"""
+        """retrieves no messages from database for user with survey option"""
         self.populate_database(5, multiple_users=True)
 
         with self.app.app_context():
@@ -528,7 +528,7 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
                 self.assertEqual(len(msg), 0)
 
     def test_all_message_returned_with_cc_option(self):
-        """retrieves all messages from repository for user with cc option"""
+        """retrieves all messages from database for user with cc option"""
         self.populate_database(5)
 
         with self.app.app_context():
@@ -543,7 +543,7 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
                 self.assertEqual(len(msg), 5)
 
     def test_no_message_returned_with_cc_option(self):
-        """retrieves no messages from repository for user with cc option"""
+        """retrieves no messages from database for user with cc option"""
         self.populate_database(5)
 
         with self.app.app_context():
@@ -558,7 +558,7 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
                 self.assertEqual(len(msg), 0)
 
     def test_all_message_returned_with_ce_option(self):
-        """retrieves all messages from repository for user with ce option"""
+        """retrieves all messages from database for user with ce option"""
         self.populate_database(5)
 
         with self.app.app_context():
@@ -573,7 +573,7 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
                 self.assertEqual(len(msg), 5)
 
     def test_no_message_returned_with_ce_option(self):
-        """retrieves no messages from repository for user with ce option"""
+        """retrieves no messages from database for user with ce option"""
         self.populate_database(5)
 
         with self.app.app_context():
@@ -588,7 +588,7 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
                 self.assertEqual(len(msg), 0)
 
     def test_message_list_returned_in_descending_order(self):
-        """retrieves messages from repository in desc sent_date order"""
+        """retrieves messages from database in desc sent_date order"""
         self.populate_database(5)
 
         with self.app.app_context():
@@ -608,7 +608,7 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
                 self.assertListEqual(desc_date, date)
 
     def test_message_list_returned_in_ascending_order(self):
-        """retrieves messages from repository in asc sent_date order"""
+        """retrieves messages from database in asc sent_date order"""
         self.populate_database(5)
 
         with self.app.app_context():
@@ -628,7 +628,7 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
                 self.assertListEqual(asc_date, date)
 
     def test_message_list_returned_in_ascending_order_not_drafts(self):
-        """retrieves messages and drafts from repository in asc sent_date order"""
+        """retrieves messages and drafts from database in asc sent_date order"""
         self.populate_database(5, add_draft=True)
 
         with self.app.app_context():
@@ -650,7 +650,7 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
                 self.assertListEqual(asc_date, date)
 
     def test_messages_list_returned_in_descending_order_not_drafts(self):
-        """retrieves messages and drafts from repository in desc sent_date order"""
+        """retrieves messages and drafts from database in desc sent_date order"""
         self.populate_database(5, add_draft=True)
 
         with self.app.app_context():
@@ -754,7 +754,7 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
                         Retriever().retrieve_draft(message_id, self.user_internal)
 
     def test_draft_returned_with_msg_id_draft_not_in_database(self):
-        """retrieves draft using id where draft not in repository"""
+        """retrieves draft using id where draft not in database"""
         message_id = str(uuid.uuid4())
         self.populate_database(1, single=False, add_draft=True)
         with self.app.app_context():
@@ -805,7 +805,7 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
                     Retriever().retrieve_message(1, self.user_internal)
 
     def test_all_msg_returned_for_thread_id_with_draft(self):
-        """retrieves messages for thread_id from repository with draft """
+        """retrieves messages for thread_id from database with draft """
         self.populate_database(3, add_reply=True, add_draft=True)
 
         with self.app.app_context():
@@ -814,7 +814,7 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
                 self.assertEqual(len(response.items), 9)
 
     def test_all_msg_returned_for_thread_id_without_draft(self):
-        """retrieves messages for thread_id from repository without draft"""
+        """retrieves messages for thread_id from database without draft"""
         self.populate_database(3, add_reply=True)
 
         with self.app.app_context():
@@ -823,7 +823,7 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
                 self.assertEqual(len(response.items), 6)
 
     def test_all_msg_returned_for_thread_id_with_draft_inbox(self):
-        """retrieves messages for thread_id from repository with draft inbox"""
+        """retrieves messages for thread_id from database with draft inbox"""
         self.populate_database(3, add_reply=True, add_draft=True)
 
         with self.app.app_context():
@@ -892,7 +892,7 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
                     Retriever().retrieve_thread_list(1, MESSAGE_QUERY_LIMIT, self.user_respondent)
 
     def test_thread_list_returned_in_descending_order_respondent(self):
-        """retrieves threads from repository in desc sent_date order for respondent"""
+        """retrieves threads from database in desc sent_date order for respondent"""
         self.create_threads(5)
         self.populate_database(5, single=False, multiple_users=True)
 
@@ -913,7 +913,7 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
                 self.assertListEqual(desc_date, date)
 
     def test_thread_list_returned_in_descending_order_internal(self):
-        """retrieves threads from repository in desc sent_date order for internal user"""
+        """retrieves threads from database in desc sent_date order for internal user"""
         self.create_threads(5)
         self.populate_database(5, single=False, multiple_users=True)
 
@@ -934,7 +934,7 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
                 self.assertListEqual(desc_date, date)
 
     def test_thread_list_returned_in_descending_order_respondent_with_draft(self):
-        """retrieves threads from repository in desc sent_date order for respondent with draft"""
+        """retrieves threads from database in desc sent_date order for respondent with draft"""
         self.create_threads(5, add_respondent_draft=True)
         self.populate_database(5, single=False, multiple_users=True)
 
@@ -955,7 +955,7 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
                 self.assertListEqual(desc_date, date)
 
     def test_thread_list_returned_in_descending_order_internal_with_draft(self):
-        """retrieves threads from repository in desc sent_date order for internal user with draft"""
+        """retrieves threads from database in desc sent_date order for internal user with draft"""
         self.create_threads(5, add_internal_draft=True)
         self.populate_database(5, single=False, multiple_users=True)
 

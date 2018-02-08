@@ -20,3 +20,4 @@ if __name__ == "__main__":
             result = unittest.TextTestRunner(verbosity=2).run(suite)
             if result.failures or result.errors or behave_errors:
                 sys.exit(1)
+

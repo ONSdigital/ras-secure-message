@@ -70,8 +70,8 @@ class Retriever:
                     .order_by(t.c.max_date.asc()).paginate(page, limit, False)
 
         except Exception as e:
-            logger.error('Error retrieving messages from repository', error=e)
-            raise InternalServerError(description="Error retrieving messages from repository")
+            logger.error('Error retrieving messages from database', error=e)
+            raise InternalServerError(description="Error retrieving messages from database")
 
         return True, result
 
@@ -128,8 +128,8 @@ class Retriever:
                     .order_by(t.c.max_date.asc()).paginate(page, limit, False)
 
         except Exception as e:
-            logger.error('Error retrieving messages from repository', error=e)
-            raise InternalServerError(description="Error retrieving messages from repository")
+            logger.error('Error retrieving messages from database', error=e)
+            raise InternalServerError(description="Error retrieving messages from database")
 
         return True, result
 
@@ -142,8 +142,8 @@ class Retriever:
             result = SecureMessage.query.join(Status).filter(and_(*status_conditions)).filter(
                 Status.label == 'UNREAD').count()
         except Exception as e:
-            logger.error('Error retrieving count of unread messages from repository', error=e)
-            raise InternalServerError(description="Error retrieving count of unread messages from repository")
+            logger.error('Error retrieving count of unread messages from database', error=e)
+            raise InternalServerError(description="Error retrieving count of unread messages from database")
         return result
 
     @staticmethod
@@ -181,8 +181,8 @@ class Retriever:
                 .order_by(t.c.max_id.desc()).paginate(page, limit, False)
 
         except Exception as e:
-            logger.error('Error retrieving messages from repository', error=e)
-            raise InternalServerError(description="Error retrieving messages from repository")
+            logger.error('Error retrieving messages from database', error=e)
+            raise InternalServerError(description="Error retrieving messages from database")
 
         return True, result
 
@@ -197,8 +197,8 @@ class Retriever:
                 logger.error('Message ID not found', message_id=message_id)
                 raise NotFound(description="Message with msg_id '{0}' does not exist".format(message_id))
         except SQLAlchemyError as e:
-            logger.error('Error retrieving message from repository', error=e)
-            raise InternalServerError(description="Error retrieving message from repository")
+            logger.error('Error retrieving message from database', error=e)
+            raise InternalServerError(description="Error retrieving message from database")
 
         return result.serialize(user)
 
@@ -231,8 +231,8 @@ class Retriever:
                 raise NotFound(description="Conversation with thread_id '{0}' does not exist".format(thread_id))
 
         except SQLAlchemyError as e:
-            logger.error('Error retrieving conversation from repository', error=e)
-            raise InternalServerError(description="Error retrieving conversation from repository")
+            logger.error('Error retrieving conversation from database', error=e)
+            raise InternalServerError(description="Error retrieving conversation from database")
 
         return True, result
 
@@ -248,7 +248,7 @@ class Retriever:
                 raise NotFound(description="Draft with msg_id '{0}' does not exist".format(message_id))
         except SQLAlchemyError:
             logger.exception("SQLAlchemy error occurred while retrieving draft")
-            raise InternalServerError(description="Error retrieving draft from repository")
+            raise InternalServerError(description="Error retrieving draft from database")
 
         message = result.serialize(user)
 
@@ -268,7 +268,7 @@ class Retriever:
             database_status['errors'] = str(e)
             resp = jsonify(database_status)
             resp.status_code = 500
-            logger.error('No connection to repository', status_code=resp.status_code, error=e)
+            logger.error('No connection to database', status_code=resp.status_code, error=e)
 
         return resp
 
@@ -279,8 +279,8 @@ class Retriever:
             result = SecureMessage.query.filter(SecureMessage.msg_id == draft_id) \
                 .filter(SecureMessage.statuses.any(Status.label == Labels.DRAFT.value)).first()
         except Exception as e:
-            logger.error('Error retrieving message from repository', error=e)
-            raise InternalServerError(description="Error retrieving message from repository")
+            logger.error('Error retrieving message from database', error=e)
+            raise InternalServerError(description="Error retrieving message from database")
 
         if result is None:
             return False, result
