@@ -166,7 +166,6 @@ Feature: Message Send Endpoint
     Given the user is set as internal
       And  the from is set to internal
       And  the to is set to 'someone_who_does_not_exist'
-      And debug step
     When the message is sent
     Then a bad request status code (400) is returned
 

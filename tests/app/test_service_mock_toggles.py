@@ -1,6 +1,6 @@
 import unittest
 
-from secure_message.services.service_toggles import Party
+from secure_message.services.service_toggles import Party, InternalUser
 from secure_message.api_mocks.party_service_mock import PartyServiceMock
 from secure_message.services.party_service import PartyService
 
@@ -28,3 +28,15 @@ class ServiceMockTestCase(unittest.TestCase):
         sut.use_real_service()
         sut.use_mock_service()
         self.assertTrue(isinstance(sut._service, PartyServiceMock))
+
+    def test_mock_user_service_returns_expected_value(self):
+        sut = InternalUser(False)
+        sut.use_mock_service()
+        user_data = sut.get_user_details("Someuuid")
+        self.assertIsNotNone(user_data)
+
+    def test_mock_user_service_returns_404_if_value_not_present(self):
+        sut = InternalUser(False)
+        sut.use_mock_service()
+        _, status = sut.get_user_details("SomeUnknownuuid")
+        self.assertEqual(status, 404)

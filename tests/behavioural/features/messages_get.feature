@@ -11,8 +11,8 @@ Feature: Get Messages list Endpoint
 
   Scenario: An internal user sends multiple messages, Internal user reads them confirm correct count seen
     Given sending from internal to respondent
-    And  '5' messages are sent
-    When messages are read
+      And  '5' messages are sent
+    When messages with a label of  'SENT' are read
     Then  '5' messages are returned
 
   Scenario: A Respondent sends multiple messages and reads them to confirm all have SENT labels
@@ -58,7 +58,7 @@ Feature: Get Messages list Endpoint
       And  '5' messages are sent
       And  ru set to alternate ru
       And  '3' messages are sent
-    When the user is set as internal
+    When the user is set as respondent
      And ru set to default ru
      And messages are read using current 'ru_id'
     Then  '5' messages are returned
@@ -205,7 +205,8 @@ Feature: Get Messages list Endpoint
   Scenario: An internal user sends multiple messages , all should be returned with sent from internal True
     Given sending from internal to respondent
       And '7' messages are sent
-    When messages are read
+          And debug step
+    When messages with a label of  'SENT' are read
       Then a success status code (200) is returned
       And '7' messages are returned with sent from internal
 

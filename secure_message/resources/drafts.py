@@ -47,14 +47,14 @@ class DraftSave(Resource):
     @staticmethod
     def _save_draft(draft, saver=Saver()):
         saver.save_message(draft.data)
-
+        uuid_to = ''
         if draft.data.msg_to is not None and draft.data.msg_to:
             uuid_to = draft.data.msg_to[0]
             saver.save_msg_status(uuid_to, draft.data.msg_id, Labels.DRAFT_INBOX.value)
 
         uuid_from = draft.data.msg_from
         saver.save_msg_status(uuid_from, draft.data.msg_id, Labels.DRAFT.value)
-
+        saver.save_msg_actors(draft.data.msg_id, uuid_from, uuid_to, g.user.is_internal)
         saver.save_msg_event(draft.data.msg_id, EventsApi.DRAFT_SAVED.value)
 
 

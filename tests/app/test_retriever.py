@@ -17,11 +17,10 @@ from secure_message.validation.user import User
 from tests.app import test_utilities
 
 
-
 class RetrieverTestCaseHelper:
 
-    default_internal_actor = 'internal_actor'#"ce12b958-2a5f-44f4-a6da-861e59070a32"
-    default_external_actor = 'external_actor' #"0a7ad740-10d5-4ecb-b7ca-3c0384afb882"
+    default_internal_actor = 'internal_actor'
+    default_external_actor = 'external_actor'
 
     """Helper class for Retriever Tests"""
     def add_secure_message(self, msg_id, subject="test", body="test", thread_id="ThreadId",
@@ -69,7 +68,7 @@ class RetrieverTestCaseHelper:
                 label, msg_id, actor)
             con.execute(query)
 
-    def populate_database(self, no_of_messages=0, single=True, add_reply=False, add_draft=False, multiple_users=False ,
+    def populate_database(self, no_of_messages=0, single=True, add_reply=False, add_draft=False, multiple_users=False,
                           external_actor=default_external_actor,
                           internal_actor=default_internal_actor):
         """ Populate the db with a specified number of messages and optionally replies , multiple users"""
@@ -95,7 +94,7 @@ class RetrieverTestCaseHelper:
                 self.add_status(label="SENT", msg_id=msg_id, actor=external_actor)
                 self.add_status(label="INBOX", msg_id=msg_id, actor=internal_actor)
                 self.add_status(label="UNREAD", msg_id=msg_id, actor=internal_actor)
-                self.add_actors(msg_id=msg_id , from_actor=external_actor, to_actor=internal_actor ,
+                self.add_actors(msg_id=msg_id, from_actor=external_actor, to_actor=internal_actor,
                                 sent_from_internal=False)
                 self.add_event(event=EventsApi.SENT.value, msg_id=msg_id, date_time=datetime(year, month, day))
 
@@ -273,7 +272,7 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
                 for message in result.items:
                     serialized_message = message.serialize(self.user_internal)
                     msg.append(serialized_message)
-                self.assertEqual(len(msg), 5)
+                self.assertEqual(len(msg), 10)
 
     def test_msg_limit_returned_when_db_greater_than_limit_with_replies(self):
         """retrieves x messages when repository has greater than x entries and repository has reply messages"""
@@ -647,7 +646,7 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
                         date.append(serialized_msg['modified_date'])
 
                 asc_date = sorted(date, reverse=False)
-                self.assertEqual(len(date), 5)
+                self.assertEqual(len(date), 10)
                 self.assertListEqual(asc_date, date)
 
     def test_messages_list_returned_in_descending_order_not_drafts(self):
@@ -669,7 +668,7 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
                         date.append(serialized_msg['modified_date'])
 
                 desc_date = sorted(date, reverse=True)
-                self.assertEqual(len(date), 5)
+                self.assertEqual(len(date), 10)
                 self.assertListEqual(desc_date, date)
 
     def test_draft_returned_with_msg_id_true(self):
@@ -805,7 +804,6 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
                 with self.assertRaises(InternalServerError):
                     Retriever().retrieve_message(1, self.user_internal)
 
-    @unittest.skip("Return to threads")
     def test_all_msg_returned_for_thread_id_with_draft(self):
         """retrieves messages for thread_id from repository with draft """
         self.populate_database(3, add_reply=True, add_draft=True)
@@ -815,7 +813,6 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
                 response = Retriever().retrieve_thread('ThreadId', self.user_internal, 1, MESSAGE_QUERY_LIMIT)[1]
                 self.assertEqual(len(response.items), 9)
 
-    @unittest.skip("Return to threads")
     def test_all_msg_returned_for_thread_id_without_draft(self):
         """retrieves messages for thread_id from repository without draft"""
         self.populate_database(3, add_reply=True)
@@ -825,7 +822,6 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
                 response = Retriever().retrieve_thread('ThreadId', self.user_respondent, 1, MESSAGE_QUERY_LIMIT)[1]
                 self.assertEqual(len(response.items), 6)
 
-    @unittest.skip("Return to threads")
     def test_all_msg_returned_for_thread_id_with_draft_inbox(self):
         """retrieves messages for thread_id from repository with draft inbox"""
         self.populate_database(3, add_reply=True, add_draft=True)
@@ -835,7 +831,6 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
                 response = Retriever().retrieve_thread('ThreadId', self.user_respondent, 1, MESSAGE_QUERY_LIMIT)[1]
                 self.assertEqual(len(response.items), 6)
 
-    @unittest.skip("Return to threads")
     def test_thread_returned_in_desc_order(self):
         """check thread returned in correct order"""
         self.populate_database(3, add_reply=True)
@@ -851,7 +846,6 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
                 self.assertEqual(len(sent), 6)
                 self.assertListEqual(desc_date, sent)
 
-    @unittest.skip("Threads need to be revisited")
     def test_thread_returned_in_desc_order_with_draft(self):
         """check thread returned in correct order with draft"""
         self.populate_database(3, add_reply=True, add_draft=True)
@@ -889,7 +883,6 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
                 with self.assertRaises(InternalServerError):
                     Retriever().retrieve_draft('draftId', self.user_respondent)
 
-    @unittest.skip("Threads need to be revisited")
     def test_retrieve_thread_list_raises_server_error(self):
         """retrieves threads when db does not exist"""
         with self.app.app_context():
@@ -898,7 +891,6 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
                 with self.assertRaises(InternalServerError):
                     Retriever().retrieve_thread_list(1, MESSAGE_QUERY_LIMIT, self.user_respondent)
 
-    @unittest.skip("Threads need to be revisited")
     def test_thread_list_returned_in_descending_order_respondent(self):
         """retrieves threads from repository in desc sent_date order for respondent"""
         self.create_threads(5)
@@ -920,7 +912,6 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
                 self.assertEqual(len(date), 5)
                 self.assertListEqual(desc_date, date)
 
-    @unittest.skip("Threads need to be revisited")
     def test_thread_list_returned_in_descending_order_internal(self):
         """retrieves threads from repository in desc sent_date order for internal user"""
         self.create_threads(5)
@@ -942,7 +933,6 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
                 self.assertEqual(len(date), 5)
                 self.assertListEqual(desc_date, date)
 
-    @unittest.skip("Threads need to be revisited")
     def test_thread_list_returned_in_descending_order_respondent_with_draft(self):
         """retrieves threads from repository in desc sent_date order for respondent with draft"""
         self.create_threads(5, add_respondent_draft=True)
@@ -964,7 +954,6 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
                 self.assertEqual(len(date), 5)
                 self.assertListEqual(desc_date, date)
 
-    @unittest.skip("Threads need to be revisited")
     def test_thread_list_returned_in_descending_order_internal_with_draft(self):
         """retrieves threads from repository in desc sent_date order for internal user with draft"""
         self.create_threads(5, add_internal_draft=True)
@@ -986,7 +975,6 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
                 self.assertEqual(len(date), 5)
                 self.assertListEqual(desc_date, date)
 
-    @unittest.skip("Threads need to be revisited")
     def test_latest_message_from_each_thread_chosen_desc(self):
         """checks the message chosen for each thread is the latest message within that thread"""
         self.create_threads(5)
@@ -1015,7 +1003,6 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
                     self.assertEqual(date[x], str(thread.items[0].events[0].date_time))
                     self.assertEqual(msg_ids[x], thread.items[0].events[0].msg_id)
 
-    @unittest.skip("Threads need to be revisited")
     def test_latest_message_from_each_thread_chosen_desc_respondent_with_respondent_draft(self):
         """checks the message chosen for each thread is the latest message within that thread
          for respondent with respondent drafts"""
@@ -1045,7 +1032,6 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
                     self.assertEqual(date[x], str(thread.items[0].events[0].date_time))
                     self.assertEqual(msg_ids[x], thread.items[0].events[0].msg_id)
 
-    @unittest.skip("Threads need to be revisited")
     def test_latest_message_from_each_thread_chosen_desc_internal_with_respondent_draft(self):
         """checks the message chosen for each thread is the latest message within that thread
         for internal user with respondent drafts"""
@@ -1075,7 +1061,6 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
                     self.assertEqual(date[x], str(thread.items[0].events[0].date_time))
                     self.assertEqual(msg_ids[x], thread.items[0].events[0].msg_id)
 
-    @unittest.skip("Threads need to be revisited")
     def test_latest_message_from_each_thread_chosen_desc_respondent_with_internal_draft(self):
         """checks the message chosen for each thread is the latest message within that thread
          for respondent with internal drafts"""
@@ -1105,7 +1090,6 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
                     self.assertEqual(date[x], str(thread.items[0].events[0].date_time))
                     self.assertEqual(msg_ids[x], thread.items[0].events[0].msg_id)
 
-    @unittest.skip("Threads need to be revisited")
     def test_latest_message_from_each_thread_chosen_desc_internal_with_internal_draft(self):
         """checks the message chosen for each thread is the latest message within that thread
         for internal user with internal drafts"""
@@ -1135,7 +1119,6 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
                     self.assertEqual(date[x], str(thread.items[0].events[0].date_time))
                     self.assertEqual(msg_ids[x], thread.items[0].events[0].msg_id)
 
-    @unittest.skip("Threads need to be revisited")
     def test_latest_message_from_each_thread_chosen_desc_respondent_with_both_users_drafts(self):
         """checks the message chosen for each thread is the latest message within that thread
          for respondent with drafts from both users"""
@@ -1165,7 +1148,6 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
                     self.assertEqual(date[x], str(thread.items[0].events[0].date_time))
                     self.assertEqual(msg_ids[x], thread.items[0].events[0].msg_id)
 
-    @unittest.skip("Threads need to be revisited")
     def test_latest_message_from_each_thread_chosen_desc_internal_with_both_users_drafts(self):
         """checks the message chosen for each thread is the latest message within that thread
         for internal user with drafts from both users"""

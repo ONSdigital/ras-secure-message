@@ -10,13 +10,7 @@ from sqlalchemy import event, DDL
 
 from secure_message.exception.exceptions import MissingEnvironmentVariable
 from secure_message.repository import database
-from secure_message.resources.health import Health, DatabaseHealth, HealthDetails
-from secure_message.resources.info import Info
-from secure_message.resources.labels import Labels
-from secure_message.resources.messages import MessageList, MessageSend, MessageById, MessageModifyById
 from secure_message.authentication.authenticator import authenticate
-from secure_message.resources.drafts import DraftSave, DraftById, DraftModifyById, DraftList
-from secure_message.resources.threads import ThreadById, ThreadList
 from secure_message.logger_config import logger_initial_config
 from secure_message.v1.application import set_v1_resources
 from secure_message.v2.application import set_v2_resources

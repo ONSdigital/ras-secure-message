@@ -4,6 +4,7 @@ from datetime import datetime, timezone
 from flask import g
 
 from secure_message import constants
+from secure_message.services.service_toggles import internal_user_service
 from secure_message.validation.domain import Message, MessageSchema, DraftSchema
 from secure_message.validation.user import User
 from secure_message.application import create_app
@@ -81,7 +82,7 @@ class MessageSchemaTestCase(unittest.TestCase):
         self.json_message = {'msg_to': ['Tej'], 'msg_from': 'Gemma', 'subject': 'MyMessage', 'body': 'hello',
                              'thread_id': "", 'ru_id': "7fc0e8ab-189c-4794-b8f4-9f05a1db185b", 'survey': "RSI"}
         self.now = datetime.now(timezone.utc)
-
+        internal_user_service.use_mock_service()
         self.app = create_app()
 
     def test_valid_message_passes_validation(self):

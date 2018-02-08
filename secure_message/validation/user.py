@@ -1,4 +1,4 @@
-from secure_message.services.service_toggles import party
+from secure_message.services.service_toggles import party, internal_user_service
 
 
 class User:
@@ -18,9 +18,10 @@ class User:
 
     @staticmethod
     def is_valid_internal_user(uuid):
-        return 200       # Todo add internal userlookup
+        _, status_code = internal_user_service.get_user_details(uuid)
+        return True if status_code == 200 else False
 
     @staticmethod
     def is_valid_respondent(uuid):
         _, status_code = party.get_user_details(uuid)
-        return status_code == 200
+        return True if status_code == 200 else False
