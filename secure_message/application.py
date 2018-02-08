@@ -13,7 +13,6 @@ from secure_message.repository import database
 from secure_message.authentication.authenticator import authenticate
 from secure_message.logger_config import logger_initial_config
 from secure_message.v1.application import set_v1_resources
-from secure_message.v2.application import set_v2_resources
 
 logger_initial_config(service_name='ras-secure-message')
 logger = wrap_logger(logging.getLogger(__name__))
@@ -44,7 +43,6 @@ def create_app(config=None):
         database.db.session.commit()  # NOQA pylint:disable=no-member
 
     set_v1_resources(api)
-    set_v2_resources(api)
 
     @app.before_request
     def before_request():  # NOQA pylint:disable=unused-variable
