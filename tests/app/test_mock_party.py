@@ -140,11 +140,11 @@ class PartyTestCase(unittest.TestCase):
 
         self.engine = create_engine(self.app.config['SQLALCHEMY_DATABASE_URI'])
 
-        resp = self.client.post("http://localhost:5050/message/send", data=json.dumps(data), headers=self.headers)
+        resp = self.client.post("http://localhost:5050/messages/send", data=json.dumps(data), headers=self.headers)
         resp_data = json.loads(resp.data)
         msg_id = resp_data['msg_id']
 
-        message_resp = self.client.get(f'http://localhost:5050/message/{msg_id}', headers=self.headers)
+        message_resp = self.client.get(f'http://localhost:5050/messages/{msg_id}', headers=self.headers)
         message = json.loads(message_resp.data)
 
         self.assertEqual(message['@msg_from'], {'telephone': '+443069990289',
@@ -181,8 +181,8 @@ class PartyTestCase(unittest.TestCase):
 
         self.engine = create_engine(self.app.config['SQLALCHEMY_DATABASE_URI'])
 
-        self.client.post("http://localhost:5050/message/send", data=json.dumps(data), headers=self.headers)
-        self.client.post("http://localhost:5050/message/send", data=json.dumps(data), headers=self.headers)
+        self.client.post("http://localhost:5050/messages/send", data=json.dumps(data), headers=self.headers)
+        self.client.post("http://localhost:5050/messages/send", data=json.dumps(data), headers=self.headers)
 
         messages_get = self.client.get("http://localhost:5050/messages", headers=self.headers)
         get_return = json.loads(messages_get.data)
@@ -215,11 +215,11 @@ class PartyTestCase(unittest.TestCase):
 
         self.engine = create_engine(self.app.config['SQLALCHEMY_DATABASE_URI'])
 
-        draft_resp = self.client.post("http://localhost:5050/draft/save", data=json.dumps(data), headers=self.headers)
+        draft_resp = self.client.post("http://localhost:5050/drafts/save", data=json.dumps(data), headers=self.headers)
         draft_details = json.loads(draft_resp.data)
         draft_id = draft_details['msg_id']
 
-        draft_get = self.client.get(f'http://localhost:5050/draft/{draft_id}', headers=self.headers)
+        draft_get = self.client.get(f'http://localhost:5050/drafts/{draft_id}', headers=self.headers)
         draft = json.loads(draft_get.data)
 
         self.assertEqual(draft['@msg_from'], {'telephone': '+443069990289', 'firstName': 'Vana',
@@ -245,8 +245,8 @@ class PartyTestCase(unittest.TestCase):
 
         self.engine = create_engine(self.app.config['SQLALCHEMY_DATABASE_URI'])
 
-        self.client.post("http://localhost:5050/draft/save", data=json.dumps(data), headers=self.headers)
-        self.client.post("http://localhost:5050/draft/save", data=json.dumps(data), headers=self.headers)
+        self.client.post("http://localhost:5050/drafts/save", data=json.dumps(data), headers=self.headers)
+        self.client.post("http://localhost:5050/drafts/save", data=json.dumps(data), headers=self.headers)
 
         drafts_get = self.client.get("http://localhost:5050/drafts", headers=self.headers)
         drafts_data = json.loads(drafts_get.data)
@@ -311,11 +311,11 @@ class PartyTestCase(unittest.TestCase):
 
         self.engine = create_engine(self.app.config['SQLALCHEMY_DATABASE_URI'])
 
-        message_post = self.client.post("http://localhost:5050/message/send", data=json.dumps(data), headers=self.headers)
+        message_post = self.client.post("http://localhost:5050/messages/send", data=json.dumps(data), headers=self.headers)
         message_data = json.loads(message_post.data)
         msg_id = message_data['msg_id']
 
-        message_get = self.client.get("http://localhost:5050/message/{}".format(msg_id), headers=self.headers)
+        message_get = self.client.get("http://localhost:5050/messages/{}".format(msg_id), headers=self.headers)
         message = json.loads(message_get.data)
 
         self.assertEqual(message['@ru_id']['name'], "Apple")
@@ -338,8 +338,8 @@ class PartyTestCase(unittest.TestCase):
 
         self.engine = create_engine(self.app.config['SQLALCHEMY_DATABASE_URI'])
 
-        self.client.post("http://localhost:5050/message/send", data=json.dumps(data), headers=self.headers)
-        self.client.post("http://localhost:5050/message/send", data=json.dumps(data), headers=self.headers)
+        self.client.post("http://localhost:5050/messages/send", data=json.dumps(data), headers=self.headers)
+        self.client.post("http://localhost:5050/messages/send", data=json.dumps(data), headers=self.headers)
 
         messages_get = self.client.get("http://localhost:5050/messages", headers=self.headers)
         get_return = json.loads(messages_get.data)
@@ -366,11 +366,11 @@ class PartyTestCase(unittest.TestCase):
 
         self.engine = create_engine(self.app.config['SQLALCHEMY_DATABASE_URI'])
 
-        draft_save = self.client.post("http://localhost:5050/draft/save", data=json.dumps(data), headers=self.headers)
+        draft_save = self.client.post("http://localhost:5050/drafts/save", data=json.dumps(data), headers=self.headers)
         draft_data = json.loads(draft_save.data)
         draft_id = draft_data['msg_id']
 
-        message_get = self.client.get(f'http://localhost:5050/draft/{draft_id}', headers=self.headers)
+        message_get = self.client.get(f'http://localhost:5050/drafts/{draft_id}', headers=self.headers)
         message = json.loads(message_get.data)
 
         self.assertEqual(message['@ru_id']['name'], "Apple")
@@ -393,8 +393,8 @@ class PartyTestCase(unittest.TestCase):
 
         self.engine = create_engine(self.app.config['SQLALCHEMY_DATABASE_URI'])
 
-        self.client.post("http://localhost:5050/draft/save", data=json.dumps(data), headers=self.headers)
-        self.client.post("http://localhost:5050/draft/save", data=json.dumps(data), headers=self.headers)
+        self.client.post("http://localhost:5050/drafts/save", data=json.dumps(data), headers=self.headers)
+        self.client.post("http://localhost:5050/drafts/save", data=json.dumps(data), headers=self.headers)
 
         drafts_get = self.client.get("http://localhost:5050/drafts", headers=self.headers)
         drafts_data = json.loads(drafts_get.data)

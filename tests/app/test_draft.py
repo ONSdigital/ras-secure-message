@@ -48,7 +48,7 @@ class DraftTestCase(unittest.TestCase):
 
         AlertUser.alert_method = mock.Mock(AlertViaGovNotify)
 
-        self.url = "http://localhost:5050/draft/save"
+        self.url = "http://localhost:5050/drafts/save"
 
         self.headers = {'Content-Type': 'application/json', 'Authorization': encrypted_jwt}
 
