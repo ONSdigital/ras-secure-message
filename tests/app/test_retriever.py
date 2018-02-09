@@ -176,7 +176,7 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
         self.app.testing = True
         self.engine = create_engine(self.app.config['SQLALCHEMY_DATABASE_URI'])
         self.MESSAGE_LIST_ENDPOINT = "http://localhost:5050/messages"
-        self.MESSAGE_BY_ID_ENDPOINT = "http://localhost:5050/message/"
+        self.MESSAGE_BY_ID_ENDPOINT = "http://localhost:5050/messages/"
         with self.app.app_context():
             database.db.init_app(current_app)
             database.db.drop_all()

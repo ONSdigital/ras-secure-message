@@ -64,15 +64,15 @@ class SecureMessagingContextHelper:
 
         # Urls
 
-        self._message_post_url = SecureMessagingContextHelper.__BASE_URL + "/message/send"
-        self._message_get_url = SecureMessagingContextHelper.__BASE_URL + "/message/{0}"
-        self._draft_post_url = SecureMessagingContextHelper.__BASE_URL + "/draft/save"
-        self._draft_put_url = SecureMessagingContextHelper.__BASE_URL + "/draft/{0}/modify"
-        self._draft_get_url = SecureMessagingContextHelper.__BASE_URL + "/draft/{0}"
-        self._message_put_url = SecureMessagingContextHelper.__BASE_URL + "/message/{}/modify"
+        self._message_post_url = SecureMessagingContextHelper.__BASE_URL + "/messages/send"
+        self._message_get_url = SecureMessagingContextHelper.__BASE_URL + "/messages/{0}"
+        self._draft_post_url = SecureMessagingContextHelper.__BASE_URL + "/drafts/save"
+        self._draft_put_url = SecureMessagingContextHelper.__BASE_URL + "/drafts/{0}/modify"
+        self._draft_get_url = SecureMessagingContextHelper.__BASE_URL + "/drafts/{0}"
+        self._message_put_url = SecureMessagingContextHelper.__BASE_URL + "/messages/{}/modify"
         self._messages_get_url = SecureMessagingContextHelper.__BASE_URL + "/messages"
         self._drafts_get_url = SecureMessagingContextHelper.__BASE_URL + "/drafts"
-        self._thread_get_url = SecureMessagingContextHelper.__BASE_URL + "/thread/{0}"
+        self._thread_get_url = SecureMessagingContextHelper.__BASE_URL + "/threads/{0}"
         self._threads_get_url = SecureMessagingContextHelper.__BASE_URL + "/threads"
         self._health_endpoint = SecureMessagingContextHelper.__BASE_URL + "/health"
         self._health_db_endpoint = SecureMessagingContextHelper.__BASE_URL + "/health/db"
