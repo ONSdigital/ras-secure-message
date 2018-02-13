@@ -19,9 +19,9 @@ class User:
     @staticmethod
     def is_valid_internal_user(uuid):
         _, status_code = internal_user_service.get_user_details(uuid)
-        return True if status_code == 200 else False
+        return status_code == 200
 
     @staticmethod
     def is_valid_respondent(uuid):
         _, status_code = party.get_user_details(uuid)
-        return True if status_code == 200 else False
+        return status_code == 200

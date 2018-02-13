@@ -102,7 +102,7 @@ class Modifier:
             db.get_engine(app=db.get_app()).execute(del_draft_msg)
 
         except Exception as e:
-            logger.error('Error deleting draft from database', msg_id=draft_id, error=e)
+            logger.exception('Error deleting draft from database', msg_id=draft_id, error=e)
             raise InternalServerError(description="Error deleting draft from database")
 
     @staticmethod

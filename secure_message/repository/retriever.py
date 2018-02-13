@@ -60,14 +60,13 @@ class Retriever:
                 .group_by(SecureMessage.msg_id).subquery('t')
 
             if descend:
-                result = SecureMessage.query \
-                    .filter(SecureMessage.msg_id == t.c.msg_id) \
-                    .order_by(t.c.max_date.desc()).paginate(page, limit, False)
-
+                order = t.c.max_date.desc()
             else:
-                result = SecureMessage.query \
-                    .filter(SecureMessage.msg_id == t.c.msg_id) \
-                    .order_by(t.c.max_date.asc()).paginate(page, limit, False)
+                order = t.c.max_date.asc()
+
+            result = SecureMessage.query \
+                .filter(SecureMessage.msg_id == t.c.msg_id) \
+                .order_by(order).paginate(page, limit, False)
 
         except Exception as e:
             logger.error('Error retrieving messages from database', error=e)
@@ -107,7 +106,7 @@ class Retriever:
             conditions.append(SecureMessage.collection_exercise == str(ce))
 
         try:
-            t = db.session.query(SecureMessage.msg_id, func.max(Events.date_time)  # pylint:disable=no-member
+            t = db.session.query(SecureMessage.msg_id, func.max(Events.date_time)  # pylint:disable=no-member  ~ below used to obtain not in
                                  .label('max_date')) \
                 .join(Events).join(Status).outerjoin(Actors) \
                 .filter(and_(*conditions)) \
@@ -118,17 +117,16 @@ class Retriever:
                 .group_by(SecureMessage.msg_id).subquery('t')
 
             if descend:
-                result = SecureMessage.query \
-                    .filter(SecureMessage.msg_id == t.c.msg_id) \
-                    .order_by(t.c.max_date.desc()).paginate(page, limit, False)
-
+                order = t.c.max_date.desc()
             else:
-                result = SecureMessage.query \
-                    .filter(SecureMessage.msg_id == t.c.msg_id) \
-                    .order_by(t.c.max_date.asc()).paginate(page, limit, False)
+                order = t.c.max_date.asc()
+
+            result = SecureMessage.query \
+                .filter(SecureMessage.msg_id == t.c.msg_id) \
+                .order_by(order).paginate(page, limit, False)
 
         except Exception as e:
-            logger.error('Error retrieving messages from database', error=e)
+            logger.exception('Error retrieving messages from database', error=e)
             raise InternalServerError(description="Error retrieving messages from database")
 
         return True, result
@@ -142,7 +140,7 @@ class Retriever:
             result = SecureMessage.query.join(Status).filter(and_(*status_conditions)).filter(
                 Status.label == 'UNREAD').count()
         except Exception as e:
-            logger.error('Error retrieving count of unread messages from database', error=e)
+            logger.exception('Error retrieving count of unread messages from database', error=e)
             raise InternalServerError(description="Error retrieving count of unread messages from database")
         return result
 
@@ -181,7 +179,7 @@ class Retriever:
                 .order_by(t.c.max_id.desc()).paginate(page, limit, False)
 
         except Exception as e:
-            logger.error('Error retrieving messages from database', error=e)
+            logger.exception('Error retrieving messages from database', error=e)
             raise InternalServerError(description="Error retrieving messages from database")
 
         return True, result
