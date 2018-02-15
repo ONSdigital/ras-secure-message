@@ -1,5 +1,5 @@
 # ras-secure-message
-[![Build Status](https://travis-ci.org/ONSdigital/ras-secure-message.svg?branch=master)](https://travis-ci.org/ONSdigital/ras-secure-message) 
+[![Build Status](https://travis-ci.org/ONSdigital/ras-secure-message.svg?branch=master)](https://travis-ci.org/ONSdigital/ras-secure-message)
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/4e427a826650454d98ed74dade65a4ff)](https://www.codacy.com/app/ONSDigital/ras-secure-message)
 [![codecov](https://codecov.io/gh/ONSdigital/ras-secure-message/branch/master/graph/badge.svg)](https://codecov.io/gh/ONSdigital/ras-secure-message)
 
@@ -23,6 +23,11 @@ Use pipenv to create a virtualenv and install dependencies
 pipenv install
 ```
 
+Alternatively you can use make
+```bash
+make build
+```
+
 Set environmental variables. Replace $SOURCE_ROOT with the parent directory of the project.
 
 ```
@@ -42,6 +47,10 @@ pipenv run python run.py
 or
 ```bash
 docker-compose up
+```
+or (when postgres is set up)
+```bash
+make start
 ```
 
 
