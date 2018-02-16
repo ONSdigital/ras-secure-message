@@ -151,7 +151,7 @@ def add_to_and_from_details(messages):
 
 def _get_from_details(message):
     """looks up the details for the from users"""
-    if message['sent_from_internal']:
+    if message['from_internal']:
         from_details, _ = internal_user_service.get_user_details(message['msg_from'])
     else:
         from_details, _ = party.get_user_details(message['msg_from'])
@@ -161,7 +161,7 @@ def _get_from_details(message):
 def _get_to_details(message):
     """looks up the details of all the to users"""
     user_details = []
-    if message['sent_from_internal']:
+    if message['from_internal']:
         to_user_details_finder = party.get_user_details
     else:
         to_user_details_finder = internal_user_service.get_user_details

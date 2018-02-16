@@ -23,6 +23,7 @@ class DraftSave(Resource):
     def post(self):
         """Handles saving of draft"""
         post_data = request.get_json()
+        post_data['from_internal'] = g.user.is_internal
         draft = DraftSchema().load(post_data)
 
         if 'msg_id' in post_data:
@@ -54,7 +55,6 @@ class DraftSave(Resource):
 
         uuid_from = draft.data.msg_from
         saver.save_msg_status(uuid_from, draft.data.msg_id, Labels.DRAFT.value)
-        saver.save_msg_actors(draft.data.msg_id, uuid_from, uuid_to, g.user.is_internal)
         saver.save_msg_event(draft.data.msg_id, EventsApi.DRAFT_SAVED.value)
 
 

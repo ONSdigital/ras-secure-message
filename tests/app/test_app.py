@@ -254,22 +254,6 @@ class FlaskTestCase(unittest.TestCase):
             for row in request:
                 self.assertTrue(row is not None)
 
-    def test_message_post_stores_audit_correctly_for_internal_user(self):
-        """Test internal user details have been added to audit table on send message"""
-
-        url = "http://localhost:5050/message/send"
-
-        response = self.client.post(url, data=json.dumps(self.test_message), headers=self.headers)
-        data = json.loads(response.data)
-
-        with self.engine.connect() as con:
-            request = con.execute("SELECT * FROM securemessage.internal_sent_audit WHERE"
-                                  " msg_id='{0}' AND internal_user='{1}'"
-                                  .format(data['msg_id'], self.test_message['msg_from']))
-
-            for row in request:
-                self.assertTrue(row is not None)
-
     def test_draft_inbox_labels_removed_on_draft_send(self):
         """Test that draft inbox labels are removed on draft send"""
 

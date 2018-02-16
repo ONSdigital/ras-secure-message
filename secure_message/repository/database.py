@@ -29,14 +29,15 @@ class SecureMessage(db.Model):
     ru_id = Column("ru_id", String(constants.MAX_RU_ID_LEN + 1))
     collection_exercise = Column("collection_exercise", String(constants.MAX_COLLECTION_EXERCISE_LEN + 1))
     survey = Column("survey", String(constants.MAX_SURVEY_LEN + 1))
+    from_internal = Column('from_internal', Boolean())
+
     statuses = relationship('Status', backref='secure_message', lazy="dynamic")
     events = relationship('Events', backref='secure_message', order_by='Events.date_time', lazy="dynamic")
-    actors = relationship('Actors', backref='secure_message', lazy="dynamic")
 
     __table_args__ = (Index("idx_ru_survey_cc", "ru_id", "survey", "collection_case", "collection_exercise"), )
 
     def __init__(self, msg_id="", subject="", body="", thread_id="", collection_case='',
-                 ru_id='', survey='', collection_exercise=''):
+                 ru_id='', survey='', collection_exercise='', from_internal = False):
 
         logger.debug("Initialised Secure Message entity: msg_id: {}".format(id))
         self.msg_id = msg_id
@@ -47,6 +48,7 @@ class SecureMessage(db.Model):
         self.ru_id = ru_id
         self.survey = survey
         self.collection_exercise = collection_exercise
+        self.from_internal = from_internal
 
     def set_from_domain_model(self, domain_model):
         """set dbMessage attributes to domain_model attributes"""
@@ -58,6 +60,7 @@ class SecureMessage(db.Model):
         self.ru_id = domain_model.ru_id
         self.survey = domain_model.survey
         self.collection_exercise = domain_model.collection_exercise
+        self.from_internal = domain_model.from_internal
 
     def serialize(self, user, body_summary=False):
         """Return object data in easily serializeable format"""
@@ -71,6 +74,7 @@ class SecureMessage(db.Model):
                    'ru_id': self.ru_id,
                    'survey': self.survey,
                    'collection_exercise': self.collection_exercise,
+                   'from_internal': self.from_internal,
                    '_links': '',
                    'labels': []}
 
@@ -78,13 +82,7 @@ class SecureMessage(db.Model):
 
         self._populate_events(message)
 
-        self._populate_actors(message)
-
         return message
-
-    def _populate_actors(self, message):
-        for row in self.actors:
-            message['sent_from_internal'] = row.sent_from_internal
 
     def _populate_events(self, message):
         for row in self.events:
@@ -139,61 +137,35 @@ class Status(db.Model):
         return data
 
 
-class InternalSentAudit(db.Model):
-    """Label Assignment table model"""
-    __tablename__ = "internal_sent_audit"
-
-    id = Column("id", Integer(), primary_key=True)
-    msg_id = Column('msg_id', String(constants.MAX_MSG_ID_LEN + 1), ForeignKey('secure_message.msg_id'), index=True)
-    internal_user = Column('internal_user', String(constants.MAX_STATUS_ACTOR_LEN + 1))
-
-    def __init__(self, msg_id='', internal_user=''):
-        self.msg_id = msg_id
-        self.internal_urn = internal_user
-
-    def set_from_domain_model(self, msg_id, msg_urn):
-        """Set internal sent audit table me"""
-        self.msg_id = msg_id
-        self.internal_user = msg_urn
-
-    @property
-    def serialize(self):
-        """Return object data in easily serializeable format"""
-        data = {'msg_id': self.msg_id,
-                'internal_user': self.internal_user}
-
-        return data
-
-
-class Actors(db.Model):
-    """Label Assignment table model"""
-    __tablename__ = "actors"
-
-    id = Column("id", Integer(), primary_key=True)
-    msg_id = Column('msg_id', String(constants.MAX_MSG_ID_LEN + 1), ForeignKey('secure_message.msg_id'), index=True)
-    from_actor = Column('from_actor', String(constants.MAX_STATUS_ACTOR_LEN + 1))
-    to_actor = Column('to_actor', String(constants.MAX_STATUS_ACTOR_LEN + 1))
-    sent_from_internal = Column('sent_from_internal', Boolean())
-
-    def __init__(self, msg_id, from_actor, to_actor, sent_from_internal):
-        self.set_from_domain_model(msg_id, from_actor, to_actor, sent_from_internal)
-
-    def set_from_domain_model(self, msg_id, from_actor, to_actor, sent_from_internal):
-        """Set actors values"""
-        self.msg_id = msg_id
-        self.from_actor = from_actor
-        self.to_actor = to_actor
-        self.sent_from_internal = sent_from_internal
-
-    @property
-    def serialize(self):
-        """Return object data in easily serializeable format"""
-        data = {'msg_id': self.msg_id,
-                'from_actor': self.from_actor,
-                'to_actor': self.to_actor,
-                'sent_from_internal': self.sent_from_internal}
-
-        return data
+# class Actors(db.Model):
+#     """Label Assignment table model"""
+#     __tablename__ = "actors"
+#
+#     id = Column("id", Integer(), primary_key=True)
+#     msg_id = Column('msg_id', String(constants.MAX_MSG_ID_LEN + 1), ForeignKey('secure_message.msg_id'), index=True)
+#     from_actor = Column('from_actor', String(constants.MAX_STATUS_ACTOR_LEN + 1))
+#     to_actor = Column('to_actor', String(constants.MAX_STATUS_ACTOR_LEN + 1))
+#     from_internal = Column('from_internal', Boolean())
+#
+#     def __init__(self, msg_id, from_actor, to_actor, from_internal):
+#         self.set_from_domain_model(msg_id, from_actor, to_actor, from_internal)
+#
+#     def set_from_domain_model(self, msg_id, from_actor, to_actor, from_internal):
+#         """Set actors values"""
+#         self.msg_id = msg_id
+#         self.from_actor = from_actor
+#         self.to_actor = to_actor
+#         self.from_internal = from_internal
+#
+#     @property
+#     def serialize(self):
+#         """Return object data in easily serializeable format"""
+#         data = {'msg_id': self.msg_id,
+#                 'from_actor': self.from_actor,
+#                 'to_actor': self.to_actor,
+#                 'from_internal': self.from_internal}
+#
+#         return data
 
 
 class Events(db.Model):

@@ -25,15 +25,15 @@ class RetrieverTestCaseHelper:
     """Helper class for Retriever Tests"""
     def add_secure_message(self, msg_id, subject="test", body="test", thread_id="ThreadId",
                            collection_case="ACollectionCase", ru_id="f1a5e99c-8edf-489a-9c72-6cabe6c387fc",
-                           survey=test_utilities.BRES_SURVEY, collection_exercise='CollectionExercise'):
+                           survey=test_utilities.BRES_SURVEY, collection_exercise='CollectionExercise', from_internal = False):
 
         """ Populate the secure_message table"""
 
         with self.engine.connect() as con:
             query = "INSERT INTO securemessage.secure_message(msg_id, subject, body, thread_id," \
-                    "collection_case, ru_id, survey, collection_exercise) VALUES ('{0}', '{1}','{2}'," \
-                    "'{3}', '{4}', '{5}', '{6}', '{7}')".format(msg_id, subject, body, thread_id, collection_case,
-                                                                ru_id, survey, collection_exercise)
+                    "collection_case, ru_id, survey, collection_exercise, from_internal) VALUES ('{0}', '{1}','{2}'," \
+                    "'{3}', '{4}', '{5}', '{6}', '{7}', '{8}')".format(msg_id, subject, body, thread_id, collection_case,
+                                                                ru_id, survey, collection_exercise, from_internal)
             con.execute(query)
 
     def add_status(self, label, msg_id, actor):
@@ -42,14 +42,6 @@ class RetrieverTestCaseHelper:
         with self.engine.connect() as con:
             query = "INSERT INTO securemessage.status(label, msg_id, actor) VALUES('{0}', '{1}', '{2}')".format(
                 label, msg_id, actor)
-            con.execute(query)
-
-    def add_actors(self, msg_id, from_actor, to_actor, sent_from_internal):
-        """ Populate the actors table"""
-
-        with self.engine.connect() as con:
-            query = "INSERT INTO securemessage.actors(msg_id, from_actor, to_actor, sent_from_internal) VALUES('{0}', '{1}', '{2}', '{3}')".format(
-                msg_id, from_actor, to_actor, sent_from_internal)
             con.execute(query)
 
     def add_event(self, event, msg_id, date_time):
@@ -90,12 +82,11 @@ class RetrieverTestCaseHelper:
 
             if single:
                 msg_id = str(uuid.uuid4())
-                self.add_secure_message(msg_id=msg_id)
+                self.add_secure_message(msg_id=msg_id, from_internal=False)
                 self.add_status(label="SENT", msg_id=msg_id, actor=external_actor)
                 self.add_status(label="INBOX", msg_id=msg_id, actor=internal_actor)
                 self.add_status(label="UNREAD", msg_id=msg_id, actor=internal_actor)
-                self.add_actors(msg_id=msg_id, from_actor=external_actor, to_actor=internal_actor,
-                                sent_from_internal=False)
+
                 self.add_event(event=EventsApi.SENT.value, msg_id=msg_id, date_time=datetime(year, month, day))
 
             if add_reply:
@@ -103,33 +94,30 @@ class RetrieverTestCaseHelper:
                 self.add_event(event=EventsApi.READ.value, msg_id=msg_id, date_time=datetime(year, month, day + 1))
 
                 msg_id = str(uuid.uuid4())
-                self.add_secure_message(msg_id=msg_id)
+                self.add_secure_message(msg_id=msg_id, from_internal=True)
                 self.add_status(label="SENT", msg_id=msg_id, actor=internal_actor)
                 self.add_status(label="INBOX", msg_id=msg_id, actor=external_actor)
                 self.add_status(label="UNREAD", msg_id=msg_id, actor=external_actor)
-                self.add_actors(msg_id=msg_id, from_actor=internal_actor, to_actor=external_actor,
-                                sent_from_internal=True)
+
                 self.add_event(event=EventsApi.SENT.value, msg_id=msg_id, date_time=datetime(year, month, day + 1))
 
             if add_draft:
                 msg_id = str(uuid.uuid4())
-                self.add_secure_message(msg_id=msg_id)
+                self.add_secure_message(msg_id=msg_id, from_internal=True)
                 self.add_status(label="DRAFT_INBOX", msg_id=msg_id, actor=external_actor)
                 self.add_status(label="DRAFT", msg_id=msg_id, actor=internal_actor)
-                self.add_actors(msg_id=msg_id, from_actor=internal_actor, to_actor=external_actor,
-                                sent_from_internal=True)
+
                 self.add_event(event=EventsApi.DRAFT_SAVED.value, msg_id=msg_id, date_time=datetime(year, month, day))
 
             if multiple_users:
                 msg_id = str(uuid.uuid4())
                 self.add_secure_message(msg_id=msg_id, thread_id="AnotherThreadId",
                                         collection_case="AnotherCollectionCase", collection_exercise="AnotherCollectionExercise",
-                                        ru_id='0a6018a0-3e67-4407-b120-780932434b36', survey="AnotherSurvey",)
+                                        ru_id='0a6018a0-3e67-4407-b120-780932434b36', survey="AnotherSurvey",from_internal=False)
                 self.add_status(label="SENT", msg_id=msg_id, actor="1a7ad740-10d5-4ecb-b7ca-fb8823c0384a")
                 self.add_status(label="INBOX", msg_id=msg_id, actor="11111111-10d5-4ecb-b7ca-fb8823c0384a")
                 self.add_status(label="UNREAD", msg_id=msg_id, actor="11111111-10d5-4ecb-b7ca-fb8823c0384a")
-                self.add_actors(msg_id=msg_id, from_actor="1a7ad740-10d5-4ecb-b7ca-fb8823c0384a", to_actor="11111111-10d5-4ecb-b7ca-fb8823c0384a",
-                                sent_from_internal=False)
+
                 self.add_event(event=EventsApi.SENT.value, msg_id=msg_id, date_time=datetime(year, month, day))
 
     def create_threads(self, no_of_threads=1, add_internal_draft=False, add_respondent_draft=False,
@@ -155,32 +143,27 @@ class RetrieverTestCaseHelper:
             msg_id = str(uuid.uuid4())
             thread_id = msg_id
             threads.append(thread_id)
-            self.add_secure_message(msg_id=msg_id, thread_id=thread_id, survey=constants.BRES_USER)
+            self.add_secure_message(msg_id=msg_id, thread_id=thread_id, survey=constants.BRES_USER, from_internal=False)
             self.add_status(label="SENT", msg_id=msg_id, actor=external_actor)
             self.add_status(label="INBOX", msg_id=msg_id, actor=internal_actor)
-            self.add_actors(msg_id=msg_id, from_actor=external_actor, to_actor=internal_actor,
-                            sent_from_internal=False)
             self.add_event(event=EventsApi.SENT.value, msg_id=msg_id, date_time=datetime(year, month, day))
             self.add_event(event=EventsApi.READ.value, msg_id=msg_id, date_time=datetime(year, month, day + 1))
 
             msg_id = str(uuid.uuid4())
-            self.add_secure_message(msg_id=msg_id, thread_id=thread_id, survey=constants.BRES_USER)
+            self.add_secure_message(msg_id=msg_id, thread_id=thread_id, survey=constants.BRES_USER, from_internal=True)
             self.add_status(label="SENT", msg_id=msg_id, actor=internal_actor)
             self.add_status(label="UNREAD", msg_id=msg_id, actor=external_actor)
             self.add_status(label="INBOX", msg_id=msg_id, actor=external_actor)
-            self.add_actors(msg_id=msg_id, from_actor=internal_actor, to_actor=external_actor,
-                            sent_from_internal=True)
             self.add_event(event=EventsApi.SENT.value, msg_id=msg_id, date_time=datetime(year, month, day + 1))
 
             last_msg_id = msg_id
 
             if add_internal_draft:  # adds draft from internal
                 msg_id = str(uuid.uuid4())
-                self.add_secure_message(msg_id=msg_id, thread_id=thread_id, survey=constants.BRES_USER)
+                self.add_secure_message(msg_id=msg_id, thread_id=thread_id, survey=constants.BRES_USER, from_internal=True)
                 self.add_status(label="DRAFT_INBOX", msg_id=msg_id, actor=external_actor)
                 self.add_status(label="DRAFT", msg_id=msg_id, actor=internal_actor)
-                self.add_actors(msg_id=msg_id, from_actor=internal_actor, to_actor=external_actor,
-                                sent_from_internal=True)
+
                 self.add_event(event=EventsApi.DRAFT_SAVED.value, msg_id=msg_id, date_time=datetime(year, month, day + 2))
 
             if add_respondent_draft:  # adds draft from respondent
@@ -189,11 +172,10 @@ class RetrieverTestCaseHelper:
                 self.add_event(event=EventsApi.READ.value, msg_id=last_msg_id, date_time=datetime(year, month, day + 1))
 
                 msg_id = str(uuid.uuid4())
-                self.add_secure_message(msg_id=msg_id, thread_id=thread_id, survey=constants.BRES_USER)
+                self.add_secure_message(msg_id=msg_id, thread_id=thread_id, survey=constants.BRES_USER, from_internal=False)
                 self.add_status(label="DRAFT_INBOX", msg_id=msg_id, actor=internal_actor)
                 self.add_status(label="DRAFT", msg_id=msg_id, actor=external_actor)
-                self.add_actors(msg_id=msg_id, from_actor=external_actor, to_actor=internal_actor,
-                                sent_from_internal=False)
+
                 self.add_event(event=EventsApi.DRAFT_SAVED.value, msg_id=msg_id, date_time=datetime(year, month, day + 2))
 
         return threads

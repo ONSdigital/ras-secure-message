@@ -22,7 +22,6 @@ class MessageSendV2(MessageSend):
         """Saves the message to the database along with the subsequent status and audit"""
         save = Saver()
         save.save_message(message.data)
-        save.save_msg_actors(message.data.msg_id, message.data.msg_from, message.data.msg_to[0], g.user.is_internal)
         save.save_msg_event(message.data.msg_id, EventsApi.SENT.value)
 
         save.save_msg_status(message.data.msg_from, message.data.msg_id, Labels.SENT.value)

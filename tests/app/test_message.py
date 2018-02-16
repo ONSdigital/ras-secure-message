@@ -24,7 +24,7 @@ class MessageTestCase(unittest.TestCase):
                       'ASurveyType', 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc', 'CollectionExercise')
         sut_str = repr(sut)
         expected = '<Message(msg_id=AMsgId msg_to=[\'to\'] msg_from=from subject=subject body=body thread_id=5 collection_case=ACollectionCase ' \
-                   'ru_id=f1a5e99c-8edf-489a-9c72-6cabe6c387fc collection_exercise=CollectionExercise survey=ASurveyType)>'
+                   'ru_id=f1a5e99c-8edf-489a-9c72-6cabe6c387fc collection_exercise=CollectionExercise survey=ASurveyType from_internal=False)>'
         self.assertEquals(sut_str, expected)
 
     def test_message_with_different_collection_case_not_equal(self):
