@@ -35,16 +35,15 @@ class MessageList(Resource):
         message_args = get_options(request.args)
 
         message_service = Retriever()
-        status, result = message_service.retrieve_message_list(message_args.page, message_args.limit, g.user,
+        result = message_service.retrieve_message_list(message_args.page, message_args.limit, g.user,
                                                                ru_id=message_args.ru_id, survey=message_args.survey,
                                                                cc=message_args.cc, label=message_args.label,
                                                                descend=message_args.desc, ce=message_args.ce)
 
-        if status:
-            resp = paginated_list_to_json(result, message_args.page, message_args.limit, request.host_url,
-                                          g.user, message_args.string_query_args, MESSAGE_LIST_ENDPOINT)
-            resp.status_code = 200
-            return resp
+        resp = paginated_list_to_json(result, message_args.page, message_args.limit, request.host_url,
+                                      g.user, message_args.string_query_args, MESSAGE_LIST_ENDPOINT)
+        resp.status_code = 200
+        return resp
 
 
 class MessageSend(Resource):
@@ -61,8 +60,9 @@ class MessageSend(Resource):
         is_draft = False
         draft_id = None
         if 'msg_id' in post_data:
-            is_draft, returned_draft = Retriever().check_msg_id_is_a_draft(post_data['msg_id'], g.user)
-            if is_draft is True:
+            returned_draft = Retriever().get_draft(post_data['msg_id'], g.user)
+            if returned_draft:
+                is_draft = True
                 draft_id = post_data['msg_id']
                 post_data['msg_id'] = ''
 

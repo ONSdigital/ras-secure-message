@@ -72,7 +72,7 @@ class Retriever:
             logger.error('Error retrieving messages from database', error=e)
             raise InternalServerError(description="Error retrieving messages from database")
 
-        return True, result
+        return result
 
     @staticmethod
     def _retrieve_message_list_internal(page, limit, ru_id, survey, cc, ce, label, descend):
@@ -129,7 +129,7 @@ class Retriever:
             logger.exception('Error retrieving messages from database', error=e)
             raise InternalServerError(description="Error retrieving messages from database")
 
-        return True, result
+        return result
 
     @staticmethod
     def unread_message_count(user):
@@ -182,7 +182,7 @@ class Retriever:
             logger.exception('Error retrieving messages from database', error=e)
             raise InternalServerError(description="Error retrieving messages from database")
 
-        return True, result
+        return result
 
     @staticmethod
     def retrieve_message(message_id, user):
@@ -232,7 +232,7 @@ class Retriever:
             logger.error('Error retrieving conversation from database', error=e)
             raise InternalServerError(description="Error retrieving conversation from database")
 
-        return True, result
+        return result
 
     @staticmethod
     def retrieve_draft(message_id, user):
@@ -271,7 +271,7 @@ class Retriever:
         return resp
 
     @staticmethod
-    def check_msg_id_is_a_draft(draft_id, user):
+    def get_draft(draft_id, user):
         """Check msg_id is that of a valid draft and return true/false if no ID is present"""
         try:
             result = SecureMessage.query.filter(SecureMessage.msg_id == draft_id) \
@@ -280,6 +280,5 @@ class Retriever:
             logger.error('Error retrieving message from database', error=e)
             raise InternalServerError(description="Error retrieving message from database")
 
-        if result is None:
-            return False, result
-        return True, result.serialize(user)
+        return result.serialize(user) if result else None
+

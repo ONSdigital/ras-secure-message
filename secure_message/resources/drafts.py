@@ -92,13 +92,12 @@ class DraftList(Resource):
         message_args = get_options(request.args)
 
         message_service = Retriever()
-        status, result = message_service.retrieve_message_list(message_args.page, message_args.limit, g.user, label=Labels.DRAFT.value)
+        result = message_service.retrieve_message_list(message_args.page, message_args.limit, g.user, label=Labels.DRAFT.value)
 
-        if status:
-            resp = paginated_list_to_json(result, message_args.page, message_args.limit, request.host_url,
-                                          g.user, message_args.string_query_args, DRAFT_LIST_ENDPOINT)
-            resp.status_code = 200
-            return resp
+        resp = paginated_list_to_json(result, message_args.page, message_args.limit, request.host_url,
+                                      g.user, message_args.string_query_args, DRAFT_LIST_ENDPOINT)
+        resp.status_code = 200
+        return resp
 
 
 class DraftModifyById(Resource):
@@ -113,12 +112,12 @@ class DraftModifyById(Resource):
         if data['msg_id'] != draft_id:
             logger.error('Conflicting message IDs', draft_id=draft_id, message_id=data['msg_id'])
             raise BadRequest(description="Conflicting msg_id's")
-        is_draft = Retriever().check_msg_id_is_a_draft(draft_id, g.user)
-        if is_draft[0] is False:
+        existing_draft = Retriever().get_draft(draft_id, g.user)
+        if not existing_draft:
             logger.error('Draft put requires valid draft')
             raise BadRequest(description="Draft put requires valid draft")
 
-        not_modified = self.etag_check(request.headers, is_draft[1])
+        not_modified = self.etag_check(request.headers, existing_draft)
 
         if not_modified is False:
             return Response(response="Draft has been modified since last check", status=409, mimetype="text/html")
@@ -148,8 +147,6 @@ class DraftModifyById(Resource):
         if headers.get('ETag'):
             current_etag = generate_etag(current_draft['msg_to'], current_draft['msg_id'],
                                          current_draft['subject'], current_draft['body'])
-            if current_etag == headers.get('ETag'):
-                return True
-            return False
+            return current_etag == headers.get('ETag')
         else:
             return True
