@@ -38,15 +38,7 @@ def create_app(config=None):
     api = Api(app)
     CORS(app)
 
-    database.db.init_app(app)
-
-    logger.info('Starting Secure Message Service...', config=app_config)
-
-    with app.app_context():
-        event.listen(database.db.metadata, 'before_create', DDL(
-            "CREATE SCHEMA IF NOT EXISTS securemessage"))
-        database.db.create_all()
-        database.db.session.commit()  # NOQA pylint:disable=no-member
+    create_db(app, app_config)
 
     api.add_resource(Health, '/health')
     api.add_resource(DatabaseHealth, '/health/db')
@@ -81,6 +73,22 @@ def create_app(config=None):
         return response
 
     return app
+
+
+def retry_if_database_error(exception):
+    logger.error('Database error has occurred', error=exception)
+    return isinstance(exception, DatabaseError) and not isinstance(exception, ProgrammingError)
+
+
+@retry(retry_on_exception=retry_if_database_error, wait_fixed=2000, stop_max_delay=30000, wrap_exception=True)
+def create_db(app, app_config):
+    database.db.init_app(app)
+    logger.info('Starting Secure Message Service...', config=app_config)
+    with app.app_context():
+        event.listen(database.db.metadata, 'before_create', DDL(
+            "CREATE SCHEMA IF NOT EXISTS securemessage"))
+        database.db.create_all()
+        database.db.session.commit()  # NOQA pylint:disable=no-member
 
 
 def _request_requires_authentication():
