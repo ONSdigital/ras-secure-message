@@ -137,37 +137,6 @@ class Status(db.Model):
         return data
 
 
-# class Actors(db.Model):
-#     """Label Assignment table model"""
-#     __tablename__ = "actors"
-#
-#     id = Column("id", Integer(), primary_key=True)
-#     msg_id = Column('msg_id', String(constants.MAX_MSG_ID_LEN + 1), ForeignKey('secure_message.msg_id'), index=True)
-#     from_actor = Column('from_actor', String(constants.MAX_STATUS_ACTOR_LEN + 1))
-#     to_actor = Column('to_actor', String(constants.MAX_STATUS_ACTOR_LEN + 1))
-#     from_internal = Column('from_internal', Boolean())
-#
-#     def __init__(self, msg_id, from_actor, to_actor, from_internal):
-#         self.set_from_domain_model(msg_id, from_actor, to_actor, from_internal)
-#
-#     def set_from_domain_model(self, msg_id, from_actor, to_actor, from_internal):
-#         """Set actors values"""
-#         self.msg_id = msg_id
-#         self.from_actor = from_actor
-#         self.to_actor = to_actor
-#         self.from_internal = from_internal
-#
-#     @property
-#     def serialize(self):
-#         """Return object data in easily serializeable format"""
-#         data = {'msg_id': self.msg_id,
-#                 'from_actor': self.from_actor,
-#                 'to_actor': self.to_actor,
-#                 'from_internal': self.from_internal}
-#
-#         return data
-
-
 class Events(db.Model):
     """Events table model"""
     __tablename__ = "events"
