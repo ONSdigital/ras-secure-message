@@ -2,6 +2,7 @@ import logging
 from structlog import wrap_logger
 from secure_message import constants
 
+
 logger = wrap_logger(logging.getLogger(__name__))
 
 
@@ -21,7 +22,7 @@ class PartyServiceMock:
         try:
             return self._respondent_ids[uuid], 200
         except KeyError:
-            error = 'User ID:{} not in mock party service'.format(uuid)
+            error = f'User ID:{uuid} not in mock party service'
             logger.error('User ID not in mock party service', user_uuid=uuid)
             return error, 404
 

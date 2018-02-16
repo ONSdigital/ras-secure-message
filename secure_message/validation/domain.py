@@ -189,9 +189,9 @@ class DraftSchema(Schema):
                         logger.error('Not a valid respondent', user=item)
                         raise ValidationError("{0} is not a valid respondent.".format(item))
                 else:  # Respondent sending to internal
-                    if not (msg_to[0] == constants.BRES_USER or
-                            msg_to[0] == constants.NON_SPECIFIC_INTERNAL_USER or
-                            g.user.is_valid_internal_user(msg_to[0])):
+                    if item and not (msg_to[0] == constants.BRES_USER or
+                                     msg_to[0] == constants.NON_SPECIFIC_INTERNAL_USER or
+                                     g.user.is_valid_internal_user(msg_to[0])):
                         logger.error('Not a valid internal user', user=item)
                         raise ValidationError("{0} is not a valid internal user.".format(item))
         else:

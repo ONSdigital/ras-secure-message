@@ -33,10 +33,12 @@ class InternalUserServiceMock:
                 "emailAddress": "mock@email.com"
             },
             "BRES": {
-                "id": "TRES",
+                "id": 'BRES',
                 "firstName": "BRES",
                 "lastName": "",
-                "emailAddress": "mock@email.com"
+                "emailAddress": "",
+                "telephone": "", "status": "",
+                "sampleUnitType": "BI"
             },
             "SomeStringUntilWeGetIds": {
                 "id": "SomeStringUntilWeGetIds",
@@ -48,9 +50,8 @@ class InternalUserServiceMock:
 
     def get_user_details(self, uuid):
         """gets the user details from the internal user service"""
-        logger.debug("getting mock user details for uaa")
         if uuid:
             found = self.internal_user_dict.get(uuid)
             if found:
                 return found, 200
-        return "error retrieving details", 404
+        return f"error retrieving details for {uuid}", 404

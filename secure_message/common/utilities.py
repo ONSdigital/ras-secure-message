@@ -4,7 +4,7 @@ import logging
 
 from flask import jsonify
 from structlog import wrap_logger
-from secure_message.services.service_toggles import party
+from secure_message.services.service_toggles import party, internal_user_service
 from secure_message.constants import MESSAGE_BY_ID_ENDPOINT, MESSAGE_LIST_ENDPOINT, MESSAGE_QUERY_LIMIT
 
 logger = wrap_logger(logging.getLogger(__name__))
@@ -142,6 +142,43 @@ def get_details_by_uuids(uuids):
 
 
 def add_to_and_from_details(messages):
+    """Adds user details for sender and recipient"""
+    for message in messages:
+        message['@msg_from'] = _get_from_details(message)
+        message['@msg_to'] = _get_to_details(message)
+    return messages
+
+
+def _get_from_details(message):
+    """looks up the details for the from users"""
+    if message['sent_from_internal']:
+        from_details, _ = internal_user_service.get_user_details(message['msg_from'])
+    else:
+        from_details, _ = party.get_user_details(message['msg_from'])
+    return from_details
+
+
+def _get_to_details(message):
+    """looks up the details of all the to users"""
+    user_details = []
+    if message['sent_from_internal']:
+        to_user_details_finder = party.get_user_details
+    else:
+        to_user_details_finder = internal_user_service.get_user_details
+
+    for uuid in message['msg_to']:
+
+        detail, status_code = to_user_details_finder(uuid)
+
+        if status_code == 200:
+            user_details.append(detail)
+        else:
+            logger.info('No details found for user', uuid=uuid)
+
+    return user_details
+
+
+def add_to_and_from_details_old(messages):
     """Adds user details for sender and recipient"""
 
     uuid_list = []

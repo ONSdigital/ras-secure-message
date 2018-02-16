@@ -76,13 +76,26 @@ class MessageSend(Resource):
             if last_modified is False:
                 return Response(response="Draft has been modified since last check", status=409, mimetype="text/html")
 
-        message = MessageSchema().load(post_data)
+        message = self._validate_post_data(post_data)
         if message.errors == {}:
-            return self._message_save(message, is_draft, draft_id)
+            self._message_save(message, is_draft, draft_id)
+            if is_draft:
+                Modifier().del_draft(draft_id)
+            # listener errors are logged but still a 201 reported
+            MessageSend._alert_listeners(message.data)
+            resp = jsonify({'status': '201', 'msg_id': message.data.msg_id, 'thread_id': message.data.thread_id})
+            resp.status_code = 201
+            return resp
+
         resp = jsonify(message.errors)
         resp.status_code = 400
         logger.error('Message send failed', errors=message.errors)
         return resp
+
+    @staticmethod
+    def _validate_post_data(post_data):
+        message = MessageSchema().load(post_data)
+        return message
 
     @staticmethod
     def _message_save(message, is_draft, draft_id):
@@ -100,16 +113,6 @@ class MessageSend(Resource):
             save.save_msg_status(message.data.msg_to[0], message.data.msg_id, Labels.INBOX.value)
             save.save_msg_status(message.data.msg_to[0], message.data.msg_id, Labels.UNREAD.value)
 
-        if is_draft is True:
-            Modifier().del_draft(draft_id)
-
-        # listener errors are logged but still a 201 reported
-        MessageSend._alert_listeners(message.data)
-
-        resp = jsonify({'status': '201', 'msg_id': message.data.msg_id, 'thread_id': message.data.thread_id})
-        resp.status_code = 201
-        return resp
-
     @staticmethod
     def _alert_listeners(message):
         """used to alert user and case service once messages have been saved"""
@@ -123,7 +126,7 @@ class MessageSend(Resource):
     def _try_send_alert_email(message):
         """Send an email to recipient if appropriate"""
         party_data = None
-        if message.msg_to[0] != constants.BRES_USER:
+        if g.user.is_internal:
             party_data, status_code = party.get_user_details(message.msg_to[0])  # NOQA TODO avoid 2 lookups (see validate)
             if status_code == 200:
                 if 'emailAddress' in party_data and party_data['emailAddress'].strip():
@@ -247,3 +250,21 @@ class MessageModifyById(Resource):
             raise BadRequest(description=f"Invalid action requested: {action}")
 
         return action, label
+
+
+class MessageCounter(Resource):
+    @staticmethod
+    def get():
+        """Get count of unread messages"""
+
+        if request.args.get('name'):
+            name = str(request.args.get('name'))
+            if name.lower() == 'unread':
+                message_service = Retriever()
+                return jsonify(name=name, total=message_service.unread_message_count(g.user))
+            else:
+                logger.debug('Invalid label name', name=name, request=request.url)
+                raise BadRequest(description="Invalid label")
+        else:
+            logger.debug('No Name parameter specified in URL', request=request.url)
+            raise BadRequest(description='No Label Name Parameter specified.')

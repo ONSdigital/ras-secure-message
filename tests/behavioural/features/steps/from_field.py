@@ -39,18 +39,18 @@ def step_impl_the_msg_from_is_set_to_alternative_respondent(context):
     step_impl_the_msg_from_is_set_to(context, context.bdd_helper.alternative_respondent_id)
 
 
-@given("the from is set to internal")
-@when("the from is set to internal")
-def step_impl_the_msg_from_is_set_to_internal(context):
+@given("the from is set to internal bres user")
+@when("the from is set to internal bres user")
+def step_impl_the_msg_from_is_set_to_internal_bres_user(context):
     """set the from to the internal user as set in the helper """
-    step_impl_the_msg_from_is_set_to(context, context.bdd_helper.internal_id)
+    step_impl_the_msg_from_is_set_to(context, context.bdd_helper.internal_id_bres_user)
 
 
-@given("the from is set to alternative internal")
-@when("the from is set to alternative internal")
-def step_impl_the_msg_from_is_set_to_alternative_internal(context):
+@given("the from is set to internal non bres user")
+@when("the from is set to internal non bres user")
+def step_impl_the_msg_from_is_set_to_internal_non_bres_user(context):
     """set the from to the internal user as set in the helper """
-    step_impl_the_msg_from_is_set_to(context, context.bdd_helper.alternative_internal_id)
+    step_impl_the_msg_from_is_set_to(context, context.bdd_helper.internal_id_specific_user)
 
 
 @then("retrieved message msg_from is as was saved")
@@ -58,3 +58,19 @@ def step_impl_retrieved_msg_from_is_as_saved(context):
     """validate that the responsemessage from field matches that submitted"""
     msg_resp = json.loads(context.response.data)
     nose.tools.assert_equal(msg_resp['msg_from'], context.bdd_helper.last_saved_message_data['msg_from'])
+
+# V2 Steps below
+
+
+@given("the from is set to internal group")
+@when("the from is set to internal group")
+def step_impl_the_msg_from_is_set_to_internal_group_user(context):
+    """ set the msg from field in the message data to the internal group  as specified in the helper"""
+    step_impl_the_msg_from_is_set_to(context, context.bdd_helper.internal_id_group_user)
+
+
+@given("the from is set to internal specific user")
+@when("the from is set to internal specific user")
+def step_impl_the_msg_from_is_set_to_internal_specific_user(context):
+    """ set the msg from field in the message data to the specific internal user as specified in the helper"""
+    step_impl_the_msg_from_is_set_to(context, context.bdd_helper.internal_id_specific_user)

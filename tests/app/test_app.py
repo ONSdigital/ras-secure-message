@@ -12,7 +12,7 @@ from secure_message.common.eventsapi import EventsApi
 from secure_message.repository import database
 from secure_message.authentication.jwt import encode
 from secure_message.authentication.jwe import Encrypter
-from secure_message.services.service_toggles import case_service, party
+from secure_message.services.service_toggles import case_service, party, internal_user_service
 from secure_message.resources.messages import MessageSend
 from secure_message.resources.messages import logger as message_logger
 from secure_message.common.alerts import AlertViaLogging
@@ -68,6 +68,7 @@ class FlaskTestCase(unittest.TestCase):
 
         party.use_mock_service()
         case_service.use_mock_service()
+        internal_user_service.use_mock_service()
 
     def test_that_checks_post_request_is_within_database(self):
         """check messages from messageSend endpoint saved in database correctly"""
@@ -389,9 +390,8 @@ class FlaskTestCase(unittest.TestCase):
     @patch.object(case_service, 'store_case_event')
     def test_case_service_called_on_sent_if_NotifyCaseService_is_set(self, case):
         """Test case service called if set to do so in config """
-
-        self.app.config["NOTIFY_VIA_GOV_NOTIFY"] = '0'
         self.app.config['NOTIFY_CASE_SERVICE'] = '1'
+        self.app.config['NOTIFY_VIA_GOV_NOTIFY'] = '0'
         url = "http://localhost:5050/message/send"
         self.client.post(url, data=json.dumps(self.test_message), headers=self.headers)
         self.assertTrue(case.called)

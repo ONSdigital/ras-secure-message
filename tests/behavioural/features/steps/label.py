@@ -60,3 +60,11 @@ def step_impl_n_messages_have_specific_label(context, message_count, label):
         if label in response['labels']:
             label_count += 1
     nose.tools.assert_equal(int(message_count), label_count)
+
+
+# V2 Below
+
+@then("the returned label count was '{label_count}' V2")
+def step_impl_n_messages_have_specific_label_v2(context, label_count):
+    """validate that a specific number of messages in a reply have a specific label"""
+    nose.tools.assert_equal(int(label_count), context.bdd_helper.label_count)

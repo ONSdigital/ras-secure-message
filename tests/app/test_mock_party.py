@@ -9,6 +9,7 @@ from secure_message.common.utilities import get_business_details_by_ru, get_deta
 from secure_message.authentication.jwe import Encrypter
 from secure_message.authentication.jwt import encode
 from secure_message.api_mocks.party_service_mock import PartyServiceMock
+from secure_message.services.service_toggles import internal_user_service, case_service, party
 from tests.app import test_utilities
 
 
@@ -29,6 +30,9 @@ class PartyTestCase(unittest.TestCase):
     def setUp(self):
         self.app = create_app()
         self.client = self.app.test_client()
+        internal_user_service.use_mock_service()
+        case_service.use_mock_service()
+        party.use_mock_service()
 
     def test_get_user_details_by_uuid(self):
         """Test that user details are returned using uuids"""
@@ -222,11 +226,13 @@ class PartyTestCase(unittest.TestCase):
         draft_get = self.client.get(f'http://localhost:5050/draft/{draft_id}', headers=self.headers)
         draft = json.loads(draft_get.data)
 
-        self.assertEqual(draft['@msg_from'], {'telephone': '+443069990289', 'firstName': 'Vana',
-                                              'emailAddress': 'vana123@aol.com',
-                                              'id': '0a7ad740-10d5-4ecb-b7ca-3c0384afb882',
-                                              'status': 'ACTIVE', 'lastName': 'Oorschot',
-                                              'sampleUnitType': 'BI'})
+        self.assertTrue(draft['@msg_from'] == {"id": "0a7ad740-10d5-4ecb-b7ca-3c0384afb882",
+                                               "firstName": "Vana",
+                                               "lastName": "Oorschot",
+                                               "emailAddress": "vana123@aol.com",
+                                               "telephone": "+443069990289",
+                                               "status": "ACTIVE",
+                                               "sampleUnitType": "BI"})
 
     def test_drafts_get_return_user_details_in_to_and_from(self):
         """Test get all drafts returns to and from as user details"""

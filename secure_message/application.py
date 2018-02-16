@@ -8,11 +8,17 @@ from flask_cors import CORS
 from structlog import wrap_logger
 from sqlalchemy import event, DDL
 
-from secure_message.exception.exceptions import MissingEnvironmentVariable
-from secure_message.repository import database
 from secure_message.authentication.authenticator import authenticate
+from secure_message.exception.exceptions import MissingEnvironmentVariable
 from secure_message.logger_config import logger_initial_config
-from secure_message.v1.application import set_v1_resources
+from secure_message.repository import database
+from secure_message.resources.drafts import DraftSave, DraftById, DraftModifyById, DraftList
+from secure_message.resources.health import Health, DatabaseHealth, HealthDetails
+from secure_message.resources.info import Info
+from secure_message.resources.messages import MessageList, MessageSend, MessageById, MessageModifyById, MessageCounter
+from secure_message.v2.resources.messages import MessageSendV2, MessageCounterV2
+from secure_message.resources.threads import ThreadById, ThreadList
+
 
 logger_initial_config(service_name='ras-secure-message')
 logger = wrap_logger(logging.getLogger(__name__))
@@ -42,7 +48,28 @@ def create_app(config=None):
         database.db.create_all()
         database.db.session.commit()  # NOQA pylint:disable=no-member
 
-    set_v1_resources(api)
+    api.add_resource(Health, '/health')
+    api.add_resource(DatabaseHealth, '/health/db')
+    api.add_resource(HealthDetails, '/health/details')
+    api.add_resource(Info, '/info')
+
+    api.add_resource(MessageList, '/messages', '/v2/messages')
+    api.add_resource(MessageSend, '/message/send')
+    api.add_resource(MessageById, '/message/<message_id>', '/v2/messages/<message_id>')
+    api.add_resource(MessageModifyById, '/message/<message_id>/modify', '/v2/messages/modify/<message_id>')
+    api.add_resource(MessageCounter, '/labels')
+
+    api.add_resource(DraftSave, '/draft/save', '/v2/drafts')
+    api.add_resource(DraftModifyById, '/draft/<draft_id>/modify', '/v2/drafts/<draft_id>')
+    api.add_resource(DraftById, '/draft/<draft_id>', '/v2/drafts/<draft_id>')
+    api.add_resource(DraftList, '/drafts', '/v2/drafts')
+
+    api.add_resource(ThreadList, '/threads')
+    api.add_resource(ThreadById, '/thread/<thread_id>', '/v2/threads/<thread_id>')
+
+    # V2
+    api.add_resource(MessageSendV2, '/v2/messages')
+    api.add_resource(MessageCounterV2, '/v2/messages/count')
 
     @app.before_request
     def before_request():  # NOQA pylint:disable=unused-variable

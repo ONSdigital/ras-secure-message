@@ -4,7 +4,7 @@ Feature: Checking correct labels for messages are added & deleted
     Given prepare for tests using 'mock' services
 
   Scenario: A Respondent  modifies the archive status or a message to archived
-    Given sending from respondent to internal
+    Given sending from respondent to internal bres user
       And  the message is sent
       And  the message is read
       And  a label of 'ARCHIVE' is to be added
@@ -13,7 +13,7 @@ Feature: Checking correct labels for messages are added & deleted
     Then the response message has the label 'ARCHIVE'
 
   Scenario: An internal user modifies the archive status or a message to archived
-    Given sending from internal to respondent
+    Given sending from internal bres user to respondent
       And  the message is sent
       And  the message is read
       And  a label of 'ARCHIVE' is to be added
@@ -22,7 +22,7 @@ Feature: Checking correct labels for messages are added & deleted
     Then the response message has the label 'ARCHIVE'
 
   Scenario: A Respondent removes an archived status from a message
-    Given sending from respondent to internal
+    Given sending from respondent to internal bres user
       And  the message is sent
       And  the message is read
       And  a label of 'ARCHIVE' is to be added
@@ -34,7 +34,7 @@ Feature: Checking correct labels for messages are added & deleted
     Then the response message does not have the label 'ARCHIVE'
 
   Scenario: An internal user removes an archived status from a message
-    Given sending from internal to respondent
+    Given sending from internal bres user to respondent
       And  the message is sent
       And  the message is read
       And  a label of 'ARCHIVE' is to be added
@@ -46,7 +46,7 @@ Feature: Checking correct labels for messages are added & deleted
     Then the response message does not have the label 'ARCHIVE'
 
    Scenario: A respondent sends a message the internal user marks it as READ
-    Given sending from respondent to internal
+    Given sending from respondent to internal bres user
       And  the message is sent
       And  the user is set as internal
      When the message is read
@@ -56,7 +56,7 @@ Feature: Checking correct labels for messages are added & deleted
      Then the response message does not have the label 'UNREAD'
 
   Scenario: An internal user sends a message the internal user marks it as READ
-    Given sending from internal to respondent
+    Given sending from internal bres user to respondent
       And  the message is sent
       And  the user is set as respondent
      When the message is read
@@ -66,7 +66,7 @@ Feature: Checking correct labels for messages are added & deleted
      Then the response message does not have the label 'UNREAD'
 
   Scenario: A respondent sends a message the internal user marks it as READ then UNREAD
-    Given sending from respondent to internal
+    Given sending from respondent to internal bres user
       And  the message is sent
       And  the user is set as internal
       And  the message is read
@@ -82,7 +82,7 @@ Feature: Checking correct labels for messages are added & deleted
 
 
   Scenario: An internal user sends a message the internal user marks it as READ then UNREAD
-    Given sending from internal to respondent
+    Given sending from internal bres user to respondent
       And  the message is sent
       And  the user is set as respondent
       And  the message is read
@@ -99,7 +99,7 @@ Feature: Checking correct labels for messages are added & deleted
 
 
   Scenario: A respondent sends a message the internal user attempts to modify a label without specifying which label
-    Given sending from respondent to internal
+    Given sending from respondent to internal bres user
       And  the message is sent
       And  the user is set as internal
       And  the message is read
@@ -108,7 +108,7 @@ Feature: Checking correct labels for messages are added & deleted
 
 
   Scenario: An internal user sends a message the internal user attempts to modify a label without specifying which label
-    Given sending from internal to respondent
+    Given sending from internal bres user to respondent
       And  the message is sent
       And  the user is set as respondent
       And  the message is read
@@ -117,7 +117,7 @@ Feature: Checking correct labels for messages are added & deleted
 
 
   Scenario: A respondent sends a message the internal user attempts to modify a label without an expected action
-    Given sending from respondent to internal
+    Given sending from respondent to internal bres user
       And  the message is sent
       And  the user is set as internal
       And  the message is read
@@ -127,7 +127,7 @@ Feature: Checking correct labels for messages are added & deleted
 
 
   Scenario: An internal user sends a message the internal user attempts to modify a label without an expected action
-    Given sending from internal to respondent
+    Given sending from internal bres user to respondent
       And  the message is sent
       And  the user is set as respondent
       And  the message is read
@@ -136,7 +136,7 @@ Feature: Checking correct labels for messages are added & deleted
     Then a bad request status code (400) is returned
 
    Scenario: A respondent sends a message the internal user attempts to modify a label with an invalid name
-    Given sending from respondent to internal
+    Given sending from respondent to internal bres user
       And  the message is sent
       And  the user is set as internal
       And  the message is read
@@ -146,7 +146,7 @@ Feature: Checking correct labels for messages are added & deleted
 
 
   Scenario: An internal user sends a message the internal user attempts to modify a label with an invalid name
-    Given sending from internal to respondent
+    Given sending from internal bres user to respondent
       And  the message is sent
       And  the user is set as respondent
       And  the message is read
@@ -156,7 +156,7 @@ Feature: Checking correct labels for messages are added & deleted
 
 
   Scenario: A respondent sends a message the internal user attempts to modify a label using an incorrect message id
-    Given sending from respondent to internal
+    Given sending from respondent to internal bres user
       And  the message is sent
       And  the user is set as internal
       And  the message is read
@@ -166,7 +166,7 @@ Feature: Checking correct labels for messages are added & deleted
 
 
   Scenario: An internal user sends a message the internal user attempts to modify a label using an incorrect message id
-    Given sending from internal to respondent
+    Given sending from internal bres user to respondent
       And  the message is sent
       And  the user is set as respondent
       And  the message is read
@@ -175,7 +175,7 @@ Feature: Checking correct labels for messages are added & deleted
       Then a not found status code (404) is returned
 
   Scenario: Respondent sends a message to an internal user an alternative respondent attempts to modify its labels
-      Given sending from respondent to internal
+      Given sending from respondent to internal bres user
         And  the message is sent
       When  the user is set as alternative respondent
         And a label of 'UNREAD' is to be removed
@@ -183,7 +183,7 @@ Feature: Checking correct labels for messages are added & deleted
       Then a bad request status code (400) is returned
 
   Scenario: An internal user sends a mesage to a respondent user an alternative respondent attempts to modify its labels
-      Given sending from internal to respondent
+      Given sending from internal bres user to respondent
         And  the message is sent
       When  the user is set as alternative respondent
         And a label of 'UNREAD' is to be removed
