@@ -40,6 +40,7 @@ def create_app(config=None):
     api = Api(app)
     CORS(app)
 
+    logger.info('Starting Secure Message Service...', config=app_config)
     create_db(app, app_config)
 
     api.add_resource(Health, '/health')
@@ -85,7 +86,6 @@ def retry_if_database_error(exception):
 @retry(retry_on_exception=retry_if_database_error, wait_fixed=2000, stop_max_delay=30000, wrap_exception=True)
 def create_db(app, app_config):
     database.db.init_app(app)
-    logger.info('Starting Secure Message Service...', config=app_config)
     with app.app_context():
         event.listen(database.db.metadata, 'before_create', DDL(
             "CREATE SCHEMA IF NOT EXISTS securemessage"))
