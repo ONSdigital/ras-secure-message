@@ -37,7 +37,7 @@ class SecureMessage(db.Model):
     __table_args__ = (Index("idx_ru_survey_cc", "ru_id", "survey", "collection_case", "collection_exercise"), )
 
     def __init__(self, msg_id="", subject="", body="", thread_id="", collection_case='',
-                 ru_id='', survey='', collection_exercise='', from_internal = False):
+                 ru_id='', survey='', collection_exercise='', from_internal=False):
 
         logger.debug("Initialised Secure Message entity: msg_id: {}".format(id))
         self.msg_id = msg_id

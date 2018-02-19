@@ -281,4 +281,3 @@ class Retriever:
             raise InternalServerError(description="Error retrieving message from database")
 
         return result.serialize(user) if result else None
-

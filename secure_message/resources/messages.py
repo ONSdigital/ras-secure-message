@@ -36,9 +36,9 @@ class MessageList(Resource):
 
         message_service = Retriever()
         result = message_service.retrieve_message_list(message_args.page, message_args.limit, g.user,
-                                                               ru_id=message_args.ru_id, survey=message_args.survey,
-                                                               cc=message_args.cc, label=message_args.label,
-                                                               descend=message_args.desc, ce=message_args.ce)
+                                                       ru_id=message_args.ru_id, survey=message_args.survey,
+                                                       cc=message_args.cc, label=message_args.label,
+                                                       descend=message_args.desc, ce=message_args.ce)
 
         resp = paginated_list_to_json(result, message_args.page, message_args.limit, request.host_url,
                                       g.user, message_args.string_query_args, MESSAGE_LIST_ENDPOINT)
@@ -76,7 +76,7 @@ class MessageSend(Resource):
             if last_modified is False:
                 return Response(response="Draft has been modified since last check", status=409, mimetype="text/html")
 
-        post_data['from_internal'] =g.user.is_internal
+        post_data['from_internal'] = g.user.is_internal
         message = self._validate_post_data(post_data)
 
         if message.errors == {}:
