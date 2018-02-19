@@ -7,7 +7,7 @@ if __name__ == "__main__":
     os.environ['APP_SETTINGS'] = 'TestConfig'
 
     from behave import __main__ as behave_executable
-    behave = behave_executable.main()
+    behave_errors = behave_executable.main()
 
     test_dirs = os.listdir('./tests')
     suites_list = []
@@ -18,6 +18,6 @@ if __name__ == "__main__":
             suite = loader.discover(test_path)
             suites_list.append(suite)
             result = unittest.TextTestRunner(verbosity=2).run(suite)
-            i = len(result.failures) + len(result.errors)
-            if i != 0 or behave == 1:
+            if result.failures or result.errors or behave_errors:
                 sys.exit(1)
+

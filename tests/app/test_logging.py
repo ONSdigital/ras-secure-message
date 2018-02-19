@@ -1,13 +1,11 @@
 import sys
 import unittest
-from unittest import mock
 from io import StringIO
 
 from flask import g
 
 from secure_message.validation.domain import MessageSchema
 from secure_message.application import create_app
-from secure_message.logger_config import logger_initial_config
 from secure_message.validation.user import User
 
 
@@ -34,6 +32,7 @@ class LoggingTestCase(unittest.TestCase):
             schema.load(message)
         output = out.getvalue().strip()
         self.assertIsNotNone(output)
+
 
 if __name__ == '__main__':
     unittest.main()

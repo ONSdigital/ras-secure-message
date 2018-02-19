@@ -1,4 +1,4 @@
-from secure_message.services.service_toggles import party
+from secure_message.services.service_toggles import party, internal_user_service
 
 
 class User:
@@ -17,6 +17,11 @@ class User:
         return bool(self.role == 'respondent')
 
     @staticmethod
-    def is_valid_user(uuid):
+    def is_valid_internal_user(uuid):
+        _, status_code = internal_user_service.get_user_details(uuid)
+        return status_code == 200
+
+    @staticmethod
+    def is_valid_respondent(uuid):
         _, status_code = party.get_user_details(uuid)
         return status_code == 200

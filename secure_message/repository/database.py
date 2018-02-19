@@ -74,12 +74,7 @@ class SecureMessage(db.Model):
                    '_links': '',
                    'labels': []}
 
-        if user.is_internal:
-            actor = constants.BRES_USER
-        else:
-            actor = user.user_uuid
-
-        self._populate_to_and_from(actor, message)
+        self._populate_to_and_from(user, message)
 
         self._populate_events(message)
 
@@ -100,11 +95,10 @@ class SecureMessage(db.Model):
             elif row.event == EventsApi.READ.value:
                 message['read_date'] = str(row.date_time)
 
-    def _populate_to_and_from(self, actor, message):
+    def _populate_to_and_from(self, user, message):
         for row in self.statuses:
-            if row.actor == actor:
+            if row.actor == user.user_uuid or (user.is_internal and (row.actor == constants.NON_SPECIFIC_INTERNAL_USER or row.actor == constants.BRES_USER)):
                 message['labels'].append(row.label)
-
             if row.label == Labels.INBOX.value:
                 message['msg_to'].append(row.actor)
             elif row.label == Labels.SENT.value:

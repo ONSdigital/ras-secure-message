@@ -51,6 +51,21 @@ Feature: Message Send Endpoint
     When the message is sent
     Then a bad request status code (400) is returned
 
+  Scenario: Respondent sends a message and their id is not in the from field should receive a 400 error
+    Given the user is set as respondent
+      And the from is set to alternative respondent
+      And the to is set to internal
+    When the message is sent
+    Then a bad request status code (400) is returned
+
+  Scenario: Internal User sends a message and their id is not in the from field should receive a 400 error
+    Given the user is set as internal
+      And the from is set to alternative internal
+      And the to is set to respondent
+    When the message is sent
+    Then a bad request status code (400) is returned
+
+
   Scenario: Respondent sending a message with a missing "Body" field and receive a 400 error
     Given sending from respondent to internal
       And  the body is set to empty
@@ -139,6 +154,7 @@ Feature: Message Send Endpoint
     When the message is sent
     Then a bad request status code (400) is returned
 
+ @ignore  # Reinstate this test when we have an internal user definition
  Scenario: Respondent sends a message with a msg_to set to an unknown user should receive a 400
     Given the user is set as respondent
       And  the from is set to respondent
