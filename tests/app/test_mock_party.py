@@ -162,10 +162,7 @@ class PartyTestCase(unittest.TestCase):
         self.assertEqual(message['@msg_to'], [{"id": "BRES",
                                                "firstName": "BRES",
                                                "lastName": "",
-                                               "emailAddress": "",
-                                               "telephone": "",
-                                               "status": "",
-                                               "sampleUnitType": "BI"
+                                               "emailAddress": "mock@email.com"
                                                }])
 
     def test_messages_get_replaces_uuids_with_user_details(self):
@@ -269,9 +266,7 @@ class PartyTestCase(unittest.TestCase):
             self.assertEqual(draft['@msg_to'][0], {"id": constants.BRES_USER,
                                                    "firstName": "BRES",
                                                    "lastName": "",
-                                                   "emailAddress": "",
-                                                   "telephone": "", "status": "",
-                                                   "sampleUnitType": "BI"})
+                                                   "emailAddress": "mock@email.com"})
 
     def test_get_business_details_by_ru(self):
         """Test get details for one business using ru_id"""

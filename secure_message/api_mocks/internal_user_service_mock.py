@@ -33,12 +33,10 @@ class InternalUserServiceMock:
                 "emailAddress": "mock@email.com"
             },
             "BRES": {
-                "id": 'BRES',
+                "id": "BRES",
                 "firstName": "BRES",
                 "lastName": "",
-                "emailAddress": "",
-                "telephone": "", "status": "",
-                "sampleUnitType": "BI"
+                "emailAddress": "mock@email.com"
             },
             "SomeStringUntilWeGetIds": {
                 "id": "SomeStringUntilWeGetIds",

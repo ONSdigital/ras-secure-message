@@ -19,7 +19,6 @@ from secure_message.resources.messages import MessageList, MessageSend, MessageB
 from secure_message.v2.resources.messages import MessageSendV2, MessageCounterV2
 from secure_message.resources.threads import ThreadById, ThreadList
 
-
 logger_initial_config(service_name='ras-secure-message')
 logger = wrap_logger(logging.getLogger(__name__))
 

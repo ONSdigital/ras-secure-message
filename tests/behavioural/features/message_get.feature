@@ -64,21 +64,6 @@ Feature: Message get by ID Endpoint
     Then a success status code (200) is returned
       And  retrieved message additional from data matches that from party service
 
-
-  Scenario: Internal user saves and retrieves a message verify the message from additional data  (@msg_from) is as expected
-    Given sending from internal bres user to respondent
-      And   the message is sent
-    When  the message is read
-    Then a success status code (200) is returned
-      And  retrieved message additional from data matches that from party service
-
-  Scenario: Respondent saves and retrieves a message verify the message to additional data  (@msg_to) is as expected
-    Given sending from respondent to internal bres user
-      And   the message is sent
-    When  the message is read
-    Then a success status code (200) is returned
-      And  retrieved message additional to data matches that from party service
-
   Scenario: Internal user saves and retrieves a message verify the message to additional data  (@msg_to) is as expected
     Given sending from internal bres user to respondent
       And   the message is sent
