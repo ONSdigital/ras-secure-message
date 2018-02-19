@@ -25,6 +25,7 @@ cryptography = "==2.1.2"
 cfenv = "==0.5.3"
 gunicorn = "==19.7.1"
 requests = "*"
+retrying = "*"
 
 
 [dev-packages]
