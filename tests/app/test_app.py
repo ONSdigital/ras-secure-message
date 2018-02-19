@@ -377,7 +377,6 @@ class FlaskTestCase(unittest.TestCase):
 
         self.app.config["NOTIFY_VIA_GOV_NOTIFY"] = '0'
         self.app.config['NOTIFY_CASE_SERVICE'] = '1'
-        self.app.config['NOTIFY_VIA_GOV_NOTIFY'] = '0'
         url = "http://localhost:5050/message/send"
         self.client.post(url, data=json.dumps(self.test_message), headers=self.headers)
         self.assertTrue(case.called)

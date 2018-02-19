@@ -5,19 +5,20 @@ from flask_restful import Resource
 from structlog import wrap_logger
 from werkzeug.exceptions import BadRequest
 
+
+from secure_message.authorization.authorizer import Authorizer
 from secure_message.common.alerts import AlertUser, AlertViaGovNotify, AlertViaLogging
 from secure_message.common.eventsapi import EventsApi
 from secure_message.common.labels import Labels
 from secure_message.common.utilities import get_options, paginated_list_to_json, add_users_and_business_details
+from secure_message import constants
 from secure_message.constants import MESSAGE_LIST_ENDPOINT
 from secure_message.repository.modifier import Modifier
 from secure_message.repository.retriever import Retriever
 from secure_message.repository.saver import Saver
 from secure_message.resources.drafts import DraftModifyById
-from secure_message.validation.domain import MessageSchema
-from secure_message.authorization.authorizer import Authorizer
 from secure_message.services.service_toggles import party, case_service
-from secure_message import constants
+from secure_message.validation.domain import MessageSchema
 
 logger = wrap_logger(logging.getLogger(__name__))
 

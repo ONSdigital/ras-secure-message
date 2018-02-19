@@ -5,7 +5,7 @@ from sqlalchemy import create_engine
 
 from secure_message import constants
 from secure_message.application import create_app
-from secure_message.common.utilities import get_business_details_by_ru, get_details_by_uuids
+from secure_message.common.utilities import get_business_details_by_ru
 from secure_message.authentication.jwe import Encrypter
 from secure_message.authentication.jwt import encode
 from secure_message.api_mocks.party_service_mock import PartyServiceMock
@@ -33,99 +33,6 @@ class PartyTestCase(unittest.TestCase):
         internal_user_service.use_mock_service()
         case_service.use_mock_service()
         party.use_mock_service()
-
-    def test_get_user_details_by_uuid(self):
-        """Test that user details are returned using uuids"""
-
-        list_uuids = ['f62dfda8-73b0-4e0e-97cf-1b06327a6712']
-        expected = {"id": "f62dfda8-73b0-4e0e-97cf-1b06327a6712",
-                    "firstName": "Bhavana",
-                    "lastName": "Lincoln",
-                    "emailAddress": "lincoln.bhavana@gmail.com",
-                    "telephone": "+443069990888",
-                    "status": "ACTIVE",
-                    "sampleUnitType": "BI"}
-        with self.app.app_context():
-            user_details = get_details_by_uuids(list_uuids)
-        result = user_details[0]
-        self.assertTrue(result == expected)
-
-    def test_get_user_details_by_uuids(self):
-        """Test that user details are returned using uuids"""
-
-        list_uuids = ['f62dfda8-73b0-4e0e-97cf-1b06327a6712',
-                      '01b51fcc-ed43-4cdb-ad1c-450f9986859b',
-                      'dd5a38ff-1ecb-4634-94c8-2358df33e614',
-                      'ab123456-ce17-40c2-a8fc-abcdef123456',
-                      '654321ab-ce17-40c2-a8fc-abcdef123456'
-                      ]
-
-        with self.app.app_context():
-            user_details = get_details_by_uuids(list_uuids)
-
-        self.assertEqual(user_details[0], {"id": "f62dfda8-73b0-4e0e-97cf-1b06327a6712",
-                                           "firstName": "Bhavana",
-                                           "lastName": "Lincoln",
-                                           "emailAddress": "lincoln.bhavana@gmail.com",
-                                           "telephone": "+443069990888",
-                                           "status": "ACTIVE",
-                                           "sampleUnitType": "BI"})
-        self.assertEqual(user_details[1], {"id": "01b51fcc-ed43-4cdb-ad1c-450f9986859b",
-                                           "firstName": "Chandana",
-                                           "lastName": "Blanchet",
-                                           "emailAddress": "cblanc@hotmail.co.uk",
-                                           "telephone": "+443069990854",
-                                           "status": "ACTIVE",
-                                           "sampleUnitType": "BI"})
-        self.assertEqual(user_details[2], {"id": "dd5a38ff-1ecb-4634-94c8-2358df33e614",
-                                           "firstName": "Ida",
-                                           "lastName": "Larue",
-                                           "emailAddress": "ilarue47@yopmail.com",
-                                           "telephone": "+443069990250",
-                                           "status": "ACTIVE",
-                                           "sampleUnitType": "BI"})
-        expected = {"associations": [{"enrolments": [{"enrolmentStatus": "ENABLED",
-                                                      "name": "Business Register and Employment Survey",
-                                                      "surveyId": "cb0711c3-0ac8-41d3-ae0e-567e5ea1ef87"
-                                                      }],
-                                      "partyId": "b3ba864b-7cbc-4f44-84fe-88dc018a1a4c",
-                                      "sampleUnitRef": "50012345678"
-                                      }],
-                    "id": "ab123456-ce17-40c2-a8fc-abcdef123456",
-                    "firstName": "Ivor",
-                    "lastName": "Bres",
-                    "emailAddress": "ivor.bres@hostmail.com",
-                    "telephone": "+447894056785",
-                    "status": "ACTIVE",
-                    "sampleUnitType": "BI"}
-        self.assertEqual(user_details[3], expected)
-        expected = {"associations": [{"enrolments": [], "partyId": "b3ba864b-7cbc-4f44-84fe-88dc018a1a4c",
-                                      "sampleUnitRef": "50012345678"}],
-                    "id": "654321ab-ce17-40c2-a8fc-abcdef123456",
-                    "firstName": "IvorNot",
-                    "lastName": "Bres",
-                    "emailAddress": "ivorNot.bres@hostmail.com",
-                    "telephone": "+447894056786",
-                    "status": "ACTIVE",
-                    "sampleUnitType": "BI"}
-
-        self.assertEqual(user_details[4], expected)
-
-    # def test_get_user_details_by_invalid_uuid(self):
-    #     """Test that function returns error when invalid uuid present"""
-    #
-    #     list_uuids = ['f62dfda8-73b0-4e0e-97cf-1b06327a6778']
-    #
-    #     with self.assertRaises(ExpectationFailed):
-    #         get_details_by_uuids(list_uuids)
-    #
-    # def test_get_business_details_by_invalid_ru(self):
-    #     """Test that function returns error when invalid ru present"""
-    #
-    #     list_ru = ['f62dfda8-73b0-4e0e-97cf-1b06327a6778']
-    #
-    #     with self.assertRaises(ExpectationFailed):
-    #         get_business_details_by_ru(list_ru)
 
     def test_message_by_id_replaces_uuids(self):
         """Test get message by id endpoint replaces to and from with user details"""

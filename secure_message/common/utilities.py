@@ -178,26 +178,6 @@ def _get_to_details(message):
     return user_details
 
 
-def add_to_and_from_details_old(messages):
-    """Adds user details for sender and recipient"""
-
-    uuid_list = []
-
-    for message in messages:
-        uuid_list.extend([uuid for uuid in message['msg_to'] if uuid not in uuid_list])
-        if message['msg_from'] not in uuid_list:
-            uuid_list.append(message['msg_from'])
-
-    user_details = get_details_by_uuids(uuid_list)
-
-    for message in messages:
-
-        message['@msg_to'] = [user for user in user_details if user["id"] in message['msg_to']]
-        message['@msg_from'] = next((user for user in user_details if user["id"] == message['msg_from']), None)
-
-    return messages
-
-
 def add_business_details(messages):
     """Adds business details"""
 
