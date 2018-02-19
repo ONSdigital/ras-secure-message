@@ -3,8 +3,9 @@ import os
 import sys
 
 from structlog import configure
-from structlog.stdlib import add_log_level, filter_by_level
 from structlog.processors import JSONRenderer, TimeStamper
+from structlog.stdlib import add_log_level, filter_by_level
+
 
 
 def logger_initial_config(service_name=None,

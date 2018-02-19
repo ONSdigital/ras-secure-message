@@ -6,20 +6,22 @@ from flask import json, jsonify
 from flask_restful import Api
 from flask_cors import CORS
 from retrying import retry
+from sqlalchemy import DDL, event
 from sqlalchemy.exc import DatabaseError, ProgrammingError
 from structlog import wrap_logger
-from sqlalchemy import event, DDL
+
 
 from secure_message.authentication.authenticator import authenticate
 from secure_message.exception.exceptions import MissingEnvironmentVariable
 from secure_message.logger_config import logger_initial_config
 from secure_message.repository import database
-from secure_message.resources.drafts import DraftSave, DraftById, DraftModifyById, DraftList
-from secure_message.resources.health import Health, DatabaseHealth, HealthDetails
+from secure_message.resources.drafts import DraftById, DraftList, DraftModifyById, DraftSave
+from secure_message.resources.health import DatabaseHealth, Health, HealthDetails
 from secure_message.resources.info import Info
-from secure_message.resources.messages import MessageList, MessageSend, MessageById, MessageModifyById, MessageCounter
-from secure_message.v2.resources.messages import MessageSendV2, MessageCounterV2
+from secure_message.resources.messages import MessageById, MessageCounter, MessageList, MessageModifyById, MessageSend
 from secure_message.resources.threads import ThreadById, ThreadList
+from secure_message.v2.resources.messages import MessageSendV2, MessageCounterV2
+
 
 logger_initial_config(service_name='ras-secure-message')
 logger = wrap_logger(logging.getLogger(__name__))
@@ -61,7 +63,6 @@ def create_app(config=None):
     api.add_resource(ThreadList, '/threads')
     api.add_resource(ThreadById, '/thread/<thread_id>', '/v2/threads/<thread_id>')
 
-    # V2
     api.add_resource(MessageSendV2, '/v2/messages')
     api.add_resource(MessageCounterV2, '/v2/messages/count')
 
