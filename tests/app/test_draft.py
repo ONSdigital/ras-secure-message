@@ -21,7 +21,7 @@ from secure_message.resources.drafts import DraftModifyById, DraftSave
 from secure_message.validation.domain import DraftSchema
 from secure_message.validation.user import User
 from secure_message.constants import MAX_RU_ID_LEN
-from secure_message.services.service_toggles import party, case_service
+from secure_message.services.service_toggles import party, case_service, internal_user_service
 from tests.app import test_utilities
 
 
@@ -73,6 +73,7 @@ class DraftTestCase(unittest.TestCase):
         self.user_respondent = User('0a7ad740-10d5-4ecb-b7ca-3c0384afb882', 'respondent')
         case_service.use_mock_service()
         party.use_mock_service()
+        internal_user_service.use_mock_service()
 
     def test_draft_call_saver(self):
         """Test saver called as expected to save draft"""

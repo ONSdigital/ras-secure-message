@@ -80,4 +80,4 @@ party = Party(False)
 case_service = Case(False)
 
 
-internal_user = InternalUser(False)
+internal_user_service = InternalUser(False)

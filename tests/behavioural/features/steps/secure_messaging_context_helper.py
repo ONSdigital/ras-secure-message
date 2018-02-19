@@ -40,6 +40,8 @@ class SecureMessagingContextHelper:
     __ALTERNATIVE_RESPONDENT_USER_TOKEN = {constants.USER_IDENTIFIER: __ALTERNATIVE_RESPONDENT_USER_ID,
                                            "role": "respondent"}
 
+    __ALTERNATIVE_INTERNAL_USER_ID = "SomeStringUntilWeGetIds"
+
     __BASE_URL = "http://localhost:5050"
 
     __default_message_data = data = {'msg_to': ['0a7ad740-10d5-4ecb-b7ca-3c0384afb882'],
@@ -178,6 +180,10 @@ class SecureMessagingContextHelper:
         return copy.copy(constants.BRES_USER)
 
     @property
+    def alternative_internal_id(self):
+        return copy.copy(SecureMessagingContextHelper.__ALTERNATIVE_INTERNAL_USER_ID)
+
+    @property
     def last_saved_message_data(self):
         return copy.deepcopy(self.sent_messages[len(self.sent_messages) - 1])
 
@@ -204,7 +210,7 @@ class SecureMessagingContextHelper:
 
     def store_messages_response_data(self, response):
         """stores the response from a request regarding multiple messages"""
-        response_data = json.loads(response)  # Handle the fact that get mesages returns data differently
+        response_data = json.loads(response)  # Handle the fact that get messages returns data differently
         self._messages_responses_data.append(response_data)
 
     def set_message_data_to_a_prior_version(self, message_index):

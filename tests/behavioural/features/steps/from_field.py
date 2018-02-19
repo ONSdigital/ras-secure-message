@@ -35,17 +35,22 @@ def step_impl_the_msg_from_is_set_to_respondent(context):
 @given("the from is set to alternative respondent")
 @when("the from is set to alternative respondent")
 def step_impl_the_msg_from_is_set_to_alternative_respondent(context):
-    def step_impl_the_msg_from_is_set_to_respondent(context):
-        """set the from to the alternate respondent as set in the helper """
+    """set the from to the alternate respondent as set in the helper """
     step_impl_the_msg_from_is_set_to(context, context.bdd_helper.alternative_respondent_id)
 
 
 @given("the from is set to internal")
 @when("the from is set to internal")
 def step_impl_the_msg_from_is_set_to_internal(context):
-    def step_impl_the_msg_from_is_set_to_respondent(context):
-        """set the from to the internal user as set in the helper """
+    """set the from to the internal user as set in the helper """
     step_impl_the_msg_from_is_set_to(context, context.bdd_helper.internal_id)
+
+
+@given("the from is set to alternative internal")
+@when("the from is set to alternative internal")
+def step_impl_the_msg_from_is_set_to_alternative_internal(context):
+    """set the from to the internal user as set in the helper """
+    step_impl_the_msg_from_is_set_to(context, context.bdd_helper.alternative_internal_id)
 
 
 @then("retrieved message msg_from is as was saved")

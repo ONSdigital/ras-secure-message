@@ -106,7 +106,7 @@ Feature: Get Drafts
     Then  a success status code (200) is returned
       And  '5' messages are returned
 
-  Scenario: Respondent saves multiple drafts with two collection exercises , validate retrieves correct count based on collection exercise
+  Scenario: Internal user saves multiple drafts with two collection exercises , validate retrieves correct count based on collection exercise
     Given sending from internal to respondent
      And   '5' drafts are sent
      And   collection exercise is set to alternate collection exercise
