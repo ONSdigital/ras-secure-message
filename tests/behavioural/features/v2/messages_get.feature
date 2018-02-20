@@ -42,3 +42,19 @@ Feature: Get Messages list V2 Endpoint
     | specific user |
     | group        |
 
+
+ Scenario Outline: An internal user sends multiple messages to two respondents , then one respondent is forgotten by party service , all messages should be retrieved on get messages
+    Given sending from internal <user> to respondent
+      And  '5' messages are sent using V2
+      And  the to is set to alternative respondent
+      And  '3' messages are sent using V2
+      And  party service forgets alternative respondent
+      And debug step
+    When messages are read V2
+    Then  '8' messages are returned
+
+    Examples: user type
+    | user        |
+    | specific user |
+    | group        |
+
