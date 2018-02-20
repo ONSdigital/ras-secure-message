@@ -10,21 +10,17 @@ class PartyServiceMock:
 
     def get_business_details(self, ru):
         """Return mock business details"""
-        try:
-            return self._business_details[ru], 200
-        except KeyError:
-            error = f'RU:{ru} not in mock party service.'
-            logger.error('RU not in mock party service.', ru=ru)
-            return error, 404
+        business_details = self._business_details.get(ru)
+        if business_details is None:
+            logger.error(f"no details for ru:{ru} found in mock party service")
+        return business_details
 
     def get_user_details(self, uuid):
         """Return mock user details"""
-        try:
-            return self._respondent_ids[uuid], 200
-        except KeyError:
-            error = f'User ID:{uuid} not in mock party service'
-            logger.error('User ID not in mock party service', user_uuid=uuid)
-            return error, 404
+        user_details = self._respondent_ids.get(uuid)
+        if user_details is None:
+            logger.error(f"no details for user:{uuid} found in mock party service")
+        return user_details
 
     _business_details = {'c614e64e-d981-4eba-b016-d9822f09a4fb': {"id": "c614e64e-d981-4eba-b016-d9822f09a4fb",
                                                                   "name": "AOL"},

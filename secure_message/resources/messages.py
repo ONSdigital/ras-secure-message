@@ -129,8 +129,8 @@ class MessageSend(Resource):
         """Send an email to recipient if appropriate"""
         party_data = None
         if g.user.is_internal:
-            party_data, status_code = party.get_user_details(message.msg_to[0])  # NOQA TODO avoid 2 lookups (see validate)
-            if status_code == 200:
+            party_data = party.get_user_details(message.msg_to[0])  # NOQA TODO avoid 2 lookups (see validate)
+            if party_data:
                 if 'emailAddress' in party_data and party_data['emailAddress'].strip():
                     recipient_email = party_data['emailAddress'].strip()
                     alert_method = AlertViaLogging() if current_app.config['NOTIFY_VIA_GOV_NOTIFY'] == '0' else AlertViaGovNotify()
@@ -147,8 +147,8 @@ class MessageSend(Resource):
             if message.msg_from == constants.BRES_USER:
                 case_user = constants.BRES_USER
             else:
-                party_data, status_code = party.get_user_details(message.msg_from)  # NOQA TODO avoid 2 lookups(see validate)
-                if status_code == 200:
+                party_data= party.get_user_details(message.msg_from)  # NOQA TODO avoid 2 lookups(see validate)
+                if party_data:
                     first_name = party_data['firstName'] if 'firstName' in party_data else ''
                     last_name = party_data['lastName'] if 'lastName' in party_data else ''
                     case_user = '{} {}'.format(first_name, last_name).strip()
@@ -258,15 +258,12 @@ class MessageCounter(Resource):
     @staticmethod
     def get():
         """Get count of unread messages"""
-
-        if request.args.get('name'):
-            name = str(request.args.get('name'))
-            if name.lower() == 'unread':
-                message_service = Retriever()
-                return jsonify(name=name, total=message_service.unread_message_count(g.user))
+        try:
+            if request.args.get('name').lower() == 'unread':
+                return jsonify(name=request.args['name'], total=Retriever().unread_message_count(g.user))
             else:
-                logger.debug('Invalid label name', name=name, request=request.url)
+                logger.debug('Invalid label name', name=request.args.get('name'), request=request.url)
                 raise BadRequest(description="Invalid label")
-        else:
+        except KeyError:
             logger.debug('No Name parameter specified in URL', request=request.url)
             raise BadRequest(description='No Label Name Parameter specified.')

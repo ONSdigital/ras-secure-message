@@ -148,7 +148,7 @@ class PartyServiceIntegrationTestCase(unittest.TestCase):
         sut = party
         sut.use_real_service()
         expected = {"errors": "Respondent with party id '0a6018a0-3e67-4407-b120-780932434b36' does not exist."}
-        result, status_code = sut.get_user_details('0a6018a0-3e67-4407-b120-780932434b36')
+        result = sut.get_user_details('0a6018a0-3e67-4407-b120-780932434b36')
         self.assertEqual(result, expected)
 
     @unittest.SkipTest
@@ -164,5 +164,5 @@ class PartyServiceIntegrationTestCase(unittest.TestCase):
                     "status": "CREATED",
                     "sampleUnitType": "BI"
                     }
-        result, status_code = sut.get_user_details('db036fd7-ce17-40c2-a8fc-932e7c228397')
+        result = sut.get_user_details('db036fd7-ce17-40c2-a8fc-932e7c228397')
         self.assertEqual(result, expected)

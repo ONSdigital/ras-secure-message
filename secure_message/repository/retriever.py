@@ -276,8 +276,7 @@ class Retriever:
         try:
             result = SecureMessage.query.filter(SecureMessage.msg_id == draft_id) \
                 .filter(SecureMessage.statuses.any(Status.label == Labels.DRAFT.value)).first()
+            return result.serialize(user) if result else None
         except Exception as e:
             logger.error('Error retrieving message from database', error=e)
             raise InternalServerError(description="Error retrieving message from database")
-
-        return result.serialize(user) if result else None

@@ -115,9 +115,9 @@ def get_business_details_by_ru(rus):
 
     for ru in rus:
 
-        detail, status_code = party.get_business_details(ru)
+        detail = party.get_business_details(ru)
 
-        if status_code == 200:
+        if detail is not None:
             details.append(detail)
         else:
             logger.info('No details found for RU ID', ru=ru)
@@ -125,36 +125,18 @@ def get_business_details_by_ru(rus):
     return details
 
 
-def get_details_by_uuids(uuids):
-    """Function to retrieve user details from uuids using the party service"""
-
-    respondent_details = []
-    for uuid in uuids:
-
-        detail, status_code = party.get_user_details(uuid)
-
-        if status_code == 200:
-            respondent_details.append(detail)
-        else:
-            logger.info('No details found for user', uuid=uuid)
-
-    return respondent_details
-
-
 def add_to_and_from_details(messages):
     """Adds user details for sender and recipient"""
-    for message in messages:
-        message['@msg_from'] = _get_from_details(message)
-        message['@msg_to'] = _get_to_details(message)
+    [msg.update({'@msg_from': _get_from_details(msg), '@msg_to': _get_to_details(msg)}) for msg in messages]
     return messages
 
 
 def _get_from_details(message):
     """looks up the details for the from users"""
     if message['from_internal']:
-        from_details, _ = internal_user_service.get_user_details(message['msg_from'])
+        from_details = internal_user_service.get_user_details(message['msg_from'])
     else:
-        from_details, _ = party.get_user_details(message['msg_from'])
+        from_details = party.get_user_details(message['msg_from'])
     return from_details
 
 
@@ -168,12 +150,10 @@ def _get_to_details(message):
 
     for uuid in message['msg_to']:
 
-        detail, status_code = to_user_details_finder(uuid)
+        detail = to_user_details_finder(uuid)
 
-        if status_code == 200:
+        if detail:
             user_details.append(detail)
-        else:
-            logger.info('No details found for user', uuid=uuid)
 
     return user_details
 

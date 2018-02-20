@@ -449,7 +449,7 @@ class FlaskTestCase(unittest.TestCase):
                                                                        "lastName": "",
                                                                        "telephone": "+443069990888",
                                                                        "status": "ACTIVE",
-                                                                       "sampleUnitType": "BI"}, 200))
+                                                                       "sampleUnitType": "BI"}))
     @patch.object(CaseServiceMock, 'store_case_event')
     @patch.object(message_logger, 'info')
     def test_if_user_has_no_first_name_or_last_name_then_unknown_user_passed_to_case_service(self, mock_logger,

@@ -311,23 +311,17 @@ class PartyTestCase(unittest.TestCase):
         for draft in drafts:
             self.assertEqual(draft['@ru_id']['name'], "Apple")
 
-    def test_get_user_details_returns_error_if_uuid_not_known(self):
+    def test_get_user_details_returns_none_if_uuid_not_known(self):
         user = 'SomeoneWhoClearlyDoesNotExist'
         sut = PartyServiceMock()
-        expected_status_code = 404
-        expected_data = 'User ID:{} not in mock party service'.format(user)
-        result_data, result_status_code = sut.get_user_details(user)
-        self.assertEqual(result_data, expected_data)
-        self.assertEqual(result_status_code, expected_status_code)
+        result_data = sut.get_user_details(user)
+        self.assertIsNone(result_data)
 
-    def test_get_business_details_returns_error_if_ru_not_known(self):
+    def test_get_business_details_returns_none_if_ru_not_known(self):
         uuid = 'ABusinessThatDoesNotExist'
         sut = PartyServiceMock()
-        expected_status_code = 404
-        expected_data = 'RU:{} not in mock party service.'.format(uuid)
-        result_data, result_status_code = sut.get_business_details(uuid)
-        self.assertEqual(result_data, expected_data)
-        self.assertEqual(result_status_code, expected_status_code)
+        result_data = sut.get_business_details(uuid)
+        self.assertIsNone(result_data)
 
 
 if __name__ == '__main__':

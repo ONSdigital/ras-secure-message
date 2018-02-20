@@ -48,8 +48,11 @@ class InternalUserServiceMock:
 
     def get_user_details(self, uuid):
         """gets the user details from the internal user service"""
+        found = None
         if uuid:
             found = self.internal_user_dict.get(uuid)
-            if found:
-                return found, 200
-        return f"error retrieving details for {uuid}", 404
+            if not found:
+                err_string = f"error retrieving details for {uuid}"
+                logger.error(err_string)
+
+        return found

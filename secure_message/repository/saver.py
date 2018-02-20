@@ -3,7 +3,7 @@ import logging
 from sqlalchemy.exc import SQLAlchemyError
 from structlog import wrap_logger
 from secure_message.exception.exceptions import MessageSaveException
-from secure_message.repository.database import db, SecureMessage, Status, Events
+from secure_message.repository.database import db, Events, SecureMessage, Status
 
 logger = wrap_logger(logging.getLogger(__name__))
 
