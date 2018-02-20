@@ -12,6 +12,11 @@ Feature: Get threads list Endpoint V2
     Then  a success status code (200) is returned
       And '3' messages are returned
 
+    Examples: user type
+    | user        |
+    | specific user |
+    | group        |
+
   Scenario Outline: There are 3 conversations between respondent and internal , internal attempts to read them
     Given sending from respondent to internal <user>
       And '3' messages are sent using V2
