@@ -255,6 +255,9 @@ class MessageModifyById(Resource):
 
 
 class MessageCounter(Resource):
+
+    """Get a count of unread messages"""
+
     @staticmethod
     def get():
         """Get count of unread messages"""

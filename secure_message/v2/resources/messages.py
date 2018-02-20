@@ -14,6 +14,7 @@ from secure_message.v2.repository.retriever import RetrieverV2
 
 class MessageSendV2(MessageSend):
 
+    """Send A message using the V2 endpoint"""
     def post(self):     # expose endpoint as a resource
         return super(MessageSendV2, self).post()
 
@@ -35,10 +36,9 @@ class MessageSendV2(MessageSend):
 
 
 class MessageCounterV2(Resource):
-
+    """Get count of unread messages using v2 endpoint"""
     @staticmethod
     def get():
-        """Get count of unread messages"""
         if request.args.get('label') and request.args.get('survey'):
             name = str(request.args.get('label'))
             survey = request.args.get('survey')
