@@ -1,7 +1,7 @@
 import logging
 
 from flask import g, Response
-from flask import request, jsonify
+from flask import request, jsonify, make_response
 from flask_restful import Resource
 from structlog import wrap_logger
 from werkzeug.exceptions import BadRequest
@@ -20,9 +20,13 @@ logger = wrap_logger(logging.getLogger(__name__))
 
 
 class DraftSave(Resource):
+
+    """Save a draft message"""
+
     def post(self):
         """Handles saving of draft"""
         post_data = request.get_json()
+        post_data['from_internal'] = g.user.is_internal
         draft = DraftSchema().load(post_data)
 
         if 'msg_id' in post_data:
@@ -39,10 +43,8 @@ class DraftSave(Resource):
 
             return resp
 
-        res = jsonify(draft.errors)
-        res.status_code = 400
-        logger.error('Failed saving draft', status_code=res.status_code)
-        return res
+        logger.error('Failed saving draft', status_code=400)
+        return make_response(jsonify(draft.errors), 400)
 
     @staticmethod
     def _save_draft(draft, saver=Saver()):
@@ -54,7 +56,6 @@ class DraftSave(Resource):
 
         uuid_from = draft.data.msg_from
         saver.save_msg_status(uuid_from, draft.data.msg_id, Labels.DRAFT.value)
-        saver.save_msg_actors(draft.data.msg_id, uuid_from, uuid_to, g.user.is_internal)
         saver.save_msg_event(draft.data.msg_id, EventsApi.DRAFT_SAVED.value)
 
 
@@ -76,10 +77,8 @@ class DraftById(Resource):
             resp.headers['ETag'] = etag
             return resp
 
-        result = jsonify({'status': 'error'})
-        result.status_code = 403
-        logger.error('Error getting message by ID', msg_id=draft_id, status_code=result.status_code)
-        return result
+        logger.error('Error getting message by ID', msg_id=draft_id, status_code=403)
+        return make_response(jsonify({'status': 'error'}), 403)
 
 
 class DraftList(Resource):
@@ -92,13 +91,12 @@ class DraftList(Resource):
         message_args = get_options(request.args)
 
         message_service = Retriever()
-        status, result = message_service.retrieve_message_list(message_args.page, message_args.limit, g.user, label=Labels.DRAFT.value)
+        result = message_service.retrieve_message_list(message_args.page, message_args.limit, g.user, label=Labels.DRAFT.value)
 
-        if status:
-            resp = paginated_list_to_json(result, message_args.page, message_args.limit, request.host_url,
-                                          g.user, message_args.string_query_args, DRAFT_LIST_ENDPOINT)
-            resp.status_code = 200
-            return resp
+        resp = paginated_list_to_json(result, message_args.page, message_args.limit, request.host_url,
+                                      g.user, message_args.string_query_args, DRAFT_LIST_ENDPOINT)
+        resp.status_code = 200
+        return resp
 
 
 class DraftModifyById(Resource):
@@ -113,12 +111,12 @@ class DraftModifyById(Resource):
         if data['msg_id'] != draft_id:
             logger.error('Conflicting message IDs', draft_id=draft_id, message_id=data['msg_id'])
             raise BadRequest(description="Conflicting msg_id's")
-        is_draft = Retriever().check_msg_id_is_a_draft(draft_id, g.user)
-        if is_draft[0] is False:
+        existing_draft = Retriever().get_draft(draft_id, g.user)
+        if not existing_draft:
             logger.error('Draft put requires valid draft')
             raise BadRequest(description="Draft put requires valid draft")
 
-        not_modified = self.etag_check(request.headers, is_draft[1])
+        not_modified = self.etag_check(request.headers, existing_draft)
 
         if not_modified is False:
             return Response(response="Draft has been modified since last check", status=409, mimetype="text/html")
@@ -137,10 +135,8 @@ class DraftModifyById(Resource):
             resp.status_code = 200
             return resp
 
-        resp = jsonify(draft.errors)
-        resp.status_code = 400
-        logger.error('Error sending draft', msg_id=draft_id, status_code=resp.status_code)
-        return resp
+        logger.error('Error sending draft', msg_id=draft_id, status_code=400)
+        return make_response(jsonify(draft.errors), 400)
 
     @staticmethod
     def etag_check(headers, current_draft):
@@ -148,8 +144,6 @@ class DraftModifyById(Resource):
         if headers.get('ETag'):
             current_etag = generate_etag(current_draft['msg_to'], current_draft['msg_id'],
                                          current_draft['subject'], current_draft['body'])
-            if current_etag == headers.get('ETag'):
-                return True
-            return False
+            return current_etag == headers.get('ETag')
         else:
             return True

@@ -22,43 +22,45 @@ class PartyService:
     def get_business_details(self, ru):
         """Retrieves the business details from the party service"""
 
-        if ru not in self._business_details_cache:
+        ru_dict = self._business_details_cache.get(ru)
+
+        if ru_dict is None:
+            logger.info(f"Party Service: retrieve party ru data for {ru}")
+
             party_data = requests.get(PartyService.get_url('RAS_PARTY_GET_BY_BUSINESS', ru),
                                       auth=current_app.config['BASIC_AUTH'], verify=False)
-            logger.debug("Party data retrieved for", ru=ru)
-            self._business_details_cache[ru] = party_data
-        else:
-            party_data = self._business_details_cache.get(ru)
+            if party_data.status_code == 200:
+                ru_dict = json.loads(party_data.text)
+                self._business_details_cache[ru] = ru_dict
+                logger.debug(f"Party data retrieved for ru:{ru}")
+            else:
+                logger.debug(f"Party data failed for ru:{ru}", status_code=party_data.status_code, text=party_data.text,
+                             ru=ru)
 
-        if party_data.status_code == 200:
-            party_dict = json.loads(party_data.text)
-            return party_dict, party_data.status_code
-
-        logger.error('Party service failed', status_code=party_data.status_code, text=party_data.text, ru=ru)
-        return party_data.text, party_data.status_code
+        return ru_dict
 
     def get_user_details(self, uuid):
         if uuid == constants.BRES_USER:
-            party_dict = {"id": constants.BRES_USER,
-                          "firstName": "BRES",
-                          "lastName": "",
-                          "emailAddress": "",
-                          "telephone": "",
-                          "status": "",
-                          "sampleUnitType": "BI"}
-            return party_dict, 200
+            user_dict = {"id": constants.BRES_USER,
+                         "firstName": "BRES",
+                         "lastName": "",
+                         "emailAddress": "",
+                         "telephone": "",
+                         "status": "",
+                         "sampleUnitType": "BI"}
+            return user_dict
 
-        if uuid not in self._users_cache:
-            logger.info("Party Service: retrieve party data using", uuid=uuid)
+        user_dict = self._users_cache.get(uuid)
+
+        if user_dict is None:
+            logger.info(f"Party Service: retrieve party user data for {uuid}")
             party_data = requests.get(PartyService.get_url('RAS_PARTY_GET_BY_RESPONDENT', uuid),
                                       auth=current_app.config['BASIC_AUTH'], verify=False)
-            self._users_cache[uuid] = party_data
-        else:
-            party_data = self._users_cache.get(uuid)
-
-        if party_data.status_code == 200:
-            party_dict = json.loads(party_data.text)
-            return party_dict, party_data.status_code
-
-        logger.error('Party service failed', status_code=party_data.status_code, text=party_data.text, uuid=uuid)
-        return party_data.text, party_data.status_code
+            if party_data.status_code == 200:
+                user_dict = json.loads(party_data.text)
+                self._users_cache[uuid] = user_dict
+                logger.debug(f"Party data retrieved for uuid:{uuid}")
+            else:
+                logger.error(f'Party service failed for uuid:{uuid}', status_code=party_data.status_code, text=party_data.text,
+                             uuid=uuid)
+        return user_dict

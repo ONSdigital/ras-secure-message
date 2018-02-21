@@ -1,23 +1,24 @@
 import logging
 
-from flask import request, jsonify, g, Response, current_app
+from flask import request, jsonify, g, Response, current_app, make_response
 from flask_restful import Resource
 from structlog import wrap_logger
 from werkzeug.exceptions import BadRequest
 
+
+from secure_message.authorization.authorizer import Authorizer
 from secure_message.common.alerts import AlertUser, AlertViaGovNotify, AlertViaLogging
 from secure_message.common.eventsapi import EventsApi
 from secure_message.common.labels import Labels
 from secure_message.common.utilities import get_options, paginated_list_to_json, add_users_and_business_details
+from secure_message import constants
 from secure_message.constants import MESSAGE_LIST_ENDPOINT
 from secure_message.repository.modifier import Modifier
 from secure_message.repository.retriever import Retriever
 from secure_message.repository.saver import Saver
 from secure_message.resources.drafts import DraftModifyById
-from secure_message.validation.domain import MessageSchema
-from secure_message.authorization.authorizer import Authorizer
 from secure_message.services.service_toggles import party, case_service
-from secure_message import constants
+from secure_message.validation.domain import MessageSchema
 
 logger = wrap_logger(logging.getLogger(__name__))
 
@@ -35,16 +36,13 @@ class MessageList(Resource):
         message_args = get_options(request.args)
 
         message_service = Retriever()
-        status, result = message_service.retrieve_message_list(message_args.page, message_args.limit, g.user,
-                                                               ru_id=message_args.ru_id, survey=message_args.survey,
-                                                               cc=message_args.cc, label=message_args.label,
-                                                               descend=message_args.desc, ce=message_args.ce)
+        result = message_service.retrieve_message_list(message_args.page, message_args.limit, g.user,
+                                                       ru_id=message_args.ru_id, survey=message_args.survey,
+                                                       cc=message_args.cc, label=message_args.label,
+                                                       descend=message_args.desc, ce=message_args.ce)
 
-        if status:
-            resp = paginated_list_to_json(result, message_args.page, message_args.limit, request.host_url,
-                                          g.user, message_args.string_query_args, MESSAGE_LIST_ENDPOINT)
-            resp.status_code = 200
-            return resp
+        return make_response(paginated_list_to_json(result, message_args.page, message_args.limit, request.host_url,
+                                                    g.user, message_args.string_query_args, MESSAGE_LIST_ENDPOINT), 200)
 
 
 class MessageSend(Resource):
@@ -61,8 +59,9 @@ class MessageSend(Resource):
         is_draft = False
         draft_id = None
         if 'msg_id' in post_data:
-            is_draft, returned_draft = Retriever().check_msg_id_is_a_draft(post_data['msg_id'], g.user)
-            if is_draft is True:
+            returned_draft = Retriever().get_draft(post_data['msg_id'], g.user)
+            if returned_draft:
+                is_draft = True
                 draft_id = post_data['msg_id']
                 post_data['msg_id'] = ''
 
@@ -76,20 +75,30 @@ class MessageSend(Resource):
             if last_modified is False:
                 return Response(response="Draft has been modified since last check", status=409, mimetype="text/html")
 
-        message = MessageSchema().load(post_data)
+        post_data['from_internal'] = g.user.is_internal
+        message = self._validate_post_data(post_data)
+
         if message.errors == {}:
-            return self._message_save(message, is_draft, draft_id)
-        resp = jsonify(message.errors)
-        resp.status_code = 400
+            self._message_save(message, is_draft, draft_id)
+            if is_draft:
+                Modifier().del_draft(draft_id)
+            # listener errors are logged but still a 201 reported
+            MessageSend._alert_listeners(message.data)
+            return make_response(jsonify({'status': '201', 'msg_id': message.data.msg_id, 'thread_id': message.data.thread_id}), 201)
+
         logger.error('Message send failed', errors=message.errors)
-        return resp
+        return make_response(jsonify(message.errors), 400)
+
+    @staticmethod
+    def _validate_post_data(post_data):
+        message = MessageSchema().load(post_data)
+        return message
 
     @staticmethod
     def _message_save(message, is_draft, draft_id):
         """Saves the message to the database along with the subsequent status and audit"""
         save = Saver()
         save.save_message(message.data)
-        save.save_msg_actors(message.data.msg_id, message.data.msg_from, message.data.msg_to[0], g.user.is_internal)
         save.save_msg_event(message.data.msg_id, EventsApi.SENT.value)
         if g.user.is_respondent:
             save.save_msg_status(message.data.msg_from, message.data.msg_id, Labels.SENT.value)
@@ -99,16 +108,6 @@ class MessageSend(Resource):
             save.save_msg_status(constants.BRES_USER, message.data.msg_id, Labels.SENT.value)
             save.save_msg_status(message.data.msg_to[0], message.data.msg_id, Labels.INBOX.value)
             save.save_msg_status(message.data.msg_to[0], message.data.msg_id, Labels.UNREAD.value)
-
-        if is_draft is True:
-            Modifier().del_draft(draft_id)
-
-        # listener errors are logged but still a 201 reported
-        MessageSend._alert_listeners(message.data)
-
-        resp = jsonify({'status': '201', 'msg_id': message.data.msg_id, 'thread_id': message.data.thread_id})
-        resp.status_code = 201
-        return resp
 
     @staticmethod
     def _alert_listeners(message):
@@ -123,9 +122,9 @@ class MessageSend(Resource):
     def _try_send_alert_email(message):
         """Send an email to recipient if appropriate"""
         party_data = None
-        if message.msg_to[0] != constants.BRES_USER:
-            party_data, status_code = party.get_user_details(message.msg_to[0])  # NOQA TODO avoid 2 lookups (see validate)
-            if status_code == 200:
+        if g.user.is_internal:
+            party_data = party.get_user_details(message.msg_to[0])  # NOQA TODO avoid 2 lookups (see validate)
+            if party_data:
                 if 'emailAddress' in party_data and party_data['emailAddress'].strip():
                     recipient_email = party_data['emailAddress'].strip()
                     alert_method = AlertViaLogging() if current_app.config['NOTIFY_VIA_GOV_NOTIFY'] == '0' else AlertViaGovNotify()
@@ -142,8 +141,8 @@ class MessageSend(Resource):
             if message.msg_from == constants.BRES_USER:
                 case_user = constants.BRES_USER
             else:
-                party_data, status_code = party.get_user_details(message.msg_from)  # NOQA TODO avoid 2 lookups(see validate)
-                if status_code == 200:
+                party_data= party.get_user_details(message.msg_from)  # NOQA TODO avoid 2 lookups(see validate)
+                if party_data:
                     first_name = party_data['firstName'] if 'firstName' in party_data else ''
                     last_name = party_data['lastName'] if 'lastName' in party_data else ''
                     case_user = '{} {}'.format(first_name, last_name).strip()
@@ -247,3 +246,21 @@ class MessageModifyById(Resource):
             raise BadRequest(description=f"Invalid action requested: {action}")
 
         return action, label
+
+
+class MessageCounter(Resource):
+
+    """Get a count of unread messages"""
+
+    @staticmethod
+    def get():
+        """Get count of unread messages"""
+        try:
+            if request.args.get('name').lower() == 'unread':
+                return jsonify(name=request.args['name'], total=Retriever().unread_message_count(g.user))
+            else:
+                logger.debug('Invalid label name', name=request.args.get('name'), request=request.url)
+                raise BadRequest(description="Invalid label")
+        except KeyError:
+            logger.debug('No Name parameter specified in URL', request=request.url)
+            raise BadRequest(description='No Label Name Parameter specified.')

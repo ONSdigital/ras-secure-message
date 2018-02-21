@@ -8,7 +8,7 @@ from werkzeug.exceptions import InternalServerError, NotFound
 
 from secure_message.common.eventsapi import EventsApi
 from secure_message.common.labels import Labels
-from secure_message.repository.database import Actors, db, Events, SecureMessage, Status
+from secure_message.repository.database import db, Events, SecureMessage, Status
 from secure_message import constants
 
 logger = wrap_logger(logging.getLogger(__name__))
@@ -53,7 +53,7 @@ class Retriever:
         try:
             t = db.session.query(SecureMessage.msg_id, func.max(Events.date_time)  # pylint:disable=no-member
                                  .label('max_date')) \
-                .join(Events).join(Status).outerjoin(Actors) \
+                .join(Events).join(Status) \
                 .filter(and_(*conditions)) \
                 .filter(and_(*status_conditions)) \
                 .filter(or_(Events.event == EventsApi.SENT.value, Events.event == EventsApi.DRAFT_SAVED.value)) \
@@ -72,7 +72,7 @@ class Retriever:
             logger.error('Error retrieving messages from database', error=e)
             raise InternalServerError(description="Error retrieving messages from database")
 
-        return True, result
+        return result
 
     @staticmethod
     def _retrieve_message_list_internal(page, limit, ru_id, survey, cc, ce, label, descend):
@@ -85,9 +85,9 @@ class Retriever:
         if label is not None:
             valid_statuses.append(label)
             if label in [Labels.INBOX.value, Labels.ARCHIVE.value, Labels.UNREAD.value]:
-                actor_conditions.append(Actors.sent_from_internal == False)  # NOQA pylint:disable=singleton-comparison
+                actor_conditions.append(SecureMessage.from_internal == False)  # NOQA pylint:disable=singleton-comparison
             if label in [Labels.DRAFT.value, Labels.SENT.value]:
-                actor_conditions.append(Actors.sent_from_internal == True)  # NOQA pylint:disable=singleton-comparison
+                actor_conditions.append(SecureMessage.from_internal == True)  # NOQA pylint:disable=singleton-comparison
         else:
             status_reject_conditions.append(Labels.DRAFT_INBOX.value)
             valid_statuses = [Labels.INBOX.value, Labels.DRAFT.value]
@@ -108,7 +108,7 @@ class Retriever:
         try:
             t = db.session.query(SecureMessage.msg_id, func.max(Events.date_time)  # pylint:disable=no-member  ~ below used to obtain not in
                                  .label('max_date')) \
-                .join(Events).join(Status).outerjoin(Actors) \
+                .join(Events).join(Status) \
                 .filter(and_(*conditions)) \
                 .filter(or_(*actor_conditions)) \
                 .filter(~Status.label.in_(status_reject_conditions)) \
@@ -129,7 +129,7 @@ class Retriever:
             logger.exception('Error retrieving messages from database', error=e)
             raise InternalServerError(description="Error retrieving messages from database")
 
-        return True, result
+        return result
 
     @staticmethod
     def unread_message_count(user):
@@ -182,7 +182,7 @@ class Retriever:
             logger.exception('Error retrieving messages from database', error=e)
             raise InternalServerError(description="Error retrieving messages from database")
 
-        return True, result
+        return result
 
     @staticmethod
     def retrieve_message(message_id, user):
@@ -232,7 +232,7 @@ class Retriever:
             logger.error('Error retrieving conversation from database', error=e)
             raise InternalServerError(description="Error retrieving conversation from database")
 
-        return True, result
+        return result
 
     @staticmethod
     def retrieve_draft(message_id, user):
@@ -271,15 +271,12 @@ class Retriever:
         return resp
 
     @staticmethod
-    def check_msg_id_is_a_draft(draft_id, user):
+    def get_draft(draft_id, user):
         """Check msg_id is that of a valid draft and return true/false if no ID is present"""
         try:
             result = SecureMessage.query.filter(SecureMessage.msg_id == draft_id) \
                 .filter(SecureMessage.statuses.any(Status.label == Labels.DRAFT.value)).first()
+            return result.serialize(user) if result else None
         except Exception as e:
             logger.error('Error retrieving message from database', error=e)
             raise InternalServerError(description="Error retrieving message from database")
-
-        if result is None:
-            return False, result
-        return True, result.serialize(user)

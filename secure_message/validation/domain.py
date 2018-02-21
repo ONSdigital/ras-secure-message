@@ -16,7 +16,7 @@ class Message:
     """Class to hold message attributes"""
 
     def __init__(self, msg_from, subject, body, msg_to='', thread_id=None, msg_id='', collection_case='',
-                 survey='', ru_id='', collection_exercise=''):
+                 survey='', ru_id='', collection_exercise='', from_internal=False):
 
         self.msg_id = str(uuid.uuid4()) if not msg_id else msg_id  # If empty msg_id assign to a uuid
         self.msg_to = None if not msg_to else msg_to
@@ -28,11 +28,12 @@ class Message:
         self.ru_id = ru_id
         self.collection_exercise = collection_exercise
         self.survey = survey
+        self.from_internal = from_internal
 
     def __repr__(self):
         return f'<Message(msg_id={self.msg_id} msg_to={self.msg_to} msg_from={self.msg_from} subject={self.subject}' \
                f' body={self.body} thread_id={self.thread_id} collection_case={self.collection_case} ru_id={self.ru_id}' \
-               f' collection_exercise={self.collection_exercise} survey={self.survey})>'
+               f' collection_exercise={self.collection_exercise} survey={self.survey} from_internal={self.from_internal})>'
 
     def __eq__(self, other):
         if isinstance(other, Message):
@@ -53,6 +54,7 @@ class MessageSchema(Schema):
     ru_id = fields.Str(required=True)
     survey = fields.Str(required=True)
     collection_exercise = fields.Str(allow_none=True)
+    from_internal = fields.Boolean(allow_none=True)
 
     @pre_load
     def check_sent_and_read_date(self, data):
@@ -160,6 +162,7 @@ class DraftSchema(Schema):
     ru_id = fields.Str(allow_none=True)
     survey = fields.Str(required=True)
     collection_exercise = fields.Str(allow_none=True)
+    from_internal = fields.Boolean(allow_none=True)
 
     @pre_load
     def check_variables_set_and_not_set(self, data):   # NOQA pylint:disable=no-self-use
@@ -189,9 +192,9 @@ class DraftSchema(Schema):
                         logger.error('Not a valid respondent', user=item)
                         raise ValidationError("{0} is not a valid respondent.".format(item))
                 else:  # Respondent sending to internal
-                    if not (msg_to[0] == constants.BRES_USER or
-                            msg_to[0] == constants.NON_SPECIFIC_INTERNAL_USER or
-                            g.user.is_valid_internal_user(msg_to[0])):
+                    if item and not (msg_to[0] == constants.BRES_USER or
+                                     msg_to[0] == constants.NON_SPECIFIC_INTERNAL_USER or
+                                     g.user.is_valid_internal_user(msg_to[0])):
                         logger.error('Not a valid internal user', user=item)
                         raise ValidationError("{0} is not a valid internal user.".format(item))
         else:

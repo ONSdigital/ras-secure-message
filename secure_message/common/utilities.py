@@ -4,7 +4,7 @@ import logging
 
 from flask import jsonify
 from structlog import wrap_logger
-from secure_message.services.service_toggles import party
+from secure_message.services.service_toggles import party, internal_user_service
 from secure_message.constants import MESSAGE_BY_ID_ENDPOINT, MESSAGE_LIST_ENDPOINT, MESSAGE_QUERY_LIMIT
 
 logger = wrap_logger(logging.getLogger(__name__))
@@ -115,9 +115,9 @@ def get_business_details_by_ru(rus):
 
     for ru in rus:
 
-        detail, status_code = party.get_business_details(ru)
+        detail = party.get_business_details(ru)
 
-        if status_code == 200:
+        if detail is not None:
             details.append(detail)
         else:
             logger.info('No details found for RU ID', ru=ru)
@@ -125,40 +125,37 @@ def get_business_details_by_ru(rus):
     return details
 
 
-def get_details_by_uuids(uuids):
-    """Function to retrieve user details from uuids using the party service"""
-
-    respondent_details = []
-    for uuid in uuids:
-
-        detail, status_code = party.get_user_details(uuid)
-
-        if status_code == 200:
-            respondent_details.append(detail)
-        else:
-            logger.info('No details found for user', uuid=uuid)
-
-    return respondent_details
-
-
 def add_to_and_from_details(messages):
     """Adds user details for sender and recipient"""
-
-    uuid_list = []
-
-    for message in messages:
-        uuid_list.extend([uuid for uuid in message['msg_to'] if uuid not in uuid_list])
-        if message['msg_from'] not in uuid_list:
-            uuid_list.append(message['msg_from'])
-
-    user_details = get_details_by_uuids(uuid_list)
-
-    for message in messages:
-
-        message['@msg_to'] = [user for user in user_details if user["id"] in message['msg_to']]
-        message['@msg_from'] = next((user for user in user_details if user["id"] == message['msg_from']), None)
-
+    [msg.update({'@msg_from': _get_from_details(msg), '@msg_to': _get_to_details(msg)}) for msg in messages]
     return messages
+
+
+def _get_from_details(message):
+    """looks up the details for the from users"""
+    if message['from_internal']:
+        from_details = internal_user_service.get_user_details(message['msg_from'])
+    else:
+        from_details = party.get_user_details(message['msg_from'])
+    return from_details
+
+
+def _get_to_details(message):
+    """looks up the details of all the to users"""
+    user_details = []
+    if message['from_internal']:
+        to_user_details_finder = party.get_user_details
+    else:
+        to_user_details_finder = internal_user_service.get_user_details
+
+    for uuid in message['msg_to']:
+
+        detail = to_user_details_finder(uuid)
+
+        if detail:
+            user_details.append(detail)
+
+    return user_details
 
 
 def add_business_details(messages):

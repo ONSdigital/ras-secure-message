@@ -18,10 +18,8 @@ class User:
 
     @staticmethod
     def is_valid_internal_user(uuid):
-        _, status_code = internal_user_service.get_user_details(uuid)
-        return status_code == 200
+        return internal_user_service.get_user_details(uuid) is not None
 
     @staticmethod
     def is_valid_respondent(uuid):
-        _, status_code = party.get_user_details(uuid)
-        return status_code == 200
+        return party.get_user_details(uuid) is not None
