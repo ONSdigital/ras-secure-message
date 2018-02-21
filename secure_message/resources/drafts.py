@@ -1,7 +1,7 @@
 import logging
 
 from flask import g, Response
-from flask import request, jsonify
+from flask import request, jsonify, make_response
 from flask_restful import Resource
 from structlog import wrap_logger
 from werkzeug.exceptions import BadRequest
@@ -43,10 +43,8 @@ class DraftSave(Resource):
 
             return resp
 
-        res = jsonify(draft.errors)
-        res.status_code = 400
-        logger.error('Failed saving draft', status_code=res.status_code)
-        return res
+        logger.error('Failed saving draft', status_code=400)
+        return make_response(jsonify(draft.errors), 400)
 
     @staticmethod
     def _save_draft(draft, saver=Saver()):
@@ -79,10 +77,8 @@ class DraftById(Resource):
             resp.headers['ETag'] = etag
             return resp
 
-        result = jsonify({'status': 'error'})
-        result.status_code = 403
-        logger.error('Error getting message by ID', msg_id=draft_id, status_code=result.status_code)
-        return result
+        logger.error('Error getting message by ID', msg_id=draft_id, status_code=403)
+        return make_response(jsonify({'status': 'error'}), 403)
 
 
 class DraftList(Resource):
@@ -139,10 +135,8 @@ class DraftModifyById(Resource):
             resp.status_code = 200
             return resp
 
-        resp = jsonify(draft.errors)
-        resp.status_code = 400
-        logger.error('Error sending draft', msg_id=draft_id, status_code=resp.status_code)
-        return resp
+        logger.error('Error sending draft', msg_id=draft_id, status_code=400)
+        return make_response(jsonify(draft.errors), 400)
 
     @staticmethod
     def etag_check(headers, current_draft):

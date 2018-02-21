@@ -35,17 +35,27 @@ class RetrieverV2(Retriever):
 
     @staticmethod
     def _get_conditions_internal_user(survey, user):
+        """Sets the conditions/predicates that are used by the query for the case of an internal actor"""
         status_conditions = []
         status_conditions.append(Status.actor == str(user.user_uuid))
         status_conditions.append(Status.actor == constants.NON_SPECIFIC_INTERNAL_USER)
+        status_conditions.append(Status.actor == constants.BRES_USER)
         survey_conditions = []
-        survey_conditions.append(SecureMessage.survey == survey)
+        if survey:
+            survey_conditions.append(SecureMessage.survey == survey)
+        else:
+            survey_conditions.append(True)
         return status_conditions, survey_conditions
 
     @staticmethod
     def _get_conditions_respondent(survey, user):
+        """Sets the conditions/predicates that are used by the query for the case of an external actor"""
         status_conditions = []
         status_conditions.append(Status.actor == str(user.user_uuid))
         survey_conditions = []
-        survey_conditions.append(SecureMessage.survey == survey)
+        if survey:
+            survey_conditions.append(SecureMessage.survey == survey)
+        else:
+            survey_conditions.append(True)
+
         return status_conditions, survey_conditions

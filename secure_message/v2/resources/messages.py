@@ -39,7 +39,7 @@ class MessageCounterV2(Resource):
     """Get count of unread messages using v2 endpoint"""
     @staticmethod
     def get():
-        if request.args.get('label') and request.args.get('survey'):
+        if request.args.get('label'):
             name = str(request.args.get('label'))
             survey = request.args.get('survey')
             if name.lower() == 'unread':

@@ -28,3 +28,57 @@ Feature: Unread Message count endpoint V2
     | user        |
     | specific user |
     | group        |
+
+
+
+Scenario Outline: Respondent sends multiple messages to internal , some to BRES , some to group/user internal reads unread messages , count should include all messages
+Given sending from respondent to internal bres user
+  And the survey is set to 'SomeSurvey'
+  And '5' messages are sent
+  And sending from respondent to internal <user>
+  And '4' messages are sent using V2
+  And the user is set as internal <user>
+When the count of  messages with 'UNREAD' label in survey 'SomeSurvey' is made V2
+Then the returned label count was '9' V2
+
+Examples: user type
+| user        |
+| specific user |
+| group        |
+
+
+Scenario Outline: Respondent sends multiple messages to internal on different surveys internal reads inbox messages , count should be correct for each survey
+Given sending from respondent to internal <user>
+  And the survey is set to 'Survey1'
+  And '5' messages are sent
+  And the survey is set to 'Survey2'
+  And '4' messages are sent using V2
+  And the survey is set to 'Survey3'
+  And '3' messages are sent using V2
+  And the user is set as internal <user>
+When the count of  messages with 'UNREAD' label in survey 'Survey2' is made V2
+Then the returned label count was '4' V2
+
+Examples: user type
+| user        |
+| specific user |
+| group        |
+
+
+Scenario Outline: Respondent sends multiple messages to internal on different surveys internal reads inbox messages
+                  with no survey specified , count should be all messaegs
+Given sending from respondent to internal <user>
+  And the survey is set to 'Survey1'
+  And '5' messages are sent
+  And the survey is set to 'Survey2'
+  And '4' messages are sent using V2
+  And the survey is set to 'Survey3'
+  And '3' messages are sent using V2
+  And the user is set as internal <user>
+When the count of messages with 'UNREAD' label is made V2
+Then the returned label count was '12' V2
+
+Examples: user type
+| user        |
+| specific user |
+| group        |

@@ -49,7 +49,6 @@ Feature: Get Messages list V2 Endpoint
       And  the to is set to alternative respondent
       And  '3' messages are sent using V2
       And  party service forgets alternative respondent
-      And debug step
     When messages are read V2
     Then  '8' messages are returned
 

@@ -1,6 +1,6 @@
 import logging
 
-from flask import request, jsonify, g, Response, current_app
+from flask import request, jsonify, g, Response, current_app, make_response
 from flask_restful import Resource
 from structlog import wrap_logger
 from werkzeug.exceptions import BadRequest
@@ -41,10 +41,8 @@ class MessageList(Resource):
                                                        cc=message_args.cc, label=message_args.label,
                                                        descend=message_args.desc, ce=message_args.ce)
 
-        resp = paginated_list_to_json(result, message_args.page, message_args.limit, request.host_url,
-                                      g.user, message_args.string_query_args, MESSAGE_LIST_ENDPOINT)
-        resp.status_code = 200
-        return resp
+        return make_response(paginated_list_to_json(result, message_args.page, message_args.limit, request.host_url,
+                                      g.user, message_args.string_query_args, MESSAGE_LIST_ENDPOINT), 200)
 
 
 class MessageSend(Resource):
@@ -86,14 +84,10 @@ class MessageSend(Resource):
                 Modifier().del_draft(draft_id)
             # listener errors are logged but still a 201 reported
             MessageSend._alert_listeners(message.data)
-            resp = jsonify({'status': '201', 'msg_id': message.data.msg_id, 'thread_id': message.data.thread_id})
-            resp.status_code = 201
-            return resp
+            return make_response(jsonify({'status': '201', 'msg_id': message.data.msg_id, 'thread_id': message.data.thread_id}), 201)
 
-        resp = jsonify(message.errors)
-        resp.status_code = 400
         logger.error('Message send failed', errors=message.errors)
-        return resp
+        return make_response(jsonify(message.errors), 400)
 
     @staticmethod
     def _validate_post_data(post_data):

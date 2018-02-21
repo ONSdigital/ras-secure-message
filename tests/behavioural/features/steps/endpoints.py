@@ -425,6 +425,17 @@ def step_impl_the_unread_messages_are_counted(context, label_name, survey):
     context.bdd_helper.label_count = label_count
 
 
+@when("the count of messages with '{label_name}' label is made V2")
+@given("the count of messages with '{label_name}' label is made V2")
+def step_impl_the_unread_messages_are_counted(context, label_name):
+    """access the messages_count endpoint to get the count of unread messages"""
+    url = context.bdd_helper.messages_get_unread_count_v2_url + f"?label={label_name}"
+    context.response = context.app.test_client().get(url, headers=context.bdd_helper.headers)
+    response_data = context.response.data
+    label_count = json.loads(response_data)["total"]
+    context.bdd_helper.label_count = label_count
+
+
 @given("the message is saved as draft V2")
 @when("the message is saved as draft V2")
 def step_impl_the_message_is_saved_as_draft_v2(context):
