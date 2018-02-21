@@ -1,7 +1,7 @@
 
 import logging
 
-from flask import g, make_response,request
+from flask import g, make_response, request
 from flask_restful import Resource
 from structlog import wrap_logger
 from secure_message.common.utilities import get_options, paginated_list_to_json
@@ -36,5 +36,5 @@ class ThreadList(Resource):
 
         result = Retriever().retrieve_thread_list(message_args.page, message_args.limit, g.user)
 
-        return make_response( paginated_list_to_json(result, message_args.page, message_args.limit, request.host_url,
-                                                     g.user, message_args.string_query_args, THREAD_LIST_ENDPOINT), 200)
+        return make_response(paginated_list_to_json(result, message_args.page, message_args.limit, request.host_url,
+                                                    g.user, message_args.string_query_args, THREAD_LIST_ENDPOINT), 200)

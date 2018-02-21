@@ -416,7 +416,7 @@ def step_impl_messages_are_read_with_specific_label_using_v2(context, label_name
 
 @when("the count of  messages with '{label_name}' label in survey '{survey}' is made V2")
 @given("the count of  messages with '{label_name}' label in survey '{survey}' is made V2")
-def step_impl_the_unread_messages_are_counted(context, label_name, survey):
+def step_impl_the_unread_messages_are_counted_for_survey(context, label_name, survey):
     """access the messages_count endpoint to get the count of unread messages"""
     url = context.bdd_helper.messages_get_unread_count_v2_url + "?label={}&survey={}".format(label_name, survey)
     context.response = context.app.test_client().get(url, headers=context.bdd_helper.headers)

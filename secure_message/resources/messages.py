@@ -42,7 +42,7 @@ class MessageList(Resource):
                                                        descend=message_args.desc, ce=message_args.ce)
 
         return make_response(paginated_list_to_json(result, message_args.page, message_args.limit, request.host_url,
-                                      g.user, message_args.string_query_args, MESSAGE_LIST_ENDPOINT), 200)
+                                                    g.user, message_args.string_query_args, MESSAGE_LIST_ENDPOINT), 200)
 
 
 class MessageSend(Resource):
