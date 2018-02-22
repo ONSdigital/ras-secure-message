@@ -26,7 +26,7 @@ class CaseServiceTestCase(unittest.TestCase):
     @responses.activate
     def test_store_case_event_posts_request_to_remote_service(self):
         """Test store_case_event sends a request and returns data"""
-        responses.add(responses.POST, self.app.config['RM_CASE_POST'].format(self.app.config['RM_CASE_SERVICE'], '1234'),'{"something": "else"}', 200)
+        responses.add(responses.POST, self.app.config['RM_CASE_POST'].format(self.app.config['RM_CASE_SERVICE'], '1234'), json={"something": "else"}, status=200)
         sut = CaseService()
         case_event_data = CaseServiceTestHelper(200, 'OK', '{"something": "else"}')
 
@@ -39,7 +39,7 @@ class CaseServiceTestCase(unittest.TestCase):
     @responses.activate
     def test_store_case_event_posts_request_with_error_in_dict(self):
         """Test store_case_event sends a request and returns data"""
-        responses.add(responses.POST, self.app.config['RM_CASE_POST'].format(self.app.config['RM_CASE_SERVICE'], '1234'),'{"error": {"error1":"TestError"}}', 200)
+        responses.add(responses.POST, self.app.config['RM_CASE_POST'].format(self.app.config['RM_CASE_SERVICE'], '1234'), json={"error": {"error1":"TestError"}}, status=200)
         sut = CaseService()
         case_event_data = CaseServiceTestHelper(200, 'OK', '{"error": {"error1":"TestError"}}')
 

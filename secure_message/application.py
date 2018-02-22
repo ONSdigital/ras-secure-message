@@ -40,7 +40,7 @@ def create_app(config=None):
     create_db(app, app_config)
 
     set_v1_resources(api)
-    cache_client_token()
+    cache_client_token(app)
 
 
     @app.before_request
@@ -62,7 +62,7 @@ def create_app(config=None):
     return app
 
 
-def cache_client_token():
+def cache_client_token(app):
     token = get_client_token(app.config['CLIENT_ID'],
                                 app.config['CLIENT_SECRET'],
                                 app.config['UAA_URL'],

@@ -10,22 +10,6 @@ from secure_message.authentication.jwe import Encrypter
 from secure_message import constants
 
 
-def test_authentication_non_encrypted_jwt_pass(self):
-    """Authenticate request using an un-ecrypted JWT"""
-    expected_res = {'status': "ok"}
-    data = {
-        constants.USER_IDENTIFIER: "ce12b958-2a5f-44f4-a6da-861e59070a31",
-        "role": "internal"
-    }
-
-    signed_jwt = encode(data)
-    app = create_app()
-    with app.app_context():
-        app.config['SM_JWT_ENCRYPT'] = 0
-        res = check_jwt(signed_jwt)
-    self.assertEqual(res, expected_res)
-
-
 class AuthenticationTestCase(unittest.TestCase):
     """Test case for request authentication"""
 
@@ -119,6 +103,21 @@ class AuthenticationTestCase(unittest.TestCase):
             signed_jwt = encode(data)
             decoded_jwt = decode(signed_jwt)
         self.assertEqual(data, decoded_jwt)
+
+    def test_authentication_non_encrypted_jwt_pass(self):
+        """Authenticate request using an un-ecrypted JWT"""
+        expected_res = {'status': "ok"}
+        data = {
+            constants.USER_IDENTIFIER: "ce12b958-2a5f-44f4-a6da-861e59070a31",
+            "role": "internal"
+        }
+
+
+        with self.app.app_context():
+            signed_jwt = encode(data)
+            self.app.config['SM_JWT_ENCRYPT'] = 0
+            res = check_jwt(signed_jwt)
+        self.assertEqual(res, expected_res)
 
 
 if __name__ == '__main__':
