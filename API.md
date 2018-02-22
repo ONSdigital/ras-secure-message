@@ -617,7 +617,7 @@ Note V2 will have either uuids or 'GROUP' for the user ids , and a uuid for the 
       "body": "Test",
       "collection_case": "collection case1",
       "collection_exercise": "collection exercise1",
-      "from_internal": 'False",
+      "from_internal": "False",
       "labels": [
         "SENT"
       ],
