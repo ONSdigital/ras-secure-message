@@ -57,3 +57,35 @@ Feature: Get Messages list V2 Endpoint
     | specific user |
     | group        |
 
+  Scenario Outline: A Respondent sends multiple messages using v2 on different surveys to multiple internal user types ,
+                    Internal user reads them without setting a survey confirm correct count seen
+    Given sending from respondent to internal <user>
+      And the survey is set to 'Survey1'
+      And  '5' messages are sent using V2
+      And sending from respondent to internal bres user
+      And the survey is set to 'Survey2'
+    And  '7' messages are sent using V2
+    When  messages are read V2
+    Then  '12' messages are returned
+
+    Examples: user type
+    | user        |
+    | specific user |
+    | group        |
+
+
+  Scenario Outline: A Respondent sends multiple messages using v2 on different surveys to multiple internal user types ,
+                    Internal user reads them for a survey confirm correct count seen
+    Given sending from respondent to internal <user>
+      And the survey is set to 'Survey1'
+      And  '5' messages are sent using V2
+      And sending from respondent to internal bres user
+      And the survey is set to 'Survey2'
+    And  '7' messages are sent using V2
+    When  messages are read using survey of 'Survey1'
+    Then  '5' messages are returned
+
+    Examples: user type
+    | user        |
+    | specific user |
+    | group        |
