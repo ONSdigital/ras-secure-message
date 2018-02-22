@@ -358,3 +358,147 @@ def step_impl_access_messages_endpoint_with_post_method(context):
     context.response = context.app.test_client().post(context.bdd_helper.messages_get_url,
                                                       data=json.dumps(context.bdd_helper.message_data),
                                                       headers=context.bdd_helper.headers)
+
+# V2 steps below this
+
+
+@given("the message is sent V2")
+@when("the message is sent V2")
+def step_impl_the_message_is_sent_v2(context):
+    """sends the current message data to the message send endpoint"""
+    context.bdd_helper.sent_messages.extend([copy.deepcopy(context.bdd_helper.message_data)])
+    context.response = context.app.test_client().post(context.bdd_helper.message_post_v2_url,
+                                                      data=json.dumps(context.bdd_helper.message_data),
+                                                      headers=context.bdd_helper.headers)
+
+    returned_data = json.loads(context.response.data)
+    _try_persist_msg_and_thread_id_to_context(context, returned_data)
+    context.bdd_helper.store_last_single_message_response_data(context.response)
+
+
+@given("the message is read V2")
+@when("the message is read V2")
+def step_impl_the_previously_saved_message_is_retrieved_using_v2_endpoint(context):
+    """reads message with the id saved in the context via the message get V2 endpoint"""
+    url = context.bdd_helper.message_get_v2_url.format(context.msg_id)
+    context.response = context.app.test_client().get(url, headers=context.bdd_helper.headers)
+    returned_data = json.loads(context.response.data)
+    _try_persist_msg_and_thread_id_to_context(context, returned_data)
+    context.bdd_helper.store_last_single_message_response_data(context.response)
+
+
+@given("'{message_count}' messages are sent using V2")
+@when("'{message_count}' messages are sent using V2")
+def step_impl_the_n_messages_are_sent_via_v2(context, message_count):
+    """sends a defined number of messages"""
+    for i in range(0, int(message_count)):
+        step_impl_the_message_is_sent_v2(context)
+
+
+@given("messages are read V2")
+@when("messages are read V2")
+def step_impl_messages_are_read_using_v2(context):
+    """get a message list"""
+    url = context.bdd_helper.messages_get_v2_url
+    context.response = context.app.test_client().get(url, headers=context.bdd_helper.headers)
+    response_data = context.response.data
+    context.bdd_helper.store_messages_response_data(response_data)
+
+
+@given("messages with a label of  '{label_name}' are read using V2")
+@when("messages with a label of  '{label_name}' are read using V2")
+def step_impl_messages_are_read_with_specific_label_using_v2(context, label_name):
+    """filter get messages to only return messages matching a specified label"""
+    param = "?label={}".format(label_name)
+    url = context.bdd_helper.messages_get_v2_url + param
+    _step_impl_get_messages_with_filter(context, url)
+
+
+@when("the count of  messages with '{label_name}' label in survey '{survey}' is made V2")
+@given("the count of  messages with '{label_name}' label in survey '{survey}' is made V2")
+def step_impl_the_unread_messages_are_counted_for_survey(context, label_name, survey):
+    """access the messages_count endpoint to get the count of unread messages"""
+    url = context.bdd_helper.messages_get_unread_count_v2_url + "?label={}&survey={}".format(label_name, survey)
+    context.response = context.app.test_client().get(url, headers=context.bdd_helper.headers)
+    response_data = context.response.data
+    label_count = json.loads(response_data)["total"]
+    context.bdd_helper.label_count = label_count
+
+
+@when("the count of messages with '{label_name}' label is made V2")
+@given("the count of messages with '{label_name}' label is made V2")
+def step_impl_the_unread_messages_are_counted(context, label_name):
+    """access the messages_count endpoint to get the count of unread messages"""
+    url = context.bdd_helper.messages_get_unread_count_v2_url + f"?label={label_name}"
+    context.response = context.app.test_client().get(url, headers=context.bdd_helper.headers)
+    response_data = context.response.data
+    label_count = json.loads(response_data)["total"]
+    context.bdd_helper.label_count = label_count
+
+
+@given("the message is saved as draft V2")
+@when("the message is saved as draft V2")
+def step_impl_the_message_is_saved_as_draft_v2(context):
+    """saves the current message data as a draft via  draft post """
+    context.bdd_helper.sent_messages.extend([copy.deepcopy(context.bdd_helper.message_data)])
+    context.response = context.app.test_client().post(context.bdd_helper.draft_post_v2_url,
+                                                      data=json.dumps(context.bdd_helper.message_data),
+                                                      headers=context.bdd_helper.headers)
+    returned_data = json.loads(context.response.data)
+    _try_persist_msg_and_thread_id_to_context(context, returned_data)
+    context.bdd_helper.store_last_single_message_response_data(context.response)
+
+
+@given("the draft is read V2")
+@when("the draft is read V2")
+def step_impl_the_previously_saved_draft_is_retrieved_v2(context):
+    """read a draft"""
+    url = context.bdd_helper.draft_get_v2_url.format(context.msg_id)
+    context.response = context.app.test_client().get(url, headers=context.bdd_helper.headers)
+
+    returned_data = json.loads(context.response.data)
+    _try_persist_msg_and_thread_id_to_context(context, returned_data)
+    context.bdd_helper.store_last_single_message_response_data(context.response)
+
+
+@when("the message labels are modified V2")
+@given("the message labels are modified V2")
+def step_impl_the_message_labels_are_modified_v2(context):
+    """update the labels on the messages identified by the context.msg_id"""
+    step_impl_the_specific_message_id_is_retrieved_on_specific_msg_id_v2(context, context.msg_id)
+
+
+@when("the message labels are modified on msg id '{msg_id}' V2")
+@given("the message labels are modified on msg id '{msg_id}' V2")
+def step_impl_the_specific_message_id_is_retrieved_on_specific_msg_id_v2(context, msg_id):
+    """modify the labels on a specified message id"""
+    url = context.bdd_helper.message_put_v2_url.format(msg_id)
+
+    context.response = context.app.test_client().put(url, data=json.dumps(context.bdd_helper.message_data),
+                                                     headers=context.bdd_helper.headers)
+    context.bdd_helper.store_last_single_message_response_data(context.response)
+
+
+@given("'{draft_count}' drafts are sent V2")
+@when("'{draft_count}' drafts are sent V2")
+def step_impl_the_n_drafts_are_sent_vw(context, draft_count):
+    """saves a specific number of drafts """
+    for i in range(0, int(draft_count)):
+        step_impl_the_message_is_saved_as_draft(context)
+
+
+@given("drafts are read V2")
+@when("drafts are read V2")
+def step_impl_drafts_are_read_v2(context):
+    """read draft messages"""
+    url = context.bdd_helper.drafts_get_v2_url
+    _step_impl_drafts_are_read(context, url)
+
+
+@given("the draft is sent as a message V2")
+@when("the draft is sent as a message V2")
+def step_impl_the_draft_is_sent_as_message_v2(context):
+    """sends a message that was a draft as a message """
+    context.bdd_helper.message_data['msg_id'] = context.msg_id
+    step_impl_the_message_is_sent_v2(context)
+    context.bdd_helper.message_data['msg_id'] = ""

@@ -12,7 +12,7 @@ from secure_message.common.eventsapi import EventsApi
 from secure_message.repository import database
 from secure_message.authentication.jwt import encode
 from secure_message.authentication.jwe import Encrypter
-from secure_message.services.service_toggles import case_service, party
+from secure_message.services.service_toggles import case_service, party, internal_user_service
 from secure_message.resources.messages import MessageSend
 from secure_message.resources.messages import logger as message_logger
 from secure_message.common.alerts import AlertViaLogging
@@ -68,6 +68,7 @@ class FlaskTestCase(unittest.TestCase):
 
         party.use_mock_service()
         case_service.use_mock_service()
+        internal_user_service.use_mock_service()
 
     def test_that_checks_post_request_is_within_database(self):
         """check messages from messageSend endpoint saved in database correctly"""
@@ -250,22 +251,6 @@ class FlaskTestCase(unittest.TestCase):
             request = con.execute("SELECT * FROM securemessage.status WHERE "
                                   "msg_id='{0}' AND actor='{1}' AND label='SENT'"
                                   .format(data['msg_id'], self.test_message['survey']))
-            for row in request:
-                self.assertTrue(row is not None)
-
-    def test_message_post_stores_audit_correctly_for_internal_user(self):
-        """Test internal user details have been added to audit table on send message"""
-
-        url = "http://localhost:5050/message/send"
-
-        response = self.client.post(url, data=json.dumps(self.test_message), headers=self.headers)
-        data = json.loads(response.data)
-
-        with self.engine.connect() as con:
-            request = con.execute("SELECT * FROM securemessage.internal_sent_audit WHERE"
-                                  " msg_id='{0}' AND internal_user='{1}'"
-                                  .format(data['msg_id'], self.test_message['msg_from']))
-
             for row in request:
                 self.assertTrue(row is not None)
 
@@ -464,7 +449,7 @@ class FlaskTestCase(unittest.TestCase):
                                                                        "lastName": "",
                                                                        "telephone": "+443069990888",
                                                                        "status": "ACTIVE",
-                                                                       "sampleUnitType": "BI"}, 200))
+                                                                       "sampleUnitType": "BI"}))
     @patch.object(CaseServiceMock, 'store_case_event')
     @patch.object(message_logger, 'info')
     def test_if_user_has_no_first_name_or_last_name_then_unknown_user_passed_to_case_service(self, mock_logger,

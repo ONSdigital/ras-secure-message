@@ -69,5 +69,5 @@ def step_impl_n_messages_returned(context, message_count):
 @when("debug step")
 @then("debug step")
 def step_impl_debug_step(context):
-    """Allows a debug step to be set in a feature file by breakpointing the pass below."""
+    """Allows a debug step to be set in a feature file by break pointing the pass below."""
     pass

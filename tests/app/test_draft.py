@@ -249,16 +249,16 @@ class DraftTestCase(unittest.TestCase):
 
         with self.app.app_context():
             with current_app.test_request_context():
-                is_valid_draft = Retriever().check_msg_id_is_a_draft(msg_id, self.user_respondent)
-        self.assertTrue(is_valid_draft[0])
+                draft = Retriever().get_draft(msg_id, self.user_respondent)
+        self.assertIsNotNone(draft)
 
     def test_draft_modified_since_last_read_false(self):
         """Test draft_modified_since_last_read function returns false for valid draft id"""
 
         with self.app.app_context():
             with current_app.test_request_context():
-                is_valid_draft = Retriever().check_msg_id_is_a_draft('000000-0000-00000', self.user_respondent)
-        self.assertFalse(is_valid_draft[0])
+                is_valid_draft = Retriever().get_draft('000000-0000-00000', self.user_respondent)
+        self.assertFalse(is_valid_draft)
 
     def test_etag_check_returns_true_if_data_equal(self):
         """Test etag_check function returns true for unchanged draft etag"""
@@ -363,7 +363,7 @@ class DraftTestCase(unittest.TestCase):
             database.db.drop_all()
             with current_app.test_request_context():
                 with self.assertRaises(InternalServerError):
-                    Retriever().check_msg_id_is_a_draft(msg_id, self.user_respondent)
+                    Retriever().get_draft(msg_id, self.user_respondent)
 
     def test_draft_same_to_from_causes_error(self):
         """marshalling message with same to and from field"""

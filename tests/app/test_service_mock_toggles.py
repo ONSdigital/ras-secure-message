@@ -35,8 +35,8 @@ class ServiceMockTestCase(unittest.TestCase):
         user_data = sut.get_user_details("Someuuid")
         self.assertIsNotNone(user_data)
 
-    def test_mock_user_service_returns_404_if_value_not_present(self):
+    def test_mock_user_service_returns_none_if_value_not_present(self):
         sut = InternalUser(False)
         sut.use_mock_service()
-        _, status = sut.get_user_details("SomeUnknownuuid")
-        self.assertEqual(status, 404)
+        user_details = sut.get_user_details("SomeUnknownuuid")
+        self.assertIsNone(user_details)

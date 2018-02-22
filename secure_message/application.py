@@ -8,15 +8,22 @@ from flask_cors import CORS
 import redis
 from retrying import retry
 import requests
+from sqlalchemy import DDL, event
 from sqlalchemy.exc import DatabaseError, ProgrammingError
 from structlog import wrap_logger
-from sqlalchemy import event, DDL
 
-from secure_message.exception.exceptions import MissingEnvironmentVariable
-from secure_message.repository import database
+
 from secure_message.authentication.authenticator import authenticate
+from secure_message.exception.exceptions import MissingEnvironmentVariable
 from secure_message.logger_config import logger_initial_config
-from secure_message.v1.application import set_v1_resources
+from secure_message.repository import database
+from secure_message.resources.drafts import DraftById, DraftList, DraftModifyById, DraftSave
+from secure_message.resources.health import DatabaseHealth, Health, HealthDetails
+from secure_message.resources.info import Info
+from secure_message.resources.messages import MessageById, MessageCounter, MessageList, MessageModifyById, MessageSend
+from secure_message.resources.threads import ThreadById, ThreadList
+from secure_message.v2.resources.messages import MessageSendV2, MessageCounterV2
+
 
 logger_initial_config(service_name='ras-secure-message')
 logger = wrap_logger(logging.getLogger(__name__))
@@ -39,7 +46,27 @@ def create_app(config=None):
     logger.info('Starting Secure Message Service...', config=app_config)
     create_db(app, app_config)
 
-    set_v1_resources(api)
+    api.add_resource(Health, '/health')
+    api.add_resource(DatabaseHealth, '/health/db')
+    api.add_resource(HealthDetails, '/health/details')
+    api.add_resource(Info, '/info')
+
+    api.add_resource(MessageList, '/messages', '/v2/messages')
+    api.add_resource(MessageSend, '/message/send')
+    api.add_resource(MessageById, '/message/<message_id>', '/v2/messages/<message_id>')
+    api.add_resource(MessageModifyById, '/message/<message_id>/modify', '/v2/messages/modify/<message_id>')
+    api.add_resource(MessageCounter, '/labels')
+
+    api.add_resource(DraftSave, '/draft/save', '/v2/drafts')
+    api.add_resource(DraftModifyById, '/draft/<draft_id>/modify', '/v2/drafts/<draft_id>')
+    api.add_resource(DraftById, '/draft/<draft_id>', '/v2/drafts/<draft_id>')
+    api.add_resource(DraftList, '/drafts', '/v2/drafts')
+
+    api.add_resource(ThreadList, '/threads')
+    api.add_resource(ThreadById, '/thread/<thread_id>', '/v2/threads/<thread_id>')
+
+    api.add_resource(MessageSendV2, '/v2/messages')
+    api.add_resource(MessageCounterV2, '/v2/messages/count')
     cache_client_token(app)
 
 

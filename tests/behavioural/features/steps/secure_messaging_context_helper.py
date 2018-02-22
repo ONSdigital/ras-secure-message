@@ -31,7 +31,12 @@ class SecureMessagingContextHelper:
     __DEFAULT_COLLECTION_EXERCISE = 'collection exercise1'
     __ALTERNATE_COLLECTION_EXERCISE = 'AnotherCollectionExercise'
 
-    __INTERNAL_USER_TOKEN = {constants.USER_IDENTIFIER: "BRES", "role": "internal"}
+    __INTERNAL_USER_SPECIFIC_USER_ID = "SomeStringUntilWeGetIds"
+    __INTERNAL_USER_GROUP = constants.NON_SPECIFIC_INTERNAL_USER
+
+    __INTERNAL_BRES_USER_TOKEN = {constants.USER_IDENTIFIER: "BRES", "role": "internal"}
+    __INTERNAL_GROUP_USER_TOKEN = {constants.USER_IDENTIFIER: __INTERNAL_USER_GROUP, "role": "internal"}
+    __INTERNAL_SPECIFIC_USER_TOKEN = {constants.USER_IDENTIFIER: __INTERNAL_USER_SPECIFIC_USER_ID, "role": "internal"}
 
     __RESPONDENT_USER_ID = "01b51fcc-ed43-4cdb-ad1c-450f9986859b"
     __RESPONDENT_USER_TOKEN = {constants.USER_IDENTIFIER: __RESPONDENT_USER_ID, "role": "respondent"}
@@ -39,8 +44,6 @@ class SecureMessagingContextHelper:
     __ALTERNATIVE_RESPONDENT_USER_ID = "0a7ad740-10d5-4ecb-b7ca-3c0384afb882"
     __ALTERNATIVE_RESPONDENT_USER_TOKEN = {constants.USER_IDENTIFIER: __ALTERNATIVE_RESPONDENT_USER_ID,
                                            "role": "respondent"}
-
-    __ALTERNATIVE_INTERNAL_USER_ID = "SomeStringUntilWeGetIds"
 
     __BASE_URL = "http://localhost:5050"
 
@@ -57,28 +60,47 @@ class SecureMessagingContextHelper:
     def __init__(self):
         self._token_data = {}
         self._headers = {'Content-Type': 'application/json', 'Authorization': ''}
-        self.token_data = SecureMessagingContextHelper.__INTERNAL_USER_TOKEN  # use attribute to set headers
+        self.token_data = SecureMessagingContextHelper.__INTERNAL_BRES_USER_TOKEN  # use attribute to set headers
         self._message_data = copy.deepcopy(SecureMessagingContextHelper.__default_message_data)
         self._sent_messages = []
         self._single_message_responses_data = []
         self._messages_responses_data = []
         self._last_saved_message_data = None
+        self._last_saved_label_count = 0
 
         # Urls
 
         self._message_post_url = SecureMessagingContextHelper.__BASE_URL + "/message/send"
         self._message_get_url = SecureMessagingContextHelper.__BASE_URL + "/message/{0}"
+        self._message_put_url = SecureMessagingContextHelper.__BASE_URL + "/message/{}/modify"
+        self._messages_get_url = SecureMessagingContextHelper.__BASE_URL + "/messages"
+
         self._draft_post_url = SecureMessagingContextHelper.__BASE_URL + "/draft/save"
         self._draft_put_url = SecureMessagingContextHelper.__BASE_URL + "/draft/{0}/modify"
         self._draft_get_url = SecureMessagingContextHelper.__BASE_URL + "/draft/{0}"
-        self._message_put_url = SecureMessagingContextHelper.__BASE_URL + "/message/{}/modify"
-        self._messages_get_url = SecureMessagingContextHelper.__BASE_URL + "/messages"
         self._drafts_get_url = SecureMessagingContextHelper.__BASE_URL + "/drafts"
+
         self._thread_get_url = SecureMessagingContextHelper.__BASE_URL + "/thread/{0}"
         self._threads_get_url = SecureMessagingContextHelper.__BASE_URL + "/threads"
+
         self._health_endpoint = SecureMessagingContextHelper.__BASE_URL + "/health"
         self._health_db_endpoint = SecureMessagingContextHelper.__BASE_URL + "/health/db"
         self._health_details_endpoint = SecureMessagingContextHelper.__BASE_URL + "/health/details"
+
+        # V2 urls
+
+        self._message_post_url_v2 = SecureMessagingContextHelper.__BASE_URL + "/v2/messages"
+        self._message_get_url_v2 = SecureMessagingContextHelper.__BASE_URL + "/v2/messages/{0}"
+        self._messages_get_url_v2 = SecureMessagingContextHelper.__BASE_URL + "/v2/messages"
+        self._message_get_unread_count_url_v2 = SecureMessagingContextHelper.__BASE_URL + "/v2/messages/count"
+        self._message_put_url_v2 = SecureMessagingContextHelper.__BASE_URL + "/v2/messages/modify/{}"
+
+        self._draft_post_url_v2 = SecureMessagingContextHelper.__BASE_URL + "/v2/drafts"
+        self._draft_put_url_v2 = SecureMessagingContextHelper.__BASE_URL + "/v2/drafts/{0}"
+        self._draft_get_url_v2 = SecureMessagingContextHelper.__BASE_URL + "/v2/drafts/{0}"
+        self._drafts_get_url_v2 = SecureMessagingContextHelper.__BASE_URL + "/v2/drafts"
+
+        self._thread_get_url_v2 = SecureMessagingContextHelper.__BASE_URL + "/v2/threads/{0}"
 
     @staticmethod
     def _encrypt_token_data(token_data):
@@ -116,8 +138,16 @@ class SecureMessagingContextHelper:
         self._message_data = value
 
     @property       # return an internal user that the client is free to change
-    def internal_user_token(self):
-        return copy.deepcopy(SecureMessagingContextHelper.__INTERNAL_USER_TOKEN)
+    def internal_bres_user_token(self):
+        return copy.deepcopy(SecureMessagingContextHelper.__INTERNAL_BRES_USER_TOKEN)
+
+    @property
+    def internal_group_user_token(self):
+        return copy.deepcopy(SecureMessagingContextHelper.__INTERNAL_GROUP_USER_TOKEN)
+
+    @property
+    def internal_specific_user_token(self):
+        return copy.deepcopy(SecureMessagingContextHelper.__INTERNAL_SPECIFIC_USER_TOKEN)
 
     @property       # return an external user that the client is free to change
     def respondent_user_token(self):
@@ -168,6 +198,46 @@ class SecureMessagingContextHelper:
         return self._threads_get_url
 
     @property
+    def message_post_v2_url(self):
+        return self._message_post_url_v2
+
+    @property
+    def message_get_v2_url(self):
+        return self._message_get_url_v2
+
+    @property
+    def messages_get_v2_url(self):
+        return self._messages_get_url_v2
+
+    @property
+    def messages_get_unread_count_v2_url(self):
+        return self._message_get_unread_count_url_v2
+
+    @property
+    def message_put_v2_url(self):
+        return self._message_put_url_v2
+
+    @property
+    def draft_post_v2_url(self):
+        return self._draft_post_url_v2
+
+    @property
+    def draft_put_v2_url(self):
+        return self._draft_put_url_v2
+
+    @property
+    def draft_get_v2_url(self):
+        return self._draft_get_url_v2
+
+    @property
+    def drafts_get_v2_url(self):
+        return self._drafts_get_url_v2
+
+    @property
+    def thread_get_v2_url(self):
+        return self._thread_get_url_v2
+
+    @property
     def respondent_id(self):
         return copy.copy(SecureMessagingContextHelper.__RESPONDENT_USER_ID)
 
@@ -176,12 +246,16 @@ class SecureMessagingContextHelper:
         return copy.copy(SecureMessagingContextHelper.__ALTERNATIVE_RESPONDENT_USER_ID)
 
     @property
-    def internal_id(self):
+    def internal_id_bres_user(self):
         return copy.copy(constants.BRES_USER)
 
     @property
-    def alternative_internal_id(self):
-        return copy.copy(SecureMessagingContextHelper.__ALTERNATIVE_INTERNAL_USER_ID)
+    def internal_id_specific_user(self):
+        return copy.copy(SecureMessagingContextHelper.__INTERNAL_USER_SPECIFIC_USER_ID)
+
+    @property
+    def internal_id_group_user(self):
+        return copy.copy(SecureMessagingContextHelper.__INTERNAL_USER_GROUP)
 
     @property
     def last_saved_message_data(self):
@@ -190,6 +264,14 @@ class SecureMessagingContextHelper:
     @last_saved_message_data.setter
     def last_saved_message_data(self, value):
         self._last_saved_message_data = copy.deepcopy(value)
+
+    @property
+    def label_count(self):
+        return self._last_saved_label_count
+
+    @label_count.setter
+    def label_count(self, value):
+        self._last_saved_label_count = int(value)
 
     @property
     def sent_messages(self):
