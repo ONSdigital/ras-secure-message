@@ -1,5 +1,6 @@
 import json
 import requests
+import responses
 import unittest
 from unittest import mock
 
@@ -22,11 +23,12 @@ class CaseServiceTestCase(unittest.TestCase):
         self.app = create_app()
         self.app.testing = True
 
+    @responses.activate
     def test_store_case_event_posts_request_to_remote_service(self):
         """Test store_case_event sends a request and returns data"""
+        responses.add(responses.POST, self.app.config['RM_CASE_POST'].format(self.app.config['RM_CASE_SERVICE'], '1234'),'{"something": "else"}', 200)
         sut = CaseService()
         case_event_data = CaseServiceTestHelper(200, 'OK', '{"something": "else"}')
-        requests.post = mock.Mock(name='post', return_value=case_event_data)
 
         with self.app.app_context():
             result_data, result_status = sut.store_case_event('1234', 'user')
@@ -34,11 +36,12 @@ class CaseServiceTestCase(unittest.TestCase):
         self.assertEqual(result_data, json.loads(case_event_data.text))
         self.assertEqual(result_status, 200)
 
+    @responses.activate
     def test_store_case_event_posts_request_with_error_in_dict(self):
         """Test store_case_event sends a request and returns data"""
+        responses.add(responses.POST, self.app.config['RM_CASE_POST'].format(self.app.config['RM_CASE_SERVICE'], '1234'),'{"error": {"error1":"TestError"}}', 200)
         sut = CaseService()
         case_event_data = CaseServiceTestHelper(200, 'OK', '{"error": {"error1":"TestError"}}')
-        requests.post = mock.Mock(name='post', return_value=case_event_data)
 
         with self.app.app_context():
             result_data, result_status = sut.store_case_event('1234', 'user')

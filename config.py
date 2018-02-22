@@ -88,9 +88,14 @@ class Config:
     # redis
     REDIS_DB = os.getenv('REDIS_DB')
 
+    # uaa
+    CLIENT_ID = os.getenv('CLIENT_ID')
+    CLIENT_SECRET = os.getenv('CLIENT_SECRET')
+    UAA_URL = os.getenv('UAA_URL')
+
     NON_DEFAULT_VARIABLES = ['JWT_SECRET', 'SECURITY_USER_NAME', 'SECURITY_USER_PASSWORD',
                              'NOTIFICATION_API_KEY', 'SERVICE_ID', 'NOTIFICATION_TEMPLATE_ID',
-                             'REDIS_HOST', 'REDIS_PORT', 'REDIS_DB']
+                             'REDIS_HOST', 'REDIS_PORT', 'REDIS_DB', 'CLIENT_ID', 'CLIENT_SECRET']
 
     # These should always be set in the environment on prod
     JWT_ALGORITHM = os.getenv('JWT_ALGORITHM')
@@ -120,8 +125,13 @@ class DevConfig(Config):
 
     # Redis
     REDIS_HOST = os.getenv('REDIS_HOST', 'localhost')
-    REDIS_PORT = os.getenv('REDIS_PORT', 6379)
+    REDIS_PORT = os.getenv('REDIS_PORT', 7379)
     REDIS_DB = os.getenv('REDIS_DB', 1)
+
+    # uaa
+    CLIENT_ID = os.getenv('CLIENT_ID', 'securemessage')
+    CLIENT_SECRET = os.getenv('CLIENT_SECRET', 'loginsecret')
+    UAA_URL = os.getenv('UAA_URL', 'uaa-int.apps.devtest.onsclofo.uk')
 
 
 class TestConfig(DevConfig):

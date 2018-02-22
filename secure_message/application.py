@@ -5,7 +5,9 @@ from flask import Flask, request
 from flask import json, jsonify
 from flask_restful import Api
 from flask_cors import CORS
+import redis
 from retrying import retry
+import requests
 from sqlalchemy.exc import DatabaseError, ProgrammingError
 from structlog import wrap_logger
 from sqlalchemy import event, DDL
@@ -38,6 +40,8 @@ def create_app(config=None):
     create_db(app, app_config)
 
     set_v1_resources(api)
+    cache_client_token()
+
 
     @app.before_request
     def before_request():  # NOQA pylint:disable=unused-variable
@@ -56,6 +60,32 @@ def create_app(config=None):
         return response
 
     return app
+
+
+def cache_client_token():
+    token = get_client_token(app.config['CLIENT_ID'],
+                                app.config['CLIENT_SECRET'],
+                                app.config['UAA_URL'],
+    )
+
+    r = redis.StrictRedis(host=app.config['REDIS_HOST'],
+                          port=app.config['REDIS_PORT'],
+                          db=app.config['REDIS_DB']
+    )
+
+    r.setex('secure-message-client-token', token.get('expires_in') - 15, token)
+
+def get_client_token(client_id, client_secret, url):
+    headers = {'Content-Type': 'application/x-www-form-urlencoded',
+               'Accept': 'application/json'}
+    payload = {'grant_type': 'client_credentials',
+               'response_type': 'token',
+               'token_format': 'opaque'}
+    response = requests.post('http://{}/oauth/token'.format(url), headers=headers,
+                             params=payload,
+                             auth=(client_id, client_secret))
+    resp_json = response.json()
+    return resp_json
 
 
 def retry_if_database_error(exception):
