@@ -71,7 +71,6 @@ def create_app(config=None):
     if not app.config.get('TESTING'):
         cache_client_token(app)
 
-
     @app.before_request
     def before_request():  # NOQA pylint:disable=unused-variable
         if _request_requires_authentication():
@@ -93,16 +92,15 @@ def create_app(config=None):
 
 def cache_client_token(app):
     token = get_client_token(app.config['CLIENT_ID'],
-                                app.config['CLIENT_SECRET'],
-                                app.config['UAA_URL'],
-    )
+                             app.config['CLIENT_SECRET'],
+                             app.config['UAA_URL'])
 
     r = redis.StrictRedis(host=app.config['REDIS_HOST'],
                           port=app.config['REDIS_PORT'],
-                          db=app.config['REDIS_DB']
-    )
+                          db=app.config['REDIS_DB'])
 
     r.setex('secure-message-client-token', token.get('expires_in') - 15, token)
+
 
 def get_client_token(client_id, client_secret, url):
     headers = {'Content-Type': 'application/x-www-form-urlencoded',

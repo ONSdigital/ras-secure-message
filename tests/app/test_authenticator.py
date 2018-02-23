@@ -112,7 +112,6 @@ class AuthenticationTestCase(unittest.TestCase):
             "role": "internal"
         }
 
-
         with self.app.app_context():
             signed_jwt = encode(data)
             self.app.config['SM_JWT_ENCRYPT'] = 0
