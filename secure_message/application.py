@@ -71,7 +71,6 @@ def create_app(config=None):
     if not app.config.get('TESTING'):
         cache_client_token(app)
 
-
     @app.before_request
     def before_request():  # NOQA pylint:disable=unused-variable
         if _request_requires_authentication():
@@ -80,6 +79,7 @@ def create_app(config=None):
             if res != {'status': "ok"}:
                 logger.error('Failed to authenticate user', result=res)
                 return res
+            refesh_client_token_if_required(app)
 
     @app.errorhandler(Exception)
     def handle_exception(error):  # NOQA pylint:disable=unused-variable
@@ -93,16 +93,27 @@ def create_app(config=None):
 
 def cache_client_token(app):
     token = get_client_token(app.config['CLIENT_ID'],
-                                app.config['CLIENT_SECRET'],
-                                app.config['UAA_URL'],
-    )
+                             app.config['CLIENT_SECRET'],
+                             app.config['UAA_URL'])
 
     r = redis.StrictRedis(host=app.config['REDIS_HOST'],
                           port=app.config['REDIS_PORT'],
-                          db=app.config['REDIS_DB']
-    )
+                          db=app.config['REDIS_DB'])
 
     r.setex('secure-message-client-token', token.get('expires_in') - 15, token)
+
+
+def refesh_client_token_if_required(app):
+    r = redis.StrictRedis(host=app.config['REDIS_HOST'],
+                          port=app.config['REDIS_PORT'],
+                          db=app.config['REDIS_DB'])
+
+    try:
+        # If the key hasn't expired, we don't care what it returns.
+        r['secure-message-client-token']
+    except KeyError:
+        cache_client_token(app)
+
 
 def get_client_token(client_id, client_secret, url):
     headers = {'Content-Type': 'application/x-www-form-urlencoded',
@@ -110,7 +121,7 @@ def get_client_token(client_id, client_secret, url):
     payload = {'grant_type': 'client_credentials',
                'response_type': 'token',
                'token_format': 'opaque'}
-    response = requests.post('http://{}/oauth/token'.format(url), headers=headers,
+    response = requests.post(f'http://{url}/oauth/token', headers=headers,
                              params=payload,
                              auth=(client_id, client_secret))
     resp_json = response.json()
