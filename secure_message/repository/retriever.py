@@ -145,20 +145,32 @@ class Retriever:
         return result
 
     @staticmethod
-    def retrieve_thread_list(page, limit, user):
+    def retrieve_thread_list(user, request_args):
         """returns list of threads from db"""
         status_conditions = []
         conditions = []
         actor_conditions = []
 
         if user.is_respondent:
-            actor_conditions.append(Status.actor == str(user.user_uuid))
+            actor_conditions.append(Status.actor == user.user_uuid)
         else:
-            actor_conditions.append(Status.actor == str(user.user_uuid))
+            actor_conditions.append(Status.actor == user.user_uuid)
             actor_conditions.append(Status.actor == constants.BRES_USER)
             actor_conditions.append(Status.actor == constants.NON_SPECIFIC_INTERNAL_USER)
 
         status_conditions.append(Status.label != Labels.DRAFT_INBOX.value)
+
+        if request_args.ru_id:
+            conditions.append(SecureMessage.ru_id == request_args.ru_id)
+
+        if request_args.survey:
+            conditions.append(SecureMessage.survey == request_args.survey)
+
+        if request_args.cc:
+            conditions.append(SecureMessage.collection_case == request_args.cc)
+
+        if request_args.ce:
+            conditions.append(SecureMessage.collection_exercise == request_args.ce)
 
         try:
             t = db.session.query(SecureMessage.thread_id, func.max(Events.id)  # pylint:disable=no-member
@@ -176,7 +188,7 @@ class Retriever:
                 .filter(or_(Events.event == EventsApi.SENT.value, Events.event == EventsApi.DRAFT_SAVED.value)) \
                 .filter(and_(*conditions)) \
                 .filter(and_(*status_conditions)) \
-                .order_by(t.c.max_id.desc()).paginate(page, limit, False)
+                .order_by(t.c.max_id.desc()).paginate(request_args.page, request_args.limit, False)
 
         except Exception as e:
             logger.exception('Error retrieving messages from database', error=e)
