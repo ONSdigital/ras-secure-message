@@ -67,7 +67,9 @@ def create_app(config=None):
 
     api.add_resource(MessageSendV2, '/v2/messages')
     api.add_resource(MessageCounterV2, '/v2/messages/count')
-    cache_client_token(app)
+
+    if not app.config.get('TESTING'):
+        cache_client_token(app)
 
 
     @app.before_request

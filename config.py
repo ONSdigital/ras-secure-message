@@ -135,5 +135,6 @@ class DevConfig(Config):
 
 
 class TestConfig(DevConfig):
+    TESTING = True
     SM_USER_AUTHENTICATION_PRIVATE_KEY = open("./jwt-test-keys/sm-user-authentication-encryption-private-key.pem").read()
     SM_USER_AUTHENTICATION_PUBLIC_KEY = open("./jwt-test-keys/sm-user-authentication-encryption-public-key.pem").read()
