@@ -1,7 +1,6 @@
 import unittest
 
 from flask import Response
-from werkzeug.exceptions import BadRequest
 
 from secure_message.application import create_app
 from secure_message.authentication.authenticator import check_jwt, authenticate
@@ -66,7 +65,8 @@ class AuthenticationTestCase(unittest.TestCase):
 
     def test_authentication_jwt_user_urn_missing_fail(self):
         """Authenticate request with missing user_urn claim"""
-
+        expected_res = Response(response="400 Bad Request: Missing user_uuid claim,user_uuid is required to access this Microservice Resource",
+                                status=400, mimetype="text/html")
         data = {}
 
         encrypter = Encrypter(_private_key=self.app.config['SM_USER_AUTHENTICATION_PRIVATE_KEY'],
@@ -75,17 +75,20 @@ class AuthenticationTestCase(unittest.TestCase):
         with self.app.app_context():
             signed_jwt = encode(data)
             encrypted_jwt = encrypter.encrypt_token(signed_jwt)
-            with self.assertRaises(BadRequest):
-                check_jwt(encrypted_jwt)
+            res = check_jwt(encrypted_jwt)
+            self.assertEqual(res.status_code, expected_res.status_code)
+            self.assertEqual(res.data, expected_res.data)
 
     def test_authentication_jwt_not_encrypted_fail(self):
         """Authenticate request using JWT without encryption"""
-
+        expected_res = Response(response="400 Bad Request: Token incorrect size",
+                                status=400, mimetype="text/html")
         data = {constants.USER_IDENTIFIER: "12345678910"}
 
         with self.app.app_context():
-            with self.assertRaises(BadRequest):
-                check_jwt(encode(data))
+            res = check_jwt(encode(data))
+            self.assertEqual(res.status_code, expected_res.status_code)
+            self.assertEqual(res.data, expected_res.data)
 
     def test_authenticate_request_with_correct_header_data(self):
         """Authenticate request using authenticate function and with correct header data"""
@@ -109,7 +112,7 @@ class AuthenticationTestCase(unittest.TestCase):
                                 status=400, mimetype="text/html")
         with self.app.app_context():
             res = authenticate(headers={})
-        self.assertEqual(res._status, expected_res._status)
+        self.assertEqual(res.status_code, expected_res.status_code)
 
     def test_encode_decode_jwt(self):
         """decoding and encoding jwt"""
