@@ -18,37 +18,35 @@ class Retriever:
     """Created when retrieving messages"""
 
     @staticmethod
-    def retrieve_message_list(page, limit, user, ru_id=None, survey=None, cc=None, ce=None, label=None, descend=True):
+    def retrieve_message_list(user, message_args):
         """returns list of messages from db"""
 
         if user.is_respondent:
-            return Retriever._retrieve_message_list_respondent(page, limit, user=user, ru_id=ru_id, survey=survey,
-                                                               cc=cc, ce=ce, label=label, descend=descend)
-        return Retriever._retrieve_message_list_internal(page, limit, ru_id=ru_id, survey=survey,
-                                                         cc=cc, ce=ce, label=label, descend=descend)
+            return Retriever._retrieve_message_list_respondent(message_args, user=user)
+        return Retriever._retrieve_message_list_internal(message_args)
 
     @staticmethod
-    def _retrieve_message_list_respondent(page, limit, user, ru_id, survey, cc, ce, label, descend):
+    def _retrieve_message_list_respondent(message_args, user):
         """returns list of messages from db"""
         conditions = []
         status_conditions = [Status.actor == str(user.user_uuid)]
 
-        if label is not None:
-            status_conditions.append(Status.label == str(label))
+        if message_args.label:
+            status_conditions.append(Status.label == message_args.label)
         else:
             status_conditions.append(Status.label != Labels.DRAFT_INBOX.value)
 
-        if ru_id is not None:
-            conditions.append(SecureMessage.ru_id == str(ru_id))
+        if message_args.ru_id:
+            conditions.append(SecureMessage.ru_id == str(message_args.ru_id))
 
-        if survey is not None:
-            conditions.append(SecureMessage.survey == str(survey))
+        if message_args.survey:
+            conditions.append(SecureMessage.survey == str(message_args.survey))
 
-        if cc is not None:
-            conditions.append(SecureMessage.collection_case == str(cc))
+        if message_args.cc:
+            conditions.append(SecureMessage.collection_case == message_args.cc)
 
-        if ce is not None:
-            conditions.append(SecureMessage.collection_exercise == str(ce))
+        if message_args.ce:
+            conditions.append(SecureMessage.collection_exercise == message_args.ce)
 
         try:
             t = db.session.query(SecureMessage.msg_id, func.max(Events.date_time)  # pylint:disable=no-member
@@ -59,14 +57,14 @@ class Retriever:
                 .filter(or_(Events.event == EventsApi.SENT.value, Events.event == EventsApi.DRAFT_SAVED.value)) \
                 .group_by(SecureMessage.msg_id).subquery('t')
 
-            if descend:
+            if message_args.desc:
                 order = t.c.max_date.desc()
             else:
                 order = t.c.max_date.asc()
 
             result = SecureMessage.query \
                 .filter(SecureMessage.msg_id == t.c.msg_id) \
-                .order_by(order).paginate(page, limit, False)
+                .order_by(order).paginate(message_args.page, message_args.limit, False)
 
         except Exception as e:
             logger.error('Error retrieving messages from database', error=e)
@@ -75,35 +73,35 @@ class Retriever:
         return result
 
     @staticmethod
-    def _retrieve_message_list_internal(page, limit, ru_id, survey, cc, ce, label, descend):
+    def _retrieve_message_list_internal(message_args):
         """returns list of messages from db"""
         conditions = []
         status_reject_conditions = []
         valid_statuses = []
         actor_conditions = []
 
-        if label is not None:
-            valid_statuses.append(label)
-            if label in [Labels.INBOX.value, Labels.ARCHIVE.value, Labels.UNREAD.value]:
+        if message_args.label:
+            valid_statuses.append(message_args.label)
+            if message_args.label in [Labels.INBOX.value, Labels.ARCHIVE.value, Labels.UNREAD.value]:
                 actor_conditions.append(SecureMessage.from_internal == False)  # NOQA pylint:disable=singleton-comparison
-            if label in [Labels.DRAFT.value, Labels.SENT.value]:
+            if message_args.label in [Labels.DRAFT.value, Labels.SENT.value]:
                 actor_conditions.append(SecureMessage.from_internal == True)  # NOQA pylint:disable=singleton-comparison
         else:
             status_reject_conditions.append(Labels.DRAFT_INBOX.value)
             valid_statuses = [Labels.INBOX.value, Labels.DRAFT.value]
             actor_conditions.append(True)
 
-        if ru_id is not None:
-            conditions.append(SecureMessage.ru_id == str(ru_id))
+        if message_args.ru_id:
+            conditions.append(SecureMessage.ru_id == str(message_args.ru_id))
 
-        if survey is not None:
-            conditions.append(SecureMessage.survey == str(survey))
+        if message_args.survey:
+            conditions.append(SecureMessage.survey == str(message_args.survey))
 
-        if cc is not None:
-            conditions.append(SecureMessage.collection_case == str(cc))
+        if message_args.cc:
+            conditions.append(SecureMessage.collection_case == str(message_args.cc))
 
-        if ce is not None:
-            conditions.append(SecureMessage.collection_exercise == str(ce))
+        if message_args.ce:
+            conditions.append(SecureMessage.collection_exercise == str(message_args.ce))
 
         try:
             t = db.session.query(SecureMessage.msg_id, func.max(Events.date_time)  # pylint:disable=no-member  ~ below used to obtain not in
@@ -116,14 +114,14 @@ class Retriever:
                 .filter(or_(Events.event == EventsApi.SENT.value, Events.event == EventsApi.DRAFT_SAVED.value)) \
                 .group_by(SecureMessage.msg_id).subquery('t')
 
-            if descend:
+            if message_args.desc:
                 order = t.c.max_date.desc()
             else:
                 order = t.c.max_date.asc()
 
             result = SecureMessage.query \
                 .filter(SecureMessage.msg_id == t.c.msg_id) \
-                .order_by(order).paginate(page, limit, False)
+                .order_by(order).paginate(message_args.page, message_args.limit, False)
 
         except Exception as e:
             logger.exception('Error retrieving messages from database', error=e)
@@ -213,7 +211,7 @@ class Retriever:
         return result.serialize(user)
 
     @staticmethod
-    def retrieve_thread(thread_id, user, page, limit):
+    def retrieve_thread(thread_id, user, message_args):
         """returns paginated list of messages for thread id"""
         status_conditions = []
         actor_conditions = []
@@ -234,7 +232,7 @@ class Retriever:
                 .filter(and_(*status_conditions)) \
                 .filter(or_(*actor_conditions)) \
                 .filter(or_(Events.event == EventsApi.SENT.value, Events.event == EventsApi.DRAFT_SAVED.value)) \
-                .order_by(Events.date_time.desc()).paginate(page, limit, False)
+                .order_by(Events.date_time.desc()).paginate(message_args.page, message_args.limit, False)
 
             if not result.items:
                 logger.debug('Thread does not exist', thread_id=thread_id)

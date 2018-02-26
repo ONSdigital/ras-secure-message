@@ -13,8 +13,8 @@ logger = wrap_logger(logging.getLogger(__name__))
 MessageArgs = collections.namedtuple('MessageArgs', 'string_query_args page limit ru_id survey cc label desc ce')
 
 
-def get_options(args):
-    """extract options"""
+def get_options(args, label_override=None):
+    """extract options from request , allow label to be set by caller"""
 
     string_query_args = '?'
     page = 1
@@ -41,9 +41,13 @@ def get_options(args):
     if args.get('cc'):
         cc = str(args.get('cc'))
         string_query_args = add_string_query_args(string_query_args, 'cc', args.get('cc'))
-    if args.get('label'):
-        label = str(args.get('label'))
-        string_query_args = add_string_query_args(string_query_args, 'label', args.get('label'))
+    if label_override:
+        label = label_override
+        string_query_args = add_string_query_args(string_query_args, 'label', label_override)
+    else:
+        if args.get('label'):
+            label = str(args.get('label'))
+            string_query_args = add_string_query_args(string_query_args, 'label', args.get('label'))
     if args.get('ce'):
         ce = str(args.get('ce'))
         string_query_args = add_string_query_args(string_query_args, 'ce', args.get('ce'))
@@ -62,13 +66,12 @@ def add_string_query_args(string_query_args, arg, val):
     return f'{string_query_args}&{arg}={val}'
 
 
-def paginated_list_to_json(paginated_list, page, limit, host_url, user, string_query_args,
-                           endpoint=MESSAGE_LIST_ENDPOINT):
+def paginated_list_to_json(paginated_list, host_url, user, message_args, endpoint=MESSAGE_LIST_ENDPOINT):
     """used to change a pagination object to json format with links"""
     messages = []
     msg_count = 0
     arg_joiner = ''
-    if string_query_args != '?':
+    if message_args.string_query_args != '?':
         arg_joiner = '&'
 
     for message in paginated_list.items:
@@ -78,15 +81,15 @@ def paginated_list_to_json(paginated_list, page, limit, host_url, user, string_q
         messages.append(msg)
 
     links = {'first': {"href": f"{host_url}{endpoint}"},
-             'self': {"href": f"{host_url}{endpoint}{arg_joiner}{string_query_args}page={page}&limit={limit}"}}
+             'self': {"href": f"{host_url}{endpoint}{arg_joiner}{message_args.string_query_args}page={message_args.page}&limit={message_args.limit}"}}
 
     if paginated_list.has_next:
         links['next'] = {
-            "href": f"{host_url}{endpoint}{arg_joiner}{string_query_args}page={page + 1}&limit={limit}"}
+            "href": f"{host_url}{endpoint}{arg_joiner}{message_args.string_query_args}page={message_args.page + 1}&limit={message_args.limit}"}
 
     if paginated_list.has_prev:
         links['prev'] = {
-            "href": f"{host_url}{endpoint}{arg_joiner}{string_query_args}page={page - 1}&limit={limit}"}
+            "href": f"{host_url}{endpoint}{arg_joiner}{message_args.string_query_args}page={message_args.page - 1}&limit={message_args.limit}"}
     messages = add_users_and_business_details(messages)
     return jsonify({"messages": messages, "_links": links})
 

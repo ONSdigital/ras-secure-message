@@ -8,14 +8,13 @@ from werkzeug.exceptions import NotFound, InternalServerError
 
 from secure_message.application import create_app
 from secure_message.common.eventsapi import EventsApi
-from secure_message.common.utilities import MessageArgs
 from secure_message.repository import database
 from secure_message.repository.retriever import Retriever
 from secure_message.constants import MESSAGE_QUERY_LIMIT
 from secure_message.services.service_toggles import party
 from secure_message import constants
 from secure_message.validation.user import User
-from tests.app import test_utilities
+from tests.app.test_utilities import BRES_SURVEY, get_args
 
 
 class RetrieverTestCaseHelper:
@@ -26,7 +25,7 @@ class RetrieverTestCaseHelper:
     """Helper class for Retriever Tests"""
     def add_secure_message(self, msg_id, subject="test", body="test", thread_id="ThreadId",
                            collection_case="ACollectionCase", ru_id="f1a5e99c-8edf-489a-9c72-6cabe6c387fc",
-                           survey=test_utilities.BRES_SURVEY, collection_exercise='CollectionExercise', from_internal=False):
+                           survey=BRES_SURVEY, collection_exercise='CollectionExercise', from_internal=False):
 
         """ Populate the secure_message table"""
 
@@ -181,9 +180,6 @@ class RetrieverTestCaseHelper:
 
         return threads
 
-    def get_args(self, page=1, limit=100, survey="", cc="", ru="", label="", desc=True, ce=""):
-        return MessageArgs(string_query_args="", page=page, limit=limit, ru_id=ru, survey=survey, cc=cc, label=label, desc=desc, ce=ce)
-
 
 class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
     """Test case for message retrieval"""
@@ -209,7 +205,8 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
         """retrieves messages from empty database"""
         with self.app.app_context():
             with current_app.test_request_context():
-                response = Retriever().retrieve_message_list(1, MESSAGE_QUERY_LIMIT, self.user_respondent)
+                args = get_args(page=1, limit=MESSAGE_QUERY_LIMIT)
+                response = Retriever().retrieve_message_list(self.user_respondent, args)
                 msg = []
                 for message in response.items:
                     msg.append(message.serialize)
@@ -221,7 +218,8 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
             self.db.drop_all()
             with current_app.test_request_context():
                 with self.assertRaises(InternalServerError):
-                    Retriever().retrieve_message_list(1, MESSAGE_QUERY_LIMIT, self.user_respondent)
+                    args = get_args(page=1, limit=MESSAGE_QUERY_LIMIT)
+                    Retriever().retrieve_message_list(self.user_respondent, args)
 
     def test_all_msg_returned_when_db_less_than_limit(self):
         """retrieves messages from database with less entries than retrieval amount"""
@@ -229,7 +227,8 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
 
         with self.app.app_context():
             with current_app.test_request_context():
-                response = Retriever().retrieve_message_list(1, MESSAGE_QUERY_LIMIT, self.user_respondent)
+                args = get_args(page=1, limit=MESSAGE_QUERY_LIMIT)
+                response = Retriever().retrieve_message_list(self.user_respondent, args)
                 msg = []
                 for message in response.items:
                     msg.append(message.serialize)
@@ -240,7 +239,8 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
         self.populate_database(MESSAGE_QUERY_LIMIT + 5)
         with self.app.app_context():
             with current_app.test_request_context():
-                result = Retriever().retrieve_message_list(1, MESSAGE_QUERY_LIMIT, self.user_respondent)
+                args = get_args(page=1, limit=MESSAGE_QUERY_LIMIT)
+                result = Retriever().retrieve_message_list(self.user_respondent, args)
                 msg = []
                 for message in result.items:
                     serialized_message = message.serialize(self.user_respondent)
@@ -252,8 +252,8 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
         self.populate_database(5, add_draft=True)
         with self.app.app_context():
             with current_app.test_request_context():
-                result = Retriever().retrieve_message_list(1, MESSAGE_QUERY_LIMIT, self.user_internal,
-                                                           survey=test_utilities.BRES_SURVEY)
+                args = get_args(page=1, limit=MESSAGE_QUERY_LIMIT, survey=BRES_SURVEY)
+                result = Retriever().retrieve_message_list(self.user_internal, args)
                 msg = []
                 for message in result.items:
                     serialized_message = message.serialize(self.user_internal)
@@ -265,7 +265,8 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
         self.populate_database(MESSAGE_QUERY_LIMIT + 5, multiple_users=True, add_reply=True)
         with self.app.app_context():
             with current_app.test_request_context():
-                result = Retriever().retrieve_message_list(1, MESSAGE_QUERY_LIMIT, self.user_respondent)
+                args = get_args(page=1, limit=MESSAGE_QUERY_LIMIT)
+                result = Retriever().retrieve_message_list(self.user_respondent, args)
                 msg = []
                 for message in result.items:
                     serialized_message = message.serialize(self.user_respondent)
@@ -277,7 +278,8 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
         self.populate_database(MESSAGE_QUERY_LIMIT + 5, multiple_users=True, add_reply=True, add_draft=True)
         with self.app.app_context():
             with current_app.test_request_context():
-                result = Retriever().retrieve_message_list(1, MESSAGE_QUERY_LIMIT, self.user_respondent)
+                args = get_args(page=1, limit=MESSAGE_QUERY_LIMIT)
+                result = Retriever().retrieve_message_list(self.user_respondent, args)
                 msg = []
                 for message in result.items:
                     serialized_message = message.serialize(self.user_respondent)
@@ -399,8 +401,8 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
 
         with self.app.app_context():
             with current_app.test_request_context():
-                response = Retriever().retrieve_message_list(1, MESSAGE_QUERY_LIMIT,
-                                                             self.user_internal, survey=test_utilities.BRES_SURVEY, label='DRAFT')
+                args = get_args(page=1, limit=MESSAGE_QUERY_LIMIT, survey=BRES_SURVEY, label='DRAFT')
+                response = Retriever().retrieve_message_list(self.user_internal, args)
                 msg = []
                 for message in response.items:
                     serialized_msg = message.serialize(self.user_internal)
@@ -414,8 +416,8 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
 
         with self.app.app_context():
             with current_app.test_request_context():
-                response = Retriever().retrieve_message_list(1, MESSAGE_QUERY_LIMIT, self.user_respondent,
-                                                             label="SENT")
+                args = get_args(page=1, limit=MESSAGE_QUERY_LIMIT, label='SENT')
+                response = Retriever().retrieve_message_list(self.user_respondent, args)
                 msg = []
                 for message in response.items:
                     serialized_msg = message.serialize(self.user_respondent)
@@ -429,8 +431,8 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
 
         with self.app.app_context():
             with current_app.test_request_context():
-                response = Retriever().retrieve_message_list(1, MESSAGE_QUERY_LIMIT, self.user_internal,
-                                                             label="INBOX", survey=test_utilities.BRES_SURVEY)
+                args = get_args(page=1, limit=MESSAGE_QUERY_LIMIT, survey=BRES_SURVEY, label='INBOX')
+                response = Retriever().retrieve_message_list(self.user_internal, args)
                 msg = []
                 for message in response.items:
                     serialized_msg = message.serialize(self.user_internal)
@@ -444,7 +446,8 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
 
         with self.app.app_context():
             with current_app.test_request_context():
-                response = Retriever().retrieve_message_list(1, MESSAGE_QUERY_LIMIT, self.user_respondent)
+                args = get_args(page=1, limit=MESSAGE_QUERY_LIMIT)
+                response = Retriever().retrieve_message_list(self.user_respondent, args)
 
                 msg = []
                 for message in response.items:
@@ -459,8 +462,8 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
 
         with self.app.app_context():
             with current_app.test_request_context():
-                response = Retriever().retrieve_message_list(1, MESSAGE_QUERY_LIMIT, self.user_respondent,
-                                                             ru_id='f1a5e99c-8edf-489a-9c72-6cabe6c387fc')
+                args = get_args(page=1, limit=MESSAGE_QUERY_LIMIT, ru='f1a5e99c-8edf-489a-9c72-6cabe6c387fc')
+                response = Retriever().retrieve_message_list(self.user_respondent, args)
                 msg = []
                 for message in response.items:
                     serialized_msg = message.serialize(self.user_respondent)
@@ -474,8 +477,8 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
 
         with self.app.app_context():
             with current_app.test_request_context():
-                response = Retriever().retrieve_message_list(1, MESSAGE_QUERY_LIMIT, self.user_respondent,
-                                                             ru_id='0a6018a0-3e67-4407-b120-780932434b36')
+                args = get_args(page=1, limit=MESSAGE_QUERY_LIMIT, ru='0a6018a0-3e67-4407-b120-780932434b36')
+                response = Retriever().retrieve_message_list(self.user_respondent, args)
                 msg = []
                 for message in response.items:
                     serialized_msg = message.serialize(self.user_respondent)
@@ -489,13 +492,13 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
 
         with self.app.app_context():
             with current_app.test_request_context():
-                response = Retriever().retrieve_message_list(1, MESSAGE_QUERY_LIMIT, self.user_respondent,
-                                                             survey=test_utilities.BRES_SURVEY)
+                args = get_args(page=1, limit=MESSAGE_QUERY_LIMIT, survey=BRES_SURVEY)
+                response = Retriever().retrieve_message_list(self.user_respondent, args)
                 msg = []
                 for message in response.items:
                     serialized_msg = message.serialize(self.user_respondent)
                     msg.append(serialized_msg)
-                    self.assertTrue(serialized_msg['survey'] == test_utilities.BRES_SURVEY)
+                    self.assertTrue(serialized_msg['survey'] == BRES_SURVEY)
                 self.assertEqual(len(msg), 5)
 
     def test_no_message_returned_with_survey_option(self):
@@ -504,8 +507,8 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
 
         with self.app.app_context():
             with current_app.test_request_context():
-                response = Retriever().retrieve_message_list(1, MESSAGE_QUERY_LIMIT, self.user_respondent,
-                                                             survey='AnotherSurvey')
+                args = get_args(page=1, limit=MESSAGE_QUERY_LIMIT, survey='AnotherSurvey')
+                response = Retriever().retrieve_message_list(self.user_respondent, args)
                 msg = []
                 for message in response.items:
                     serialized_msg = message.serialize(self.user_respondent)
@@ -519,8 +522,8 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
 
         with self.app.app_context():
             with current_app.test_request_context():
-                response = Retriever().retrieve_message_list(1, MESSAGE_QUERY_LIMIT, self.user_respondent,
-                                                             cc='ACollectionCase')
+                args = get_args(page=1, limit=MESSAGE_QUERY_LIMIT, cc='ACollectionCase')
+                response = Retriever().retrieve_message_list(self.user_respondent, args)
                 msg = []
                 for message in response.items:
                     serialized_msg = message.serialize(self.user_respondent)
@@ -534,8 +537,8 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
 
         with self.app.app_context():
             with current_app.test_request_context():
-                response = Retriever().retrieve_message_list(1, MESSAGE_QUERY_LIMIT, self.user_respondent,
-                                                             cc='AnotherCollectionCase')
+                args = get_args(page=1, limit=MESSAGE_QUERY_LIMIT, cc='AnotherCollectionCase')
+                response = Retriever().retrieve_message_list(self.user_respondent, args)
                 msg = []
                 for message in response.items:
                     serialized_msg = message.serialize(self.user_respondent)
@@ -549,8 +552,8 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
 
         with self.app.app_context():
             with current_app.test_request_context():
-                response = Retriever().retrieve_message_list(1, MESSAGE_QUERY_LIMIT, self.user_respondent,
-                                                             ce='CollectionExercise')
+                args = get_args(page=1, limit=MESSAGE_QUERY_LIMIT, ce='CollectionExercise')
+                response = Retriever().retrieve_message_list(self.user_respondent, args)
                 msg = []
                 for message in response.items:
                     serialized_msg = message.serialize(self.user_respondent)
@@ -564,8 +567,8 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
 
         with self.app.app_context():
             with current_app.test_request_context():
-                response = Retriever().retrieve_message_list(1, MESSAGE_QUERY_LIMIT, self.user_respondent,
-                                                             ce='AnotherCollectionExercise')
+                args = get_args(page=1, limit=MESSAGE_QUERY_LIMIT, ce='AnotherCollectionExercise')
+                response = Retriever().retrieve_message_list(self.user_respondent, args)
                 msg = []
                 for message in response.items:
                     serialized_msg = message.serialize(self.user_respondent)
@@ -579,8 +582,8 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
 
         with self.app.app_context():
             with current_app.test_request_context():
-                response = Retriever().retrieve_message_list(1, MESSAGE_QUERY_LIMIT, self.user_respondent,
-                                                             descend=True)
+                args = get_args(page=1, limit=MESSAGE_QUERY_LIMIT, desc=True)
+                response = Retriever().retrieve_message_list(self.user_respondent, args)
                 date = []
                 for message in response.items:
                     serialized_msg = message.serialize(self.user_respondent)
@@ -599,8 +602,8 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
 
         with self.app.app_context():
             with current_app.test_request_context():
-                response = Retriever().retrieve_message_list(1, MESSAGE_QUERY_LIMIT, self.user_respondent,
-                                                             descend=False)
+                args = get_args(page=1, limit=MESSAGE_QUERY_LIMIT, desc=False)
+                response = Retriever().retrieve_message_list(self.user_respondent, args)
                 date = []
                 for message in response.items:
                     serialized_msg = message.serialize(self.user_respondent)
@@ -619,9 +622,8 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
 
         with self.app.app_context():
             with current_app.test_request_context():
-                response = Retriever().retrieve_message_list(1, MESSAGE_QUERY_LIMIT, self.user_internal,
-                                                             survey=test_utilities.BRES_SURVEY,
-                                                             descend=False)
+                args = get_args(page=1, limit=MESSAGE_QUERY_LIMIT, survey=BRES_SURVEY, desc=False)
+                response = Retriever().retrieve_message_list(self.user_internal, args)
 
                 date = []
                 for message in response.items:
@@ -641,9 +643,8 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
 
         with self.app.app_context():
             with current_app.test_request_context():
-                response = Retriever().retrieve_message_list(1, MESSAGE_QUERY_LIMIT, self.user_internal,
-                                                             survey=test_utilities.BRES_SURVEY,
-                                                             descend=True)
+                args = get_args(page=1, limit=MESSAGE_QUERY_LIMIT, survey=BRES_SURVEY, desc=True)
+                response = Retriever().retrieve_message_list(self.user_internal, args)
 
                 date = []
                 for message in response.items:
@@ -796,7 +797,8 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
 
         with self.app.app_context():
             with current_app.test_request_context():
-                response = Retriever().retrieve_thread('ThreadId', self.user_internal, 1, MESSAGE_QUERY_LIMIT)
+                args = get_args(page=1, limit=MESSAGE_QUERY_LIMIT)
+                response = Retriever().retrieve_thread('ThreadId', self.user_internal, args)
                 self.assertEqual(len(response.items), 9)
 
     def test_all_msg_returned_for_thread_id_without_draft(self):
@@ -805,7 +807,8 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
 
         with self.app.app_context():
             with current_app.test_request_context():
-                response = Retriever().retrieve_thread('ThreadId', self.user_respondent, 1, MESSAGE_QUERY_LIMIT)
+                args = get_args(page=1, limit=MESSAGE_QUERY_LIMIT)
+                response = Retriever().retrieve_thread('ThreadId', self.user_respondent, args)
                 self.assertEqual(len(response.items), 6)
 
     def test_all_msg_returned_for_thread_id_with_draft_inbox(self):
@@ -814,7 +817,8 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
 
         with self.app.app_context():
             with current_app.test_request_context():
-                response = Retriever().retrieve_thread('ThreadId', self.user_respondent, 1, MESSAGE_QUERY_LIMIT)
+                args = get_args(page=1, limit=MESSAGE_QUERY_LIMIT)
+                response = Retriever().retrieve_thread('ThreadId', self.user_respondent, args)
                 self.assertEqual(len(response.items), 6)
 
     def test_thread_returned_in_desc_order(self):
@@ -823,7 +827,8 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
 
         with self.app.app_context():
             with current_app.test_request_context():
-                response = Retriever().retrieve_thread('ThreadId', self.user_respondent, 1, MESSAGE_QUERY_LIMIT)
+                args = get_args(page=1, limit=MESSAGE_QUERY_LIMIT)
+                response = Retriever().retrieve_thread('ThreadId', self.user_respondent, args)
                 self.assertEqual(len(response.items), 6)
 
                 sent = [str(message.events[0].date_time) for message in response.items]
@@ -838,7 +843,8 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
 
         with self.app.app_context():
             with current_app.test_request_context():
-                response = Retriever().retrieve_thread('ThreadId', self.user_internal, 1, MESSAGE_QUERY_LIMIT)
+                args = get_args(page=1, limit=MESSAGE_QUERY_LIMIT)
+                response = Retriever().retrieve_thread('ThreadId', self.user_internal, args)
                 self.assertEqual(len(response.items), 9)
 
                 date = [str(message.events[0].date_time) for message in response.items]
@@ -852,14 +858,16 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
             self.db.drop_all()
             with current_app.test_request_context():
                 with self.assertRaises(InternalServerError):
-                    Retriever().retrieve_thread('ThreadId', self.user_respondent, 1, MESSAGE_QUERY_LIMIT)
+                    args = get_args(page=1, limit=MESSAGE_QUERY_LIMIT)
+                    Retriever().retrieve_thread('ThreadId', self.user_respondent, args)
 
     def test_thread_returned_with_thread_id_returns_404(self):
         """retrieves thread using id that doesn't exist"""
         with self.app.app_context():
             with current_app.test_request_context():
                 with self.assertRaises(NotFound):
-                    Retriever().retrieve_thread('anotherThreadId', self.user_respondent, 1, MESSAGE_QUERY_LIMIT)
+                    args = get_args(page=1, limit=MESSAGE_QUERY_LIMIT)
+                    Retriever().retrieve_thread('anotherThreadId', self.user_respondent, args)
 
     def test_retrieve_draft_raises_server_error(self):
         """retrieves draft when db does not exist"""
@@ -875,7 +883,7 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
             self.db.drop_all()
             with current_app.test_request_context():
                 with self.assertRaises(InternalServerError):
-                    args = self.get_args(limit=MESSAGE_QUERY_LIMIT)
+                    args = get_args(limit=MESSAGE_QUERY_LIMIT)
                     Retriever().retrieve_thread_list(self.user_respondent, args)
 
     def test_thread_list_returned_in_descending_order_respondent(self):
@@ -885,7 +893,7 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
 
         with self.app.app_context():
             with current_app.test_request_context():
-                args = self.get_args(limit=MESSAGE_QUERY_LIMIT)
+                args = get_args(limit=MESSAGE_QUERY_LIMIT)
                 response = Retriever().retrieve_thread_list(self.user_respondent, args)
 
                 date = []
@@ -907,7 +915,7 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
 
         with self.app.app_context():
             with current_app.test_request_context():
-                args = self.get_args(limit=MESSAGE_QUERY_LIMIT)
+                args = get_args(limit=MESSAGE_QUERY_LIMIT)
                 response = Retriever().retrieve_thread_list(self.user_internal, args)
 
                 date = []
@@ -929,7 +937,7 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
 
         with self.app.app_context():
             with current_app.test_request_context():
-                args = self.get_args(limit=MESSAGE_QUERY_LIMIT)
+                args = get_args(limit=MESSAGE_QUERY_LIMIT)
                 response = Retriever().retrieve_thread_list(self.user_respondent, args)
 
                 date = []
@@ -951,7 +959,7 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
 
         with self.app.app_context():
             with current_app.test_request_context():
-                args = self.get_args(limit=MESSAGE_QUERY_LIMIT)
+                args = get_args(limit=MESSAGE_QUERY_LIMIT)
                 response = Retriever().retrieve_thread_list(self.user_internal, args)
 
                 date = []
@@ -973,7 +981,7 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
 
         with self.app.app_context():
             with current_app.test_request_context():
-                args = self.get_args(limit=MESSAGE_QUERY_LIMIT)
+                args = get_args(limit=MESSAGE_QUERY_LIMIT)
                 response = Retriever().retrieve_thread_list(self.user_internal, args)
 
                 date = []
@@ -990,8 +998,10 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
 
                 self.assertEqual(len(msg_ids), 5)
 
+                args = get_args(page=1, limit=MESSAGE_QUERY_LIMIT)
+
                 for x in range(0, len(thread_ids)):
-                    thread = Retriever().retrieve_thread(thread_ids[x], self.user_internal, 1, MESSAGE_QUERY_LIMIT)
+                    thread = Retriever().retrieve_thread(thread_ids[x], self.user_internal, args)
                     self.assertEqual(date[x], str(thread.items[0].events[0].date_time))
                     self.assertEqual(msg_ids[x], thread.items[0].events[0].msg_id)
 
@@ -1003,7 +1013,7 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
 
         with self.app.app_context():
             with current_app.test_request_context():
-                args = self.get_args(limit=MESSAGE_QUERY_LIMIT)
+                args = get_args(limit=MESSAGE_QUERY_LIMIT)
                 response = Retriever().retrieve_thread_list(self.user_respondent, args)
 
                 date = []
@@ -1020,8 +1030,10 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
 
                 self.assertEqual(len(msg_ids), 5)
 
+                args = get_args(page=1, limit=MESSAGE_QUERY_LIMIT)
+
                 for x in range(0, len(thread_ids)):
-                    thread = Retriever().retrieve_thread(thread_ids[x], self.user_respondent, 1, MESSAGE_QUERY_LIMIT)
+                    thread = Retriever().retrieve_thread(thread_ids[x], self.user_respondent, args)
                     self.assertEqual(date[x], str(thread.items[0].events[0].date_time))
                     self.assertEqual(msg_ids[x], thread.items[0].events[0].msg_id)
 
@@ -1033,7 +1045,7 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
 
         with self.app.app_context():
             with current_app.test_request_context():
-                args = self.get_args(limit=MESSAGE_QUERY_LIMIT)
+                args = get_args(limit=MESSAGE_QUERY_LIMIT)
                 response = Retriever().retrieve_thread_list(self.user_internal, args)
 
                 date = []
@@ -1050,8 +1062,10 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
 
                 self.assertEqual(len(msg_ids), 5)
 
+                args = get_args(page=1, limit=MESSAGE_QUERY_LIMIT)
+
                 for x in range(0, len(thread_ids)):
-                    thread = Retriever().retrieve_thread(thread_ids[x], self.user_internal, 1, MESSAGE_QUERY_LIMIT)
+                    thread = Retriever().retrieve_thread(thread_ids[x], self.user_internal, args)
                     self.assertEqual(date[x], str(thread.items[0].events[0].date_time))
                     self.assertEqual(msg_ids[x], thread.items[0].events[0].msg_id)
 
@@ -1063,7 +1077,7 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
 
         with self.app.app_context():
             with current_app.test_request_context():
-                args = self.get_args(limit=MESSAGE_QUERY_LIMIT)
+                args = get_args(limit=MESSAGE_QUERY_LIMIT)
                 response = Retriever().retrieve_thread_list(self.user_respondent, args)
 
                 date = []
@@ -1080,8 +1094,10 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
 
                 self.assertEqual(len(msg_ids), 5)
 
+                args = get_args(page=1, limit=MESSAGE_QUERY_LIMIT)
+
                 for x in range(0, len(thread_ids)):
-                    thread = Retriever().retrieve_thread(thread_ids[x], self.user_respondent, 1, MESSAGE_QUERY_LIMIT)
+                    thread = Retriever().retrieve_thread(thread_ids[x], self.user_respondent, args)
                     self.assertEqual(date[x], str(thread.items[0].events[0].date_time))
                     self.assertEqual(msg_ids[x], thread.items[0].events[0].msg_id)
 
@@ -1093,7 +1109,7 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
 
         with self.app.app_context():
             with current_app.test_request_context():
-                args = self.get_args(limit=MESSAGE_QUERY_LIMIT)
+                args = get_args(limit=MESSAGE_QUERY_LIMIT)
                 response = Retriever().retrieve_thread_list(self.user_internal, args)
 
                 date = []
@@ -1110,8 +1126,10 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
 
                 self.assertEqual(len(msg_ids), 5)
 
+                args = get_args(page=1, limit=MESSAGE_QUERY_LIMIT)
+
                 for x in range(0, len(thread_ids)):
-                    thread = Retriever().retrieve_thread(thread_ids[x], self.user_internal, 1, MESSAGE_QUERY_LIMIT)
+                    thread = Retriever().retrieve_thread(thread_ids[x], self.user_internal, args)
                     self.assertEqual(date[x], str(thread.items[0].events[0].date_time))
                     self.assertEqual(msg_ids[x], thread.items[0].events[0].msg_id)
 
@@ -1123,7 +1141,7 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
 
         with self.app.app_context():
             with current_app.test_request_context():
-                args = self.get_args(limit=MESSAGE_QUERY_LIMIT)
+                args = get_args(limit=MESSAGE_QUERY_LIMIT)
                 response = Retriever().retrieve_thread_list(self.user_respondent, args)
 
                 date = []
@@ -1140,8 +1158,10 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
 
                 self.assertEqual(len(msg_ids), 5)
 
+                args = get_args(page=1, limit=MESSAGE_QUERY_LIMIT)
+
                 for x in range(0, len(thread_ids)):
-                    thread = Retriever().retrieve_thread(thread_ids[x], self.user_respondent, 1, MESSAGE_QUERY_LIMIT)
+                    thread = Retriever().retrieve_thread(thread_ids[x], self.user_respondent, args)
                     self.assertEqual(date[x], str(thread.items[0].events[0].date_time))
                     self.assertEqual(msg_ids[x], thread.items[0].events[0].msg_id)
 
@@ -1152,7 +1172,7 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
         self.populate_database(5, single=False, multiple_users=True)
 
         with self.app.app_context():
-                args = self.get_args(limit=MESSAGE_QUERY_LIMIT)
+                args = get_args(limit=MESSAGE_QUERY_LIMIT)
                 response = Retriever().retrieve_thread_list(self.user_internal, args)
 
                 date = []
@@ -1169,8 +1189,10 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
 
                 self.assertEqual(len(msg_ids), 5)
 
+                args = get_args(page=1, limit=MESSAGE_QUERY_LIMIT)
+
                 for x in range(0, len(thread_ids)):
-                    thread = Retriever().retrieve_thread(thread_ids[x], self.user_internal, 1, MESSAGE_QUERY_LIMIT)
+                    thread = Retriever().retrieve_thread(thread_ids[x], self.user_internal, args)
                     self.assertEqual(date[x], str(thread.items[0].events[0].date_time))
                     self.assertEqual(msg_ids[x], thread.items[0].events[0].msg_id)
 

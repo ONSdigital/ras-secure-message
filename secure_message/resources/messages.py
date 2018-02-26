@@ -36,13 +36,9 @@ class MessageList(Resource):
         message_args = get_options(request.args)
 
         message_service = Retriever()
-        result = message_service.retrieve_message_list(message_args.page, message_args.limit, g.user,
-                                                       ru_id=message_args.ru_id, survey=message_args.survey,
-                                                       cc=message_args.cc, label=message_args.label,
-                                                       descend=message_args.desc, ce=message_args.ce)
+        result = message_service.retrieve_message_list(g.user, message_args)
 
-        return make_response(paginated_list_to_json(result, message_args.page, message_args.limit, request.host_url,
-                                                    g.user, message_args.string_query_args, MESSAGE_LIST_ENDPOINT), 200)
+        return make_response(paginated_list_to_json(result, request.host_url, g.user, message_args, MESSAGE_LIST_ENDPOINT), 200)
 
 
 class MessageSend(Resource):
