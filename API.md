@@ -343,6 +343,7 @@ The only reason for the existence of Get drafts ( as opposed to using Get Messag
 }
 ```
 See get message for @msg_from, @msg_to and @ru
+[Get messages](#GET-/messages-or-/v2/messages)
 
 ## `POST /draft/save or /v2/drafts`
 
@@ -460,6 +461,7 @@ Returns a draft message based on msg_id. Note that the reply contains an Etag he
 }
 ```
 See Get messages for description of @msg_from, @msg_to and @ru
+[Get messages](#GET-/messages-or-/v2/messages)
 
 ## `PUT /draft/{id}/modify or /v2/drafts/<draft_id>`
 Note V2 uses drafts, V1 uses draft (singular)
@@ -468,7 +470,7 @@ The id passed in must equal the msg_id in the data else an error will be returne
 
 Note the draft put ( and a message post of a draft) have an optional mechanism for collision detection.
 That is the use of etags. If the header contains a header called `ETag` then its value should be the value returned
-on get draft by id. If present then the draft put endpoint regenerates the etag prior to saving the new one . If the two are the same then it has not been modified since it was read, if they differ then a change has taken place and the draft put returns a 409 error . If the Etag header is not present on draft put or message post then this functionality is ignored.
+on get draft by id. If present then the draft put endpoint regenerates the etag prior to saving the new one. If the two are the same then it has not been modified since it was read, if they differ then a change has taken place and the draft put returns a 409 error . If the Etag header is not present on draft put or message post then this functionality is ignored.
 
 #### Example JSON DATA for put V1
 
@@ -525,7 +527,7 @@ on get draft by id. If present then the draft put endpoint regenerates the etag 
 This is currently implemented but not used in production. Hence should be treated with caution.
 
 It can use the same filter arguments as Get Messages, and returns the latest message in each thread that satisfies
-the criteria passed in .
+the criteria passed in .[Get messages](#GET-/messages-or-/v2/messages)
 
  
 
@@ -681,6 +683,7 @@ Note V2 will have either uuids or 'GROUP' for the user ids, and a uuid for the s
 }
 ```
 For descriptions of @msg_from, @msg_to and @ru see messages get
+[Get messages](#GET-/messages-or-/v2/messages)
 
 ## `GET /thread/{thread_id} or /v2/threads/<thread_id>` 
 Note V2 uses threads, V1 uses thread (singular) 
@@ -843,6 +846,7 @@ Note, V2 messages should have survey_id, collection_case and use either a uuid o
 }
 ```
 Note, See message get for descriptions of @msg_from, @msg_to and @ru
+[Get messages](#GET-/messages-or-/v2/messages)
 
 ## `GET /health`
 
