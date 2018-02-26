@@ -102,15 +102,15 @@ def cache_client_token(app):
     r = redis.StrictRedis(host=app.config['REDIS_HOST'],
                           port=app.config['REDIS_PORT'],
                           db=app.config['REDIS_DB'])
-    put_token(token)
+    put_token(r, token)
 
-def put_token(token):
+def put_token(conn, token):
     try:
-        r.setex('secure-message-client-token', token.get('expires_in') - 15, token)
+        conn.setex('secure-message-client-token', token.get('expires_in') - 15, token)
     except redis.exceptions.RedisError:
         logger.exception("RedisError occurred. Retrying.")
         sleep(0.5)
-        put_token(token)
+        put_token(conn, token)
 
 def get_client_token(client_id, client_secret, url):
     headers = {'Content-Type': 'application/x-www-form-urlencoded',

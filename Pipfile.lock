@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "4c8cf479c5a1f9f17a4ebf1d7f035312cd84a9707e305f1baf0c06493c3d1831"
+            "sha256": "2ebe9a642727c8515cec52ae926fa7a0a820b98913407188381f8dc0bb2bf87d"
         },
         "host-environment-markers": {
             "implementation_name": "cpython",
@@ -9,9 +9,9 @@
             "os_name": "posix",
             "platform_machine": "x86_64",
             "platform_python_implementation": "CPython",
-            "platform_release": "17.3.0",
+            "platform_release": "17.4.0",
             "platform_system": "Darwin",
-            "platform_version": "Darwin Kernel Version 17.3.0: Thu Nov  9 18:09:22 PST 2017; root:xnu-4570.31.3~1/RELEASE_X86_64",
+            "platform_version": "Darwin Kernel Version 17.4.0: Sun Dec 17 09:19:54 PST 2017; root:xnu-4570.41.2~1/RELEASE_X86_64",
             "python_full_version": "3.6.3",
             "python_version": "3.6",
             "sys_platform": "darwin"
@@ -439,13 +439,6 @@
             ],
             "version": "==4.5.1"
         },
-        "fakeredis": {
-            "hashes": [
-                "sha256:31a786029156847f5a9a2ae50eac17689ebd7ce373dbbb51862f5b8ee92cadef",
-                "sha256:445b9bd847f41c6df2c9438e49bf54e96323fb1809a3039b20969e2c67870b04"
-            ],
-            "version": "==0.9.0"
-        },
         "flake8": {
             "hashes": [
                 "sha256:c7841163e2b576d435799169b78703ad6ac1bbb0f199994fc05f700b2a90ea37",
@@ -508,6 +501,12 @@
                 "sha256:dd8d182285a0fe56bace7f45b5e7d1a6ebcbf524e8f3bd87eb0f125271b8831f"
             ],
             "version": "==0.6.1"
+        },
+        "mockredispy": {
+            "hashes": [
+                "sha256:8caefadab8f32bd41bbccbcc9615347dd4f840cfedc253f43a4675f07036a446"
+            ],
+            "version": "==2.9.3"
         },
         "nose": {
             "hashes": [
@@ -583,13 +582,6 @@
                 "sha256:9ddcb879c8cc859d2540204b5399011f842e5e8823674bf429f70ada281b3cc6"
             ],
             "version": "==3.4.1"
-        },
-        "redis": {
-            "hashes": [
-                "sha256:8a1900a9f2a0a44ecf6e8b5eb3e967a9909dfed219ad66df094f27f7d6f330fb",
-                "sha256:a22ca993cea2962dbb588f9f30d0015ac4afcc45bee27d3978c0dbe9e97c6c0f"
-            ],
-            "version": "==2.10.6"
         },
         "requests": {
             "hashes": [
