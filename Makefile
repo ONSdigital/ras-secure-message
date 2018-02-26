@@ -7,4 +7,4 @@ start:
 	pipenv run python run.py
 
 test:
-	export APP_SETTINGS=TestConfig && pipenv run pytest && unset APP_SETTINGS
+	 pipenv run pytest
