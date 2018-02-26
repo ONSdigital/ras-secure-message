@@ -3,7 +3,6 @@ import os
 import sys
 from time import sleep
 
-import fakeredis
 from flask import Flask, request
 from flask import json, jsonify
 from flask_restful import Api
@@ -72,7 +71,9 @@ def create_app(config=None):
     api.add_resource(MessageSendV2, '/v2/messages')
     api.add_resource(MessageCounterV2, '/v2/messages/count')
 
-    cache_client_token(app)
+    if app.config['USE_UAA']:
+        cache_client_token(app)
+
 
     @app.before_request
     def before_request():  # NOQA pylint:disable=unused-variable
@@ -98,16 +99,18 @@ def cache_client_token(app):
                              app.config['CLIENT_SECRET'],
                              app.config['UAA_URL'])
 
-    if not app.testing:
-        r = redis.StrictRedis(host=app.config['REDIS_HOST'],
-                              port=app.config['REDIS_PORT'],
-                              db=app.config['REDIS_DB'])
-    else:
-        logging.debug("App running in test mode. Using fakeredis.")
-        r = fakeredis.FakeStrictRedis()
+    r = redis.StrictRedis(host=app.config['REDIS_HOST'],
+                          port=app.config['REDIS_PORT'],
+                          db=app.config['REDIS_DB'])
+    put_token(token)
 
-    r.setex('secure-message-client-token', token.get('expires_in') - 15, token)
-
+def put_token(token):
+    try:
+        r.setex('secure-message-client-token', token.get('expires_in') - 15, token)
+    except redis.exceptions.RedisError:
+        logger.exception("RedisError occurred. Retrying.")
+        sleep(0.5)
+        put_token(token)
 
 def get_client_token(client_id, client_secret, url):
     headers = {'Content-Type': 'application/x-www-form-urlencoded',
@@ -122,7 +125,8 @@ def get_client_token(client_id, client_secret, url):
     try:
         s = requests.Session()
         s.mount(get_token_url, HTTPAdapter(max_retries=15))
-        response = requests.post(get_token_url, headers=headers,
+        response = requests.post(get_token_url,
+                                 headers=headers,
                                  params=payload,
                                  auth=(client_id, client_secret))
         response.raise_for_status()
