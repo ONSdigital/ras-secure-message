@@ -64,7 +64,7 @@ Feature: Get Messages list V2 Endpoint
       And  '5' messages are sent using V2
       And sending from respondent to internal bres user
       And the survey is set to 'Survey2'
-    And  '7' messages are sent using V2
+      And  '7' messages are sent using V2
     When  messages are read V2
     Then  '12' messages are returned
 
@@ -81,7 +81,7 @@ Feature: Get Messages list V2 Endpoint
       And  '5' messages are sent using V2
       And sending from respondent to internal bres user
       And the survey is set to 'Survey2'
-    And  '7' messages are sent using V2
+      And  '7' messages are sent using V2
     When  messages are read using survey of 'Survey1'
     Then  '5' messages are returned
 

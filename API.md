@@ -4,14 +4,14 @@
 All calls , except health , health details and info , require that a valid JWT be passed in an Authorization header. 
 this currently has two fields :
 
-* party_id which is how the user is identified , this should be the users uuid
-* role which is set to either 'internal' for ons staff or 'respondent' for respondents
+* party_id which is how the user is identified, this should be the users uuid
+* role which is set to either 'internal' for ons staff or 'respondent' for respondents.
 
-The JWT useage does cause some issues in that currently it may or may not be encrypted. The secure message api relies on an environment variable called 'SM_JWT_ENCRYPT' . If this is set to 1 then it assumes the JWT is encrypted and attempts to decrypt it . If '0' then it skips the decryption. It is a common error to have this set incorrectly.
+The JWT usage does cause some issues in that currently it may or may not be encrypted. The secure message api relies on an environment variable called 'SM_JWT_ENCRYPT'. If this is set to 1 then it assumes the JWT is encrypted and attempts to decrypt it. If '0' then it skips the decryption. It is a common error to have this set incorrectly.
 
-After possible decryption, the service attempts to decode the JWT data . For that it uses a an algorithm defined in config and a secret also defined in config . If the algorithm and/or secret are out of step between client and secure message service then the jwt will fail checks and the service will return a 500.
+After possible decryption, the service attempts to decode the JWT data . For that it uses an algorithm defined in config and a secret also defined in config. If the algorithm and/or secret are out of step between client and secure message service then the JWT will fail checks and the service will return a 500.
  
-Being able to get a response from a health or info endpoint but 500's from a message post or read is often an indicator that something in this area is not configured correctly . An easy check for config is to access the /health/details endpoint.
+Being able to get a response from a health or info endpoint but 500's from a message post or read is often an indicator that something in this area is not configured correctly. An easy check for config is to access the /health/details endpoint.
  
  
 ## `GET /messages  or /v2/messages` 
@@ -25,7 +25,7 @@ Retrieves a list of messages based on the selected parameters passed on the quer
 | `**Variable**` | `**Type**` | `**Example Value**` | `**Notes**` |
 | :---: | :---: | :---: | :---: |
 | cc (collection_case) | `string` | 0000000000000000 | optionally restrict by collection case |
-| ru_id | `string` | aaa1aa1a-1aa1-1111-aa11-11a11aa111aa | optionally restrict by ru id  ) |
+| ru_id | `string` | aaa1aa1a-1aa1-1111-aa11-11a11aa111aa | optionally restrict by ru id  |
 | survey | `string` | aaa1aa1a-1aa1-1111-aa11-11a11aa111aa | optionally restrict by survey  |
 | label | `string` | INBOX/DRAFT/SENT | used to select types of messages to return e.g SENT or INBOX |
 | ce (collection_exercise) | `string`| aaa1aa1a-1aa1-1111-aa11-11a11aa111aa | optionally restrict by collection exercise |
@@ -141,11 +141,11 @@ When a message is posted then typically no msg_id is supplied . If a msg_id is s
 }
 ```
 #### Example JSON DATA for post Version 2
-* msg_to   Should be set to a specific user uuid if known , else to the constant 'GROUP' if sending to an unknown user in ONS
-* msg_from The current user uuid
-* thread_id Should be set to the thread id of the message being replied to if the message is a reply, else left empty
-* survey  Should be the uuid of the survey . This was ignored in V1 but is now critical in V2 so that we can restrict messages by survey
-* collection_case will now be mandatory . It was optional in V1 but always set. Its main use is to be passed to the case service to inform it that a message has been sent
+* msg_to - Should be set to a specific user uuid if known , else to the constant 'GROUP' if sending to an unknown user in ONS
+* msg_from - The current user uuid
+* thread_id - Should be set to the thread id of the message being replied to if the message is a reply, else left empty
+* survey - Should be the uuid of the survey . This was ignored in V1 but is now critical in V2 so that we can restrict messages by survey
+* collection_case - Will now be mandatory . It was optional in V1 but always set. Its main use is to be passed to the case service to inform it that a message has been sent
 
 The main differences between the V1 and V2 endpoints are:
  * V1 will ignore the from and set the from user to be a constant value of 'BRES'
@@ -229,7 +229,7 @@ Note V2 uses messages , V1 uses message (singular)
     ]
     }
 ```
-V2 will only return 'BRES' in from or to only for existing old bres messages. Nw messages will have a user uuid or 'GROUP' depending on how the message was stored. See Messages get for details of @msg_from, @msg_to and @ru
+V2 will only return 'BRES' in from or to only for existing old bres messages. New messages will have a user uuid or 'GROUP' depending on how the message was stored. See Messages get for details of @msg_from, @msg_to and @ru
 
 ## `PUT message/{id}/modify or `/v2/messages/modify/<message_id>`  
 
@@ -400,7 +400,7 @@ Note only a subject and body are validated for drafts.
 ## `GET /draft/{id} or /v2/drafts/<draft_id>`
 
 Note V2 uses drafts , V1 uses draft (singular)
-Returns a draft message based on msg_id. Note that the reply contains an Etag header , the value of which is a hash of msg_to, msg_id, subject and body . This may optionally be passed back to secure message to detect changes in teh case of multiple users editing the same draft ( see drafts put)
+Returns a draft message based on msg_id. Note that the reply contains an Etag header, the value of which is a hash of msg_to, msg_id, subject and body. This may optionally be passed back to secure message to detect changes in the case of multiple users editing the same draft ( see drafts put)
 
 #### Example JSON Response
 
