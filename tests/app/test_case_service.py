@@ -46,6 +46,17 @@ class CaseServiceTestCase(unittest.TestCase):
         self.assertEqual(result_data, {"error1": "TestError"})
         self.assertEqual(result_status, 200)
 
+    def test_store_case_event_no_case_id_log_error_as_expected(self):
+        """Tests that the logger is called with the correct information if store case event called without a case id """
+        sut = CaseService()
+        case_event_data = CaseServiceTestHelper(200, 'OK', '{"error": {"error1":"TestError"}}')
+        requests.post = mock.Mock(name='post', return_value=case_event_data)
+
+        with self.assertLogs(level="ERROR") as cm:
+            sut.store_case_event('', 'user')
+
+        self.assertIn("No case id for user user, case event not called", cm.output[0])
+
 
 if __name__ == '__main__':
     unittest.main()
