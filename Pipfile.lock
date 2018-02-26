@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "6407e857e107f2e647dd1e111a89e3940e0449dfe5fcfda71f9b729f81ce0f25"
+            "sha256": "4c8cf479c5a1f9f17a4ebf1d7f035312cd84a9707e305f1baf0c06493c3d1831"
         },
         "host-environment-markers": {
             "implementation_name": "cpython",
@@ -9,9 +9,9 @@
             "os_name": "posix",
             "platform_machine": "x86_64",
             "platform_python_implementation": "CPython",
-            "platform_release": "17.2.0",
+            "platform_release": "17.3.0",
             "platform_system": "Darwin",
-            "platform_version": "Darwin Kernel Version 17.2.0: Fri Sep 29 18:27:05 PDT 2017; root:xnu-4570.20.62~3/RELEASE_X86_64",
+            "platform_version": "Darwin Kernel Version 17.3.0: Thu Nov  9 18:09:22 PST 2017; root:xnu-4570.31.3~1/RELEASE_X86_64",
             "python_full_version": "3.6.3",
             "python_version": "3.6",
             "sys_platform": "darwin"
@@ -31,9 +31,10 @@
     "default": {
         "aniso8601": {
             "hashes": [
-                "sha256:085786415d3550e89785ffbedaa9bb37d41de0707a1268bdbba11249064b71d1"
+                "sha256:cdf20d7f5172cf9a786fad94bbeaffe6dead415c99ab52800f744b1f8841e33d",
+                "sha256:b7215a41e5194a829dc87d1ea5039315be85a6158ba15c8157a284c29fa6808b"
             ],
-            "version": "==2.0.0"
+            "version": "==2.0.1"
         },
         "asn1crypto": {
             "hashes": [
@@ -364,12 +365,10 @@
         },
         "behave": {
             "hashes": [
-                "sha256:89238a5e4b11ff607e8ebc6b4b1fb1a0b1f3d794fba80e1fb4b6b3652979c927",
-                "sha256:8c182feece4a519c5ffc11e1ab3682d25d5a390dd5f4573bb1296443beb9d7c7",
-                "sha256:81b731ac5187e31e4aad2594944fa914943683a9818320846d037c5ebd6d5d0b",
-                "sha256:07c741f30497b6f9361a9bc74c68418507cd17e70d6f586faa3bff57684a2ec8"
+                "sha256:ebda1a6c9e5bfe95c5f9f0a2794e01c7098b3dde86c10a95d8621c5907ff6f1c",
+                "sha256:b9662327aa53294c1351b0a9c369093ccec1d21026f050c3bd9b3e5cccf81a86"
             ],
-            "version": "==1.2.5"
+            "version": "==1.2.6"
         },
         "certifi": {
             "hashes": [
@@ -439,6 +438,13 @@
                 "sha256:f8a923a85cb099422ad5a2e345fe877bbc89a8a8b23235824a93488150e45f6e"
             ],
             "version": "==4.5.1"
+        },
+        "fakeredis": {
+            "hashes": [
+                "sha256:31a786029156847f5a9a2ae50eac17689ebd7ce373dbbb51862f5b8ee92cadef",
+                "sha256:445b9bd847f41c6df2c9438e49bf54e96323fb1809a3039b20969e2c67870b04"
+            ],
+            "version": "==0.9.0"
         },
         "flake8": {
             "hashes": [
@@ -577,6 +583,13 @@
                 "sha256:9ddcb879c8cc859d2540204b5399011f842e5e8823674bf429f70ada281b3cc6"
             ],
             "version": "==3.4.1"
+        },
+        "redis": {
+            "hashes": [
+                "sha256:8a1900a9f2a0a44ecf6e8b5eb3e967a9909dfed219ad66df094f27f7d6f330fb",
+                "sha256:a22ca993cea2962dbb588f9f30d0015ac4afcc45bee27d3978c0dbe9e97c6c0f"
+            ],
+            "version": "==2.10.6"
         },
         "requests": {
             "hashes": [

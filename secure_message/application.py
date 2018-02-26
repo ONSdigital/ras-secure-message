@@ -1,6 +1,9 @@
 import logging
 import os
+import sys
+from time import sleep
 
+import fakeredis
 from flask import Flask, request
 from flask import json, jsonify
 from flask_restful import Api
@@ -8,6 +11,7 @@ from flask_cors import CORS
 import redis
 from retrying import retry
 import requests
+from requests.adapters import HTTPAdapter
 from sqlalchemy import DDL, event
 from sqlalchemy.exc import DatabaseError, ProgrammingError
 from structlog import wrap_logger
@@ -68,8 +72,7 @@ def create_app(config=None):
     api.add_resource(MessageSendV2, '/v2/messages')
     api.add_resource(MessageCounterV2, '/v2/messages/count')
 
-    if not app.config.get('TESTING'):
-        cache_client_token(app)
+    cache_client_token(app)
 
     @app.before_request
     def before_request():  # NOQA pylint:disable=unused-variable
@@ -95,9 +98,13 @@ def cache_client_token(app):
                              app.config['CLIENT_SECRET'],
                              app.config['UAA_URL'])
 
-    r = redis.StrictRedis(host=app.config['REDIS_HOST'],
-                          port=app.config['REDIS_PORT'],
-                          db=app.config['REDIS_DB'])
+    if not app.testing:
+        r = redis.StrictRedis(host=app.config['REDIS_HOST'],
+                              port=app.config['REDIS_PORT'],
+                              db=app.config['REDIS_DB'])
+    else:
+        logging.debug("App running in test mode. Using fakeredis.")
+        r = fakeredis.FakeStrictRedis()
 
     r.setex('secure-message-client-token', token.get('expires_in') - 15, token)
 
@@ -105,14 +112,42 @@ def cache_client_token(app):
 def get_client_token(client_id, client_secret, url):
     headers = {'Content-Type': 'application/x-www-form-urlencoded',
                'Accept': 'application/json'}
+
     payload = {'grant_type': 'client_credentials',
                'response_type': 'token',
                'token_format': 'opaque'}
-    response = requests.post('http://{}/oauth/token'.format(url), headers=headers,
-                             params=payload,
-                             auth=(client_id, client_secret))
-    resp_json = response.json()
-    return resp_json
+
+    get_token_url = f'http://{url}/oauth/token'
+
+    try:
+        s = requests.Session()
+        s.mount(get_token_url, HTTPAdapter(max_retries=15))
+        response = requests.post(get_token_url, headers=headers,
+                                 params=payload,
+                                 auth=(client_id, client_secret))
+        response.raise_for_status()
+    except requests.HTTPError as e:
+        logger.exception(f"{e.response.status} response received while retrieving client token.")
+        if e.response.status >= 500:
+            logger.debug("Retrying in 10 seconds.")
+            sleep(10)
+            get_client_token(client_id, client_secret, url)
+        elif 400 <= e.response.status < 500:
+            logger.debug("Client error encountered. Shutting down.")
+            sys.exit(1)
+    except requests.RequestException as e:
+        logger.exception(f"{e.__class__.__name__} occured while retrieving client token.")
+        logger.debug("Waiting 10 seconds and retrying client token retrieval.")
+        sleep(10)
+        get_client_token(client_id, client_secret, url)
+
+    try:
+        resp_json = response.json()
+        return resp_json
+    except ValueError:
+        logger.exception("Failed to decode response JSON. Retrying in 10 seconds.")
+        sleep(10)
+        get_client_token(client_id, client_secret, url)
 
 
 def retry_if_database_error(exception):
