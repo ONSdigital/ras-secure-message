@@ -462,7 +462,7 @@ Returns a draft message based on msg_id. Note that the reply contains an Etag he
 See Get messages for description of @msg_from, @msg_to and @ru
 
 ## `PUT /draft/{id}/modify or /v2/drafts/<draft_id>`
-Note V2 uses drafts , V1 uses draft (singular)
+Note V2 uses drafts, V1 uses draft (singular)
 This modifies an existing draft message based on msg_id. If the draft does not exist then an error is returned.
 The id passed in must equal the msg_id in the data else an error will be returned.
 
@@ -524,13 +524,13 @@ on get draft by id. If present then the draft put endpoint regenerates the etag 
 
 This is currently implemented but not used in production. Hence should be treated with caution.
 
-It can use the same filter arguments as Get Messages , and returns the latest message in each thread that satisfies
+It can use the same filter arguments as Get Messages, and returns the latest message in each thread that satisfies
 the criteria passed in .
 
  
 
 #### Example JSON Response
-Note V2 will have either uuids or 'GROUP' for the user ids , and a uuid for the survey id
+Note V2 will have either uuids or 'GROUP' for the user ids, and a uuid for the survey id
 ```json
 {
   "_links": {
@@ -683,7 +683,7 @@ Note V2 will have either uuids or 'GROUP' for the user ids , and a uuid for the 
 For descriptions of @msg_from, @msg_to and @ru see messages get
 
 ## `GET /thread/{thread_id} or /v2/threads/<thread_id>` 
-Note V2 uses threads , V1 uses thread (singular) 
+Note V2 uses threads, V1 uses thread (singular) 
 This has been implemented but not used in production, hence should be treated with caution.
 This returns all messages on a specific thread.
 
@@ -691,7 +691,7 @@ Note there is a known bug here. That is messages are ordered by date of entry wh
 sub conversations are in progress (i.e two internal users replying on a thread ).
 
 #### Example JSON Response
-Note , V2 messages should have survey_id, collection_case and use either a uuid or "GROUP" for the internal user.
+Note, V2 messages should have survey_id, collection_case and use either a uuid or "GROUP" for the internal user.
 ```json
 {
   "_links": {
@@ -842,11 +842,11 @@ Note , V2 messages should have survey_id, collection_case and use either a uuid 
   ]
 }
 ```
-Note , See message get for descriptions of @msg_from, @msg_to and @ru
+Note, See message get for descriptions of @msg_from, @msg_to and @ru
 
 ## `GET /health`
 
-Returns a simple indicator that the service is running . It is useful since it bypasses all aspects of the JWT.
+Returns a simple indicator that the service is running. It is useful since it bypasses all aspects of the JWT.
 So persistent 500s whilst health returns is often an indicator of incorrect JWT configuration.
 
 
@@ -917,7 +917,7 @@ be useful in determining JWT errors since it shows SM_JWT_ENCRYPT values. Bypass
 ```
 ## `GET /info`
 
-Similar to the health endpoints , it was added for consistency between services. Bypasses all aspects of JWT.
+Similar to the health endpoints, it was added for consistency between services. Bypasses all aspects of JWT.
 
 #### Example JSON Response
 ```json
