@@ -137,7 +137,7 @@ class MessageSend(Resource):
             if message.msg_from == constants.BRES_USER:
                 case_user = constants.BRES_USER
             else:
-                party_data= party.get_user_details(message.msg_from)  # NOQA TODO avoid 2 lookups(see validate)
+                party_data = party.get_user_details(message.msg_from)  # NOQA TODO avoid 2 lookups(see validate)
                 if party_data:
                     first_name = party_data['firstName'] if 'firstName' in party_data else ''
                     last_name = party_data['lastName'] if 'lastName' in party_data else ''

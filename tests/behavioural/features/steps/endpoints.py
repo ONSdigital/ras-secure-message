@@ -446,6 +446,15 @@ def step_impl_messages_are_read_with_specific_label_using_v2(context, label_name
     _step_impl_get_messages_with_filter(context, url)
 
 
+@given("messages are read using survey of '{survey}'")
+@when("messages are read using survey of '{survey}'")
+def step_impl_messages_are_read_with_specific_survey(context, survey):
+    """restrict messages in get messages to those with a specific survey"""
+    param = f"?survey={survey}"
+    url = context.bdd_helper.messages_get_url + param
+    _step_impl_get_messages_with_filter(context, url)
+
+
 @when("the count of  messages with '{label_name}' label in survey '{survey}' is made V2")
 @given("the count of  messages with '{label_name}' label in survey '{survey}' is made V2")
 def step_impl_the_messages_for_specific_survey_are_counted_for_survey(context, label_name, survey):
