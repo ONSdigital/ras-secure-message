@@ -17,7 +17,7 @@ from secure_message.repository.modifier import Modifier
 from secure_message.repository.retriever import Retriever
 from secure_message.repository.saver import Saver
 from secure_message.resources.drafts import DraftModifyById
-from secure_message.services.service_toggles import party, case_service
+from secure_message.services.service_toggles import party, case_service, internal_user_service
 from secure_message.validation.domain import MessageSchema
 
 logger = wrap_logger(logging.getLogger(__name__))
@@ -137,23 +137,41 @@ class MessageSend(Resource):
 
     @staticmethod
     def _inform_case_service(message):
+
         if current_app.config['NOTIFY_CASE_SERVICE'] == '1':
-            if message.msg_from == constants.BRES_USER:
-                case_user = constants.BRES_USER
+            case_user = MessageSend._resolve_user_details_for_case_service(g.user, message)
+
+            if case_user:
+                case_service.store_case_event(message.collection_case, case_user)
             else:
-                party_data = party.get_user_details(message.msg_from)  # NOQA TODO avoid 2 lookups(see validate)
-                if party_data:
-                    first_name = party_data['firstName'] if 'firstName' in party_data else ''
-                    last_name = party_data['lastName'] if 'lastName' in party_data else ''
-                    case_user = '{} {}'.format(first_name, last_name).strip()
-                    if not case_user:
-                        case_user = 'Unknown user'
-                        logger.info('no user names in party data for id  Unknown user used in case ',
-                                    party_id=party_data['id'])
-                # else not testable , as it fails on validation
-            case_service.store_case_event(message.collection_case, case_user)
+                logger.info(f'unable to resolve details, for case service, for {g.user.user_uuid} role: {g.user.role}')
+
         else:
             logger.info('Case service notifications switched off, hence not sent', msg_id=message.msg_id)
+
+    @staticmethod
+    def _resolve_user_details_for_case_service(user, message):
+        case_user = ''
+        if message.msg_from == constants.BRES_USER:
+            case_user = constants.BRES_USER
+        else:
+            if g.user.is_internal:
+                user_data = internal_user_service.get_user_details(user.user_uuid)
+                service = 'user'
+            else:
+                user_data = party.get_user_details(message.msg_from)  # NOQA TODO avoid 2 lookups(see validate)
+                service = 'party'
+
+            if user_data:
+                first_name = user_data.get('firstName', '')
+                last_name = user_data.get('lastName', '')
+                case_user = '{} {}'.format(first_name, last_name).strip()
+                if not case_user:
+                    case_user = 'Unknown user'
+                    logger.info(f'no user names in {service} service for id {user.user_uuid} Unknown user used in case',
+                                case_user=case_user)
+
+        return case_user
 
 
 class MessageById(Resource):

@@ -26,6 +26,6 @@ class CaseService:
 
             return case_service_dict, case_service_data.status_code
         else:
-            err = f"No case id for user {user_name}, case event not called"
+            err = f"No case id for case involving user {user_name}, case event not called"
             logger.error(err)
             return {'error': err}, 400

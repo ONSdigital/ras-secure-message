@@ -18,6 +18,7 @@ from secure_message.resources.messages import logger as message_logger
 from secure_message.common.alerts import AlertViaLogging
 from secure_message.api_mocks.party_service_mock import PartyServiceMock
 from secure_message.api_mocks.case_service_mock import CaseServiceMock
+from secure_message.api_mocks.internal_user_service_mock import InternalUserServiceMock
 from tests.app import test_utilities
 
 
@@ -452,8 +453,8 @@ class FlaskTestCase(unittest.TestCase):
                                                                        "sampleUnitType": "BI"}))
     @patch.object(CaseServiceMock, 'store_case_event')
     @patch.object(message_logger, 'info')
-    def test_if_user_has_no_first_name_or_last_name_then_unknown_user_passed_to_case_service(self, mock_logger,
-                                                                                             mock_case, mock_party):
+    def test_if_respondent_has_no_first_name_or_last_name_then_unknown_user_passed_to_case_service(self, mock_logger,
+                                                                                                   mock_case, mock_party):
         """Test if party data has no name for the user then a constant of 'Unknown user' is used"""
         self.test_message.update({'msg_to': [constants.BRES_USER],
                                   'msg_from': '0a7ad740-10d5-4ecb-b7ca-3c0384afb882',
@@ -479,8 +480,44 @@ class FlaskTestCase(unittest.TestCase):
         url = "http://localhost:5050/message/send"
         self.client.post(url, data=json.dumps(self.test_message), headers=self.headers)
         mock_case.assert_called_with('ACollectionCase', 'Unknown user')
-        mock_logger.assert_called_with('no user names in party data for id  Unknown user used in case ',
-                                       party_id='f62dfda8-73b0-4e0e-97cf-1b06327a6712')
+        mock_logger.assert_called_with('no user names in party service for id 0a7ad740-10d5-4ecb-b7ca-3c0384afb882 Unknown user used in case',
+                                       case_user='Unknown user')
+
+    @patch.object(InternalUserServiceMock, 'get_user_details', return_value=({"id": "f62dfda8-73b0-4e0e-97cf-1b06327a6712",
+                                                                              "emailAddress": "   ",
+                                                                              "lastName": "",
+                                                                              "telephone": "+443069990888"}))
+    @patch.object(CaseServiceMock, 'store_case_event')
+    @patch.object(message_logger, 'info')
+    def test_if_internal_user_has_no_first_name_or_last_name_then_unknown_user_passed_to_case_service(self, mock_logger,
+                                                                                                      mock_case, mock_party):
+        """Test if party data has no name for the user then a constant of 'Unknown user' is used"""
+        self.test_message.update({'msg_to': ['0a7ad740-10d5-4ecb-b7ca-3c0384afb882'],
+                                  'msg_from': 'f62dfda8-73b0-4e0e-97cf-1b06327a6712',
+                                  'subject': 'MyMessage',
+                                  'body': 'hello',
+                                  'collection_case': 'ACollectionCase',
+                                  'collection_exercise': 'ACollectionExercise',
+                                  'ru_id': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc',
+                                  'survey': test_utilities.BRES_SURVEY})
+
+        token_data = {constants.USER_IDENTIFIER: "f62dfda8-73b0-4e0e-97cf-1b06327a6712",
+                      "role": "internal"}
+
+        encrypter = Encrypter(_private_key=self.app.config['SM_USER_AUTHENTICATION_PRIVATE_KEY'],
+                              _private_key_password=self.app.config['SM_USER_AUTHENTICATION_PRIVATE_KEY_PASSWORD'],
+                              _public_key=self.app.config['SM_USER_AUTHENTICATION_PUBLIC_KEY'])
+
+        with self.app.app_context():
+            signed_jwt = encode(token_data)
+            encrypted_jwt = encrypter.encrypt_token(signed_jwt)
+
+        self.headers = {'Content-Type': 'application/json', 'Authorization': encrypted_jwt}
+        url = "http://localhost:5050/v2/messages"
+        self.client.post(url, data=json.dumps(self.test_message), headers=self.headers)
+        mock_case.assert_called_with('ACollectionCase', 'Unknown user')
+        mock_logger.assert_called_with('no user names in user service for id f62dfda8-73b0-4e0e-97cf-1b06327a6712 Unknown user used in case',
+                                       case_user='Unknown user')
 
 
 if __name__ == '__main__':

@@ -294,6 +294,9 @@ class MessageSchemaTestCase(unittest.TestCase):
 
         self.assertTrue(errors == {'msg_to': ['NotAValidUser is not a valid internal user.']})
 
+    def test_respondent_unknown_to_party_service_logs_expected_error(self):
+        """test if user unknown then """
+
 
 if __name__ == '__main__':
     unittest.main()

@@ -55,7 +55,7 @@ class CaseServiceTestCase(unittest.TestCase):
         with self.assertLogs(level="ERROR") as cm:
             sut.store_case_event('', 'user')
 
-        self.assertIn("No case id for user user, case event not called", cm.output[0])
+        self.assertIn("No case id for case involving user user, case event not called", cm.output[0])
 
 
 if __name__ == '__main__':
