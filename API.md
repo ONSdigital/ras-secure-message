@@ -1,6 +1,76 @@
 # Secure Messaging API
 
+## Contents
+
+* [Overview](*overview)
+* [Message Fields](*message-fields)
+* [JWT](#jwt)
+* Messages
+    * [Get Message List](#get-message-list)
+    * [Send Message](#send-message)
+    * [Get Message by Id](#get-message-by-id)
+    * [Modify Message Labels](#modify-message-labels)
+    * [Get Count of Unread Messages](#get-count-of-unread-messages)
+* Drafts
+    * [Get Drafts List](*get-drafts-list)
+    * [Save a New Draft Message](*save-a-new-draft-message)
+    * [Get a Draft by Id](*get-a-draft-by-id)
+    * [Modify an Existing Draft Message](*modify-an-existing-draft-message)
+* Conversations
+    * [Get conversation list](*get-conversation-list)
+    * [Get Conversation by Id](*get-onversation-by-id)
+* Health and Status 
+    * [Get Health](#get-health)
+    * [Get Health With Database-status](#get-health-with-database-status)
+    * [Get Service Details](#get-service-details)
+    * [Get Service Version](get-service-version)
+
+## Overview
+
+The secure message service provides a method by which messages may be passed between an enrolled respondent and the ONS.
+
+The 'secure' aspect alludes to it not being email , it uses a message store in a database within the ONS. So that the only time 'messages' leave is to be rendered on a web page.
+
+Messages are sent using an email-like set of characteristics ( From, To , Subject and Body). They also encompass ONS specific meta data such as survey, collection case, reporting unit and collection instrument.
+
+The api uses UUIDs to define from, to, survey, collection case, reporting unit and collection exercise. 
+
+Each message is stored internally with a set of flags that indicate the state of the message per actor. These flags are known as labels in the service. That is if person A sends a message to person B then person A will have a label of SENT and person B will have a labels of INBOX and UNREAD. This storage of state per actor is crucial. 
+
+The api endpoints fall into 4 groups:
+
+* Messages - These end points can be used to send a message , read a message, get a count of unread messages , and change a label on a message
+* Drafts - Messages can be saved as Drafts for further editing . The ability to create drafts , read drafts , modify drafts and view lists of drafts are provided through these endpoints.
+* Conversations - Messages can exist as part of a conversation . Messages within a conversation share the same thread identifier. Conversations/Threads can be obtained via a list of conversations or a specific conversation.
+* Health and Information - Several endpoints are provided that can be used to view the health and status of the service
+
+
+### Message Fields
+
+See the endpoint descriptions for detailed usage of each field. This is an overview.
+
+* Message id . (msg_id) This is an id assigned to a message or draft when it is created . It is a uuid. Some endpoints expect a message id whilst others will error if a message id is presented.See each endpoint for details.
+* Thread id . (thread_id) This is a unique identifier for a conversation. If a thread id is presented on message post then the api will assume that a message is part of an existing conversation.
+* From . (msg_from) This is the uuid of the actor that sent a message. If the actor is a respondent then it is their user uuid. If they are an internal user then it may be their user uuid ,  or it may be a constant 'BRES' for v1 messages.
+* To . (msg_to) These are the user uuids of the recipients of the message. Currently only one to user is supported. The message to can be as 'From' but with the addition that it can be the constant 'GROUP' to indicate that the message is being sent to a group handling the specific survey at the ons.
+* Subject . (subject) The subject of the message. Limited in the API to 100 characters , but since replies are prefixed with 'Re: ' then in practice it is 96 characters.
+* Body . (body) Up to 10000 characters. 
+* Survey . (survey). This is the uuid of the survey . Mandatory when saving a message , optional for drafts.
+* Collection Case . (collection_case) uuid of the collection case. Can be used as a filter option (cc). Used to send to the case service to inform it that a newmessage has been sent on the case.
+* Collection Exercise .  (collection exercise) uuid of the collection exercise , can be used as a filter option (ce) 
+* Reporting unit . (ru) uuid of the reporting unit . Can be used as a filter option. 
+* Labels . These can be used to set a status on a message , or retrieve messages with a specific label. Valid labels:
+    * SENT  Added to a mesage for the actor who sent the message
+    * INBOX Added to the message for teh actor who received the message
+    * DRAFT Added to a message to indicate that it is a draft for the actor who is sending a draft
+    * UNREAD Added to a message to indicate that a message has not been read
+    * ARCHIVE Added to a message to indicate that a message has been archived
+    * DRAFT_INBOX  Added to a message to indicate that the message is a draft for an actor who is the target of a draft message. 
+* page . Which page of the result set is to be returned when getting a list of messages/drafts/threads
+* limit . How many messages to return per page when getting a list of messages/drafts/threads.
+    
 ## JWT ##
+
 All calls , except health , health details and info , require that a valid JWT be passed in an Authorization header. 
 this currently has two fields :
 
@@ -14,7 +84,9 @@ After possible decryption, the service attempts to decode the JWT data . For tha
 Being able to get a response from a health or info endpoint but 500's from a message post or read is often an indicator that something in this area is not configured correctly. An easy check for config is to access the /health/details endpoint.
  
  
-## `GET /messages  or /v2/messages` 
+## Get Message List ##
+
+`GET /messages  or /v2/messages` 
 
 Retrieves a list of messages based on the selected parameters passed on the query string.
 
@@ -117,7 +189,9 @@ Note, it is possible to retrieve drafts via Get messages by setting a label para
 ```
 Note the message response contains @msg_from , @msg_to and @ru . These hold values that the secure message api has resolved from the party service or the user authentication service. They are not guaranteed to be populated if the service is not available or if the message was sent to 'GROUP'
 
-## `POST /message/send`  or '/v2/messages'
+## Send Message ## 
+
+`POST /message/send`  or '/v2/messages'
 
 The messages post endpoint stores a secure message . If the recipient is a respondent it will also send an email via Notify.Gov. Then inform the case service that a message has been sent 
 
@@ -174,7 +248,9 @@ Note if the message is a new message ( not a reply to an existing one) then the 
 }
 ```
 
-## `GET /message/{id}` or `/v2/messages/<message_id>`
+## Get Message by Id
+
+`GET /message/{id}` or `/v2/messages/<message_id>`
 
 &mdash; When an individual message is requested by message id, it returns the specific message by the message id.
 Note V2 uses messages , V1 uses message (singular) 
@@ -231,7 +307,9 @@ Note V2 uses messages , V1 uses message (singular)
 ```
 V2 will only return 'BRES' in from or to only for existing old bres messages. New messages will have a user uuid or 'GROUP' depending on how the message was stored. See Messages get for details of @msg_from, @msg_to and @ru
 
-## `PUT message/{id}/modify or `/v2/messages/modify/<message_id>`  
+## Modify Message Labels
+
+`PUT message/{id}/modify or `/v2/messages/modify/<message_id>`  
 
 Note V2 uses messages , V1 uses message (singular)
 
@@ -261,7 +339,24 @@ Note there is only an UNREAD label , absence of `UNREAD` is interpreted as the m
 }
 ```
 
-## `GET /drafts or /v2/drafts`
+## Get Count of Unread Messages
+
+`GET /labels?name=unread`
+
+This gives a count of messages that have not been read for a specific user. There are no current requirements around internal users. 
+
+#### Example JSON Response
+
+```json
+{
+    "name": "unread",
+    "total": 39
+}
+```
+
+## Get Drafts List
+
+`GET /drafts or /v2/drafts`
 
 This gets draft messages . See get messages endpoint for filter options . It functions identically to get messages 
 but sets a filter parameter of label=`DRAFT`.
@@ -343,9 +438,11 @@ The only reason for the existence of Get drafts ( as opposed to using Get Messag
 }
 ```
 See get message for @msg_from, @msg_to and @ru
-[Get messages](#GET-/messages-or-/v2/messages)
+[Get Message List](#get-message-list)
 
-## `POST /draft/save or /v2/drafts`
+## Save a New Draft Message
+
+`POST /draft/save or /v2/drafts`
 
 Note V2 uses drafts , V1 uses draft (singular) . 
 
@@ -398,7 +495,9 @@ Note only a subject and body are validated for drafts.
 ```
 
 
-## `GET /draft/{id} or /v2/drafts/<draft_id>`
+## Get a Draft by Id
+
+`GET /draft/{id} or /v2/drafts/<draft_id>`
 
 Note V2 uses drafts , V1 uses draft (singular)
 Returns a draft message based on msg_id. Note that the reply contains an Etag header, the value of which is a hash of msg_to, msg_id, subject and body. This may optionally be passed back to secure message to detect changes in the case of multiple users editing the same draft ( see drafts put)
@@ -461,9 +560,12 @@ Returns a draft message based on msg_id. Note that the reply contains an Etag he
 }
 ```
 See Get messages for description of @msg_from, @msg_to and @ru
-[Get messages](#GET-/messages-or-/v2/messages)
+[Get Message List](#get-message-list)
 
-## `PUT /draft/{id}/modify or /v2/drafts/<draft_id>`
+## Modify an Existing Draft Message
+
+`PUT /draft/{id}/modify or /v2/drafts/<draft_id>`
+
 Note V2 uses drafts, V1 uses draft (singular)
 This modifies an existing draft message based on msg_id. If the draft does not exist then an error is returned.
 The id passed in must equal the msg_id in the data else an error will be returned.
@@ -511,23 +613,16 @@ on get draft by id. If present then the draft put endpoint regenerates the etag 
 }
 ```
 
-## `GET /labels?name=unread`
+## Get Conversation list 
 
-#### Example JSON Response
+`GET /threads` 
 
-```json
-{
-    "name": "unread",
-    "total": 39
-}
-```
-
-## `GET /threads` 
-
+This returns a list of conversations , showing the latest message in a conversation . 
 This is currently implemented but not used in production. Hence should be treated with caution.
 
 It can use the same filter arguments as Get Messages, and returns the latest message in each thread that satisfies
-the criteria passed in .[Get messages](#GET-/messages-or-/v2/messages)
+the criteria passed in .
+[Get Message List](#get-message-list)
 
  
 
@@ -683,9 +778,12 @@ Note V2 will have either uuids or 'GROUP' for the user ids, and a uuid for the s
 }
 ```
 For descriptions of @msg_from, @msg_to and @ru see messages get
-[Get messages](#GET-/messages-or-/v2/messages)
+[Get Message List](#get-message-list)
 
-## `GET /thread/{thread_id} or /v2/threads/<thread_id>` 
+## Get Conversation by Id
+
+`GET /thread/{thread_id} or /v2/threads/<thread_id>` 
+
 Note V2 uses threads, V1 uses thread (singular) 
 This has been implemented but not used in production, hence should be treated with caution.
 This returns all messages on a specific thread.
@@ -846,9 +944,11 @@ Note, V2 messages should have survey_id, collection_case and use either a uuid o
 }
 ```
 Note, See message get for descriptions of @msg_from, @msg_to and @ru
-[Get messages](#GET-/messages-or-/v2/messages)
+[Get Message List](#get-message-list)
 
-## `GET /health`
+## Get Health
+
+`GET /health`
 
 Returns a simple indicator that the service is running. It is useful since it bypasses all aspects of the JWT.
 So persistent 500s whilst health returns is often an indicator of incorrect JWT configuration.
@@ -859,7 +959,9 @@ So persistent 500s whilst health returns is often an indicator of incorrect JWT 
 {"status" : "healthy"}
 ```
 
-## `GET /health/db`
+## Get Health With Database Status
+
+`GET /health/db`
 
 
 Similar to health but validates that the current databse connection is valid. Hence it is useful in various enviornments if database issues are suspected. Bypasses all aspects of the JWT.
@@ -873,7 +975,9 @@ Similar to health but validates that the current databse connection is valid. He
 }
 ```
 
-## `GET /health/details`
+## Get Service Details
+
+`GET /health/details`
 
 Returns more detailed information about secure message including some of the environment variables. This can 
 be useful in determining JWT errors since it shows SM_JWT_ENCRYPT values. Bypasses all aspects of the JWT.
@@ -919,7 +1023,9 @@ be useful in determining JWT errors since it shows SM_JWT_ENCRYPT values. Bypass
   "Version": "0.1.2"
 }
 ```
-## `GET /info`
+## Get Service Version
+
+`GET /info`
 
 Similar to the health endpoints, it was added for consistency between services. Bypasses all aspects of JWT.
 
