@@ -144,7 +144,7 @@ class MessageSend(Resource):
             if case_user:
                 case_service.store_case_event(message.collection_case, case_user)
             else:
-                logger.info(f'unable to resolve details, for case service, for {g.user.user_uuid} role: {g.user.role}')
+                logger.warning(f'unable to resolve details, for case service, for {g.user.user_uuid} role: {g.user.role}')
 
         else:
             logger.info('Case service notifications switched off, hence not sent', msg_id=message.msg_id)
@@ -168,8 +168,8 @@ class MessageSend(Resource):
                 case_user = '{} {}'.format(first_name, last_name).strip()
                 if not case_user:
                     case_user = 'Unknown user'
-                    logger.info(f'no user names in {service} service for id {user.user_uuid} Unknown user used in case',
-                                case_user=case_user)
+                    logger.warning(f'no user names in {service} service for id {user.user_uuid} Unknown user used in case',
+                                   case_user=case_user)
 
         return case_user
 
