@@ -133,7 +133,7 @@ def get_client_token(client_id, client_secret, url):
     except requests.HTTPError as e:
         logger.exception(f"{e.response.status_code} response received while retrieving client token.")
         if e.response.status_code >= 500:
-            logger.debug("Retrying in 10 seconds.")
+            logger.debug("Retrying in 1 seconds.")
             sleep(1)
             get_client_token(client_id, client_secret, url)
         elif 400 <= e.response.status_code < 500:
