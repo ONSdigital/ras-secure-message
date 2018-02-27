@@ -7,3 +7,5 @@ app/__pycache__
 **/.DS_Store
 **/._.DS_Store
 htmlcov/
+.env
+.pytest_cache

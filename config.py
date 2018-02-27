@@ -26,8 +26,14 @@ class Config:
         logger.info('Cloud Foundry environment identified.',
                     protocol=cf.protocol, database=cf.database())
         SQLALCHEMY_DATABASE_URI = cf.credentials()
+
+        # Redis
+        REDIS_HOST = cf.redis.credentials['host']
+        REDIS_PORT = cf.redis.credentials['port']
     else:
         SQLALCHEMY_DATABASE_URI = SECURE_MESSAGING_DATABASE_URL
+        REDIS_HOST = os.getenv('REDIS_HOST')
+        REDIS_PORT = os.getenv('REDIS_PORT')
 
     # LOGGING SETTINGS
     SMS_LOG_LEVEL = os.getenv('SMS_LOG_LEVEL', 'INFO')
@@ -79,8 +85,17 @@ class Config:
 
     NOTIFY_CASE_SERVICE = os.getenv('NOTIFY_CASE_SERVICE', '1')
 
+    # redis
+    REDIS_DB = os.getenv('REDIS_DB')
+
+    # uaa
+    CLIENT_ID = os.getenv('CLIENT_ID')
+    CLIENT_SECRET = os.getenv('CLIENT_SECRET')
+    UAA_URL = os.getenv('UAA_URL')
+
     NON_DEFAULT_VARIABLES = ['JWT_SECRET', 'SECURITY_USER_NAME', 'SECURITY_USER_PASSWORD',
-                             'NOTIFICATION_API_KEY', 'SERVICE_ID', 'NOTIFICATION_TEMPLATE_ID']
+                             'NOTIFICATION_API_KEY', 'SERVICE_ID', 'NOTIFICATION_TEMPLATE_ID',
+                             'REDIS_HOST', 'REDIS_PORT', 'REDIS_DB', 'CLIENT_ID', 'CLIENT_SECRET']
 
     # These should always be set in the environment on prod
     JWT_ALGORITHM = os.getenv('JWT_ALGORITHM')
@@ -93,6 +108,12 @@ class Config:
     SECURITY_USER_NAME = os.getenv('SECURITY_USER_NAME')
     SECURITY_USER_PASSWORD = os.getenv('SECURITY_USER_PASSWORD')
     BASIC_AUTH = (SECURITY_USER_NAME, SECURITY_USER_PASSWORD)
+
+    # SQLAlchemy
+    SQLALCHEMY_TRACK_MODIFICATIONS = os.getenv('SQLALCHEMY_TRACK_MODIFICATIONS', False)
+
+    # UAA
+    USE_UAA = 1
 
 
 class DevConfig(Config):
@@ -108,18 +129,20 @@ class DevConfig(Config):
     BASIC_AUTH = (SECURITY_USER_NAME, SECURITY_USER_PASSWORD)
     SERVICE_ID = os.getenv('SERVICE_ID', 'test_service_id')
 
+    # Redis
+    REDIS_HOST = os.getenv('REDIS_HOST', 'localhost')
+    REDIS_PORT = os.getenv('REDIS_PORT', 7379)
+    REDIS_DB = os.getenv('REDIS_DB', 1)
 
-class TestConfig(Config):
+    # uaa
+    CLIENT_ID = os.getenv('CLIENT_ID', 'securemessage')
+    CLIENT_SECRET = os.getenv('CLIENT_SECRET', 'loginsecret')
+    UAA_URL = os.getenv('UAA_URL', 'http://uaa-int.apps.devtest.onsclofo.uk')
+    USE_UAA = int(os.getenv('USE_UAA', 1))
 
-    JWT_SECRET = 'testsecret'
-    JWT_ALGORITHM = 'HS256'
-    NOTIFY_VIA_GOV_NOTIFY = '0'
-    NOTIFICATION_API_KEY = 'test_notification_api_key'
-    NOTIFICATION_TEMPLATE_ID = 'test_notification_template_id'
-    RAS_SM_PATH = './'
+
+class TestConfig(DevConfig):
+    TESTING = True
     SM_USER_AUTHENTICATION_PRIVATE_KEY = open("./jwt-test-keys/sm-user-authentication-encryption-private-key.pem").read()
     SM_USER_AUTHENTICATION_PUBLIC_KEY = open("./jwt-test-keys/sm-user-authentication-encryption-public-key.pem").read()
-    SECURITY_USER_NAME = 'admin'
-    SECURITY_USER_PASSWORD = 'secret'
-    BASIC_AUTH = (SECURITY_USER_NAME, SECURITY_USER_PASSWORD)
-    SERVICE_ID = 'test_service_id'
+    USE_UAA = 0
