@@ -43,7 +43,6 @@ def create_app(config=None):
     if missing_vars:
         raise MissingEnvironmentVariable(missing_vars)
 
-
     api = Api(app)
     CORS(app)
 
@@ -78,7 +77,6 @@ def create_app(config=None):
     if app.config['USE_UAA']:
         cache_client_token(app)
 
-
     @app.before_request
     def before_request():  # NOQA pylint:disable=unused-variable
         refresh_client_token_if_required(app)
@@ -88,7 +86,6 @@ def create_app(config=None):
             if res != {'status': "ok"}:
                 logger.error('Failed to authenticate user', result=res)
                 return res
-
 
     @app.errorhandler(Exception)
     def handle_exception(error):  # NOQA pylint:disable=unused-variable
