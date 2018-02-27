@@ -82,7 +82,7 @@ def create_app(config=None):
             if res != {'status': "ok"}:
                 logger.error('Failed to authenticate user', result=res)
                 return res
-            refesh_client_token_if_required(app)
+            refresh_client_token_if_required(app)
 
     @app.errorhandler(Exception)
     def handle_exception(error):  # NOQA pylint:disable=unused-variable
@@ -114,7 +114,7 @@ def put_token(conn, token):
         put_token(conn, token)
 
 
-def refesh_client_token_if_required(app):
+def refresh_client_token_if_required(app):
     r = redis.StrictRedis(host=app.config['REDIS_HOST'],
                           port=app.config['REDIS_PORT'],
                           db=app.config['REDIS_DB'])
