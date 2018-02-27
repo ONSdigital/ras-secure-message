@@ -120,7 +120,7 @@ def get_client_token(client_id, client_secret, url):
                'response_type': 'token',
                'token_format': 'opaque'}
 
-    get_token_url = f'http://{url}/oauth/token'
+    get_token_url = f'{url}/oauth/token'
 
     try:
         s = requests.Session()
@@ -131,12 +131,12 @@ def get_client_token(client_id, client_secret, url):
                                  auth=(client_id, client_secret))
         response.raise_for_status()
     except requests.HTTPError as e:
-        logger.exception(f"{e.response.status} response received while retrieving client token.")
-        if e.response.status >= 500:
+        logger.exception(f"{e.response.status_code} response received while retrieving client token.")
+        if e.response.status_code >= 500:
             logger.debug("Retrying in 10 seconds.")
-            sleep(10)
+            sleep(1)
             get_client_token(client_id, client_secret, url)
-        elif 400 <= e.response.status < 500:
+        elif 400 <= e.response.status_code < 500:
             logger.debug("Client error encountered. Shutting down.")
             sys.exit(1)
     except requests.RequestException as e:
