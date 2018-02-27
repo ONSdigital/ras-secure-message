@@ -109,6 +109,12 @@ class Config:
     SECURITY_USER_PASSWORD = os.getenv('SECURITY_USER_PASSWORD')
     BASIC_AUTH = (SECURITY_USER_NAME, SECURITY_USER_PASSWORD)
 
+    # SQLAlchemy
+    SQLALCHEMY_TRACK_MODIFICATIONS = os.getenv('SQLALCHEMY_TRACK_MODIFICATIONS', False)
+
+    # UAA
+    USE_UAA = 1
+
 
 class DevConfig(Config):
 
@@ -132,9 +138,11 @@ class DevConfig(Config):
     CLIENT_ID = os.getenv('CLIENT_ID', 'securemessage')
     CLIENT_SECRET = os.getenv('CLIENT_SECRET', 'loginsecret')
     UAA_URL = os.getenv('UAA_URL', 'uaa-int.apps.devtest.onsclofo.uk')
+    USE_UAA = int(os.getenv('USE_UAA', 1))
 
 
 class TestConfig(DevConfig):
     TESTING = True
     SM_USER_AUTHENTICATION_PRIVATE_KEY = open("./jwt-test-keys/sm-user-authentication-encryption-private-key.pem").read()
     SM_USER_AUTHENTICATION_PUBLIC_KEY = open("./jwt-test-keys/sm-user-authentication-encryption-public-key.pem").read()
+    USE_UAA = 0
