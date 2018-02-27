@@ -104,7 +104,7 @@ class Decrypter:
 
         tokens = encrypted_token.split('.')
         if len(tokens) != 5:
-            raise BadRequest(description="Token incorrect size")
+            raise BadRequest(description="Token incorrect size.  Is the token encrypted?")
         jwe_protected_header = tokens[0]
         self._check_jwe_protected_header(jwe_protected_header)
         encrypted_key = tokens[1]
