@@ -137,7 +137,7 @@ class DevConfig(Config):
     # uaa
     CLIENT_ID = os.getenv('CLIENT_ID', 'securemessage')
     CLIENT_SECRET = os.getenv('CLIENT_SECRET', 'loginsecret')
-    UAA_URL = os.getenv('UAA_URL', 'uaa-int.apps.devtest.onsclofo.uk')
+    UAA_URL = os.getenv('UAA_URL', 'http://uaa-int.apps.devtest.onsclofo.uk')
     USE_UAA = int(os.getenv('USE_UAA', 1))
 
 

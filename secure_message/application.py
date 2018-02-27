@@ -43,10 +43,14 @@ def create_app(config=None):
     if missing_vars:
         raise MissingEnvironmentVariable(missing_vars)
 
+
     api = Api(app)
     CORS(app)
 
     logger.info('Starting Secure Message Service...', config=app_config)
+    app.redis_connection = redis.StrictRedis(host=app.config['REDIS_HOST'],
+                                             port=app.config['REDIS_PORT'],
+                                             db=app.config['REDIS_DB'])
     create_db(app, app_config)
 
     api.add_resource(Health, '/health')
@@ -76,13 +80,14 @@ def create_app(config=None):
 
     @app.before_request
     def before_request():  # NOQA pylint:disable=unused-variable
+        refresh_client_token_if_required(app)
         if _request_requires_authentication():
             log_request()
             res = authenticate(request.headers)
             if res != {'status': "ok"}:
                 logger.error('Failed to authenticate user', result=res)
                 return res
-            refresh_client_token_if_required(app)
+
 
     @app.errorhandler(Exception)
     def handle_exception(error):  # NOQA pylint:disable=unused-variable
@@ -99,10 +104,7 @@ def cache_client_token(app):
                              app.config['CLIENT_SECRET'],
                              app.config['UAA_URL'])
 
-    r = redis.StrictRedis(host=app.config['REDIS_HOST'],
-                          port=app.config['REDIS_PORT'],
-                          db=app.config['REDIS_DB'])
-    put_token(r, token)
+    put_token(app.redis_connection, token)
 
 
 def put_token(conn, token):
@@ -115,13 +117,9 @@ def put_token(conn, token):
 
 
 def refresh_client_token_if_required(app):
-    r = redis.StrictRedis(host=app.config['REDIS_HOST'],
-                          port=app.config['REDIS_PORT'],
-                          db=app.config['REDIS_DB'])
-
     try:
         # If the key hasn't expired, we don't care what it returns.
-        r['secure-message-client-token']
+        app.redis_connection['secure-message-client-token']
     except KeyError:
         cache_client_token(app)
 
