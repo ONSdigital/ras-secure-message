@@ -191,7 +191,7 @@ Note the message response contains @msg_from , @msg_to and @ru . These hold valu
 
 ## Send Message ## 
 
-`POST /message/send`  or '/v2/messages'
+`POST /message/send or '/v2/messages'
 
 The messages post endpoint stores a secure message . If the recipient is a respondent it will also send an email via Notify.Gov. Then inform the case service that a message has been sent 
 
@@ -250,7 +250,7 @@ Note if the message is a new message ( not a reply to an existing one) then the 
 
 ## Get Message by Id
 
-`GET /message/{id}` or `/v2/messages/<message_id>`
+`GET /message/{id} or /v2/messages/<message_id>`
 
 &mdash; When an individual message is requested by message id, it returns the specific message by the message id.
 Note V2 uses messages , V1 uses message (singular) 
@@ -309,7 +309,7 @@ V2 will only return 'BRES' in from or to only for existing old bres messages. Ne
 
 ## Modify Message Labels
 
-`PUT message/{id}/modify or `/v2/messages/modify/<message_id>`  
+`PUT message/{id}/modify or /v2/messages/modify/<message_id>`  
 
 Note V2 uses messages , V1 uses message (singular)
 
