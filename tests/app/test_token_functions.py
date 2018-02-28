@@ -1,4 +1,3 @@
-import json
 from datetime import timedelta
 import unittest
 from unittest import mock
@@ -8,7 +7,7 @@ import responses
 from sqlalchemy import create_engine
 
 from secure_message import application
-from secure_message.application import create_app, cache_client_token, get_client_token
+from secure_message.application import cache_client_token, get_client_token
 
 
 class TestClientTokenFunctions(unittest.TestCase):

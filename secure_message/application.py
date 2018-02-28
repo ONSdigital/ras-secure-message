@@ -97,9 +97,11 @@ def create_app(config=None):
 
     return app
 
+
 def refresh_client_token_if_required(app):
     if app.token_expires_at <= maya.now():
         cache_client_token(app)
+
 
 def cache_client_token(app):
     app.token = get_client_token(app.config['CLIENT_ID'],
