@@ -74,7 +74,6 @@ def create_app(config=None):
     if app.config['USE_UAA']:
         cache_client_token(app)
 
-
     @app.before_request
     def before_request():  # NOQA pylint:disable=unused-variable
         if _request_requires_authentication():
@@ -104,6 +103,7 @@ def cache_client_token(app):
                           db=app.config['REDIS_DB'])
     put_token(r, token)
 
+
 def put_token(conn, token):
     try:
         conn.setex('secure-message-client-token', token.get('expires_in') - 15, token)
@@ -111,6 +111,7 @@ def put_token(conn, token):
         logger.exception("RedisError occurred. Retrying.")
         sleep(0.5)
         put_token(conn, token)
+
 
 def get_client_token(client_id, client_secret, url):
     headers = {'Content-Type': 'application/x-www-form-urlencoded',

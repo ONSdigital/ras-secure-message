@@ -483,7 +483,5 @@ class FlaskTestCase(unittest.TestCase):
                                        party_id='f62dfda8-73b0-4e0e-97cf-1b06327a6712')
 
 
-
-
 if __name__ == '__main__':
     unittest.main()
