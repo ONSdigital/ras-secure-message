@@ -79,7 +79,8 @@ def create_app(config=None):
 
     @app.before_request
     def before_request():  # NOQA pylint:disable=unused-variable
-        refresh_client_token_if_required(app)
+        if app.config['USE_UAA']:
+            refresh_client_token_if_required(app)
         if _request_requires_authentication():
             log_request()
             res = authenticate(request.headers)
