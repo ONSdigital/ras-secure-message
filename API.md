@@ -2,8 +2,8 @@
 
 ## Contents
 
-* [Overview](*overview)
-* [Message Fields](*message-fields)
+* [Overview](#overview)
+* [Message Fields](#message-fields)
 * [JWT](#jwt)
 * Messages
     * [Get Message List](#get-message-list)
@@ -12,20 +12,20 @@
     * [Modify Message Labels](#modify-message-labels)
     * [Get Count of Unread Messages](#get-count-of-unread-messages)
 * Drafts
-    * [Get Drafts List](*get-drafts-list)
-    * [Save a New Draft Message](*save-a-new-draft-message)
-    * [Get a Draft by Id](*get-a-draft-by-id)
-    * [Modify an Existing Draft Message](*modify-an-existing-draft-message)
+    * [Get Drafts List](#get-drafts-list)
+    * [Save a New Draft Message](#save-a-new-draft-message)
+    * [Get a Draft by Id](#get-a-draft-by-id)
+    * [Modify an Existing Draft Message](#modify-an-existing-draft-message)
 * Conversations
-    * [Get conversation list](*get-conversation-list)
-    * [Get Conversation by Id](*get-onversation-by-id)
+    * [Get conversation list](#get-conversation-list)
+    * [Get Conversation by Id](#get-onversation-by-id)
 * Health and Status 
     * [Get Health](#get-health)
     * [Get Health With Database-status](#get-health-with-database-status)
     * [Get Service Details](#get-service-details)
-    * [Get Service Version](get-service-version)
+    * [Get Service Version](#get-service-version)
 
-## Overview
+## Overview 
 
 The secure message service provides a method by which messages may be passed between an enrolled respondent and the ONS.
 
