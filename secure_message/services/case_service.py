@@ -1,5 +1,5 @@
 import logging
-from flask import json, current_app
+from flask import current_app
 import requests
 from structlog import wrap_logger
 
@@ -20,11 +20,7 @@ class CaseService:
             case_service_data = requests.post(url, auth=current_app.config['BASIC_AUTH'], json=json_data, verify=False)
             logger.debug('case service post result', status_code=case_service_data.status_code,
                          reason=case_service_data.reason, text=case_service_data.text)
-            case_service_dict = json.loads(case_service_data.text)
-            if 'error' in case_service_dict:
-                case_service_dict = case_service_dict['error']
-
-            return case_service_dict, case_service_data.status_code
+            return case_service_data.status_code
         else:
             err = f"No case id for case involving user {user_name}, case event not called"
             logger.error(err)
