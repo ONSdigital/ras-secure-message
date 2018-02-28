@@ -2,15 +2,9 @@ import json
 import responses
 import unittest
 
+
 from secure_message.application import create_app
 from secure_message.services.case_service import CaseService
-
-
-class CaseServiceTestHelper:
-    def __init__(self, status_code, reason, text):
-        self.status_code = status_code
-        self.reason = reason
-        self.text = text
 
 
 class CaseServiceTestCase(unittest.TestCase):
@@ -29,12 +23,11 @@ class CaseServiceTestCase(unittest.TestCase):
                       json={"something": "else"},
                       status=200)
         sut = CaseService()
-        case_event_data = CaseServiceTestHelper(200, 'OK', '{"something": "else"}')
 
         with self.app.app_context():
             result_data, result_status = sut.store_case_event('1234', 'user')
 
-        self.assertEqual(result_data, json.loads(case_event_data.text))
+        self.assertEqual(result_data, json.loads('{"something": "else"}'))
         self.assertEqual(result_status, 200)
 
     @responses.activate
@@ -52,11 +45,15 @@ class CaseServiceTestCase(unittest.TestCase):
         self.assertEqual(result_data, {"error1": "TestError"})
         self.assertEqual(result_status, 200)
 
+    @responses.activate
     def test_store_case_event_no_case_id_log_error_as_expected(self):
         """Tests that the logger is called with the correct information if store case event called without a case id """
         sut = CaseService()
-        case_event_data = CaseServiceTestHelper(200, 'OK', '{"error": {"error1":"TestError"}}')
-        requests.post = mock.Mock(name='post', return_value=case_event_data)
+
+        responses.add(responses.POST,
+                      self.app.config['RM_CASE_POST'].format(self.app.config['RM_CASE_SERVICE'], '1234'),
+                      json={"error": {"error2": "TestError"}},
+                      status=200)
 
         with self.assertLogs(level="ERROR") as cm:
             sut.store_case_event('', 'user')

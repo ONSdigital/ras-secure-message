@@ -19,7 +19,7 @@ class PartyServiceMock:
         """Return mock user details"""
         user_details = self._respondent_ids.get(uuid)
         if user_details is None:
-            logger.error(f"no details for user:{uuid} found in mock party service")
+            logger.error(f'Party service failed for uuid:{uuid}')
         return user_details
 
     _business_details = {'c614e64e-d981-4eba-b016-d9822f09a4fb': {"id": "c614e64e-d981-4eba-b016-d9822f09a4fb",

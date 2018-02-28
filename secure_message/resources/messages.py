@@ -139,39 +139,27 @@ class MessageSend(Resource):
     def _inform_case_service(message):
 
         if current_app.config['NOTIFY_CASE_SERVICE'] == '1':
-            case_user = MessageSend._resolve_user_details_for_case_service(g.user, message)
-
-            if case_user:
-                case_service.store_case_event(message.collection_case, case_user)
-            else:
-                logger.warning(f'unable to resolve details, for case service, for {g.user.user_uuid} role: {g.user.role}')
-
+            case_user = MessageSend._get_user_name(g.user, message)
+            case_service.store_case_event(message.collection_case, case_user)
         else:
             logger.info('Case service notifications switched off, hence not sent', msg_id=message.msg_id)
 
     @staticmethod
-    def _resolve_user_details_for_case_service(user, message):
-        case_user = ''
+    def _get_user_name(user, message):
+        user_name = 'Unknown user'
         if message.msg_from == constants.BRES_USER:
-            case_user = constants.BRES_USER
+            user_name = constants.BRES_USER
         else:
-            if g.user.is_internal:
-                user_data = internal_user_service.get_user_details(user.user_uuid)
-                service = 'user'
-            else:
-                user_data = party.get_user_details(message.msg_from)  # NOQA TODO avoid 2 lookups(see validate)
-                service = 'party'
+            user_data = internal_user_service.get_user_details(message.msg_from) if user.is_internal else party.get_user_details(message.msg_from)
 
             if user_data:
                 first_name = user_data.get('firstName', '')
                 last_name = user_data.get('lastName', '')
-                case_user = '{} {}'.format(first_name, last_name).strip()
-                if not case_user:
-                    case_user = 'Unknown user'
-                    logger.warning(f'no user names in {service} service for id {user.user_uuid} Unknown user used in case',
-                                   case_user=case_user)
+                full_name = f'{first_name} {last_name}'.strip()
+                if full_name:
+                    user_name = full_name
 
-        return case_user
+        return user_name
 
 
 class MessageById(Resource):

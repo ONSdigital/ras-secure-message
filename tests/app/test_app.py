@@ -480,8 +480,6 @@ class FlaskTestCase(unittest.TestCase):
         url = "http://localhost:5050/message/send"
         self.client.post(url, data=json.dumps(self.test_message), headers=self.headers)
         mock_case.assert_called_with('ACollectionCase', 'Unknown user')
-        mock_logger.assert_called_with('no user names in party service for id 0a7ad740-10d5-4ecb-b7ca-3c0384afb882 Unknown user used in case',
-                                       case_user='Unknown user')
 
     @patch.object(InternalUserServiceMock, 'get_user_details', return_value=({"id": "f62dfda8-73b0-4e0e-97cf-1b06327a6712",
                                                                               "emailAddress": "   ",
@@ -516,10 +514,6 @@ class FlaskTestCase(unittest.TestCase):
         url = "http://localhost:5050/v2/messages"
         self.client.post(url, data=json.dumps(self.test_message), headers=self.headers)
         mock_case.assert_called_with('ACollectionCase', 'Unknown user')
-        mock_logger.assert_called_with('no user names in user service for id f62dfda8-73b0-4e0e-97cf-1b06327a6712 Unknown user used in case',
-                                       case_user='Unknown user')
-
-
 
 
 if __name__ == '__main__':
