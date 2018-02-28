@@ -20,7 +20,7 @@ class Config:
     VERSION = os.getenv('VERSION', '0.1.2')
 
     SECURE_MESSAGING_DATABASE_URL = os.getenv(
-        'SECURE_MESSAGING_DATABASE_URL', 'postgresql://postgres:postgres@localhost:5432')
+        'SECURE_MESSAGING_DATABASE_URL', 'postgresql://postgres:postgres@localhost:6432')
 
     if cf.detected:
         logger.info('Cloud Foundry environment identified.',
@@ -112,6 +112,7 @@ class DevConfig(Config):
 class TestConfig(Config):
 
     JWT_SECRET = 'testsecret'
+    SM_JWT_ENCRYPT = os.getenv('SM_JWT_ENCRYPT', '1')
     JWT_ALGORITHM = 'HS256'
     NOTIFY_VIA_GOV_NOTIFY = '0'
     NOTIFICATION_API_KEY = 'test_notification_api_key'
