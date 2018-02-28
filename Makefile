@@ -5,3 +5,6 @@ build:
 
 start:
 	pipenv run python run.py
+
+test:
+	 pipenv run pytest
