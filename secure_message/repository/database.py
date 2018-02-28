@@ -39,7 +39,7 @@ class SecureMessage(db.Model):
     def __init__(self, msg_id="", subject="", body="", thread_id="", collection_case='',
                  ru_id='', survey='', collection_exercise='', from_internal=False):
 
-        logger.debug("Initialised Secure Message entity: msg_id: {}".format(id))
+        logger.debug(f"Initialised Secure Message entity: msg_id: {id}")
         self.msg_id = msg_id
         self.subject = subject
         self.body = body
