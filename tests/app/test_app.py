@@ -452,9 +452,7 @@ class FlaskTestCase(unittest.TestCase):
                                                                        "status": "ACTIVE",
                                                                        "sampleUnitType": "BI"}))
     @patch.object(CaseServiceMock, 'store_case_event')
-    @patch.object(message_logger, 'warning')
-    def test_if_respondent_has_no_first_name_or_last_name_then_unknown_user_passed_to_case_service(self, mock_logger,
-                                                                                                   mock_case, mock_party):
+    def test_if_respondent_has_no_first_name_or_last_name_then_unknown_user_passed_to_case_service(self, mock_case, mock_party):
         """Test if party data has no name for the user then a constant of 'Unknown user' is used"""
         self.test_message.update({'msg_to': [constants.BRES_USER],
                                   'msg_from': '0a7ad740-10d5-4ecb-b7ca-3c0384afb882',
@@ -486,9 +484,7 @@ class FlaskTestCase(unittest.TestCase):
                                                                               "lastName": "",
                                                                               "telephone": "+443069990888"}))
     @patch.object(CaseServiceMock, 'store_case_event')
-    @patch.object(message_logger, 'warning')
-    def test_if_internal_user_has_no_first_name_or_last_name_then_unknown_user_passed_to_case_service(self, mock_logger,
-                                                                                                      mock_case, mock_party):
+    def test_if_internal_user_has_no_first_name_or_last_name_then_unknown_user_passed_to_case_service(self, mock_case, mock_party):
         """Test if party data has no name for the user then a constant of 'Unknown user' is used"""
         self.test_message.update({'msg_to': ['0a7ad740-10d5-4ecb-b7ca-3c0384afb882'],
                                   'msg_from': 'f62dfda8-73b0-4e0e-97cf-1b06327a6712',
