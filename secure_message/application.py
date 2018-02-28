@@ -7,7 +7,7 @@ from flask import Flask, request
 from flask import json, jsonify
 from flask_restful import Api
 from flask_cors import CORS
-import redis
+import maya
 from retrying import retry
 import requests
 from requests.adapters import HTTPAdapter
@@ -47,9 +47,7 @@ def create_app(config=None):
     CORS(app)
 
     logger.info('Starting Secure Message Service...', config=app_config)
-    app.redis_connection = redis.StrictRedis(host=app.config['REDIS_HOST'],
-                                             port=app.config['REDIS_PORT'],
-                                             db=app.config['REDIS_DB'])
+
     create_db(app, app_config)
 
     api.add_resource(Health, '/health')
@@ -77,6 +75,8 @@ def create_app(config=None):
     if app.config['USE_UAA']:
         cache_client_token(app)
 
+    app.token_expires_at = maya.now()
+
     @app.before_request
     def before_request():  # NOQA pylint:disable=unused-variable
         refresh_client_token_if_required(app)
@@ -96,30 +96,17 @@ def create_app(config=None):
 
     return app
 
+def refresh_client_token_if_required(app):
+    if app.token_expires_at <= maya.now():
+        cache_client_token(app)
 
 def cache_client_token(app):
-    token = get_client_token(app.config['CLIENT_ID'],
-                             app.config['CLIENT_SECRET'],
-                             app.config['UAA_URL'])
+    app.token = get_client_token(app.config['CLIENT_ID'],
+                                 app.config['CLIENT_SECRET'],
+                                 app.config['UAA_URL'])
 
-    put_token(app.redis_connection, token)
-
-
-def put_token(conn, token):
-    try:
-        conn.setex('secure-message-client-token', token.get('expires_in') - 15, token)
-    except redis.exceptions.RedisError:
-        logger.exception("RedisError occurred. Retrying.")
-        sleep(0.5)
-        put_token(conn, token)
-
-
-def refresh_client_token_if_required(app):
-    try:
-        # If the key hasn't expired, we don't care what it returns.
-        app.redis_connection['secure-message-client-token']
-    except KeyError:
-        cache_client_token(app)
+    expires_in = app.token['expires_in'] - 10
+    app.token_expires_at = maya.now().add(seconds=expires_in)
 
 
 def get_client_token(client_id, client_secret, url):
