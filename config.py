@@ -139,7 +139,6 @@ class DevConfig(Config):
     CLIENT_SECRET = os.getenv('CLIENT_SECRET', 'loginsecret')
     UAA_URL = os.getenv('UAA_URL', 'http://uaa-int.apps.devtest.onsclofo.uk')
     USE_UAA = int(os.getenv('USE_UAA', 1))
-    SM_JWT_ENCRYPT = os.getenv('SM_JWT_ENCRYPT', '1')
 
 
 class TestConfig(DevConfig):
