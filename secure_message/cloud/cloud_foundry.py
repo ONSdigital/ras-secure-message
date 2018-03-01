@@ -31,10 +31,6 @@ class ONSCloudFoundry(object):
     def protocol(self):
         return self._protocol
 
-    @property
-    def redis(self):
-        return self._cf_env.get_service(name='rm-redis')
-
     def database(self):
         return self._cf_env.get_service(tags='database')
 

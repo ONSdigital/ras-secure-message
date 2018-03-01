@@ -26,14 +26,8 @@ class Config:
         logger.info('Cloud Foundry environment identified.',
                     protocol=cf.protocol, database=cf.database())
         SQLALCHEMY_DATABASE_URI = cf.credentials()
-
-        # Redis
-        REDIS_HOST = cf.redis.credentials['host']
-        REDIS_PORT = cf.redis.credentials['port']
     else:
         SQLALCHEMY_DATABASE_URI = SECURE_MESSAGING_DATABASE_URL
-        REDIS_HOST = os.getenv('REDIS_HOST')
-        REDIS_PORT = os.getenv('REDIS_PORT')
 
     # LOGGING SETTINGS
     SMS_LOG_LEVEL = os.getenv('SMS_LOG_LEVEL', 'INFO')
@@ -82,9 +76,6 @@ class Config:
 
     NOTIFY_CASE_SERVICE = os.getenv('NOTIFY_CASE_SERVICE', '1')
 
-    # redis
-    REDIS_DB = os.getenv('REDIS_DB')
-
     # uaa
     CLIENT_ID = os.getenv('CLIENT_ID')
     CLIENT_SECRET = os.getenv('CLIENT_SECRET')
@@ -92,7 +83,7 @@ class Config:
 
     NON_DEFAULT_VARIABLES = ['JWT_SECRET', 'SECURITY_USER_NAME', 'SECURITY_USER_PASSWORD',
                              'NOTIFICATION_API_KEY', 'SERVICE_ID', 'NOTIFICATION_TEMPLATE_ID',
-                             'REDIS_HOST', 'REDIS_PORT', 'REDIS_DB', 'CLIENT_ID', 'CLIENT_SECRET']
+                             'CLIENT_ID', 'CLIENT_SECRET']
 
     # These should always be set in the environment on prod
     JWT_ALGORITHM = os.getenv('JWT_ALGORITHM')
@@ -125,11 +116,6 @@ class DevConfig(Config):
     SECURITY_USER_PASSWORD = os.getenv('SECURITY_USER_PASSWORD', 'secret')
     BASIC_AUTH = (SECURITY_USER_NAME, SECURITY_USER_PASSWORD)
     SERVICE_ID = os.getenv('SERVICE_ID', 'test_service_id')
-
-    # Redis
-    REDIS_HOST = os.getenv('REDIS_HOST', 'localhost')
-    REDIS_PORT = os.getenv('REDIS_PORT', 7379)
-    REDIS_DB = os.getenv('REDIS_DB', 1)
 
     # uaa
     CLIENT_ID = os.getenv('CLIENT_ID', 'securemessage')
