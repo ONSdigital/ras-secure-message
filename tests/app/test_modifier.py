@@ -28,27 +28,23 @@ class ModifyTestCaseHelper:
         with self.engine.connect() as con:
             for i in range(record_count):
                 msg_id = str(uuid.uuid4())
-                query = "INSERT INTO securemessage.secure_message(id, msg_id, subject, body, thread_id," \
-                        " collection_case, ru_id, collection_exercise, survey) VALUES ({0}, '{1}', 'test','test','', " \
-                        " 'ACollectionCase', 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc', 'ACollectionExercise'," \
-                        "'BRES')".format(i, msg_id)
+                query = f'''INSERT INTO securemessage.secure_message(id, msg_id, subject, body, thread_id,
+                        collection_case, ru_id, collection_exercise, survey) VALUES ({i}, '{msg_id}', 'test','test','',
+                        'ACollectionCase', 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc', 'ACollectionExercise',
+                        'BRES')'''
                 con.execute(query)
-                query = "INSERT INTO securemessage.status(label, msg_id, actor) VALUES('SENT', '{0}', " \
-                        "'0a7ad740-10d5-4ecb-b7ca-3c0384afb882')".format(msg_id)
+                query = f'''INSERT INTO securemessage.status(label, msg_id, actor) VALUES('SENT', '{msg_id}',
+                        '0a7ad740-10d5-4ecb-b7ca-3c0384afb882')'''
                 con.execute(query)
-                query = "INSERT INTO securemessage.status(label, msg_id, actor) VALUES('INBOX', '{0}', 'BRES')".format(
-                    msg_id)
+                query = f"INSERT INTO securemessage.status(label, msg_id, actor) VALUES('INBOX', '{msg_id}', 'BRES')"
                 con.execute(query)
-                query = "INSERT INTO securemessage.status(label, msg_id, actor) VALUES('UNREAD', '{0}', 'BRES')".format(
-                    msg_id)
+                query = f"INSERT INTO securemessage.status(label, msg_id, actor) VALUES('UNREAD', '{msg_id}', 'BRES')"
                 con.execute(query)
-                query = "INSERT INTO securemessage.events(event, msg_id, date_time)" \
-                        " VALUES('" + EventsApi.SENT.value + "', '{0}', '{1}')".format(
-                            msg_id, "2017-02-03 00:00:00")
+                query = f'''INSERT INTO securemessage.events(event, msg_id, date_time)
+                         VALUES('{EventsApi.SENT.value}', '{msg_id}', '2017-02-03 00:00:00')'''
                 con.execute(query)
-                query = "INSERT INTO securemessage.events(event, msg_id, date_time) " \
-                        "VALUES('" + EventsApi.READ.value + "', '{0}', '{1}')".format(
-                            msg_id, "2017-02-03 00:00:00")
+                query = f'''INSERT INTO securemessage.events(event, msg_id, date_time)
+                        VALUES('{EventsApi.READ.value}', '{msg_id}', '2017-02-03 00:00:00')'''
                 con.execute(query)
 
 

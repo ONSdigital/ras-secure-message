@@ -40,24 +40,21 @@ class RetrieverTestCaseHelper:
         """ Populate the status table"""
 
         with self.engine.connect() as con:
-            query = "INSERT INTO securemessage.status(label, msg_id, actor) VALUES('{0}', '{1}', '{2}')".format(
-                label, msg_id, actor)
+            query = f"INSERT INTO securemessage.status(label, msg_id, actor) VALUES('{label}', '{msg_id}', '{actor}')"
             con.execute(query)
 
     def add_event(self, event, msg_id, date_time):
         """ Populate the event table"""
 
         with self.engine.connect() as con:
-            query = "INSERT INTO securemessage.events(event, msg_id, date_time) VALUES('{0}', '{1}', '{2}')".format(
-                event, msg_id, date_time)
+            query = f"INSERT INTO securemessage.events(event, msg_id, date_time) VALUES('{event}', '{msg_id}', '{date_time}')"
             con.execute(query)
 
     def del_status(self, label, msg_id, actor):
         """ Delete a specific row from status table"""
 
         with self.engine.connect() as con:
-            query = "DELETE FROM securemessage.status WHERE label = '{0}' AND msg_id = '{1}' AND actor = '{2}'".format(
-                label, msg_id, actor)
+            query = f"DELETE FROM securemessage.status WHERE label = '{label}' AND msg_id = '{msg_id}' AND actor = '{actor}'"
             con.execute(query)
 
     def populate_database(self, no_of_messages=0, single=True, add_reply=False, add_draft=False, multiple_users=False,
