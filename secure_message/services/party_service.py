@@ -12,13 +12,6 @@ class PartyService:
         self._users_cache = {}
         self._business_details_cache = {}
 
-    @staticmethod
-    def get_url(api_param, code):
-        try:
-            return current_app.config[api_param].format(current_app.config['RAS_PARTY_SERVICE'], code)
-        except KeyError:
-            raise KeyError(f"{api_param} not present")
-
     def get_business_details(self, ru):
         """Retrieves the business details from the party service"""
 
@@ -27,7 +20,7 @@ class PartyService:
         if ru_dict is None:
             logger.info(f"Party Service: retrieve party ru data for {ru}")
 
-            party_data = requests.get(PartyService.get_url('RAS_PARTY_GET_BY_BUSINESS', ru),
+            party_data = requests.get(f"{current_app.config['RAS_PARTY_SERVICE']}party-api/v1/businesses/id/{ru}",
                                       auth=current_app.config['BASIC_AUTH'], verify=False)
             if party_data.status_code == 200:
                 ru_dict = json.loads(party_data.text)
@@ -54,7 +47,7 @@ class PartyService:
 
         if user_dict is None:
             logger.info(f"Party Service: retrieve party user data for {uuid}")
-            party_data = requests.get(PartyService.get_url('RAS_PARTY_GET_BY_RESPONDENT', uuid),
+            party_data = requests.get(f"{current_app.config['RAS_PARTY_SERVICE']}party-api/v1/respondents/id/{uuid}",
                                       auth=current_app.config['BASIC_AUTH'], verify=False)
             if party_data.status_code == 200:
                 user_dict = json.loads(party_data.text)

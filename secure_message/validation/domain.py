@@ -75,24 +75,24 @@ class MessageSchema(Schema):
             if g.user.is_internal:  # internal user must be sending to a respondent
                 if not g.user.is_valid_respondent(item):
                     logger.error('Not a valid respondent', user=item)
-                    raise ValidationError("{0} is not a valid respondent.".format(item))
+                    raise ValidationError(f"{item} is not a valid respondent.")
             else:  # Respondent sending to internal
                 if not (msg_to[0] == constants.BRES_USER or
                         msg_to[0] == constants.NON_SPECIFIC_INTERNAL_USER or
                         g.user.is_valid_internal_user(msg_to[0])):
                     logger.error('Not a valid internal user', user=item)
-                    raise ValidationError("{0} is not a valid internal user.".format(item))
+                    raise ValidationError(f"{item} is not a valid internal user.")
 
     @validates("msg_from")
     def validate_from(self, msg_from):
         self.validate_non_zero_field_length("msg_from", len(msg_from), constants.MAX_FROM_LEN)
         if g.user.is_internal and msg_from != constants.BRES_USER and msg_from != constants.NON_SPECIFIC_INTERNAL_USER:
             logger.error('Internal user not authorised to send a message on behalf of user or work group', message_from=msg_from)
-            raise ValidationError('You are not authorised to send a message on behalf of user or work group {0}'.format(msg_from))
+            raise ValidationError(f'You are not authorised to send a message on behalf of user or work group {msg_from}')
         if g.user.is_respondent and msg_from != g.user.user_uuid:
             logger.error('Respondent not authorised to send a message on behalf of user or work group',
                          message_from=msg_from, user_uuid=g.user.user_uuid)
-            raise ValidationError('You are not authorised to send a message on behalf of user or work group {0}'.format(msg_from))
+            raise ValidationError(f'You are not authorised to send a message on behalf of user or work group {msg_from}')
 
     @validates("body")
     def validate_body(self, body):
@@ -132,21 +132,21 @@ class MessageSchema(Schema):
     def validate_not_present(data, field_name):
         if field_name in data.keys():
             logger.error('Field cannot be set', field_name=field_name)
-            raise ValidationError("{0} can not be set".format(field_name))
+            raise ValidationError(f"{field_name} can not be set")
 
     def validate_non_zero_field_length(self, field_name, length, max_field_len):
         if length <= 0:
             logger.error('Field not populated', field_name=field_name)
             if field_name == "Body":
                 field_name = "message"
-            raise ValidationError('Please enter a {0}'.format(field_name.lower()))
+            raise ValidationError(f'Please enter a {field_name.lower()}')
         self.validate_field_length(field_name, length, max_field_len)
 
     @staticmethod
     def validate_field_length(field_name, length, max_field_len, data=None):
         if length > max_field_len:
             logger.error('Field is too large', field_name=field_name, length=length, max_field_len=max_field_len)
-            raise ValidationError('{0} field length must not be greater than {1}'.format(field_name, max_field_len), field_name, [], data)
+            raise ValidationError(f'{field_name} field length must not be greater than {max_field_len}', field_name, [], data)
 
 
 class DraftSchema(Schema):
@@ -169,10 +169,10 @@ class DraftSchema(Schema):
         """Check sent and read date not set and that from and survey are set"""
         if 'msg_from' not in data or not data['msg_from']:
             logger.error('Field missing', field='msg_from')
-            raise ValidationError("{0} Missing".format('msg_from'))
+            raise ValidationError("msg_from Missing")
         if 'survey' not in data or not data['survey']:
             logger.error('Field missing', field='survey')
-            raise ValidationError("{0} Missing".format('survey'))
+            raise ValidationError("survey Missing")
         return data
 
     @validates_schema
@@ -190,13 +190,13 @@ class DraftSchema(Schema):
                 if g.user.is_internal:  # internal user must be sending to a respondent
                     if item and not g.user.is_valid_respondent(item):
                         logger.error('Not a valid respondent', user=item)
-                        raise ValidationError("{0} is not a valid respondent.".format(item))
+                        raise ValidationError(f"{item} is not a valid respondent.")
                 else:  # Respondent sending to internal
                     if item and not (msg_to[0] == constants.BRES_USER or
                                      msg_to[0] == constants.NON_SPECIFIC_INTERNAL_USER or
                                      g.user.is_valid_internal_user(msg_to[0])):
                         logger.error('Not a valid internal user', user=item)
-                        raise ValidationError("{0} is not a valid internal user.".format(item))
+                        raise ValidationError(f"{item} is not a valid internal user.")
         else:
             logger.debug('msg_to field empty')
 
@@ -205,10 +205,10 @@ class DraftSchema(Schema):
         self.validate_field_length(msg_from, len(msg_from), constants.MAX_FROM_LEN)
         if g.user.is_internal and msg_from != g.user.user_uuid and msg_from != constants.BRES_USER:
             logger.error('Internal user not authorised to save a draft on behalf of user or work group', message_from=msg_from)
-            raise ValidationError('You are not authorised to save a draft on behalf of user or work group {0}'.format(msg_from))
+            raise ValidationError(f'You are not authorised to save a draft on behalf of user or work group {msg_from}')
         if g.user.is_respondent and msg_from != g.user.user_uuid:
             logger.error('Respondent not authorised to save a draft on behalf of user or work group', message_from=msg_from, user_id=g.user.user_uuid)
-            raise ValidationError('You are not authorised to save a draft on behalf of user or work group {0}'.format(msg_from))
+            raise ValidationError(f'You are not authorised to save a draft on behalf of user or work group {msg_from}')
 
     @validates("body")
     def validate_body(self, body):
@@ -249,4 +249,4 @@ class DraftSchema(Schema):
     def validate_field_length(field_name, length, max_field_len, data=None):
         if length > max_field_len:
             logger.error('Field is too large', field_name=field_name, length=length, max_field_len=max_field_len)
-            raise ValidationError('{0} field length must not be greater than {1}.'.format(field_name, max_field_len), field_name, [], data)
+            raise ValidationError(f'{field_name} field length must not be greater than {max_field_len}.', field_name, [], data)

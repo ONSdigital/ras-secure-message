@@ -4,7 +4,7 @@ from datetime import datetime, timezone
 from flask import g
 
 from secure_message import constants
-from secure_message.services.service_toggles import internal_user_service
+from secure_message.services.service_toggles import internal_user_service, party, case_service
 from secure_message.validation.domain import Message, MessageSchema, DraftSchema
 from secure_message.validation.user import User
 from secure_message.application import create_app
@@ -17,6 +17,9 @@ class MessageTestCase(unittest.TestCase):
     def setUp(self):
         """setup test environment"""
         self.now = datetime.now(timezone.utc)
+        internal_user_service.use_mock_service()
+        party.use_mock_service()
+        case_service.use_mock_service()
 
     def test_message(self):
         """creating Message object"""
@@ -83,6 +86,8 @@ class MessageSchemaTestCase(unittest.TestCase):
                              'thread_id': "", 'ru_id': "7fc0e8ab-189c-4794-b8f4-9f05a1db185b", 'survey': "RSI"}
         self.now = datetime.now(timezone.utc)
         internal_user_service.use_mock_service()
+        party.use_mock_service()
+        case_service.use_mock_service()
         self.app = create_app()
 
     def test_valid_message_passes_validation(self):
@@ -283,7 +288,7 @@ class MessageSchemaTestCase(unittest.TestCase):
         self.assertTrue(errors == {'msg_from': ['You are not authorised to save a draft on behalf of user or work group '
                                                 '6779kgh83-ed43-474b-ad1c-500f5287439a']})
 
-    def test_msg_to_validation_invalid_user(self):
+    def test_msg_to_validation_invalid_internal_user(self):
         """marshalling message where msg_to field is a invalid user"""
         self.json_message['msg_to'] = ["NotAValidUser"]
         self.json_message['msg_from'] = "01b51fcc-ed43-4cdb-ad1c-450f9986859b"
@@ -293,6 +298,17 @@ class MessageSchemaTestCase(unittest.TestCase):
             errors = schema.load(self.json_message)[1]
 
         self.assertTrue(errors == {'msg_to': ['NotAValidUser is not a valid internal user.']})
+
+    def test_msg_to_validation_invalid_respondent(self):
+        """marshalling message where msg_to field is a invalid user"""
+        self.json_message['msg_to'] = ["NotAValidUser"]
+        self.json_message['msg_from'] = "01b51fcc-ed43-4cdb-ad1c-450f9986859b"
+        with self.app.app_context():
+            g.user = User("01b51fcc-ed43-4cdb-ad1c-450f9986859b", 'internal')
+            schema = DraftSchema()
+            errors = schema.load(self.json_message)[1]
+
+        self.assertTrue(errors == {'msg_to': ['NotAValidUser is not a valid respondent.']})
 
 
 if __name__ == '__main__':

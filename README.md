@@ -94,9 +94,6 @@ Environment variables available for configuration are listed below:
 | NOTIFY_VIA_GOV_NOTIFY           | Toggle for using Gov Notify for notifications      | '1' (enable Gov Notify email notifications)
 | SM_JWT_ENCRYPT                  | Toggle to use encrypted tokens                     | '1' (enable encrypted tokens)
 | NOTIFY_CASE_SERVICE             | Toggle to notify case service                      | '1' (enable notifying case service)
-| REDIS_HOST                      | Hostname for Redis instance                        | N/A
-| REDIS_PORT                      | Port that Redis instance listens on                | N/A
-| REDIS_DB                        | Redis database name                                | N/A
 | CLIENT_ID                       | ID of the client service in UAA                    | N/A
 | CLIENT_SECRET                   | Password of the client service in UAA              | N/A
 | UAA_URL                         | URL of a UAA instance                              | N/A

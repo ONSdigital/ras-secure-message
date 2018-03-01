@@ -26,14 +26,8 @@ class Config:
         logger.info('Cloud Foundry environment identified.',
                     protocol=cf.protocol, database=cf.database())
         SQLALCHEMY_DATABASE_URI = cf.credentials()
-
-        # Redis
-        REDIS_HOST = cf.redis.credentials['host']
-        REDIS_PORT = cf.redis.credentials['port']
     else:
         SQLALCHEMY_DATABASE_URI = SECURE_MESSAGING_DATABASE_URL
-        REDIS_HOST = os.getenv('REDIS_HOST')
-        REDIS_PORT = os.getenv('REDIS_PORT')
 
     # LOGGING SETTINGS
     SMS_LOG_LEVEL = os.getenv('SMS_LOG_LEVEL', 'INFO')
@@ -57,7 +51,7 @@ class Config:
     # JWT authentication config
     SM_JWT_ALGORITHM = os.getenv('JWT_ALGORITHM', 'HS256')
     JWT_SECRET = os.getenv('JWT_SECRET')
-    SM_JWT_ENCRYPT = os.getenv('SM_JWT_ENCRYPT', '1')
+    SM_JWT_ENCRYPT = os.getenv('SM_JWT_ENCRYPT', '0')
 
     # Keys
     RAS_SM_PATH = os.getenv('RAS_SM_PATH', './')
@@ -74,19 +68,13 @@ class Config:
     RAS_PARTY_SERVICE_PORT = os.getenv('RAS_PARTY_SERVICE_PORT', 8081)
     RAS_PARTY_SERVICE_PROTOCOL = os.getenv('RAS_PARTY_SERVICE_PROTOCOL', 'http')
     RAS_PARTY_SERVICE = f'{RAS_PARTY_SERVICE_PROTOCOL}://{RAS_PARTY_SERVICE_HOST}:{RAS_PARTY_SERVICE_PORT}/'
-    RAS_PARTY_GET_BY_BUSINESS = '{}party-api/v1/businesses/id/{}'
-    RAS_PARTY_GET_BY_RESPONDENT = '{}party-api/v1/respondents/id/{}'
 
     RM_CASE_SERVICE_HOST = os.getenv('RM_CASE_SERVICE_HOST', 'localhost')
     RM_CASE_SERVICE_PORT = os.getenv('RM_CASE_SERVICE_PORT', 8171)
     RM_CASE_SERVICE_PROTOCOL = os.getenv('RM_CASE_SERVICE_PROTOCOL', 'http')
     RM_CASE_SERVICE = f'{RM_CASE_SERVICE_PROTOCOL}://{RM_CASE_SERVICE_HOST}:{RM_CASE_SERVICE_PORT}/'
-    RM_CASE_POST = '{}cases/{}/events'
 
     NOTIFY_CASE_SERVICE = os.getenv('NOTIFY_CASE_SERVICE', '1')
-
-    # redis
-    REDIS_DB = os.getenv('REDIS_DB')
 
     # uaa
     CLIENT_ID = os.getenv('CLIENT_ID')
@@ -95,7 +83,7 @@ class Config:
 
     NON_DEFAULT_VARIABLES = ['JWT_SECRET', 'SECURITY_USER_NAME', 'SECURITY_USER_PASSWORD',
                              'NOTIFICATION_API_KEY', 'SERVICE_ID', 'NOTIFICATION_TEMPLATE_ID',
-                             'REDIS_HOST', 'REDIS_PORT', 'REDIS_DB', 'CLIENT_ID', 'CLIENT_SECRET']
+                             'CLIENT_ID', 'CLIENT_SECRET']
 
     # These should always be set in the environment on prod
     JWT_ALGORITHM = os.getenv('JWT_ALGORITHM')
@@ -129,11 +117,6 @@ class DevConfig(Config):
     BASIC_AUTH = (SECURITY_USER_NAME, SECURITY_USER_PASSWORD)
     SERVICE_ID = os.getenv('SERVICE_ID', 'test_service_id')
 
-    # Redis
-    REDIS_HOST = os.getenv('REDIS_HOST', 'localhost')
-    REDIS_PORT = os.getenv('REDIS_PORT', 7379)
-    REDIS_DB = os.getenv('REDIS_DB', 1)
-
     # uaa
     CLIENT_ID = os.getenv('CLIENT_ID', 'securemessage')
     CLIENT_SECRET = os.getenv('CLIENT_SECRET', 'loginsecret')
@@ -143,6 +126,7 @@ class DevConfig(Config):
 
 class TestConfig(DevConfig):
     TESTING = True
+    SM_JWT_ENCRYPT = os.getenv('SM_JWT_ENCRYPT', '1')
     SM_USER_AUTHENTICATION_PRIVATE_KEY = open("./jwt-test-keys/sm-user-authentication-encryption-private-key.pem").read()
     SM_USER_AUTHENTICATION_PUBLIC_KEY = open("./jwt-test-keys/sm-user-authentication-encryption-public-key.pem").read()
     USE_UAA = 0
