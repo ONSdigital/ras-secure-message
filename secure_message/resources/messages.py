@@ -137,7 +137,6 @@ class MessageSend(Resource):
 
     @staticmethod
     def _inform_case_service(message):
-
         if current_app.config['NOTIFY_CASE_SERVICE'] == '1':
             case_user = MessageSend._get_user_name(g.user, message)
             case_service.store_case_event(message.collection_case, case_user)

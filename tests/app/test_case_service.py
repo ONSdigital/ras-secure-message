@@ -18,7 +18,7 @@ class CaseServiceTestCase(unittest.TestCase):
     def test_store_case_event_posts_request_to_remote_service(self):
         """Test store_case_event sends a request and returns data"""
         responses.add(responses.POST,
-                      self.app.config['RM_CASE_POST'].format(self.app.config['RM_CASE_SERVICE'], '1234'),
+                      f"{self.app.config['RM_CASE_SERVICE']}cases/1234/events",
                       json={"something": "else"},
                       status=201)
         sut = CaseService()
