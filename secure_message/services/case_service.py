@@ -11,7 +11,7 @@ class CaseService:
     def store_case_event(case_id, user_name):
         """posts the data to the case service"""
 
-        if case_id:
+        if case_id.strip():
             json_data = {"description": "New Secure Message",
                          "category": "SECURE_MESSAGE_SENT",
                          "createdBy": user_name}
