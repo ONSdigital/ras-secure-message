@@ -1,4 +1,3 @@
-import json
 import logging
 
 from flask import current_app
@@ -11,46 +10,34 @@ logger = wrap_logger(logging.getLogger(__name__))
 
 class InternalUserService:
     @staticmethod
-    def get_user_details(uuid):  # NOQA pylint:disable=unused-argument
+    def get_user_details(uuid):
         """gets the user details from the internal user service"""
-        logger.debug("Getting user details from uaa")
+        logger.info("Getting user details from uaa", uuid=uuid)
         url = f"{current_app.config['UAA_URL']}/Users/{uuid}"
-        uaa_token_bytes = current_app.redis_connection['secure-message-client-token']
-        uaa_token_str = uaa_token_bytes.decode("utf-8")
-        try:
-            # Saving to and from redis stops the data retreived from UAA from
-            # being valid json.  Fixing the quotes sorts this out.
-            uaa_token_str = uaa_token_str.replace("'",'"')
-            uaa_token = json.loads(uaa_token_str)
-        except ValueError:
-            logger.exception("Failed to convert to JSON")
-            raise
-
-        token = uaa_token.get('access_token')
+        uaa_token = current_app.oauth_client_token
         headers = {'Accept': 'application/json',
-                  'Authorization': 'Bearer ' + token,
-                  'Content-Type': 'application/json'}
+                   'Authorization': 'Bearer ' + uaa_token.get('access_token'),
+                   'Content-Type': 'application/json'}
 
         try:
             response = requests.get(url, headers=headers)
             response.raise_for_status()
-        except HTTPError:
-            logger.exception(f"Failed to get user info for {uuid}")
-            raise
-
-        try:
             resp_json = response.json()
+        except HTTPError:
+            logger.exception("Failed to get user info", uuid=uuid)
+            raise
         except ValueError:
-            logger.exception("Failed to decode response JSON.")
+            logger.exception("Failed to decode response JSON.", uuid=uuid)
             raise
 
         try:
-            user_details =  {
+            user_details = {
                 "id": uuid,
                 "firstName": resp_json['name']['givenName'],
                 "lastName": resp_json['name']['familyName'],
                 "emailAddress": resp_json['emails'][0]['value']
             }
+            logger.info("Successfully retrieved and formatted user details", uuid=uuid)
             return user_details
         except KeyError:
             logger.exception("UAA didn't return all expected details")
