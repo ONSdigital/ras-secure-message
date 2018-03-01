@@ -13,7 +13,7 @@ class InternalUserService:
     @staticmethod
     def get_user_details(uuid):  # NOQA pylint:disable=unused-argument
         """gets the user details from the internal user service"""
-        logger.debug("getting user details from uaa")
+        logger.debug("Getting user details from uaa")
         url = f"{current_app.config['UAA_URL']}/Users/{uuid}"
         uaa_token_bytes = current_app.redis_connection['secure-message-client-token']
         uaa_token_str = uaa_token_bytes.decode("utf-8")
@@ -27,7 +27,6 @@ class InternalUserService:
             raise
 
         token = uaa_token.get('access_token')
-        logger.info(token)
         headers = {'Accept': 'application/json',
                   'Authorization': 'Bearer ' + token,
                   'Content-Type': 'application/json'}
