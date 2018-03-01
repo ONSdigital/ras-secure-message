@@ -72,6 +72,8 @@ def create_app(config=None):
     api.add_resource(MessageSendV2, '/v2/messages')
     api.add_resource(MessageCounterV2, '/v2/messages/count')
 
+    app.token_expires_at = maya.now()
+
     if app.config['USE_UAA']:
         cache_client_token(app)
 
