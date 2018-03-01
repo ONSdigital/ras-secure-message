@@ -51,7 +51,7 @@ class Config:
     # JWT authentication config
     SM_JWT_ALGORITHM = os.getenv('JWT_ALGORITHM', 'HS256')
     JWT_SECRET = os.getenv('JWT_SECRET')
-    SM_JWT_ENCRYPT = os.getenv('SM_JWT_ENCRYPT', '1')
+    SM_JWT_ENCRYPT = os.getenv('SM_JWT_ENCRYPT', '0')
 
     # Keys
     RAS_SM_PATH = os.getenv('RAS_SM_PATH', './')
@@ -129,6 +129,7 @@ class DevConfig(Config):
 
 class TestConfig(DevConfig):
     TESTING = True
+    SM_JWT_ENCRYPT = os.getenv('SM_JWT_ENCRYPT', '1')
     SM_USER_AUTHENTICATION_PRIVATE_KEY = open("./jwt-test-keys/sm-user-authentication-encryption-private-key.pem").read()
     SM_USER_AUTHENTICATION_PUBLIC_KEY = open("./jwt-test-keys/sm-user-authentication-encryption-public-key.pem").read()
     USE_UAA = 0

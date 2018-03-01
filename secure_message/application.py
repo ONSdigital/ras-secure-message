@@ -75,8 +75,6 @@ def create_app(config=None):
     if app.config['USE_UAA']:
         cache_client_token(app)
 
-    app.token_expires_at = maya.now()
-
     @app.before_request
     def before_request():  # NOQA pylint:disable=unused-variable
         if app.config['USE_UAA']:

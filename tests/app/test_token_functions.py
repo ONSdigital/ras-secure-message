@@ -10,8 +10,10 @@ from secure_message import application
 from secure_message.application import cache_client_token, get_client_token
 
 
+
 class TestClientTokenFunctions(unittest.TestCase):
     """Test case for functions that interact with UAA to retrieve client tokens"""
+
 
     def setUp(self):
         """setup test environment"""
@@ -34,6 +36,7 @@ class TestClientTokenFunctions(unittest.TestCase):
                                    maya.now(),
                                    delta=timedelta(seconds=1))
 
+
     def test_cache_client_token(self):
         with mock.patch('secure_message.application.get_client_token') as m:
             m.return_value = self.token
@@ -46,6 +49,7 @@ class TestClientTokenFunctions(unittest.TestCase):
                 self.assertAlmostEqual(self.app.token_expires_at,
                                        maya.now().add(seconds=self.token['expires_in'] - 10),
                                        delta=timedelta(1))
+
 
     @responses.activate
     def test_get_client_token(self):
