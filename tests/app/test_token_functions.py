@@ -19,7 +19,7 @@ class TestClientTokenFunctions(unittest.TestCase):
         self.client = self.app.test_client()
         self.engine = create_engine(self.app.config['SQLALCHEMY_DATABASE_URI'])
 
-        self.token = {
+        self.oauth_client_token = {
             "access_token": "705288eea2474641bde364032d465157",
             "token_type": "bearer",
             "expires_in": 43199,
@@ -30,41 +30,41 @@ class TestClientTokenFunctions(unittest.TestCase):
     def test_set_expiry_on_startup(self):
         """Test token_expires_at is set on app startup"""
         with self.app.app_context():
-            self.assertAlmostEqual(self.app.token_expires_at,
+            self.assertAlmostEqual(self.app.oauth_client_token_expires_at,
                                    maya.now(),
                                    delta=timedelta(seconds=1))
 
     def test_cache_client_token(self):
         with mock.patch('secure_message.application.get_client_token') as m:
-            m.return_value = self.token
+            m.return_value = self.oauth_client_token
             with self.app.app_context():
                 cache_client_token(self.app)
                 self.assertTrue(m.called_with(self.app.config['CLIENT_ID'],
                                               self.app.config['CLIENT_SECRET'],
                                               self.app.config['UAA_URL']))
-                self.assertEqual(self.app.token, self.token)
-                self.assertAlmostEqual(self.app.token_expires_at,
-                                       maya.now().add(seconds=self.token['expires_in'] - 10),
+                self.assertEqual(self.app.oauth_client_token, self.oauth_client_token)
+                self.assertAlmostEqual(self.app.oauth_client_token_expires_at,
+                                       maya.now().add(seconds=self.oauth_client_token['expires_in'] - 10),
                                        delta=timedelta(1))
 
     @responses.activate
     def test_get_client_token(self):
         responses.add(responses.POST,
                       'http://test/oauth/token?grant_type=client_credentials&response_type=token&token_format=opaque',
-                      json=self.token,
+                      json=self.oauth_client_token,
                       status=201)
 
         with self.app.app_context():
             resp = get_client_token('test_id',
                                     'test_secret',
                                     'http://test')
-            self.assertEqual(resp, self.token)
+            self.assertEqual(resp, self.oauth_client_token)
 
     @responses.activate
     def test_get_client_token_http_error_400_range(self):
         responses.add(responses.POST,
                       'http://test/oauth/token?grant_type=client_credentials&response_type=token&token_format=opaque',
-                      json=self.token,
+                      json=self.oauth_client_token,
                       status=401)
 
         with self.assertRaises(SystemExit):
@@ -76,15 +76,15 @@ class TestClientTokenFunctions(unittest.TestCase):
     def test_get_client_token_http_error_500_range(self):
         responses.add(responses.POST,
                       'http://test/oauth/token?grant_type=client_credentials&response_type=token&token_format=opaque',
-                      json=self.token,
+                      json=self.oauth_client_token,
                       status=500)
         responses.add(responses.POST,
                       'http://test/oauth/token?grant_type=client_credentials&response_type=token&token_format=opaque',
-                      json=self.token,
+                      json=self.oauth_client_token,
                       status=201)
 
         resp = get_client_token('test_id',
                                 'test_secret',
                                 'http://test')
 
-        self.assertEqual(self.token, resp)
+        self.assertEqual(self.oauth_client_token, resp)
