@@ -27,7 +27,7 @@ class InternalUserService:
             logger.exception("Failed to get user info", uuid=uuid)
             raise
         except ValueError:
-            logger.exception("Failed to decode response JSON.", uuid=uuid)
+            logger.exception("Failed to decode response JSON", uuid=uuid)
             raise
 
         try:
@@ -40,5 +40,5 @@ class InternalUserService:
             logger.info("Successfully retrieved and formatted user details", uuid=uuid)
             return user_details
         except KeyError:
-            logger.exception("UAA didn't return all expected details")
+            logger.exception("UAA didn't return all expected details", uuid=uuid)
             raise
