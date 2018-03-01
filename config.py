@@ -74,8 +74,6 @@ class Config:
     RAS_PARTY_SERVICE_PORT = os.getenv('RAS_PARTY_SERVICE_PORT', 8081)
     RAS_PARTY_SERVICE_PROTOCOL = os.getenv('RAS_PARTY_SERVICE_PROTOCOL', 'http')
     RAS_PARTY_SERVICE = f'{RAS_PARTY_SERVICE_PROTOCOL}://{RAS_PARTY_SERVICE_HOST}:{RAS_PARTY_SERVICE_PORT}/'
-    RAS_PARTY_GET_BY_BUSINESS = '{}party-api/v1/businesses/id/{}'
-    RAS_PARTY_GET_BY_RESPONDENT = '{}party-api/v1/respondents/id/{}'
 
     RM_CASE_SERVICE_HOST = os.getenv('RM_CASE_SERVICE_HOST', 'localhost')
     RM_CASE_SERVICE_PORT = os.getenv('RM_CASE_SERVICE_PORT', 8171)
