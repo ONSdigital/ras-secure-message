@@ -15,7 +15,7 @@ class CaseService:
                      "category": "SECURE_MESSAGE_SENT",
                      "createdBy": user_name}
 
-        url = current_app.config['RM_CASE_POST'].format(current_app.config['RM_CASE_SERVICE'], case_id)
+        url = f"{current_app.config['RM_CASE_SERVICE']}cases/{case_id}/events"
         case_service_data = requests.post(url, auth=current_app.config['BASIC_AUTH'], json=json_data, verify=False)
         logger.debug('case service post result', status_code=case_service_data.status_code,
                      reason=case_service_data.reason, text=case_service_data.text)

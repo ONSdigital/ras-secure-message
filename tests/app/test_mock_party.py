@@ -223,7 +223,7 @@ class PartyTestCase(unittest.TestCase):
         message_data = json.loads(message_post.data)
         msg_id = message_data['msg_id']
 
-        message_get = self.client.get("http://localhost:5050/message/{}".format(msg_id), headers=self.headers)
+        message_get = self.client.get(f"http://localhost:5050/message/{msg_id}", headers=self.headers)
         message = json.loads(message_get.data)
 
         self.assertEqual(message['@ru_id']['name'], "Apple")

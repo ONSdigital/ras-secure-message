@@ -160,7 +160,7 @@ def step_impl_messages_are_read_with_filter_of_current_param_value(context, para
     param_value = context.bdd_helper.message_data[param_name]
     param_name = 'cc' if param_name == 'collection_case' else param_name
     param_name = 'ce' if param_name == 'collection_exercise' else param_name
-    param = "?{}={}".format(param_name, param_value)
+    param = f"?{param_name}={param_value}"
     url = context.bdd_helper.messages_get_url + param
     _step_impl_get_messages_with_filter(context, url)
 
@@ -211,7 +211,7 @@ def step_impl_drafts_are_read_with_filter_of_current_param_value(context, param_
     param_value = context.bdd_helper.message_data[param_name]
     param_name = 'cc' if param_name == 'collection_case' else param_name
     param_name = 'ce' if param_name == 'collection_exercise' else param_name
-    param = "?{}={}".format(param_name, param_value)
+    param = f"?{param_name}={param_value}"
     url = context.bdd_helper.messages_get_url + param
     _step_impl_get_drafts_with_filter(context, url)
 
@@ -226,7 +226,7 @@ def _step_impl_get_drafts_with_filter(context, url):
 @when("drafts with a label of  '{label_name}' are read")
 def step_impl_drafts_are_read_with_filter_of_specific_label(context, label_name):
     """reads drafts with a specified label"""
-    param = "?label={}".format(label_name)
+    param = f"?label={label_name}"
     url = context.bdd_helper.messages_get_url + param
     _step_impl_get_drafts_with_filter(context, url)
 
