@@ -145,7 +145,7 @@ class MessageSend(Resource):
                 if party_data:
                     first_name = party_data['firstName'] if 'firstName' in party_data else ''
                     last_name = party_data['lastName'] if 'lastName' in party_data else ''
-                    case_user = '{} {}'.format(first_name, last_name).strip()
+                    case_user = f"{first_name} {last_name}".strip()
                     if not case_user:
                         case_user = 'Unknown user'
                         logger.info('no user names in party data for id  Unknown user used in case ',

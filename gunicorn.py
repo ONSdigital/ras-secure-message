@@ -20,7 +20,7 @@
 
 import os
 PORT = os.getenv('PORT', 8000)
-bind = '0.0.0.0:{}'.format(PORT)
+bind = f"0.0.0.0:{PORT}"
 backlog = 2048
 
 #
