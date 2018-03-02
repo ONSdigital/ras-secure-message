@@ -89,3 +89,17 @@ Feature: Get Messages list V2 Endpoint
     | user        |
     | specific user |
     | group        |
+
+  Scenario: Respondent saves a message to GROUP and gets message list verify the @msg_to is correctly populated
+    Given sending from respondent to internal group
+      And   the message is sent V2
+      And messages are read V2
+    Then a success status code (200) is returned
+      And the at_msg_to is set correctly for internal group for all messages
+
+  Scenario: Respondent saves a message to BRES using V1 and gets message list using V2 verify the @msg_to is correctly populated
+    Given sending from respondent to internal group
+      And   the message is sent
+      And messages are read V2
+    Then a success status code (200) is returned
+      And the at_msg_to is set correctly for bres user for all messages
