@@ -30,10 +30,9 @@ class RetrieverTestCaseHelper:
         """ Populate the secure_message table"""
 
         with self.engine.connect() as con:
-            query = "INSERT INTO securemessage.secure_message(msg_id, subject, body, thread_id," \
-                    "collection_case, ru_id, survey, collection_exercise, from_internal) VALUES ('{0}', '{1}','{2}'," \
-                    "'{3}', '{4}', '{5}', '{6}', '{7}', '{8}')".format(msg_id, subject, body, thread_id, collection_case,
-                                                                       ru_id, survey, collection_exercise, from_internal)
+            query = f'''INSERT INTO securemessage.secure_message(msg_id, subject, body, thread_id,
+                    collection_case, ru_id, survey, collection_exercise, from_internal) VALUES ('{msg_id}', '{subject}','{body}',
+                    '{thread_id}', '{collection_case}', '{ru_id}', '{survey}', '{collection_exercise}', '{from_internal}')'''
             con.execute(query)
 
     def add_status(self, label, msg_id, actor):

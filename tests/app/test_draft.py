@@ -235,16 +235,15 @@ class DraftTestCase(unittest.TestCase):
 
         with self.engine.connect() as con:
             msg_id = str(uuid.uuid4())
-            query = "INSERT INTO securemessage.secure_message(msg_id, subject, body, thread_id," \
-                    " collection_case, ru_id, survey) VALUES ('{0}', 'test','test','', " \
-                    " 'ACollectionCase', 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc', 'ACollectionExercise'" \
-                    "'BRES')".format(msg_id)
+            query = f'''INSERT INTO securemessage.secure_message(msg_id, subject, body, thread_id,
+                    collection_case, ru_id, survey) VALUES ('{msg_id}', 'test','test','',
+                    'ACollectionCase', 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc', 'ACollectionExercise'
+                    'BRES')'''
             con.execute(query)
             query = "INSERT INTO securemessage.status(label, msg_id, actor) VALUES('DRAFT', '{0}', " \
                     "'0a7ad740-10d5-4ecb-b7ca-3c0384afb882')".format(msg_id)
             con.execute(query)
-            query = "INSERT INTO securemessage.status(label, msg_id, actor) VALUES('DRAFT_INBOX', '{0}'," \
-                    " 'SurveyType')".format(msg_id)
+            query = f"INSERT INTO securemessage.status(label, msg_id, actor) VALUES('DRAFT_INBOX', '{msg_id}', 'SurveyType')"
             con.execute(query)
 
         with self.app.app_context():
@@ -409,7 +408,7 @@ class DraftTestCase(unittest.TestCase):
     def test_ru_id_field_too_long_causes_error(self):
         """marshalling message with ru_id field too long"""
         self.test_message['ru_id'] = "x" * (MAX_RU_ID_LEN + 1)
-        expected_error = 'ru_id field length must not be greater than {0}.'.format(MAX_RU_ID_LEN)
+        expected_error = f"ru_id field length must not be greater than {MAX_RU_ID_LEN}."
         with self.app.app_context():
             g.user = User(self.test_message['msg_from'], 'respondent')
             schema = DraftSchema()
