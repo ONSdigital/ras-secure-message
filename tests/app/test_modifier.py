@@ -267,7 +267,7 @@ class ModifyTestCase(unittest.TestCase, ModifyTestCaseHelper):
                 modifier.del_draft(self.test_message['msg_id'])
 
                 with self.engine.connect() as con:
-                    request = con.execute(f"SELECT * FROM securemessage.status WHERE msg_id='test123' AND actor='{0}'"
+                    request = con.execute("SELECT * FROM securemessage.status WHERE msg_id='test123' AND actor='{0}'"
                                           .format('0a7ad740-10d5-4ecb-b7ca-3c0384afb882'))
                     for row in request:
                         self.assertTrue(row is None)
