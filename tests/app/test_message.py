@@ -110,7 +110,7 @@ class MessageSchemaTestCase(unittest.TestCase):
     def test_body_too_big_fails_validation(self):
         """marshalling message with body field too long """
         self.json_message['body'] = "x" * (MAX_BODY_LEN + 1)
-        expected_error = 'Body field length must not be greater than {0}'.format(MAX_BODY_LEN)
+        expected_error = f"Body field length must not be greater than {MAX_BODY_LEN}"
 
         with self.app.app_context():
             g.user = User(self.json_message['msg_from'], 'respondent')
@@ -163,7 +163,7 @@ class MessageSchemaTestCase(unittest.TestCase):
     def test_subject_field_too_long_causes_error(self):
         """marshalling message with subject field too long"""
         self.json_message['subject'] = "x" * (MAX_SUBJECT_LEN + 1)
-        expected_error = 'Subject field length must not be greater than {0}'.format(MAX_SUBJECT_LEN)
+        expected_error = f"Subject field length must not be greater than {MAX_SUBJECT_LEN}"
         with self.app.app_context():
             g.user = User(self.json_message['msg_from'], 'respondent')
             schema = MessageSchema()
@@ -183,7 +183,7 @@ class MessageSchemaTestCase(unittest.TestCase):
     def test_thread_field_too_long_causes_error(self):
         """marshalling message with thread_id field too long"""
         self.json_message['thread_id'] = "x" * (MAX_THREAD_LEN + 1)
-        expected_error = 'Thread field length must not be greater than {0}'.format(MAX_THREAD_LEN)
+        expected_error = f"Thread field length must not be greater than {MAX_THREAD_LEN}"
         with self.app.app_context():
             g.user = User(self.json_message['msg_from'], 'respondent')
             schema = MessageSchema()

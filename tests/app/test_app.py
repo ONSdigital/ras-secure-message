@@ -163,7 +163,7 @@ class FlaskTestCase(unittest.TestCase):
             self.client.post(url, data=json.dumps(test_message), headers=self.headers)
             self.assertTrue(True)  # i.e no exception
         except Exception as e:
-            self.fail("post raised unexpected exception: {0}".format(e))
+            self.fail(f"post raised unexpected exception: {e}")
 
     def test_message_post_stores_labels_correctly_for_sender_of_message(self):
         """posts to message send end point to ensure labels are saved as expected"""
@@ -186,8 +186,7 @@ class FlaskTestCase(unittest.TestCase):
         data = json.loads(response.data)
 
         with self.engine.connect() as con:
-            request = con.execute("SELECT * FROM securemessage.events WHERE event='Sent' AND msg_id='{0}'"
-                                  .format(data['msg_id']))
+            request = con.execute(f"SELECT * FROM securemessage.events WHERE event='Sent' AND msg_id='{data['msg_id']}'")
             for row in request:
                 self.assertTrue(row is not None)
 
@@ -217,8 +216,7 @@ class FlaskTestCase(unittest.TestCase):
         data = json.loads(response.data)
 
         with self.engine.connect() as con:
-            request = con.execute("SELECT * FROM securemessage.events WHERE event='Sent' AND msg_id='{0}'"
-                                  .format(data['msg_id']))
+            request = con.execute(f"SELECT * FROM securemessage.events WHERE event='Sent' AND msg_id='{data['msg_id']}'")
             for row in request:
                 self.assertTrue(row is not None)
 
@@ -276,7 +274,7 @@ class FlaskTestCase(unittest.TestCase):
         self.client.post("http://localhost:5050/message/send", data=json.dumps(self.test_message), headers=self.headers)
 
         with self.engine.connect() as con:
-            request = con.execute("SELECT * FROM securemessage.status WHERE msg_id='{0}'".format(msg_id))
+            request = con.execute(f"SELECT * FROM securemessage.status WHERE msg_id='{msg_id}'")
 
             for row in request:
                 self.assertNotEqual(row['label'], 'DRAFT_INBOX')
@@ -358,7 +356,7 @@ class FlaskTestCase(unittest.TestCase):
         draft_save_data = json.loads(draft_save.data)
         draft_id = draft_save_data['msg_id']
 
-        draft_get = self.client.get("http://localhost:5050/draft/{0}".format(draft_id), headers=self.headers)
+        draft_get = self.client.get(f"http://localhost:5050/draft/{draft_id}", headers=self.headers)
         draft_get_data = json.loads(draft_get.data)
 
         self.assertTrue(draft_get_data['msg_to'] is not None)

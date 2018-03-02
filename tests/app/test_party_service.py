@@ -106,7 +106,7 @@ class PartyTestCase(unittest.TestCase):
                            'status': '',
                            'telephone': ''}
 
-        mock_request.get(user_data_url, status_code=200, reason="OK", text="{}".format(expected_result))
+        mock_request.get(user_data_url, status_code=200, reason="OK", text=str(expected_result))
 
         with self.app.app_context():
             result_data = sut.get_user_details(constants.BRES_USER)
