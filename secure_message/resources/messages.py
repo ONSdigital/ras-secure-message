@@ -32,15 +32,14 @@ class MessageList(Resource):
     @staticmethod
     def get():
         """Get message list with options"""
-
+        logger.info("Getting message list", user_uuid=g.user.user_uuid)
         message_args = get_options(request.args)
-
         message_service = Retriever()
         result = message_service.retrieve_message_list(message_args.page, message_args.limit, g.user,
                                                        ru_id=message_args.ru_id, survey=message_args.survey,
                                                        cc=message_args.cc, label=message_args.label,
                                                        descend=message_args.desc, ce=message_args.ce)
-
+        logger.info("Successfully retrieved message list", user_uuid=g.user.user_uuid)
         return make_response(paginated_list_to_json(result, message_args.page, message_args.limit, request.host_url,
                                                     g.user, message_args.string_query_args, MESSAGE_LIST_ENDPOINT), 200)
 
@@ -138,6 +137,7 @@ class MessageSend(Resource):
     @staticmethod
     def _inform_case_service(message):
         if current_app.config['NOTIFY_CASE_SERVICE'] == '1':
+            logger.info("Notifying case service", msg_id=message.msg_id)
             case_user = MessageSend._get_user_name(g.user, message)
             case_service.store_case_event(message.collection_case, case_user)
         else:
@@ -167,6 +167,7 @@ class MessageById(Resource):
     @staticmethod
     def get(message_id):
         """Get message by id"""
+        logger.info("Getting individual message", user_uuid=g.user.user_uuid)
         # check user is authorised to view message
         message_service = Retriever()
         message = message_service.retrieve_message(message_id, g.user)
@@ -260,6 +261,7 @@ class MessageCounter(Resource):
     @staticmethod
     def get():
         """Get count of unread messages"""
+        logger.info("Getting count of unread messages", user_uuid=g.user.user_uuid)
         try:
             if request.args.get('name').lower() == 'unread':
                 return jsonify(name=request.args['name'], total=Retriever().unread_message_count(g.user))

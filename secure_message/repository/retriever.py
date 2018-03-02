@@ -22,8 +22,10 @@ class Retriever:
         """returns list of messages from db"""
 
         if user.is_respondent:
+            logger.info("Retrieving message list for respondent", user_uuid=user.user_uuid)
             return Retriever._retrieve_message_list_respondent(page, limit, user=user, ru_id=ru_id, survey=survey,
                                                                cc=cc, ce=ce, label=label, descend=descend)
+        logger.info("Retrieving message list for internal user", user_uuid=user.user_uuid)
         return Retriever._retrieve_message_list_internal(page, limit, ru_id=ru_id, survey=survey,
                                                          cc=cc, ce=ce, label=label, descend=descend)
 

@@ -28,27 +28,23 @@ class ModifyTestCaseHelper:
         with self.engine.connect() as con:
             for i in range(record_count):
                 msg_id = str(uuid.uuid4())
-                query = "INSERT INTO securemessage.secure_message(id, msg_id, subject, body, thread_id," \
-                        " collection_case, ru_id, collection_exercise, survey) VALUES ({0}, '{1}', 'test','test','', " \
-                        " 'ACollectionCase', 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc', 'ACollectionExercise'," \
-                        "'BRES')".format(i, msg_id)
+                query = f'''INSERT INTO securemessage.secure_message(id, msg_id, subject, body, thread_id,
+                        collection_case, ru_id, collection_exercise, survey) VALUES ({i}, '{msg_id}', 'test','test','',
+                        'ACollectionCase', 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc', 'ACollectionExercise',
+                        'BRES')'''
                 con.execute(query)
-                query = "INSERT INTO securemessage.status(label, msg_id, actor) VALUES('SENT', '{0}', " \
-                        "'0a7ad740-10d5-4ecb-b7ca-3c0384afb882')".format(msg_id)
+                query = f'''INSERT INTO securemessage.status(label, msg_id, actor) VALUES('SENT', '{msg_id}',
+                        '0a7ad740-10d5-4ecb-b7ca-3c0384afb882')'''
                 con.execute(query)
-                query = "INSERT INTO securemessage.status(label, msg_id, actor) VALUES('INBOX', '{0}', 'BRES')".format(
-                    msg_id)
+                query = f"INSERT INTO securemessage.status(label, msg_id, actor) VALUES('INBOX', '{msg_id}', 'BRES')"
                 con.execute(query)
-                query = "INSERT INTO securemessage.status(label, msg_id, actor) VALUES('UNREAD', '{0}', 'BRES')".format(
-                    msg_id)
+                query = f"INSERT INTO securemessage.status(label, msg_id, actor) VALUES('UNREAD', '{msg_id}', 'BRES')"
                 con.execute(query)
-                query = "INSERT INTO securemessage.events(event, msg_id, date_time)" \
-                        " VALUES('" + EventsApi.SENT.value + "', '{0}', '{1}')".format(
-                            msg_id, "2017-02-03 00:00:00")
+                query = f'''INSERT INTO securemessage.events(event, msg_id, date_time)
+                         VALUES('{EventsApi.SENT.value}', '{msg_id}', '2017-02-03 00:00:00')'''
                 con.execute(query)
-                query = "INSERT INTO securemessage.events(event, msg_id, date_time) " \
-                        "VALUES('" + EventsApi.READ.value + "', '{0}', '{1}')".format(
-                            msg_id, "2017-02-03 00:00:00")
+                query = f'''INSERT INTO securemessage.events(event, msg_id, date_time)
+                        VALUES('{EventsApi.READ.value}', '{msg_id}', '2017-02-03 00:00:00')'''
                 con.execute(query)
 
 
@@ -169,7 +165,7 @@ class ModifyTestCase(unittest.TestCase, ModifyTestCaseHelper):
                 modifier.add_unread(message, self.user_internal)
                 modifier.add_unread(message, self.user_internal)
         with self.engine.connect() as con:
-            query = "SELECT count(label) FROM securemessage.status WHERE msg_id = '{}' AND label = 'UNREAD'".format(msg_id)
+            query = f"SELECT count(label) FROM securemessage.status WHERE msg_id = '{msg_id}' AND label = 'UNREAD'"
             query_x = con.execute(query)
             unread_label_total = []
             for row in query_x:
@@ -257,24 +253,22 @@ class ModifyTestCase(unittest.TestCase, ModifyTestCaseHelper):
                 modifier = Modifier()
 
                 with self.engine.connect() as con:
-                    add_message = "INSERT INTO securemessage.secure_message (msg_id, body, subject, thread_id, collection_case, ru_id, " \
-                                  "survey, collection_exercise) VALUES ('{0}', '{1}', '{2}', '{3}', '{4}', '{5}', '{6}', '{7}')" \
-                                  .format(self.test_message['msg_id'], self.test_message['body'], self.test_message['subject'],
-                                          self.test_message['thread_id'],
-                                          self.test_message['collection_case'], self.test_message['ru_id'], 'test',
-                                          self.test_message['collection_exercise'])
+                    add_message = f'''INSERT INTO securemessage.secure_message (msg_id, body, subject, thread_id, collection_case, ru_id,
+                                  survey, collection_exercise) VALUES ('{self.test_message['msg_id']}', '{self.test_message['body']}',
+                                  '{self.test_message['subject']}', '{self.test_message['thread_id']}',
+                                  '{self.test_message['collection_case']}', '{self.test_message['ru_id']}',
+                                  'test', '{self.test_message['collection_exercise']}')'''
                     con.execute(add_message)
 
                 with self.engine.connect() as con:
-                    add_draft = ("INSERT INTO securemessage.status (label, msg_id, actor) "
-                                 "VALUES ('{0}', 'test123', '0a7ad740-10d5-4ecb-b7ca-3c0384afb882')")\
-                        .format(Labels.DRAFT.value)
+                    add_draft = (f'''INSERT INTO securemessage.status (label, msg_id, actor)
+                                 VALUES ('{Labels.DRAFT.value}', 'test123', '0a7ad740-10d5-4ecb-b7ca-3c0384afb882')''')
                     con.execute(add_draft)
                 modifier.del_draft(self.test_message['msg_id'])
 
                 with self.engine.connect() as con:
-                    request = con.execute("SELECT * FROM securemessage.status WHERE msg_id='{0}' AND actor='{1}'"
-                                          .format('test123', '0a7ad740-10d5-4ecb-b7ca-3c0384afb882'))
+                    request = con.execute("SELECT * FROM securemessage.status WHERE msg_id='test123' AND actor='{0}'"
+                                          .format('0a7ad740-10d5-4ecb-b7ca-3c0384afb882'))
                     for row in request:
                         self.assertTrue(row is None)
                         break
@@ -298,23 +292,20 @@ class ModifyTestCase(unittest.TestCase, ModifyTestCaseHelper):
 
                 modifier = Modifier()
                 with self.engine.connect() as con:
-                    add_draft_event = ("INSERT INTO securemessage.events (event, msg_id, date_time) "
-                                       "VALUES ('{0}', 'test123', '{1}')").format(EventsApi.DRAFT_SAVED.value,
-                                                                                  datetime.now(timezone.utc))
-                    add_draft = "INSERT INTO securemessage.secure_message (msg_id, body, subject, thread_id, collection_case, ru_id, " \
-                                "survey, collection_exercise) VALUES ('{0}', '{1}', '{2}', '{3}', '{4}', '{5}', '{6}', '{7}')" \
-                        .format(self.test_message['msg_id'], self.test_message['body'], self.test_message['subject'],
-                                self.test_message['thread_id'],
-                                self.test_message['collection_case'], self.test_message['ru_id'],
-                                'test', self.test_message['collection_exercise'])
+                    add_draft_event = (f'''INSERT INTO securemessage.events (event, msg_id, date_time)
+                                       VALUES ('{EventsApi.DRAFT_SAVED.value}', 'test123', '{datetime.now(timezone.utc)}')''')
+                    add_draft = f'''INSERT INTO securemessage.secure_message (msg_id, body, subject, thread_id, collection_case, ru_id,
+                                survey, collection_exercise) VALUES ('{self.test_message['msg_id']}', '{self.test_message['body']}',
+                                '{self.test_message['subject']}', '{self.test_message['thread_id']}',
+                                '{self.test_message['collection_case']}', '{self.test_message['ru_id']}',
+                                'test', '{self.test_message['collection_exercise']}')'''
 
                     con.execute(add_draft)
                     con.execute(add_draft_event)
                 modifier.del_draft(self.test_message['msg_id'])
 
                 with self.engine.connect() as con:
-                    request = con.execute("SELECT * FROM securemessage.events WHERE msg_id='{0}'"
-                                          .format('test123'))
+                    request = con.execute("SELECT * FROM securemessage.events WHERE msg_id='test123'")
                     for row in request:
                         self.assertTrue(row is None)
 
