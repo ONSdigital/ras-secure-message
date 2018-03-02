@@ -145,7 +145,6 @@ class Retriever:
     @staticmethod
     def retrieve_thread_list(user, request_args):
         """returns list of threads from db"""
-        status_conditions = []
         conditions = []
         actor_conditions = []
 
@@ -155,8 +154,6 @@ class Retriever:
             actor_conditions.append(Status.actor == user.user_uuid)
             actor_conditions.append(Status.actor == constants.BRES_USER)
             actor_conditions.append(Status.actor == constants.NON_SPECIFIC_INTERNAL_USER)
-
-        status_conditions.append(Status.label != Labels.DRAFT_INBOX.value)
 
         if request_args.ru_id:
             conditions.append(SecureMessage.ru_id == request_args.ru_id)
@@ -174,7 +171,7 @@ class Retriever:
             t = db.session.query(SecureMessage.thread_id, func.max(Events.id)  # pylint:disable=no-member
                                  .label('max_id')) \
                 .join(Events).join(Status) \
-                .filter(and_(*status_conditions)) \
+                .filter(Status.label != Labels.DRAFT_INBOX.value) \
                 .filter(or_(*actor_conditions)) \
                 .filter(or_(Events.event == EventsApi.SENT.value, Events.event == EventsApi.DRAFT_SAVED.value)) \
                 .group_by(SecureMessage.thread_id).subquery('t')
@@ -185,7 +182,6 @@ class Retriever:
             result = SecureMessage.query.join(Events).join(Status) \
                 .filter(or_(Events.event == EventsApi.SENT.value, Events.event == EventsApi.DRAFT_SAVED.value)) \
                 .filter(and_(*conditions)) \
-                .filter(and_(*status_conditions)) \
                 .order_by(t.c.max_id.desc()).paginate(request_args.page, request_args.limit, False)
 
         except Exception as e:
@@ -213,7 +209,6 @@ class Retriever:
     @staticmethod
     def retrieve_thread(thread_id, user, message_args):
         """returns paginated list of messages for thread id"""
-        status_conditions = []
         actor_conditions = []
 
         if user.is_respondent:
@@ -223,13 +218,11 @@ class Retriever:
             actor_conditions.append(Status.actor == constants.BRES_USER)
             actor_conditions.append(Status.actor == constants.NON_SPECIFIC_INTERNAL_USER)
 
-        status_conditions.append(Status.label != Labels.DRAFT_INBOX.value)
-
         try:
 
             result = SecureMessage.query.join(Events).join(Status) \
                 .filter(SecureMessage.thread_id == thread_id) \
-                .filter(and_(*status_conditions)) \
+                .filter(Status.label != Labels.DRAFT_INBOX.value) \
                 .filter(or_(*actor_conditions)) \
                 .filter(or_(Events.event == EventsApi.SENT.value, Events.event == EventsApi.DRAFT_SAVED.value)) \
                 .order_by(Events.date_time.desc()).paginate(message_args.page, message_args.limit, False)
