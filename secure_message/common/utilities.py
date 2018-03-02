@@ -4,6 +4,7 @@ import logging
 
 from flask import jsonify
 from structlog import wrap_logger
+from secure_message.common.labels import Labels
 from secure_message.services.service_toggles import party, internal_user_service
 from secure_message.constants import MESSAGE_BY_ID_ENDPOINT, MESSAGE_LIST_ENDPOINT, MESSAGE_QUERY_LIMIT
 
@@ -13,7 +14,7 @@ logger = wrap_logger(logging.getLogger(__name__))
 MessageArgs = collections.namedtuple('MessageArgs', 'string_query_args page limit ru_id survey cc label desc ce')
 
 
-def get_options(args, label_override=None):
+def get_options(args, draft_only=False):
     """extract options from request , allow label to be set by caller"""
 
     string_query_args = '?'
@@ -41,9 +42,9 @@ def get_options(args, label_override=None):
     if args.get('cc'):
         cc = str(args.get('cc'))
         string_query_args = add_string_query_args(string_query_args, 'cc', args.get('cc'))
-    if label_override:
-        label = label_override
-        string_query_args = add_string_query_args(string_query_args, 'label', label_override)
+    if draft_only:
+        label = Labels.DRAFT.value
+        string_query_args = add_string_query_args(string_query_args, 'label', label)
     else:
         if args.get('label'):
             label = str(args.get('label'))

@@ -88,7 +88,7 @@ class DraftList(Resource):
     def get():
         """Get message list with options"""
 
-        message_args = get_options(request.args, label_override=Labels.DRAFT.value)
+        message_args = get_options(request.args, draft_only=True)
 
         result = Retriever().retrieve_message_list(g.user, message_args)
 
