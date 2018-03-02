@@ -7,4 +7,5 @@ start:
 	pipenv run python run.py
 
 test:
-	 pipenv run pytest
+	pipenv check --style ./secure_message ./tests
+	pipenv run pytest

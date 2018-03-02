@@ -17,7 +17,6 @@ script:
 
 services:
     - postgresql
-    - redis-server
 
 after_success:
     - pipenv run codecov
