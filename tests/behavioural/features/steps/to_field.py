@@ -2,6 +2,7 @@ import nose.tools
 from behave import given, then, when
 from flask import json
 from secure_message import constants
+from secure_message.constants import BRES_USER, NON_SPECIFIC_INTERNAL_USER
 
 
 @given("the to is set to '{msg_to}'")
@@ -80,3 +81,48 @@ def step_impl_the_msg_to_is_set_to_internal_group_user(context):
 def step_impl_the_msg_to_is_set_to_internal_specific_user(context):
     """ set the msg to field in the message data to the specific internal user as specified in the helper"""
     step_impl_the_msg_to_is_set_to(context, context.bdd_helper.internal_id_specific_user)
+
+
+@then("the at_msg_to is set correctly for internal group")
+def step_impl_the_at_msg_to_is_set_to_internal_group_user(context):
+    msg_resp = json.loads(context.response.data)
+    expected = {"id": NON_SPECIFIC_INTERNAL_USER,
+                "firstName": "Ons user",
+                "lastName": "",
+                "emailAddress": ""
+                }
+    nose.tools.assert_equal(msg_resp['@msg_to'][0], expected)
+
+
+@then("the at_msg_to is set correctly for bres user")
+def step_impl_the_at_msg_to_is_set_to_bres_user(context):
+    msg_resp = json.loads(context.response.data)
+    expected = {"id": BRES_USER,
+                "firstName": "BRES",
+                "lastName": "",
+                "emailAddress": ""
+                }
+    nose.tools.assert_equal(msg_resp['@msg_to'][0], expected)
+
+
+@then("the at_msg_to is set correctly for internal group for all messages")
+def step_impl_the_at_msg_to_is_set_to_internal_group_user_for_all_messages(context):
+
+    expected = {"id": NON_SPECIFIC_INTERNAL_USER,
+                "firstName": "Ons user",
+                "lastName": "",
+                "emailAddress": ""
+                }
+    for msg in context.bdd_helper.messages_responses_data[0]['messages']:
+        nose.tools.assert_equal(msg['@msg_to'][0], expected)
+
+
+@then("the at_msg_to is set correctly for bres user for all messages")
+def step_impl_the_at_msg_to_is_set_to_bres_user_for_all_messages(context):
+    expected = {"id": BRES_USER,
+                "firstName": "BRES",
+                "lastName": "",
+                "emailAddress": ""
+                }
+    for msg in context.bdd_helper.messages_responses_data[0]['messages']:
+        nose.tools.assert_equal(msg['@msg_to'][0], expected)

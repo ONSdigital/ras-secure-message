@@ -66,10 +66,11 @@ class PartyTestCase(unittest.TestCase):
                                                 'lastName': 'Oorschot',
                                                 'sampleUnitType': 'BI'
                                                 })
+
         self.assertEqual(message['@msg_to'], [{"id": "BRES",
                                                "firstName": "BRES",
                                                "lastName": "",
-                                               "emailAddress": "mock@email.com"
+                                               "emailAddress": ""
                                                }])
 
     def test_messages_get_replaces_uuids_with_user_details(self):
@@ -173,7 +174,7 @@ class PartyTestCase(unittest.TestCase):
             self.assertEqual(draft['@msg_to'][0], {"id": constants.BRES_USER,
                                                    "firstName": "BRES",
                                                    "lastName": "",
-                                                   "emailAddress": "mock@email.com"})
+                                                   "emailAddress": ""})
 
     def test_get_business_details_by_ru(self):
         """Test get details for one business using ru_id"""

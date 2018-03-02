@@ -18,6 +18,7 @@ from secure_message.repository.retriever import Retriever
 from secure_message.repository.saver import Saver
 from secure_message.resources.drafts import DraftModifyById
 from secure_message.services.service_toggles import party, case_service, internal_user_service
+
 from secure_message.validation.domain import MessageSchema
 
 logger = wrap_logger(logging.getLogger(__name__))
@@ -145,18 +146,19 @@ class MessageSend(Resource):
 
     @staticmethod
     def _get_user_name(user, message):
-        user_name = 'Unknown user'
-        if message.msg_from == constants.BRES_USER:
-            user_name = constants.BRES_USER
-        else:
-            user_data = internal_user_service.get_user_details(message.msg_from) if user.is_internal else party.get_user_details(message.msg_from)
 
-            if user_data:
-                first_name = user_data.get('firstName', '')
-                last_name = user_data.get('lastName', '')
-                full_name = f'{first_name} {last_name}'.strip()
-                if full_name:
-                    user_name = full_name
+        if message.msg_from == constants.BRES_USER:
+            return constants.BRES_USER
+
+        user_name = 'Unknown user'
+        user_data = internal_user_service.get_user_details(message.msg_from) if user.is_internal else party.get_user_details(message.msg_from)
+
+        if user_data:
+            first_name = user_data.get('firstName', '')
+            last_name = user_data.get('lastName', '')
+            full_name = f'{first_name} {last_name}'.strip()
+            if full_name:
+                user_name = full_name
 
         return user_name
 

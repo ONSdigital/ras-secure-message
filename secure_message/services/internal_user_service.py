@@ -5,6 +5,8 @@ import requests
 from requests import HTTPError
 from structlog import wrap_logger
 
+from secure_message.constants import NON_SPECIFIC_INTERNAL_USER, BRES_USER
+
 logger = wrap_logger(logging.getLogger(__name__))
 
 
@@ -12,6 +14,9 @@ class InternalUserService:
     @staticmethod
     def get_user_details(uuid):
         """gets the user details from the internal user service"""
+        if uuid in [NON_SPECIFIC_INTERNAL_USER, BRES_USER]:
+            return InternalUserService._get_non_specific_user_details(uuid)
+
         logger.info("Getting user details from uaa", uuid=uuid)
         url = f"{current_app.config['UAA_URL']}/Users/{uuid}"
         uaa_token = current_app.oauth_client_token
@@ -42,3 +47,19 @@ class InternalUserService:
         except KeyError:
             logger.exception("UAA didn't return all expected details", uuid=uuid)
             raise
+
+    @staticmethod
+    def _get_non_specific_user_details(group):
+        if group == NON_SPECIFIC_INTERNAL_USER:
+            return {
+                "id": NON_SPECIFIC_INTERNAL_USER,
+                "firstName": "Ons user",
+                "lastName": "",
+                "emailAddress": ""
+            }
+        else:
+            return {"id": BRES_USER,
+                    "firstName": "BRES",
+                    "lastName": "",
+                    "emailAddress": ""
+                    }
