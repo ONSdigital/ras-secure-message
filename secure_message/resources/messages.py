@@ -17,7 +17,7 @@ from secure_message.repository.modifier import Modifier
 from secure_message.repository.retriever import Retriever
 from secure_message.repository.saver import Saver
 from secure_message.resources.drafts import DraftModifyById
-from secure_message.services.service_toggles import party, case_service
+from secure_message.services.service_toggles import party, case_service, internal_user_service
 from secure_message.validation.domain import MessageSchema
 
 logger = wrap_logger(logging.getLogger(__name__))
@@ -32,12 +32,11 @@ class MessageList(Resource):
     @staticmethod
     def get():
         """Get message list with options"""
-
+        logger.info("Getting message list", user_uuid=g.user.user_uuid)
         message_args = get_options(request.args)
-
         message_service = Retriever()
         result = message_service.retrieve_message_list(g.user, message_args)
-
+        logger.info("Successfully retrieved message list", user_uuid=g.user.user_uuid)
         return make_response(paginated_list_to_json(result, request.host_url, g.user, message_args, MESSAGE_LIST_ENDPOINT), 200)
 
 
@@ -134,22 +133,29 @@ class MessageSend(Resource):
     @staticmethod
     def _inform_case_service(message):
         if current_app.config['NOTIFY_CASE_SERVICE'] == '1':
-            if message.msg_from == constants.BRES_USER:
-                case_user = constants.BRES_USER
-            else:
-                party_data = party.get_user_details(message.msg_from)  # NOQA TODO avoid 2 lookups(see validate)
-                if party_data:
-                    first_name = party_data['firstName'] if 'firstName' in party_data else ''
-                    last_name = party_data['lastName'] if 'lastName' in party_data else ''
-                    case_user = '{} {}'.format(first_name, last_name).strip()
-                    if not case_user:
-                        case_user = 'Unknown user'
-                        logger.info('no user names in party data for id  Unknown user used in case ',
-                                    party_id=party_data['id'])
-                # else not testable , as it fails on validation
+            logger.info("Notifying case service", msg_id=message.msg_id)
+            case_user = MessageSend._get_user_name(g.user, message)
             case_service.store_case_event(message.collection_case, case_user)
         else:
             logger.info('Case service notifications switched off, hence not sent', msg_id=message.msg_id)
+
+    @staticmethod
+    def _get_user_name(user, message):
+
+        if message.msg_from == constants.BRES_USER:
+            return constants.BRES_USER
+
+        user_name = 'Unknown user'
+        user_data = internal_user_service.get_user_details(message.msg_from) if user.is_internal else party.get_user_details(message.msg_from)
+
+        if user_data:
+            first_name = user_data.get('firstName', '')
+            last_name = user_data.get('lastName', '')
+            full_name = f'{first_name} {last_name}'.strip()
+            if full_name:
+                user_name = full_name
+
+        return user_name
 
 
 class MessageById(Resource):
@@ -158,6 +164,7 @@ class MessageById(Resource):
     @staticmethod
     def get(message_id):
         """Get message by id"""
+        logger.info("Getting individual message", user_uuid=g.user.user_uuid)
         # check user is authorised to view message
         message_service = Retriever()
         message = message_service.retrieve_message(message_id, g.user)
@@ -251,6 +258,7 @@ class MessageCounter(Resource):
     @staticmethod
     def get():
         """Get count of unread messages"""
+        logger.info("Getting count of unread messages", user_uuid=g.user.user_uuid)
         try:
             if request.args.get('name').lower() == 'unread':
                 return jsonify(name=request.args['name'], total=Retriever().unread_message_count(g.user))

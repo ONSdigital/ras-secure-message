@@ -18,8 +18,8 @@ class MessageTestCase(unittest.TestCase):
         """setup test environment"""
         self.now = datetime.now(timezone.utc)
         internal_user_service.use_mock_service()
-        case_service.use_mock_service()
         party.use_mock_service()
+        case_service.use_mock_service()
 
     def test_message(self):
         """creating Message object"""
@@ -86,8 +86,8 @@ class MessageSchemaTestCase(unittest.TestCase):
                              'thread_id': "", 'ru_id': "7fc0e8ab-189c-4794-b8f4-9f05a1db185b", 'survey': "RSI"}
         self.now = datetime.now(timezone.utc)
         internal_user_service.use_mock_service()
-        case_service.use_mock_service()
         party.use_mock_service()
+        case_service.use_mock_service()
         self.app = create_app()
 
     def test_valid_message_passes_validation(self):
@@ -110,7 +110,7 @@ class MessageSchemaTestCase(unittest.TestCase):
     def test_body_too_big_fails_validation(self):
         """marshalling message with body field too long """
         self.json_message['body'] = "x" * (MAX_BODY_LEN + 1)
-        expected_error = 'Body field length must not be greater than {0}'.format(MAX_BODY_LEN)
+        expected_error = f"Body field length must not be greater than {MAX_BODY_LEN}"
 
         with self.app.app_context():
             g.user = User(self.json_message['msg_from'], 'respondent')
@@ -163,7 +163,7 @@ class MessageSchemaTestCase(unittest.TestCase):
     def test_subject_field_too_long_causes_error(self):
         """marshalling message with subject field too long"""
         self.json_message['subject'] = "x" * (MAX_SUBJECT_LEN + 1)
-        expected_error = 'Subject field length must not be greater than {0}'.format(MAX_SUBJECT_LEN)
+        expected_error = f"Subject field length must not be greater than {MAX_SUBJECT_LEN}"
         with self.app.app_context():
             g.user = User(self.json_message['msg_from'], 'respondent')
             schema = MessageSchema()
@@ -183,7 +183,7 @@ class MessageSchemaTestCase(unittest.TestCase):
     def test_thread_field_too_long_causes_error(self):
         """marshalling message with thread_id field too long"""
         self.json_message['thread_id'] = "x" * (MAX_THREAD_LEN + 1)
-        expected_error = 'Thread field length must not be greater than {0}'.format(MAX_THREAD_LEN)
+        expected_error = f"Thread field length must not be greater than {MAX_THREAD_LEN}"
         with self.app.app_context():
             g.user = User(self.json_message['msg_from'], 'respondent')
             schema = MessageSchema()
@@ -288,7 +288,7 @@ class MessageSchemaTestCase(unittest.TestCase):
         self.assertTrue(errors == {'msg_from': ['You are not authorised to save a draft on behalf of user or work group '
                                                 '6779kgh83-ed43-474b-ad1c-500f5287439a']})
 
-    def test_msg_to_validation_invalid_user(self):
+    def test_msg_to_validation_invalid_internal_user(self):
         """marshalling message where msg_to field is a invalid user"""
         self.json_message['msg_to'] = ["NotAValidUser"]
         self.json_message['msg_from'] = "01b51fcc-ed43-4cdb-ad1c-450f9986859b"
@@ -298,6 +298,17 @@ class MessageSchemaTestCase(unittest.TestCase):
             errors = schema.load(self.json_message)[1]
 
         self.assertTrue(errors == {'msg_to': ['NotAValidUser is not a valid internal user.']})
+
+    def test_msg_to_validation_invalid_respondent(self):
+        """marshalling message where msg_to field is a invalid user"""
+        self.json_message['msg_to'] = ["NotAValidUser"]
+        self.json_message['msg_from'] = "01b51fcc-ed43-4cdb-ad1c-450f9986859b"
+        with self.app.app_context():
+            g.user = User("01b51fcc-ed43-4cdb-ad1c-450f9986859b", 'internal')
+            schema = DraftSchema()
+            errors = schema.load(self.json_message)[1]
+
+        self.assertTrue(errors == {'msg_to': ['NotAValidUser is not a valid respondent.']})
 
 
 if __name__ == '__main__':

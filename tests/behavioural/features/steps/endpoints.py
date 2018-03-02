@@ -148,7 +148,7 @@ def step_impl_messages_are_read(context):
 @when("messages are read with '{limit}' per page requesting page '{page}'")
 def step_impl_messages_read_with_specific_limit_per_page_requesting_specific_page(context, limit, page):
     """get a message list with limit and page parameters"""
-    param = "?limit={}&page={}".format(int(limit), int(page))
+    param = f"?limit={int(limit)}&page={int(page)}"
     url = context.bdd_helper.messages_get_url + param
     _step_impl_get_messages_with_filter(context, url)
 
@@ -160,7 +160,7 @@ def step_impl_messages_are_read_with_filter_of_current_param_value(context, para
     param_value = context.bdd_helper.message_data[param_name]
     param_name = 'cc' if param_name == 'collection_case' else param_name
     param_name = 'ce' if param_name == 'collection_exercise' else param_name
-    param = "?{}={}".format(param_name, param_value)
+    param = f"?{param_name}={param_value}"
     url = context.bdd_helper.messages_get_url + param
     _step_impl_get_messages_with_filter(context, url)
 
@@ -169,7 +169,7 @@ def step_impl_messages_are_read_with_filter_of_current_param_value(context, para
 @when("messages with a label of  '{label_name}' are read")
 def step_impl_messages_are_read_with_specific_label(context, label_name):
     """filter get messages to only return messages matching a specified label"""
-    param = "?label={}".format(label_name)
+    param = f"?label={label_name}"
     url = context.bdd_helper.messages_get_url + param
     _step_impl_get_messages_with_filter(context, url)
 
@@ -192,7 +192,7 @@ def step_impl_drafts_are_read(context):
 @when("drafts are read with '{limit}' per page requesting page '{page}'")
 def step_impl_drafts_read_with_specific_limit_per_page_requesting_specific_page(context, limit, page):
     """draft messages are read with a specific limit per page and specific page number"""
-    param = "?limit={}&page={}".format(int(limit), int(page))
+    param = f"?limit={int(limit)}&page={int(page)}"
     url = context.bdd_helper.messages_get_url + param
     _step_impl_drafts_are_read(context, url)
 
@@ -211,7 +211,7 @@ def step_impl_drafts_are_read_with_filter_of_current_param_value(context, param_
     param_value = context.bdd_helper.message_data[param_name]
     param_name = 'cc' if param_name == 'collection_case' else param_name
     param_name = 'ce' if param_name == 'collection_exercise' else param_name
-    param = "?{}={}".format(param_name, param_value)
+    param = f"?{param_name}={param_value}"
     url = context.bdd_helper.messages_get_url + param
     _step_impl_get_drafts_with_filter(context, url)
 
@@ -226,7 +226,7 @@ def _step_impl_get_drafts_with_filter(context, url):
 @when("drafts with a label of  '{label_name}' are read")
 def step_impl_drafts_are_read_with_filter_of_specific_label(context, label_name):
     """reads drafts with a specified label"""
-    param = "?label={}".format(label_name)
+    param = f"?label={label_name}"
     url = context.bdd_helper.messages_get_url + param
     _step_impl_get_drafts_with_filter(context, url)
 
@@ -441,7 +441,7 @@ def step_impl_messages_are_read_using_v2(context):
 @when("messages with a label of  '{label_name}' are read using V2")
 def step_impl_messages_are_read_with_specific_label_using_v2(context, label_name):
     """filter get messages to only return messages matching a specified label"""
-    param = "?label={}".format(label_name)
+    param = f"?label={label_name}"
     url = context.bdd_helper.messages_get_v2_url + param
     _step_impl_get_messages_with_filter(context, url)
 
@@ -459,7 +459,7 @@ def step_impl_messages_are_read_with_specific_survey(context, survey):
 @given("the count of  messages with '{label_name}' label in survey '{survey}' is made V2")
 def step_impl_the_messages_for_specific_survey_are_counted_for_survey(context, label_name, survey):
     """access the messages_count endpoint to get the count of unread messages"""
-    url = context.bdd_helper.messages_get_unread_count_v2_url + "?label={}&survey={}".format(label_name, survey)
+    url = context.bdd_helper.messages_get_unread_count_v2_url + f"?label={label_name}&survey={survey}"
     context.response = context.app.test_client().get(url, headers=context.bdd_helper.headers)
     response_data = context.response.data
     label_count = json.loads(response_data)["total"]

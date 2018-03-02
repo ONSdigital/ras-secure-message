@@ -1,12 +1,65 @@
 import logging
 
+from flask import current_app
+import requests
+from requests import HTTPError
 from structlog import wrap_logger
+
+from secure_message.constants import NON_SPECIFIC_INTERNAL_USER, BRES_USER
 
 logger = wrap_logger(logging.getLogger(__name__))
 
 
 class InternalUserService:
     @staticmethod
-    def get_user_details(uuid):  # NOQA pylint:disable=unused-argument
+    def get_user_details(uuid):
         """gets the user details from the internal user service"""
-        logger.debug("getting user details from uaa")
+        if uuid in [NON_SPECIFIC_INTERNAL_USER, BRES_USER]:
+            return InternalUserService._get_non_specific_user_details(uuid)
+
+        logger.info("Getting user details from uaa", uuid=uuid)
+        url = f"{current_app.config['UAA_URL']}/Users/{uuid}"
+        uaa_token = current_app.oauth_client_token
+        headers = {'Accept': 'application/json',
+                   'Authorization': 'Bearer ' + uaa_token.get('access_token'),
+                   'Content-Type': 'application/json'}
+
+        try:
+            response = requests.get(url, headers=headers)
+            response.raise_for_status()
+            resp_json = response.json()
+        except HTTPError:
+            logger.exception("Failed to get user info", uuid=uuid)
+            raise
+        except ValueError:
+            logger.exception("Failed to decode response JSON", uuid=uuid)
+            raise
+
+        try:
+            user_details = {
+                "id": uuid,
+                "firstName": resp_json['name']['givenName'],
+                "lastName": resp_json['name']['familyName'],
+                "emailAddress": resp_json['emails'][0]['value']
+            }
+            logger.info("Successfully retrieved and formatted user details", uuid=uuid)
+            return user_details
+        except KeyError:
+            logger.exception("UAA didn't return all expected details", uuid=uuid)
+            raise
+
+    @staticmethod
+    def _get_non_specific_user_details(group):
+        if group == NON_SPECIFIC_INTERNAL_USER:
+            return {
+                "id": NON_SPECIFIC_INTERNAL_USER,
+                "firstName": "Ons user",
+                "lastName": "",
+                "emailAddress": ""
+            }
+        else:
+            return {"id": BRES_USER,
+                    "firstName": "BRES",
+                    "lastName": "",
+                    "emailAddress": ""
+                    }

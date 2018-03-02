@@ -14,4 +14,4 @@ class MessageSchemaV2(MessageSchema):
         if msg_from != g.user.user_uuid:
             logger.error('Users can only send messages from themselves',
                          message_from=msg_from, user_uuid=g.user.user_uuid)
-            raise ValidationError('You are not authorised to send a message on behalf of user or work group {0}'.format(msg_from))
+            raise ValidationError(f"You are not authorised to send a message on behalf of user or work group {msg_from}")

@@ -22,7 +22,9 @@ class Retriever:
         """returns list of messages from db"""
 
         if user.is_respondent:
+            logger.info("Retrieving message list for respondent", user_uuid=user.user_uuid)
             return Retriever._retrieve_message_list_respondent(message_args, user=user)
+        logger.info("Retrieving message list for internal user", user_uuid=user.user_uuid)
         return Retriever._retrieve_message_list_internal(message_args)
 
     @staticmethod
@@ -199,7 +201,7 @@ class Retriever:
             result = db_model.query.filter_by(msg_id=message_id).first()
             if result is None:
                 logger.error('Message ID not found', message_id=message_id)
-                raise NotFound(description="Message with msg_id '{0}' does not exist".format(message_id))
+                raise NotFound(description=f"Message with msg_id '{message_id}' does not exist")
         except SQLAlchemyError as e:
             logger.error('Error retrieving message from database', error=e)
             raise InternalServerError(description="Error retrieving message from database")
@@ -229,7 +231,7 @@ class Retriever:
 
             if not result.items:
                 logger.debug('Thread does not exist', thread_id=thread_id)
-                raise NotFound(description="Conversation with thread_id '{0}' does not exist".format(thread_id))
+                raise NotFound(description=f"Conversation with thread_id '{thread_id}' does not exist")
 
         except SQLAlchemyError as e:
             logger.error('Error retrieving conversation from database', error=e)
@@ -246,7 +248,7 @@ class Retriever:
                 .filter(SecureMessage.statuses.any(Status.label == Labels.DRAFT.value)).first()
             if result is None:
                 logger.error('Draft does not exist', message_id=message_id)
-                raise NotFound(description="Draft with msg_id '{0}' does not exist".format(message_id))
+                raise NotFound(description=f"Draft with msg_id '{message_id}' does not exist")
         except SQLAlchemyError:
             logger.exception("SQLAlchemy error occurred while retrieving draft")
             raise InternalServerError(description="Error retrieving draft from database")
