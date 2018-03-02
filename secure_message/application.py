@@ -72,7 +72,7 @@ def create_app(config=None):
     api.add_resource(MessageSendV2, '/v2/messages')
     api.add_resource(MessageCounterV2, '/v2/messages/count')
 
-    app.oauth_client_token_expires_at  = maya.now()
+    app.oauth_client_token_expires_at = maya.now()
 
     if app.config['USE_UAA']:
         cache_client_token(app)
@@ -99,7 +99,7 @@ def create_app(config=None):
 
 
 def refresh_client_token_if_required(app):
-    if app.oauth_client_token_expires_at  <= maya.now():
+    if app.oauth_client_token_expires_at <= maya.now():
         cache_client_token(app)
 
 
@@ -109,7 +109,7 @@ def cache_client_token(app):
                                               app.config['UAA_URL'])
 
     expires_in = app.oauth_client_token['expires_in'] - 10
-    app.oauth_client_token_expires_at  = maya.now().add(seconds=expires_in)
+    app.oauth_client_token_expires_at = maya.now().add(seconds=expires_in)
 
 
 def get_client_token(client_id, client_secret, url):
