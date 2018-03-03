@@ -11,6 +11,7 @@ Feature: Checking correct labels for messages are added & deleted
     When  the message labels are modified
       And  the message is read
     Then the response message has the label 'ARCHIVE'
+      And a success status code (200) is returned
 
   Scenario: An internal user modifies the archive status or a message to archived
     Given sending from internal bres user to respondent
@@ -20,6 +21,7 @@ Feature: Checking correct labels for messages are added & deleted
     When  the message labels are modified
       And  the message is read
     Then the response message has the label 'ARCHIVE'
+      And a success status code (200) is returned
 
   Scenario: A Respondent removes an archived status from a message
     Given sending from respondent to internal bres user
@@ -32,6 +34,7 @@ Feature: Checking correct labels for messages are added & deleted
       And  the message labels are modified
       And  the message is read
     Then the response message does not have the label 'ARCHIVE'
+     And a success status code (200) is returned
 
   Scenario: An internal user removes an archived status from a message
     Given sending from internal bres user to respondent
@@ -44,6 +47,7 @@ Feature: Checking correct labels for messages are added & deleted
       And  the message labels are modified
       And  the message is read
     Then the response message does not have the label 'ARCHIVE'
+     And a success status code (200) is returned
 
    Scenario: A respondent sends a message the internal user marks it as READ
     Given sending from respondent to internal bres user
@@ -54,6 +58,7 @@ Feature: Checking correct labels for messages are added & deleted
       And  the message labels are modified
       And  the message is read
      Then the response message does not have the label 'UNREAD'
+      And a success status code (200) is returned
 
   Scenario: An internal user sends a message the internal user marks it as READ
     Given sending from internal bres user to respondent
@@ -64,6 +69,7 @@ Feature: Checking correct labels for messages are added & deleted
       And  the message labels are modified
       And  the message is read
      Then the response message does not have the label 'UNREAD'
+      And a success status code (200) is returned
 
   Scenario: A respondent sends a message the internal user marks it as READ then UNREAD
     Given sending from respondent to internal bres user
@@ -79,6 +85,7 @@ Feature: Checking correct labels for messages are added & deleted
      Then the response message has the label 'UNREAD'
       And the response message has the label 'INBOX'
       And the response message should a label count of '2'
+      And a success status code (200) is returned
 
 
   Scenario: An internal user sends a message the internal user marks it as READ then UNREAD
@@ -95,6 +102,7 @@ Feature: Checking correct labels for messages are added & deleted
      Then the response message has the label 'UNREAD'
       And the response message has the label 'INBOX'
       And the response message should a label count of '2'
+      And a success status code (200) is returned
 
 
 
