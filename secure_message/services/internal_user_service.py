@@ -45,18 +45,25 @@ class InternalUserService:
             logger.info("Successfully retrieved and formatted user details", uuid=uuid)
             return user_details
         except KeyError:
+            user_details = InternalUserService._get_default_user(uuid)
             logger.exception("UAA didn't return all expected details", uuid=uuid)
-            raise
+
+            return user_details
+
+    @staticmethod
+    def _get_default_user(uuid):
+        user_details = {
+            "id": uuid,
+            "firstName": "ONS",
+            "lastName": "User",
+            "emailAddress": ""
+        }
+        return user_details
 
     @staticmethod
     def _get_non_specific_user_details(group):
         if group == NON_SPECIFIC_INTERNAL_USER:
-            return {
-                "id": NON_SPECIFIC_INTERNAL_USER,
-                "firstName": "Ons user",
-                "lastName": "",
-                "emailAddress": ""
-            }
+            return InternalUserService._get_default_user(NON_SPECIFIC_INTERNAL_USER)
         else:
             return {"id": BRES_USER,
                     "firstName": "BRES",
