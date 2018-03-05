@@ -46,7 +46,7 @@ class Config:
     REQUESTS_POST_TIMEOUT = os.getenv('REQUESTS_POST_TIMEOUT', 20)
 
     # SQLAlchemy configuration
-    SQLALCHEMY_POOL_SIZE = os.getenv('SQLALCHEMY_POOL_SIZE', None)
+    SQLALCHEMY_POOL_SIZE = os.getenv('SQLALCHEMY_POOL_SIZE', 5)
 
     # JWT authentication config
     SM_JWT_ALGORITHM = os.getenv('JWT_ALGORITHM', 'HS256')
