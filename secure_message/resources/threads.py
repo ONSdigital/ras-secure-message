@@ -17,10 +17,12 @@ class ThreadById(Resource):
     @staticmethod
     def get(thread_id):
         """Get messages by thread id"""
+        logger.info("Getting messages from thread", thread_id=thread_id, user_uuid=g.user.user_uuid)
         message_args = get_options(request.args)  # NOQA TODO - Named Tuple
 
         conversation = Retriever().retrieve_thread(thread_id, g.user, message_args.page, message_args.limit)
 
+        logger.info("Successfully retrieved messages from thread", thread_id=thread_id, user_uuid=g.user.user_uuid)
         return make_response(paginated_list_to_json(conversation, message_args.page, message_args.limit, request.host_url, g.user,
                              message_args.string_query_args, THREAD_BY_ID_ENDPOINT + "/" + thread_id), 200)
 
@@ -31,10 +33,11 @@ class ThreadList(Resource):
     @staticmethod
     def get():
         """Get thread list"""
-
+        logger.info("Getting list of threads for user", user_uuid=g.user.user_uuid)
         message_args = get_options(request.args)
 
         result = Retriever().retrieve_thread_list(message_args.page, message_args.limit, g.user)
 
+        logger.info("Successfully retrieved threads for user", user_uuid=g.user.user_uuid)
         return make_response(paginated_list_to_json(result, message_args.page, message_args.limit, request.host_url,
                                                     g.user, message_args.string_query_args, THREAD_LIST_ENDPOINT), 200)
