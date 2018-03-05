@@ -45,6 +45,16 @@ class InternalUserService:
             logger.info("Successfully retrieved and formatted user details", uuid=uuid)
             return user_details
         except KeyError:
+            user_details = {
+                "id": uuid,
+                "firstName": "ONS",
+                "lastName": "User",
+                "emailAddress": "N/A"
+            }
+            logger.exception("UAA didn't return all expected details", uuid=uuid, uaa_resp=resp_json)
+
+            return user_details
+
             logger.exception("UAA didn't return all expected details", uuid=uuid)
             raise
 
@@ -53,9 +63,9 @@ class InternalUserService:
         if group == NON_SPECIFIC_INTERNAL_USER:
             return {
                 "id": NON_SPECIFIC_INTERNAL_USER,
-                "firstName": "Ons user",
-                "lastName": "",
-                "emailAddress": ""
+                "firstName": "ONS",
+                "lastName": "User",
+                "emailAddress": "N/A"
             }
         else:
             return {"id": BRES_USER,
