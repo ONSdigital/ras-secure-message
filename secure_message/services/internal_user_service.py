@@ -46,7 +46,7 @@ class InternalUserService:
             return user_details
         except KeyError:
             user_details = InternalUserService._get_default_user(uuid)
-            logger.exception("UAA didn't return all expected details", uuid=uuid, uaa_resp=resp_json)
+            logger.exception("UAA didn't return all expected details", uuid=uuid)
 
             return user_details
 

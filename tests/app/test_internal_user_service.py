@@ -1,7 +1,6 @@
 import unittest
 
 from secure_message import constants
-from secure_message.application import create_app
 from secure_message.services.internal_user_service import InternalUserService
 
 
@@ -14,11 +13,6 @@ class PartyBusinessTestHelper:
 
 class InternalUserServiceTestCase(unittest.TestCase):
     """Test cases for internal user service"""
-
-    def setUp(self):
-        """setup test environment"""
-        self.app = create_app()
-        self.app.testing = True
 
     def test_results_default_information_returned_for_bres_user(self):
         """Test get business details sends a request and returns data"""
