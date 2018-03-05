@@ -34,7 +34,7 @@ class InternalUserServiceTestCase(unittest.TestCase):
         expected = {"id": constants.NON_SPECIFIC_INTERNAL_USER,
                     "firstName": "ONS",
                     "lastName": "User",
-                    "emailAddress": "N/A"
+                    "emailAddress": ""
                     }
         actual = sut.get_user_details(constants.NON_SPECIFIC_INTERNAL_USER)
 

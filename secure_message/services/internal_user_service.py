@@ -56,7 +56,7 @@ class InternalUserService:
             "id": uuid,
             "firstName": "ONS",
             "lastName": "User",
-            "emailAddress": "N/A"
+            "emailAddress": ""
         }
         return user_details
 
