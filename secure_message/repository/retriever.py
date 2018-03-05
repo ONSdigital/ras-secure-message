@@ -68,8 +68,8 @@ class Retriever:
                 .filter(SecureMessage.msg_id == t.c.msg_id) \
                 .order_by(order).paginate(message_args.page, message_args.limit, False)
 
-        except Exception as e:
-            logger.error('Error retrieving messages from database', error=e)
+        except Exception:
+            logger.exception('Error retrieving messages from database')
             raise InternalServerError(description="Error retrieving messages from database")
 
         return result
@@ -125,8 +125,8 @@ class Retriever:
                 .filter(SecureMessage.msg_id == t.c.msg_id) \
                 .order_by(order).paginate(message_args.page, message_args.limit, False)
 
-        except Exception as e:
-            logger.exception('Error retrieving messages from database', error=e)
+        except Exception:
+            logger.exception('Error retrieving messages from database')
             raise InternalServerError(description="Error retrieving messages from database")
 
         return result
@@ -134,13 +134,14 @@ class Retriever:
     @staticmethod
     def unread_message_count(user):
         """Count users unread messages"""
+        logger.info("Getting unread message count", user_uuid=user.user_uuid)
         status_conditions = []
         status_conditions.append(Status.actor == str(user.user_uuid))
         try:
             result = SecureMessage.query.join(Status).filter(and_(*status_conditions)).filter(
                 Status.label == 'UNREAD').count()
-        except Exception as e:
-            logger.exception('Error retrieving count of unread messages from database', error=e)
+        except Exception:
+            logger.exception('Error retrieving count of unread messages from database')
             raise InternalServerError(description="Error retrieving count of unread messages from database")
         return result
 
@@ -151,9 +152,11 @@ class Retriever:
         actor_conditions = []
 
         if user.is_respondent:
-            actor_conditions.append(Status.actor == user.user_uuid)
+            logger.info("Retrieving list of threads for respondent", user_uuid=user.user_uuid)
+            actor_conditions.append(Status.actor == str(user.user_uuid))
         else:
-            actor_conditions.append(Status.actor == user.user_uuid)
+            logger.info("Retrieving list of threads for internal user", user_uuid=user.user_uuid)
+            actor_conditions.append(Status.actor == str(user.user_uuid))
             actor_conditions.append(Status.actor == constants.BRES_USER)
             actor_conditions.append(Status.actor == constants.NON_SPECIFIC_INTERNAL_USER)
 
@@ -186,8 +189,8 @@ class Retriever:
                 .filter(and_(*conditions)) \
                 .order_by(t.c.max_id.desc()).paginate(request_args.page, request_args.limit, False)
 
-        except Exception as e:
-            logger.exception('Error retrieving messages from database', error=e)
+        except Exception:
+            logger.exception('Error retrieving messages from database')
             raise InternalServerError(description="Error retrieving messages from database")
 
         return result
@@ -196,14 +199,14 @@ class Retriever:
     def retrieve_message(message_id, user):
         """returns single message from db"""
         db_model = SecureMessage()
-
+        logger.info("Retrieving message", message_id=message_id)
         try:
             result = db_model.query.filter_by(msg_id=message_id).first()
             if result is None:
                 logger.error('Message ID not found', message_id=message_id)
                 raise NotFound(description=f"Message with msg_id '{message_id}' does not exist")
-        except SQLAlchemyError as e:
-            logger.error('Error retrieving message from database', error=e)
+        except SQLAlchemyError:
+            logger.exception('Error retrieving message from database')
             raise InternalServerError(description="Error retrieving message from database")
 
         return result.serialize(user)
@@ -214,14 +217,15 @@ class Retriever:
         actor_conditions = []
 
         if user.is_respondent:
+            logger.info("Retrieving messages in thread for responent", thread_id=thread_id, user_uuid=user.user_uuid)
             actor_conditions.append(Status.actor == str(user.user_uuid))
         else:
+            logger.info("Retrieving messages in thread for internal user", thread_id=thread_id, user_uuid=user.user_uuid)
             actor_conditions.append(Status.actor == str(user.user_uuid))
             actor_conditions.append(Status.actor == constants.BRES_USER)
             actor_conditions.append(Status.actor == constants.NON_SPECIFIC_INTERNAL_USER)
 
         try:
-
             result = SecureMessage.query.join(Events).join(Status) \
                 .filter(SecureMessage.thread_id == thread_id) \
                 .filter(Status.label != Labels.DRAFT_INBOX.value) \
@@ -233,8 +237,8 @@ class Retriever:
                 logger.debug('Thread does not exist', thread_id=thread_id)
                 raise NotFound(description=f"Conversation with thread_id '{thread_id}' does not exist")
 
-        except SQLAlchemyError as e:
-            logger.error('Error retrieving conversation from database', error=e)
+        except SQLAlchemyError:
+            logger.exception('Error retrieving conversation from database')
             raise InternalServerError(description="Error retrieving conversation from database")
 
         return result
@@ -242,7 +246,7 @@ class Retriever:
     @staticmethod
     def retrieve_draft(message_id, user):
         """returns single draft from db"""
-
+        logger.info("Retrieving draft message", message_id=message_id)
         try:
             result = SecureMessage.query.filter(SecureMessage.msg_id == message_id) \
                 .filter(SecureMessage.statuses.any(Status.label == Labels.DRAFT.value)).first()
@@ -260,28 +264,24 @@ class Retriever:
     @staticmethod
     def check_db_connection():
         """checks if db connection is working"""
-        database_status = {"status": "healthy", "errors": "none"}
-        resp = jsonify(database_status)
-        resp.status_code = 200
-
         try:
             SecureMessage().query.limit(1).all()
         except Exception as e:  # NOQA pylint:disable=broad-except
-            database_status['status'] = "unhealthy"
-            database_status['errors'] = str(e)
-            resp = jsonify(database_status)
-            resp.status_code = 500
-            logger.error('No connection to database', status_code=resp.status_code, error=e)
+            logger.exception('No connection to database')
+            response = jsonify({"status": "unhealthy", "errors": str(e)})
+            response.status_code = 500
+            return response
 
-        return resp
+        return jsonify({"status": "healthy", "errors": "none"})
 
     @staticmethod
     def get_draft(draft_id, user):
         """Check msg_id is that of a valid draft and return true/false if no ID is present"""
+        logger.info("Checking if message is a draft", message_id=draft_id)
         try:
             result = SecureMessage.query.filter(SecureMessage.msg_id == draft_id) \
                 .filter(SecureMessage.statuses.any(Status.label == Labels.DRAFT.value)).first()
             return result.serialize(user) if result else None
-        except Exception as e:
-            logger.error('Error retrieving message from database', error=e)
+        except Exception:
+            logger.exception('Error retrieving message from database')
             raise InternalServerError(description="Error retrieving message from database")

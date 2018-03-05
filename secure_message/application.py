@@ -28,7 +28,7 @@ from secure_message.resources.threads import ThreadById, ThreadList
 from secure_message.v2.resources.messages import MessageSendV2, MessageCounterV2
 
 
-logger_initial_config(service_name='ras-secure-message')
+logger_initial_config(service_name='ras-secure-message', log_level="DEBUG")
 logger = wrap_logger(logging.getLogger(__name__))
 
 
@@ -58,7 +58,8 @@ def create_app(config=None):
     api.add_resource(MessageList, '/messages', '/v2/messages')
     api.add_resource(MessageSend, '/message/send')
     api.add_resource(MessageById, '/message/<message_id>', '/v2/messages/<message_id>')
-    api.add_resource(MessageModifyById, '/message/<message_id>/modify', '/v2/messages/modify/<message_id>')
+    api.add_resource(MessageModifyById, '/message/<message_id>/modify',
+                     '/v2/messages/modify/<message_id>')
     api.add_resource(MessageCounter, '/labels')
 
     api.add_resource(DraftSave, '/draft/save', '/v2/drafts')
@@ -131,17 +132,18 @@ def get_client_token(client_id, client_secret, url):
                                  auth=(client_id, client_secret))
         response.raise_for_status()
     except requests.HTTPError as e:
-        logger.exception(f"{e.response.status_code} response received while retrieving client token.")
+        logger.exception(
+            f"{e.response.status_code} response received while retrieving client token.")
         if e.response.status_code >= 500:
-            logger.debug("Retrying in 1 seconds.")
+            logger.info("Retrying client token retrieval in 1 seconds.")
             sleep(1)
             get_client_token(client_id, client_secret, url)
         elif 400 <= e.response.status_code < 500:
-            logger.debug("Client error encountered. Shutting down.")
+            logger.warning("Client error encountered. Shutting down.")
             sys.exit(1)
     except requests.RequestException as e:
         logger.exception(f"{e.__class__.__name__} occured while retrieving client token.")
-        logger.debug("Waiting 10 seconds and retrying client token retrieval.")
+        logger.info("Retrying client token retrieval in 10 seconds.")
         sleep(10)
         get_client_token(client_id, client_secret, url)
 
