@@ -87,8 +87,8 @@ def step_impl_the_msg_to_is_set_to_internal_specific_user(context):
 def step_impl_the_at_msg_to_is_set_to_internal_group_user(context):
     msg_resp = json.loads(context.response.data)
     expected = {"id": NON_SPECIFIC_INTERNAL_USER,
-                "firstName": "Ons user",
-                "lastName": "",
+                "firstName": "ONS",
+                "lastName": "User",
                 "emailAddress": ""
                 }
     nose.tools.assert_equal(msg_resp['@msg_to'][0], expected)
@@ -109,8 +109,8 @@ def step_impl_the_at_msg_to_is_set_to_bres_user(context):
 def step_impl_the_at_msg_to_is_set_to_internal_group_user_for_all_messages(context):
 
     expected = {"id": NON_SPECIFIC_INTERNAL_USER,
-                "firstName": "Ons user",
-                "lastName": "",
+                "firstName": "ONS",
+                "lastName": "User",
                 "emailAddress": ""
                 }
     for msg in context.bdd_helper.messages_responses_data[0]['messages']:
