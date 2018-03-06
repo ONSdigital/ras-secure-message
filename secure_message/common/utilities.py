@@ -45,10 +45,9 @@ def get_options(args, draft_only=False):
     if draft_only:
         label = Labels.DRAFT.value
         string_query_args = add_string_query_args(string_query_args, 'label', label)
-    else:
-        if args.get('label'):
-            label = str(args.get('label'))
-            string_query_args = add_string_query_args(string_query_args, 'label', args.get('label'))
+    elif args.get('label'):
+        label = str(args.get('label'))
+        string_query_args = add_string_query_args(string_query_args, 'label', args.get('label'))
     if args.get('ce'):
         ce = str(args.get('ce'))
         string_query_args = add_string_query_args(string_query_args, 'ce', args.get('ce'))
