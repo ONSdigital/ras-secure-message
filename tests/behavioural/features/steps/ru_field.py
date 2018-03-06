@@ -7,7 +7,7 @@ from flask import json
 @when("the ru is set to '{ru}'")
 def step_impl_the_ru_is_set_to(context, ru):
     """set the message data ru to a specific value"""
-    context.bdd_helper.message_data['ru'] = ru
+    context.bdd_helper.message_data['ru_id'] = ru
 
 
 @then("retrieved message ru is as was saved")

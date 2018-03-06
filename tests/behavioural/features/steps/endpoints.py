@@ -266,6 +266,38 @@ def step_impl_the_threads_are_read(context):
     context.bdd_helper.store_messages_response_data(context.response.data)
 
 
+@when("the threads in survey '{survey}' are read")
+@given("the threads in survey '{survey}' are read")
+def step_impl_the_threads_in_specific_survey_are_returned(context, survey):
+    url = context.bdd_helper.threads_get_url + f"?survey={survey}"
+    context.response = context.app.test_client().get(url, headers=context.bdd_helper.headers)
+    context.bdd_helper.store_messages_response_data(context.response.data)
+
+
+@when("the threads with ru '{ru_id}' are read")
+@given("the threads with ru '{ru_id}' are read")
+def step_impl_the_threads_in_specific_ru_id_are_returned(context, ru_id):
+    url = context.bdd_helper.threads_get_url + f"?ru_id={ru_id}"
+    context.response = context.app.test_client().get(url, headers=context.bdd_helper.headers)
+    context.bdd_helper.store_messages_response_data(context.response.data)
+
+
+@when("the threads with collection case '{cc}' are read")
+@given("the threads with collection case '{cc}' are read")
+def step_impl_the_threads_in_specific_collection_case_id_are_returned(context, cc):
+    url = context.bdd_helper.threads_get_url + f"?cc={cc}"
+    context.response = context.app.test_client().get(url, headers=context.bdd_helper.headers)
+    context.bdd_helper.store_messages_response_data(context.response.data)
+
+
+@when("the threads with collection exercise '{ce}' are read")
+@given("the threads with collection exercise '{ce}' are read")
+def step_impl_the_threads_in_specific_collection_case_exercise_are_returned(context, ce):
+    url = context.bdd_helper.threads_get_url + f"?ce={ce}"
+    context.response = context.app.test_client().get(url, headers=context.bdd_helper.headers)
+    context.bdd_helper.store_messages_response_data(context.response.data)
+
+
 @when("user accesses the /draft/save endpoint with using the PUT method")
 def step_impl_access_endpoint_with_wrong_method(context):
     context.bdd_helper.sent_messages.extend([context.bdd_helper.message_data])
@@ -425,7 +457,7 @@ def step_impl_messages_are_read_with_specific_survey(context, survey):
 
 @when("the count of  messages with '{label_name}' label in survey '{survey}' is made V2")
 @given("the count of  messages with '{label_name}' label in survey '{survey}' is made V2")
-def step_impl_the_unread_messages_are_counted_for_survey(context, label_name, survey):
+def step_impl_the_messages_for_specific_survey_are_counted_for_survey(context, label_name, survey):
     """access the messages_count endpoint to get the count of unread messages"""
     url = context.bdd_helper.messages_get_unread_count_v2_url + f"?label={label_name}&survey={survey}"
     context.response = context.app.test_client().get(url, headers=context.bdd_helper.headers)
