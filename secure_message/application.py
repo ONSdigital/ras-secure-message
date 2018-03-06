@@ -123,21 +123,33 @@ def get_client_token(client_id, client_secret, url):
 
     get_token_url = f'{url}/oauth/token'
 
+    s = requests.Session()
+    s.mount(get_token_url, HTTPAdapter(max_retries=15))
+
     try:
-        s = requests.Session()
-        s.mount(get_token_url, HTTPAdapter(max_retries=15))
-        response = requests.post(get_token_url,
-                                 headers=headers,
-                                 params=payload,
-                                 auth=(client_id, client_secret))
+        logger.debug("Attempting to GET client token from UAA")
+        response = s.post(get_token_url,
+                          headers=headers,
+                          params=payload,
+                          auth=(client_id, client_secret))
         response.raise_for_status()
+
+        try:
+            return response.json()
+            logger.debug("Decoding client token response json")
+            logger.debug(response.json())
+        except ValueError:
+            logger.exception("Failed to decode response JSON. Retrying in 10 seconds.")
+            sleep(10)
+            return get_client_token(client_id, client_secret, url)
+
     except requests.HTTPError as e:
         logger.exception(
             f"{e.response.status_code} response received while retrieving client token.")
         if e.response.status_code >= 500:
             logger.info("Retrying client token retrieval in 1 seconds.")
             sleep(1)
-            get_client_token(client_id, client_secret, url)
+            return get_client_token(client_id, client_secret, url)
         elif 400 <= e.response.status_code < 500:
             logger.warning("Client error encountered. Shutting down.")
             sys.exit(1)
@@ -145,16 +157,7 @@ def get_client_token(client_id, client_secret, url):
         logger.exception(f"{e.__class__.__name__} occured while retrieving client token.")
         logger.info("Retrying client token retrieval in 10 seconds.")
         sleep(10)
-        get_client_token(client_id, client_secret, url)
-
-    try:
-        resp_json = response.json()
-        return resp_json
-    except ValueError:
-        logger.exception("Failed to decode response JSON. Retrying in 10 seconds.")
-        sleep(10)
-        get_client_token(client_id, client_secret, url)
-
+        return get_client_token(client_id, client_secret, url)
 
 def retry_if_database_error(exception):
     logger.error('Database error has occurred', error=exception)
