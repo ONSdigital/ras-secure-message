@@ -135,9 +135,8 @@ def get_client_token(client_id, client_secret, url):
         response.raise_for_status()
 
         try:
-            return response.json()
             logger.debug("Decoding client token response json")
-            logger.debug(response.json())
+            return response.json()
         except ValueError:
             logger.exception("Failed to decode response JSON. Retrying in 10 seconds.")
             sleep(10)
