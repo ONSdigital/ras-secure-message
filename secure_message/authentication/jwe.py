@@ -3,6 +3,7 @@ Module to generate encrypt and decrypt token
 """
 import os
 import base64
+from functools import singledispatch
 
 from cryptography.hazmat.backends.openssl.backend import backend
 from cryptography.hazmat.primitives.ciphers import Cipher
@@ -44,9 +45,18 @@ class Encrypter:
 
         self.public_key = backend.load_pem_public_key(public_key_bytes)
 
+    def _encode_token(self, token):
+        """
+        Decodes string tokens without altering bytes tokens.
+        """
+        try:
+            return token.encode()
+        except AttributeError:
+            return token
+
     def encrypt_token(self, token):
         """Function to encrypt jwt"""
-
+        token = self._encode_token(token)
         jwe_protected_header = self._base_64_encode(b'{"alg":"RSA-OAEP","enc":"A256GCM"}')
 
         encrypted_key = self._base_64_encode(self.public_key.encrypt(self.cek, padding.OAEP(
@@ -57,7 +67,7 @@ class Encrypter:
 
         encryptor.authenticate_additional_data(jwe_protected_header)
 
-        ciphertext = encryptor.update(token.encode()) + encryptor.finalize()
+        ciphertext = encryptor.update(self._encode_token(token)) + encryptor.finalize()
         tag = encryptor.tag
 
         encoded_ciphertext = self._base_64_encode(ciphertext)
@@ -95,12 +105,20 @@ class Decrypter:
 
         self.public_key = backend.load_pem_public_key(public_key_bytes)
 
+    def _decode_token(self, token):
+        """
+        Decodes string tokens without altering bytes tokens.
+        """
+        try:
+            return token.decode()
+        except AttributeError:
+            return token
+
     def decrypt_token(self, encrypted_token):
         """
         Function to decrypt encrypted jwt
         """
-        if not isinstance(encrypted_token, str):
-            encrypted_token = encrypted_token.decode()
+        encrypted_token = self._decode_token(encrypted_token)
 
         tokens = encrypted_token.split('.')
         if len(tokens) != 5:

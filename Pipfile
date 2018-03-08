@@ -19,14 +19,13 @@ flask-cors = "==3.0.2"
 marshmallow = "==2.13.1"
 "psycopg2" = "==2.7.1"
 sqlalchemy = "==1.1.5"
-python-jose = "==1.2.0"
 structlog = "==16.1.0"
 cryptography = "==2.1.2"
-cfenv = "==0.5.3"
 gunicorn = "==19.7.1"
 requests = "*"
 retrying = "*"
 maya = "*"
+pyjwt = "*"
 
 
 [dev-packages]

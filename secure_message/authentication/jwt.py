@@ -3,7 +3,7 @@ Module to generate jwt token
 """
 
 from flask import current_app
-from jose import jwt
+import jwt
 
 
 def encode(data):
