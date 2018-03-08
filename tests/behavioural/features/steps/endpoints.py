@@ -3,7 +3,7 @@ from flask import json
 import copy
 
 
-# These steps genrate http requests and responses
+# These steps generate http requests and responses
 
 @given("the message is sent")
 @when("the message is sent")

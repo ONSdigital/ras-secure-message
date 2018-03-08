@@ -116,8 +116,3 @@ Feature: Get threads list Endpoint
       And  '3' messages are returned
       # Drafts added last
       And '3' messages have a 'DRAFT' label
-
-
-
-
-
