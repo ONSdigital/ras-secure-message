@@ -215,3 +215,5 @@ Feature: Get Messages list Endpoint
     When messages are read
       Then a success status code (200) is returned
       And '0' messages are returned with sent from internal
+
+  Scenario: An internal user sends a long message, the respondent views their inbox and sees a 100 character summary of the body

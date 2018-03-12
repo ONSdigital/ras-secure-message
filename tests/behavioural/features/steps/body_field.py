@@ -31,8 +31,21 @@ def step_impl_the_msg_body_is_set_too_long(context):
     context.bdd_helper.message_data['body'] = "x" * (constants.MAX_BODY_LEN + 1)
 
 
+@given("the message body is '{body_length}' characters long")
+def step_impl_the_msg_body_is_set_too_long(context, body_length):
+    """set the body to be body_length characters long"""
+    context.bdd_helper.message_data['body'] = "x" * int(body_length)
+
+
 @then("retrieved message body is as was saved")
 def step_impl_retrieved_body_is_as_saved(context):
-    """validate that the received body was teh same as was sent"""
+    """validate that the received body was the same as was sent"""
     msg_resp = json.loads(context.response.data)
     nose.tools.assert_equal(msg_resp['body'], context.bdd_helper.last_saved_message_data['body'])
+
+
+@then("the threads first message body is as was saved")
+def step_impl_retrieved_body_is_as_saved(context):
+    """validate that the received body of the first message in a thread was the same as was sent"""
+    msg_resp = json.loads(context.response.data)
+    nose.tools.assert_equal(msg_resp['messages'][0]['body'], context.bdd_helper.last_saved_message_data['body'])

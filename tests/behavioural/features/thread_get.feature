@@ -104,6 +104,25 @@ Feature: Get thread by id Endpoint
     Then '3' messages are returned
       And '3' messages have a 'SENT' label
 
+  Scenario: Respondent sends a message to internal group, validate the entire message body is received
+    Given sending from respondent to internal group
+      And   the message body is '10000' characters long
+      And   the message is sent
+      And   the user is set as internal
+      And   the from is set to internal group
+      And   the to is set to respondent
+      And   the message is read
+      And   the thread id is set to the last returned thread id
+      And   the message is sent
+      And   the user is set as respondent
+      And   the from is set to respondent
+      And   the to is set to internal group
+      And   the message is read
+      And   the thread id is set to the last returned thread id
+      And   the message is sent
+    When the thread is read
+    Then  a success status code (200) is returned
+      And the threads first message body is as was saved
 
   Scenario:Respondent tries to retrieve a conversation that does not exist
     Given sending from respondent to internal bres user
