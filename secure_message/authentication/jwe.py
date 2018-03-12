@@ -46,7 +46,7 @@ class Encrypter:
 
     def _encode_token(self, token):
         """
-        Decodes string tokens without altering bytes tokens.
+        Encodes string tokens without altering bytes tokens.
         """
         try:
             return token.encode()
