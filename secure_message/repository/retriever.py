@@ -148,17 +148,19 @@ class Retriever:
     @staticmethod
     def retrieve_thread_list(user, request_args):
         """returns list of threads from db"""
+        if user.is_respondent:
+            return Retriever._retrieve_respondent_thread_list(request_args, user)
+        else:
+            return Retriever._retrieve_internal_thread_list(request_args, user)
+
+    @staticmethod
+    def _retrieve_respondent_thread_list(request_args, user):
         conditions = []
         actor_conditions = []
 
         if user.is_respondent:
             logger.info("Retrieving list of threads for respondent", user_uuid=user.user_uuid)
             actor_conditions.append(Status.actor == str(user.user_uuid))
-        else:
-            logger.info("Retrieving list of threads for internal user", user_uuid=user.user_uuid)
-            actor_conditions.append(Status.actor == str(user.user_uuid))
-            actor_conditions.append(Status.actor == constants.BRES_USER)
-            actor_conditions.append(Status.actor == constants.NON_SPECIFIC_INTERNAL_USER)
 
         if request_args.ru_id:
             conditions.append(SecureMessage.ru_id == request_args.ru_id)
@@ -190,6 +192,48 @@ class Retriever:
                 .order_by(t.c.max_id.desc()).paginate(request_args.page, request_args.limit, False)
 
         except Exception:
+            logger.exception('Error retrieving messages from database')
+            raise InternalServerError(description="Error retrieving messages from database")
+
+        return result
+
+    @staticmethod
+    def _retrieve_internal_thread_list(request_args, user):
+        conditions = []
+
+        logger.info("Retrieving list of threads for internal user", user_uuid=user.user_uuid)
+
+        if request_args.ru_id:
+            conditions.append(SecureMessage.ru_id == request_args.ru_id)
+
+        if request_args.survey:
+            conditions.append(SecureMessage.survey == request_args.survey)
+
+        if request_args.cc:
+            conditions.append(SecureMessage.collection_case == request_args.cc)
+
+        if request_args.ce:
+            conditions.append(SecureMessage.collection_exercise == request_args.ce)
+
+        try:
+            t = db.session.query(SecureMessage.thread_id, func.max(Status.id)  # pylint:disable=no-member
+                                 .label('status_id')) \
+                .join(Events).join(Status) \
+                .filter(or_(and_(SecureMessage.from_internal == False, Status.label == Labels.INBOX.value),  # NOQA
+                            and_(SecureMessage.from_internal == True,
+                                 Status.label.in_([Labels.SENT.value, Labels.DRAFT.value]))
+                            )
+                        ) \
+                .group_by(SecureMessage.thread_id).subquery('t')
+
+            conditions.append(SecureMessage.thread_id == t.c.thread_id)
+            conditions.append(Status.id == t.c.status_id)
+
+            result = SecureMessage.query.join(Events).join(Status) \
+                .filter(and_(*conditions)) \
+                .order_by(t.c.status_id.desc()).paginate(request_args.page, request_args.limit, False)
+
+        except Exception as e:
             logger.exception('Error retrieving messages from database')
             raise InternalServerError(description="Error retrieving messages from database")
 

@@ -297,7 +297,7 @@ Feature: Draft Save Endpoint
     When   the previously returned draft is modified
     Then   a conflict error status code (409) is returned
 
-  Scenario: A Respondent saves a message and an internal user replies , the thread id should not equal the message id
+   Scenario: A Respondent saves a draft message and an internal user replies , the thread id should not equal the message id
     Given sending from respondent to internal bres user
       And  the message is saved as draft
       And  the user is set as internal
