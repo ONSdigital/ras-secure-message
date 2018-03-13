@@ -441,4 +441,3 @@ Feature: Get threads list Endpoint V2
     | user        |
     | specific user |
     | group        |
-    | group        |
