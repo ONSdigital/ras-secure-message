@@ -1,7 +1,7 @@
 import logging
 
 from flask import Response, g, current_app
-from jose import JWTError
+from jwt.exceptions import InvalidTokenError
 from structlog import wrap_logger
 from werkzeug.exceptions import BadRequest
 
@@ -49,7 +49,7 @@ def check_jwt(token):
 
         return {'status': "ok"}
 
-    except JWTError:
+    except (InvalidTokenError):
         logger.error('Failed to decrypt or decode the JWT. Is the JWT Algorithm and Secret setup correctly?')
         return Response(response="Invalid token to access this Microservice Resource", status=400, mimetype="text/html")
     except BadRequest as e:
