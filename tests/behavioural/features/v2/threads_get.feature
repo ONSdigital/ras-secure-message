@@ -480,3 +480,15 @@ Feature: Get threads list Endpoint V2
         And  '1' messages are returned
         And all response messages have the label 'SENT'
 
+  Scenario: A respondent sends a message to  an internal group .An internal user creates a draft on the thread ,
+            a second internal user gets the thread. Validate that the second user can see the draft from the other internal user.
+     Given sending from respondent to internal group
+        And the message is sent V2
+        And the thread id is set to the last returned thread id
+        And sending from internal specific user to respondent
+        And the message is saved as draft V2
+        And the user is set to alternative internal specific user
+      When the threads are read
+      Then a success status code (200) is returned
+       And '1' messages are returned
+       And all response messages have the label 'DRAFT'
