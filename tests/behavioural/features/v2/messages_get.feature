@@ -63,7 +63,7 @@ Feature: Get Messages list V2 Endpoint
       And the message body is '5000' characters long
       And '1' messages are sent using V2
     When messages are read V2
-    Then the message bodies are 100 characters or less
+    Then the message bodies are '100' characters or less
 
     Examples: user type
     | user        |

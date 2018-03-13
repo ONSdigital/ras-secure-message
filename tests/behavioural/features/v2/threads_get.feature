@@ -405,7 +405,7 @@ Feature: Get threads list Endpoint V2
       And the message body is '5000' characters long
       And '1' messages are sent using V2
     When the threads are read
-    Then the message bodies are 100 characters or less
+    Then the message bodies are '100' characters or less
 
 
   Scenario Outline: There is a conversation between respondent and internal the last message is a draft with an empty to field ,
