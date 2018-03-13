@@ -78,11 +78,44 @@ class SecureMessage(db.Model):
                    '_links': '',
                    'labels': []}
 
-        self._populate_to_and_from(user, message)
+        if user.is_internal:
+            self._populate_to_from_and_labels_internal_user(message)
+        else:
+            self._populate_to_from_and_labels_respondent(user, message)
 
         self._populate_events(message)
 
         return message
+
+    def _populate_to_from_and_labels_internal_user(self, message):
+        """populate the labels and to and from if the user is internal"""
+        try:
+            if message['from_internal']:
+                respondent = [x.actor for x in self.statuses if x.label == Labels.INBOX.value or x.label == Labels.DRAFT_INBOX.value][0]
+            else:
+                respondent = [x.actor for x in self.statuses if x.label == Labels.SENT.value or x.label == Labels.DRAFT.value][0]
+        except IndexError:
+            logger("Could not determine respondent from message", msg_id=message["msg_id"])
+            raise
+        for row in self.statuses:
+            if row.actor != respondent:
+                message['labels'].append(row.label)
+            self._add_to_and_from(message, row)
+
+    def _populate_to_from_and_labels_respondent(self, user, message):
+        """Populate labels and to and from if the user is a respondent"""
+        for row in self.statuses:
+            if row.actor == user.user_uuid:
+                message['labels'].append(row.label)
+            self._add_to_and_from(message, row)
+
+    @staticmethod
+    def _add_to_and_from(message, row):
+        """Populate the message to and from"""
+        if row.label in [Labels.INBOX.value, Labels.DRAFT_INBOX.value]:
+            message['msg_to'].append(row.actor)
+        elif row.label in [Labels.SENT.value, Labels.DRAFT.value]:
+            message['msg_from'] = row.actor
 
     def _populate_events(self, message):
         for row in self.events:
@@ -92,19 +125,6 @@ class SecureMessage(db.Model):
                 message['modified_date'] = str(row.date_time)
             elif row.event == EventsApi.READ.value:
                 message['read_date'] = str(row.date_time)
-
-    def _populate_to_and_from(self, user, message):
-        for row in self.statuses:
-            if row.actor == user.user_uuid or (user.is_internal and (row.actor == constants.NON_SPECIFIC_INTERNAL_USER or row.actor == constants.BRES_USER)):
-                message['labels'].append(row.label)
-            if row.label == Labels.INBOX.value:
-                message['msg_to'].append(row.actor)
-            elif row.label == Labels.SENT.value:
-                message['msg_from'] = row.actor
-            elif row.label == Labels.DRAFT.value:
-                message['msg_from'] = row.actor
-            elif row.label == Labels.DRAFT_INBOX.value:
-                message['msg_to'].append(row.actor)
 
 
 class Status(db.Model):

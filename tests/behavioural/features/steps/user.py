@@ -111,6 +111,14 @@ def step_impl_the_user_is_internal_specific_user(context):
         context.bdd_helper.token_data = context.bdd_helper.internal_specific_user_token
 
 
+@given("the user is set to alternative internal specific user")
+@when("the user is set to alternative internal specific user")
+def step_impl_the_user_is_set_to_alternative_internal_specific_user(context):
+    "Set the user to the alternative internal user"
+    with context.app.app_context():
+        context.bdd_helper.token_data = context.bdd_helper.alternative_internal_specific_user_token
+
+
 @given("the user is set as internal group")
 @when("the user is set as internal group")
 def step_impl_the_user_is_internal_group_user(context):

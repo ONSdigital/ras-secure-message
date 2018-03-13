@@ -84,18 +84,20 @@ class RetrieverTestCaseHelper:
                 self.add_status(label="UNREAD", msg_id=msg_id, actor=internal_actor)
 
                 self.add_event(event=EventsApi.SENT.value, msg_id=msg_id, date_time=datetime(year, month, day))
+                day = day + 1
 
             if add_reply:
                 self.del_status(label="UNREAD", msg_id=msg_id, actor=internal_actor)
-                self.add_event(event=EventsApi.READ.value, msg_id=msg_id, date_time=datetime(year, month, day + 1))
-
+                self.add_event(event=EventsApi.READ.value, msg_id=msg_id, date_time=datetime(year, month, day))
+                day = day + 1
                 msg_id = str(uuid.uuid4())
                 self.add_secure_message(msg_id=msg_id, from_internal=True)
                 self.add_status(label="SENT", msg_id=msg_id, actor=internal_actor)
                 self.add_status(label="INBOX", msg_id=msg_id, actor=external_actor)
                 self.add_status(label="UNREAD", msg_id=msg_id, actor=external_actor)
 
-                self.add_event(event=EventsApi.SENT.value, msg_id=msg_id, date_time=datetime(year, month, day + 1))
+                self.add_event(event=EventsApi.SENT.value, msg_id=msg_id, date_time=datetime(year, month, day))
+                day = day + 1
 
             if add_draft:
                 msg_id = str(uuid.uuid4())
@@ -104,6 +106,7 @@ class RetrieverTestCaseHelper:
                 self.add_status(label="DRAFT", msg_id=msg_id, actor=internal_actor)
 
                 self.add_event(event=EventsApi.DRAFT_SAVED.value, msg_id=msg_id, date_time=datetime(year, month, day))
+                day = day + 1
 
             if multiple_users:
                 msg_id = str(uuid.uuid4())
@@ -115,6 +118,7 @@ class RetrieverTestCaseHelper:
                 self.add_status(label="UNREAD", msg_id=msg_id, actor="11111111-10d5-4ecb-b7ca-fb8823c0384a")
 
                 self.add_event(event=EventsApi.SENT.value, msg_id=msg_id, date_time=datetime(year, month, day))
+                day = day + 1
 
     def create_threads(self, no_of_threads=1, add_internal_draft=False, add_respondent_draft=False,
                        external_actor=default_external_actor,
@@ -142,15 +146,18 @@ class RetrieverTestCaseHelper:
             self.add_secure_message(msg_id=msg_id, thread_id=thread_id, survey=constants.BRES_USER, from_internal=False)
             self.add_status(label="SENT", msg_id=msg_id, actor=external_actor)
             self.add_status(label="INBOX", msg_id=msg_id, actor=internal_actor)
-            self.add_event(event=EventsApi.SENT.value, msg_id=msg_id, date_time=datetime(year, month, day))
-            self.add_event(event=EventsApi.READ.value, msg_id=msg_id, date_time=datetime(year, month, day + 1))
 
+            self.add_event(event=EventsApi.SENT.value, msg_id=msg_id, date_time=datetime(year, month, day))
+            day += 1
+            self.add_event(event=EventsApi.READ.value, msg_id=msg_id, date_time=datetime(year, month, day))
+            day += 1
             msg_id = str(uuid.uuid4())
             self.add_secure_message(msg_id=msg_id, thread_id=thread_id, survey=constants.BRES_USER, from_internal=True)
             self.add_status(label="SENT", msg_id=msg_id, actor=internal_actor)
             self.add_status(label="UNREAD", msg_id=msg_id, actor=external_actor)
             self.add_status(label="INBOX", msg_id=msg_id, actor=external_actor)
-            self.add_event(event=EventsApi.SENT.value, msg_id=msg_id, date_time=datetime(year, month, day + 1))
+            self.add_event(event=EventsApi.SENT.value, msg_id=msg_id, date_time=datetime(year, month, day))
+            day += 1
 
             last_msg_id = msg_id
 
@@ -160,20 +167,21 @@ class RetrieverTestCaseHelper:
                 self.add_status(label="DRAFT_INBOX", msg_id=msg_id, actor=external_actor)
                 self.add_status(label="DRAFT", msg_id=msg_id, actor=internal_actor)
 
-                self.add_event(event=EventsApi.DRAFT_SAVED.value, msg_id=msg_id, date_time=datetime(year, month, day + 2))
+                self.add_event(event=EventsApi.DRAFT_SAVED.value, msg_id=msg_id, date_time=datetime(year, month, day))
+                day += 1
 
             if add_respondent_draft:  # adds draft from respondent
 
                 self.del_status(label="UNREAD", msg_id=last_msg_id, actor=RetrieverTestCaseHelper.default_external_actor)
-                self.add_event(event=EventsApi.READ.value, msg_id=last_msg_id, date_time=datetime(year, month, day + 1))
-
+                self.add_event(event=EventsApi.READ.value, msg_id=last_msg_id, date_time=datetime(year, month, day))
+                day += 1
                 msg_id = str(uuid.uuid4())
                 self.add_secure_message(msg_id=msg_id, thread_id=thread_id, survey=constants.BRES_USER, from_internal=False)
                 self.add_status(label="DRAFT_INBOX", msg_id=msg_id, actor=internal_actor)
                 self.add_status(label="DRAFT", msg_id=msg_id, actor=external_actor)
 
-                self.add_event(event=EventsApi.DRAFT_SAVED.value, msg_id=msg_id, date_time=datetime(year, month, day + 2))
-
+                self.add_event(event=EventsApi.DRAFT_SAVED.value, msg_id=msg_id, date_time=datetime(year, month, day))
+                day += 1
         return threads
 
 
@@ -907,7 +915,6 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
     def test_thread_list_returned_in_descending_order_internal(self):
         """retrieves threads from database in desc sent_date order for internal user"""
         self.create_threads(5)
-        self.populate_database(5, single=False, multiple_users=True)
 
         with self.app.app_context():
             with current_app.test_request_context():
@@ -951,7 +958,6 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
     def test_thread_list_returned_in_descending_order_internal_with_draft(self):
         """retrieves threads from database in desc sent_date order for internal user with draft"""
         self.create_threads(5, add_internal_draft=True)
-        self.populate_database(5, single=False, multiple_users=True)
 
         with self.app.app_context():
             with current_app.test_request_context():
@@ -973,7 +979,6 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
     def test_latest_message_from_each_thread_chosen_desc(self):
         """checks the message chosen for each thread is the latest message within that thread"""
         self.create_threads(5)
-        self.populate_database(5, single=False, multiple_users=True)
 
         with self.app.app_context():
             with current_app.test_request_context():
@@ -1037,7 +1042,6 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
         """checks the message chosen for each thread is the latest message within that thread
         for internal user with respondent drafts"""
         self.create_threads(5, add_respondent_draft=True)
-        self.populate_database(5, single=False, multiple_users=True)
 
         with self.app.app_context():
             with current_app.test_request_context():
@@ -1101,7 +1105,6 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
         """checks the message chosen for each thread is the latest message within that thread
         for internal user with internal drafts"""
         self.create_threads(5, add_internal_draft=True)
-        self.populate_database(5, single=False, multiple_users=True)
 
         with self.app.app_context():
             with current_app.test_request_context():
@@ -1164,8 +1167,7 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
     def test_latest_message_from_each_thread_chosen_desc_internal_with_both_users_drafts(self):
         """checks the message chosen for each thread is the latest message within that thread
         for internal user with drafts from both users"""
-        self.create_threads(5, add_internal_draft=True, add_respondent_draft=True)
-        self.populate_database(5, single=False, multiple_users=True)
+        self.create_threads(1, add_internal_draft=True, add_respondent_draft=True)
 
         with self.app.app_context():
                 args = get_args(limit=MESSAGE_QUERY_LIMIT)
@@ -1183,7 +1185,7 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
                     thread_ids.append(serialized_msg['thread_id'])
                     msg_ids.append(serialized_msg['msg_id'])
 
-                self.assertEqual(len(msg_ids), 5)
+                self.assertEqual(len(msg_ids), 1)
 
                 args = get_args(page=1, limit=MESSAGE_QUERY_LIMIT)
 
