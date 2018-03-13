@@ -103,7 +103,7 @@ class SecureMessage(db.Model):
             self._add_to_and_from(message, row)
 
     def _populate_to_from_and_labels_respondent(self, user, message):
-        """Populate labels and to and from if teh user is a respondent"""
+        """Populate labels and to and from if the user is a respondent"""
         for row in self.statuses:
             if row.actor == user.user_uuid:
                 message['labels'].append(row.label)
