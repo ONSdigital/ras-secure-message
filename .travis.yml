@@ -13,7 +13,8 @@ install:
     - pipenv install --dev --deploy
 
 script:
-    - pipenv run coverage run run_tests.py
+    - make test
+    - pipenv run coverage
 
 services:
     - postgresql
