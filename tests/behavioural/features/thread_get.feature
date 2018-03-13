@@ -104,7 +104,6 @@ Feature: Get thread by id Endpoint
     Then '3' messages are returned
       And '3' messages have a 'SENT' label
 
-
   Scenario:Respondent tries to retrieve a conversation that does not exist
     Given sending from respondent to internal bres user
     When the thread_id is set to 'DoesNotExist'
