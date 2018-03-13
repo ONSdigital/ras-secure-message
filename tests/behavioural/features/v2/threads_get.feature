@@ -408,7 +408,37 @@ Feature: Get threads list Endpoint V2
     Then the message bodies are 100 characters or less
 
 
+  Scenario Outline: There is a conversation between respondent and internal the last message is a draft with an empty to field ,
+                    respondent attempts to read them, should receive  a 200
+    Given sending from respondent to internal <user>
+      And the message is sent V2
+      And the thread id is set to the last returned thread id
+      And the to is set to empty
+      And the message is saved as draft V2
+   When the threads are read
+    Then  a success status code (200) is returned
+      And '1' messages are returned
+
     Examples: user type
     | user        |
     | specific user |
+    | group        |
+
+
+  Scenario Outline: There is a conversation between internal and respondent the last message is a draft with an empty to field ,
+                    respondent attempts to read them, should receive  a 200
+    Given sending from internal <user> to respondent
+      And the message is sent V2
+      And the thread id is set to the last returned thread id
+      And the to is set to empty
+      And the message is saved as draft V2
+   When the threads are read
+    Then  a success status code (200) is returned
+      And '1' messages are returned
+
+
+    Examples: user type
+    | user        |
+    | specific user |
+    | group        |
     | group        |

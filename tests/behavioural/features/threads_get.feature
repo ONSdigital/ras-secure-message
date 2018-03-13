@@ -123,5 +123,3 @@ Feature: Get threads list Endpoint
       And '1' messages are sent
     When the threads are read
     Then the message bodies are 100 characters or less
-
-
