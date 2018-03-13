@@ -400,6 +400,14 @@ Feature: Get threads list Endpoint V2
     | group        |
 
 
+ Scenario Outline: A respondent sends a very long message, the internal user sees a 100 character summary in their inbox
+    Given sending from internal <user> to respondent
+      And the message body is '5000' characters long
+      And '1' messages are sent using V2
+    When the threads are read
+    Then the message bodies are '100' characters or less
+
+
   Scenario Outline: There is a conversation between respondent and internal the last message is a draft with an empty to field ,
                     respondent attempts to read them, should receive  a 200
     Given sending from respondent to internal <user>
