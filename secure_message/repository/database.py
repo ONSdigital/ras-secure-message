@@ -112,14 +112,10 @@ class SecureMessage(db.Model):
     @staticmethod
     def _add_to_and_from(message, row):
         """Populate the message to and from"""
-        if row.label == Labels.INBOX.value:
+        if row.label in [Labels.INBOX.value, Labels.DRAFT_INBOX.value]:
             message['msg_to'].append(row.actor)
-        elif row.label == Labels.SENT.value:
+        elif row.label in [Labels.SENT.value, Labels.DRAFT.value]:
             message['msg_from'] = row.actor
-        elif row.label == Labels.DRAFT.value:
-            message['msg_from'] = row.actor
-        elif row.label == Labels.DRAFT_INBOX.value:
-            message['msg_to'].append(row.actor)
 
     def _populate_events(self, message):
         for row in self.events:

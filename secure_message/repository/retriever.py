@@ -68,7 +68,7 @@ class Retriever:
                 .filter(SecureMessage.msg_id == t.c.msg_id) \
                 .order_by(order).paginate(message_args.page, message_args.limit, False)
 
-        except Exception:
+        except SQLAlchemyError:
             logger.exception('Error retrieving messages from database')
             raise InternalServerError(description="Error retrieving messages from database")
 
@@ -125,7 +125,7 @@ class Retriever:
                 .filter(SecureMessage.msg_id == t.c.msg_id) \
                 .order_by(order).paginate(message_args.page, message_args.limit, False)
 
-        except Exception:
+        except SQLAlchemyError:
             logger.exception('Error retrieving messages from database')
             raise InternalServerError(description="Error retrieving messages from database")
 
@@ -191,7 +191,7 @@ class Retriever:
                 .filter(and_(*conditions)) \
                 .order_by(t.c.max_id.desc()).paginate(request_args.page, request_args.limit, False)
 
-        except Exception:
+        except SQLAlchemyError:
             logger.exception('Error retrieving messages from database')
             raise InternalServerError(description="Error retrieving messages from database")
 
@@ -234,7 +234,7 @@ class Retriever:
                 .filter(and_(*conditions)) \
                 .order_by(t.c.status_id.desc()).paginate(request_args.page, request_args.limit, False)
 
-        except Exception as e:
+        except SQLAlchemyError:
             logger.exception('Error retrieving messages from database')
             raise InternalServerError(description="Error retrieving messages from database")
 
