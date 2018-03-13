@@ -23,7 +23,14 @@ class ThreadById(Resource):
         conversation = Retriever().retrieve_thread(thread_id, g.user, message_args)
 
         logger.info("Successfully retrieved messages from thread", thread_id=thread_id, user_uuid=g.user.user_uuid)
-        return make_response(paginated_list_to_json(conversation, request.host_url, g.user, message_args, THREAD_BY_ID_ENDPOINT + "/" + thread_id), 200)
+        return make_response(paginated_list_to_json(conversation,
+                                                    request.host_url,
+                                                    g.user,
+                                                    message_args,
+                                                    THREAD_BY_ID_ENDPOINT + "/" + thread_id,
+                                                    body_summary=False),
+
+                             200)
 
 
 class ThreadList(Resource):
