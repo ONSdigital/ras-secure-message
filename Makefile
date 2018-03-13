@@ -11,4 +11,4 @@ lint:
 	pipenv check ./secure_message ./tests
 
 test: lint
-	pipenv run run_tests.py
+	pipenv run python run_tests.py
