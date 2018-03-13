@@ -64,4 +64,17 @@ Feature: Get draft by id
       And  the draft is read
     Then  a forbidden status code (403) is returned
 
+  Scenario: Respondent saves a draft with an empty to field then reads it , should receive a 200
+    Given sending from respondent to internal bres user
+      And  the to is set to empty
+    When the message is saved as draft
+      And the draft is read
+    Then a success status code (200) is returned
+
+  Scenario: Internal user saves a draft with an empty to field then reads it , should receive a 200
+    Given sending from internal bres user to respondent
+      And  the to is set to empty
+    When the message is saved as draft
+      And the draft is read
+    Then a success status code (200) is returned
 
