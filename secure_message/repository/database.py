@@ -89,10 +89,14 @@ class SecureMessage(db.Model):
 
     def _populate_to_from_and_labels_internal_user(self, message):
         """populate the labels and to and from if the user is internal"""
-        if message['from_internal']:
-            respondent = [x.actor for x in self.statuses if x.label == Labels.INBOX.value or x.label == Labels.DRAFT_INBOX.value][0]
-        else:
-            respondent = [x.actor for x in self.statuses if x.label == Labels.SENT.value or x.label == Labels.DRAFT.value][0]
+        try:
+            if message['from_internal']:
+                respondent = [x.actor for x in self.statuses if x.label == Labels.INBOX.value or x.label == Labels.DRAFT_INBOX.value][0]
+            else:
+                respondent = [x.actor for x in self.statuses if x.label == Labels.SENT.value or x.label == Labels.DRAFT.value][0]
+        except IndexError:
+            logger("Could not determine respondent from message", msg_id=message["msg_id"])
+            raise
         for row in self.statuses:
             if row.actor != respondent:
                 message['labels'].append(row.label)
