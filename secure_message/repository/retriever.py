@@ -199,6 +199,7 @@ class Retriever:
 
     @staticmethod
     def _retrieve_internal_thread_list(request_args, user):
+        """Retrieve a list of threads for an internal user"""
         conditions = []
 
         logger.info("Retrieving list of threads for internal user", user_uuid=user.user_uuid)
