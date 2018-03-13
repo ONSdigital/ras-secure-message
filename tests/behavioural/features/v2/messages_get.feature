@@ -57,6 +57,19 @@ Feature: Get Messages list V2 Endpoint
     | specific user |
     | group        |
 
+
+ Scenario Outline: An internal user sends a very long message, the respondent sees a 100 character summary in their inbox
+    Given sending from internal <user> to respondent
+      And the message body is '5000' characters long
+      And '1' messages are sent using V2
+    When messages are read V2
+    Then the message bodies are 100 characters or less
+
+    Examples: user type
+    | user        |
+    | specific user |
+    | group        |
+
   Scenario Outline: A Respondent sends multiple messages using v2 on different surveys to multiple internal user types ,
                     Internal user reads them without setting a survey confirm correct count seen
     Given sending from respondent to internal <user>

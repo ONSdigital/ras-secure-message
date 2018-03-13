@@ -49,3 +49,11 @@ def step_impl_retrieved_body_is_as_saved(context):
     """validate that the received body of the first message in a thread was the same as was sent"""
     msg_resp = json.loads(context.response.data)
     nose.tools.assert_equal(msg_resp['messages'][0]['body'], context.bdd_helper.last_saved_message_data['body'])
+
+
+@then("the message bodies are 100 characters or less")
+def step_impl_retrieved_bodies_are_100_characters_or_less(context):
+    """validate that the message bodies in a response list are more than 100 characters in length"""
+    msg_resp = json.loads(context.response.data)
+    for message in msg_resp['messages']:
+        nose.tools.assert_less_equal(len(message['body']), 100)
