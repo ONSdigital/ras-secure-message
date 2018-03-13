@@ -436,7 +436,6 @@ Feature: Get threads list Endpoint V2
     Then  a success status code (200) is returned
       And '1' messages are returned
 
-
     Examples: user type
     | user        |
     | specific user |
