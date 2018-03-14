@@ -66,7 +66,7 @@ def add_string_query_args(string_query_args, arg, val):
     return f'{string_query_args}&{arg}={val}'
 
 
-def paginated_list_to_json(paginated_list, host_url, user, message_args, endpoint=MESSAGE_LIST_ENDPOINT, body_summary=True):
+def paginated_list_to_json(paginated_list, host_url, user, message_args, endpoint=MESSAGE_LIST_ENDPOINT):
     """used to change a pagination object to json format with links"""
     messages = []
     msg_count = 0
@@ -76,7 +76,7 @@ def paginated_list_to_json(paginated_list, host_url, user, message_args, endpoin
 
     for message in paginated_list.items:
         msg_count += 1
-        msg = message.serialize(user, body_summary=body_summary)
+        msg = message.serialize(user, body_summary=True)
         msg['_links'] = {"self": {"href": f"{host_url}{MESSAGE_BY_ID_ENDPOINT}/{msg['msg_id']}"}}
         messages.append(msg)
 
@@ -130,7 +130,8 @@ def get_business_details_by_ru(rus):
 
 def add_to_and_from_details(messages):
     """Adds user details for sender and recipient"""
-    [msg.update({'@msg_from': _get_from_details(msg), '@msg_to': _get_to_details(msg)}) for msg in messages]
+    for message in messages:
+        message.update({'@msg_from': _get_from_details(message), '@msg_to': _get_to_details(message)})
     return messages
 
 

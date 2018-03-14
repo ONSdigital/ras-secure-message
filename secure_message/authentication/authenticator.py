@@ -49,7 +49,7 @@ def check_jwt(token):
 
         return {'status': "ok"}
 
-    except (InvalidTokenError):
+    except InvalidTokenError:
         logger.error('Failed to decrypt or decode the JWT. Is the JWT Algorithm and Secret setup correctly?')
         return Response(response="Invalid token to access this Microservice Resource", status=400, mimetype="text/html")
     except BadRequest as e:

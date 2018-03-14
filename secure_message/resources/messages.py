@@ -74,7 +74,7 @@ class MessageSend(Resource):
         message = self._validate_post_data(post_data)
 
         if message.errors == {}:
-            self._message_save(message, is_draft, draft_id)
+            self._message_save(message)
             if is_draft:
                 Modifier().del_draft(draft_id)
             # listener errors are logged but still a 201 reported
@@ -90,7 +90,7 @@ class MessageSend(Resource):
         return message
 
     @staticmethod
-    def _message_save(message, is_draft, draft_id):
+    def _message_save(message):
         """Saves the message to the database along with the subsequent status and audit"""
         save = Saver()
         save.save_message(message.data)

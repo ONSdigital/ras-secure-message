@@ -21,7 +21,7 @@ class CaseService:
             logger.debug('case service post result', status_code=case_service_data.status_code,
                          reason=case_service_data.reason, text=case_service_data.text)
             return case_service_data.status_code
-        else:
-            err = f"No case id for case involving user {user_name}, case event not called"
-            logger.error(err)
-            return {'error': err}, 400
+
+        err = f"No case id for case involving user {user_name}, case event not called"
+        logger.error(err)
+        return {'error': err}, 400

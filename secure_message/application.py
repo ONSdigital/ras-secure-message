@@ -48,7 +48,7 @@ def create_app(config=None):
 
     logger.info('Starting Secure Message Service...', config=app_config)
 
-    create_db(app, app_config)
+    create_db(app)
 
     api.add_resource(Health, '/health')
     api.add_resource(DatabaseHealth, '/health/db')
@@ -88,6 +88,7 @@ def create_app(config=None):
             if res != {'status': "ok"}:
                 logger.error('Failed to authenticate user', result=res)
                 return res
+        return None
 
     @app.errorhandler(Exception)
     def handle_exception(error):  # NOQA pylint:disable=unused-variable
@@ -165,7 +166,7 @@ def retry_if_database_error(exception):
 
 
 @retry(retry_on_exception=retry_if_database_error, wait_fixed=2000, stop_max_delay=30000, wrap_exception=True)
-def create_db(app, app_config):
+def create_db(app):
     database.db.init_app(app)
     with app.app_context():
         event.listen(database.db.metadata, 'before_create', DDL(

@@ -50,6 +50,7 @@ class Modifier:
         if archive not in message['labels']:
             Modifier.add_label(archive, message, user)
             return True
+        return False
 
     @staticmethod
     def del_archived(message, user):

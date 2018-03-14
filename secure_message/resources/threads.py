@@ -27,8 +27,7 @@ class ThreadById(Resource):
                                                     request.host_url,
                                                     g.user,
                                                     message_args,
-                                                    THREAD_BY_ID_ENDPOINT + "/" + thread_id,
-                                                    body_summary=False),
+                                                    THREAD_BY_ID_ENDPOINT + "/" + thread_id),
 
                              200)
 

@@ -1,8 +1,8 @@
 import logging
+from structlog import wrap_logger
+
 from secure_message.constants import BRES_USER, NON_SPECIFIC_INTERNAL_USER
 from secure_message.services.internal_user_service import InternalUserService
-
-from structlog import wrap_logger
 
 logger = wrap_logger(logging.getLogger(__name__))
 
@@ -53,7 +53,7 @@ class InternalUserServiceMock:
         found = None
         if uuid:
             if uuid in [NON_SPECIFIC_INTERNAL_USER, BRES_USER]:
-                return InternalUserService._get_non_specific_user_details(uuid)
+                return InternalUserService.get_non_specific_user_details(uuid)
             found = self.internal_user_dict.get(uuid)
             if not found:
                 err_string = f"error retrieving details for {uuid}"

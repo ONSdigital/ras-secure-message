@@ -75,6 +75,7 @@ class Retriever:
         return result
 
     @staticmethod
+    # pylint:disable=too-complex
     def _retrieve_message_list_internal(message_args):
         """returns list of messages from db"""
         conditions = []
@@ -106,7 +107,8 @@ class Retriever:
             conditions.append(SecureMessage.collection_exercise == str(message_args.ce))
 
         try:
-            t = db.session.query(SecureMessage.msg_id, func.max(Events.date_time)  # pylint:disable=no-member  ~ below used to obtain not in
+            # pylint:disable=no-member
+            t = db.session.query(SecureMessage.msg_id, func.max(Events.date_time)
                                  .label('max_date')) \
                 .join(Events).join(Status) \
                 .filter(and_(*conditions)) \
