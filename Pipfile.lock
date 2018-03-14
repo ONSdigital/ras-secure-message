@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "48f7c6e9439cd00345f5ffcc0293426ee510f9b4c72926f620ec5dc2748931d7"
+            "sha256": "a409568ed6189e6d8c12b5f07b6a27b051f4ef1e5e2987483d138c46c94730cd"
         },
         "host-environment-markers": {
             "implementation_name": "cpython",
@@ -31,10 +31,10 @@
     "default": {
         "aniso8601": {
             "hashes": [
-                "sha256:cdf20d7f5172cf9a786fad94bbeaffe6dead415c99ab52800f744b1f8841e33d",
-                "sha256:b7215a41e5194a829dc87d1ea5039315be85a6158ba15c8157a284c29fa6808b"
+                "sha256:f7052eb342bf2000c6264a253acedb362513bf9270800be2bc8e3e229fe08b5a",
+                "sha256:7cf068e7aec00edeb21879c2bbda048656c34d281e133a77425be03b352122d8"
             ],
-            "version": "==2.0.1"
+            "version": "==3.0.0"
         },
         "asn1crypto": {
             "hashes": [
@@ -296,10 +296,10 @@
         },
         "python-dateutil": {
             "hashes": [
-                "sha256:95511bae634d69bc7329ba55e646499a842bc4ec342ad54a8cdb65645a0aad3c",
-                "sha256:891c38b2a02f5bb1be3e4793866c8df49c7d19baabf9c1bad62547e0b4866aca"
+                "sha256:07009062406cffd554a9b4135cd2ff167c9bf6b7aac61fe946c93e69fad1bbd8",
+                "sha256:8f95bb7e6edbb2456a51a1fb58c8dca942024b4f5844cae62c90aa88afe6e300"
             ],
-            "version": "==2.6.1"
+            "version": "==2.7.0"
         },
         "pytz": {
             "hashes": [
@@ -593,13 +593,6 @@
             ],
             "version": "==0.4.2"
         },
-        "pep8": {
-            "hashes": [
-                "sha256:b22cfae5db09833bb9bd7c8463b53e1a9c9b39f12e304a8d0bba729c501827ee",
-                "sha256:fe249b52e20498e59e0b5c5256aa52ee99fc295b26ec9eaa85776ffdb9fe6374"
-            ],
-            "version": "==1.7.1"
-        },
         "pluggy": {
             "hashes": [
                 "sha256:7f8ae7f5bdf75671a718d2daf0a64b7885f74510bcd98b1a0bb420eb9a9d0cff"
@@ -633,12 +626,6 @@
                 "sha256:4fe3b99da7e789545327b75548cee6b511e4faa98afe268130fea1af4b5ec022"
             ],
             "version": "==1.8.2"
-        },
-        "pylint-mccabe": {
-            "hashes": [
-                "sha256:f3628affbc6064c08477243915f6752f3ef59fb82803b00be92f30d0ef7bbf29"
-            ],
-            "version": "==0.1.3"
         },
         "pytest": {
             "hashes": [
