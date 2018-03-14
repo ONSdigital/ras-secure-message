@@ -152,8 +152,8 @@ class Retriever:
         """returns list of threads from db"""
         if user.is_respondent:
             return Retriever._retrieve_respondent_thread_list(request_args, user)
-        else:
-            return Retriever._retrieve_internal_thread_list(request_args, user)
+
+        return Retriever._retrieve_internal_thread_list(request_args, user)
 
     @staticmethod
     def _retrieve_respondent_thread_list(request_args, user):
@@ -222,11 +222,11 @@ class Retriever:
             t = db.session.query(SecureMessage.thread_id, func.max(Status.id)  # pylint:disable=no-member
                                  .label('status_id')) \
                 .join(Events).join(Status) \
-                .filter(or_(and_(SecureMessage.from_internal == False, Status.label == Labels.INBOX.value),  # NOQA
-                            and_(SecureMessage.from_internal == True,
+                .filter(or_(and_(SecureMessage.from_internal.is_(False), Status.label == Labels.INBOX.value),  # NOQA
+                            and_(SecureMessage.from_internal.is_(True),
                                  Status.label.in_([Labels.SENT.value, Labels.DRAFT.value]))
-                            )
-                        ) \
+                           )
+                       ) \
                 .group_by(SecureMessage.thread_id).subquery('t')
 
             conditions.append(SecureMessage.thread_id == t.c.thread_id)
