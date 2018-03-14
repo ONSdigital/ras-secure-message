@@ -34,9 +34,12 @@ class SecureMessagingContextHelper:
     __INTERNAL_USER_SPECIFIC_USER_ID = "SomeStringUntilWeGetIds"
     __INTERNAL_USER_GROUP = constants.NON_SPECIFIC_INTERNAL_USER
 
+    __ALTERNATIVE_INTERNAL_USER_SPECIFIC_USER_ID = "01b51fcc-ed43-4cdb-ad1c-450f9986859b"
+
     __INTERNAL_BRES_USER_TOKEN = {constants.USER_IDENTIFIER: "BRES", "role": "internal"}
     __INTERNAL_GROUP_USER_TOKEN = {constants.USER_IDENTIFIER: __INTERNAL_USER_GROUP, "role": "internal"}
     __INTERNAL_SPECIFIC_USER_TOKEN = {constants.USER_IDENTIFIER: __INTERNAL_USER_SPECIFIC_USER_ID, "role": "internal"}
+    __ALTERNATIVE_SPECIFIC_USER_TOKEN = {constants.USER_IDENTIFIER: __ALTERNATIVE_INTERNAL_USER_SPECIFIC_USER_ID, "role": "internal"}
 
     __RESPONDENT_USER_ID = "01b51fcc-ed43-4cdb-ad1c-450f9986859b"
     __RESPONDENT_USER_TOKEN = {constants.USER_IDENTIFIER: __RESPONDENT_USER_ID, "role": "respondent"}
@@ -149,6 +152,10 @@ class SecureMessagingContextHelper:
     def internal_specific_user_token(self):
         return copy.deepcopy(SecureMessagingContextHelper.__INTERNAL_SPECIFIC_USER_TOKEN)
 
+    @property
+    def alternative_internal_specific_user_token(self):
+        return copy.deepcopy(SecureMessagingContextHelper.__ALTERNATIVE_SPECIFIC_USER_TOKEN)
+
     @property       # return an external user that the client is free to change
     def respondent_user_token(self):
         return copy.deepcopy(SecureMessagingContextHelper.__RESPONDENT_USER_TOKEN)
@@ -252,6 +259,10 @@ class SecureMessagingContextHelper:
     @property
     def internal_id_specific_user(self):
         return copy.copy(SecureMessagingContextHelper.__INTERNAL_USER_SPECIFIC_USER_ID)
+
+    @property
+    def alternative_internal_id_specific_user(self):
+        return copy.copy(SecureMessagingContextHelper.__ALTERNATIVE_INTERNAL_USER_SPECIFIC_USER_ID)
 
     @property
     def internal_id_group_user(self):
