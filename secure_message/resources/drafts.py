@@ -88,13 +88,11 @@ class DraftList(Resource):
     def get():
         """Get message list with options"""
 
-        message_args = get_options(request.args)
+        message_args = get_options(request.args, draft_only=True)
 
-        message_service = Retriever()
-        result = message_service.retrieve_message_list(message_args.page, message_args.limit, g.user, label=Labels.DRAFT.value)
+        result = Retriever().retrieve_message_list(g.user, message_args)
 
-        resp = paginated_list_to_json(result, message_args.page, message_args.limit, request.host_url,
-                                      g.user, message_args.string_query_args, DRAFT_LIST_ENDPOINT)
+        resp = paginated_list_to_json(result, request.host_url, g.user, message_args, DRAFT_LIST_ENDPOINT)
         resp.status_code = 200
         return resp
 

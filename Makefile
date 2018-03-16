@@ -6,6 +6,9 @@ build:
 start:
 	pipenv run python run.py
 
-test:
-	pipenv check --style ./secure_message ./tests
-	pipenv run pytest
+lint:
+	pipenv run flake8 ./secure_message ./tests
+	pipenv check ./secure_message ./tests
+
+test: lint
+	pipenv run python run_tests.py
