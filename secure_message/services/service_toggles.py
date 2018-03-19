@@ -1,4 +1,5 @@
 import logging
+
 from structlog import wrap_logger
 
 from secure_message.api_mocks.case_service_mock import CaseServiceMock

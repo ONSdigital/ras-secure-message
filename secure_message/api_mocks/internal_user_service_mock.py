@@ -1,4 +1,5 @@
 import logging
+
 from structlog import wrap_logger
 
 from secure_message.constants import BRES_USER, NON_SPECIFIC_INTERNAL_USER
