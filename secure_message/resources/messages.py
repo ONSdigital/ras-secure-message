@@ -217,7 +217,7 @@ class MessageModifyById(Resource):
     @staticmethod
     def _try_modify_unread(action, message, user):
         """Used to validate that the label can be modified to read"""
-        if message['msg_to'][0] != user.user_uuid:
+        if message['msg_to'][0] != user.user_uuid and message['msg_to'][0] != constants.NON_SPECIFIC_INTERNAL_USER:
             return False
         if action == 'add':
             return Modifier.add_unread(message, user)

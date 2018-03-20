@@ -15,10 +15,26 @@ logger = wrap_logger(logging.getLogger(__name__))
 class Modifier:
     """Modifies message to add / remove statuses"""
 
+
+    @staticmethod
+    def _get_label_actor(user, message):
+        try:
+            if user.is_respondent:
+                actor = user.user_uuid
+            elif message['from_internal']:
+                actor = message['msg_from']
+            else:
+                actor = message['msg_to'][0]
+        except KeyError:
+            logger.exception("Failed to remove label, no msg_to field")
+            raise InternalServerError(description="Error getting actor details from message")
+
+        return actor
+
     @staticmethod
     def add_label(label, message, user, session=db.session):
         """add a label to status table"""
-        actor = user.user_uuid if user.is_respondent else constants.BRES_USER
+        actor = Modifier._get_label_actor(user=user, message=message)
 
         try:
             status = Status(label=label, msg_id=message['msg_id'], actor=actor)
@@ -33,7 +49,8 @@ class Modifier:
     @staticmethod
     def remove_label(label, message, user):
         """delete a label from status table"""
-        actor = user.user_uuid if user.is_respondent else constants.BRES_USER
+        actor = Modifier._get_label_actor(user=user, message=message)
+
         try:
             query = "DELETE FROM securemessage.status WHERE label = '{0}' and msg_id = '{1}' and actor = '{2}'". \
                 format(label, message['msg_id'], actor)
