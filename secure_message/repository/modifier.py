@@ -15,7 +15,6 @@ logger = wrap_logger(logging.getLogger(__name__))
 class Modifier:
     """Modifies message to add / remove statuses"""
 
-
     @staticmethod
     def _get_label_actor(user, message):
         try:
