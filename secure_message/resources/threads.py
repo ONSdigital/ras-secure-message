@@ -27,9 +27,8 @@ class ThreadById(Resource):
                                                     request.host_url,
                                                     g.user,
                                                     message_args,
-                                                    THREAD_BY_ID_ENDPOINT + "/" + thread_id),
-
-                             200)
+                                                    THREAD_BY_ID_ENDPOINT + "/" + thread_id,
+                                                    body_summary=False), 200)
 
 
 class ThreadList(Resource):
