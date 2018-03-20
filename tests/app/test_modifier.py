@@ -1,22 +1,22 @@
+from datetime import datetime, timezone
 import unittest
 import uuid
-from werkzeug.exceptions import InternalServerError
 
-from datetime import datetime, timezone
 from flask import current_app, g
 from sqlalchemy import create_engine
+from werkzeug.exceptions import InternalServerError
 
+from secure_message import constants
 from secure_message.application import create_app
 from secure_message.common.eventsapi import EventsApi
 from secure_message.common.labels import Labels
 from secure_message.repository import database
+from secure_message.repository.database import SecureMessage
 from secure_message.repository.modifier import Modifier
 from secure_message.repository.retriever import Retriever
 from secure_message.repository.saver import Saver
 from secure_message.validation.domain import DraftSchema
 from secure_message.validation.user import User
-from secure_message.repository.database import SecureMessage
-from secure_message import constants
 from tests.app import test_utilities
 
 

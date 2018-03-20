@@ -3,11 +3,11 @@ import logging
 from flask import jsonify
 from structlog import wrap_logger
 from werkzeug.exceptions import InternalServerError
+
 from secure_message.common.eventsapi import EventsApi
 from secure_message.common.labels import Labels
 from secure_message.repository.database import db, Status, SecureMessage
 from secure_message.repository.saver import Saver
-from secure_message import constants
 
 logger = wrap_logger(logging.getLogger(__name__))
 
