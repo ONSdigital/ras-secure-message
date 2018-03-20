@@ -7,7 +7,6 @@ applications:
     TESTING: False
     CSRF_ENABLED: True
     SMS_LOG_LEVEL: DEBUG
-    APP_LOG_LEVEL: DEBUG
     RAS_SM_PATH: /home/vcap/app
     DEV_PORT: 5050
   services:
