@@ -58,13 +58,30 @@ Test the application
 --------------------
 Ensure dev dependencies have been installed
 ```bash
-pipenv install --dev
+make build
 ```
 
+Ensure there is a postgres instance running on port 5432
 ```bash
 docker run -d -p 5432:5432 --name postgres -e POSTGRES_PASSWORD=postgres -e POSTGRES_DB=postgres -d postgres
+```
+
+Run them using coverage
+```bash
 pipenv run coverage run run_tests.py
 ```
+
+Or the makefile
+```bash
+make test
+```
+
+Or directly with behave
+```bash
+pipenv run behave # Runs all of the tests
+pipenv run behave tests/behavioural/features/v2/thread_get.feature # Runs individual feature test
+```
+
 
 Test the response
 -----------------
