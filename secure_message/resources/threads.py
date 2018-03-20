@@ -28,9 +28,7 @@ class ThreadById(Resource):
                                                     g.user,
                                                     message_args,
                                                     THREAD_BY_ID_ENDPOINT + "/" + thread_id,
-                                                    body_summary=False),
-
-                             200)
+                                                    body_summary=False), 200)
 
 
 class ThreadList(Resource):

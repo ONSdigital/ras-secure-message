@@ -95,7 +95,7 @@ class SecureMessage(db.Model):
             else:
                 respondent = [x.actor for x in self.statuses if x.label == Labels.SENT.value or x.label == Labels.DRAFT.value][0]
         except IndexError:
-            logger("Could not determine respondent from message", msg_id=message["msg_id"])
+            logger.error("Could not determine respondent from message", msg_id=message["msg_id"])
             raise
         for row in self.statuses:
             if row.actor != respondent:

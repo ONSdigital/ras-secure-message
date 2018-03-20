@@ -130,7 +130,8 @@ def get_business_details_by_ru(rus):
 
 def add_to_and_from_details(messages):
     """Adds user details for sender and recipient"""
-    [msg.update({'@msg_from': _get_from_details(msg), '@msg_to': _get_to_details(msg)}) for msg in messages]
+    for message in messages:
+        message.update({'@msg_from': _get_from_details(message), '@msg_to': _get_to_details(message)})
     return messages
 
 

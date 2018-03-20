@@ -44,7 +44,8 @@ class Encrypter:
 
         self.public_key = backend.load_pem_public_key(public_key_bytes)
 
-    def _encode_token(self, token):
+    @staticmethod
+    def _encode_token(token):
         """
         Encodes string tokens without altering bytes tokens.
         """
@@ -104,7 +105,8 @@ class Decrypter:
 
         self.public_key = backend.load_pem_public_key(public_key_bytes)
 
-    def _decode_token(self, token):
+    @staticmethod
+    def _decode_token(token):
         """
         Decodes string tokens without altering bytes tokens.
         """

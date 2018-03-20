@@ -15,7 +15,7 @@ class InternalUserService:
     def get_user_details(uuid):
         """gets the user details from the internal user service"""
         if uuid in [NON_SPECIFIC_INTERNAL_USER, BRES_USER]:
-            return InternalUserService._get_non_specific_user_details(uuid)
+            return InternalUserService.get_non_specific_user_details(uuid)
 
         logger.info("Getting user details from uaa", uuid=uuid)
         url = f"{current_app.config['UAA_URL']}/Users/{uuid}"
@@ -61,12 +61,13 @@ class InternalUserService:
         return user_details
 
     @staticmethod
-    def _get_non_specific_user_details(group):
+    def get_non_specific_user_details(group):
         if group == NON_SPECIFIC_INTERNAL_USER:
             return InternalUserService._get_default_user(NON_SPECIFIC_INTERNAL_USER)
-        else:
-            return {"id": BRES_USER,
-                    "firstName": "BRES",
-                    "lastName": "",
-                    "emailAddress": ""
-                    }
+
+        return {
+            "id": BRES_USER,
+            "firstName": "BRES",
+            "lastName": "",
+            "emailAddress": ""
+        }

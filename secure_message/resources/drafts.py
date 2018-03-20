@@ -143,5 +143,5 @@ class DraftModifyById(Resource):
             current_etag = generate_etag(current_draft['msg_to'], current_draft['msg_id'],
                                          current_draft['subject'], current_draft['body'])
             return current_etag == headers.get('ETag')
-        else:
-            return True
+
+        return True

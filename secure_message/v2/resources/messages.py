@@ -19,7 +19,7 @@ class MessageSendV2(MessageSend):
         return super(MessageSendV2, self).post()
 
     @staticmethod
-    def _message_save(message, is_draft, draft_id):
+    def _message_save(message):
         """Saves the message to the database along with the subsequent status and audit"""
         save = Saver()
         save.save_message(message.data)
