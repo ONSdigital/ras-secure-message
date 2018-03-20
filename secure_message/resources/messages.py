@@ -5,13 +5,12 @@ from flask_restful import Resource
 from structlog import wrap_logger
 from werkzeug.exceptions import BadRequest
 
-
+from secure_message import constants
 from secure_message.authorization.authorizer import Authorizer
 from secure_message.common.alerts import AlertUser, AlertViaGovNotify, AlertViaLogging
 from secure_message.common.eventsapi import EventsApi
 from secure_message.common.labels import Labels
 from secure_message.common.utilities import get_options, paginated_list_to_json, add_users_and_business_details
-from secure_message import constants
 from secure_message.constants import MESSAGE_LIST_ENDPOINT
 from secure_message.repository.modifier import Modifier
 from secure_message.repository.retriever import Retriever
@@ -217,7 +216,7 @@ class MessageModifyById(Resource):
     @staticmethod
     def _try_modify_unread(action, message, user):
         """Used to validate that the label can be modified to read"""
-        if message['msg_to'][0] != user.user_uuid:
+        if message['msg_to'][0] != user.user_uuid and message['msg_to'][0] != constants.NON_SPECIFIC_INTERNAL_USER:
             return False
         if action == 'add':
             return Modifier.add_unread(message, user)
