@@ -43,7 +43,6 @@ class HealthDetails(Resource):
         details = {'Name': current_app.config['NAME'],
                    'Version': current_app.config['VERSION'],
                    'SMS Log level': current_app.config['SMS_LOG_LEVEL'],
-                   'APP Log Level': current_app.config['APP_LOG_LEVEL'],
                    'API Functionality': func_list,
                    'Using party service mock': party.using_mock,
                    'SM JWT ENCRYPT': current_app.config['SM_JWT_ENCRYPT'],
