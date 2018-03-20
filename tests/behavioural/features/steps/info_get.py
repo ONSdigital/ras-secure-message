@@ -7,7 +7,7 @@ from flask import json
 
 @given('the user requests endpoint info')
 def step_impl_requests_endpoint_info(context):
-    context.response = context.app.test_client().get('/info')
+    context.response = context.client.get('/info')
 
 
 @then('the endpoint info is returned')

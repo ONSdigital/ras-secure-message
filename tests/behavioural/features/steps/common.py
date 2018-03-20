@@ -2,7 +2,6 @@ from behave import given, then, when
 from flask import current_app
 import nose.tools
 
-from secure_message.application import create_app
 from secure_message.services.service_toggles import party, case_service, internal_user_service
 from secure_message.repository import database
 from tests.behavioural.features.steps.secure_messaging_context_helper import SecureMessagingContextHelper
@@ -11,7 +10,6 @@ from tests.behavioural.features.steps.secure_messaging_context_helper import Sec
 @given("prepare for tests using '{service_type}' services")
 def step_impl_prepare_for_tests(context, service_type):
     """Prepare bdd tests to run against either mock or real external services."""
-    context.app = create_app()
     step_impl_reset_db(context)
     with context.app.app_context():
         context.bdd_helper = SecureMessagingContextHelper()
