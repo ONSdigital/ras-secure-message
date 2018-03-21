@@ -28,7 +28,6 @@ from secure_message.resources.threads import ThreadById, ThreadList
 from secure_message.v2.resources.messages import MessageSendV2, MessageCounterV2
 
 
-logger_initial_config(service_name='ras-secure-message', log_level="DEBUG")
 logger = wrap_logger(logging.getLogger(__name__))
 
 
@@ -36,6 +35,8 @@ def create_app(config=None):
     app = Flask(__name__)
     app_config = f"config.{config or os.getenv('APP_SETTINGS', 'Config')}"
     app.config.from_object(app_config)
+
+    logger_initial_config(service_name='ras-secure-message', log_level=app.config.get('SMS_LOG_LEVEL'))
 
     missing_vars = [var for var in app.config['NON_DEFAULT_VARIABLES']
                     if app.config.get(var) is None]
