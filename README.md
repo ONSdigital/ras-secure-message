@@ -66,17 +66,16 @@ Ensure there is a postgres instance running on port 5432
 docker run -d -p 5432:5432 --name postgres -e POSTGRES_PASSWORD=postgres -e POSTGRES_DB=postgres -d postgres
 ```
 
-Run them using coverage
+Run the with make
 ```bash
-pipenv run coverage run run_tests.py
+make test # Runs linters, behave and unit tests
+make lint # Runs linters only
 ```
+*Note: Ensure APP_SETTINGS isn't set in .env as it could cause the tests to fail
+in a non obvious way.*
 
-Or the makefile
-```bash
-make test
-```
 
-Or directly with behave
+Run the behave tests with:
 ```bash
 pipenv run behave # Runs all of the tests
 pipenv run behave tests/behavioural/features/v2/thread_get.feature # Runs individual feature test
