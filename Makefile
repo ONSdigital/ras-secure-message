@@ -13,4 +13,4 @@ lint:
 
 test: lint
 	pipenv run behave --format progress
-	export APP_SETTINGS=TestConfig && pipenv run python -m unittest && unset APP_SETTINGS
+	export APP_SETTINGS=TestConfig && pipenv run pytest && unset APP_SETTINGS
