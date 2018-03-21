@@ -12,4 +12,5 @@ lint:
 	pipenv check ./secure_message ./tests
 
 test: lint
-	pipenv run python run_tests.py
+	pipenv run behave --format progress
+	export APP_SETTINGS=TestConfig && pipenv run pytest && unset APP_SETTINGS

@@ -30,9 +30,7 @@ class Config:
         SQLALCHEMY_DATABASE_URI = SECURE_MESSAGING_DATABASE_URL
 
     # LOGGING SETTINGS
-    SMS_LOG_LEVEL = os.getenv('SMS_LOG_LEVEL', 'INFO')
-    APP_LOG_LEVEL = os.getenv('APP_LOG_LEVEL', 'INFO')
-    SMS_WERKZEUG_LOG_LEVEL = os.getenv('SMS_WERKZEUG_LOG_LEVEL', 'INFO')
+    SMS_LOG_LEVEL = os.getenv('SMS_LOG_LEVEL', 'DEBUG')
 
     # EMAIL NOTIFICATION SETTINGS
     NOTIFICATION_SERVICE_ID = os.getenv('SERVICE_ID')
@@ -130,3 +128,6 @@ class TestConfig(DevConfig):
     SM_USER_AUTHENTICATION_PRIVATE_KEY = open("./jwt-test-keys/sm-user-authentication-encryption-private-key.pem").read()
     SM_USER_AUTHENTICATION_PUBLIC_KEY = open("./jwt-test-keys/sm-user-authentication-encryption-public-key.pem").read()
     USE_UAA = 0
+
+    # LOGGING SETTINGS
+    SMS_LOG_LEVEL = 'ERROR'
