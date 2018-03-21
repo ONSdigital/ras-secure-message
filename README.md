@@ -66,7 +66,7 @@ Ensure there is a postgres instance running on port 5432
 docker run -d -p 5432:5432 --name postgres -e POSTGRES_PASSWORD=postgres -e POSTGRES_DB=postgres -d postgres
 ```
 
-Run the with make
+Run the tests with make
 ```bash
 make test # Runs linters, behave and unit tests
 make lint # Runs linters only
@@ -97,8 +97,9 @@ Environment variables available for configuration are listed below:
 
 | Environment Variable            | Description                                        | Default
 |---------------------------------|----------------------------------------------------|-------------------------------
-| NAME                            | Name of application                                | 'ras-frontstage'
-| VERSION                         | Version number of application                      | '0.1.0' (manually update as application updates)
+| NAME                            | Name of application                                | 'ras-secure-message'
+| VERSION                         | Version number of application                      | '0.1.3' (manually update as application updates)
+| SMS_LOG_LEVEL                   | Log level for the application                      | 'DEBUG'
 | SECURITY_USER_NAME              | Username for basic auth                            | N/A
 | SECURITY_USER_PASSWORD          | Password for basic auth                            | N/A
 | JWT_ALGORITHM                   | Algorithm used to code JWT                         | 'HS256'
@@ -108,7 +109,7 @@ Environment variables available for configuration are listed below:
 | NOTIFICATION_API_KEY            | API key to use Gov Notify service                  | N/A
 | NOTIFICATION_TEMPLATE_ID        | Template id for Gov Notify service                 | N/A
 | NOTIFY_VIA_GOV_NOTIFY           | Toggle for using Gov Notify for notifications      | '1' (enable Gov Notify email notifications)
-| SM_JWT_ENCRYPT                  | Toggle to use encrypted tokens                     | '1' (enable encrypted tokens)
+| SM_JWT_ENCRYPT                  | Toggle to use encrypted tokens                     | '0'
 | NOTIFY_CASE_SERVICE             | Toggle to notify case service                      | '1' (enable notifying case service)
 | CLIENT_ID                       | ID of the client service in UAA                    | N/A
 | CLIENT_SECRET                   | Password of the client service in UAA              | N/A
@@ -116,7 +117,7 @@ Environment variables available for configuration are listed below:
 | USE_UAA                         | Sets whether a client token should be retrieved    | 1
 
 
-For each external application which frontstage communicates with there are 3 environment variables e.g. for the RM case service:
+For each external application which secure-message communicates with there are 3 environment variables e.g. for the RM case service:
 
 | Environment Variable            | Description                       | Default
 |---------------------------------|-----------------------------------|-------------------------------
