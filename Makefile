@@ -13,4 +13,4 @@ lint:
 
 test: lint
 	pipenv run behave --format progress
-	pipenv run pytest
+	export APP_SETTINGS=TestConfig && pipenv run pytest && unset APP_SETTINGS
