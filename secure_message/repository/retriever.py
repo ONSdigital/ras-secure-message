@@ -9,7 +9,6 @@ from werkzeug.exceptions import InternalServerError, NotFound
 from secure_message.common.eventsapi import EventsApi
 from secure_message.common.labels import Labels
 from secure_message.repository.database import db, Events, SecureMessage, Status
-from secure_message import constants
 
 logger = wrap_logger(logging.getLogger(__name__))
 
@@ -260,25 +259,47 @@ class Retriever:
 
     @staticmethod
     def retrieve_thread(thread_id, user, message_args):
-        """returns paginated list of messages for thread id"""
-        actor_conditions = []
-
         if user.is_respondent:
-            logger.info("Retrieving messages in thread for responent", thread_id=thread_id, user_uuid=user.user_uuid)
-            actor_conditions.append(Status.actor == str(user.user_uuid))
-        else:
-            logger.info("Retrieving messages in thread for internal user", thread_id=thread_id, user_uuid=user.user_uuid)
-            actor_conditions.append(Status.actor == str(user.user_uuid))
-            actor_conditions.append(Status.actor == constants.BRES_USER)
-            actor_conditions.append(Status.actor == constants.NON_SPECIFIC_INTERNAL_USER)
+            logger.info("Retrieving messages in thread for respondent", thread_id=thread_id, user_uuid=user.user_uuid)
+            return Retriever._retrieve_thread_for_respondent(thread_id, user, message_args)
+        logger.info("Retrieving messages in thread for internal user", thread_id=thread_id, user_uuid=user.user_uuid)
+        return Retriever._retrieve_thread_for_internal_user(thread_id, message_args)
 
+    @staticmethod
+    def _retrieve_thread_for_respondent(thread_id, user, message_args):
+        """returns paginated list of messages for thread id fora respondent"""
         try:
             result = SecureMessage.query.join(Events).join(Status) \
                 .filter(SecureMessage.thread_id == thread_id) \
                 .filter(Status.label != Labels.DRAFT_INBOX.value) \
-                .filter(or_(*actor_conditions)) \
+                .filter(Status.actor == user.user_uuid) \
                 .filter(or_(Events.event == EventsApi.SENT.value, Events.event == EventsApi.DRAFT_SAVED.value)) \
-                .order_by(Events.date_time.desc()).paginate(message_args.page, message_args.limit, False)
+                .order_by(Status.id.desc()).paginate(message_args.page, message_args.limit, False)
+
+            if not result.items:
+                logger.debug('Thread does not exist', thread_id=thread_id)
+                raise NotFound(description=f"Conversation with thread_id '{thread_id}' does not exist")
+
+        except SQLAlchemyError:
+            logger.exception('Error retrieving conversation from database')
+            raise InternalServerError(description="Error retrieving conversation from database")
+
+        return result
+
+    @staticmethod
+    def _retrieve_thread_for_internal_user(thread_id, message_args):
+        """returns paginated list of messages for thread id for an internal user"""
+
+        try:
+            result = SecureMessage.query.join(Events).join(Status) \
+                .filter(SecureMessage.thread_id == thread_id) \
+                .filter(or_(and_(SecureMessage.from_internal.is_(False), Status.label == Labels.INBOX.value),  # NOQA
+                            and_(SecureMessage.from_internal.is_(True),
+                                 Status.label.in_([Labels.SENT.value, Labels.DRAFT.value]))
+                           )
+                       ) \
+                .filter(or_(Events.event == EventsApi.SENT.value, Events.event == EventsApi.DRAFT_SAVED.value)) \
+                .order_by(Status.id.desc()).paginate(message_args.page, message_args.limit, False)
 
             if not result.items:
                 logger.debug('Thread does not exist', thread_id=thread_id)
