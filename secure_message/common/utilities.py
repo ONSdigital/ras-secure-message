@@ -137,6 +137,7 @@ def add_to_and_from_details(messages):
 
 def _get_from_details(message):
     """looks up the details for the from users"""
+    logger.info("Getting user from details", is_internal=message['from_internal'], user_uuid=message['msg_from'])
     if message['from_internal']:
         from_details = internal_user_service.get_user_details(message['msg_from'])
     else:
@@ -181,5 +182,7 @@ def add_business_details(messages):
 def add_users_and_business_details(messages):
     """Add both user and business details to messages based on data from party service"""
     messages = add_to_and_from_details(messages)
+    logger.info("Sucessfully added to and from details")
     messages = add_business_details(messages)
+    logger.info("Successfully added business details")
     return messages
