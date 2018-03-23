@@ -801,7 +801,6 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
 
         with self.app.app_context():
             with current_app.test_request_context():
-                args = get_args(page=1, limit=MESSAGE_QUERY_LIMIT)
                 response = Retriever().retrieve_thread('ThreadId', self.user_internal)
                 self.assertEqual(len(response.all()), 9)
 
@@ -811,7 +810,6 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
 
         with self.app.app_context():
             with current_app.test_request_context():
-                args = get_args(page=1, limit=MESSAGE_QUERY_LIMIT)
                 response = Retriever().retrieve_thread('ThreadId', self.user_respondent)
                 self.assertEqual(len(response.all()), 6)
 
@@ -821,7 +819,6 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
 
         with self.app.app_context():
             with current_app.test_request_context():
-                args = get_args(page=1, limit=MESSAGE_QUERY_LIMIT)
                 response = Retriever().retrieve_thread('ThreadId', self.user_respondent)
                 self.assertEqual(len(response.all()), 6)
 
@@ -831,7 +828,6 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
 
         with self.app.app_context():
             with current_app.test_request_context():
-                args = get_args(page=1, limit=MESSAGE_QUERY_LIMIT)
                 response = Retriever().retrieve_thread('ThreadId', self.user_respondent)
                 self.assertEqual(len(response.all()), 6)
 
@@ -847,7 +843,6 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
 
         with self.app.app_context():
             with current_app.test_request_context():
-                args = get_args(page=1, limit=MESSAGE_QUERY_LIMIT)
                 response = Retriever().retrieve_thread('ThreadId', self.user_internal)
                 self.assertEqual(len(response.all()), 9)
 
@@ -862,7 +857,6 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
             self.db.drop_all()
             with current_app.test_request_context():
                 with self.assertRaises(InternalServerError):
-                    args = get_args(page=1, limit=MESSAGE_QUERY_LIMIT)
                     Retriever().retrieve_thread('ThreadId', self.user_respondent)
 
     def test_thread_returned_with_thread_id_returns_404(self):
@@ -870,7 +864,6 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
         with self.app.app_context():
             with current_app.test_request_context():
                 with self.assertRaises(NotFound):
-                    args = get_args(page=1, limit=MESSAGE_QUERY_LIMIT)
                     Retriever().retrieve_thread('anotherThreadId', self.user_respondent)
 
     def test_retrieve_draft_raises_server_error(self):
