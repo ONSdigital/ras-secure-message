@@ -123,3 +123,24 @@ Feature: Get threads list Endpoint
       And '1' messages are sent
     When the threads are read
     Then the message bodies are '100' characters or less
+
+  Scenario: There are 50 conversations between respondent and internal user. Internal user gets conversations should see 50
+   Given sending from respondent to internal group
+    And '50' messages are sent using V2
+   When the user is set as internal specific user
+    And the threads are read
+   Then  '50' messages have a 'INBOX' label
+
+  Scenario: There are 50 conversations between internal user and respondent. Internal user gets conversations should see 50
+   Given sending from internal specific user to respondent
+    And '50' messages are sent using V2
+   When the user is set as respondent
+    And the threads are read
+   Then  '50' messages have a 'INBOX' label
+
+  Scenario: There are 50 conversations between internal user and respondent. Alternative Internal user gets conversations should see 50
+   Given sending from internal specific user to respondent
+    And '50' messages are sent using V2
+   When the user is set to alternative internal specific user
+    And the threads are read
+   Then  '50' messages have a 'SENT' label

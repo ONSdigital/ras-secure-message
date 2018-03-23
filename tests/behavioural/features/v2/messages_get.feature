@@ -116,3 +116,24 @@ Feature: Get Messages list V2 Endpoint
       And messages are read V2
     Then a success status code (200) is returned
       And the at_msg_to is set correctly for bres user for all messages
+
+  Scenario: There are 50 messages between respondent and internal user. Internal user gets conversations should see 50
+   Given sending from respondent to internal group
+    And '50' messages are sent using V2
+   When the user is set as internal specific user
+    And messages are read V2
+   Then  '50' messages have a 'INBOX' label
+
+  Scenario: There are 50 messages between internal user and respondent. Internal user gets conversations should see 50
+   Given sending from internal specific user to respondent
+    And '50' messages are sent using V2
+   When the user is set as respondent
+    And messages are read V2
+   Then  '50' messages have a 'INBOX' label
+
+  Scenario: There are 50 messages between internal user and respondent. Alternative Internal user gets conversations should see 50
+   Given sending from internal specific user to respondent
+    And '50' messages are sent using V2
+   When the user is set to alternative internal specific user
+    And messages are read V2
+   Then  '50' messages have a 'SENT' label

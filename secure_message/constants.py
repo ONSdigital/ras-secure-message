@@ -9,13 +9,13 @@ MAX_MSG_ID_LEN = 60               # Maximum size of a message UUID in a message
 MAX_COLLECTION_CASE_LEN = 60      # Maximum size of the message collection case identifier
 MAX_RU_ID_LEN = 60                # Maximum size of the message ru_id identifier
 MAX_BUSINESS_NAME_LEN = 60        # Maximum size of the message business name identifier
-MAX_SURVEY_LEN = 60      # Maximum size of the message collection instrument identifier
+MAX_SURVEY_LEN = 60               # Maximum size of the message collection instrument identifier
 MAX_COLLECTION_EXERCISE_LEN = 60  # Maximum size of the message collection exercise identifier
 
 # Status Table Column Size Definitions
 
-MAX_STATUS_LABEL_LEN = 50          # Maximum length of a label column
-MAX_STATUS_ACTOR_LEN = 100         # Maximum length of the actor column
+MAX_STATUS_LABEL_LEN = 50         # Maximum length of a label column
+MAX_STATUS_ACTOR_LEN = 100        # Maximum length of the actor column
 
 # Events Table Column Size Definitions
 
@@ -29,7 +29,7 @@ THREAD_BY_ID_ENDPOINT = "thread"
 THREAD_LIST_ENDPOINT = "threads"
 DRAFT_LIST_ENDPOINT = "drafts"
 
-MESSAGE_QUERY_LIMIT = 20
+MESSAGE_QUERY_LIMIT = 2000
 
 USER_IDENTIFIER = 'party_id'
 
