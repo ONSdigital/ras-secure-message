@@ -10,7 +10,7 @@ from secure_message.authorization.authorizer import Authorizer
 from secure_message.common.alerts import AlertUser, AlertViaGovNotify, AlertViaLogging
 from secure_message.common.eventsapi import EventsApi
 from secure_message.common.labels import Labels
-from secure_message.common.utilities import get_options, paginated_list_to_json, add_users_and_business_details
+from secure_message.common.utilities import get_options, process_paginated_list, add_users_and_business_details
 from secure_message.constants import MESSAGE_LIST_ENDPOINT
 from secure_message.repository.modifier import Modifier
 from secure_message.repository.retriever import Retriever
@@ -36,7 +36,9 @@ class MessageList(Resource):
         message_service = Retriever()
         result = message_service.retrieve_message_list(g.user, message_args)
         logger.info("Successfully retrieved message list", user_uuid=g.user.user_uuid)
-        return make_response(paginated_list_to_json(result, request.host_url, g.user, message_args, MESSAGE_LIST_ENDPOINT), 200)
+        messages, links = process_paginated_list(result, request.host_url, g.user, message_args, MESSAGE_LIST_ENDPOINT)
+        messages = add_users_and_business_details(messages)
+        return jsonify({"messages": messages, "_links": links})
 
 
 class MessageSend(Resource):

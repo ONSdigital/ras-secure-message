@@ -1,10 +1,10 @@
 
 import logging
 
-from flask import g, make_response, request
+from flask import g, jsonify, request
 from flask_restful import Resource
 from structlog import wrap_logger
-from secure_message.common.utilities import get_options, paginated_list_to_json
+from secure_message.common.utilities import get_options, process_paginated_list, add_users_and_business_details
 from secure_message.constants import THREAD_LIST_ENDPOINT, THREAD_BY_ID_ENDPOINT
 from secure_message.repository.retriever import Retriever
 
@@ -23,12 +23,14 @@ class ThreadById(Resource):
         conversation = Retriever().retrieve_thread(thread_id, g.user, message_args)
 
         logger.info("Successfully retrieved messages from thread", thread_id=thread_id, user_uuid=g.user.user_uuid)
-        return make_response(paginated_list_to_json(conversation,
-                                                    request.host_url,
-                                                    g.user,
-                                                    message_args,
-                                                    THREAD_BY_ID_ENDPOINT + "/" + thread_id,
-                                                    body_summary=False), 200)
+        messages, links = process_paginated_list(conversation,
+                                                 request.host_url,
+                                                 g.user,
+                                                 message_args,
+                                                 THREAD_BY_ID_ENDPOINT + "/" + thread_id,
+                                                 body_summary=False)
+        messages = add_users_and_business_details(messages)
+        return jsonify({"messages": messages, "_links": links})
 
 
 class ThreadList(Resource):
@@ -43,4 +45,6 @@ class ThreadList(Resource):
         result = Retriever().retrieve_thread_list(g.user, message_args)
 
         logger.info("Successfully retrieved threads for user", user_uuid=g.user.user_uuid)
-        return make_response(paginated_list_to_json(result, request.host_url, g.user, message_args, THREAD_LIST_ENDPOINT), 200)
+        messages, links = process_paginated_list(result, request.host_url, g.user, message_args, THREAD_LIST_ENDPOINT)
+        messages = add_users_and_business_details(messages)
+        return jsonify({"messages": messages, "_links": links})
