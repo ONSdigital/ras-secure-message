@@ -274,9 +274,9 @@ class Retriever:
                 .filter(Status.label != Labels.DRAFT_INBOX.value) \
                 .filter(Status.actor == user.user_uuid) \
                 .filter(or_(Events.event == EventsApi.SENT.value, Events.event == EventsApi.DRAFT_SAVED.value)) \
-                .order_by(Status.id.desc()).paginate(message_args.page, message_args.limit, False)
+                .order_by(Status.id.desc())
 
-            if not result.items:
+            if not result.all():
                 logger.debug('Thread does not exist', thread_id=thread_id)
                 raise NotFound(description=f"Conversation with thread_id '{thread_id}' does not exist")
 
@@ -299,9 +299,9 @@ class Retriever:
                            )
                        ) \
                 .filter(or_(Events.event == EventsApi.SENT.value, Events.event == EventsApi.DRAFT_SAVED.value)) \
-                .order_by(Status.id.desc()).paginate(message_args.page, message_args.limit, False)
+                .order_by(Status.id.desc())
 
-            if not result.items:
+            if not result.all():
                 logger.debug('Thread does not exist', thread_id=thread_id)
                 raise NotFound(description=f"Conversation with thread_id '{thread_id}' does not exist")
 

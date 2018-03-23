@@ -23,14 +23,11 @@ class ThreadById(Resource):
         conversation = Retriever().retrieve_thread(thread_id, g.user, message_args)
 
         logger.info("Successfully retrieved messages from thread", thread_id=thread_id, user_uuid=g.user.user_uuid)
-        messages, links = process_paginated_list(conversation,
-                                                 request.host_url,
-                                                 g.user,
-                                                 message_args,
-                                                 THREAD_BY_ID_ENDPOINT + "/" + thread_id,
-                                                 body_summary=False)
-        messages = add_users_and_business_details(messages)
-        return jsonify({"messages": messages, "_links": links})
+        messages = []
+        for message in conversation.all():
+            msg = message.serialize(g.user, body_summary=True)
+            messages.append(msg)
+        return jsonify({"messages": add_users_and_business_details(messages)})
 
 
 class ThreadList(Resource):
