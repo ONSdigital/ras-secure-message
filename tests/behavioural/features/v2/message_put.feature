@@ -23,3 +23,14 @@ Feature: Checking correct labels for messages are added & deleted V2
     | user        |
     | specific user |
     | group        |
+
+
+  Scenario: A respondent sends a message to group. A specific internal user marks it as read .Reads message should not have UNREAD label
+    Given sending from respondent to internal group
+      And  the message is sent V2
+      And  the user is set as internal specific user
+      And  the message is read V2
+      And  a label of 'UNREAD' is to be removed
+      And  the message labels are modified V2
+    When   the message is read V2
+    Then the response message does not have the label 'UNREAD'
