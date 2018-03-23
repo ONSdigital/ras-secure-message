@@ -244,6 +244,19 @@ def step_impl_the_thread_is_read(context):
     context.bdd_helper.store_messages_response_data(context.response.data)
 
 
+@given("the last '{message_count}' messages of thread are read")
+@when("the last '{message_count}' messages of thread are read")
+def step_impl_the_last_n_messages_of_thread_are_read(context):
+    """read a specific thread based on context thread id"""
+    url = context.bdd_helper.thread_get_url.format(context.thread_id)
+    context.response = context.client.get(url, headers=context.bdd_helper.headers)
+
+    returned_data = json.loads(context.response.data)
+    _try_persist_msg_and_thread_id_to_context(context, returned_data)
+
+    context.bdd_helper.store_messages_response_data(context.response.data)
+
+
 def _try_persist_msg_and_thread_id_to_context(context, returned_data):
     """common function used to extract msg_id and thread_id from returned messages"""
     if 'msg_id' in returned_data:

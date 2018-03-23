@@ -60,3 +60,75 @@ Feature: Get thread by id Endpoint V2
     | user        |
     | specific user |
     | group        |
+
+  Scenario Outline: Respondent sends 15 messages on one thread . When they get thread by id should return the number of messages on the thread
+    Given sending from respondent to internal <user>
+      And   the message is sent V2
+      And   the thread id is set to the last returned thread id
+      And   the message is sent V2
+      And   the message is sent V2
+      And   the message is sent V2
+      And   the message is sent V2
+      And   the message is sent V2
+      And   the message is sent V2
+      And   the message is sent V2
+      And   the message is sent V2
+      And   the message is sent V2
+      And   the message is sent V2
+      And   the message is sent V2
+      And   the message is sent V2
+      And   the message is sent V2
+      And   the message is sent V2
+    When the thread is read
+    Then '15' messages are returned
+     And a success status code (200) is returned
+
+      Examples: user type
+    | user        |
+    | specific user |
+    | group        |
+
+  Scenario Outline: Respondent sends 15 messages on one thread . When the internal user gets the  thread by id should return the number of messages on the thread
+    Given sending from respondent to internal <user>
+      And   the message is sent V2
+      And   the thread id is set to the last returned thread id
+      And   the message is sent V2
+      And   the message is sent V2
+      And   the message is sent V2
+      And   the message is sent V2
+      And   the message is sent V2
+      And   the message is sent V2
+      And   the message is sent V2
+      And   the message is sent V2
+      And   the message is sent V2
+      And   the message is sent V2
+      And   the message is sent V2
+      And   the message is sent V2
+      And   the message is sent V2
+      And   the message is sent V2
+    When  the user is set as internal specific user
+     And  the thread is read
+    Then '15' messages are returned
+     And a success status code (200) is returned
+
+      Examples: user type
+    | user        |
+    | specific user |
+    | group        |
+
+
+   Scenario: an internal user sends  message , another internal reads the thread, should see the sent message
+     Given sending from internal specific user to respondent
+      And the message is sent V2
+      And the thread id is set to the last returned thread id
+     When the user is set to alternative internal specific user
+      And the thread is read
+     Then '1' messages are returned
+
+    Scenario: a respondent sends  message to a specific internal user , another internal reads the thread, should see the message
+     Given sending from respondent to internal specific user
+      And the message is sent V2
+      And the thread id is set to the last returned thread id
+     When the user is set to alternative internal specific user
+      And the thread is read
+     Then '1' messages are returned
