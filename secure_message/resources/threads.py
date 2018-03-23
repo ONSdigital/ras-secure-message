@@ -5,7 +5,7 @@ from flask import g, jsonify, request
 from flask_restful import Resource
 from structlog import wrap_logger
 from secure_message.common.utilities import get_options, process_paginated_list, add_users_and_business_details
-from secure_message.constants import THREAD_LIST_ENDPOINT, THREAD_BY_ID_ENDPOINT
+from secure_message.constants import THREAD_LIST_ENDPOINT
 from secure_message.repository.retriever import Retriever
 
 logger = wrap_logger(logging.getLogger(__name__))
@@ -18,9 +18,8 @@ class ThreadById(Resource):
     def get(thread_id):
         """Get messages by thread id"""
         logger.info("Getting messages from thread", thread_id=thread_id, user_uuid=g.user.user_uuid)
-        message_args = get_options(request.args)  # NOQA TODO - Named Tuple
 
-        conversation = Retriever().retrieve_thread(thread_id, g.user, message_args)
+        conversation = Retriever().retrieve_thread(thread_id, g.user)
 
         logger.info("Successfully retrieved messages from thread", thread_id=thread_id, user_uuid=g.user.user_uuid)
         messages = []

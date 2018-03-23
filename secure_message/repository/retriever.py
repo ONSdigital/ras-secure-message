@@ -258,15 +258,15 @@ class Retriever:
         return result.serialize(user)
 
     @staticmethod
-    def retrieve_thread(thread_id, user, message_args):
+    def retrieve_thread(thread_id, user):
         if user.is_respondent:
             logger.info("Retrieving messages in thread for respondent", thread_id=thread_id, user_uuid=user.user_uuid)
-            return Retriever._retrieve_thread_for_respondent(thread_id, user, message_args)
+            return Retriever._retrieve_thread_for_respondent(thread_id, user)
         logger.info("Retrieving messages in thread for internal user", thread_id=thread_id, user_uuid=user.user_uuid)
-        return Retriever._retrieve_thread_for_internal_user(thread_id, message_args)
+        return Retriever._retrieve_thread_for_internal_user(thread_id)
 
     @staticmethod
-    def _retrieve_thread_for_respondent(thread_id, user, message_args):
+    def _retrieve_thread_for_respondent(thread_id, user):
         """returns paginated list of messages for thread id fora respondent"""
         try:
             result = SecureMessage.query.join(Events).join(Status) \
@@ -287,7 +287,7 @@ class Retriever:
         return result
 
     @staticmethod
-    def _retrieve_thread_for_internal_user(thread_id, message_args):
+    def _retrieve_thread_for_internal_user(thread_id):
         """returns paginated list of messages for thread id for an internal user"""
 
         try:
