@@ -259,8 +259,8 @@ class DraftTestCase(unittest.TestCase):
                 is_valid_draft = Retriever().get_draft('000000-0000-00000', self.user_respondent)
         self.assertFalse(is_valid_draft)
 
-    def test_etag_check_returns_true_if_data_equal(self):
-        """Test etag_check function returns true for unchanged draft etag"""
+    def test_is_draft_modified_returns_false_if_data_equal(self):
+        """Test is_draft_modified function returns false for unchanged draft etag"""
 
         message = {'msg_to': [constants.BRES_USER],
                    'msg_from': '0a7ad740-10d5-4ecb-b7ca-3c0384afb882',
@@ -277,10 +277,10 @@ class DraftTestCase(unittest.TestCase):
 
         etag = utilities.generate_etag(message['msg_to'], message['msg_id'], message['subject'], message['body'])
 
-        self.assertTrue(DraftModifyById.etag_check({'etag': etag}, message))
+        self.assertFalse(DraftModifyById.is_draft_modified({'etag': etag}, message))
 
-    def test_etag_check_returns_false_if_msg_to_changed(self):
-        """Test etag_check function returns false for changed draft etag"""
+    def test_is_draft_modified_returns_true_if_msg_to_changed(self):
+        """Test is_draft_modified function returns true for changed draft etag"""
 
         message = {'msg_to': [constants.BRES_USER],
                    'msg_from': '0a7ad740-10d5-4ecb-b7ca-3c0384afb882',
@@ -296,10 +296,10 @@ class DraftTestCase(unittest.TestCase):
                    'labels': ['DRAFT']}
 
         etag = utilities.generate_etag(['XXX'], message['msg_id'], message['subject'], message['body'])
-        self.assertFalse(DraftModifyById.etag_check({'ETag': etag}, message))
+        self.assertTrue(DraftModifyById.is_draft_modified({'ETag': etag}, message))
 
-    def test_etag_check_returns_false_if_msg_id_changed(self):
-        """Test etag_check function returns false for changed draft etag"""
+    def test_is_draft_modified_returns_true_if_msg_id_changed(self):
+        """Test is_draft_modified function returns true for changed draft etag"""
 
         message = {'msg_to': [constants.BRES_USER],
                    'msg_from': '0a7ad740-10d5-4ecb-b7ca-3c0384afb882',
@@ -315,10 +315,10 @@ class DraftTestCase(unittest.TestCase):
                    'labels': ['DRAFT']}
 
         etag = utilities.generate_etag(message['msg_to'], 'XXX', message['subject'], message['body'])
-        self.assertFalse(DraftModifyById.etag_check({'ETag': etag}, message))
+        self.assertTrue(DraftModifyById.is_draft_modified({'ETag': etag}, message))
 
-    def test_etag_check_returns_false_if_subject_changed(self):
-        """Test etag_check function returns false for changed draft etag"""
+    def test_is_draft_modified_returns_true_if_subject_changed(self):
+        """Test is_draft_modified function returns true for changed draft etag"""
 
         message = {'msg_to': [constants.BRES_USER],
                    'msg_from': '0a7ad740-10d5-4ecb-b7ca-3c0384afb882',
@@ -334,10 +334,10 @@ class DraftTestCase(unittest.TestCase):
                    'labels': ['DRAFT']}
 
         etag = utilities.generate_etag(message['msg_to'], message['msg_id'], 'XXX', message['body'])
-        self.assertFalse(DraftModifyById.etag_check({'ETag': etag}, message))
+        self.assertTrue(DraftModifyById.is_draft_modified({'ETag': etag}, message))
 
-    def test_etag_check_returns_false_if_body_changed(self):
-        """Test etag_check function returns false for changed draft etag"""
+    def test_is_draft_modified_returns_true_if_body_changed(self):
+        """Test is_draft_modified function returns true for changed draft etag"""
 
         message = {'msg_to': [constants.BRES_USER],
                    'msg_from': '0a7ad740-10d5-4ecb-b7ca-3c0384afb882',
@@ -353,7 +353,7 @@ class DraftTestCase(unittest.TestCase):
                    'labels': ['DRAFT']}
 
         etag = utilities.generate_etag(message['msg_to'], message['msg_id'], message['subject'], 'XXX')
-        self.assertFalse(DraftModifyById.etag_check({'ETag': etag}, message))
+        self.assertTrue(DraftModifyById.is_draft_modified({'ETag': etag}, message))
 
     def test_draft_modified_since_last_read_t_raises_error(self):
         """Test draft_modified_since_last_read function raises internal server error"""

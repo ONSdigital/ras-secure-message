@@ -114,9 +114,7 @@ class DraftModifyById(Resource):
             logger.error('Draft put requires valid draft')
             raise BadRequest(description="Draft put requires valid draft")
 
-        not_modified = self.etag_check(request.headers, existing_draft)
-
-        if not_modified is False:
+        if self.is_draft_modified(request.headers, existing_draft):
             return Response(response="Draft has been modified since last check", status=409, mimetype="text/html")
 
         draft = DraftSchema().load(data)
@@ -137,11 +135,15 @@ class DraftModifyById(Resource):
         return make_response(jsonify(draft.errors), 400)
 
     @staticmethod
-    def etag_check(headers, current_draft):
-        """Check etag to make sure draft has not been modified since get request"""
+    def is_draft_modified(headers, current_draft):
+        """Check etag to see if draft has been modified
+
+           :returns: False if the supplied ETag in the header, and the generated ETag of the
+           draft match, or if no ETag is supplied in the header.  Otherwise returns True.
+        """
         if headers.get('ETag'):
             current_etag = generate_etag(current_draft['msg_to'], current_draft['msg_id'],
                                          current_draft['subject'], current_draft['body'])
-            return current_etag == headers.get('ETag')
+            return current_etag != headers.get('ETag')
 
-        return True
+        return False
