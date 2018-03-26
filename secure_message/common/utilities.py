@@ -2,7 +2,6 @@ import collections
 import hashlib
 import logging
 
-from flask import jsonify
 from structlog import wrap_logger
 from secure_message.common.labels import Labels
 from secure_message.services.service_toggles import party, internal_user_service
@@ -66,16 +65,14 @@ def add_string_query_args(string_query_args, arg, val):
     return f'{string_query_args}&{arg}={val}'
 
 
-def paginated_list_to_json(paginated_list, host_url, user, message_args, endpoint=MESSAGE_LIST_ENDPOINT, body_summary=True):
+def process_paginated_list(paginated_list, host_url, user, message_args, endpoint=MESSAGE_LIST_ENDPOINT, body_summary=True):
     """used to change a pagination object to json format with links"""
     messages = []
-    msg_count = 0
     arg_joiner = ''
     if message_args.string_query_args != '?':
         arg_joiner = '&'
 
     for message in paginated_list.items:
-        msg_count += 1
         msg = message.serialize(user, body_summary=body_summary)
         msg['_links'] = {"self": {"href": f"{host_url}{MESSAGE_BY_ID_ENDPOINT}/{msg['msg_id']}"}}
         messages.append(msg)
@@ -90,8 +87,7 @@ def paginated_list_to_json(paginated_list, host_url, user, message_args, endpoin
     if paginated_list.has_prev:
         links['prev'] = {
             "href": f"{host_url}{endpoint}{arg_joiner}{message_args.string_query_args}page={message_args.page - 1}&limit={message_args.limit}"}
-    messages = add_users_and_business_details(messages)
-    return jsonify({"messages": messages, "_links": links})
+    return messages, links
 
 
 def generate_etag(msg_to, msg_id, subject, body):

@@ -10,7 +10,7 @@ from secure_message.authorization.authorizer import Authorizer
 from secure_message.common.eventsapi import EventsApi
 from secure_message.common.labels import Labels
 from secure_message.constants import DRAFT_LIST_ENDPOINT
-from secure_message.common.utilities import get_options, paginated_list_to_json, generate_etag, add_users_and_business_details
+from secure_message.common.utilities import get_options, process_paginated_list, generate_etag, add_users_and_business_details
 from secure_message.repository.modifier import Modifier
 from secure_message.repository.retriever import Retriever
 from secure_message.repository.saver import Saver
@@ -92,9 +92,9 @@ class DraftList(Resource):
 
         result = Retriever().retrieve_message_list(g.user, message_args)
 
-        resp = paginated_list_to_json(result, request.host_url, g.user, message_args, DRAFT_LIST_ENDPOINT)
-        resp.status_code = 200
-        return resp
+        messages, links = process_paginated_list(result, request.host_url, g.user, message_args, DRAFT_LIST_ENDPOINT)
+        messages = add_users_and_business_details(messages)
+        return jsonify({"messages": messages, "_links": links})
 
 
 class DraftModifyById(Resource):
