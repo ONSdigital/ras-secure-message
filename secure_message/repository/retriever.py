@@ -1,9 +1,9 @@
 import logging
 
-from structlog import wrap_logger
 from flask import jsonify
 from sqlalchemy import and_, func, or_
 from sqlalchemy.exc import SQLAlchemyError
+from structlog import wrap_logger
 from werkzeug.exceptions import InternalServerError, NotFound
 
 from secure_message.common.eventsapi import EventsApi

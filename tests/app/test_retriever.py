@@ -1163,29 +1163,29 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
         self.create_threads(1, add_internal_draft=True, add_respondent_draft=True)
 
         with self.app.app_context():
-                args = get_args(limit=MESSAGE_QUERY_LIMIT)
-                response = Retriever().retrieve_thread_list(self.user_internal, args)
+            args = get_args(limit=MESSAGE_QUERY_LIMIT)
+            response = Retriever().retrieve_thread_list(self.user_internal, args)
 
-                date = []
-                thread_ids = []
-                msg_ids = []
-                for message in response.items:
-                    serialized_msg = message.serialize(self.user_internal)
-                    if 'sent_date' in serialized_msg:
-                        date.append(serialized_msg['sent_date'])
-                    elif 'modified_date' in serialized_msg:
-                        date.append(serialized_msg['modified_date'])
-                    thread_ids.append(serialized_msg['thread_id'])
-                    msg_ids.append(serialized_msg['msg_id'])
+            date = []
+            thread_ids = []
+            msg_ids = []
+            for message in response.items:
+                serialized_msg = message.serialize(self.user_internal)
+                if 'sent_date' in serialized_msg:
+                    date.append(serialized_msg['sent_date'])
+                elif 'modified_date' in serialized_msg:
+                    date.append(serialized_msg['modified_date'])
+                thread_ids.append(serialized_msg['thread_id'])
+                msg_ids.append(serialized_msg['msg_id'])
 
-                self.assertEqual(len(msg_ids), 1)
+            self.assertEqual(len(msg_ids), 1)
 
-                args = get_args(page=1, limit=MESSAGE_QUERY_LIMIT)
+            args = get_args(page=1, limit=MESSAGE_QUERY_LIMIT)
 
-                for x in range(0, len(thread_ids)):
-                    thread = Retriever().retrieve_thread(thread_ids[x], self.user_internal)
-                    self.assertEqual(date[x], str(thread.all()[0].events[0].date_time))
-                    self.assertEqual(msg_ids[x], thread.all()[0].events[0].msg_id)
+            for x in range(0, len(thread_ids)):
+                thread = Retriever().retrieve_thread(thread_ids[x], self.user_internal)
+                self.assertEqual(date[x], str(thread.all()[0].events[0].date_time))
+                self.assertEqual(msg_ids[x], thread.all()[0].events[0].msg_id)
 
 
 if __name__ == '__main__':
