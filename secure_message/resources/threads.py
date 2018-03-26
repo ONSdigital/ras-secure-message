@@ -24,7 +24,7 @@ class ThreadById(Resource):
         logger.info("Successfully retrieved messages from thread", thread_id=thread_id, user_uuid=g.user.user_uuid)
         messages = []
         for message in conversation.all():
-            msg = message.serialize(g.user, body_summary=True)
+            msg = message.serialize(g.user, body_summary=False)
             messages.append(msg)
         return jsonify({"messages": add_users_and_business_details(messages)})
 
