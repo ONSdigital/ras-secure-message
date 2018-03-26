@@ -53,7 +53,7 @@ class PartyServiceIntegrationTestCase(unittest.TestCase):
                                              'name': 'Business Register and Employment Survey'
                                              }
                                         ]
-                                    },
+                                     },
                                     {'partyId': '0e2e030b-6138-411d-9178-9b35e7a47fca',
                                      'enrolments':
                                         [
