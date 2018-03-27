@@ -38,7 +38,7 @@ def get_options(args, draft_only=False):
 def generate_string_query_args(args):
     string_query = "?"
     for field in args._fields:
-        if field in ['page', 'limit']:
+        if field in ['page']:
             pass
         value = getattr(args, field)
         if value is not None:
@@ -53,9 +53,6 @@ def process_paginated_list(paginated_list, host_url, user, message_args, endpoin
     """used to change a pagination object to json format with links"""
     messages = []
     string_query_args = generate_string_query_args(message_args)
-    arg_joiner = ''
-    if string_query_args != '?':
-        arg_joiner = '&'
 
     for message in paginated_list.items:
         msg = message.serialize(user, body_summary=body_summary)
@@ -63,15 +60,15 @@ def process_paginated_list(paginated_list, host_url, user, message_args, endpoin
         messages.append(msg)
 
     links = {'first': {"href": f"{host_url}{endpoint}"},
-             'self': {"href": f"{host_url}{endpoint}{arg_joiner}{string_query_args}page={message_args.page}&limit={message_args.limit}"}}
+             'self': {"href": f"{host_url}{endpoint}{string_query_args}&page={message_args.page}"}}
 
     if paginated_list.has_next:
         links['next'] = {
-            "href": f"{host_url}{endpoint}{arg_joiner}{string_query_args}page={message_args.page + 1}&limit={message_args.limit}"}
+            "href": f"{host_url}{endpoint}{string_query_args}&page={message_args.page + 1}"}
 
     if paginated_list.has_prev:
         links['prev'] = {
-            "href": f"{host_url}{endpoint}{arg_joiner}{string_query_args}page={message_args.page - 1}&limit={message_args.limit}"}
+            "href": f"{host_url}{endpoint}{string_query_args}&page={message_args.page - 1}"}
     return messages, links
 
 
