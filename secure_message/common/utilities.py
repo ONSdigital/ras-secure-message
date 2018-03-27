@@ -8,44 +8,31 @@ from secure_message.services.service_toggles import party, internal_user_service
 from secure_message.constants import MESSAGE_BY_ID_ENDPOINT, MESSAGE_LIST_ENDPOINT, MESSAGE_QUERY_LIMIT
 
 logger = wrap_logger(logging.getLogger(__name__))
-
-
 MessageArgs = collections.namedtuple('MessageArgs', 'page limit ru_id survey cc label desc ce')
 
 
 def get_options(args, draft_only=False):
     """extract options from request , allow label to be set by caller"""
 
-    page = 1
-    limit = MESSAGE_QUERY_LIMIT
-    ru_id = None
-    survey = None
-    cc = None
-    label = None
-    desc = True
-    ce = None
+    fields = {'page': 1, 'limit': MESSAGE_QUERY_LIMIT, 'ru_id': None, 'survey': None,
+              'desc': True, 'cc': None, 'label': None, 'ce': None}
 
-    if args.get('limit'):
-        limit = int(args.get('limit'))
-    if args.get('page'):
-        page = int(args.get('page'))
-    if args.get('ru_id'):
-        ru_id = str(args.get('ru_id'))
-    if args.get('survey'):
-        survey = str(args.get('survey'))
-    if args.get('cc'):
-        cc = str(args.get('cc'))
+    for field in ['survey', 'cc', 'ce', 'ru_id', 'label']:
+        if args.get(field):
+            fields[field] = str(args.get(field))
+
+    for field in ['limit', 'page']:
+        if args.get(field):
+            fields[field] = int(args.get(field))
+
+    if args.get('desc') and args.get('desc') == 'false':
+        fields['desc'] = False
     if draft_only:
-        label = Labels.DRAFT.value
-    elif args.get('label'):
-        label = str(args.get('label'))
-    if args.get('ce'):
-        ce = str(args.get('ce'))
-    if args.get('desc'):
-        desc = False if args.get('desc') == 'false' else True
+        fields['label'] = Labels.DRAFT.value
 
-    return MessageArgs(page=page, limit=limit, ru_id=ru_id, survey=survey,
-                       cc=cc, label=label, desc=desc, ce=ce)
+    return MessageArgs(page=fields['page'], limit=fields['limit'], ru_id=fields['ru_id'],
+                       survey=fields['survey'], cc=fields['cc'], label=fields['label'],
+                       desc=fields['desc'], ce=fields['ce'])
 
 
 def generate_string_query_args(args):
