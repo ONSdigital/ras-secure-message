@@ -10,13 +10,12 @@ from secure_message.constants import MESSAGE_BY_ID_ENDPOINT, MESSAGE_LIST_ENDPOI
 logger = wrap_logger(logging.getLogger(__name__))
 
 
-MessageArgs = collections.namedtuple('MessageArgs', 'string_query_args page limit ru_id survey cc label desc ce')
+MessageArgs = collections.namedtuple('MessageArgs', 'page limit ru_id survey cc label desc ce')
 
 
 def get_options(args, draft_only=False):
     """extract options from request , allow label to be set by caller"""
 
-    string_query_args = '?'
     page = 1
     limit = MESSAGE_QUERY_LIMIT
     ru_id = None
@@ -28,48 +27,47 @@ def get_options(args, draft_only=False):
 
     if args.get('limit'):
         limit = int(args.get('limit'))
-
     if args.get('page'):
         page = int(args.get('page'))
-
     if args.get('ru_id'):
-        string_query_args = add_string_query_args(string_query_args, 'ru_id', args.get('ru_id'))
         ru_id = str(args.get('ru_id'))
     if args.get('survey'):
         survey = str(args.get('survey'))
-        string_query_args = add_string_query_args(string_query_args, 'survey', args.get('survey'))
     if args.get('cc'):
         cc = str(args.get('cc'))
-        string_query_args = add_string_query_args(string_query_args, 'cc', args.get('cc'))
     if draft_only:
         label = Labels.DRAFT.value
-        string_query_args = add_string_query_args(string_query_args, 'label', label)
     elif args.get('label'):
         label = str(args.get('label'))
-        string_query_args = add_string_query_args(string_query_args, 'label', args.get('label'))
     if args.get('ce'):
         ce = str(args.get('ce'))
-        string_query_args = add_string_query_args(string_query_args, 'ce', args.get('ce'))
     if args.get('desc'):
         desc = False if args.get('desc') == 'false' else True
-        string_query_args = add_string_query_args(string_query_args, 'desc', args.get('desc'))
 
-    return MessageArgs(string_query_args=string_query_args, page=page, limit=limit, ru_id=ru_id, survey=survey,
+    return MessageArgs(page=page, limit=limit, ru_id=ru_id, survey=survey,
                        cc=cc, label=label, desc=desc, ce=ce)
 
 
-def add_string_query_args(string_query_args, arg, val):
-    """Create query string for get messages options"""
-    if string_query_args == '?':
-        return f'{string_query_args}{arg}={val}'
-    return f'{string_query_args}&{arg}={val}'
+def generate_string_query_args(args):
+    string_query = "?"
+    for field in args._fields:
+        if field in ['page', 'limit']:
+            pass
+        value = getattr(args, field)
+        if value is not None:
+            if string_query == '?':
+                string_query = string_query + f'{field}={value}'
+            else:
+                string_query = string_query + f'&{field}={value}'
+    return string_query
 
 
 def process_paginated_list(paginated_list, host_url, user, message_args, endpoint=MESSAGE_LIST_ENDPOINT, body_summary=True):
     """used to change a pagination object to json format with links"""
     messages = []
+    string_query_args = generate_string_query_args(message_args)
     arg_joiner = ''
-    if message_args.string_query_args != '?':
+    if string_query_args != '?':
         arg_joiner = '&'
 
     for message in paginated_list.items:
@@ -78,15 +76,15 @@ def process_paginated_list(paginated_list, host_url, user, message_args, endpoin
         messages.append(msg)
 
     links = {'first': {"href": f"{host_url}{endpoint}"},
-             'self': {"href": f"{host_url}{endpoint}{arg_joiner}{message_args.string_query_args}page={message_args.page}&limit={message_args.limit}"}}
+             'self': {"href": f"{host_url}{endpoint}{arg_joiner}{string_query_args}page={message_args.page}&limit={message_args.limit}"}}
 
     if paginated_list.has_next:
         links['next'] = {
-            "href": f"{host_url}{endpoint}{arg_joiner}{message_args.string_query_args}page={message_args.page + 1}&limit={message_args.limit}"}
+            "href": f"{host_url}{endpoint}{arg_joiner}{string_query_args}page={message_args.page + 1}&limit={message_args.limit}"}
 
     if paginated_list.has_prev:
         links['prev'] = {
-            "href": f"{host_url}{endpoint}{arg_joiner}{message_args.string_query_args}page={message_args.page - 1}&limit={message_args.limit}"}
+            "href": f"{host_url}{endpoint}{arg_joiner}{string_query_args}page={message_args.page - 1}&limit={message_args.limit}"}
     return messages, links
 
 
