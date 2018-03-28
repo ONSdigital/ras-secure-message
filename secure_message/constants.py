@@ -24,7 +24,7 @@ MAX_EVENT_LEN = 20          # Maximum length of a event column
 # Endpoint names
 
 MESSAGE_BY_ID_ENDPOINT = "message"
-MESSAGE_LIST_ENDPOINT = "messages"
+MESSAGE_LIST_ENDPOINT = "v2/messages"
 THREAD_BY_ID_ENDPOINT = "thread"
 THREAD_LIST_ENDPOINT = "threads"
 DRAFT_LIST_ENDPOINT = "drafts"
