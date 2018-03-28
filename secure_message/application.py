@@ -3,8 +3,7 @@ import os
 import sys
 from time import sleep
 
-from flask import Flask, request
-from flask import json, jsonify
+from flask import Flask, json, jsonify, request
 from flask_restful import Api
 from flask_cors import CORS
 import maya
