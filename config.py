@@ -17,7 +17,7 @@ class Config:
     All configuration may be overridden by setting the appropriate environment variable name.
     """
     NAME = os.getenv('NAME', 'ras-secure-message')
-    VERSION = os.getenv('VERSION', '0.1.3')
+    VERSION = os.getenv('VERSION', '0.1.5')
 
     SECURE_MESSAGING_DATABASE_URL = os.getenv(
         'SECURE_MESSAGING_DATABASE_URL', 'postgresql://postgres:postgres@localhost:5432')
