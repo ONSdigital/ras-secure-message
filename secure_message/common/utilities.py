@@ -1,6 +1,7 @@
 import collections
 import hashlib
 import logging
+import urllib.parse
 
 from structlog import wrap_logger
 from secure_message.common.labels import Labels
@@ -36,17 +37,14 @@ def get_options(args, draft_only=False):
 
 
 def generate_string_query_args(args):
-    string_query = "?"
+    params = {}
     for field in args._fields:
         if field in ['page']:
-            pass
+            continue
         value = getattr(args, field)
-        if value is not None:
-            if string_query == '?':
-                string_query = string_query + f'{field}={value}'
-            else:
-                string_query = string_query + f'&{field}={value}'
-    return string_query
+        if value:
+            params[field] = value
+    return urllib.parse.urlencode(params)
 
 
 def process_paginated_list(paginated_list, host_url, user, message_args, endpoint=MESSAGE_LIST_ENDPOINT, body_summary=True):
@@ -60,15 +58,16 @@ def process_paginated_list(paginated_list, host_url, user, message_args, endpoin
         messages.append(msg)
 
     links = {'first': {"href": f"{host_url}{endpoint}"},
-             'self': {"href": f"{host_url}{endpoint}{string_query_args}&page={message_args.page}"}}
+             'self': {"href": f"{host_url}{endpoint}?{string_query_args}&page={message_args.page}"}}
 
     if paginated_list.has_next:
         links['next'] = {
-            "href": f"{host_url}{endpoint}{string_query_args}&page={message_args.page + 1}"}
+            "href": f"{host_url}{endpoint}?{string_query_args}&page={message_args.page + 1}"}
 
     if paginated_list.has_prev:
         links['prev'] = {
-            "href": f"{host_url}{endpoint}{string_query_args}&page={message_args.page - 1}"}
+            "href": f"{host_url}{endpoint}?{string_query_args}&page={message_args.page - 1}"}
+
     return messages, links
 
 
