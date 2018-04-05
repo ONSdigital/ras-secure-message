@@ -4,23 +4,26 @@ import logging
 import urllib.parse
 
 from structlog import wrap_logger
+
 from secure_message.common.labels import Labels
-from secure_message.services.service_toggles import party, internal_user_service
 from secure_message.constants import MESSAGE_BY_ID_ENDPOINT, MESSAGE_LIST_ENDPOINT, MESSAGE_QUERY_LIMIT
+from secure_message.services.service_toggles import party, internal_user_service
 
 logger = wrap_logger(logging.getLogger(__name__))
-MessageArgs = collections.namedtuple('MessageArgs', 'page limit ru_id survey cc label desc ce')
+MessageArgs = collections.namedtuple('MessageArgs', 'page limit ru_id surveys cc label desc ce')
 
 
 def get_options(args, draft_only=False):
     """extract options from request , allow label to be set by caller"""
 
-    fields = {'page': 1, 'limit': MESSAGE_QUERY_LIMIT, 'ru_id': None, 'survey': None,
+    fields = {'page': 1, 'limit': MESSAGE_QUERY_LIMIT, 'ru_id': None, 'surveys': None,
               'desc': True, 'cc': None, 'label': None, 'ce': None}
 
-    for field in ['survey', 'cc', 'ce', 'ru_id', 'label']:
+    for field in ['cc', 'ce', 'ru_id', 'label']:
         if args.get(field):
             fields[field] = str(args.get(field))
+
+    fields['surveys'] = args.getlist('survey')
 
     for field in ['limit', 'page']:
         if args.get(field):
@@ -32,7 +35,7 @@ def get_options(args, draft_only=False):
         fields['label'] = Labels.DRAFT.value
 
     return MessageArgs(page=fields['page'], limit=fields['limit'], ru_id=fields['ru_id'],
-                       survey=fields['survey'], cc=fields['cc'], label=fields['label'],
+                       surveys=fields['surveys'], cc=fields['cc'], label=fields['label'],
                        desc=fields['desc'], ce=fields['ce'])
 
 
