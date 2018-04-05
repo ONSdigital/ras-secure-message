@@ -1,6 +1,7 @@
+import copy
+
 from behave import given, when
 from flask import json
-import copy
 
 
 # These steps generate http requests and responses
@@ -283,6 +284,14 @@ def step_impl_the_threads_are_read(context):
 @given("the threads in survey '{survey}' are read")
 def step_impl_the_threads_in_specific_survey_are_returned(context, survey):
     url = context.bdd_helper.threads_get_url + f"?survey={survey}"
+    context.response = context.client.get(url, headers=context.bdd_helper.headers)
+    context.bdd_helper.store_messages_response_data(context.response.data)
+
+
+@when("the threads in are read with filters for both default and alternate surveys")
+def step_impl_the_threads_in_default_and_alternate_are_returned(context):
+    url = context.bdd_helper.threads_get_url + f"?survey={context.bdd_helper.default_survey}" \
+                                               f"&survey={context.bdd_helper.alternate_survey}"
     context.response = context.client.get(url, headers=context.bdd_helper.headers)
     context.bdd_helper.store_messages_response_data(context.response.data)
 

@@ -165,6 +165,14 @@ class SecureMessagingContextHelper:
         return copy.deepcopy(SecureMessagingContextHelper.__ALTERNATIVE_RESPONDENT_USER_TOKEN)
 
     @property
+    def default_survey(self):
+        return copy.copy(SecureMessagingContextHelper.__DEFAULT_SURVEY)
+
+    @property
+    def alternate_survey(self):
+        return copy.copy(SecureMessagingContextHelper.__ALTERNATE_SURVEY)
+
+    @property
     def message_post_url(self):
         return self._message_post_url
 
