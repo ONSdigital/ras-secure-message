@@ -1,5 +1,4 @@
 import logging
-from pprint import pprint
 
 from flask import g, jsonify, request
 from flask_restful import Resource
@@ -38,8 +37,6 @@ class ThreadList(Resource):
         """Get thread list"""
         logger.info("Getting list of threads for user", user_uuid=g.user.user_uuid)
         message_args = get_options(request.args)
-        pprint(request.args)
-
         result = Retriever().retrieve_thread_list(g.user, message_args)
 
         logger.info("Successfully retrieved threads for user", user_uuid=g.user.user_uuid)
