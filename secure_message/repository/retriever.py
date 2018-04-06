@@ -40,8 +40,8 @@ class Retriever:
         if message_args.ru_id:
             conditions.append(SecureMessage.ru_id == str(message_args.ru_id))
 
-        if message_args.survey:
-            conditions.append(SecureMessage.survey == str(message_args.survey))
+        if message_args.surveys:
+            conditions.append(SecureMessage.survey.in_(message_args.surveys))
 
         if message_args.cc:
             conditions.append(SecureMessage.collection_case == message_args.cc)
@@ -96,8 +96,8 @@ class Retriever:
         if message_args.ru_id:
             conditions.append(SecureMessage.ru_id == str(message_args.ru_id))
 
-        if message_args.survey:
-            conditions.append(SecureMessage.survey == str(message_args.survey))
+        if message_args.surveys:
+            conditions.append(SecureMessage.survey.in_(message_args.surveys))
 
         if message_args.cc:
             conditions.append(SecureMessage.collection_case == str(message_args.cc))
@@ -166,8 +166,8 @@ class Retriever:
         if request_args.ru_id:
             conditions.append(SecureMessage.ru_id == request_args.ru_id)
 
-        if request_args.survey:
-            conditions.append(SecureMessage.survey == request_args.survey)
+        if request_args.surveys:
+            conditions.append(SecureMessage.survey.in_(request_args.surveys))
 
         if request_args.cc:
             conditions.append(SecureMessage.collection_case == request_args.cc)
@@ -208,8 +208,8 @@ class Retriever:
         if request_args.ru_id:
             conditions.append(SecureMessage.ru_id == request_args.ru_id)
 
-        if request_args.survey:
-            conditions.append(SecureMessage.survey == request_args.survey)
+        if request_args.surveys:
+            conditions.append(SecureMessage.survey.in_(request_args.surveys))
 
         if request_args.cc:
             conditions.append(SecureMessage.collection_case == request_args.cc)

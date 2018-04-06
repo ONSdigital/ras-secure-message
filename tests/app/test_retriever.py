@@ -256,7 +256,7 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
         self.populate_database(5, add_draft=True)
         with self.app.app_context():
             with current_app.test_request_context():
-                args = get_args(page=1, limit=MESSAGE_QUERY_LIMIT, survey=BRES_SURVEY)
+                args = get_args(page=1, limit=MESSAGE_QUERY_LIMIT, surveys=[BRES_SURVEY])
                 result = Retriever().retrieve_message_list(self.user_internal, args)
                 msg = []
                 for message in result.items:
@@ -405,7 +405,7 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
 
         with self.app.app_context():
             with current_app.test_request_context():
-                args = get_args(page=1, limit=MESSAGE_QUERY_LIMIT, survey=BRES_SURVEY, label='DRAFT')
+                args = get_args(page=1, limit=MESSAGE_QUERY_LIMIT, surveys=[BRES_SURVEY], label='DRAFT')
                 response = Retriever().retrieve_message_list(self.user_internal, args)
                 msg = []
                 for message in response.items:
@@ -435,7 +435,7 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
 
         with self.app.app_context():
             with current_app.test_request_context():
-                args = get_args(page=1, limit=MESSAGE_QUERY_LIMIT, survey=BRES_SURVEY, label='INBOX')
+                args = get_args(page=1, limit=MESSAGE_QUERY_LIMIT, surveys=[BRES_SURVEY], label='INBOX')
                 response = Retriever().retrieve_message_list(self.user_internal, args)
                 msg = []
                 for message in response.items:
@@ -496,7 +496,7 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
 
         with self.app.app_context():
             with current_app.test_request_context():
-                args = get_args(page=1, limit=MESSAGE_QUERY_LIMIT, survey=BRES_SURVEY)
+                args = get_args(page=1, limit=MESSAGE_QUERY_LIMIT, surveys=[BRES_SURVEY])
                 response = Retriever().retrieve_message_list(self.user_respondent, args)
                 msg = []
                 for message in response.items:
@@ -511,7 +511,7 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
 
         with self.app.app_context():
             with current_app.test_request_context():
-                args = get_args(page=1, limit=MESSAGE_QUERY_LIMIT, survey='AnotherSurvey')
+                args = get_args(page=1, limit=MESSAGE_QUERY_LIMIT, surveys='AnotherSurvey')
                 response = Retriever().retrieve_message_list(self.user_respondent, args)
                 msg = []
                 for message in response.items:
@@ -626,7 +626,7 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
 
         with self.app.app_context():
             with current_app.test_request_context():
-                args = get_args(page=1, limit=MESSAGE_QUERY_LIMIT, survey=BRES_SURVEY, desc=False)
+                args = get_args(page=1, limit=MESSAGE_QUERY_LIMIT, surveys=[BRES_SURVEY], desc=False)
                 response = Retriever().retrieve_message_list(self.user_internal, args)
 
                 date = []
@@ -647,7 +647,7 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
 
         with self.app.app_context():
             with current_app.test_request_context():
-                args = get_args(page=1, limit=MESSAGE_QUERY_LIMIT, survey=BRES_SURVEY, desc=True)
+                args = get_args(page=1, limit=MESSAGE_QUERY_LIMIT, surveys=[BRES_SURVEY], desc=True)
                 response = Retriever().retrieve_message_list(self.user_internal, args)
 
                 date = []

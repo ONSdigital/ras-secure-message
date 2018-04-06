@@ -500,3 +500,29 @@ Feature: Get threads list Endpoint V2
       Then a success status code (200) is returned
        And '1' messages are returned
        And all response messages have the label 'DRAFT'
+
+  Scenario: An internal user sends messages regarding multiple different surveys, validate that when the get the threads list
+            filtered by both surveys then all messages are returned
+    Given sending from internal specific user to respondent
+      And survey set to default survey
+      And the message is sent V2
+      And sending from internal specific user to respondent
+      And survey is set to alternate survey
+      And the message is sent V2
+      And the user is set as internal specific user
+    When the threads in are read with filters for both default and alternate surveys
+    Then  a success status code (200) is returned
+      And  '2' messages are returned
+
+  Scenario: A respondent sends messages regarding multiple different surveys, validate that when the get the threads list
+        filtered by both surveys then all messages are returned
+    Given sending from respondent to internal group
+      And survey set to default survey
+      And the message is sent V2
+      And sending from respondent to internal group
+      And survey is set to alternate survey
+      And the message is sent V2
+      And the user is set as internal specific user
+    When the threads in are read with filters for both default and alternate surveys
+    Then  a success status code (200) is returned
+      And  '2' messages are returned
