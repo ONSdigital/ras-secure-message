@@ -35,7 +35,7 @@ class MessageSendV2(MessageSend):
         return message
 
 
-class MessageCounterV2(Resource):
+class UnreadMessageCounterV2(Resource):
     """Get count of unread messages using v2 endpoint"""
     @staticmethod
     def get():
@@ -51,3 +51,14 @@ class MessageCounterV2(Resource):
         else:
             logger.debug('No Name parameter specified in URL', request=request.url)
             raise BadRequest(description='No Label Name Parameter specified.')
+
+
+class MessageCounterV2(Resource):
+
+    """Get count of all messages using v2 endpoint"""
+
+    @staticmethod
+    def get():
+        survey = request.args.get('survey')
+        message_service = RetrieverV2()
+        return jsonify(total=message_service.message_count_by_survey(g.user, survey))

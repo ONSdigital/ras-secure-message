@@ -34,6 +34,24 @@ class RetrieverV2(Retriever):
         return result
 
     @staticmethod
+    def message_count_by_survey(user, survey):
+        """Count users messages for a specific survey"""
+        if user.is_internal:
+            status_conditions, survey_conditions = RetrieverV2._get_conditions_internal_user(survey, user)
+        else:
+            status_conditions, survey_conditions = RetrieverV2._get_conditions_respondent(survey, user)
+
+        try:
+            result = SecureMessage.query.join(Status). \
+                filter(or_(*status_conditions)). \
+                filter(and_(*survey_conditions)). \
+                count()
+        except Exception as e:
+            logger.error('Error retrieving count of messages by survey from database', error=e)
+            raise InternalServerError(description="Error retrieving count of unread messages from database")
+        return result
+
+    @staticmethod
     def _get_conditions_internal_user(survey, user):
         """Sets the conditions/predicates that are used by the query for the case of an internal actor"""
         status_conditions = []
