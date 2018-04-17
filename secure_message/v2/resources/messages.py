@@ -59,6 +59,6 @@ class MessageCounterV2(Resource):
 
     @staticmethod
     def get():
-        survey = request.args.get('survey')
+        survey = request.args.getlist('survey')
         message_service = RetrieverV2()
         return jsonify(total=message_service.message_count_by_survey(g.user, survey))
