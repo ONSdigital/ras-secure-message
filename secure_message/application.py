@@ -71,8 +71,7 @@ def create_app(config=None):
     api.add_resource(ThreadById, '/thread/<thread_id>', '/v2/threads/<thread_id>')
 
     api.add_resource(MessageSendV2, '/v2/messages')
-    api.add_resource(UnreadMessageCounterV2, '/v2/messages/count')
-    api.add_resource(MessageCounterV2, '/v2/messages/countall')
+    api.add_resource(MessageCounterV2, '/v2/messages/count')
 
     app.oauth_client_token_expires_at = maya.now()
 
