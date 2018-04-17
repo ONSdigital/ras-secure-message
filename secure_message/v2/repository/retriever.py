@@ -2,7 +2,7 @@ import logging
 
 
 from structlog import wrap_logger
-from sqlalchemy import and_, or_, distinct, func
+from sqlalchemy import and_, or_
 from werkzeug.exceptions import InternalServerError
 
 from secure_message.repository.database import SecureMessage, Status
@@ -36,9 +36,16 @@ class RetrieverV2(Retriever):
     @staticmethod
     def message_count_by_survey(user, survey):
         """Count users messages for a specific survey"""
+        if user.is_internal:
+            status_conditions, survey_conditions = RetrieverV2._get_conditions_internal_user(survey, user)
+        else:
+            status_conditions, survey_conditions = RetrieverV2._get_conditions_respondent(survey, user)
 
         try:
-            result = SecureMessage.query(func.count(distinct(SecureMessage.thread_id)).join(Status.msg_id))
+            result = SecureMessage.query.join(Status).\
+                filter(or_(*status_conditions)).\
+                filter(and_(*survey_conditions)).\
+                distinct(SecureMessage.thread_id).count()
         except Exception as e:
             logger.error('Error retrieving count of messages by survey from database', error=e)
             raise InternalServerError(description="Error retrieving count of unread messages from database")
@@ -53,7 +60,7 @@ class RetrieverV2(Retriever):
         status_conditions.append(Status.actor == constants.BRES_USER)
         survey_conditions = []
         if survey:
-            survey_conditions.append(SecureMessage.survey == survey)
+            survey_conditions.append(SecureMessage.survey.in_(survey))
         else:
             survey_conditions.append(True)
         return status_conditions, survey_conditions
@@ -65,7 +72,7 @@ class RetrieverV2(Retriever):
         status_conditions.append(Status.actor == str(user.user_uuid))
         survey_conditions = []
         if survey:
-            survey_conditions.append(SecureMessage.survey == survey)
+            survey_conditions.append(SecureMessage.survey.in_(survey))
         else:
             survey_conditions.append(True)
 
