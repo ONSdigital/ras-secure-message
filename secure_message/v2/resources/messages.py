@@ -41,7 +41,7 @@ class MessageCounterV2(Resource):
     def get():
         if request.args.get('label'):
             name = str(request.args.get('label'))
-            survey = request.args.get('survey')
+            survey = request.args.getlist('survey')
             if name.lower() == 'unread':
                 message_service = RetrieverV2()
                 return jsonify(name=name, total=message_service.unread_message_count_by_survey(g.user, survey))
