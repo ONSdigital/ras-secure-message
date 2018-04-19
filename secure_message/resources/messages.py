@@ -17,8 +17,7 @@ from secure_message.repository.retriever import Retriever
 from secure_message.repository.saver import Saver
 from secure_message.resources.drafts import DraftModifyById
 from secure_message.services.service_toggles import party, case_service, internal_user_service
-from secure_message.v2.validation.domain import MessageSchemaV2
-from secure_message.v2.repository.retriever import RetrieverV2
+from secure_message.validation.domain import MessageSchema
 
 logger = wrap_logger(logging.getLogger(__name__))
 
@@ -99,7 +98,7 @@ class MessageSend(Resource):
 
     @staticmethod
     def _validate_post_data(post_data):
-        message = MessageSchemaV2().load(post_data)
+        message = MessageSchema().load(post_data)
         return message
 
     @staticmethod
@@ -249,7 +248,7 @@ class MessageModifyById(Resource):
         return action, label
 
 
-class MessageCounterV2(Resource):
+class MessageCounter(Resource):
     """Get count of unread messages using v2 endpoint"""
     @staticmethod
     def get():
@@ -257,7 +256,7 @@ class MessageCounterV2(Resource):
             name = str(request.args.get('label'))
             survey = request.args.get('survey')
             if name.lower() == 'unread':
-                message_service = RetrieverV2()
+                message_service = Retriever()
                 return jsonify(name=name, total=message_service.unread_message_count_by_survey(g.user, survey))
             else:
                 logger.debug('Invalid label name', name=name, request=request.url)

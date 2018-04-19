@@ -70,8 +70,6 @@ def create_app(config=None):
     api.add_resource(ThreadList, '/threads')
     api.add_resource(ThreadById, '/thread/<thread_id>', '/v2/threads/<thread_id>')
 
-
-
     app.oauth_client_token_expires_at = maya.now()
 
     if app.config['USE_UAA']:

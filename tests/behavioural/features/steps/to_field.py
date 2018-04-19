@@ -115,14 +115,3 @@ def step_impl_the_at_msg_to_is_set_to_internal_group_user_for_all_messages(conte
                 }
     for msg in context.bdd_helper.messages_responses_data[0]['messages']:
         nose.tools.assert_equal(msg['@msg_to'][0], expected)
-
-
-@then("the at_msg_to is set correctly for bres user for all messages")
-def step_impl_the_at_msg_to_is_set_to_bres_user_for_all_messages(context):
-    expected = {"id": BRES_USER,
-                "firstName": "BRES",
-                "lastName": "",
-                "emailAddress": ""
-                }
-    for msg in context.bdd_helper.messages_responses_data[0]['messages']:
-        nose.tools.assert_equal(msg['@msg_to'][0], expected)
