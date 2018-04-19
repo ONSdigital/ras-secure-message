@@ -17,7 +17,8 @@ from secure_message.repository.retriever import Retriever
 from secure_message.repository.saver import Saver
 from secure_message.resources.drafts import DraftModifyById
 from secure_message.services.service_toggles import party, case_service, internal_user_service
-from secure_message.validation.domain import MessageSchema
+from secure_message.v2.validation.domain import MessageSchemaV2
+from secure_message.v2.repository.retriever import RetrieverV2
 
 logger = wrap_logger(logging.getLogger(__name__))
 
@@ -86,24 +87,20 @@ class MessageSend(Resource):
         return make_response(jsonify(message.errors), 400)
 
     @staticmethod
-    def _validate_post_data(post_data):
-        message = MessageSchema().load(post_data)
-        return message
-
-    @staticmethod
     def _message_save(message):
         """Saves the message to the database along with the subsequent status and audit"""
         save = Saver()
         save.save_message(message.data)
         save.save_msg_event(message.data.msg_id, EventsApi.SENT.value)
-        if g.user.is_respondent:
-            save.save_msg_status(message.data.msg_from, message.data.msg_id, Labels.SENT.value)
-            save.save_msg_status(constants.BRES_USER, message.data.msg_id, Labels.INBOX.value)
-            save.save_msg_status(constants.BRES_USER, message.data.msg_id, Labels.UNREAD.value)
-        else:
-            save.save_msg_status(constants.BRES_USER, message.data.msg_id, Labels.SENT.value)
-            save.save_msg_status(message.data.msg_to[0], message.data.msg_id, Labels.INBOX.value)
-            save.save_msg_status(message.data.msg_to[0], message.data.msg_id, Labels.UNREAD.value)
+
+        save.save_msg_status(message.data.msg_from, message.data.msg_id, Labels.SENT.value)
+        save.save_msg_status(message.data.msg_to[0], message.data.msg_id, Labels.INBOX.value)
+        save.save_msg_status(message.data.msg_to[0], message.data.msg_id, Labels.UNREAD.value)
+
+    @staticmethod
+    def _validate_post_data(post_data):
+        message = MessageSchemaV2().load(post_data)
+        return message
 
     @staticmethod
     def _alert_listeners(message):
@@ -252,20 +249,19 @@ class MessageModifyById(Resource):
         return action, label
 
 
-class MessageCounter(Resource):
-
-    """Get a count of unread messages"""
-
+class MessageCounterV2(Resource):
+    """Get count of unread messages using v2 endpoint"""
     @staticmethod
     def get():
-        """Get count of unread messages"""
-        logger.info("Getting count of unread messages", user_uuid=g.user.user_uuid)
-        try:
-            if request.args.get('name').lower() == 'unread':
-                return jsonify(name=request.args['name'], total=Retriever().unread_message_count(g.user))
+        if request.args.get('label'):
+            name = str(request.args.get('label'))
+            survey = request.args.get('survey')
+            if name.lower() == 'unread':
+                message_service = RetrieverV2()
+                return jsonify(name=name, total=message_service.unread_message_count_by_survey(g.user, survey))
             else:
-                logger.debug('Invalid label name', name=request.args.get('name'), request=request.url)
+                logger.debug('Invalid label name', name=name, request=request.url)
                 raise BadRequest(description="Invalid label")
-        except KeyError:
+        else:
             logger.debug('No Name parameter specified in URL', request=request.url)
             raise BadRequest(description='No Label Name Parameter specified.')

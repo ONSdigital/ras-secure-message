@@ -12,29 +12,6 @@ from secure_message.v2.repository.retriever import RetrieverV2
 # todo change these to be one class
 
 
-class MessageSendV2(MessageSend):
-
-    """Send A message using the V2 endpoint"""
-    def post(self):     # expose endpoint as a resource
-        return super(MessageSendV2, self).post()
-
-    @staticmethod
-    def _message_save(message):
-        """Saves the message to the database along with the subsequent status and audit"""
-        save = Saver()
-        save.save_message(message.data)
-        save.save_msg_event(message.data.msg_id, EventsApi.SENT.value)
-
-        save.save_msg_status(message.data.msg_from, message.data.msg_id, Labels.SENT.value)
-        save.save_msg_status(message.data.msg_to[0], message.data.msg_id, Labels.INBOX.value)
-        save.save_msg_status(message.data.msg_to[0], message.data.msg_id, Labels.UNREAD.value)
-
-    @staticmethod
-    def _validate_post_data(post_data):
-        message = MessageSchemaV2().load(post_data)
-        return message
-
-
 class MessageCounterV2(Resource):
     """Get count of unread messages using v2 endpoint"""
     @staticmethod
