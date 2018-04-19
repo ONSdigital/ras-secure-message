@@ -25,7 +25,7 @@ from secure_message.resources.health import DatabaseHealth, Health, HealthDetail
 from secure_message.resources.info import Info
 from secure_message.resources.messages import MessageById, MessageCounter, MessageList, MessageModifyById, MessageSend
 from secure_message.resources.threads import ThreadById, ThreadList
-from secure_message.v2.resources.messages import MessageSendV2, UnreadMessageCounterV2, MessageCounterV2
+from secure_message.v2.resources.messages import MessageSendV2, MessageCounterV2
 
 logger = wrap_logger(logging.getLogger(__name__))
 
