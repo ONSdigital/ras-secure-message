@@ -110,13 +110,6 @@ Feature: Get Messages list V2 Endpoint
     Then a success status code (200) is returned
       And the at_msg_to is set correctly for internal group for all messages
 
-  Scenario: Respondent saves a message to BRES using V1 and gets message list using V2 verify the @msg_to is correctly populated
-    Given sending from respondent to internal group
-      And   the message is sent
-      And messages are read V2
-    Then a success status code (200) is returned
-      And the at_msg_to is set correctly for bres user for all messages
-
   Scenario: There are 50 messages between respondent and internal user. Internal user gets conversations should see 50
    Given sending from respondent to internal group
     And '50' messages are sent using V2
