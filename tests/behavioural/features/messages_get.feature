@@ -4,31 +4,31 @@ Feature: Get Messages list Endpoint
     Given prepare for tests using 'mock' services
 
   Scenario: A Respondent sends multiple messages, Internal user reads them confirm correct count seen
-    Given sending from respondent to internal bres user
+    Given sending from respondent to internal user
       And  '5' messages are sent
     When messages are read
     Then  '5' messages are returned
 
   Scenario: An internal user sends multiple messages, Internal user reads them confirm correct count seen
-    Given sending from internal bres user to respondent
+    Given sending from internal user to respondent
       And  '5' messages are sent
     When messages with a label of  'SENT' are read
     Then  '5' messages are returned
 
   Scenario: A Respondent sends multiple messages and reads them to confirm all have SENT labels
-    Given sending from respondent to internal bres user
+    Given sending from respondent to internal user
       And  '5' messages are sent
     When messages are read
     Then  all response messages have the label 'SENT'
 
   Scenario: An internal user sends multiple messages and reads them to confirm all have SENT labels
-    Given sending from internal bres user to respondent
+    Given sending from internal user to respondent
       And  '5' messages are sent
     When messages are read
     Then  all response messages have the label 'SENT'
 
   Scenario: A Respondent sends multiple messages, and Internal user reads them confirm all have INBOX and UNREAD  labels
-    Given sending from respondent to internal bres user
+    Given sending from respondent to internal user
       And  '5' messages are sent
       And the user is set as internal
     When messages are read
@@ -36,7 +36,7 @@ Feature: Get Messages list Endpoint
       And all response messages have the label 'UNREAD'
 
   Scenario: An internal user sends multiple messages, and a respondent user reads them confirm all have INBOX and UNREAD  labels
-    Given sending from internal bres user to respondent
+    Given sending from internal user to respondent
       And  '5' messages are sent
       And the user is set as respondent
     When messages are read
@@ -44,7 +44,7 @@ Feature: Get Messages list Endpoint
       And all response messages have the label 'UNREAD'
 
    Scenario: A Respondent sends multiple messages against two rus, Internal user reads them confirm correct count seen
-    Given sending from respondent to internal bres user
+    Given sending from respondent to internal user
       And  '5' messages are sent
       And  ru set to alternate ru
       And  '3' messages are sent
@@ -54,7 +54,7 @@ Feature: Get Messages list Endpoint
     Then  '5' messages are returned
 
   Scenario: An internal user sends multiple messages against two rus, Respondent user reads them confirm correct count seen
-    Given sending from internal bres user to respondent
+    Given sending from internal user to respondent
       And  '5' messages are sent
       And  ru set to alternate ru
       And  '3' messages are sent
@@ -64,7 +64,7 @@ Feature: Get Messages list Endpoint
     Then  '5' messages are returned
 
    Scenario: A Respondent sends multiple messages against two surveys, Internal user reads them confirm correct count seen
-    Given sending from respondent to internal bres user
+    Given sending from respondent to internal user
       And  '5' messages are sent
       And  survey is set to alternate survey
       And  '3' messages are sent
@@ -74,7 +74,7 @@ Feature: Get Messages list Endpoint
     Then  '5' messages are returned
 
   Scenario: An internal user sends multiple messages against two surveys, respondent reads them confirm correct count seen
-    Given sending from internal bres user to respondent
+    Given sending from internal user to respondent
       And  '5' messages are sent
       And  survey is set to alternate survey
       And  '3' messages are sent
@@ -84,7 +84,7 @@ Feature: Get Messages list Endpoint
     Then  '5' messages are returned
 
   Scenario: A respondent user sends multiple messages against two collection cases, Internal user  reads them confirm correct count seen
-    Given sending from respondent to internal bres user
+    Given sending from respondent to internal user
       And  '5' messages are sent
       And  collection case is set to alternate collection case
       And  '3' messages are sent
@@ -95,7 +95,7 @@ Feature: Get Messages list Endpoint
 
 
    Scenario: An internal user sends multiple messages against two collection cases, Respondent  reads them confirm correct count seen
-    Given sending from internal bres user to respondent
+    Given sending from internal user to respondent
       And  '5' messages are sent
       And  collection case is set to alternate collection case
       And  '3' messages are sent
@@ -105,7 +105,7 @@ Feature: Get Messages list Endpoint
     Then  '5' messages are returned
 
   Scenario: A respondent user sends multiple messages against two collection exercises, Internal user  reads them confirm correct count seen
-    Given sending from respondent to internal bres user
+    Given sending from respondent to internal user
       And  '5' messages are sent
       And  collection exercise is set to alternate collection exercise
       And  '3' messages are sent
@@ -116,7 +116,7 @@ Feature: Get Messages list Endpoint
 
 
    Scenario: An internal user sends multiple messages against two collection exercises, Respondent  reads them confirm correct count seen
-    Given sending from internal bres user to respondent
+    Given sending from internal user to respondent
       And  '5' messages are sent
       And  collection exercise is set to alternate collection exercise
       And  '3' messages are sent
@@ -127,7 +127,7 @@ Feature: Get Messages list Endpoint
 
 
    Scenario: A respondent sends multiple messages , An internal user reads one and then gets all UNREAD
-     Given sending from respondent to internal bres user
+     Given sending from respondent to internal user
       And  '5' messages are sent
       And  the user is set as internal
       And  the message is read
@@ -139,7 +139,7 @@ Feature: Get Messages list Endpoint
       And all response messages have the label 'UNREAD'
 
    Scenario: An internal user sends multiple messages , A respondent user reads one and then gets all UNREAD
-     Given sending from internal bres user to respondent
+     Given sending from internal user to respondent
       And  '5' messages are sent
       And  the user is set as respondent
       And  the message is read
@@ -151,7 +151,7 @@ Feature: Get Messages list Endpoint
       And all response messages have the label 'UNREAD'
 
    Scenario: A respondent sends multiple messages , An internal user reads one and then gets all marked as INBOX
-     Given sending from respondent to internal bres user
+     Given sending from respondent to internal user
       And  '5' messages are sent
       And  the user is set as internal
       And  the message is read
@@ -162,7 +162,7 @@ Feature: Get Messages list Endpoint
 
 
    Scenario: An internal user sends multiple messages , A respondent user reads one and then gets all marked as INBOX
-     Given sending from internal bres user to respondent
+     Given sending from internal user to respondent
       And  '5' messages are sent
       And  the user is set as respondent
       And  the message is read
@@ -173,7 +173,7 @@ Feature: Get Messages list Endpoint
 
 
   Scenario: A respondent sends multiple messages , Another respondent should not be able to read any
-     Given sending from respondent to internal bres user
+     Given sending from respondent to internal user
       And  '5' messages are sent
       And  the user is set as alternative respondent
      When messages are read
@@ -181,7 +181,7 @@ Feature: Get Messages list Endpoint
       And '0' messages are returned
 
   Scenario: An internal user sends multiple messages , Another respondent should not be able to read any
-     Given sending from internal bres user to respondent
+     Given sending from internal user to respondent
       And  '5' messages are sent
       And  the user is set as alternative respondent
      When messages are read
@@ -189,35 +189,35 @@ Feature: Get Messages list Endpoint
       And '0' messages are returned
 
   Scenario: A respondent sends multiple messages then sets the limit to a smaller number and reads messages , assert correct number returned
-     Given sending from respondent to internal bres user
+     Given sending from respondent to internal user
       And  '23' messages are sent
      When messages are read with '5' per page requesting page '5'
      Then  a success status code (200) is returned
       And '3' messages are returned
 
   Scenario: An internal user sends multiple messages then sets the limit to a smaller number and reads messages , assert correct number returned
-     Given sending from respondent to internal bres user
+     Given sending from respondent to internal user
       And  '23' messages are sent
      When messages are read with '5' per page requesting page '5'
      Then  a success status code (200) is returned
       And '3' messages are returned
 
   Scenario: An internal user sends multiple messages , all should be returned with sent from internal True
-    Given sending from internal bres user to respondent
+    Given sending from internal user to respondent
       And '7' messages are sent
     When messages with a label of  'SENT' are read
       Then a success status code (200) is returned
       And '7' messages are returned with sent from internal
 
   Scenario: An external user sends multiple messages , no messages should be returned with sent from internal true
-    Given sending from respondent to internal bres user
+    Given sending from respondent to internal user
       And '7' messages are sent
     When messages are read
       Then a success status code (200) is returned
       And '0' messages are returned with sent from internal
 
   Scenario: An internal user sends a very long message, the respondent sees a 100 character summary in their inbox
-    Given sending from internal bres user to respondent
+    Given sending from internal user to respondent
       And the message body is '5000' characters long
       And '1' messages are sent
     When messages are read

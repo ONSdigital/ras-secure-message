@@ -33,7 +33,7 @@ class FlaskTestCase(unittest.TestCase):
 
         AlertUser.alert_method = mock.Mock(AlertViaGovNotify)
 
-        token_data = {constants.USER_IDENTIFIER: constants.BRES_USER,
+        token_data = {constants.NON_SPECIFIC_INTERNAL_USER: constants.NON_SPECIFIC_INTERNAL_USER,
                       "role": "internal"}
 
         encrypter = Encrypter(_private_key=self.app.config['SM_USER_AUTHENTICATION_PRIVATE_KEY'],
@@ -52,7 +52,7 @@ class FlaskTestCase(unittest.TestCase):
         self.headers = {'Content-Type': 'application/json', 'Authorization': encrypted_jwt}
 
         self.test_message = {'msg_to': ['0a7ad740-10d5-4ecb-b7ca-3c0384afb882'],
-                             'msg_from': constants.BRES_USER,
+                             'msg_from': constants.NON_SPECIFIC_INTERNAL_USER,
                              'subject': 'MyMessage',
                              'body': 'hello',
                              'thread_id': "",
@@ -202,7 +202,7 @@ class FlaskTestCase(unittest.TestCase):
 
         draft = ({'msg_id': self.msg_id,
                   'msg_to': ['0a7ad740-10d5-4ecb-b7ca-3c0384afb882'],
-                  'msg_from': constants.BRES_USER,
+                  'msg_from': constants.NON_SPECIFIC_INTERNAL_USER,
                   'subject': 'MyMessage',
                   'body': 'hello',
                   'thread_id': '',
@@ -263,7 +263,7 @@ class FlaskTestCase(unittest.TestCase):
 
         self.test_message.update({'msg_id': msg_id,
                                   'msg_to': ['0a7ad740-10d5-4ecb-b7ca-3c0384afb882'],
-                                  'msg_from': constants.BRES_USER,
+                                  'msg_from': constants.NON_SPECIFIC_INTERNAL_USER,
                                   'subject': 'MyMessage',
                                   'body': 'hello',
                                   'collection_case': 'ACollectionCase',
@@ -282,7 +282,7 @@ class FlaskTestCase(unittest.TestCase):
     def test_draft_created_by_respondent_does_not_show_for_internal(self):
         """Test whether a draft created by a respondent is returned to an internal user"""
 
-        self.test_message.update({'msg_to': [constants.BRES_USER],
+        self.test_message.update({'msg_to': [constants.NON_SPECIFIC_INTERNAL_USER],
                                   'msg_from': '0a7ad740-10d5-4ecb-b7ca-3c0384afb882',
                                   'subject': 'MyMessage',
                                   'body': 'hello',
@@ -308,7 +308,7 @@ class FlaskTestCase(unittest.TestCase):
         save_data = json.loads(resp.data)
         msg_id = save_data['msg_id']
 
-        token_data = {constants.USER_IDENTIFIER: constants.BRES_USER,
+        token_data = {constants.USER_IDENTIFIER: constants.NON_SPECIFIC_INTERNAL_USER,
                       "role": "internal"}
 
         encrypter = Encrypter(_private_key=self.app.config['SM_USER_AUTHENTICATION_PRIVATE_KEY'],
@@ -330,7 +330,7 @@ class FlaskTestCase(unittest.TestCase):
     def test_draft_get_returns_msg_to(self):
         """Test that draft get returns draft's msg_to if applicable"""
 
-        self.test_message.update({'msg_to': [constants.BRES_USER],
+        self.test_message.update({'msg_to': [constants.NON_SPECIFIC_INTERNAL_USER],
                                   'msg_from': '0a7ad740-10d5-4ecb-b7ca-3c0384afb882',
                                   'subject': 'MyMessage',
                                   'body': 'hello',
@@ -452,7 +452,7 @@ class FlaskTestCase(unittest.TestCase):
     @patch.object(CaseServiceMock, 'store_case_event')
     def test_if_respondent_has_no_first_name_or_last_name_then_unknown_user_passed_to_case_service(self, mock_case, mock_party):
         """Test if party data has no name for the user then a constant of 'Unknown user' is used"""
-        self.test_message.update({'msg_to': [constants.BRES_USER],
+        self.test_message.update({'msg_to': [constants.NON_SPECIFIC_INTERNAL_USER],
                                   'msg_from': '0a7ad740-10d5-4ecb-b7ca-3c0384afb882',
                                   'subject': 'MyMessage',
                                   'body': 'hello',

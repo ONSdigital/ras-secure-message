@@ -4,8 +4,8 @@ Feature: V2 access with existing V1 Data
     Given prepare for tests using 'mock' services
 
 
-  Scenario Outline: There are existing messages to BRES , A respondent adds more using V2 , all should be returned on get messages
-    Given sending from respondent to internal bres user
+  Scenario Outline: There are existing messages to internal user , A respondent adds more using V2 , all should be returned on get messages
+    Given sending from respondent to internal user
       And the message is sent
       And the message is sent
       And the message is sent
@@ -22,7 +22,7 @@ Feature: V2 access with existing V1 Data
     | group        |
 
 Scenario Outline: There are existing messages from BRES , an internal user adds more , the respondent should see all of them
-    Given sending from internal bres user to respondent
+    Given sending from internal user to respondent
       And the message is sent
       And the message is sent
       And the message is sent

@@ -35,7 +35,7 @@ class DraftTestCase(unittest.TestCase):
 
         self.engine = create_engine(self.app.config['SQLALCHEMY_DATABASE_URI'])
         token_data = {
-            constants.USER_IDENTIFIER: constants.BRES_USER,
+            constants.USER_IDENTIFIER: constants.NON_SPECIFIC_INTERNAL_USER,
             "role": "internal"
         }
         encrypter = Encrypter(_private_key=self.app.config['SM_USER_AUTHENTICATION_PRIVATE_KEY'],
@@ -53,7 +53,7 @@ class DraftTestCase(unittest.TestCase):
         self.headers = {'Content-Type': 'application/json', 'Authorization': encrypted_jwt}
 
         self.test_message = {'msg_to': ['f62dfda8-73b0-4e0e-97cf-1b06327a6712'],
-                             'msg_from': constants.BRES_USER,
+                             'msg_from': constants.NON_SPECIFIC_INTERNAL_USER,
                              'subject': 'MyMessage',
                              'body': 'hello',
                              'thread_id': '',
@@ -82,7 +82,7 @@ class DraftTestCase(unittest.TestCase):
 
         draft_save = DraftSave()
         with self.app.app_context():
-            g.user = User(constants.BRES_USER, 'internal')
+            g.user = User(constants.NON_SPECIFIC_INTERNAL_USER, 'internal')
             draft = DraftSchema().load(self.test_message)
             draft_save._save_draft(draft, saver)
 
@@ -217,7 +217,7 @@ class DraftTestCase(unittest.TestCase):
 
         self.test_message.update({'msg_id': self.msg_id,
                                   'msg_to': ['0a7ad740-10d5-4ecb-b7ca-3c0384afb882'],
-                                  'msg_from': constants.BRES_USER,
+                                  'msg_from': constants.NON_SPECIFIC_INTERNAL_USER,
                                   'subject': 'MyMessage',
                                   'body': 'hello',
                                   'thread_id': '',
@@ -262,7 +262,7 @@ class DraftTestCase(unittest.TestCase):
     def test_etag_check_returns_true_if_data_equal(self):
         """Test etag_check function returns true for unchanged draft etag"""
 
-        message = {'msg_to': [constants.BRES_USER],
+        message = {'msg_to': [constants.NON_SPECIFIC_INTERNAL_USER],
                    'msg_from': '0a7ad740-10d5-4ecb-b7ca-3c0384afb882',
                    'msg_id': 'ea420f66-12f6-4d4e-bf36-fe9b6b20c3f4',
                    'subject': 'test',
@@ -282,7 +282,7 @@ class DraftTestCase(unittest.TestCase):
     def test_etag_check_returns_false_if_msg_to_changed(self):
         """Test etag_check function returns false for changed draft etag"""
 
-        message = {'msg_to': [constants.BRES_USER],
+        message = {'msg_to': [constants.NON_SPECIFIC_INTERNAL_USER],
                    'msg_from': '0a7ad740-10d5-4ecb-b7ca-3c0384afb882',
                    'msg_id': 'ea420f66-12f6-4d4e-bf36-fe9b6b20c3f4',
                    'subject': 'test',
@@ -301,7 +301,7 @@ class DraftTestCase(unittest.TestCase):
     def test_etag_check_returns_false_if_msg_id_changed(self):
         """Test etag_check function returns false for changed draft etag"""
 
-        message = {'msg_to': [constants.BRES_USER],
+        message = {'msg_to': [constants.NON_SPECIFIC_INTERNAL_USER],
                    'msg_from': '0a7ad740-10d5-4ecb-b7ca-3c0384afb882',
                    'msg_id': 'ea420f66-12f6-4d4e-bf36-fe9b6b20c3f4',
                    'subject': 'test',
@@ -320,7 +320,7 @@ class DraftTestCase(unittest.TestCase):
     def test_etag_check_returns_false_if_subject_changed(self):
         """Test etag_check function returns false for changed draft etag"""
 
-        message = {'msg_to': [constants.BRES_USER],
+        message = {'msg_to': [constants.NON_SPECIFIC_INTERNAL_USER],
                    'msg_from': '0a7ad740-10d5-4ecb-b7ca-3c0384afb882',
                    'msg_id': 'ea420f66-12f6-4d4e-bf36-fe9b6b20c3f4',
                    'subject': 'test',
@@ -339,7 +339,7 @@ class DraftTestCase(unittest.TestCase):
     def test_etag_check_returns_false_if_body_changed(self):
         """Test etag_check function returns false for changed draft etag"""
 
-        message = {'msg_to': [constants.BRES_USER],
+        message = {'msg_to': [constants.NON_SPECIFIC_INTERNAL_USER],
                    'msg_from': '0a7ad740-10d5-4ecb-b7ca-3c0384afb882',
                    'msg_id': 'ea420f66-12f6-4d4e-bf36-fe9b6b20c3f4',
                    'subject': 'test',

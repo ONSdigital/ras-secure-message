@@ -143,7 +143,7 @@ class RetrieverTestCaseHelper:
             msg_id = str(uuid.uuid4())
             thread_id = msg_id
             threads.append(thread_id)
-            self.add_secure_message(msg_id=msg_id, thread_id=thread_id, survey=constants.BRES_USER, from_internal=False)
+            self.add_secure_message(msg_id=msg_id, thread_id=thread_id, survey=constants.NON_SPECIFIC_INTERNAL_USER, from_internal=False)
             self.add_status(label="SENT", msg_id=msg_id, actor=external_actor)
             self.add_status(label="INBOX", msg_id=msg_id, actor=internal_actor)
 
@@ -152,7 +152,7 @@ class RetrieverTestCaseHelper:
             self.add_event(event=EventsApi.READ.value, msg_id=msg_id, date_time=datetime(year, month, day))
             day += 1
             msg_id = str(uuid.uuid4())
-            self.add_secure_message(msg_id=msg_id, thread_id=thread_id, survey=constants.BRES_USER, from_internal=True)
+            self.add_secure_message(msg_id=msg_id, thread_id=thread_id, survey=constants.NON_SPECIFIC_INTERNAL_USER, from_internal=True)
             self.add_status(label="SENT", msg_id=msg_id, actor=internal_actor)
             self.add_status(label="UNREAD", msg_id=msg_id, actor=external_actor)
             self.add_status(label="INBOX", msg_id=msg_id, actor=external_actor)
@@ -163,7 +163,7 @@ class RetrieverTestCaseHelper:
 
             if add_internal_draft:  # adds draft from internal
                 msg_id = str(uuid.uuid4())
-                self.add_secure_message(msg_id=msg_id, thread_id=thread_id, survey=constants.BRES_USER, from_internal=True)
+                self.add_secure_message(msg_id=msg_id, thread_id=thread_id, survey=constants.NON_SPECIFIC_INTERNAL_USER, from_internal=True)
                 self.add_status(label="DRAFT_INBOX", msg_id=msg_id, actor=external_actor)
                 self.add_status(label="DRAFT", msg_id=msg_id, actor=internal_actor)
 
@@ -176,7 +176,7 @@ class RetrieverTestCaseHelper:
                 self.add_event(event=EventsApi.READ.value, msg_id=last_msg_id, date_time=datetime(year, month, day))
                 day += 1
                 msg_id = str(uuid.uuid4())
-                self.add_secure_message(msg_id=msg_id, thread_id=thread_id, survey=constants.BRES_USER, from_internal=False)
+                self.add_secure_message(msg_id=msg_id, thread_id=thread_id, survey=constants.NON_SPECIFIC_INTERNAL_USER, from_internal=False)
                 self.add_status(label="DRAFT_INBOX", msg_id=msg_id, actor=internal_actor)
                 self.add_status(label="DRAFT", msg_id=msg_id, actor=external_actor)
 
@@ -355,24 +355,6 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
                     response = Retriever().retrieve_message(msg_id, self.user_respondent)
                     labels = ['SENT']
                     self.assertCountEqual(response['labels'], labels)
-
-    def test_correct_to_and_from_returned_BRES_user(self):
-        """retrieves message using id and checks the to and from urns are correct"""
-        self.populate_database(1, internal_actor=constants.BRES_USER)
-        with self.engine.connect() as con:
-            query = 'SELECT msg_id FROM securemessage.secure_message LIMIT 1'
-            query_x = con.execute(query)
-            names = []
-            for row in query_x:
-                names.append(row[0])
-
-            with self.app.app_context():
-                with current_app.test_request_context():
-                    msg_id = str(names[0])
-                    response = Retriever().retrieve_message(msg_id, self.user_respondent)
-                    msg_to = [constants.BRES_USER]
-                    self.assertEqual(response['msg_to'], msg_to)
-                    self.assertEqual(response['msg_from'], self.user_respondent.user_uuid)
 
     def test_correct_to_and_from_returned_not_BRES_user(self):
         """retrieves message using id and checks the to and from urns are correct"""

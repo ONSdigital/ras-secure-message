@@ -2,7 +2,6 @@ import logging
 from flask import current_app, json
 import requests
 from structlog import wrap_logger
-from secure_message import constants
 logger = wrap_logger(logging.getLogger(__name__))
 
 
@@ -33,15 +32,6 @@ class PartyService:
         return ru_dict
 
     def get_user_details(self, uuid):
-        if uuid == constants.BRES_USER:
-            user_dict = {"id": constants.BRES_USER,
-                         "firstName": "BRES",
-                         "lastName": "",
-                         "emailAddress": "",
-                         "telephone": "",
-                         "status": "",
-                         "sampleUnitType": "BI"}
-            return user_dict
 
         user_dict = self._users_cache.get(uuid)
 

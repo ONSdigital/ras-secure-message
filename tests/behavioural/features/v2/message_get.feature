@@ -64,8 +64,8 @@ Feature: Message get by ID Endpoint V2
       And the at_msg_to is set correctly for internal group
 
   Scenario: Respondent saves a message to BRES and retrieves itge verify the @msg_to is correctly populated
-    Given sending from respondent to internal bres user
+    Given sending from respondent to internal user
       And   the message is sent
       And the message is read V2
     Then a success status code (200) is returned
-      And the at_msg_to is set correctly for bres user
+      And the at_msg_to is set correctly for internal user
