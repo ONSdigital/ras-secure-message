@@ -10,8 +10,7 @@ from secure_message.authorization.authorizer import Authorizer
 from secure_message.common.alerts import AlertUser, AlertViaGovNotify, AlertViaLogging
 from secure_message.common.eventsapi import EventsApi
 from secure_message.common.labels import Labels
-from secure_message.common.utilities import get_options, process_paginated_list, add_users_and_business_details
-from secure_message.constants import MESSAGE_LIST_ENDPOINT
+from secure_message.common.utilities import add_users_and_business_details
 from secure_message.repository.modifier import Modifier
 from secure_message.repository.retriever import Retriever
 from secure_message.repository.saver import Saver
@@ -23,22 +22,6 @@ logger = wrap_logger(logging.getLogger(__name__))
 
 
 """Rest endpoint for message resources. Messages are immutable, they can only be created."""
-
-
-class MessageList(Resource):
-    """Return a list of messages for the user"""
-
-    @staticmethod
-    def get():
-        """Get message list with options"""
-        logger.info("Getting message list", user_uuid=g.user.user_uuid)
-        message_args = get_options(request.args)
-        message_service = Retriever()
-        result = message_service.retrieve_message_list(g.user, message_args)
-        logger.info("Successfully retrieved message list", user_uuid=g.user.user_uuid)
-        messages, links = process_paginated_list(result, request.host_url, g.user, message_args, MESSAGE_LIST_ENDPOINT)
-        messages = add_users_and_business_details(messages)
-        return jsonify({"messages": messages, "_links": links})
 
 
 class MessageSend(Resource):
@@ -86,24 +69,20 @@ class MessageSend(Resource):
         return make_response(jsonify(message.errors), 400)
 
     @staticmethod
-    def _validate_post_data(post_data):
-        message = MessageSchema().load(post_data)
-        return message
-
-    @staticmethod
     def _message_save(message):
         """Saves the message to the database along with the subsequent status and audit"""
         save = Saver()
         save.save_message(message.data)
         save.save_msg_event(message.data.msg_id, EventsApi.SENT.value)
-        if g.user.is_respondent:
-            save.save_msg_status(message.data.msg_from, message.data.msg_id, Labels.SENT.value)
-            save.save_msg_status(constants.BRES_USER, message.data.msg_id, Labels.INBOX.value)
-            save.save_msg_status(constants.BRES_USER, message.data.msg_id, Labels.UNREAD.value)
-        else:
-            save.save_msg_status(constants.BRES_USER, message.data.msg_id, Labels.SENT.value)
-            save.save_msg_status(message.data.msg_to[0], message.data.msg_id, Labels.INBOX.value)
-            save.save_msg_status(message.data.msg_to[0], message.data.msg_id, Labels.UNREAD.value)
+
+        save.save_msg_status(message.data.msg_from, message.data.msg_id, Labels.SENT.value)
+        save.save_msg_status(message.data.msg_to[0], message.data.msg_id, Labels.INBOX.value)
+        save.save_msg_status(message.data.msg_to[0], message.data.msg_id, Labels.UNREAD.value)
+
+    @staticmethod
+    def _validate_post_data(post_data):
+        message = MessageSchema().load(post_data)
+        return message
 
     @staticmethod
     def _alert_listeners(message):
@@ -253,19 +232,17 @@ class MessageModifyById(Resource):
 
 
 class MessageCounter(Resource):
-
-    """Get a count of unread messages"""
-
+    """Get count of unread messages using v2 endpoint"""
     @staticmethod
     def get():
-        """Get count of unread messages"""
-        logger.info("Getting count of unread messages", user_uuid=g.user.user_uuid)
-        try:
-            if request.args.get('name').lower() == 'unread':
-                return jsonify(name=request.args['name'], total=Retriever().unread_message_count(g.user))
+        if request.args.get('label'):
+            name = str(request.args.get('label'))
+            survey = request.args.get('survey')
+            if name.lower() == 'unread':
+                return jsonify(name=name, total=Retriever().unread_message_count_by_survey(g.user, survey))
             else:
-                logger.debug('Invalid label name', name=request.args.get('name'), request=request.url)
+                logger.debug('Invalid label name', name=name, request=request.url)
                 raise BadRequest(description="Invalid label")
-        except KeyError:
+        else:
             logger.debug('No Name parameter specified in URL', request=request.url)
             raise BadRequest(description='No Label Name Parameter specified.')
