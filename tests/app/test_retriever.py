@@ -4,7 +4,7 @@ from datetime import datetime
 
 from flask import current_app
 from sqlalchemy import create_engine
-from werkzeug.exceptions import NotFound, InternalServerError
+from werkzeug.exceptions import NotFound
 
 from secure_message.application import create_app
 from secure_message.common.eventsapi import EventsApi
@@ -216,15 +216,6 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
                     msg.append(message.serialize)
                 self.assertEqual(msg, [])
 
-    def test_retrieve_message_list_raises_error(self):
-        """retrieves messages from when db does not exist"""
-        with self.app.app_context():
-            self.db.drop_all()
-            with current_app.test_request_context():
-                with self.assertRaises(InternalServerError):
-                    args = get_args(page=1, limit=MESSAGE_QUERY_LIMIT)
-                    Retriever().retrieve_message_list(self.user_respondent, args)
-
     def test_all_msg_returned_when_db_less_than_limit(self):
         """retrieves messages from database with less entries than retrieval amount"""
         self.populate_database(5)
@@ -390,14 +381,6 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
                     response = Retriever().retrieve_message(msg_id, self.user_respondent)
                     self.assertEqual(response['msg_to'][0], self.user_internal.user_uuid)
                     self.assertEqual(response['msg_from'], self.user_respondent.user_uuid)
-
-    def test_retrieve_message_raises_error(self):
-        """retrieves message from when db does not exist"""
-        with self.app.app_context():
-            self.db.drop_all()
-            with current_app.test_request_context():
-                with self.assertRaises(InternalServerError):
-                    Retriever().retrieve_message(1, self.user_internal)
 
     def test_all_draft_message_returned(self):
         """retrieves messages from database with label DRAFT for user"""
@@ -787,14 +770,6 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
                     self.assertEqual(response['msg_to'], [self.user_respondent.user_uuid])
                     self.assertEqual(response['msg_from'], self.user_internal.user_uuid)
 
-    def test_retrieve_draft_raises_error(self):
-        """retrieves draft from when db does not exist"""
-        with self.app.app_context():
-            self.db.drop_all()
-            with current_app.test_request_context():
-                with self.assertRaises(InternalServerError):
-                    Retriever().retrieve_message(1, self.user_internal)
-
     def test_all_msg_returned_for_thread_id_with_draft(self):
         """retrieves messages for thread_id from database with draft """
         self.populate_database(3, add_reply=True, add_draft=True)
@@ -851,37 +826,12 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
                 desc_date = sorted(date, reverse=True)
                 self.assertListEqual(desc_date, date)
 
-    def test_retrieve_thread_raises_server_error(self):
-        """retrieves messages when db does not exist"""
-        with self.app.app_context():
-            self.db.drop_all()
-            with current_app.test_request_context():
-                with self.assertRaises(InternalServerError):
-                    Retriever().retrieve_thread('ThreadId', self.user_respondent)
-
     def test_thread_returned_with_thread_id_returns_404(self):
         """retrieves thread using id that doesn't exist"""
         with self.app.app_context():
             with current_app.test_request_context():
                 with self.assertRaises(NotFound):
                     Retriever().retrieve_thread('anotherThreadId', self.user_respondent)
-
-    def test_retrieve_draft_raises_server_error(self):
-        """retrieves draft when db does not exist"""
-        with self.app.app_context():
-            self.db.drop_all()
-            with current_app.test_request_context():
-                with self.assertRaises(InternalServerError):
-                    Retriever().retrieve_draft('draftId', self.user_respondent)
-
-    def test_retrieve_thread_list_raises_server_error(self):
-        """retrieves threads when db does not exist"""
-        with self.app.app_context():
-            self.db.drop_all()
-            with current_app.test_request_context():
-                with self.assertRaises(InternalServerError):
-                    args = get_args(limit=MESSAGE_QUERY_LIMIT)
-                    Retriever().retrieve_thread_list(self.user_respondent, args)
 
     def test_thread_list_returned_in_descending_order_respondent(self):
         """retrieves threads from database in desc sent_date order for respondent"""
