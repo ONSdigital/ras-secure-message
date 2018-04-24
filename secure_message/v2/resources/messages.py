@@ -49,6 +49,5 @@ class MessageCounterV2(Resource):
                 logger.debug('Invalid label name', name=label, request=request.url)
                 raise BadRequest(description="Invalid label")
         else:
-            label = None
             message_service = RetrieverV2()
-            return jsonify(total=message_service.message_count_by_survey(g.user, survey, label))
+            return jsonify(total=message_service.message_count_by_survey(g.user, survey, label=None))

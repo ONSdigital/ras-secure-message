@@ -23,12 +23,12 @@ class RetrieverV2(Retriever):
         else:
             status_conditions, survey_conditions = RetrieverV2._get_conditions_respondent(survey, user)
 
-        if label is 'UNREAD':
+        if label:
             try:
                 result = SecureMessage.query.join(Status). \
                     filter(or_(*status_conditions)). \
                     filter(and_(*survey_conditions)). \
-                    filter(Status.label == 'UNREAD').count()
+                    filter(Status.label).count()
             except Exception as e:
                 logger.error('Error retrieving count of unread messages from database', error=e)
                 raise InternalServerError(description="Error retrieving count of unread messages from database")
