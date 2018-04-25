@@ -23,7 +23,7 @@ from secure_message.repository import database
 from secure_message.resources.drafts import DraftById, DraftList, DraftModifyById, DraftSave
 from secure_message.resources.health import DatabaseHealth, Health, HealthDetails
 from secure_message.resources.info import Info
-from secure_message.resources.messages import MessageById, MessageCounter, MessageList, MessageModifyById, MessageSend
+from secure_message.resources.messages import MessageCounter, MessageList, MessageModifyById, MessageSend
 from secure_message.resources.threads import ThreadById, ThreadList
 from secure_message.v2.resources.messages import MessageSendV2, MessageCounterV2
 
@@ -58,7 +58,6 @@ def create_app(config=None):
 
     api.add_resource(MessageList, '/messages', '/v2/messages')
     api.add_resource(MessageSend, '/message/send')
-    api.add_resource(MessageById, '/message/<message_id>', '/v2/messages/<message_id>')
     api.add_resource(MessageModifyById, '/message/<message_id>/modify',
                      '/v2/messages/modify/<message_id>')
     api.add_resource(MessageCounter, '/labels')
