@@ -16,7 +16,7 @@ class RetrieverV2(Retriever):
     """Created when retrieving messages"""
 
     @staticmethod
-    def message_count_by_survey(user, survey, label):
+    def message_count_by_survey(user, survey, label=None):
         """Count users messages for a specific survey"""
         if user.is_internal:
             status_conditions, survey_conditions = RetrieverV2._get_conditions_internal_user(survey, user)
@@ -28,7 +28,7 @@ class RetrieverV2(Retriever):
                 result = SecureMessage.query.join(Status). \
                     filter(or_(*status_conditions)). \
                     filter(and_(*survey_conditions)). \
-                    filter(Status.label).count()
+                    filter(Status.label == label).count()
             except Exception as e:
                 logger.error('Error retrieving count of unread messages from database', error=e)
                 raise InternalServerError(description="Error retrieving count of unread messages from database")

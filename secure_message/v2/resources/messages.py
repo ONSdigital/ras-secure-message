@@ -50,4 +50,4 @@ class MessageCounterV2(Resource):
                 raise BadRequest(description="Invalid label")
         else:
             message_service = RetrieverV2()
-            return jsonify(total=message_service.message_count_by_survey(g.user, survey, label=None))
+            return jsonify(total=message_service.message_count_by_survey(g.user, survey))
