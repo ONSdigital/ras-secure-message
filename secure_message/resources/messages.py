@@ -256,8 +256,7 @@ class MessageCounter(Resource):
             name = str(request.args.get('label'))
             survey = request.args.get('survey')
             if name.lower() == 'unread':
-                message_service = Retriever()
-                return jsonify(name=name, total=message_service.unread_message_count_by_survey(g.user, survey))
+                return jsonify(name=name, total=Retriever().unread_message_count_by_survey(g.user, survey))
             else:
                 logger.debug('Invalid label name', name=name, request=request.url)
                 raise BadRequest(description="Invalid label")
