@@ -11,21 +11,16 @@
     * [Get Message by Id](#get-message-by-id)
     * [Modify Message Labels](#modify-message-labels)
     * [Get Count of Unread Messages](#get-count-of-unread-messages)
-* Drafts
-    * [Get Drafts List](#get-drafts-list)
-    * [Save a New Draft Message](#save-a-new-draft-message)
-    * [Get a Draft by Id](#get-a-draft-by-id)
-    * [Modify an Existing Draft Message](#modify-an-existing-draft-message)
 * Conversations
     * [Get conversation list](#get-conversation-list)
     * [Get Conversation by Id](#get-onversation-by-id)
-* Health and Status 
+* Health and Status
     * [Get Health](#get-health)
     * [Get Health With Database-status](#get-health-with-database-status)
     * [Get Service Details](#get-service-details)
     * [Get Service Version](#get-service-version)
 
-## Overview 
+## Overview
 
 The secure message service provides a method by which messages may be passed between an enrolled respondent and the ONS.
 
@@ -33,14 +28,13 @@ The 'secure' aspect alludes to it not being email , it uses a message store in a
 
 Messages are sent using an email-like set of characteristics ( From, To , Subject and Body). They also encompass ONS specific meta data such as survey, collection case, reporting unit and collection instrument.
 
-The api uses UUIDs to define from, to, survey, collection case, reporting unit and collection exercise. 
+The api uses UUIDs to define from, to, survey, collection case, reporting unit and collection exercise.
 
-Each message is stored internally with a set of flags that indicate the state of the message per actor. These flags are known as labels in the service. That is if person A sends a message to person B then person A will have a label of SENT and person B will have a labels of INBOX and UNREAD. This storage of state per actor is crucial. 
+Each message is stored internally with a set of flags that indicate the state of the message per actor. These flags are known as labels in the service. That is if person A sends a message to person B then person A will have a label of SENT and person B will have a labels of INBOX and UNREAD. This storage of state per actor is crucial.
 
 The api endpoints fall into 4 groups:
 
 * Messages - These end points can be used to send a message , read a message, get a count of unread messages , and change a label on a message
-* Drafts - Messages can be saved as Drafts for further editing . The ability to create drafts , read drafts , modify drafts and view lists of drafts are provided through these endpoints.
 * Conversations - Messages can exist as part of a conversation . Messages within a conversation share the same thread identifier. Conversations/Threads can be obtained via a list of conversations or a specific conversation.
 * Health and Information - Several endpoints are provided that can be used to view the health and status of the service
 
@@ -54,24 +48,22 @@ See the endpoint descriptions for detailed usage of each field. This is an overv
 * From . (msg_from) This is the uuid of the actor that sent a message. If the actor is a respondent then it is their user uuid. If they are an internal user then it may be their user uuid ,  or it may be a constant 'BRES' for v1 messages.
 * To . (msg_to) These are the user uuids of the recipients of the message. Currently only one to user is supported. The message to can be as 'From' but with the addition that it can be the constant 'GROUP' to indicate that the message is being sent to a group handling the specific survey at the ons.
 * Subject . (subject) The subject of the message. Limited in the API to 100 characters , but since replies are prefixed with 'Re: ' then in practice it is 96 characters.
-* Body . (body) Up to 10000 characters. 
+* Body . (body) Up to 10000 characters.
 * Survey . (survey). This is the uuid of the survey . Mandatory when saving a message , optional for drafts.
 * Collection Case . (collection_case) uuid of the collection case. Can be used as a filter option (cc). Used to send to the case service to inform it that a newmessage has been sent on the case.
-* Collection Exercise .  (collection exercise) uuid of the collection exercise , can be used as a filter option (ce) 
-* Reporting unit . (ru) uuid of the reporting unit . Can be used as a filter option. 
+* Collection Exercise .  (collection exercise) uuid of the collection exercise , can be used as a filter option (ce)
+* Reporting unit . (ru) uuid of the reporting unit . Can be used as a filter option.
 * Labels . These can be used to set a status on a message , or retrieve messages with a specific label. Valid labels:
     * SENT  Added to a mesage for the actor who sent the message
     * INBOX Added to the message for teh actor who received the message
-    * DRAFT Added to a message to indicate that it is a draft for the actor who is sending a draft
     * UNREAD Added to a message to indicate that a message has not been read
     * ARCHIVE Added to a message to indicate that a message has been archived
-    * DRAFT_INBOX  Added to a message to indicate that the message is a draft for an actor who is the target of a draft message. 
 * page . Which page of the result set is to be returned when getting a list of messages/drafts/threads
 * limit . How many messages to return per page when getting a list of messages/drafts/threads.
-    
+
 ## JWT ##
 
-All calls , except health , health details and info , require that a valid JWT be passed in an Authorization header. 
+All calls , except health , health details and info , require that a valid JWT be passed in an Authorization header.
 this currently has two fields :
 
 * party_id which is how the user is identified, this should be the users uuid
@@ -80,13 +72,13 @@ this currently has two fields :
 The JWT usage does cause some issues in that currently it may or may not be encrypted. The secure message api relies on an environment variable called 'SM_JWT_ENCRYPT'. If this is set to 1 then it assumes the JWT is encrypted and attempts to decrypt it. If '0' then it skips the decryption. It is a common error to have this set incorrectly.
 
 After possible decryption, the service attempts to decode the JWT data . For that it uses an algorithm defined in config and a secret also defined in config. If the algorithm and/or secret are out of step between client and secure message service then the JWT will fail checks and the service will return a 500.
- 
+
 Being able to get a response from a health or info endpoint but 500's from a message post or read is often an indicator that something in this area is not configured correctly. An easy check for config is to access the /health/details endpoint.
- 
- 
+
+
 ## Get Message List ##
 
-`GET /messages  or /v2/messages` 
+`GET /messages  or /v2/messages`
 
 Retrieves a list of messages based on the selected parameters passed on the query string.
 
@@ -108,7 +100,7 @@ Retrieves a list of messages based on the selected parameters passed on the quer
    * An example of using one the above would be: `GET /messages?limit=2` , `/v2/messages?limit=20`    
    * Using multiple parameters: `GET /messages?limit=2&label=INBOX&survey=12345678981047653839`
 
-Note that if the user is a respondent the get messages returns messages which match the uuid of the user passed in the JWT and that satisfy any additional filter criteria. If the user is internal then it matches messages sent to all internal users that satisfy the additional filter criteria . Typically that would be restricted by survey_id so that only messages  of a specific survey are returned. 
+Note that if the user is a respondent the get messages returns messages which match the uuid of the user passed in the JWT and that satisfy any additional filter criteria. If the user is internal then it matches messages sent to all internal users that satisfy the additional filter criteria . Typically that would be restricted by survey_id so that only messages  of a specific survey are returned.
 
 Note, it is possible to retrieve drafts via Get messages by setting a label parameter of DRAFT
 
@@ -189,11 +181,11 @@ Note, it is possible to retrieve drafts via Get messages by setting a label para
 ```
 Note the message response contains @msg_from , @msg_to and @ru . These hold values that the secure message api has resolved from the party service or the user authentication service. They are not guaranteed to be populated if the service is not available or if the message was sent to 'GROUP'
 
-## Send Message ## 
+## Send Message ##
 
 `POST /message/send or '/v2/messages'
 
-The messages post endpoint stores a secure message . If the recipient is a respondent it will also send an email via Notify.Gov. Then inform the case service that a message has been sent 
+The messages post endpoint stores a secure message . If the recipient is a respondent it will also send an email via Notify.Gov. Then inform the case service that a message has been sent
 
 Note, the message post must have a Content-Type header of `application/json` , else it will return an error.
 Note, V2 uses messages , V1 uses message (singular)
@@ -211,7 +203,7 @@ When a message is posted then typically no msg_id is supplied . If a msg_id is s
   "thread_id": "",
   "ru_id": "f1a5e99c-8edf-489a-9c72-6cabe6c387fc",
   "collection_case": "ACollectionCase",
-  "survey": "BRES" 
+  "survey": "BRES"
 }
 ```
 #### Example JSON DATA for post Version 2
@@ -234,10 +226,10 @@ The main differences between the V1 and V2 endpoints are:
   "thread_id": "",
   "ru_id": "f1a5e99c-8edf-489a-9c72-6cabe6c387fc",
   "collection_case": "ACollectionCase",        
-  "survey": "2346e99c-8edf-489a-9c72-6cabe6c387fc" 
+  "survey": "2346e99c-8edf-489a-9c72-6cabe6c387fc"
 }
 ```
-#### Example JSON Response version 1 and 2 
+#### Example JSON Response version 1 and 2
 Note if the message is a new message ( not a reply to an existing one) then the thread_id and the message_id will be the same. This indicates that this message is the first in a conversation. Subsequent messages in a conversation will have their own msg_id but all share the same thread_id
 
 ```json
@@ -253,7 +245,7 @@ Note if the message is a new message ( not a reply to an existing one) then the 
 `GET /message/{id} or /v2/messages/<message_id>`
 
 &mdash; When an individual message is requested by message id, it returns the specific message by the message id.
-Note V2 uses messages , V1 uses message (singular) 
+Note V2 uses messages , V1 uses message (singular)
 #### Example JSON Response
 
 ```json
@@ -343,7 +335,7 @@ Note there is only an UNREAD label , absence of `UNREAD` is interpreted as the m
 
 `GET /labels?name=unread`
 
-This gives a count of messages that have not been read for a specific user. There are no current requirements around internal users. 
+This gives a count of messages that have not been read for a specific user. There are no current requirements around internal users.
 
 #### Example JSON Response
 
@@ -354,277 +346,18 @@ This gives a count of messages that have not been read for a specific user. Ther
 }
 ```
 
-## Get Drafts List
+## Get Conversation list
 
-`GET /drafts or /v2/drafts`
+`GET /threads`
 
-This gets draft messages . See get messages endpoint for filter options . It functions identically to get messages 
-but sets a filter parameter of label=`DRAFT`.
-The only reason for the existence of Get drafts ( as opposed to using Get Messages) is to make the verbs around drafts complete.
-
-
-
-#### Example JSON Response
-
-```json
-{
-    "_links": {
-        "first": {
-            "href": "http://localhost:5050/drafts"
-        },
-        "self": {
-            "href": "http://localhost:5050/drafts?page=1&limit=20"
-        }
-    },
-    "messages": [
-        {
-            "@msg_from": {
-                "emailAddress": "",
-                "firstName": "BRES",
-                "id": "BRES",
-                "lastName": "",
-                "sampleUnitType": "BI",
-                "status": "",
-                "telephone": ""
-            },
-            "@msg_to": [
-                {
-                    "associations": [
-                        {
-                            "enrolments": [
-                                {
-                                    "enrolmentStatus": "ENABLED",
-                                    "name": "Survey Name",
-                                    "surveyId": "cb0711c3-0ac8-41d3-ae0e-567e5ea1ef87"
-                                }
-                            ],
-                            "partyId": "1f5e1d68-2a4c-4698-8086-e23c0b98923f",
-                            "sampleUnitRef": "50012345678"
-                        }
-                    ],
-                    "emailAddress": "name@email.co.uk",
-                    "firstName": "FirstName",
-                    "id": "ef7737df-2097-4a73-a530-e98dba7bf28f",
-                    "lastName": "LastName",
-                    "sampleUnitType": "BI",
-                    "status": "ACTIVE",
-                    "telephone": "07832323234"
-                }
-            ],
-            "@ru_id": null,
-            "_links": {
-                "self": {
-                    "href": "http://localhost:5050/message/ae46748b-c6e6-4859-a57a-86e01db2dcbc"
-                }
-            },
-            "body": "Test uuid",
-            "collection_case": "ACollectionCase",
-            "collection_exercise": "",
-            "labels": [
-                "DRAFT"
-            ],
-            "modified_date": "2017-10-03 15:51:32.961321",
-            "msg_from": "BRES",
-            "msg_id": "ae46748b-c6e6-4859-a57a-86e01db2dcbc",
-            "msg_to": [
-                "ef7737df-2097-4a73-a530-e98dba7bf28f"
-            ],
-            "ru_id": "f1a5e99c-8edf-489a-9c72-6cabe6c387fc",
-            "subject": "Test uuid",
-            "survey": "BRES",
-            "thread_id": "ae46748b-c6e6-4859-a57a-86e01db2dcbc"
-        }
-    ]
-}
-```
-See get message for @msg_from, @msg_to and @ru
-[Get Message List](#get-message-list)
-
-## Save a New Draft Message
-
-`POST /draft/save or /v2/drafts`
-
-Note V2 uses drafts , V1 uses draft (singular) . 
-
-This posts a message as a draft. A draft is a message that needs different validation to a message. 
-It may or may not have a msg_to , and it may or may not have a survey_id , collection case etc. 
-A draft can be saved multiple times . When it is eventually sent then the draft message is deleted and a new 
-message is sent. At that point the message post validation is used.See Message Post.
-
-
-#### Example JSON DATA for post V1
-
-```json
-{
-  "msg_to": ["ef7737df-2097-4a73-a530-e98dba7bf28f"],
-  "msg_from": "BRES",
-  "subject": "Test uuid",
-  "body": "Save message",
-  "thread_id": "",
-  "ru_id": "f1a5e99c-8edf-489a-9c72-6cabe6c387fc",
-  "collection_case": "ACollectionCase",
-  "survey": "BRES" 
-}
-```
-
-#### Example JSON DATA for post V2
-
-Note only a subject and body are validated for drafts.
-
-```json
-{
-  "msg_to": ["ef7737df-2097-4a73-a530-e98dba7bf28f"],
-  "msg_from": "ff4537df-2097-4a73-a530-e98dba7bf28f",
-  "subject": "Test uuid",
-  "body": "Save message",
-  "thread_id": "",
-  "ru_id": "f1a5e99c-8edf-489a-9c72-6cabe6c387fc",
-  "collection_case": "ACollectionCase",
-  "survey": "f235e99c-8edf-489a-9c72-6cabe6c387fc" 
-}
-```
-
-#### Example JSON Response
-
-```json
-{
-    "msg_id": "ae46748b-c6e6-4859-a57a-86e01db2dcbc",
-    "status": "OK",
-    "thread_id": "ae46748b-c6e6-4859-a57a-86e01db2dcbc"
-}
-```
-
-
-## Get a Draft by Id
-
-`GET /draft/{id} or /v2/drafts/<draft_id>`
-
-Note V2 uses drafts , V1 uses draft (singular)
-Returns a draft message based on msg_id. Note that the reply contains an Etag header, the value of which is a hash of msg_to, msg_id, subject and body. This may optionally be passed back to secure message to detect changes in the case of multiple users editing the same draft ( see drafts put)
-
-#### Example JSON Response
-
-```json
-{
-    "@msg_from": {
-        "emailAddress": "",
-        "firstName": "BRES",
-        "id": "BRES",
-        "lastName": "",
-        "sampleUnitType": "BI",
-        "status": "",
-        "telephone": ""
-    },
-    "@msg_to": [
-        {
-            "associations": [
-                {
-                    "enrolments": [
-                        {
-                            "enrolmentStatus": "ENABLED",
-                            "name": "Survey Name",
-                            "surveyId": "cb0711c3-0ac8-41d3-ae0e-567e5ea1ef87"
-                        }
-                    ],
-                    "partyId": "1f5e1d68-2a4c-4698-8086-e23c0b98923f",
-                    "sampleUnitRef": "50012345678"
-                }
-            ],
-            "emailAddress": "name@email.co.uk",
-            "firstName": "FirstName",
-            "id": "ef7737df-2097-4a73-a530-e98dba7bf28f",
-            "lastName": "LastName",
-            "sampleUnitType": "BI",
-            "status": "ACTIVE",
-            "telephone": "07832323234"
-        }
-    ],
-    "@ru_id": null,
-    "_links": "",
-    "body": "Test uuid",
-    "collection_case": "ACollectionCase",
-    "collection_exercise": "",
-    "labels": [
-        "DRAFT"
-    ],
-    "modified_date": "2017-10-03 15:51:32.961321",
-    "msg_from": "BRES",
-    "msg_id": "ae46748b-c6e6-4859-a57a-86e01db2dcbc",
-    "msg_to": [
-        "ef7737df-2097-4a73-a530-e98dba7bf28f"
-    ],
-    "ru_id": "f1a5e99c-8edf-489a-9c72-6cabe6c387fc",
-    "subject": "Test uuid",
-    "survey": "BRES",
-    "thread_id": "ae46748b-c6e6-4859-a57a-86e01db2dcbc"
-}
-```
-See Get messages for description of @msg_from, @msg_to and @ru
-[Get Message List](#get-message-list)
-
-## Modify an Existing Draft Message
-
-`PUT /draft/{id}/modify or /v2/drafts/<draft_id>`
-
-Note V2 uses drafts, V1 uses draft (singular)
-This modifies an existing draft message based on msg_id. If the draft does not exist then an error is returned.
-The id passed in must equal the msg_id in the data else an error will be returned.
-
-Note the draft put ( and a message post of a draft) have an optional mechanism for collision detection.
-That is the use of etags. If the header contains a header called `ETag` then its value should be the value returned
-on get draft by id. If present then the draft put endpoint regenerates the etag prior to saving the new one. If the two are the same then it has not been modified since it was read, if they differ then a change has taken place and the draft put returns a 409 error . If the Etag header is not present on draft put or message post then this functionality is ignored.
-
-#### Example JSON DATA for put V1
-
-```json
-{
-  "msg_to": ["ef7737df-2097-4a73-a530-e98dba7bf28f"],
-  "msg_id": "30c68b01-7aff-49a9-9bb8-cd78c68ffb74",
-  "msg_from": "BRES",
-  "subject": "Test uuid",
-  "body": "Save message",
-  "thread_id": "",
-  "ru_id": "f1a5e99c-8edf-489a-9c72-6cabe6c387fc",
-  "collection_case": "ACollectionCase",
-  "survey": "BRES" 
-}
-```
-#### Example JSON DATA for put V2
-
-```json
-{
-  "msg_to": ["ef7737df-2097-4a73-a530-e98dba7bf28f"],
-  "msg_id": "30c68b01-7aff-49a9-9bb8-cd78c68ffb74",
-  "msg_from": "67c68b01-7aab-49c4-9bd4-cd78c68ffb74",
-  "subject": "Test uuid",
-  "body": "Save message",
-  "thread_id": "",
-  "ru_id": "f1a5e99c-8edf-489a-9c72-6cabe6c387fc",
-  "collection_case": "ACollectionCase",
-  "survey": "aa35e99c-8edf-489a-9c72-6cabe6c234e" 
-}
-```
-#### Example JSON Response
-
-```json
-{
-    "msg_id": "30c68b01-7aff-49a9-9bb8-cd78c68ffb74",
-    "status": "OK"
-}
-```
-
-## Get Conversation list 
-
-`GET /threads` 
-
-This returns a list of conversations , showing the latest message in a conversation . 
+This returns a list of conversations , showing the latest message in a conversation .
 This is currently implemented but not used in production. Hence should be treated with caution.
 
 It can use the same filter arguments as Get Messages, and returns the latest message in each thread that satisfies
 the criteria passed in .
 [Get Message List](#get-message-list)
 
- 
+
 
 #### Example JSON Response
 Note V2 will have either uuids or 'GROUP' for the user ids, and a uuid for the survey id
@@ -782,13 +515,13 @@ For descriptions of @msg_from, @msg_to and @ru see messages get
 
 ## Get Conversation by Id
 
-`GET /thread/{thread_id} or /v2/threads/<thread_id>` 
+`GET /thread/{thread_id} or /v2/threads/<thread_id>`
 
-Note V2 uses threads, V1 uses thread (singular) 
+Note V2 uses threads, V1 uses thread (singular)
 This has been implemented but not used in production, hence should be treated with caution.
 This returns all messages on a specific thread.
 
-Note there is a known bug here. That is messages are ordered by date of entry which may not be correct if several 
+Note there is a known bug here. That is messages are ordered by date of entry which may not be correct if several
 sub conversations are in progress (i.e two internal users replying on a thread ).
 
 #### Example JSON Response
@@ -970,7 +703,7 @@ Similar to health but validates that the current databse connection is valid. He
 #### Example JSON Response
 ```json
 {
-  "errors" : "none", 
+  "errors" : "none",
   "status" : "healthy"
 }
 ```
@@ -979,7 +712,7 @@ Similar to health but validates that the current databse connection is valid. He
 
 `GET /health/details`
 
-Returns more detailed information about secure message including some of the environment variables. This can 
+Returns more detailed information about secure message including some of the environment variables. This can
 be useful in determining JWT errors since it shows SM_JWT_ENCRYPT values. Bypasses all aspects of the JWT.
 
 
@@ -987,39 +720,39 @@ be useful in determining JWT errors since it shows SM_JWT_ENCRYPT values. Bypass
 ```json
   {
   "API Functionality": {
-    "/draft/<draft_id>": "Return a draft for user", 
-    "/draft/<draft_id>/modify": "Update message status by id", 
-    "/draft/save": "Save a draft message", 
-    "/drafts": "Return a list of drafts for the user", 
-    "/health": "Rest endpoint to provide application general health", 
-    "/health/db": "Rest endpoint to provide application database health", 
-    "/health/details": "Rest endpoint to provide application details", 
-    "/info": "Rest endpoint to provide application information", 
-    "/labels": "Get a count of unread messages", 
-    "/message/<message_id>": "Get and update message by id", 
-    "/message/<message_id>/modify": "Update message status by id", 
-    "/message/send": "Send message for a user", 
-    "/messages": "Return a list of messages for the user", 
-    "/thread/<thread_id>": "Return list of messages for user", 
-    "/threads": "Return a list of threads for the user", 
-    "/v2/drafts": "Return a list of drafts for the user", 
-    "/v2/drafts/<draft_id>": "Return a draft for user", 
-    "/v2/messages": "Send A message using the V2 endpoint", 
-    "/v2/messages/<message_id>": "Get and update message by id", 
-    "/v2/messages/count": "Get count of unread messages using v2 endpoint", 
-    "/v2/messages/modify/<message_id>": "Update message status by id", 
+    "/draft/<draft_id>": "Return a draft for user",
+    "/draft/<draft_id>/modify": "Update message status by id",
+    "/draft/save": "Save a draft message",
+    "/drafts": "Return a list of drafts for the user",
+    "/health": "Rest endpoint to provide application general health",
+    "/health/db": "Rest endpoint to provide application database health",
+    "/health/details": "Rest endpoint to provide application details",
+    "/info": "Rest endpoint to provide application information",
+    "/labels": "Get a count of unread messages",
+    "/message/<message_id>": "Get and update message by id",
+    "/message/<message_id>/modify": "Update message status by id",
+    "/message/send": "Send message for a user",
+    "/messages": "Return a list of messages for the user",
+    "/thread/<thread_id>": "Return list of messages for user",
+    "/threads": "Return a list of threads for the user",
+    "/v2/drafts": "Return a list of drafts for the user",
+    "/v2/drafts/<draft_id>": "Return a draft for user",
+    "/v2/messages": "Send A message using the V2 endpoint",
+    "/v2/messages/<message_id>": "Get and update message by id",
+    "/v2/messages/count": "Get count of unread messages using v2 endpoint",
+    "/v2/messages/modify/<message_id>": "Update message status by id",
     "/v2/threads/<thread_id>": "Return list of messages for user"
-  }, 
-  "APP Log Level": "INFO", 
-  "NOTIFY CASE SERVICE": "1", 
-  "NOTIFY VIA GOV NOTIFY": "0", 
-  "Name": "ras-secure-message", 
-  "RAS PARTY SERVICE HOST": "ras-party-service-sit.apps.devtest.onsclofo.uk", 
-  "RAS PARTY SERVICE PORT": "80", 
-  "RAS PARTY SERVICE PROTOCOL": "http", 
-  "SM JWT ENCRYPT": "1", 
-  "SMS Log level": "DEBUG", 
-  "Using party service mock": false, 
+  },
+  "APP Log Level": "INFO",
+  "NOTIFY CASE SERVICE": "1",
+  "NOTIFY VIA GOV NOTIFY": "0",
+  "Name": "ras-secure-message",
+  "RAS PARTY SERVICE HOST": "ras-party-service-sit.apps.devtest.onsclofo.uk",
+  "RAS PARTY SERVICE PORT": "80",
+  "RAS PARTY SERVICE PROTOCOL": "http",
+  "SM JWT ENCRYPT": "1",
+  "SMS Log level": "DEBUG",
+  "Using party service mock": false,
   "Version": "0.1.2"
 }
 ```
@@ -1032,7 +765,7 @@ Similar to the health endpoints, it was added for consistency between services. 
 #### Example JSON Response
 ```json
 {
-  "name": "ras-secure-message", 
+  "name": "ras-secure-message",
   "version": "0.1.2"
 }
 ```

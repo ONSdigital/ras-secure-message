@@ -20,7 +20,6 @@ from secure_message.authentication.authenticator import authenticate
 from secure_message.exception.exceptions import MissingEnvironmentVariable
 from secure_message.logger_config import logger_initial_config
 from secure_message.repository import database
-from secure_message.resources.drafts import DraftById, DraftList, DraftModifyById, DraftSave
 from secure_message.resources.health import DatabaseHealth, Health, HealthDetails
 from secure_message.resources.info import Info
 from secure_message.resources.messages import MessageById, MessageCounter, MessageList, MessageModifyById, MessageSend
@@ -62,11 +61,6 @@ def create_app(config=None):
     api.add_resource(MessageModifyById, '/message/<message_id>/modify',
                      '/v2/messages/modify/<message_id>')
     api.add_resource(MessageCounter, '/labels')
-
-    api.add_resource(DraftSave, '/draft/save', '/v2/drafts')
-    api.add_resource(DraftModifyById, '/draft/<draft_id>/modify', '/v2/drafts/<draft_id>')
-    api.add_resource(DraftById, '/draft/<draft_id>', '/v2/drafts/<draft_id>')
-    api.add_resource(DraftList, '/drafts', '/v2/drafts')
 
     api.add_resource(ThreadList, '/threads')
     api.add_resource(ThreadById, '/thread/<thread_id>', '/v2/threads/<thread_id>')
