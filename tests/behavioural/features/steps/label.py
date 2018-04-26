@@ -10,6 +10,14 @@ def step_impl_the_response_message_should_have_named_label(context, label):
     nose.tools.assert_true(label in response['labels'])
 
 
+@then("the response thread has the label '{label}'")
+def step_impl_the_response_thread_should_have_named_label(context, label):
+    """validate that theresponse has a specific label"""
+    response = json.loads(context.response.data)
+    print(response)
+    nose.tools.assert_true(label in response['messages'][0]['labels'])
+
+
 @then("all response messages have the label '{label}'")
 def step_impl_the_response_messages_should_all_have_named_label(context, label):
     """validate all messages in a response have as pecific label"""
@@ -24,11 +32,25 @@ def step_impl_the_response_message_should_not_have_named_label(context, label):
     nose.tools.assert_false(label in response['labels'])
 
 
+@then("the response thread does not have the label '{label}'")
+def step_impl_the_response_thread_should_not_have_named_label(context, label):
+    """validate that the response does not have a specific label"""
+    response = json.loads(context.response.data)
+    nose.tools.assert_false(label in response['messages'][0]['labels'])
+
+
 @then("the response message should a label count of '{label_count}'")
 def step_impl_the_response_message_should_have_specific_label_count(context, label_count):
     """validate that the label count in the response matches a specific number"""
     response = json.loads(context.response.data)
     nose.tools.assert_equal(len(response['labels']), int(label_count))
+
+
+@then("the response thread should a label count of '{label_count}'")
+def step_impl_the_response_thread_should_have_specific_label_count(context, label_count):
+    """validate that the label count in the response matches a specific number"""
+    response = json.loads(context.response.data)
+    nose.tools.assert_equal(len(response['messages'][0]['labels']), int(label_count))
 
 
 @given("a label of '{label}' is to be added")
