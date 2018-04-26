@@ -1,10 +1,10 @@
 from behave import given, when
 from tests.behavioural.features.steps.from_field import step_impl_the_msg_from_is_set_to_respondent
-from tests.behavioural.features.steps.from_field import step_impl_the_msg_from_is_set_to_internal_bres_user
+from tests.behavioural.features.steps.from_field import step_impl_the_msg_from_is_set_to_internal_user
 from tests.behavioural.features.steps.from_field import step_impl_the_msg_from_is_set_to_internal_specific_user
 from tests.behavioural.features.steps.from_field import step_impl_the_msg_from_is_set_to_internal_group_user
 
-from tests.behavioural.features.steps.to_field import step_impl_the_msg_to_is_set_to_internal_bres_user
+from tests.behavioural.features.steps.to_field import step_impl_the_msg_to_is_set_to_internal_user
 from tests.behavioural.features.steps.to_field import step_impl_the_msg_to_is_set_to_respondent
 from tests.behavioural.features.steps.to_field import step_impl_the_msg_to_is_set_to_internal_group_user
 from tests.behavioural.features.steps.to_field import step_impl_the_msg_to_is_set_to_internal_specific_user
@@ -16,7 +16,7 @@ from secure_message import constants
 def step_impl_the_user_is_internal(context):
     """Set the user to the internal user"""
     with context.app.app_context():
-        context.bdd_helper.token_data = context.bdd_helper.internal_bres_user_token
+        context.bdd_helper.token_data = context.bdd_helper.internal_specific_user_token
 
 
 @given("the user is set as alternative respondent")
@@ -35,21 +35,21 @@ def step_impl_the_user_is_set_as_respondent(context):
         context.bdd_helper.token_data = context.bdd_helper.respondent_user_token
 
 
-@given("sending from respondent to internal bres user")
-@when("sending from respondent to internal bres user")
-def step_impl_prepare_to_send_from_respondent_to_bres_user(context):
+@given("sending from respondent to internal user")
+@when("sending from respondent to internal user")
+def step_impl_prepare_to_send_from_respondent_to_internal_user(context):
     """set the message from to the internal user as defined in the helper"""
     step_impl_the_user_is_set_as_respondent(context)
     step_impl_the_msg_from_is_set_to_respondent(context)
-    step_impl_the_msg_to_is_set_to_internal_bres_user(context)
+    step_impl_the_msg_to_is_set_to_internal_user(context)
 
 
-@given("sending from internal bres user to respondent")
-@when("sending from internal bres user to respondent")
-def step_impl_prepare_to_send_from_internal_bres_user(context):
-    """ set the from to the repondent as set in the helper"""
+@given("sending from internal user to respondent")
+@when("sending from internal user to respondent")
+def step_impl_prepare_to_send_from_internal_user(context):
+    """ set the from to the respondent as set in the helper"""
     step_impl_the_user_is_internal(context)
-    step_impl_the_msg_from_is_set_to_internal_bres_user(context)
+    step_impl_the_msg_from_is_set_to_internal_user(context)
     step_impl_the_msg_to_is_set_to_respondent(context)
 
 
@@ -87,7 +87,7 @@ def step_impl_set_token_to_internal_with_no_role(context):
 
 @given("sending from respondent to internal specific user")
 @when("sending from respondent to internal specific user")
-def step_impl_prepare_to_send_from_respondent_to_non_bres_specific_user(context):
+def step_impl_prepare_to_send_from_respondent_to_specific_user(context):
     """set the message to to the internal user as defined in the helper"""
     step_impl_the_user_is_set_as_respondent(context)
     step_impl_the_msg_from_is_set_to_respondent(context)
@@ -96,7 +96,7 @@ def step_impl_prepare_to_send_from_respondent_to_non_bres_specific_user(context)
 
 @given("sending from respondent to internal group")
 @when("sending from respondent to internal group")
-def step_impl_prepare_to_send_from_respondent_to_non_bres_group(context):
+def step_impl_prepare_to_send_from_respondent_to_unknown_group(context):
     """set the message to to the internal user as defined in the helper"""
     step_impl_the_user_is_set_as_respondent(context)
     step_impl_the_msg_from_is_set_to_respondent(context)

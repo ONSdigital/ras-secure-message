@@ -98,10 +98,10 @@ class MessageSend(Resource):
         save.save_msg_event(message.data.msg_id, EventsApi.SENT.value)
         if g.user.is_respondent:
             save.save_msg_status(message.data.msg_from, message.data.msg_id, Labels.SENT.value)
-            save.save_msg_status(constants.BRES_USER, message.data.msg_id, Labels.INBOX.value)
-            save.save_msg_status(constants.BRES_USER, message.data.msg_id, Labels.UNREAD.value)
+            save.save_msg_status(constants.NON_SPECIFIC_INTERNAL_USER, message.data.msg_id, Labels.INBOX.value)
+            save.save_msg_status(constants.NON_SPECIFIC_INTERNAL_USER, message.data.msg_id, Labels.UNREAD.value)
         else:
-            save.save_msg_status(constants.BRES_USER, message.data.msg_id, Labels.SENT.value)
+            save.save_msg_status(constants.NON_SPECIFIC_INTERNAL_USER, message.data.msg_id, Labels.SENT.value)
             save.save_msg_status(message.data.msg_to[0], message.data.msg_id, Labels.INBOX.value)
             save.save_msg_status(message.data.msg_to[0], message.data.msg_id, Labels.UNREAD.value)
 
@@ -142,9 +142,6 @@ class MessageSend(Resource):
 
     @staticmethod
     def _get_user_name(user, message):
-
-        if message.msg_from == constants.BRES_USER:
-            return constants.BRES_USER
 
         user_name = 'Unknown user'
         user_data = internal_user_service.get_user_details(message.msg_from) if user.is_internal else party.get_user_details(message.msg_from)

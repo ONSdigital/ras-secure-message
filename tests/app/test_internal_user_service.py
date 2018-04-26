@@ -14,19 +14,6 @@ class PartyBusinessTestHelper:
 class InternalUserServiceTestCase(unittest.TestCase):
     """Test cases for internal user service"""
 
-    def test_results_default_information_returned_for_bres_user(self):
-        """Test get business details sends a request and returns data"""
-
-        sut = InternalUserService()
-        expected = {"id": constants.BRES_USER,
-                    "firstName": "BRES",
-                    "lastName": "",
-                    "emailAddress": ""
-                    }
-        actual = sut.get_user_details(constants.BRES_USER)
-
-        self.assertEqual(expected, actual)
-
     def test_results_default_information_returned_for_group_user(self):
         """Test get business details sends a request and returns data"""
 

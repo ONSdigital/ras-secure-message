@@ -3,7 +3,7 @@ Feature: Unread Message count endpoint V2
   Background: Reset database
     Given prepare for tests using 'mock' services
 
-  Scenario Outline: Respondent sending multiple valid messages to non bres user , non bres user should have same number of unread messages
+  Scenario Outline: Respondent sending multiple valid messages internal user , internal user should have same number of unread messages
     Given sending from respondent to internal <user>
       And the survey is set to 'SomeSurvey'
     When '5' messages are sent using V2
@@ -31,8 +31,8 @@ Feature: Unread Message count endpoint V2
 
 
 
-Scenario Outline: Respondent sends multiple messages to internal , some to BRES , some to group/user internal reads unread messages , count should include all messages
-Given sending from respondent to internal bres user
+Scenario Outline: Respondent sends multiple messages to internal group/user reads unread messages , count should include all messages
+Given sending from respondent to internal user
   And the survey is set to 'SomeSurvey'
   And '5' messages are sent
   And sending from respondent to internal <user>

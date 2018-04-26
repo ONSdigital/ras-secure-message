@@ -5,7 +5,7 @@ import requests
 from requests import HTTPError
 from structlog import wrap_logger
 
-from secure_message.constants import NON_SPECIFIC_INTERNAL_USER, BRES_USER
+from secure_message.constants import NON_SPECIFIC_INTERNAL_USER
 
 logger = wrap_logger(logging.getLogger(__name__))
 
@@ -14,8 +14,8 @@ class InternalUserService:
     @staticmethod
     def get_user_details(uuid):
         """gets the user details from the internal user service"""
-        if uuid in [NON_SPECIFIC_INTERNAL_USER, BRES_USER]:
-            return InternalUserService.get_non_specific_user_details(uuid)
+        if uuid in [NON_SPECIFIC_INTERNAL_USER]:
+            return InternalUserService.get_non_specific_user_details()
 
         logger.info("Getting user details from uaa", uuid=uuid)
         url = f"{current_app.config['UAA_URL']}/Users/{uuid}"
@@ -61,13 +61,5 @@ class InternalUserService:
         return user_details
 
     @staticmethod
-    def get_non_specific_user_details(group):
-        if group == NON_SPECIFIC_INTERNAL_USER:
-            return InternalUserService._get_default_user(NON_SPECIFIC_INTERNAL_USER)
-
-        return {
-            "id": BRES_USER,
-            "firstName": "BRES",
-            "lastName": "",
-            "emailAddress": ""
-        }
+    def get_non_specific_user_details():
+        return InternalUserService._get_default_user(NON_SPECIFIC_INTERNAL_USER)

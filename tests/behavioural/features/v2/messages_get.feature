@@ -75,7 +75,7 @@ Feature: Get Messages list V2 Endpoint
     Given sending from respondent to internal <user>
       And the survey is set to 'Survey1'
       And  '5' messages are sent using V2
-      And sending from respondent to internal bres user
+      And sending from respondent to internal user
       And the survey is set to 'Survey2'
       And  '7' messages are sent using V2
     When  messages are read V2
@@ -92,7 +92,7 @@ Feature: Get Messages list V2 Endpoint
     Given sending from respondent to internal <user>
       And the survey is set to 'Survey1'
       And  '5' messages are sent using V2
-      And sending from respondent to internal bres user
+      And sending from respondent to internal user
       And the survey is set to 'Survey2'
       And  '7' messages are sent using V2
     When  messages are read using survey of 'Survey1'
@@ -115,7 +115,6 @@ Feature: Get Messages list V2 Endpoint
       And   the message is sent
       And messages are read V2
     Then a success status code (200) is returned
-      And the at_msg_to is set correctly for bres user for all messages
 
   Scenario: There are 50 messages between respondent and internal user. Internal user gets conversations should see 50
    Given sending from respondent to internal group

@@ -77,8 +77,7 @@ class MessageSchema(Schema):
                     logger.error('Not a valid respondent', user=item)
                     raise ValidationError(f"{item} is not a valid respondent.")
             else:  # Respondent sending to internal
-                if not (msg_to[0] == constants.BRES_USER or
-                        msg_to[0] == constants.NON_SPECIFIC_INTERNAL_USER or
+                if not (msg_to[0] == constants.NON_SPECIFIC_INTERNAL_USER or
                         g.user.is_valid_internal_user(msg_to[0])):
                     logger.error('Not a valid internal user', user=item)
                     raise ValidationError(f"{item} is not a valid internal user.")
@@ -86,7 +85,7 @@ class MessageSchema(Schema):
     @validates("msg_from")
     def validate_from(self, msg_from):
         self.validate_non_zero_field_length("msg_from", len(msg_from), constants.MAX_FROM_LEN)
-        if g.user.is_internal and msg_from != constants.BRES_USER and msg_from != constants.NON_SPECIFIC_INTERNAL_USER:
+        if g.user.is_internal and msg_from != constants.NON_SPECIFIC_INTERNAL_USER:
             logger.error('Internal user not authorised to send a message on behalf of user or work group', message_from=msg_from)
             raise ValidationError(f'You are not authorised to send a message on behalf of user or work group {msg_from}')
         if g.user.is_respondent and msg_from != g.user.user_uuid:
@@ -192,8 +191,7 @@ class DraftSchema(Schema):
                         logger.error('Not a valid respondent', user=item)
                         raise ValidationError(f"{item} is not a valid respondent.")
                 else:  # Respondent sending to internal
-                    if item and not (msg_to[0] == constants.BRES_USER or
-                                     msg_to[0] == constants.NON_SPECIFIC_INTERNAL_USER or
+                    if item and not (msg_to[0] == constants.NON_SPECIFIC_INTERNAL_USER or
                                      g.user.is_valid_internal_user(msg_to[0])):
                         logger.error('Not a valid internal user', user=item)
                         raise ValidationError(f"{item} is not a valid internal user.")
@@ -203,7 +201,7 @@ class DraftSchema(Schema):
     @validates("msg_from")
     def validate_from(self, msg_from):
         self.validate_field_length(msg_from, len(msg_from), constants.MAX_FROM_LEN)
-        if g.user.is_internal and msg_from != g.user.user_uuid and msg_from != constants.BRES_USER:
+        if g.user.is_internal and msg_from != g.user.user_uuid:
             logger.error('Internal user not authorised to save a draft on behalf of user or work group', message_from=msg_from)
             raise ValidationError(f'You are not authorised to save a draft on behalf of user or work group {msg_from}')
         if g.user.is_respondent and msg_from != g.user.user_uuid:

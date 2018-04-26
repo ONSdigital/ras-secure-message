@@ -240,7 +240,7 @@ class ModifyTestCase(unittest.TestCase, ModifyTestCaseHelper):
         with self.app.app_context():
             with current_app.test_request_context():
                 self.test_message = {'msg_id': 'test123',
-                                     'msg_to': [constants.BRES_USER],
+                                     'msg_to': [constants.NON_SPECIFIC_INTERNAL_USER],
                                      'msg_from': '0a7ad740-10d5-4ecb-b7ca-3c0384afb882',
                                      'subject': 'MyMessage',
                                      'body': 'hello',
@@ -314,7 +314,7 @@ class ModifyTestCase(unittest.TestCase, ModifyTestCaseHelper):
         with self.app.app_context():
             with current_app.test_request_context():
                 self.test_message = {'msg_id': 'test123',
-                                     'msg_to': [constants.BRES_USER],
+                                     'msg_to': [constants.NON_SPECIFIC_INTERNAL_USER],
                                      'msg_from': '0a7ad740-10d5-4ecb-b7ca-3c0384afb882',
                                      'subject': 'MyMessage',
                                      'body': 'hello',
@@ -427,27 +427,6 @@ class ModifyTestCase(unittest.TestCase, ModifyTestCaseHelper):
         self.assertEqual(Modifier._get_label_actor(user=self.user_internal, message=message_to_respondent),
                          'ce12b958-2a5f-44f4-a6da-861e59070a31')
         self.assertEqual(Modifier._get_label_actor(user=self.user_respondent, message=message_to_respondent),
-                         '0a7ad740-10d5-4ecb-b7ca-3c0384afb882')
-
-    def test_get_label_actor_to_bres_user(self):
-        user_bres = User(constants.BRES_USER, 'internal')
-        message_to_bres = {'msg_id': 'test2',
-                                     'msg_to': [constants.BRES_USER],
-                                     'msg_from': '0a7ad740-10d5-4ecb-b7ca-3c0384afb882',
-                                     'subject': 'MyMessage',
-                                     'body': 'hello',
-                                     'thread_id': '',
-                                     'collection_case': 'ACollectionCase',
-                                     'collection_exercise': 'ACollectionExercise',
-                                     'ru_id': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc',
-                                     'survey': test_utilities.BRES_SURVEY,
-                                     'from_internal': False}
-
-        self.assertEqual(Modifier._get_label_actor(user=user_bres, message=message_to_bres),
-                         constants.BRES_USER)
-        self.assertEqual(Modifier._get_label_actor(user=self.user_internal, message=message_to_bres),
-                         constants.BRES_USER)
-        self.assertEqual(Modifier._get_label_actor(user=self.user_respondent, message=message_to_bres),
                          '0a7ad740-10d5-4ecb-b7ca-3c0384afb882')
 
     def test_get_label_actor_to_group(self):
