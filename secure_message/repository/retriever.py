@@ -176,7 +176,7 @@ class Retriever:
             conditions.append(SecureMessage.collection_exercise == request_args.ce)
 
         try:
-            t = db.session.query(SecureMessage.thread_id, func.max(Events.id)  # pylint:disable=no-member
+            t = db.session.query(SecureMessage.thread_id, func.max(SecureMessage.id)  # pylint:disable=no-member
                                  .label('max_id')) \
                 .join(Events).join(Status) \
                 .filter(Status.label != Labels.DRAFT_INBOX.value) \
@@ -185,11 +185,9 @@ class Retriever:
                 .group_by(SecureMessage.thread_id).subquery('t')
 
             conditions.append(SecureMessage.thread_id == t.c.thread_id)
-            conditions.append(Events.id == t.c.max_id)
+            conditions.append(SecureMessage.id == t.c.max_id)
 
-            result = SecureMessage.query.join(Events).join(Status) \
-                .filter(or_(Events.event == EventsApi.SENT.value, Events.event == EventsApi.DRAFT_SAVED.value)) \
-                .filter(and_(*conditions)) \
+            result = SecureMessage.query.filter(and_(*conditions)) \
                 .order_by(t.c.max_id.desc()).paginate(request_args.page, request_args.limit, False)
 
         except SQLAlchemyError:
@@ -218,8 +216,8 @@ class Retriever:
             conditions.append(SecureMessage.collection_exercise == request_args.ce)
 
         try:
-            t = db.session.query(SecureMessage.thread_id, func.max(Status.id)  # pylint:disable=no-member
-                                 .label('status_id')) \
+            t = db.session.query(SecureMessage.thread_id, func.max(SecureMessage.id)  # pylint:disable=no-member
+                                 .label('max_id')) \
                 .join(Events).join(Status) \
                 .filter(or_(and_(SecureMessage.from_internal.is_(False), Status.label == Labels.INBOX.value),  # NOQA
                             and_(SecureMessage.from_internal.is_(True),
@@ -229,11 +227,10 @@ class Retriever:
                 .group_by(SecureMessage.thread_id).subquery('t')
 
             conditions.append(SecureMessage.thread_id == t.c.thread_id)
-            conditions.append(Status.id == t.c.status_id)
+            conditions.append(SecureMessage.id == t.c.max_id)
 
-            result = SecureMessage.query.join(Events).join(Status) \
-                .filter(and_(*conditions)) \
-                .order_by(t.c.status_id.desc()).paginate(request_args.page, request_args.limit, False)
+            result = SecureMessage.query.filter(and_(*conditions)) \
+                .order_by(t.c.max_id.desc()).paginate(request_args.page, request_args.limit, False)
 
         except SQLAlchemyError:
             logger.exception('Error retrieving messages from database')

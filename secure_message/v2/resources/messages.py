@@ -39,15 +39,15 @@ class MessageCounterV2(Resource):
     """Get count of unread messages using v2 endpoint"""
     @staticmethod
     def get():
+        survey = request.args.getlist('survey')
         if request.args.get('label'):
-            name = str(request.args.get('label'))
-            survey = request.args.get('survey')
-            if name.lower() == 'unread':
+            label = str(request.args.get('label'))
+            if label.lower() == 'unread':
                 message_service = RetrieverV2()
-                return jsonify(name=name, total=message_service.unread_message_count_by_survey(g.user, survey))
+                return jsonify(name=label, total=message_service.message_count_by_survey(g.user, survey, label))
             else:
-                logger.debug('Invalid label name', name=name, request=request.url)
+                logger.debug('Invalid label name', name=label, request=request.url)
                 raise BadRequest(description="Invalid label")
         else:
-            logger.debug('No Name parameter specified in URL', request=request.url)
-            raise BadRequest(description='No Label Name Parameter specified.')
+            message_service = RetrieverV2()
+            return jsonify(total=message_service.message_count_by_survey(g.user, survey))
