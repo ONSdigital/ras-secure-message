@@ -7,7 +7,6 @@ Feature: Get Drafts V2
   Scenario Outline: A respondent saves multiple drafts then  posts one , then read drafts , validate correct number returned
     Given sending from respondent to internal <user>
       And '5' drafts are sent V2
-      And the message is read V2
       And the draft is sent as a message V2
     When  drafts are read V2
     Then  a success status code (200) is returned
@@ -22,7 +21,6 @@ Feature: Get Drafts V2
   Scenario Outline: An internal user saves multiple drafts then  posts one , then read drafts , validate correct number returned
     Given sending from internal <user> to respondent
       And '5' drafts are sent V2
-      And the message is read V2
       And the draft is sent as a message V2
     When  drafts are read V2
     Then  a success status code (200) is returned
@@ -37,7 +35,6 @@ Feature: Get Drafts V2
   Scenario Outline: A respondent saves multiple drafts then  posts one , then reads messages , validate correct number returned
     Given sending from respondent to internal <user>
       And '5' drafts are sent V2
-      And the message is read V2
       And the draft is sent as a message V2
     When  messages are read V2
     Then  a success status code (200) is returned
@@ -53,7 +50,6 @@ Feature: Get Drafts V2
   Scenario Outline: An internal user saves multiple drafts then  posts one , then reads messages , validate correct number returned
     Given sending from internal <user> to respondent
       And '5' drafts are sent V2
-      And the message is read V2
       And the draft is sent as a message V2
     When  messages are read V2
     Then  a success status code (200) is returned
@@ -65,5 +61,3 @@ Feature: Get Drafts V2
     | user        |
     | specific user |
     | group        |
-
-

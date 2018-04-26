@@ -130,7 +130,6 @@ Feature: Get Messages list Endpoint
      Given sending from respondent to internal bres user
       And  '5' messages are sent
       And  the user is set as internal
-      And  the message is read
       And  a label of 'UNREAD' is to be removed
       And  the message labels are modified
      When  messages with a label of  'UNREAD' are read
@@ -142,7 +141,6 @@ Feature: Get Messages list Endpoint
      Given sending from internal bres user to respondent
       And  '5' messages are sent
       And  the user is set as respondent
-      And  the message is read
       And  a label of 'UNREAD' is to be removed
       And  the message labels are modified
      When  messages with a label of  'UNREAD' are read
@@ -154,7 +152,6 @@ Feature: Get Messages list Endpoint
      Given sending from respondent to internal bres user
       And  '5' messages are sent
       And  the user is set as internal
-      And  the message is read
       And  a label of 'UNREAD' is to be removed
       And  the message labels are modified
      When  messages with a label of  'INBOX' are read
@@ -165,7 +162,6 @@ Feature: Get Messages list Endpoint
      Given sending from internal bres user to respondent
       And  '5' messages are sent
       And  the user is set as respondent
-      And  the message is read
       And  a label of 'UNREAD' is to be removed
       And  the message labels are modified
      When  messages with a label of  'INBOX' are read
