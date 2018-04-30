@@ -86,13 +86,11 @@ class MessageSchema(Schema):
     @validates("msg_from")
     def validate_from(self, msg_from):
         self.validate_non_zero_field_length("msg_from", len(msg_from), constants.MAX_FROM_LEN)
-        if g.user.is_internal and msg_from != constants.BRES_USER and msg_from != constants.NON_SPECIFIC_INTERNAL_USER:
-            logger.error('Internal user not authorised to send a message on behalf of user or work group', message_from=msg_from)
-            raise ValidationError(f'You are not authorised to send a message on behalf of user or work group {msg_from}')
-        if g.user.is_respondent and msg_from != g.user.user_uuid:
-            logger.error('Respondent not authorised to send a message on behalf of user or work group',
+
+        if msg_from != g.user.user_uuid:
+            logger.error('Users can only send messages from themselves',
                          message_from=msg_from, user_uuid=g.user.user_uuid)
-            raise ValidationError(f'You are not authorised to send a message on behalf of user or work group {msg_from}')
+            raise ValidationError(f"You are not authorised to send a message on behalf of user or work group {msg_from}")
 
     @validates("body")
     def validate_body(self, body):

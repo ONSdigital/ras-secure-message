@@ -69,24 +69,20 @@ class MessageSend(Resource):
         return make_response(jsonify(message.errors), 400)
 
     @staticmethod
-    def _validate_post_data(post_data):
-        message = MessageSchema().load(post_data)
-        return message
-
-    @staticmethod
     def _message_save(message):
         """Saves the message to the database along with the subsequent status and audit"""
         save = Saver()
         save.save_message(message.data)
         save.save_msg_event(message.data.msg_id, EventsApi.SENT.value)
-        if g.user.is_respondent:
-            save.save_msg_status(message.data.msg_from, message.data.msg_id, Labels.SENT.value)
-            save.save_msg_status(constants.BRES_USER, message.data.msg_id, Labels.INBOX.value)
-            save.save_msg_status(constants.BRES_USER, message.data.msg_id, Labels.UNREAD.value)
-        else:
-            save.save_msg_status(constants.BRES_USER, message.data.msg_id, Labels.SENT.value)
-            save.save_msg_status(message.data.msg_to[0], message.data.msg_id, Labels.INBOX.value)
-            save.save_msg_status(message.data.msg_to[0], message.data.msg_id, Labels.UNREAD.value)
+
+        save.save_msg_status(message.data.msg_from, message.data.msg_id, Labels.SENT.value)
+        save.save_msg_status(message.data.msg_to[0], message.data.msg_id, Labels.INBOX.value)
+        save.save_msg_status(message.data.msg_to[0], message.data.msg_id, Labels.UNREAD.value)
+
+    @staticmethod
+    def _validate_post_data(post_data):
+        message = MessageSchema().load(post_data)
+        return message
 
     @staticmethod
     def _alert_listeners(message):
@@ -236,19 +232,16 @@ class MessageModifyById(Resource):
 
 
 class MessageCounter(Resource):
-
-    """Get a count of unread messages"""
-
+    """Get count of unread messages using v2 endpoint"""
     @staticmethod
     def get():
-        """Get count of unread messages"""
-        logger.info("Getting count of unread messages", user_uuid=g.user.user_uuid)
-        try:
-            if request.args.get('name').lower() == 'unread':
-                return jsonify(name=request.args['name'], total=Retriever().unread_message_count(g.user))
+        survey = request.args.getlist('survey')
+        if request.args.get('label'):
+            label = str(request.args.get('label'))
+            if label.lower() == 'unread':
+                return jsonify(name=label, total=Retriever().message_count_by_survey(g.user, survey, label))
             else:
-                logger.debug('Invalid label name', name=request.args.get('name'), request=request.url)
+                logger.debug('Invalid label name', name=label, request=request.url)
                 raise BadRequest(description="Invalid label")
-        except KeyError:
-            logger.debug('No Name parameter specified in URL', request=request.url)
-            raise BadRequest(description='No Label Name Parameter specified.')
+        else:
+            return jsonify(total=Retriever().message_count_by_survey(g.user, survey))

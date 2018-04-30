@@ -6,6 +6,7 @@ from sqlalchemy.exc import SQLAlchemyError
 from structlog import wrap_logger
 from werkzeug.exceptions import InternalServerError, NotFound
 
+from secure_message import constants
 from secure_message.common.eventsapi import EventsApi
 from secure_message.common.labels import Labels
 from secure_message.repository.database import db, Events, SecureMessage, Status
@@ -145,6 +146,62 @@ class Retriever:
             logger.exception('Error retrieving count of unread messages from database')
             raise InternalServerError(description="Error retrieving count of unread messages from database")
         return result
+
+    @staticmethod
+    def message_count_by_survey(user, survey, label=None):
+        """Count users messages for a specific survey"""
+        if user.is_internal:
+            status_conditions, survey_conditions = Retriever._get_conditions_internal_user(survey, user)
+        else:
+            status_conditions, survey_conditions = Retriever._get_conditions_respondent(survey, user)
+
+        if label:
+            try:
+                result = SecureMessage.query.join(Status). \
+                    filter(or_(*status_conditions)). \
+                    filter(and_(*survey_conditions)). \
+                    filter(Status.label == label).count()
+            except Exception as e:
+                logger.error('Error retrieving count of unread messages from database', error=e)
+                raise InternalServerError(description="Error retrieving count of unread messages from database")
+            return result
+
+        try:
+            result = SecureMessage.query.join(Status).\
+                filter(or_(*status_conditions)).\
+                filter(and_(*survey_conditions)).\
+                distinct(SecureMessage.thread_id).count()
+        except Exception as e:
+            logger.error('Error retrieving count of messages by survey from database', error=e)
+            raise InternalServerError(description="Error retrieving count of unread messages from database")
+        return result
+
+    @staticmethod
+    def _get_conditions_internal_user(survey, user):
+        """Sets the conditions/predicates that are used by the query for the case of an internal actor"""
+        status_conditions = []
+        status_conditions.append(Status.actor == str(user.user_uuid))
+        status_conditions.append(Status.actor == constants.NON_SPECIFIC_INTERNAL_USER)
+        status_conditions.append(Status.actor == constants.BRES_USER)
+        survey_conditions = []
+        if survey:
+            survey_conditions.append(SecureMessage.survey.in_(survey))
+        else:
+            survey_conditions.append(True)
+        return status_conditions, survey_conditions
+
+    @staticmethod
+    def _get_conditions_respondent(survey, user):
+        """Sets the conditions/predicates that are used by the query for the case of an external actor"""
+        status_conditions = []
+        status_conditions.append(Status.actor == str(user.user_uuid))
+        survey_conditions = []
+        if survey:
+            survey_conditions.append(SecureMessage.survey.in_(survey))
+        else:
+            survey_conditions.append(True)
+
+        return status_conditions, survey_conditions
 
     @staticmethod
     def retrieve_thread_list(user, request_args):
