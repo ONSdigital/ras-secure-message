@@ -189,15 +189,6 @@ def step_impl_drafts_are_read(context):
     _step_impl_drafts_are_read(context, url)
 
 
-@given("drafts are read with '{limit}' per page requesting page '{page}'")
-@when("drafts are read with '{limit}' per page requesting page '{page}'")
-def step_impl_drafts_read_with_specific_limit_per_page_requesting_specific_page(context, limit, page):
-    """draft messages are read with a specific limit per page and specific page number"""
-    param = f"?limit={int(limit)}&page={int(page)}"
-    url = context.bdd_helper.messages_get_url + param
-    _step_impl_drafts_are_read(context, url)
-
-
 def _step_impl_drafts_are_read(context, url):
     """ common function to read drafts"""
     context.response = context.client.get(url, headers=context.bdd_helper.headers)
