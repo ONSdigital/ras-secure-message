@@ -16,20 +16,31 @@ class RetrieverV2(Retriever):
     """Created when retrieving messages"""
 
     @staticmethod
-    def unread_message_count_by_survey(user, survey):
-        """Count users unread messages for a specific survey"""
+    def message_count_by_survey(user, survey, label=None):
+        """Count users messages for a specific survey"""
         if user.is_internal:
             status_conditions, survey_conditions = RetrieverV2._get_conditions_internal_user(survey, user)
         else:
             status_conditions, survey_conditions = RetrieverV2._get_conditions_respondent(survey, user)
 
+        if label:
+            try:
+                result = SecureMessage.query.join(Status). \
+                    filter(or_(*status_conditions)). \
+                    filter(and_(*survey_conditions)). \
+                    filter(Status.label == label).count()
+            except Exception as e:
+                logger.error('Error retrieving count of unread messages from database', error=e)
+                raise InternalServerError(description="Error retrieving count of unread messages from database")
+            return result
+
         try:
-            result = SecureMessage.query.join(Status). \
-                filter(or_(*status_conditions)). \
-                filter(and_(*survey_conditions)). \
-                filter(Status.label == 'UNREAD').count()
+            result = SecureMessage.query.join(Status).\
+                filter(or_(*status_conditions)).\
+                filter(and_(*survey_conditions)).\
+                distinct(SecureMessage.thread_id).count()
         except Exception as e:
-            logger.error('Error retrieving count of unread messages from database', error=e)
+            logger.error('Error retrieving count of messages by survey from database', error=e)
             raise InternalServerError(description="Error retrieving count of unread messages from database")
         return result
 
@@ -42,7 +53,7 @@ class RetrieverV2(Retriever):
         status_conditions.append(Status.actor == constants.BRES_USER)
         survey_conditions = []
         if survey:
-            survey_conditions.append(SecureMessage.survey == survey)
+            survey_conditions.append(SecureMessage.survey.in_(survey))
         else:
             survey_conditions.append(True)
         return status_conditions, survey_conditions
@@ -54,7 +65,7 @@ class RetrieverV2(Retriever):
         status_conditions.append(Status.actor == str(user.user_uuid))
         survey_conditions = []
         if survey:
-            survey_conditions.append(SecureMessage.survey == survey)
+            survey_conditions.append(SecureMessage.survey.in_(survey))
         else:
             survey_conditions.append(True)
 

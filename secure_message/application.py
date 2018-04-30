@@ -27,7 +27,6 @@ from secure_message.resources.messages import MessageById, MessageCounter, Messa
 from secure_message.resources.threads import ThreadById, ThreadList
 from secure_message.v2.resources.messages import MessageSendV2, MessageCounterV2
 
-
 logger = wrap_logger(logging.getLogger(__name__))
 
 
