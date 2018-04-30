@@ -33,15 +33,6 @@ class PartyService:
         return ru_dict
 
     def get_user_details(self, uuid):
-        if uuid == constants.BRES_USER:
-            user_dict = {"id": constants.BRES_USER,
-                         "firstName": "BRES",
-                         "lastName": "",
-                         "emailAddress": "",
-                         "telephone": "",
-                         "status": "",
-                         "sampleUnitType": "BI"}
-            return user_dict
 
         user_dict = self._users_cache.get(uuid)
 
