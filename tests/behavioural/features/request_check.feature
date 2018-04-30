@@ -61,5 +61,3 @@ Feature: Checking all request pass authorisation
     |   /message/id/modify  |       GET         |
     |   /message/id/modify  |       POST        |
     |     /message/send     |       PUT         |
-    |       /messages       |       PUT         |
-    |       /messages       |       POST        |

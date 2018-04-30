@@ -279,54 +279,6 @@ class FlaskTestCase(unittest.TestCase):
             for row in request:
                 self.assertNotEqual(row['label'], 'DRAFT_INBOX')
 
-    def test_draft_created_by_respondent_does_not_show_for_internal(self):
-        """Test whether a draft created by a respondent is returned to an internal user"""
-
-        self.test_message.update({'msg_to': [constants.BRES_USER],
-                                  'msg_from': '0a7ad740-10d5-4ecb-b7ca-3c0384afb882',
-                                  'subject': 'MyMessage',
-                                  'body': 'hello',
-                                  'collection_case': 'ACollectionCase',
-                                  'collection_exercise': 'ACollectionExercise',
-                                  'ru_id': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc',
-                                  'survey': test_utilities.BRES_SURVEY})
-
-        token_data = {constants.USER_IDENTIFIER: "0a7ad740-10d5-4ecb-b7ca-3c0384afb882",
-                      "role": "respondent"}
-
-        encrypter = Encrypter(_private_key=self.app.config['SM_USER_AUTHENTICATION_PRIVATE_KEY'],
-                              _private_key_password=self.app.config['SM_USER_AUTHENTICATION_PRIVATE_KEY_PASSWORD'],
-                              _public_key=self.app.config['SM_USER_AUTHENTICATION_PUBLIC_KEY'])
-
-        with self.app.app_context():
-            signed_jwt = encode(token_data)
-            encrypted_jwt = encrypter.encrypt_token(signed_jwt)
-
-        self.headers = {'Content-Type': 'application/json', 'Authorization': encrypted_jwt}
-
-        resp = self.client.post("http://localhost:5050/draft/save", data=json.dumps(self.test_message), headers=self.headers)
-        save_data = json.loads(resp.data)
-        msg_id = save_data['msg_id']
-
-        token_data = {constants.USER_IDENTIFIER: constants.BRES_USER,
-                      "role": "internal"}
-
-        encrypter = Encrypter(_private_key=self.app.config['SM_USER_AUTHENTICATION_PRIVATE_KEY'],
-                              _private_key_password=self.app.config['SM_USER_AUTHENTICATION_PRIVATE_KEY_PASSWORD'],
-                              _public_key=self.app.config['SM_USER_AUTHENTICATION_PUBLIC_KEY'])
-
-        with self.app.app_context():
-            signed_jwt = encode(token_data)
-            encrypted_jwt = encrypter.encrypt_token(signed_jwt)
-
-        self.headers = {'Content-Type': 'application/json', 'Authorization': encrypted_jwt}
-
-        response = self.client.get("http://localhost:5050/messages?survey=BRES&label=DRAFT", headers=self.headers)
-        resp_data = json.loads(response.data)
-
-        for x in range(1, len(resp_data['messages'])):
-            self.assertNotEqual(resp_data['messages'][str(x)]['msg_id'], msg_id)
-
     def test_draft_get_returns_msg_to(self):
         """Test that draft get returns draft's msg_to if applicable"""
 
