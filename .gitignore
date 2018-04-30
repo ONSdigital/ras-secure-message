@@ -9,3 +9,4 @@ app/__pycache__
 htmlcov/
 .env
 .pytest_cache
+.vscode/*
