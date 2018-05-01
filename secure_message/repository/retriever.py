@@ -56,7 +56,7 @@ class Retriever:
                 .join(Events).join(Status) \
                 .filter(and_(*conditions)) \
                 .filter(and_(*status_conditions)) \
-                .filter(or_(Events.event == EventsApi.SENT.value, Events.event == EventsApi.DRAFT_SAVED.value)) \
+                .filter(Events.event == EventsApi.SENT.value) \
                 .group_by(SecureMessage.msg_id).subquery('t')
 
             if message_args.desc:
@@ -87,7 +87,7 @@ class Retriever:
             valid_statuses.append(message_args.label)
             if message_args.label in [Labels.INBOX.value, Labels.ARCHIVE.value, Labels.UNREAD.value]:
                 actor_conditions.append(SecureMessage.from_internal == False)  # NOQA pylint:disable=singleton-comparison
-            if message_args.label in [Labels.DRAFT.value, Labels.SENT.value]:
+            if message_args.label == Labels.SENT.value:
                 actor_conditions.append(SecureMessage.from_internal == True)  # NOQA pylint:disable=singleton-comparison
         else:
             status_reject_conditions.append(Labels.DRAFT_INBOX.value)
@@ -115,7 +115,7 @@ class Retriever:
                 .filter(or_(*actor_conditions)) \
                 .filter(~Status.label.in_(status_reject_conditions)) \
                 .filter(Status.label.in_(valid_statuses)) \
-                .filter(or_(Events.event == EventsApi.SENT.value, Events.event == EventsApi.DRAFT_SAVED.value)) \
+                .filter(Events.event == EventsApi.SENT.value) \
                 .group_by(SecureMessage.msg_id).subquery('t')
 
             if message_args.desc:
@@ -238,7 +238,7 @@ class Retriever:
                 .join(Events).join(Status) \
                 .filter(Status.label != Labels.DRAFT_INBOX.value) \
                 .filter(or_(*actor_conditions)) \
-                .filter(or_(Events.event == EventsApi.SENT.value, Events.event == EventsApi.DRAFT_SAVED.value)) \
+                .filter(Events.event == EventsApi.SENT.value) \
                 .group_by(SecureMessage.thread_id).subquery('t')
 
             conditions.append(SecureMessage.thread_id == t.c.thread_id)
@@ -325,9 +325,8 @@ class Retriever:
         try:
             result = SecureMessage.query.join(Events).join(Status) \
                 .filter(SecureMessage.thread_id == thread_id) \
-                .filter(Status.label != Labels.DRAFT_INBOX.value) \
                 .filter(Status.actor == user.user_uuid) \
-                .filter(or_(Events.event == EventsApi.SENT.value, Events.event == EventsApi.DRAFT_SAVED.value)) \
+                .filter(Events.event == EventsApi.SENT.value) \
                 .order_by(Status.id.desc())
 
             if not result.all():
@@ -352,7 +351,7 @@ class Retriever:
                                  Status.label.in_([Labels.SENT.value, Labels.DRAFT.value]))
                            )
                        ) \
-                .filter(or_(Events.event == EventsApi.SENT.value, Events.event == EventsApi.DRAFT_SAVED.value)) \
+                .filter(Events.event == EventsApi.SENT.value) \
                 .order_by(Status.id.desc())
 
             if not result.all():
@@ -366,24 +365,6 @@ class Retriever:
         return result
 
     @staticmethod
-    def retrieve_draft(message_id, user):
-        """returns single draft from db"""
-        logger.info("Retrieving draft message", message_id=message_id)
-        try:
-            result = SecureMessage.query.filter(SecureMessage.msg_id == message_id) \
-                .filter(SecureMessage.statuses.any(Status.label == Labels.DRAFT.value)).first()
-            if result is None:
-                logger.error('Draft does not exist', message_id=message_id)
-                raise NotFound(description=f"Draft with msg_id '{message_id}' does not exist")
-        except SQLAlchemyError:
-            logger.exception("SQLAlchemy error occurred while retrieving draft")
-            raise InternalServerError(description="Error retrieving draft from database")
-
-        message = result.serialize(user)
-
-        return message
-
-    @staticmethod
     def check_db_connection():
         """checks if db connection is working"""
         try:
@@ -395,15 +376,3 @@ class Retriever:
             return response
 
         return jsonify({"status": "healthy", "errors": "none"})
-
-    @staticmethod
-    def get_draft(draft_id, user):
-        """Check msg_id is that of a valid draft and return true/false if no ID is present"""
-        logger.info("Checking if message is a draft", message_id=draft_id)
-        try:
-            result = SecureMessage.query.filter(SecureMessage.msg_id == draft_id) \
-                .filter(SecureMessage.statuses.any(Status.label == Labels.DRAFT.value)).first()
-            return result.serialize(user) if result else None
-        except Exception:
-            logger.exception('Error retrieving message from database')
-            raise InternalServerError(description="Error retrieving message from database")

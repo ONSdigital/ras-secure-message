@@ -230,35 +230,6 @@ class DraftTestCase(unittest.TestCase):
                                     headers=self.headers)
         self.assertEqual(response.status_code, 201)
 
-    def test_draft_modified_since_last_read_true(self):
-        """Test draft_modified_since_last_read function returns true for valid draft id"""
-
-        with self.engine.connect() as con:
-            msg_id = str(uuid.uuid4())
-            query = f'''INSERT INTO securemessage.secure_message(msg_id, subject, body, thread_id,
-                    collection_case, ru_id, survey) VALUES ('{msg_id}', 'test','test','',
-                    'ACollectionCase', 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc', 'ACollectionExercise'
-                    'BRES')'''
-            con.execute(query)
-            query = "INSERT INTO securemessage.status(label, msg_id, actor) VALUES('DRAFT', '{0}', " \
-                    "'0a7ad740-10d5-4ecb-b7ca-3c0384afb882')".format(msg_id)
-            con.execute(query)
-            query = f"INSERT INTO securemessage.status(label, msg_id, actor) VALUES('DRAFT_INBOX', '{msg_id}', 'SurveyType')"
-            con.execute(query)
-
-        with self.app.app_context():
-            with current_app.test_request_context():
-                draft = Retriever().get_draft(msg_id, self.user_respondent)
-        self.assertIsNotNone(draft)
-
-    def test_draft_modified_since_last_read_false(self):
-        """Test draft_modified_since_last_read function returns false for valid draft id"""
-
-        with self.app.app_context():
-            with current_app.test_request_context():
-                is_valid_draft = Retriever().get_draft('000000-0000-00000', self.user_respondent)
-        self.assertFalse(is_valid_draft)
-
     def test_etag_check_returns_true_if_data_equal(self):
         """Test etag_check function returns true for unchanged draft etag"""
 
@@ -354,15 +325,6 @@ class DraftTestCase(unittest.TestCase):
 
         etag = utilities.generate_etag(message['msg_to'], message['msg_id'], message['subject'], 'XXX')
         self.assertFalse(DraftModifyById.etag_check({'ETag': etag}, message))
-
-    def test_draft_modified_since_last_read_t_raises_error(self):
-        """Test draft_modified_since_last_read function raises internal server error"""
-        msg_id = str(uuid.uuid4())
-        with self.app.app_context():
-            database.db.drop_all()
-            with current_app.test_request_context():
-                with self.assertRaises(InternalServerError):
-                    Retriever().get_draft(msg_id, self.user_respondent)
 
     def test_draft_same_to_from_causes_error(self):
         """marshalling message with same to and from field"""

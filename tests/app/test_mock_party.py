@@ -195,61 +195,6 @@ class PartyTestCase(unittest.TestCase):
 
         self.assertEqual(message['@ru_id']['name'], "Apple")
 
-    def test_get_draft_returns_business_details(self):
-        """Test get draft returns business details"""
-
-        data = {'msg_to': [constants.BRES_USER],
-                'msg_from': '0a7ad740-10d5-4ecb-b7ca-3c0384afb882',
-                'subject': 'MyMessage',
-                'body': 'hello',
-                'thread': "?",
-                'ru_id': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc',
-                'survey': test_utilities.BRES_SURVEY}
-
-        with self.app.app_context():
-            encrypted_token = _generate_encrypted_token()
-
-        self.headers = {'Content-Type': 'application/json', 'Authorization': encrypted_token}
-
-        self.engine = create_engine(self.app.config['SQLALCHEMY_DATABASE_URI'])
-
-        draft_save = self.client.post("http://localhost:5050/draft/save", data=json.dumps(data), headers=self.headers)
-        draft_data = json.loads(draft_save.data)
-        draft_id = draft_data['msg_id']
-
-        message_get = self.client.get(f'http://localhost:5050/draft/{draft_id}', headers=self.headers)
-        message = json.loads(message_get.data)
-
-        self.assertEqual(message['@ru_id']['name'], "Apple")
-
-    def test_get_drafts_returns_business_details(self):
-        """Test get all drafts includes business details"""
-
-        data = {'msg_to': [constants.BRES_USER],
-                'msg_from': '0a7ad740-10d5-4ecb-b7ca-3c0384afb882',
-                'subject': 'MyMessage',
-                'body': 'hello',
-                'thread': "?",
-                'ru_id': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc',
-                'survey': test_utilities.BRES_SURVEY}
-
-        with self.app.app_context():
-            encrypted_token = _generate_encrypted_token()
-
-        self.headers = {'Content-Type': 'application/json', 'Authorization': encrypted_token}
-
-        self.engine = create_engine(self.app.config['SQLALCHEMY_DATABASE_URI'])
-
-        self.client.post("http://localhost:5050/draft/save", data=json.dumps(data), headers=self.headers)
-        self.client.post("http://localhost:5050/draft/save", data=json.dumps(data), headers=self.headers)
-
-        drafts_get = self.client.get("http://localhost:5050/drafts", headers=self.headers)
-        drafts_data = json.loads(drafts_get.data)
-        drafts = drafts_data['messages']
-
-        for draft in drafts:
-            self.assertEqual(draft['@ru_id']['name'], "Apple")
-
     def test_get_user_details_returns_none_if_uuid_not_known(self):
         user = 'SomeoneWhoClearlyDoesNotExist'
         sut = PartyServiceMock()

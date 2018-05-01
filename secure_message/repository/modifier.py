@@ -101,19 +101,3 @@ class Modifier:
             Saver().save_msg_event(message['msg_id'], EventsApi.READ.value)
         Modifier.remove_label(unread, message, user)
         return True
-
-    @staticmethod
-    def replace_current_recipient_status(draft_id, draft_to, session=db.session):
-        """used to replace the draft INBOX_DRAFT label"""
-        del_current_status = f"DELETE FROM securemessage.status WHERE msg_id='{draft_id}' AND label='{Labels.DRAFT_INBOX.value}'"
-        # NOQA TODO: Only handling first item in list.
-        new_status = Status(msg_id=draft_id, actor=draft_to[0], label=Labels.DRAFT_INBOX.value)
-
-        try:
-            db.get_engine(app=db.get_app()).execute(del_current_status)
-            session.add(new_status)
-            session.commit()
-        except Exception as e:
-            session.rollback()
-            logger.error('Error replacing label in database', label=Labels.DRAFT_INBOX.value, msg_id=draft_id, error=e)
-            raise InternalServerError(description="Error replacing DRAFT_INBOX label")

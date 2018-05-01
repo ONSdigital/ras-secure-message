@@ -645,39 +645,6 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
                 self.assertEqual(len(date), 10)
                 self.assertListEqual(desc_date, date)
 
-    def test_draft_returned_with_msg_id_true(self):
-        """retrieves draft using id"""
-
-        self.populate_database(1, single=False, add_draft=True)
-        with self.engine.connect() as con:
-            query = 'SELECT msg_id FROM securemessage.secure_message LIMIT 1'
-            query_x = con.execute(query)
-            names = []
-            for row in query_x:
-                names.append(row[0])
-            with self.app.app_context():
-                with current_app.test_request_context():
-                    msg_id = str(names[0])
-                    response = Retriever().retrieve_draft(msg_id, self.user_internal)
-                    self.assertEqual(response['msg_id'], str(names[0]))
-
-    def test_modified_date_returned_for_draft(self):
-        """retrieves draft using id and checks the modified dates returned"""
-        self.populate_database(1, single=False, add_draft=True)
-        with self.engine.connect() as con:
-            query = 'SELECT msg_id FROM securemessage.secure_message LIMIT 1'
-            query_x = con.execute(query)
-            names = []
-            for row in query_x:
-                names.append(row[0])
-            with self.app.app_context():
-                with current_app.test_request_context():
-                    msg_id = str(names[0])
-                    response = Retriever().retrieve_draft(msg_id, self.user_internal)
-                    self.assertTrue(response['modified_date'] != "N/A")
-                    self.assertTrue('read_date' not in response)
-                    self.assertTrue('sent_date' not in response)
-
     def test_sent_date_returned_for_message(self):
         """retrieves message using id and checks the sent date returned"""
         self.populate_database(1)
@@ -711,21 +678,6 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
                     response = Retriever().retrieve_message(msg_id, self.user_internal)
                     self.assertTrue('modified_date' not in response)
                     self.assertTrue(response['read_date'] != "N/A")
-
-    def test_retrieve_draft_with_a_message_msg_id_returns_404(self):
-        """retrieves draft using id of an existing message"""
-        self.populate_database(1, single=True)
-        with self.engine.connect() as con:
-            query = 'SELECT msg_id FROM securemessage.secure_message LIMIT 1'
-            query_x = con.execute(query)
-            names = []
-            for row in query_x:
-                names.append(row[0])
-            with self.app.app_context():
-                with current_app.test_request_context():
-                    message_id = str(names[0])
-                    with self.assertRaises(NotFound):
-                        Retriever().retrieve_draft(message_id, self.user_internal)
 
     def test_draft_returned_with_msg_id_draft_not_in_database(self):
         """retrieves draft using id where draft not in database"""
