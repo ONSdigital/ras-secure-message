@@ -36,7 +36,7 @@ class Retriever:
         if message_args.label:
             status_conditions.append(Status.label == message_args.label)
         else:
-            status_conditions.append(Status.label != Labels.DRAFT_INBOX.value)
+            status_conditions.append(Status.label != "DRAFT_INBOX")
 
         if message_args.ru_id:
             conditions.append(SecureMessage.ru_id == str(message_args.ru_id))
@@ -90,7 +90,7 @@ class Retriever:
             if message_args.label == Labels.SENT.value:
                 actor_conditions.append(SecureMessage.from_internal == True)  # NOQA pylint:disable=singleton-comparison
         else:
-            status_reject_conditions.append(Labels.DRAFT_INBOX.value)
+            status_reject_conditions.append("DRAFT_INBOX")
             valid_statuses = [Labels.INBOX.value]
             actor_conditions.append(True)
 
@@ -236,7 +236,7 @@ class Retriever:
             t = db.session.query(SecureMessage.thread_id, func.max(SecureMessage.id)  # pylint:disable=no-member
                                  .label('max_id')) \
                 .join(Events).join(Status) \
-                .filter(Status.label != Labels.DRAFT_INBOX.value) \
+                .filter(Status.label != "DRAFT_INBOX") \
                 .filter(or_(*actor_conditions)) \
                 .filter(Events.event == EventsApi.SENT.value) \
                 .group_by(SecureMessage.thread_id).subquery('t')
@@ -348,7 +348,7 @@ class Retriever:
                 .filter(SecureMessage.thread_id == thread_id) \
                 .filter(or_(and_(SecureMessage.from_internal.is_(False), Status.label == Labels.INBOX.value),  # NOQA
                             and_(SecureMessage.from_internal.is_(True),
-                                 Status.label.in_([Labels.SENT.value, Labels.DRAFT.value]))
+                                 Status.label.in_([Labels.SENT.value]))
                            )
                        ) \
                 .filter(Events.event == EventsApi.SENT.value) \
