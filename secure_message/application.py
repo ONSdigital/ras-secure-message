@@ -54,7 +54,6 @@ def create_app(config=None):
     api.add_resource(HealthDetails, '/health/details')
     api.add_resource(Info, '/info')
 
-
     api.add_resource(MessageSend, '/message/send', '/v2/messages')
     api.add_resource(MessageModifyById, '/message/<message_id>/modify',
                      '/v2/messages/modify/<message_id>')
