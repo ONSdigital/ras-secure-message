@@ -51,24 +51,3 @@ Feature: Get Drafts
       And drafts are read
     Then  a success status code (200) is returned
       And  '0' messages are returned
-<<<<<<< HEAD
-=======
-
-  @ignore # Test failing as currently intended recipient can view using a DRAFT_INBOX  label  , remove @ignore when fixed
-  Scenario: A respondent saves multiple drafts then , the internal user gets messages with DRAFT_INBOX label
-    Given sending from respondent to internal bres user
-      And '5' drafts are sent
-      And the user is set as internal
-    When  drafts with a label of  'DRAFT_INBOX' are read
-    Then  a success status code (200) is returned
-      And '0' messages are returned
-
-  @ignore # Test failing as currently intended recipient can view using a DRAFT_INBOX  label  , remove @ignore when fixed
-  Scenario: An internal user saves multiple drafts then , the respondent user gets messages with DRAFT_INBOX label
-    Given sending from internal bres user to respondent
-      And '5' drafts are sent
-      And the user is set as respondent
-    When  drafts with a label of  'DRAFT_INBOX' are read
-    Then  a success status code (200) is returned
-      And '0' messages are returned
->>>>>>> origin

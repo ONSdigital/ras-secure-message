@@ -34,69 +34,6 @@ class PartyTestCase(unittest.TestCase):
         case_service.use_mock_service()
         party.use_mock_service()
 
-<<<<<<< HEAD
-    def test_messages_get_replaces_uuids_with_user_details(self):
-        """Test get all messages endpoint replaces every messages to and from with user details"""
-=======
-    def test_message_by_id_replaces_uuids(self):
-        """Test get message by id endpoint replaces to and from with user details"""
->>>>>>> origin
-        data = {'msg_to': [constants.BRES_USER],
-                'msg_from': '0a7ad740-10d5-4ecb-b7ca-3c0384afb882',
-                'subject': 'MyMessage',
-                'body': 'hello',
-                'thread': "?",
-                'ru_id': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc',
-                'survey': test_utilities.BRES_SURVEY}
-
-        with self.app.app_context():
-            encrypted_token = _generate_encrypted_token()
-
-        self.headers = {'Content-Type': 'application/json', 'Authorization': encrypted_token}
-
-        self.engine = create_engine(self.app.config['SQLALCHEMY_DATABASE_URI'])
-
-<<<<<<< HEAD
-        self.client.post("http://localhost:5050/message/send", data=json.dumps(data), headers=self.headers)
-        self.client.post("http://localhost:5050/message/send", data=json.dumps(data), headers=self.headers)
-
-        messages_get = self.client.get("http://localhost:5050/messages", headers=self.headers)
-        get_return = json.loads(messages_get.data)
-        messages = get_return['messages']
-
-        for message in messages:
-            self.assertEqual(message['@msg_from'], {'firstName': 'Vana',
-                                                    'id': '0a7ad740-10d5-4ecb-b7ca-3c0384afb882',
-                                                    'status': 'ACTIVE',
-                                                    'telephone': '+443069990289',
-                                                    'lastName': 'Oorschot',
-                                                    'emailAddress': 'vana123@aol.com',
-                                                    'sampleUnitType': 'BI'
-                                                    })
-=======
-        resp = self.client.post("http://localhost:5050/message/send", data=json.dumps(data), headers=self.headers)
-        resp_data = json.loads(resp.data)
-        msg_id = resp_data['msg_id']
-
-        message_resp = self.client.get(f'http://localhost:5050/message/{msg_id}', headers=self.headers)
-        message = json.loads(message_resp.data)
-
-        self.assertEqual(message['@msg_from'], {'telephone': '+443069990289',
-                                                'firstName': 'Vana',
-                                                'emailAddress': 'vana123@aol.com',
-                                                'id': '0a7ad740-10d5-4ecb-b7ca-3c0384afb882',
-                                                'status': 'ACTIVE',
-                                                'lastName': 'Oorschot',
-                                                'sampleUnitType': 'BI'
-                                                })
-
-        self.assertEqual(message['@msg_to'], [{"id": "BRES",
-                                               "firstName": "BRES",
-                                               "lastName": "",
-                                               "emailAddress": ""
-                                               }])
->>>>>>> origin
-
     def test_draft_get_return_user_details_for_to_and_from(self):
         """Test get draft replaces sender and recipient with user details"""
         data = {'msg_to': [constants.BRES_USER],
