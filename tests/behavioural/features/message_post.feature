@@ -3,8 +3,8 @@ Feature: Message Send Endpoint
   Background: Reset database
     Given prepare for tests using 'mock' services
 
-  Scenario: Respondent sending a valid message to BRES user and receiving a 201
-    Given sending from respondent to internal bres user
+  Scenario: Respondent sending a valid message to an internal user and receiving a 201
+    Given sending from respondent to internal specific user
     When the message is sent
     Then a created status code 201 is returned
 
@@ -14,7 +14,7 @@ Feature: Message Send Endpoint
     Then a created status code 201 is returned
 
   Scenario: Respondent send a message without a thread id and other fields correct then they should receive a 201
-    Given sending from respondent to internal bres user
+    Given sending from respondent to internal specific user
     When the message is sent
     Then a created status code 201 is returned
 
@@ -67,7 +67,7 @@ Feature: Message Send Endpoint
 
 
   Scenario: Respondent sending a message with a missing "Body" field and receive a 400 error
-    Given sending from respondent to internal bres user
+    Given sending from respondent to internal specific user
       And  the body is set to empty
     When the message is sent
     Then a bad request status code 400 is returned
@@ -79,7 +79,7 @@ Feature: Message Send Endpoint
     Then a bad request status code 400 is returned
 
   Scenario: Respondent sending a message with a missing subject field and receive a 400 error
-    Given sending from respondent to internal bres user
+    Given sending from respondent to internal specific user
       And  the subject is set to empty
     When the message is sent
     Then a bad request status code 400 is returned
@@ -92,7 +92,7 @@ Feature: Message Send Endpoint
 
 
   Scenario: Respondent send a message to too long should receive a 400
-    Given sending from respondent to internal bres user
+    Given sending from respondent to internal specific user
       And  the to field is too long
     When the message is sent
     Then a bad request status code 400 is returned
@@ -104,7 +104,7 @@ Feature: Message Send Endpoint
     Then a bad request status code 400 is returned
 
   Scenario: Respondent send a message from too long should receive a 400
-    Given sending from respondent to internal bres user
+    Given sending from respondent to internal specific user
       And  the from is too long
     When the message is sent
     Then a bad request status code 400 is returned
@@ -116,7 +116,7 @@ Feature: Message Send Endpoint
     Then a bad request status code 400 is returned
 
   Scenario: Respondent sending a message with an empty survey field and receive a 400 error
-    Given sending from respondent to internal bres user
+    Given sending from respondent to internal specific user
       And  the survey is set to empty
     When the message is sent
     Then a bad request status code 400 is returned
@@ -129,7 +129,7 @@ Feature: Message Send Endpoint
 
 
   Scenario: Respondent sends a message with a msg_id but is not a draft
-    Given sending from respondent to internal bres user
+    Given sending from respondent to internal specific user
       And  the msg_id is set to '12345678'
     When the message is sent
     Then a bad request status code 400 is returned
