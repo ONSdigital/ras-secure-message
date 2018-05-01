@@ -7,7 +7,7 @@ Feature: Get thread by id Endpoint
     Given sending from respondent to internal bres user
       And   the message is sent
       And   the user is set as internal
-      And   the from is set to internal bres user
+      And   the from is set to internal specific user
       And   the to is set to respondent
       And   the message is read
       And   the thread id is set to the last returned thread id
@@ -27,7 +27,7 @@ Feature: Get thread by id Endpoint
     Given sending from respondent to internal bres user
       And   the message is sent
       And   the user is set as internal
-      And   the from is set to internal bres user
+      And   the from is set to internal specific user
       And   the to is set to respondent
       And   the message is read
       And   the thread id is set to the last returned thread id
@@ -48,7 +48,7 @@ Feature: Get thread by id Endpoint
     Given sending from respondent to internal bres user
       And   the message is sent
       And   the user is set as internal
-      And   the from is set to internal bres user
+      And   the from is set to internal specific user
       And   the to is set to respondent
       And   the message is read
       And   the thread id is set to the last returned thread id
@@ -69,7 +69,7 @@ Feature: Get thread by id Endpoint
     Given sending from respondent to internal bres user
       And   the message is sent
       And   the user is set as internal
-      And   the from is set to internal bres user
+      And   the from is set to internal specific user
       And   the to is set to respondent
       And   the message is read
       And   the thread id is set to the last returned thread id
@@ -108,10 +108,10 @@ Feature: Get thread by id Endpoint
     Given sending from respondent to internal bres user
     When the thread_id is set to 'DoesNotExist'
      And  the thread is read
-    Then a not found status code (404) is returned
+    Then a not found status code 404 is returned
 
   Scenario:Internal user tries to retrieve a conversation that does not exist
     Given sending from internal bres user to respondent
     When the thread_id is set to 'DoesNotExist'
      And  the thread is read
-    Then a not found status code (404) is returned
+    Then a not found status code 404 is returned

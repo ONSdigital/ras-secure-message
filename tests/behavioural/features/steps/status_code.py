@@ -20,13 +20,13 @@ def step_impl_a_bad_request_is_returned(context):
     nose.tools.assert_equal(context.response.status_code, 400)
 
 
-@then("a forbidden status code (403) is returned")
+@then("a forbidden status code 403 is returned")
 def step_impl_403_returned(context):
     """validate that the status code was 403"""
     nose.tools.assert_equal(context.response.status_code, 403)
 
 
-@then("a not found status code (404) is returned")
+@then("a not found status code 404 is returned")
 def step_impl_404_returned(context):
     """validate that the status code was 404"""
     nose.tools.assert_equal(context.response.status_code, 404)
