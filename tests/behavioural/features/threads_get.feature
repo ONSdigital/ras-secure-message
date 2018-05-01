@@ -9,7 +9,7 @@ Feature: Get threads list Endpoint
       And the message is sent
       And the message is sent
    When the threads are read
-    Then  a success status code (200) is returned
+    Then  a success status code 200 is returned
       And '3' messages are returned
 
   Scenario: There are 3 conversations between respondent and internal , internal attempts to read them
@@ -17,7 +17,7 @@ Feature: Get threads list Endpoint
       And '3' messages are sent
      When   the user is set as internal
       And the threads are read
-    Then  a success status code (200) is returned
+    Then  a success status code 200 is returned
       And '3' messages are returned
 
   Scenario: There are 3 conversations between respondent and internal each with 2 messages, respondent attempts to read them
@@ -37,7 +37,7 @@ Feature: Get threads list Endpoint
       And the message is sent
 
    When the threads are read
-    Then  a success status code (200) is returned
+    Then  a success status code 200 is returned
       And '3' messages are returned
 
   Scenario: There are 3 conversations between respondent and internal each with 2 messages, internal user attempts to read them
@@ -58,7 +58,7 @@ Feature: Get threads list Endpoint
 
     When  the user is set as internal
       And the threads are read
-    Then  a success status code (200) is returned
+    Then  a success status code 200 is returned
       And '3' messages are returned
 
   Scenario: There are 3 conversations between respondent and internal each with 2  messages and a draft, validate most recent message returned for each
@@ -84,13 +84,13 @@ Feature: Get threads list Endpoint
       And the message is saved as draft
 
    When the threads are read
-    Then  a success status code (200) is returned
+    Then  a success status code 200 is returned
       And  '3' messages are returned
           # Drafts added last
       And '3' messages have a 'DRAFT' label
 
   Scenario: There are 3 conversations between an internal user and respondent each with 2  messages and a draft, validate most recent message returned for each
-    Given sending from internal bres user to respondent
+    Given sending from internal specific user to respondent
       And the message is sent
       And the thread id is set to the last returned thread id
       And the message is sent
@@ -112,13 +112,13 @@ Feature: Get threads list Endpoint
       And the message is saved as draft
 
    When the threads are read
-    Then  a success status code (200) is returned
+    Then  a success status code 200 is returned
       And  '3' messages are returned
       # Drafts added last
       And '3' messages have a 'DRAFT' label
 
   Scenario: A respondent sends a very long message, the internal user sees a 100 character summary in their inbox
-    Given sending from internal bres user to respondent
+    Given sending from internal specific user to respondent
       And the message body is '5000' characters long
       And '1' messages are sent
     When the threads are read
