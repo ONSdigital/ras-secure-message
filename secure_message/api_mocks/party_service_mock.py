@@ -1,6 +1,5 @@
 import logging
 from structlog import wrap_logger
-from secure_message import constants
 
 
 logger = wrap_logger(logging.getLogger(__name__))
