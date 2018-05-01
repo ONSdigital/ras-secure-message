@@ -14,7 +14,7 @@ from secure_message import constants
 def step_impl_the_user_is_internal(context):
     """Set the user to the internal user"""
     with context.app.app_context():
-        context.bdd_helper.token_data = context.bdd_helper.internal_bres_user_token
+        context.bdd_helper.token_data = context.bdd_helper.internal_specific_user_token
 
 
 @given("the user is set as alternative respondent")
@@ -60,14 +60,14 @@ def step_impl_set_token_to_respondent_with_no_role(context):
 @when("the user token is set to a internal user with no role associated")
 def step_impl_set_token_to_internal_with_no_role(context):
     with context.app.app_context():
-        context.bdd_helper.token_data = {constants.USER_IDENTIFIER: context.bdd_helper.internal_id_bres_user, "role": ""}
+        context.bdd_helper.token_data = {constants.USER_IDENTIFIER: context.bdd_helper.internal_id_specific_user, "role": ""}
 
 
 # Version 2 Steps Below
 
 @given("sending from respondent to internal specific user")
 @when("sending from respondent to internal specific user")
-def step_impl_prepare_to_send_from_respondent_to_non_bres_specific_user(context):
+def step_impl_prepare_to_send_from_respondent_to_specific_user(context):
     """set the message to to the internal user as defined in the helper"""
     step_impl_the_user_is_set_as_respondent(context)
     step_impl_the_msg_from_is_set_to_respondent(context)
@@ -76,7 +76,7 @@ def step_impl_prepare_to_send_from_respondent_to_non_bres_specific_user(context)
 
 @given("sending from respondent to internal group")
 @when("sending from respondent to internal group")
-def step_impl_prepare_to_send_from_respondent_to_non_bres_group(context):
+def step_impl_prepare_to_send_from_respondent_to_group(context):
     """set the message to to the internal user as defined in the helper"""
     step_impl_the_user_is_set_as_respondent(context)
     step_impl_the_msg_from_is_set_to_respondent(context)

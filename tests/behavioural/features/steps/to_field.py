@@ -2,7 +2,7 @@ import nose.tools
 from behave import given, then, when
 from flask import json
 from secure_message import constants
-from secure_message.constants import BRES_USER, NON_SPECIFIC_INTERNAL_USER
+from secure_message.constants import NON_SPECIFIC_INTERNAL_USER
 
 
 @given("the to is set to '{msg_to}'")
@@ -37,13 +37,6 @@ def step_impl_the_msg_to_is_set_to_respondent(context):
 def step_impl_the_msg_to_is_set_to_alternative_respondent(context):
     """ set the msg to field in the message data to the alternative respondent as specified in the helper"""
     step_impl_the_msg_to_is_set_to(context, context.bdd_helper.alternative_respondent_id)
-
-
-@given("the to is set to internal bres user")
-@when("the to is set to internal bres user")
-def step_impl_the_msg_to_is_set_to_internal_bres_user(context):
-    """ set the msg to field in the message data to the internal user as specified in the helper"""
-    step_impl_the_msg_to_is_set_to(context, context.bdd_helper.internal_id_bres_user)
 
 
 @given("the to is set to respondent as a string not array")

@@ -94,13 +94,14 @@ class PartyTestCase(unittest.TestCase):
         self.assertIsNone(result_data)
 
     @requests_mock.mock()
-    def test_get_user_details_for_bres_user(self, mock_request):
+    def test_get_user_details_for_internal_user(self, mock_request):
         """Test get user details sends a request and receives back data"""
         sut = PartyService()
-        user_data_url = f"{self.app.config['RAS_PARTY_SERVICE']}party-api/v1/respondents/id/{constants.BRES_USER}"
+        user_data_url = f"{self.app.config['RAS_PARTY_SERVICE']}party-api/v1/respondents/id/" \
+                        f"{constants.NON_SPECIFIC_INTERNAL_USER}"
         expected_result = {'emailAddress': '',
-                           'firstName': constants.BRES_USER,
-                           'id': constants.BRES_USER,
+                           'firstName': constants.NON_SPECIFIC_INTERNAL_USER,
+                           'id': constants.NON_SPECIFIC_INTERNAL_USER,
                            'lastName': '',
                            'sampleUnitType': 'BI',
                            'status': '',
@@ -109,7 +110,7 @@ class PartyTestCase(unittest.TestCase):
         mock_request.get(user_data_url, status_code=200, reason="OK", text=str(expected_result))
 
         with self.app.app_context():
-            result_data = sut.get_user_details(constants.BRES_USER)
+            result_data = sut.get_user_details(constants.NON_SPECIFIC_INTERNAL_USER)
 
         self.assertEqual(result_data, expected_result)
 
