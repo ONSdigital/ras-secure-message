@@ -91,7 +91,7 @@ Retrieves a list of messages based on the selected parameters passed on the quer
 | cc (collection_case) | `string` | 0000000000000000 | optionally restrict by collection case |
 | ru_id | `string` | aaa1aa1a-1aa1-1111-aa11-11a11aa111aa | optionally restrict by ru id  |
 | survey | `string` | aaa1aa1a-1aa1-1111-aa11-11a11aa111aa | optionally restrict by survey  |
-| label | `string` | INBOX/DRAFT/SENT | used to select types of messages to return e.g SENT or INBOX |
+| label | `string` | INBOX/SENT | used to select types of messages to return e.g SENT or INBOX |
 | ce (collection_exercise) | `string`| aaa1aa1a-1aa1-1111-aa11-11a11aa111aa | optionally restrict by collection exercise |
 | desc (descending) | `boolean` | True/False | order by date descending (else ascending) |
 | limit | `int` | 2 | maximum number of messages to return per page |
@@ -101,8 +101,6 @@ Retrieves a list of messages based on the selected parameters passed on the quer
    * Using multiple parameters: `GET /messages?limit=2&label=INBOX&survey=12345678981047653839`
 
 Note that if the user is a respondent the get messages returns messages which match the uuid of the user passed in the JWT and that satisfy any additional filter criteria. If the user is internal then it matches messages sent to all internal users that satisfy the additional filter criteria . Typically that would be restricted by survey_id so that only messages  of a specific survey are returned.
-
-Note, it is possible to retrieve drafts via Get messages by setting a label parameter of DRAFT
 
 #### Example JSON Response
 
@@ -720,10 +718,6 @@ be useful in determining JWT errors since it shows SM_JWT_ENCRYPT values. Bypass
 ```json
   {
   "API Functionality": {
-    "/draft/<draft_id>": "Return a draft for user",
-    "/draft/<draft_id>/modify": "Update message status by id",
-    "/draft/save": "Save a draft message",
-    "/drafts": "Return a list of drafts for the user",
     "/health": "Rest endpoint to provide application general health",
     "/health/db": "Rest endpoint to provide application database health",
     "/health/details": "Rest endpoint to provide application details",
@@ -735,8 +729,6 @@ be useful in determining JWT errors since it shows SM_JWT_ENCRYPT values. Bypass
     "/messages": "Return a list of messages for the user",
     "/thread/<thread_id>": "Return list of messages for user",
     "/threads": "Return a list of threads for the user",
-    "/v2/drafts": "Return a list of drafts for the user",
-    "/v2/drafts/<draft_id>": "Return a draft for user",
     "/v2/messages": "Send A message using the V2 endpoint",
     "/v2/messages/<message_id>": "Get and update message by id",
     "/v2/messages/count": "Get count of unread messages using v2 endpoint",

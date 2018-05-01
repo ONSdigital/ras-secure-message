@@ -409,23 +409,6 @@ Feature: Get threads list Endpoint V2
     Then the message bodies are '100' characters or less
 
 
-  Scenario Outline: There is a conversation between respondent and internal the last message is a draft with an empty to field ,
-                    respondent attempts to read them, should receive  a 200
-    Given sending from respondent to internal <user>
-      And the message is sent V2
-      And the thread id is set to the last returned thread id
-      And the to is set to empty
-      And the message is saved as draft V2
-   When the threads are read
-    Then  a success status code (200) is returned
-      And '1' messages are returned
-
-    Examples: user type
-    | user        |
-    | specific user |
-    | group        |
-
-
   Scenario Outline: There is a conversation between internal and respondent the last message is a draft with an empty to field ,
                     respondent attempts to read them, should receive  a 200
     Given sending from internal <user> to respondent
@@ -455,51 +438,6 @@ Feature: Get threads list Endpoint V2
     Then  a success status code (200) is returned
       And  '1' messages are returned
       And all response messages have the label 'SENT'
-
-  Scenario: There is a conversation between respondent and internal . The last action of the respondent is to save a draft
-               the internal person retrieves the thread list the last message they should see should be the one before the draft
-      Given sending from respondent to internal group
-        And the message is sent V2
-        And the thread id is set to the last returned thread id
-        And sending from internal specific user to respondent
-        And the message is sent V2
-        And the thread id is set to the last returned thread id
-        And sending from respondent to internal group
-        And the message is saved as draft V2
-      When the user is set as internal specific user
-        And the threads are read
-      Then a success status code (200) is returned
-        And  '1' messages are returned
-        And all response messages have the label 'SENT'
-
-  Scenario: There is a conversation between internal  and respondent . The last action of the internal person is to save a draft
-               the respondent retrieves the thread list the last message they should see should be the one before the draft
-      Given sending from internal specific user to respondent
-        And the message is sent V2
-        And the thread id is set to the last returned thread id
-        And sending from respondent to internal group
-        And the message is sent V2
-        And the thread id is set to the last returned thread id
-        And sending from internal specific user to respondent
-        And the message is saved as draft V2
-      When the user is set as respondent
-        And the threads are read
-      Then a success status code (200) is returned
-        And  '1' messages are returned
-        And all response messages have the label 'SENT'
-
-  Scenario: A respondent sends a message to  an internal group .An internal user creates a draft on the thread ,
-            a second internal user gets the thread. Validate that the second user can see the draft from the other internal user.
-     Given sending from respondent to internal group
-        And the message is sent V2
-        And the thread id is set to the last returned thread id
-        And sending from internal specific user to respondent
-        And the message is saved as draft V2
-        And the user is set to alternative internal specific user
-      When the threads are read
-      Then a success status code (200) is returned
-       And '1' messages are returned
-       And all response messages have the label 'DRAFT'
 
   Scenario: An internal user sends messages regarding multiple different surveys, validate that when the get the threads list
             filtered by both surveys then all messages are returned

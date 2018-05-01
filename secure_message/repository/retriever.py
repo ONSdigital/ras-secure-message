@@ -91,7 +91,7 @@ class Retriever:
                 actor_conditions.append(SecureMessage.from_internal == True)  # NOQA pylint:disable=singleton-comparison
         else:
             status_reject_conditions.append(Labels.DRAFT_INBOX.value)
-            valid_statuses = [Labels.INBOX.value, Labels.DRAFT.value]
+            valid_statuses = [Labels.INBOX.value]
             actor_conditions.append(True)
 
         if message_args.ru_id:
@@ -278,7 +278,7 @@ class Retriever:
                 .join(Events).join(Status) \
                 .filter(or_(and_(SecureMessage.from_internal.is_(False), Status.label == Labels.INBOX.value),  # NOQA
                             and_(SecureMessage.from_internal.is_(True),
-                                 Status.label.in_([Labels.SENT.value, Labels.DRAFT.value]))
+                                 Status.label.in_([Labels.SENT.value]))
                            )
                        ) \
                 .group_by(SecureMessage.thread_id).subquery('t')

@@ -5,7 +5,6 @@ import urllib.parse
 
 from structlog import wrap_logger
 
-from secure_message.common.labels import Labels
 from secure_message.constants import MESSAGE_BY_ID_ENDPOINT, MESSAGE_LIST_ENDPOINT, MESSAGE_QUERY_LIMIT
 from secure_message.services.service_toggles import party, internal_user_service
 

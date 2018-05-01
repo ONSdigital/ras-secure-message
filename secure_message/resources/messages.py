@@ -35,7 +35,7 @@ class MessageSend(Resource):
         post_data = request.get_json(force=True)
 
         if 'msg_id' in post_data:
-                raise BadRequest(description="Message can not include msg_id")
+            raise BadRequest(description="Message can not include msg_id")
 
         post_data['from_internal'] = g.user.is_internal
         message = self._validate_post_data(post_data)

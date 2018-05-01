@@ -6,7 +6,7 @@ from werkzeug.exceptions import InternalServerError
 
 from secure_message.common.eventsapi import EventsApi
 from secure_message.common.labels import Labels
-from secure_message.repository.database import db, Status, SecureMessage
+from secure_message.repository.database import db, Status
 from secure_message.repository.saver import Saver
 
 logger = wrap_logger(logging.getLogger(__name__))

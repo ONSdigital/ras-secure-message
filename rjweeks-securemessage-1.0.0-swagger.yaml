@@ -22,7 +22,7 @@ securityDefinitions:
     scopes:
       write: allows modifying resources
       read: allows reading resources
- 
+
 security:
   - accessCode:
     - read
@@ -32,7 +32,7 @@ tags:
   description: Respond to surveys on behalf of a Reporting Unit
 - name: Respondent Liason
   description: ONS staff supporting surveys
-  
+
 schemes:
 - https
 
@@ -107,8 +107,8 @@ paths:
                   _links:
                     self:
                       href: https://virtserver.swaggerhub.com/rjweeks/securemessage/1.0.0/message/2
-              _links: 
-                self: 
+              _links:
+                self:
                   href: https://virtserver.swaggerhub.com/rjweeks/securemessage/1.0.0/messages?page=3&limit=10
                 first:
                   href: https://virtserver.swaggerhub.com/rjweeks/securemessage/1.0.0/messages
@@ -120,7 +120,7 @@ paths:
           description: Bad syntax
         403:
           description: Forbidden
-          
+
   /message/send:
     post:
       tags:
@@ -149,7 +149,7 @@ paths:
           description: Bad syntax
         405:
           description: Method not allowed
-          
+
   /message/{id}:
     get:
       parameters:
@@ -223,101 +223,7 @@ paths:
           description: Forbidden
         404:
           description: Message not found
-          
-  /drafts:
-    get:
-      tags:
-      - Respondents
-      - Respondent Liason
-      summary: Returns a list of draft messages
-      operationId: getDrafts
-      description: Returns a list of draft messages
-      produces:
-      - application/vnd.collection+json
-      responses:
-        200:
-          description: Draft messages 
-          schema:
-            type: array
-            items:
-              $ref: '#/definitions/Message'
-          examples:
-            application/vnd.collection+json:
-              msg_to: richard.weeks@ons.gov.uk
-              msg_from: respondent@abcdef.com
-              body: 'Draft messages'
-        400:
-          description: Bad syntax
-        403:
-          description: Forbidden
 
-  /draft/save:
-      post:
-        tags:
-        - Respondents
-        - Respondent Liason
-        summary: Save a draft message
-        operationId: saveDraft
-        description: Save a draft message
-        responses:
-          201:
-            description: Draft message saved.
-          400:
-            description: Invalid draft message
-          
-  /draft/{id}:
-    get:
-      parameters:
-      - name: id
-        in: path
-        description: Message ID
-        required: true
-        type: integer
-        format: int64
-      tags:
-      - Respondents
-      - Respondent Liason
-      summary: Get a draft message by ID
-      operationId: getDraft
-      description: Get a draft message by ID
-      responses:
-        200:
-          description: Get draft message     
-    put:
-      parameters:
-      - name: id
-        in: path
-        description: Message ID
-        required: true
-        type: integer
-        format: int64
-      tags:
-      - Respondents
-      - Respondent Liason
-      summary: Update a draft message
-      operationId: updateDrafts
-      description: Update a draft message
-      responses:
-        200:
-          description: Update draft message
-    delete:
-      parameters:
-      - name: id
-        in: path
-        description: Message ID
-        required: true
-        type: integer
-        format: int64
-      tags:
-      - Respondents
-      - Respondent Liason
-      summary: Delete a draft message
-      operationId: deleteDraft
-      description: Delete a draft message.
-      responses:
-        200: 
-          description: Message deleted.
-          
   /threads:
     get:
       parameters:
@@ -347,7 +253,7 @@ paths:
               type: integer
               format: int64
               example: 98284e51-2e9d-4849-8e3b-ebb4bd48cc18
-          
+
   /thread/{id}:
     get:
       parameters:
@@ -375,8 +281,8 @@ paths:
         400:
           description: Bad syntax
         403:
-          description: Forbidden          
-        
+          description: Forbidden
+
   /archives:
     get:
       parameters:
@@ -395,7 +301,7 @@ paths:
       - application/vnd.collection+json
       responses:
         200:
-          description: Archives 
+          description: Archives
           schema:
             type: array
             items:
@@ -403,7 +309,7 @@ paths:
         400:
           description: Bad syntax
         403:
-          description: Forbidden  
+          description: Forbidden
 
   /archive/{id}:
     get:
@@ -476,7 +382,7 @@ definitions:
       body:
         type: string
         format: byte
-        
+
   Thread:
     type: object
     required:
@@ -488,9 +394,9 @@ definitions:
         example: 73685db6-9c76-44ea-a4e9-2cfb1f1eacf8
       messages:
         type: array
-        items: 
+        items:
           $ref: '#/definitions/Message'
-          
+
   Archive:
     type: object
     required:
@@ -504,7 +410,7 @@ definitions:
         type: array
         items:
           $ref: '#/definitions/Message'
-        
+
 # Added by API Auto Mocking Plugin
 host: virtserver.swaggerhub.com
 basePath: /rjweeks/securemessage/1.0.0
