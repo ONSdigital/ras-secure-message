@@ -3,63 +3,6 @@ Feature: Checking correct labels for messages are added & deleted
   Background: Reset database
     Given prepare for tests using 'mock' services
 
-   Scenario: A respondent sends a message the internal user marks it as READ
-    Given sending from respondent to internal bres user
-      And  the message is sent
-      And  the user is set as internal
-     When the message is read
-      And  a label of 'UNREAD' is to be removed
-      And  the message labels are modified
-      And  the message is read
-     Then the response message does not have the label 'UNREAD'
-      And a success status code (200) is returned
-
-  Scenario: An internal user sends a message the internal user marks it as READ
-    Given sending from internal bres user to respondent
-      And  the message is sent
-      And  the user is set as respondent
-     When the message is read
-      And  a label of 'UNREAD' is to be removed
-      And  the message labels are modified
-      And  the message is read
-     Then the response message does not have the label 'UNREAD'
-      And a success status code (200) is returned
-
-  Scenario: A respondent sends a message the internal user marks it as READ then UNREAD
-    Given sending from respondent to internal bres user
-      And  the message is sent
-      And  the user is set as internal
-      And  the message is read
-      And  a label of 'UNREAD' is to be removed
-      And  the message labels are modified
-      And  the message is read
-     When  a label of 'UNREAD' is to be added
-      And  the message labels are modified
-      And  the message is read
-     Then the response message has the label 'UNREAD'
-      And the response message has the label 'INBOX'
-      And the response message should a label count of '2'
-      And a success status code (200) is returned
-
-
-  Scenario: An internal user sends a message the internal user marks it as READ then UNREAD
-    Given sending from internal bres user to respondent
-      And  the message is sent
-      And  the user is set as respondent
-      And  the message is read
-      And  a label of 'UNREAD' is to be removed
-      And  the message labels are modified
-      And  the message is read
-     When  a label of 'UNREAD' is to be added
-      And  the message labels are modified
-      And  the message is read
-     Then the response message has the label 'UNREAD'
-      And the response message has the label 'INBOX'
-      And the response message should a label count of '2'
-      And a success status code (200) is returned
-
-
-
   Scenario: A respondent sends a message the internal user attempts to modify a label without specifying which label
     Given sending from respondent to internal bres user
       And  the message is sent
