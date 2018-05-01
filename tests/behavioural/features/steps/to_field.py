@@ -53,11 +53,11 @@ def step_impl_the_msg_to_is_set_to_respondent_as_string_not_array(context):
     context.bdd_helper.message_data['msg_to'] = context.bdd_helper.respondent_id
 
 
-@given("the to is set to internal bres user user as a string not array")
-@when("the to is set to internal bres user user as a string not array")
+@given("the to is set to internal specific user as a string not array")
+@when("the to is set to internal specific user as a string not array")
 def step_impl_the_msg_to_is_set_to_internal_as_string_not_array(context):
     """set the message to to a string not an array"""
-    context.bdd_helper.message_data['msg_to'] = context.bdd_helper.internal_id_bres_user
+    context.bdd_helper.message_data['msg_to'] = context.bdd_helper.internal_id_specific_user
 
 
 @then("retrieved message msg_to is as was saved")

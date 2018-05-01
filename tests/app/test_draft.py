@@ -238,7 +238,7 @@ class DraftTestCase(unittest.TestCase):
             query = f'''INSERT INTO securemessage.secure_message(msg_id, subject, body, thread_id,
                     collection_case, ru_id, survey) VALUES ('{msg_id}', 'test','test','',
                     'ACollectionCase', 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc', 'ACollectionExercise'
-                    'BRES')'''
+                    '{test_utilities.BRES_SURVEY}')'''
             con.execute(query)
             query = "INSERT INTO securemessage.status(label, msg_id, actor) VALUES('DRAFT', '{0}', " \
                     "'0a7ad740-10d5-4ecb-b7ca-3c0384afb882')".format(msg_id)
