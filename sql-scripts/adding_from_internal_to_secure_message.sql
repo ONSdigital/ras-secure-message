@@ -1,6 +1,6 @@
 -- Script to add a from_internal column to secure_message
 -- and populate from_internal to true
--- for messages that were sent from internal as bres user
+-- for messages that were sent from internal user
 -- Also drops the internal_sent_audit table and actors tables if present
 
 

@@ -94,17 +94,6 @@ def step_impl_the_at_msg_to_is_set_to_internal_group_user(context):
     nose.tools.assert_equal(msg_resp['@msg_to'][0], expected)
 
 
-@then("the at_msg_to is set correctly for bres user")
-def step_impl_the_at_msg_to_is_set_to_bres_user(context):
-    msg_resp = json.loads(context.response.data)
-    expected = {"id": BRES_USER,
-                "firstName": "BRES",
-                "lastName": "",
-                "emailAddress": ""
-                }
-    nose.tools.assert_equal(msg_resp['@msg_to'][0], expected)
-
-
 @then("the at_msg_to is set correctly for internal group for all messages")
 def step_impl_the_at_msg_to_is_set_to_internal_group_user_for_all_messages(context):
 

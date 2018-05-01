@@ -265,11 +265,11 @@ class MessageSchemaTestCase(unittest.TestCase):
         self.assertTrue(errors == {})
 
     def test_msg_from_validation_internal(self):
-        """marshalling message where msg_from field is an internal user and the 'uuid' is not BRES"""
+        """marshalling message where msg_from field is an internal user """
         self.json_message['msg_to'] = ["01b51fcc-ed43-4cdb-ad1c-450f9986859b"]
         self.json_message['msg_from'] = "SomeOtherWorkGroup"
         with self.app.app_context():
-            g.user = User(constants.BRES_USER, 'internal')
+            g.user = User(constants.NON_SPECIFIC_INTERNAL_USER, 'internal')
             schema = DraftSchema()
             errors = schema.load(self.json_message)[1]
 
@@ -278,7 +278,7 @@ class MessageSchemaTestCase(unittest.TestCase):
 
     def test_msg_from_validation_respondent(self):
         """marshalling message where msg_from field is a respondent and msg_from is not equal to uuid in token"""
-        self.json_message['msg_to'] = [constants.BRES_USER]
+        self.json_message['msg_to'] = [constants.NON_SPECIFIC_INTERNAL_USER]
         self.json_message['msg_from'] = "6779kgh83-ed43-474b-ad1c-500f5287439a"
         with self.app.app_context():
             g.user = User("01b51fcc-ed43-4cdb-ad1c-450f9986859b", 'respondent')

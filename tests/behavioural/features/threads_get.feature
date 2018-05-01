@@ -4,7 +4,7 @@ Feature: Get threads list Endpoint
     Given prepare for tests using 'mock' services
 
   Scenario: There are 3 conversations between respondent and internal , respondent attempts to read them
-    Given sending from respondent to internal bres user
+    Given sending from respondent to internal specific user
       And the message is sent
       And the message is sent
       And the message is sent
@@ -13,7 +13,7 @@ Feature: Get threads list Endpoint
       And '3' messages are returned
 
   Scenario: There are 3 conversations between respondent and internal , internal attempts to read them
-    Given sending from respondent to internal bres user
+    Given sending from respondent to internal specific user
       And '3' messages are sent
      When   the user is set as internal
       And the threads are read
@@ -21,7 +21,7 @@ Feature: Get threads list Endpoint
       And '3' messages are returned
 
   Scenario: There are 3 conversations between respondent and internal each with 2 messages, respondent attempts to read them
-    Given sending from respondent to internal bres user
+    Given sending from respondent to internal specific user
       And the message is sent
       And   the thread id is set to the last returned thread id
       And the message is sent
@@ -41,7 +41,7 @@ Feature: Get threads list Endpoint
       And '3' messages are returned
 
   Scenario: There are 3 conversations between respondent and internal each with 2 messages, internal user attempts to read them
-    Given sending from respondent to internal bres user
+    Given sending from respondent to internal specific user
       And the message is sent
       And   the thread id is set to the last returned thread id
       And the message is sent
@@ -62,7 +62,7 @@ Feature: Get threads list Endpoint
       And '3' messages are returned
 
   Scenario: There are 3 conversations between respondent and internal each with 2  messages and a draft, validate most recent message returned for each
-    Given sending from respondent to internal bres user
+    Given sending from respondent to internal specific user
       And the message is sent
       And the thread id is set to the last returned thread id
       And the message is sent

@@ -7,7 +7,7 @@ Feature: Message get by ID Endpoint V2
     Given sending from respondent to internal <user>
       And   the message is sent V2
       And the message is read V2
-    Then a success status code (200) is returned
+    Then a success status code 200 is returned
       And retrieved message <field> is as was saved
 
    Examples: Fields, user
@@ -34,7 +34,7 @@ Feature: Message get by ID Endpoint V2
     Given sending from internal <user> to respondent
       And   the message is sent V2
       And the message is read V2
-    Then a success status code (200) is returned
+    Then a success status code 200 is returned
       And retrieved message <field> is as was saved
 
    Examples: Fields, user
@@ -60,12 +60,6 @@ Feature: Message get by ID Endpoint V2
     Given sending from respondent to internal group
       And   the message is sent V2
       And the message is read V2
-    Then a success status code (200) is returned
+    Then a success status code 200 is returned
       And the at_msg_to is set correctly for internal group
 
-  Scenario: Respondent saves a message to BRES and retrieves itge verify the @msg_to is correctly populated
-    Given sending from respondent to internal bres user
-      And   the message is sent
-      And the message is read V2
-    Then a success status code (200) is returned
-      And the at_msg_to is set correctly for bres user

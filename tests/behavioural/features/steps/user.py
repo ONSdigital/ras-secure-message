@@ -1,10 +1,8 @@
 from behave import given, when
 from tests.behavioural.features.steps.from_field import step_impl_the_msg_from_is_set_to_respondent
-from tests.behavioural.features.steps.from_field import step_impl_the_msg_from_is_set_to_internal_bres_user
 from tests.behavioural.features.steps.from_field import step_impl_the_msg_from_is_set_to_internal_specific_user
 from tests.behavioural.features.steps.from_field import step_impl_the_msg_from_is_set_to_internal_group_user
 
-from tests.behavioural.features.steps.to_field import step_impl_the_msg_to_is_set_to_internal_bres_user
 from tests.behavioural.features.steps.to_field import step_impl_the_msg_to_is_set_to_respondent
 from tests.behavioural.features.steps.to_field import step_impl_the_msg_to_is_set_to_internal_group_user
 from tests.behavioural.features.steps.to_field import step_impl_the_msg_to_is_set_to_internal_specific_user
@@ -33,24 +31,6 @@ def step_impl_the_user_is_set_as_respondent(context):
     """set the user to the default respondent as saved in the helper"""
     with context.app.app_context():
         context.bdd_helper.token_data = context.bdd_helper.respondent_user_token
-
-
-@given("sending from respondent to internal bres user")
-@when("sending from respondent to internal bres user")
-def step_impl_prepare_to_send_from_respondent_to_bres_user(context):
-    """set the message from to the internal user as defined in the helper"""
-    step_impl_the_user_is_set_as_respondent(context)
-    step_impl_the_msg_from_is_set_to_respondent(context)
-    step_impl_the_msg_to_is_set_to_internal_bres_user(context)
-
-
-@given("sending from internal bres user to respondent")
-@when("sending from internal bres user to respondent")
-def step_impl_prepare_to_send_from_internal_bres_user(context):
-    """ set the from to the repondent as set in the helper"""
-    step_impl_the_user_is_internal(context)
-    step_impl_the_msg_from_is_set_to_internal_bres_user(context)
-    step_impl_the_msg_to_is_set_to_respondent(context)
 
 
 @given("the user token is set to respondent with no user id")
