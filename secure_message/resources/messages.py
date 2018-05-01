@@ -215,7 +215,7 @@ class MessageModifyById(Resource):
             logger.error('Invalid label provided', label=label)
             raise BadRequest(description=f"Invalid label provided: {label}")
 
-        if label not in [Labels.ARCHIVE.value, Labels.UNREAD.value]:
+        if label != Labels.UNREAD.value:
             logger.error('Non modifiable label provided', label=label)
             raise BadRequest(description=f"Non modifiable label provided: {label}")
 
