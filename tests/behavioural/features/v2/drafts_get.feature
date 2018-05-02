@@ -10,7 +10,7 @@ Feature: Get Drafts V2
       And the message is read V2
       And the draft is sent as a message V2
     When  drafts are read V2
-    Then  a success status code (200) is returned
+    Then  a success status code 200 is returned
       And '4' messages are returned
 
     Examples: user type
@@ -25,7 +25,7 @@ Feature: Get Drafts V2
       And the message is read V2
       And the draft is sent as a message V2
     When  drafts are read V2
-    Then  a success status code (200) is returned
+    Then  a success status code 200 is returned
       And '4' messages are returned
 
     Examples: user type

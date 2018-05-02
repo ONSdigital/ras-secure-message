@@ -6,7 +6,7 @@ Feature: Draft Save Endpoint V2
   Scenario Outline: Respondent saves a draft and receives a 201
     Given sending from respondent to internal <user>
     When the message is saved as draft V2
-    Then a created status code (201) is returned
+    Then a created status code 201 is returned
 
     Examples: user type
     | user        |
@@ -16,7 +16,7 @@ Feature: Draft Save Endpoint V2
   Scenario Outline: An internal user saves a draft and receives a 201
     Given sending from internal <user> to respondent
     When the message is saved as draft V2
-    Then a created status code (201) is returned
+    Then a created status code 201 is returned
 
     Examples: user type
     | user        |

@@ -53,7 +53,7 @@ Feature: Get thread by id Endpoint V2
       And   the message body is '10000' characters long
       And   the message is sent
     When the thread is read
-    Then  a success status code (200) is returned
+    Then  a success status code 200 is returned
       And the threads first message body is as was saved
 
     Examples: user type
@@ -81,7 +81,7 @@ Feature: Get thread by id Endpoint V2
       And   the message is sent V2
     When the thread is read
     Then '15' messages are returned
-     And a success status code (200) is returned
+     And a success status code 200 is returned
 
       Examples: user type
     | user        |
@@ -109,7 +109,7 @@ Feature: Get thread by id Endpoint V2
     When  the user is set as internal specific user
      And  the thread is read
     Then '15' messages are returned
-     And a success status code (200) is returned
+     And a success status code 200 is returned
 
       Examples: user type
     | user        |

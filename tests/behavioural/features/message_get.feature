@@ -142,13 +142,13 @@ Feature: Message get by ID Endpoint
     Given sending from respondent to internal specific user
       And   the message is sent
     When  the message with id '12345678-ed43-4cdb-ad1c-450f9986859b' is retrieved
-    Then  a not found status code (404) is returned
+    Then  a not found status code 404 is returned
 
   Scenario: Internal user retrieves a message with incorrect message ID
     Given sending from internal specific user to respondent
       And   the message is sent
     When  the message with id '12345678-ed43-4cdb-ad1c-450f9986859b' is retrieved
-    Then  a not found status code (404) is returned
+    Then  a not found status code 404 is returned
 
   Scenario: Respondent sends message and retrieves the same message with it's labels
     Given sending from respondent to internal specific user
@@ -185,7 +185,7 @@ Scenario: Respondent sends message and internal user retrieves the same message 
     When  the message is sent
       And   the user is set as alternative respondent
       And   the message is read
-    Then a forbidden status code (403) is returned
+    Then a forbidden status code 403 is returned
 
   Scenario: Internal user sends message and retrieves it , should be marked as from_internal True
     Given sending from internal specific user to respondent

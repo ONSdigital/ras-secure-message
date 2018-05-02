@@ -10,7 +10,7 @@ Feature: Get threads list Endpoint V2
       And the message is sent V2
       And the message is sent V2
    When the threads are read
-    Then  a success status code (200) is returned
+    Then  a success status code 200 is returned
       And '3' messages are returned
 
     Examples: user type
@@ -23,7 +23,7 @@ Feature: Get threads list Endpoint V2
       And '3' messages are sent using V2
      When   the user is set as internal <user>
       And the threads are read
-    Then  a success status code (200) is returned
+    Then  a success status code 200 is returned
       And '3' messages are returned
 
     Examples: user type
@@ -48,7 +48,7 @@ Feature: Get threads list Endpoint V2
       And the message is sent V2
 
    When the threads are read
-    Then  a success status code (200) is returned
+    Then  a success status code 200 is returned
       And '3' messages are returned
 
     Examples: user type
@@ -75,7 +75,7 @@ Feature: Get threads list Endpoint V2
 
     When  the user is set as internal <user>
       And the threads are read
-    Then  a success status code (200) is returned
+    Then  a success status code 200 is returned
       And '3' messages are returned
 
     Examples: user type
@@ -106,7 +106,7 @@ Feature: Get threads list Endpoint V2
       And the message is saved as draft V2
 
    When the threads are read
-    Then  a success status code (200) is returned
+    Then  a success status code 200 is returned
       And  '3' messages are returned
           # Drafts added last
       And '3' messages have a 'DRAFT' label
@@ -139,7 +139,7 @@ Feature: Get threads list Endpoint V2
       And the message is saved as draft V2
 
    When the threads are read
-    Then  a success status code (200) is returned
+    Then  a success status code 200 is returned
       And  '3' messages are returned
       # Drafts added last
       And '3' messages have a 'DRAFT' label
@@ -171,7 +171,7 @@ Feature: Get threads list Endpoint V2
       And the message is sent V2
 
     When the threads in survey 'Survey1' are read
-    Then  a success status code (200) is returned
+    Then  a success status code 200 is returned
       And  '2' messages are returned
 
 
@@ -203,7 +203,7 @@ Feature: Get threads list Endpoint V2
       And the message is sent V2
 
     When the threads in survey 'Survey1' are read
-    Then  a success status code (200) is returned
+    Then  a success status code 200 is returned
       And  '2' messages are returned
 
 
@@ -235,7 +235,7 @@ Feature: Get threads list Endpoint V2
       And the message is sent V2
 
     When the threads with ru 'ru1' are read
-    Then  a success status code (200) is returned
+    Then  a success status code 200 is returned
       And  '2' messages are returned
 
 
@@ -267,7 +267,7 @@ Feature: Get threads list Endpoint V2
       And the message is sent V2
 
     When the threads with ru 'ru1' are read
-    Then  a success status code (200) is returned
+    Then  a success status code 200 is returned
       And  '2' messages are returned
 
 
@@ -297,7 +297,7 @@ Feature: Get threads list Endpoint V2
       And the thread id is set to the last returned thread id
       And the message is sent V2
     When the threads with collection case 'col1' are read
-    Then  a success status code (200) is returned
+    Then  a success status code 200 is returned
       And  '2' messages are returned
 
 
@@ -329,7 +329,7 @@ Feature: Get threads list Endpoint V2
       And the message is sent V2
 
     When the threads with collection case 'col1' are read
-    Then  a success status code (200) is returned
+    Then  a success status code 200 is returned
       And  '2' messages are returned
 
 
@@ -360,7 +360,7 @@ Feature: Get threads list Endpoint V2
       And the thread id is set to the last returned thread id
       And the message is sent V2
     When the threads with collection exercise 'ce1' are read
-    Then  a success status code (200) is returned
+    Then  a success status code 200 is returned
       And  '2' messages are returned
 
 
@@ -391,7 +391,7 @@ Feature: Get threads list Endpoint V2
       And the thread id is set to the last returned thread id
       And the message is sent V2
     When the threads with collection exercise 'ce1' are read
-    Then  a success status code (200) is returned
+    Then  a success status code 200 is returned
       And  '2' messages are returned
 
 
@@ -417,7 +417,7 @@ Feature: Get threads list Endpoint V2
       And the to is set to empty
       And the message is saved as draft V2
    When the threads are read
-    Then  a success status code (200) is returned
+    Then  a success status code 200 is returned
       And '1' messages are returned
 
     Examples: user type
@@ -434,7 +434,7 @@ Feature: Get threads list Endpoint V2
       And the to is set to empty
       And the message is saved as draft V2
    When the threads are read
-    Then  a success status code (200) is returned
+    Then  a success status code 200 is returned
       And '1' messages are returned
 
     Examples: user type
@@ -452,7 +452,7 @@ Feature: Get threads list Endpoint V2
       And the message is sent V2
       And the user is set to alternative internal specific user
     When the threads are read
-    Then  a success status code (200) is returned
+    Then  a success status code 200 is returned
       And  '1' messages are returned
       And all response messages have the label 'SENT'
 
@@ -468,7 +468,7 @@ Feature: Get threads list Endpoint V2
         And the message is saved as draft V2
       When the user is set as internal specific user
         And the threads are read
-      Then a success status code (200) is returned
+      Then a success status code 200 is returned
         And  '1' messages are returned
         And all response messages have the label 'SENT'
 
@@ -484,7 +484,7 @@ Feature: Get threads list Endpoint V2
         And the message is saved as draft V2
       When the user is set as respondent
         And the threads are read
-      Then a success status code (200) is returned
+      Then a success status code 200 is returned
         And  '1' messages are returned
         And all response messages have the label 'SENT'
 
@@ -497,7 +497,7 @@ Feature: Get threads list Endpoint V2
         And the message is saved as draft V2
         And the user is set to alternative internal specific user
       When the threads are read
-      Then a success status code (200) is returned
+      Then a success status code 200 is returned
        And '1' messages are returned
        And all response messages have the label 'DRAFT'
 
@@ -511,7 +511,7 @@ Feature: Get threads list Endpoint V2
       And the message is sent V2
       And the user is set as internal specific user
     When the threads in are read with filters for both default and alternate surveys
-    Then  a success status code (200) is returned
+    Then  a success status code 200 is returned
       And  '2' messages are returned
 
   Scenario: A respondent sends messages regarding multiple different surveys, validate that when the get the threads list
@@ -524,5 +524,5 @@ Feature: Get threads list Endpoint V2
       And the message is sent V2
       And the user is set as internal specific user
     When the threads in are read with filters for both default and alternate surveys
-    Then  a success status code (200) is returned
+    Then  a success status code 200 is returned
       And  '2' messages are returned

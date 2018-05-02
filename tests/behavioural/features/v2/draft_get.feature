@@ -7,7 +7,7 @@ Feature: Get draft by id V2
       And sending from respondent to internal <user>
       And  the message is saved as draft V2
     When the draft is read V2
-    Then a success status code (200) is returned
+    Then a success status code 200 is returned
 
     Examples: user type
     | user        |
@@ -18,7 +18,7 @@ Feature: Get draft by id V2
     Given sending from internal <user> to respondent
       And  the message is saved as draft V2
     When the draft is read V2
-    Then a success status code (200) is returned
+    Then a success status code 200 is returned
 
     Examples: user type
     | user        |

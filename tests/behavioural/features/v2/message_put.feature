@@ -17,7 +17,7 @@ Feature: Checking correct labels for messages are added & deleted V2
      Then the response message has the label 'UNREAD'
       And the response message has the label 'INBOX'
       And the response message should a label count of '2'
-      And a success status code (200) is returned
+      And a success status code 200 is returned
 
     Examples: user type
     | user        |
