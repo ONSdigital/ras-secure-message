@@ -64,8 +64,7 @@ See the endpoint descriptions for detailed usage of each field. This is an overv
     * INBOX Added to the message for teh actor who received the message
     * DRAFT Added to a message to indicate that it is a draft for the actor who is sending a draft
     * UNREAD Added to a message to indicate that a message has not been read
-    * ARCHIVE Added to a message to indicate that a message has been archived
-    * DRAFT_INBOX  Added to a message to indicate that the message is a draft for an actor who is the target of a draft message. 
+    * DRAFT_INBOX  Added to a message to indicate that the message is a draft for an actor who is the target of a draft message.
 * page . Which page of the result set is to be returned when getting a list of messages/drafts/threads
 * limit . How many messages to return per page when getting a list of messages/drafts/threads.
     
@@ -316,7 +315,7 @@ Note V2 uses messages , V1 uses message (singular)
 This is used to modify the labels (aka status) associated with a message.
 Currently only limited label names and actions are supported. It is typically used to mark a message as read/unread.
 
-Valid label names: `UNREAD`, `ARCHIVE`  . Other labels will result in errors.
+`UNREAD` is the only valid label name. Other labels will result in errors.
 Valid actions : `add`,`remove` . Other actions will result in errors.
 
 Note there is only an UNREAD label , absence of `UNREAD` is interpreted as the message has been read

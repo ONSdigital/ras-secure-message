@@ -69,86 +69,6 @@ class ModifyTestCase(unittest.TestCase, ModifyTestCaseHelper):
         self.user_internal = User('ce12b958-2a5f-44f4-a6da-861e59070a31', 'internal')
         self.user_respondent = User('0a7ad740-10d5-4ecb-b7ca-3c0384afb882', 'respondent')
 
-    def test_archived_label_is_added_to_message(self):
-        """testing message is added to database with archived label attached"""
-        self.populate_database(1)
-        with self.engine.connect() as con:
-            query = 'SELECT msg_id FROM securemessage.secure_message LIMIT 1'
-            query_x = con.execute(query)
-            names = []
-            for row in query_x:
-                names.append(row[0])
-        with self.app.app_context():
-            with current_app.test_request_context():
-                msg_id = str(names[0])
-                message_service = Retriever()
-                # pass msg_id and user urn
-                message = message_service.retrieve_message(msg_id, self.user_respondent)
-                Modifier.add_archived(message, self.user_respondent, )
-                message = message_service.retrieve_message(msg_id, self.user_respondent)
-                self.assertCountEqual(message['labels'], ['SENT', 'ARCHIVE'])
-
-    def test_archived_label_is_removed_from_message(self):
-        """testing message is added to database with archived label removed and inbox and read is added instead"""
-        self.populate_database(1)
-        with self.engine.connect() as con:
-            query = 'SELECT msg_id FROM securemessage.secure_message LIMIT 1'
-            query_x = con.execute(query)
-            names = []
-            for row in query_x:
-                names.append(row[0])
-        with self.app.app_context():
-            with current_app.test_request_context():
-                msg_id = str(names[0])
-                message_service = Retriever()
-                message = message_service.retrieve_message(msg_id, self.user_respondent)
-                modifier = Modifier()
-                modifier.add_archived(message, self.user_respondent)
-                message = message_service.retrieve_message(msg_id, self.user_respondent)
-                modifier.del_archived(message, self.user_respondent, )
-                message = message_service.retrieve_message(msg_id, self.user_respondent)
-                self.assertCountEqual(message['labels'], ['SENT'])
-
-    def test_unread_label_is_removed_from_message(self):
-        """testing message is added to database with archived label removed and inbox and read is added instead"""
-        self.populate_database(1)
-        with self.engine.connect() as con:
-            query = 'SELECT msg_id FROM securemessage.secure_message LIMIT 1'
-            query_x = con.execute(query)
-            names = []
-            for row in query_x:
-                names.append(row[0])
-        with self.app.app_context():
-            with current_app.test_request_context():
-                msg_id = str(names[0])
-                message_service = Retriever()
-                message = message_service.retrieve_message(msg_id, self.user_internal)
-                modifier = Modifier()
-                modifier.del_unread(message, self.user_internal)
-                message = message_service.retrieve_message(msg_id, self.user_internal)
-                self.assertCountEqual(message['labels'], ['INBOX'])
-
-    def test_unread_label_is_added_to_message(self):
-        """testing message is added to database with archived label removed and inbox and read is added instead"""
-        self.populate_database(1)
-        with self.engine.connect() as con:
-            query = 'SELECT msg_id FROM securemessage.secure_message LIMIT 1'
-            query_x = con.execute(query)
-            names = []
-            for row in query_x:
-                names.append(row[0])
-        with self.app.app_context():
-            with current_app.test_request_context():
-                msg_id = str(names[0])
-                message_service = Retriever()
-                message = message_service.retrieve_message(msg_id, self.user_internal)
-                modifier = Modifier()
-                modifier.del_unread(message, self.user_internal)
-                message = message_service.retrieve_message(msg_id, self.user_internal)
-                modifier.add_unread(message, self.user_internal)
-                message = message_service.retrieve_message(msg_id, self.user_internal)
-                self.assertCountEqual(message['labels'], ['UNREAD', 'INBOX'])
-
     def test_two_unread_labels_are_added_to_message(self):
         """testing duplicate message labels are not added to the database"""
         self.populate_database(1)
@@ -173,26 +93,6 @@ class ModifyTestCase(unittest.TestCase, ModifyTestCaseHelper):
             for row in query_x:
                 unread_label_total.append(row[0])
             self.assertTrue(unread_label_total[0] == 1)
-
-    def test_add_archive_is_added_to_internal(self):
-        """testing message is added to database with archived label attached"""
-        self.populate_database(1)
-        with self.engine.connect() as con:
-            query = 'SELECT msg_id FROM securemessage.secure_message LIMIT 1'
-            query_x = con.execute(query)
-            names = []
-            for row in query_x:
-                names.append(row[0])
-        with self.app.app_context():
-            with current_app.test_request_context():
-                msg_id = str(names[0])
-                message_service = Retriever()
-                message = message_service.retrieve_message(msg_id, self.user_internal)
-                Modifier.del_archived(message, self.user_internal)
-                message = message_service.retrieve_message(msg_id, self.user_internal)
-                Modifier.add_archived(message, self.user_internal)
-                message = message_service.retrieve_message(msg_id, self.user_internal)
-                self.assertCountEqual(message['labels'], ['UNREAD', 'INBOX', 'ARCHIVE'])
 
     def test_read_date_is_set(self):
         """testing message read_date is set when unread label is removed"""
@@ -346,33 +246,6 @@ class ModifyTestCase(unittest.TestCase, ModifyTestCaseHelper):
 
                 self.assertEqual(retrieved_data["body"], 'not hello')
                 self.assertEqual(retrieved_data["subject"], 'not MyMessage')
-
-    def test_archive_is_removed_for_both_respondent_and_internal(self):
-        """testing archive label is removed after being added to both respondent and internal"""
-        self.populate_database(2)
-        with self.engine.connect() as con:
-            query = 'SELECT msg_id FROM securemessage.secure_message LIMIT 1'
-            query_x = con.execute(query)
-            names = []
-            for row in query_x:
-                names.append(row[0])
-        with self.app.app_context():
-            with current_app.test_request_context():
-                msg_id = str(names[0])
-                message_service = Retriever()
-                modifier = Modifier()
-                message = message_service.retrieve_message(msg_id, self.user_respondent)
-                modifier.add_archived(message, self.user_respondent)
-                message = message_service.retrieve_message(msg_id, self.user_internal)
-                modifier.add_archived(message, self.user_internal)
-                message = message_service.retrieve_message(msg_id, self.user_respondent)
-                modifier.del_archived(message, self.user_respondent)
-                message = message_service.retrieve_message(msg_id, self.user_internal)
-                modifier.del_archived(message, self.user_internal)
-                message = message_service.retrieve_message(msg_id, self.user_internal)
-                self.assertCountEqual(message['labels'], ['UNREAD', 'INBOX'])
-                message = message_service.retrieve_message(msg_id, self.user_internal)
-                self.assertCountEqual(message['labels'], ['UNREAD', 'INBOX'])
 
     def test_exception_for_add_label_raises(self):
         with self.app.app_context():

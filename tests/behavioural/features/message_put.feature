@@ -3,52 +3,6 @@ Feature: Checking correct labels for messages are added & deleted
   Background: Reset database
     Given prepare for tests using 'mock' services
 
-  Scenario: A Respondent  modifies the archive status or a message to archived
-    Given sending from respondent to internal specific user
-      And  the message is sent
-      And  the message is read
-      And  a label of 'ARCHIVE' is to be added
-    When  the message labels are modified
-      And  the message is read
-    Then the response message has the label 'ARCHIVE'
-      And a success status code 200 is returned
-
-  Scenario: An internal user modifies the archive status or a message to archived
-    Given sending from internal specific user to respondent
-      And  the message is sent
-      And  the message is read
-      And  a label of 'ARCHIVE' is to be added
-    When  the message labels are modified
-      And  the message is read
-    Then the response message has the label 'ARCHIVE'
-      And a success status code 200 is returned
-
-  Scenario: A Respondent removes an archived status from a message
-    Given sending from respondent to internal specific user
-      And  the message is sent
-      And  the message is read
-      And  a label of 'ARCHIVE' is to be added
-      And  the message labels are modified
-      And  the message is read
-    When  a label of 'ARCHIVE' is to be removed
-      And  the message labels are modified
-      And  the message is read
-    Then the response message does not have the label 'ARCHIVE'
-     And a success status code 200 is returned
-
-  Scenario: An internal user removes an archived status from a message
-    Given sending from internal specific user to respondent
-      And  the message is sent
-      And  the message is read
-      And  a label of 'ARCHIVE' is to be added
-      And  the message labels are modified
-      And  the message is read
-    When  a label of 'ARCHIVE' is to be removed
-      And  the message labels are modified
-      And  the message is read
-    Then the response message does not have the label 'ARCHIVE'
-     And a success status code 200 is returned
-
    Scenario: A respondent sends a message the internal user marks it as READ
     Given sending from respondent to internal specific user
       And  the message is sent
