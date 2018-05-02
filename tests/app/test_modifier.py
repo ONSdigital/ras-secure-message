@@ -144,13 +144,6 @@ class ModifyTestCase(unittest.TestCase, ModifyTestCaseHelper):
                 with self.assertRaises(InternalServerError):
                     Modifier.remove_label('UNREAD', {'survey': 'survey'}, self.user_internal)
 
-    def test_replace_current_recipient_status_raises(self):
-        with self.app.app_context():
-            database.db.drop_all()
-            with current_app.test_request_context():
-                with self.assertRaises(InternalServerError):
-                    Modifier.replace_current_recipient_status(self.user_internal, 'Torrance')
-
     def test_get_label_actor_to_respondent(self):
         message_to_respondent = {'msg_id': 'test1',
                                  'msg_to': ['0a7ad740-10d5-4ecb-b7ca-3c0384afb882'],

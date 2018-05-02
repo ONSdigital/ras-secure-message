@@ -56,7 +56,7 @@ class RetrieverTestCaseHelper:
             query = f"DELETE FROM securemessage.status WHERE label = '{label}' AND msg_id = '{msg_id}' AND actor = '{actor}'"
             con.execute(query)
 
-    def populate_database(self, no_of_messages=0, single=True, add_reply=False, add_draft=False, multiple_users=False,
+    def populate_database(self, no_of_messages=0, single=True, add_reply=False, multiple_users=False,
                           external_actor=default_external_actor,
                           internal_actor=default_internal_actor):
         """ Populate the db with a specified number of messages and optionally replies , multiple users"""
@@ -99,15 +99,6 @@ class RetrieverTestCaseHelper:
                 self.add_event(event=EventsApi.SENT.value, msg_id=msg_id, date_time=datetime(year, month, day))
                 day = day + 1
 
-            if add_draft:
-                msg_id = str(uuid.uuid4())
-                self.add_secure_message(msg_id=msg_id, from_internal=True)
-                self.add_status(label="DRAFT_INBOX", msg_id=msg_id, actor=external_actor)
-                self.add_status(label="DRAFT", msg_id=msg_id, actor=internal_actor)
-
-                self.add_event(event=EventsApi.DRAFT_SAVED.value, msg_id=msg_id, date_time=datetime(year, month, day))
-                day = day + 1
-
             if multiple_users:
                 msg_id = str(uuid.uuid4())
                 self.add_secure_message(msg_id=msg_id, thread_id="AnotherThreadId",
@@ -120,8 +111,7 @@ class RetrieverTestCaseHelper:
                 self.add_event(event=EventsApi.SENT.value, msg_id=msg_id, date_time=datetime(year, month, day))
                 day = day + 1
 
-    def create_threads(self, no_of_threads=1, add_internal_draft=False, add_respondent_draft=False,
-                       external_actor=default_external_actor,
+    def create_threads(self, no_of_threads=1, external_actor=default_external_actor,
                        internal_actor=default_internal_actor):
         """ Populate the db with a specified number of messages and optionally replies , multiple users"""
         threads = []
@@ -159,29 +149,6 @@ class RetrieverTestCaseHelper:
             self.add_event(event=EventsApi.SENT.value, msg_id=msg_id, date_time=datetime(year, month, day))
             day += 1
 
-            last_msg_id = msg_id
-
-            if add_internal_draft:  # adds draft from internal
-                msg_id = str(uuid.uuid4())
-                self.add_secure_message(msg_id=msg_id, thread_id=thread_id, survey=constants.BRES_USER, from_internal=True)
-                self.add_status(label="DRAFT_INBOX", msg_id=msg_id, actor=external_actor)
-                self.add_status(label="DRAFT", msg_id=msg_id, actor=internal_actor)
-
-                self.add_event(event=EventsApi.DRAFT_SAVED.value, msg_id=msg_id, date_time=datetime(year, month, day))
-                day += 1
-
-            if add_respondent_draft:  # adds draft from respondent
-
-                self.del_status(label="UNREAD", msg_id=last_msg_id, actor=RetrieverTestCaseHelper.default_external_actor)
-                self.add_event(event=EventsApi.READ.value, msg_id=last_msg_id, date_time=datetime(year, month, day))
-                day += 1
-                msg_id = str(uuid.uuid4())
-                self.add_secure_message(msg_id=msg_id, thread_id=thread_id, survey=constants.BRES_USER, from_internal=False)
-                self.add_status(label="DRAFT_INBOX", msg_id=msg_id, actor=internal_actor)
-                self.add_status(label="DRAFT", msg_id=msg_id, actor=external_actor)
-
-                self.add_event(event=EventsApi.DRAFT_SAVED.value, msg_id=msg_id, date_time=datetime(year, month, day))
-                day += 1
         return threads
 
 
@@ -242,35 +209,9 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
                     msg.append(serialized_message)
                 self.assertEqual(len(msg), MESSAGE_QUERY_LIMIT)
 
-    def test_msg_and_not_drafts_returned(self):
-        """retrieves messages not drafts"""
-        self.populate_database(5, add_draft=True)
-        with self.app.app_context():
-            with current_app.test_request_context():
-                args = get_args(page=1, limit=MESSAGE_QUERY_LIMIT, surveys=[BRES_SURVEY])
-                result = Retriever().retrieve_message_list(self.user_internal, args)
-                msg = []
-                for message in result.items:
-                    serialized_message = message.serialize(self.user_internal)
-                    msg.append(serialized_message)
-                self.assertEqual(len(msg), 10)
-
     def test_msg_limit_returned_when_db_greater_than_limit_with_replies(self):
         """retrieves x messages when database has greater than x entries and database has reply messages"""
         self.populate_database(MESSAGE_QUERY_LIMIT + 5, multiple_users=True, add_reply=True)
-        with self.app.app_context():
-            with current_app.test_request_context():
-                args = get_args(page=1, limit=MESSAGE_QUERY_LIMIT)
-                result = Retriever().retrieve_message_list(self.user_respondent, args)
-                msg = []
-                for message in result.items:
-                    serialized_message = message.serialize(self.user_respondent)
-                    msg.append(serialized_message)
-                self.assertEqual(len(msg), MESSAGE_QUERY_LIMIT)
-
-    def test_msg_limit_returned_when_db_greater_than_limit_with_replies_drafts(self):
-        """retrieves x messages when database has greater than x entries and database has reply messages and drafts"""
-        self.populate_database(MESSAGE_QUERY_LIMIT + 5, multiple_users=True, add_reply=True, add_draft=True)
         with self.app.app_context():
             with current_app.test_request_context():
                 args = get_args(page=1, limit=MESSAGE_QUERY_LIMIT)
@@ -606,35 +547,9 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
                     self.assertTrue('modified_date' not in response)
                     self.assertTrue(response['read_date'] != "N/A")
 
-    def test_correct_to_and_from_returned_for_draft(self):
-        """retrieves draft using id and checks the to and from urns are correct"""
-        self.populate_database(1, single=False, add_draft=True, internal_actor=self.user_internal.user_uuid)
-        with self.engine.connect() as con:
-            query = 'SELECT msg_id FROM securemessage.secure_message LIMIT 1'
-            query_x = con.execute(query)
-            names = []
-            for row in query_x:
-                names.append(row[0])
-
-            with self.app.app_context():
-                with current_app.test_request_context():
-                    msg_id = str(names[0])
-                    response = Retriever().retrieve_message(msg_id, self.user_internal)
-                    self.assertEqual(response['msg_to'], [self.user_respondent.user_uuid])
-                    self.assertEqual(response['msg_from'], self.user_internal.user_uuid)
-
     def test_all_msg_returned_for_thread_id(self):
         """retrieves messages for thread_id from database"""
         self.populate_database(3, add_reply=True)
-
-        with self.app.app_context():
-            with current_app.test_request_context():
-                response = Retriever().retrieve_thread('ThreadId', self.user_respondent)
-                self.assertEqual(len(response.all()), 6)
-
-    def test_all_msg_returned_for_thread_id_with_draft_inbox(self):
-        """retrieves messages for thread_id from database with draft inbox"""
-        self.populate_database(3, add_reply=True, add_draft=True)
 
         with self.app.app_context():
             with current_app.test_request_context():
@@ -655,20 +570,6 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
                 desc_date = sorted(sent, reverse=True)
                 self.assertEqual(len(sent), 6)
                 self.assertListEqual(desc_date, sent)
-
-    def test_thread_returned_in_desc_order_with_draft(self):
-        """check thread returned in correct order with draft"""
-        self.populate_database(3, add_reply=True, add_draft=True)
-
-        with self.app.app_context():
-            with current_app.test_request_context():
-                response = Retriever().retrieve_thread('ThreadId', self.user_internal)
-                self.assertEqual(len(response.all()), 9)
-
-                date = [str(message.events[0].date_time) for message in response.all()]
-
-                desc_date = sorted(date, reverse=True)
-                self.assertListEqual(desc_date, date)
 
     def test_thread_returned_with_thread_id_returns_404(self):
         """retrieves thread using id that doesn't exist"""
