@@ -68,8 +68,8 @@ class PartyTestCase(unittest.TestCase):
                                                 })
 
         self.assertEqual(message['@msg_to'], [{"id": "GROUP",
-                                               "firstName": "GROUP",
-                                               "lastName": "",
+                                               "firstName": "ONS",
+                                               "lastName": "User",
                                                "emailAddress": ""
                                                }])
 
@@ -138,8 +138,8 @@ class PartyTestCase(unittest.TestCase):
                                                   'lastName': 'Oorschot',
                                                   'sampleUnitType': 'BI'})
             self.assertEqual(draft['@msg_to'][0], {"id": constants.NON_SPECIFIC_INTERNAL_USER,
-                                                   "firstName": "GROUP",
-                                                   "lastName": "",
+                                                   "firstName": "ONS",
+                                                   "lastName": "User",
                                                    "emailAddress": ""})
 
     def test_get_business_details_by_ru(self):
