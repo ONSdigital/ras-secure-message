@@ -60,23 +60,6 @@ class Modifier:
             raise InternalServerError(description="Error removing label from database")
 
     @staticmethod
-    def add_archived(message, user):
-        """Add archived label"""
-        archive = Labels.ARCHIVE.value
-        if archive not in message['labels']:
-            Modifier.add_label(archive, message, user)
-            return True
-        return False
-
-    @staticmethod
-    def del_archived(message, user):
-        """Remove archive label from status"""
-        archive = Labels.ARCHIVE.value
-        if archive in message['labels']:
-            Modifier.remove_label(archive, message, user)
-        return True
-
-    @staticmethod
     def add_unread(message, user):
         """Add unread label to status"""
         unread = Labels.UNREAD.value

@@ -85,7 +85,7 @@ class Retriever:
 
         if message_args.label:
             valid_statuses.append(message_args.label)
-            if message_args.label in [Labels.INBOX.value, Labels.ARCHIVE.value, Labels.UNREAD.value]:
+            if message_args.label in [Labels.INBOX.value, Labels.UNREAD.value]:
                 actor_conditions.append(SecureMessage.from_internal == False)  # NOQA pylint:disable=singleton-comparison
             if message_args.label == Labels.SENT.value:
                 actor_conditions.append(SecureMessage.from_internal == True)  # NOQA pylint:disable=singleton-comparison

@@ -7,6 +7,5 @@ class Labels(Enum):
     INBOX = "INBOX"
     UNREAD = "UNREAD"
     SENT = "SENT"
-    ARCHIVE = "ARCHIVE"
 
-    label_list = [INBOX, UNREAD, SENT, ARCHIVE]
+    label_list = [INBOX, UNREAD, SENT]
