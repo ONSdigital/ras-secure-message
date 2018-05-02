@@ -8,7 +8,6 @@ from sqlalchemy import create_engine
 
 from secure_message import application, constants
 from secure_message.common.alerts import AlertUser, AlertViaGovNotify
-from secure_message.common.eventsapi import EventsApi
 from secure_message.repository import database
 from secure_message.authentication.jwt import encode
 from secure_message.authentication.jwe import Encrypter
@@ -46,8 +45,6 @@ class FlaskTestCase(unittest.TestCase):
 
         AlertUser.alert_method = mock.Mock(AlertViaLogging)
         self.app.config['NOTIFY_CASE_SERVICE'] = '1'
-
-        self.url = "http://localhost:5050/draft/save"
 
         self.headers = {'Content-Type': 'application/json', 'Authorization': encrypted_jwt}
 
@@ -190,41 +187,6 @@ class FlaskTestCase(unittest.TestCase):
             for row in request:
                 self.assertTrue(row is not None)
 
-    def test_message_post_stores_events_correctly_for_draft(self):
-        """posts to message send end point to ensure events are saved as expected for draft"""
-
-        self.client.post("http://localhost:5050/draft/save", data=json.dumps(self.test_message), headers=self.headers)
-
-        with self.engine.connect() as con:
-            request = con.execute("SELECT * FROM securemessage.secure_message LIMIT 1")
-            for row in request:
-                self.msg_id = row['msg_id']
-
-        draft = ({'msg_id': self.msg_id,
-                  'msg_to': ['0a7ad740-10d5-4ecb-b7ca-3c0384afb882'],
-                  'msg_from': constants.BRES_USER,
-                  'subject': 'MyMessage',
-                  'body': 'hello',
-                  'thread_id': '',
-                  'collection_case': 'ACollectionCase',
-                  'ru_id': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc',
-                  'survey': test_utilities.BRES_SURVEY})
-
-        response = self.client.post('http://localhost:5050/message/send', data=json.dumps(draft),
-                                    headers=self.headers)
-
-        data = json.loads(response.data)
-
-        with self.engine.connect() as con:
-            request = con.execute(f"SELECT * FROM securemessage.events WHERE event='Sent' AND msg_id='{data['msg_id']}'")
-            for row in request:
-                self.assertTrue(row is not None)
-
-            request = con.execute("SELECT * FROM securemessage.events WHERE event='" + EventsApi.DRAFT_SAVED.value +
-                                  "' AND msg_id='{0}'".format(data['msg_id']))
-            for row in request:
-                self.assertTrue(row is None)
-
     def test_message_post_stores_labels_correctly_for_recipient_of_message(self):
         """posts to message send end point to ensure labels are saved as expected"""
         url = "http://localhost:5050/message/send"
@@ -252,66 +214,6 @@ class FlaskTestCase(unittest.TestCase):
                                   .format(data['msg_id'], self.test_message['survey']))
             for row in request:
                 self.assertTrue(row is not None)
-
-    def test_draft_inbox_labels_removed_on_draft_send(self):
-        """Test that draft inbox labels are removed on draft send"""
-
-        response = self.client.post("http://localhost:5050/draft/save",
-                                    data=json.dumps(self.test_message), headers=self.headers)
-        resp_data = json.loads(response.data)
-        msg_id = resp_data['msg_id']
-
-        self.test_message.update({'msg_id': msg_id,
-                                  'msg_to': ['0a7ad740-10d5-4ecb-b7ca-3c0384afb882'],
-                                  'msg_from': constants.BRES_USER,
-                                  'subject': 'MyMessage',
-                                  'body': 'hello',
-                                  'collection_case': 'ACollectionCase',
-                                  'collection_exercise': 'ACollectionExercise',
-                                  'ru_id': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc',
-                                  'survey': test_utilities.BRES_SURVEY})
-
-        self.client.post("http://localhost:5050/message/send", data=json.dumps(self.test_message), headers=self.headers)
-
-        with self.engine.connect() as con:
-            request = con.execute(f"SELECT * FROM securemessage.status WHERE msg_id='{msg_id}'")
-
-            for row in request:
-                self.assertNotEqual(row['label'], 'DRAFT_INBOX')
-
-    def test_draft_get_returns_msg_to(self):
-        """Test that draft get returns draft's msg_to if applicable"""
-
-        self.test_message.update({'msg_to': [constants.BRES_USER],
-                                  'msg_from': '0a7ad740-10d5-4ecb-b7ca-3c0384afb882',
-                                  'subject': 'MyMessage',
-                                  'body': 'hello',
-                                  'collection_case': 'ACollectionCase',
-                                  'collection_exercise': 'ACollectionExercise',
-                                  'ru_id': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc',
-                                  'survey': test_utilities.BRES_SURVEY})
-
-        token_data = {constants.USER_IDENTIFIER: "0a7ad740-10d5-4ecb-b7ca-3c0384afb882",
-                      "role": "respondent"}
-
-        encrypter = Encrypter(_private_key=self.app.config['SM_USER_AUTHENTICATION_PRIVATE_KEY'],
-                              _private_key_password=self.app.config['SM_USER_AUTHENTICATION_PRIVATE_KEY_PASSWORD'],
-                              _public_key=self.app.config['SM_USER_AUTHENTICATION_PUBLIC_KEY'])
-
-        with self.app.app_context():
-            signed_jwt = encode(token_data)
-            encrypted_jwt = encrypter.encrypt_token(signed_jwt)
-
-        self.headers = {'Content-Type': 'application/json', 'Authorization': encrypted_jwt}
-
-        draft_save = self.client.post("http://localhost:5050/draft/save", data=json.dumps(self.test_message), headers=self.headers)
-        draft_save_data = json.loads(draft_save.data)
-        draft_id = draft_save_data['msg_id']
-
-        draft_get = self.client.get(f"http://localhost:5050/draft/{draft_id}", headers=self.headers)
-        draft_get_data = json.loads(draft_get.data)
-
-        self.assertTrue(draft_get_data['msg_to'] is not None)
 
     @patch.object(case_service, 'store_case_event')
     def test_case_service_not_called_on_sent_if_NotifyCaseService_is_not_set(self, case):

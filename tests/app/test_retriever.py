@@ -382,21 +382,6 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
                     self.assertEqual(response['msg_to'][0], self.user_internal.user_uuid)
                     self.assertEqual(response['msg_from'], self.user_respondent.user_uuid)
 
-    def test_all_draft_message_returned(self):
-        """retrieves messages from database with label DRAFT for user"""
-        self.populate_database(5, add_draft=True)
-
-        with self.app.app_context():
-            with current_app.test_request_context():
-                args = get_args(page=1, limit=MESSAGE_QUERY_LIMIT, surveys=[BRES_SURVEY], label='DRAFT')
-                response = Retriever().retrieve_message_list(self.user_internal, args)
-                msg = []
-                for message in response.items:
-                    serialized_msg = message.serialize(self.user_internal)
-                    msg.append(serialized_msg)
-                    self.assertTrue('DRAFT' in serialized_msg['labels'])
-                self.assertEqual(len(msg), 5)
-
     def test_all_sent_message_returned(self):
         """retrieves messages from database with label SENT for user"""
         self.populate_database(5, add_reply=True)
@@ -425,22 +410,6 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
                     serialized_msg = message.serialize(self.user_internal)
                     msg.append(serialized_msg)
                     self.assertTrue('INBOX' in serialized_msg['labels'])
-                self.assertEqual(len(msg), 5)
-
-    def test_all_message_returned_no_label_option(self):
-        """retrieves all messages from database for user with no messages with label DRAFT_INBOX"""
-        self.populate_database(5, add_draft=True)
-
-        with self.app.app_context():
-            with current_app.test_request_context():
-                args = get_args(page=1, limit=MESSAGE_QUERY_LIMIT)
-                response = Retriever().retrieve_message_list(self.user_respondent, args)
-
-                msg = []
-                for message in response.items:
-                    serialized_msg = message.serialize(self.user_respondent)
-                    msg.append(serialized_msg)
-                    self.assertFalse('DRAFT_INBOX' in serialized_msg['labels'])
                 self.assertEqual(len(msg), 5)
 
     def test_all_message_returned_with_ru_option(self):
@@ -603,48 +572,6 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
                 self.assertEqual(len(date), 5)
                 self.assertListEqual(asc_date, date)
 
-    def test_message_list_returned_in_ascending_order_not_drafts(self):
-        """retrieves messages and drafts from database in asc sent_date order"""
-        self.populate_database(5, add_draft=True)
-
-        with self.app.app_context():
-            with current_app.test_request_context():
-                args = get_args(page=1, limit=MESSAGE_QUERY_LIMIT, surveys=[BRES_SURVEY], desc=False)
-                response = Retriever().retrieve_message_list(self.user_internal, args)
-
-                date = []
-                for message in response.items:
-                    serialized_msg = message.serialize(self.user_internal)
-                    if 'sent_date' in serialized_msg:
-                        date.append(serialized_msg['sent_date'])
-                    elif 'modified_date' in serialized_msg:
-                        date.append(serialized_msg['modified_date'])
-
-                asc_date = sorted(date, reverse=False)
-                self.assertEqual(len(date), 10)
-                self.assertListEqual(asc_date, date)
-
-    def test_messages_list_returned_in_descending_order_not_drafts(self):
-        """retrieves messages and drafts from database in desc sent_date order"""
-        self.populate_database(5, add_draft=True)
-
-        with self.app.app_context():
-            with current_app.test_request_context():
-                args = get_args(page=1, limit=MESSAGE_QUERY_LIMIT, surveys=[BRES_SURVEY], desc=True)
-                response = Retriever().retrieve_message_list(self.user_internal, args)
-
-                date = []
-                for message in response.items:
-                    serialized_msg = message.serialize(self.user_internal)
-                    if 'sent_date' in serialized_msg:
-                        date.append(serialized_msg['sent_date'])
-                    elif 'modified_date' in serialized_msg:
-                        date.append(serialized_msg['modified_date'])
-
-                desc_date = sorted(date, reverse=True)
-                self.assertEqual(len(date), 10)
-                self.assertListEqual(desc_date, date)
-
     def test_sent_date_returned_for_message(self):
         """retrieves message using id and checks the sent date returned"""
         self.populate_database(1)
@@ -679,32 +606,6 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
                     self.assertTrue('modified_date' not in response)
                     self.assertTrue(response['read_date'] != "N/A")
 
-    def test_draft_returned_with_msg_id_draft_not_in_database(self):
-        """retrieves draft using id where draft not in database"""
-        message_id = str(uuid.uuid4())
-        self.populate_database(1, single=False, add_draft=True)
-        with self.app.app_context():
-            with current_app.test_request_context():
-                with self.assertRaises(NotFound):
-                    Retriever().retrieve_message(message_id, self.user_internal)
-
-    def test_correct_labels_returned_for_draft(self):
-        """retrieves draft using id and checks the labels are correct"""
-        self.populate_database(1, single=False, add_draft=True)
-        with self.engine.connect() as con:
-            query = 'SELECT msg_id FROM securemessage.secure_message LIMIT 1'
-            query_x = con.execute(query)
-            names = []
-            for row in query_x:
-                names.append(row[0])
-
-            with self.app.app_context():
-                with current_app.test_request_context():
-                    msg_id = str(names[0])
-                    response = Retriever().retrieve_message(msg_id, self.user_internal)
-                    labels = ['DRAFT']
-                    self.assertCountEqual(response['labels'], labels)
-
     def test_correct_to_and_from_returned_for_draft(self):
         """retrieves draft using id and checks the to and from urns are correct"""
         self.populate_database(1, single=False, add_draft=True, internal_actor=self.user_internal.user_uuid)
@@ -722,17 +623,8 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
                     self.assertEqual(response['msg_to'], [self.user_respondent.user_uuid])
                     self.assertEqual(response['msg_from'], self.user_internal.user_uuid)
 
-    def test_all_msg_returned_for_thread_id_with_draft(self):
-        """retrieves messages for thread_id from database with draft """
-        self.populate_database(3, add_reply=True, add_draft=True)
-
-        with self.app.app_context():
-            with current_app.test_request_context():
-                response = Retriever().retrieve_thread('ThreadId', self.user_internal)
-                self.assertEqual(len(response.all()), 9)
-
-    def test_all_msg_returned_for_thread_id_without_draft(self):
-        """retrieves messages for thread_id from database without draft"""
+    def test_all_msg_returned_for_thread_id(self):
+        """retrieves messages for thread_id from database"""
         self.populate_database(3, add_reply=True)
 
         with self.app.app_context():
@@ -828,49 +720,6 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
                 self.assertEqual(len(date), 5)
                 self.assertListEqual(desc_date, date)
 
-    def test_thread_list_returned_in_descending_order_respondent_with_draft(self):
-        """retrieves threads from database in desc sent_date order for respondent with draft"""
-        self.create_threads(5, add_respondent_draft=True)
-        self.populate_database(5, single=False, multiple_users=True)
-
-        with self.app.app_context():
-            with current_app.test_request_context():
-                args = get_args(limit=MESSAGE_QUERY_LIMIT)
-                response = Retriever().retrieve_thread_list(self.user_respondent, args)
-
-                date = []
-                for message in response.items:
-                    serialized_msg = message.serialize(self.user_respondent)
-                    if 'sent_date' in serialized_msg:
-                        date.append(serialized_msg['sent_date'])
-                    elif 'modified_date' in serialized_msg:
-                        date.append(serialized_msg['modified_date'])
-
-                desc_date = sorted(date, reverse=True)
-                self.assertEqual(len(date), 5)
-                self.assertListEqual(desc_date, date)
-
-    def test_thread_list_returned_in_descending_order_internal_with_draft(self):
-        """retrieves threads from database in desc sent_date order for internal user with draft"""
-        self.create_threads(5, add_internal_draft=True)
-
-        with self.app.app_context():
-            with current_app.test_request_context():
-                args = get_args(limit=MESSAGE_QUERY_LIMIT)
-                response = Retriever().retrieve_thread_list(self.user_internal, args)
-
-                date = []
-                for message in response.items:
-                    serialized_msg = message.serialize(self.user_internal)
-                    if 'sent_date' in serialized_msg:
-                        date.append(serialized_msg['sent_date'])
-                    elif 'modified_date' in serialized_msg:
-                        date.append(serialized_msg['modified_date'])
-
-                desc_date = sorted(date, reverse=True)
-                self.assertEqual(len(date), 5)
-                self.assertListEqual(desc_date, date)
-
     def test_latest_message_from_each_thread_chosen_desc(self):
         """checks the message chosen for each thread is the latest message within that thread"""
         self.create_threads(5)
@@ -900,194 +749,6 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
                     thread = Retriever().retrieve_thread(thread_ids[x], self.user_internal)
                     self.assertEqual(date[x], str(thread.all()[0].events[0].date_time))
                     self.assertEqual(msg_ids[x], thread.all()[0].events[0].msg_id)
-
-    def test_latest_message_from_each_thread_chosen_desc_respondent_with_respondent_draft(self):
-        """checks the message chosen for each thread is the latest message within that thread
-         for respondent with respondent drafts"""
-        self.create_threads(5, add_respondent_draft=True)
-        self.populate_database(5, single=False, multiple_users=True)
-
-        with self.app.app_context():
-            with current_app.test_request_context():
-                args = get_args(limit=MESSAGE_QUERY_LIMIT)
-                response = Retriever().retrieve_thread_list(self.user_respondent, args)
-
-                date = []
-                thread_ids = []
-                msg_ids = []
-                for message in response.items:
-                    serialized_msg = message.serialize(self.user_respondent)
-                    if 'sent_date' in serialized_msg:
-                        date.append(serialized_msg['sent_date'])
-                    elif 'modified_date' in serialized_msg:
-                        date.append(serialized_msg['modified_date'])
-                    thread_ids.append(serialized_msg['thread_id'])
-                    msg_ids.append(serialized_msg['msg_id'])
-
-                self.assertEqual(len(msg_ids), 5)
-
-                args = get_args(page=1, limit=MESSAGE_QUERY_LIMIT)
-
-                for x in range(0, len(thread_ids)):
-                    thread = Retriever().retrieve_thread(thread_ids[x], self.user_respondent)
-                    self.assertEqual(date[x], str(thread.all()[0].events[0].date_time))
-                    self.assertEqual(msg_ids[x], thread.all()[0].events[0].msg_id)
-
-    def test_latest_message_from_each_thread_chosen_desc_internal_with_respondent_draft(self):
-        """checks the message chosen for each thread is the latest message within that thread
-        for internal user with respondent drafts"""
-        self.create_threads(5, add_respondent_draft=True)
-
-        with self.app.app_context():
-            with current_app.test_request_context():
-                args = get_args(limit=MESSAGE_QUERY_LIMIT)
-                response = Retriever().retrieve_thread_list(self.user_internal, args)
-
-                date = []
-                thread_ids = []
-                msg_ids = []
-                for message in response.items:
-                    serialized_msg = message.serialize(self.user_internal)
-                    if 'sent_date' in serialized_msg:
-                        date.append(serialized_msg['sent_date'])
-                    elif 'modified_date' in serialized_msg:
-                        date.append(serialized_msg['modified_date'])
-                    thread_ids.append(serialized_msg['thread_id'])
-                    msg_ids.append(serialized_msg['msg_id'])
-
-                self.assertEqual(len(msg_ids), 5)
-
-                args = get_args(page=1, limit=MESSAGE_QUERY_LIMIT)
-
-                for x in range(0, len(thread_ids)):
-                    thread = Retriever().retrieve_thread(thread_ids[x], self.user_internal)
-                    self.assertEqual(date[x], str(thread.all()[0].events[0].date_time))
-                    self.assertEqual(msg_ids[x], thread.all()[0].events[0].msg_id)
-
-    def test_latest_message_from_each_thread_chosen_desc_respondent_with_internal_draft(self):
-        """checks the message chosen for each thread is the latest message within that thread
-         for respondent with internal drafts"""
-        self.create_threads(5, add_internal_draft=True)
-        self.populate_database(5, single=False, multiple_users=True)
-
-        with self.app.app_context():
-            with current_app.test_request_context():
-                args = get_args(limit=MESSAGE_QUERY_LIMIT)
-                response = Retriever().retrieve_thread_list(self.user_respondent, args)
-
-                date = []
-                thread_ids = []
-                msg_ids = []
-                for message in response.items:
-                    serialized_msg = message.serialize(self.user_respondent)
-                    if 'sent_date' in serialized_msg:
-                        date.append(serialized_msg['sent_date'])
-                    elif 'modified_date' in serialized_msg:
-                        date.append(serialized_msg['modified_date'])
-                    thread_ids.append(serialized_msg['thread_id'])
-                    msg_ids.append(serialized_msg['msg_id'])
-
-                self.assertEqual(len(msg_ids), 5)
-
-                args = get_args(page=1, limit=MESSAGE_QUERY_LIMIT)
-
-                for x in range(0, len(thread_ids)):
-                    thread = Retriever().retrieve_thread(thread_ids[x], self.user_respondent)
-                    self.assertEqual(date[x], str(thread.all()[0].events[0].date_time))
-                    self.assertEqual(msg_ids[x], thread.all()[0].events[0].msg_id)
-
-    def test_latest_message_from_each_thread_chosen_desc_internal_with_internal_draft(self):
-        """checks the message chosen for each thread is the latest message within that thread
-        for internal user with internal drafts"""
-        self.create_threads(5, add_internal_draft=True)
-
-        with self.app.app_context():
-            with current_app.test_request_context():
-                args = get_args(limit=MESSAGE_QUERY_LIMIT)
-                response = Retriever().retrieve_thread_list(self.user_internal, args)
-
-                date = []
-                thread_ids = []
-                msg_ids = []
-                for message in response.items:
-                    serialized_msg = message.serialize(self.user_internal)
-                    if 'sent_date' in serialized_msg:
-                        date.append(serialized_msg['sent_date'])
-                    elif 'modified_date' in serialized_msg:
-                        date.append(serialized_msg['modified_date'])
-                    thread_ids.append(serialized_msg['thread_id'])
-                    msg_ids.append(serialized_msg['msg_id'])
-
-                self.assertEqual(len(msg_ids), 5)
-
-                args = get_args(page=1, limit=MESSAGE_QUERY_LIMIT)
-
-                for x in range(0, len(thread_ids)):
-                    thread = Retriever().retrieve_thread(thread_ids[x], self.user_internal)
-                    self.assertEqual(date[x], str(thread.all()[0].events[0].date_time))
-                    self.assertEqual(msg_ids[x], thread.all()[0].events[0].msg_id)
-
-    def test_latest_message_from_each_thread_chosen_desc_respondent_with_both_users_drafts(self):
-        """checks the message chosen for each thread is the latest message within that thread
-         for respondent with drafts from both users"""
-        self.create_threads(5, add_internal_draft=True, add_respondent_draft=True)
-        self.populate_database(5, single=False, multiple_users=True)
-
-        with self.app.app_context():
-            with current_app.test_request_context():
-                args = get_args(limit=MESSAGE_QUERY_LIMIT)
-                response = Retriever().retrieve_thread_list(self.user_respondent, args)
-
-                date = []
-                thread_ids = []
-                msg_ids = []
-                for message in response.items:
-                    serialized_msg = message.serialize(self.user_respondent)
-                    if 'sent_date' in serialized_msg:
-                        date.append(serialized_msg['sent_date'])
-                    elif 'modified_date' in serialized_msg:
-                        date.append(serialized_msg['modified_date'])
-                    thread_ids.append(serialized_msg['thread_id'])
-                    msg_ids.append(serialized_msg['msg_id'])
-
-                self.assertEqual(len(msg_ids), 5)
-
-                args = get_args(page=1, limit=MESSAGE_QUERY_LIMIT)
-
-                for x in range(0, len(thread_ids)):
-                    thread = Retriever().retrieve_thread(thread_ids[x], self.user_respondent)
-                    self.assertEqual(date[x], str(thread.all()[0].events[0].date_time))
-                    self.assertEqual(msg_ids[x], thread.all()[0].events[0].msg_id)
-
-    def test_latest_message_from_each_thread_chosen_desc_internal_with_both_users_drafts(self):
-        """checks the message chosen for each thread is the latest message within that thread
-        for internal user with drafts from both users"""
-        self.create_threads(1, add_internal_draft=True, add_respondent_draft=True)
-
-        with self.app.app_context():
-            args = get_args(limit=MESSAGE_QUERY_LIMIT)
-            response = Retriever().retrieve_thread_list(self.user_internal, args)
-
-            date = []
-            thread_ids = []
-            msg_ids = []
-            for message in response.items:
-                serialized_msg = message.serialize(self.user_internal)
-                if 'sent_date' in serialized_msg:
-                    date.append(serialized_msg['sent_date'])
-                elif 'modified_date' in serialized_msg:
-                    date.append(serialized_msg['modified_date'])
-                thread_ids.append(serialized_msg['thread_id'])
-                msg_ids.append(serialized_msg['msg_id'])
-
-            self.assertEqual(len(msg_ids), 1)
-
-            args = get_args(page=1, limit=MESSAGE_QUERY_LIMIT)
-
-            for x in range(0, len(thread_ids)):
-                thread = Retriever().retrieve_thread(thread_ids[x], self.user_internal)
-                self.assertEqual(date[x], str(thread.all()[0].events[0].date_time))
-                self.assertEqual(msg_ids[x], thread.all()[0].events[0].msg_id)
 
 
 if __name__ == '__main__':
