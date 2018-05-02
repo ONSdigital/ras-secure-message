@@ -41,7 +41,7 @@ class PartyService:
             party_data = requests.get(f"{current_app.config['RAS_PARTY_SERVICE']}party-api/v1/respondents/id/{uuid}",
                                       auth=current_app.config['BASIC_AUTH'], verify=False)
             if party_data.status_code == 200:
-                user_dict = eval(json.loads(json.dumps(party_data.text)))
+                user_dict = ast.literal_eval(json.loads(json.dumps(party_data.text)))
                 self._users_cache[uuid] = user_dict
                 logger.debug(f"Party data retrieved for uuid:{uuid}")
             else:
