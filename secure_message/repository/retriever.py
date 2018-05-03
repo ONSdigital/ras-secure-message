@@ -137,8 +137,7 @@ class Retriever:
     def unread_message_count(user):
         """Count users unread messages"""
         logger.info("Getting unread message count", user_uuid=user.user_uuid)
-        status_conditions = []
-        status_conditions.append(Status.actor == str(user.user_uuid))
+        status_conditions = [Status.actor == str(user.user_uuid)]
         try:
             result = SecureMessage.query.join(Status).filter(and_(*status_conditions)).filter(
                 Status.label == 'UNREAD').count()
