@@ -83,71 +83,6 @@ Feature: Get threads list Endpoint V2
     | specific user |
     | group        |
 
-  Scenario Outline: There are 3 conversations between respondent and internal each with 2  messages and a draft, validate most recent message returned for each
-    Given sending from respondent to internal <user>
-      And the message is sent V2
-      And the thread id is set to the last returned thread id
-      And the message is sent V2
-      And the thread id is set to the last returned thread id
-      And the message is saved as draft V2
-
-      And the thread_id is set to empty
-      And the message is sent V2
-      And the thread id is set to the last returned thread id
-      And the message is sent V2
-      And the thread id is set to the last returned thread id
-      And the message is saved as draft V2
-
-      And the thread_id is set to empty
-      And the message is sent V2
-      And the thread id is set to the last returned thread id
-      And the message is sent V2
-      And the thread id is set to the last returned thread id
-      And the message is saved as draft V2
-
-   When the threads are read
-    Then  a success status code 200 is returned
-      And  '3' messages are returned
-          # Drafts added last
-      And '3' messages have a 'DRAFT' label
-
-    Examples: user type
-    | user        |
-    | specific user |
-    | group        |
-
-  Scenario Outline: There are 3 conversations between an internal user and respondent each with 2  messages and a draft, validate most recent message returned for each
-    Given sending from internal <user> to respondent
-      And the message is sent V2
-      And the thread id is set to the last returned thread id
-      And the message is sent V2
-      And the thread id is set to the last returned thread id
-      And the message is saved as draft V2
-
-      And the thread_id is set to empty
-      And the message is sent V2
-      And the thread id is set to the last returned thread id
-      And the message is sent V2
-      And the thread id is set to the last returned thread id
-      And the message is saved as draft V2
-
-      And the thread_id is set to empty
-      And the message is sent V2
-      And the thread id is set to the last returned thread id
-      And the message is sent V2
-      And the thread id is set to the last returned thread id
-      And the message is saved as draft V2
-
-   When the threads are read
-    Then  a success status code 200 is returned
-      And  '3' messages are returned
-      # Drafts added last
-      And '3' messages have a 'DRAFT' label
-
-    Examples: user type
-    | user        |
-    | specific user |
-    | group        |
 
   Scenario Outline: There are 3 conversations between an internal user and respondent each with 2  messages ,
                     each with different survey_id validate , that only 2 messages returned when we restrict by survey
@@ -408,40 +343,6 @@ Feature: Get threads list Endpoint V2
     When the threads are read
     Then the message bodies are '100' characters or less
 
-
-  Scenario Outline: There is a conversation between respondent and internal the last message is a draft with an empty to field ,
-                    respondent attempts to read them, should receive  a 200
-    Given sending from respondent to internal <user>
-      And the message is sent V2
-      And the thread id is set to the last returned thread id
-      And the to is set to empty
-      And the message is saved as draft V2
-   When the threads are read
-    Then  a success status code 200 is returned
-      And '1' messages are returned
-
-    Examples: user type
-    | user        |
-    | specific user |
-    | group        |
-
-
-  Scenario Outline: There is a conversation between internal and respondent the last message is a draft with an empty to field ,
-                    respondent attempts to read them, should receive  a 200
-    Given sending from internal <user> to respondent
-      And the message is sent V2
-      And the thread id is set to the last returned thread id
-      And the to is set to empty
-      And the message is saved as draft V2
-   When the threads are read
-    Then  a success status code 200 is returned
-      And '1' messages are returned
-
-    Examples: user type
-    | user        |
-    | specific user |
-    | group        |
-
     Scenario: There is a conversation between internal user and respondent, the last message being a message sent from
               Internal to tests/behavioural/features/v2/threads_get.feature:425respondent. A second internal person reads the conversation, they should see the message
               sent from internal to respondent
@@ -455,51 +356,6 @@ Feature: Get threads list Endpoint V2
     Then  a success status code 200 is returned
       And  '1' messages are returned
       And all response messages have the label 'SENT'
-
-  Scenario: There is a conversation between respondent and internal . The last action of the respondent is to save a draft
-               the internal person retrieves the thread list the last message they should see should be the one before the draft
-      Given sending from respondent to internal group
-        And the message is sent V2
-        And the thread id is set to the last returned thread id
-        And sending from internal specific user to respondent
-        And the message is sent V2
-        And the thread id is set to the last returned thread id
-        And sending from respondent to internal group
-        And the message is saved as draft V2
-      When the user is set as internal specific user
-        And the threads are read
-      Then a success status code 200 is returned
-        And  '1' messages are returned
-        And all response messages have the label 'SENT'
-
-  Scenario: There is a conversation between internal  and respondent . The last action of the internal person is to save a draft
-               the respondent retrieves the thread list the last message they should see should be the one before the draft
-      Given sending from internal specific user to respondent
-        And the message is sent V2
-        And the thread id is set to the last returned thread id
-        And sending from respondent to internal group
-        And the message is sent V2
-        And the thread id is set to the last returned thread id
-        And sending from internal specific user to respondent
-        And the message is saved as draft V2
-      When the user is set as respondent
-        And the threads are read
-      Then a success status code 200 is returned
-        And  '1' messages are returned
-        And all response messages have the label 'SENT'
-
-  Scenario: A respondent sends a message to  an internal group .An internal user creates a draft on the thread ,
-            a second internal user gets the thread. Validate that the second user can see the draft from the other internal user.
-     Given sending from respondent to internal group
-        And the message is sent V2
-        And the thread id is set to the last returned thread id
-        And sending from internal specific user to respondent
-        And the message is saved as draft V2
-        And the user is set to alternative internal specific user
-      When the threads are read
-      Then a success status code 200 is returned
-       And '1' messages are returned
-       And all response messages have the label 'DRAFT'
 
   Scenario: An internal user sends messages regarding multiple different surveys, validate that when the get the threads list
             filtered by both surveys then all messages are returned

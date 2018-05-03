@@ -1,6 +1,6 @@
 import logging
 
-from flask import request, jsonify, g, Response, current_app, make_response
+from flask import request, jsonify, g, current_app, make_response
 from flask_restful import Resource
 from structlog import wrap_logger
 from werkzeug.exceptions import BadRequest
@@ -12,7 +12,6 @@ from secure_message.common.labels import Labels
 from secure_message.repository.modifier import Modifier
 from secure_message.repository.retriever import Retriever
 from secure_message.repository.saver import Saver
-from secure_message.resources.drafts import DraftModifyById
 from secure_message.services.service_toggles import party, case_service, internal_user_service
 from secure_message.validation.domain import MessageSchema
 
@@ -33,32 +32,14 @@ class MessageSend(Resource):
             logger.info('Request must set accept content type "application/json" in header.')
         post_data = request.get_json(force=True)
 
-        is_draft = False
-        draft_id = None
         if 'msg_id' in post_data:
-            returned_draft = Retriever().get_draft(post_data['msg_id'], g.user)
-            if returned_draft:
-                is_draft = True
-                draft_id = post_data['msg_id']
-                post_data['msg_id'] = ''
-
-                if post_data['thread_id'] == draft_id:
-                    post_data['thread_id'] = ''
-
-            else:
-                raise BadRequest(description="Message can not include msg_id")
-
-            last_modified = DraftModifyById.etag_check(request.headers, returned_draft)
-            if last_modified is False:
-                return Response(response="Draft has been modified since last check", status=409, mimetype="text/html")
+            raise BadRequest(description="Message can not include msg_id")
 
         post_data['from_internal'] = g.user.is_internal
         message = self._validate_post_data(post_data)
 
         if message.errors == {}:
             self._message_save(message)
-            if is_draft:
-                Modifier().del_draft(draft_id)
             # listener errors are logged but still a 201 reported
             MessageSend._alert_listeners(message.data)
             return make_response(jsonify({'status': '201', 'msg_id': message.data.msg_id, 'thread_id': message.data.thread_id}), 201)

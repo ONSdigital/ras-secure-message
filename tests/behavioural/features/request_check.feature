@@ -51,7 +51,6 @@ Feature: Checking all request pass authorisation
 
     Examples: endpoint wrong methods
     |       endpoint        |   wrong method    |
-    |       /draft/save     |       PUT         |
     |       /health         |       POST        |
     |       /health         |       PUT         |
     |       /health/db      |       POST        |

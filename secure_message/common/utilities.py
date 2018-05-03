@@ -1,11 +1,9 @@
 import collections
-import hashlib
 import logging
 import urllib.parse
 
 from structlog import wrap_logger
 
-from secure_message.common.labels import Labels
 from secure_message.constants import MESSAGE_BY_ID_ENDPOINT, MESSAGE_LIST_ENDPOINT, MESSAGE_QUERY_LIMIT
 from secure_message.services.service_toggles import party, internal_user_service
 
@@ -13,7 +11,7 @@ logger = wrap_logger(logging.getLogger(__name__))
 MessageArgs = collections.namedtuple('MessageArgs', 'page limit ru_id surveys cc label desc ce')
 
 
-def get_options(args, draft_only=False):
+def get_options(args):
     """extract options from request , allow label to be set by caller"""
 
     fields = {'page': 1, 'limit': MESSAGE_QUERY_LIMIT, 'ru_id': None, 'surveys': None,
@@ -31,8 +29,6 @@ def get_options(args, draft_only=False):
 
     if args.get('desc') and args.get('desc') == 'false':
         fields['desc'] = False
-    if draft_only:
-        fields['label'] = Labels.DRAFT.value
 
     return MessageArgs(page=fields['page'], limit=fields['limit'], ru_id=fields['ru_id'],
                        surveys=fields['surveys'], cc=fields['cc'], label=fields['label'],
@@ -72,23 +68,6 @@ def process_paginated_list(paginated_list, host_url, user, message_args, endpoin
             "href": f"{host_url}{endpoint}?{string_query_args}&page={message_args.page - 1}"}
 
     return messages, links
-
-
-def generate_etag(msg_to, msg_id, subject, body):
-    """Function used to create an ETag"""
-    if msg_to is None:
-        msg_to = []
-
-    msg_to_str = ' '.join(str(uuid) for uuid in msg_to)
-
-    data_to_hash = {'msg_to': msg_to_str,
-                    'msg_id': msg_id,
-                    'subject': subject,
-                    'body': body}
-
-    hash_object = hashlib.sha1(str(sorted(data_to_hash.items())).encode())
-
-    return hash_object.hexdigest()
 
 
 def get_business_details_by_ru(rus):

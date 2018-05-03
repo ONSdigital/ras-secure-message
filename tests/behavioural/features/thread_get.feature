@@ -3,7 +3,7 @@ Feature: Get thread by id Endpoint
   Background: Reset database
     Given prepare for tests using 'mock' services
 
-    # 3 messages in first conversation , 2 in second
+  # 3 messages in first conversation , 2 in second
   Scenario: Respondent and internal user have two conversations respondent retrieves one conversation, validate respondent sees correct messages
     Given sending from respondent to internal specific user
       And   the message is sent
