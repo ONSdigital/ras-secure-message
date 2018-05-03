@@ -1,17 +1,12 @@
 [[source]]
-
 name = "pypi"
 verify_ssl = true
 url = "https://pypi.python.org/simple"
 
-
 [requires]
-
 python_version = "3.6"
 
-
 [packages]
-
 Flask = "==0.12"
 Flask-RESTful = "==0.3.5"
 Flask-SQLAlchemy = "==2.1"
@@ -27,10 +22,9 @@ requests = "*"
 retrying = "*"
 maya = "*"
 PyJWT = "*"
-
+locustio = "*"
 
 [dev-packages]
-
 pylint = "*"
 "flake8" = "*"
 behave = "*"
