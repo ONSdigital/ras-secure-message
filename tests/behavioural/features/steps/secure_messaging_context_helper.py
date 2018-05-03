@@ -5,7 +5,6 @@ from flask import current_app, json
 from secure_message.authentication.jwe import Encrypter
 from secure_message.authentication.jwt import encode
 from secure_message import constants
-from secure_message.common import utilities
 
 
 class SecureMessagingContextHelper:
@@ -78,11 +77,6 @@ class SecureMessagingContextHelper:
         self._message_put_url = SecureMessagingContextHelper.__BASE_URL + "/message/{}/modify"
         self._messages_get_url = SecureMessagingContextHelper.__BASE_URL + "/messages"
 
-        self._draft_post_url = SecureMessagingContextHelper.__BASE_URL + "/draft/save"
-        self._draft_put_url = SecureMessagingContextHelper.__BASE_URL + "/draft/{0}/modify"
-        self._draft_get_url = SecureMessagingContextHelper.__BASE_URL + "/draft/{0}"
-        self._drafts_get_url = SecureMessagingContextHelper.__BASE_URL + "/drafts"
-
         self._thread_get_url = SecureMessagingContextHelper.__BASE_URL + "/thread/{0}"
         self._threads_get_url = SecureMessagingContextHelper.__BASE_URL + "/threads"
 
@@ -97,11 +91,6 @@ class SecureMessagingContextHelper:
         self._messages_get_url_v2 = SecureMessagingContextHelper.__BASE_URL + "/v2/messages"
         self._message_get_unread_count_url_v2 = SecureMessagingContextHelper.__BASE_URL + "/v2/messages/count"
         self._message_put_url_v2 = SecureMessagingContextHelper.__BASE_URL + "/v2/messages/modify/{}"
-
-        self._draft_post_url_v2 = SecureMessagingContextHelper.__BASE_URL + "/v2/drafts"
-        self._draft_put_url_v2 = SecureMessagingContextHelper.__BASE_URL + "/v2/drafts/{0}"
-        self._draft_get_url_v2 = SecureMessagingContextHelper.__BASE_URL + "/v2/drafts/{0}"
-        self._drafts_get_url_v2 = SecureMessagingContextHelper.__BASE_URL + "/v2/drafts"
 
         self._thread_get_url_v2 = SecureMessagingContextHelper.__BASE_URL + "/v2/threads/{0}"
 
@@ -189,22 +178,6 @@ class SecureMessagingContextHelper:
         return self._message_put_url
 
     @property
-    def draft_post_url(self):
-        return self._draft_post_url
-
-    @property
-    def draft_put_url(self):
-        return self._draft_put_url
-
-    @property
-    def draft_get_url(self):
-        return self._draft_get_url
-
-    @property
-    def drafts_get_url(self):
-        return self._drafts_get_url
-
-    @property
     def thread_get_url(self):
         return self._thread_get_url
 
@@ -231,22 +204,6 @@ class SecureMessagingContextHelper:
     @property
     def message_put_v2_url(self):
         return self._message_put_url_v2
-
-    @property
-    def draft_post_v2_url(self):
-        return self._draft_post_url_v2
-
-    @property
-    def draft_put_v2_url(self):
-        return self._draft_put_url_v2
-
-    @property
-    def draft_get_v2_url(self):
-        return self._draft_get_url_v2
-
-    @property
-    def drafts_get_v2_url(self):
-        return self._drafts_get_url_v2
 
     @property
     def thread_get_v2_url(self):
@@ -301,7 +258,7 @@ class SecureMessagingContextHelper:
         return self._single_message_responses_data
 
     def store_last_single_message_response_data(self, response):
-        """stores the response from a request regarding a single mesage or draft"""
+        """stores the response from a request regarding a single mesage"""
         response_data = json.loads(response.data)
         self._single_message_responses_data.append(response_data)
 
@@ -317,14 +274,6 @@ class SecureMessagingContextHelper:
     def set_message_data_to_a_prior_version(self, message_index):
         """extracts the data from a previoulsy sent request"""
         self._message_data = copy.deepcopy(self.sent_messages[message_index])
-
-    def get_etag(self, message_data):
-        """generates an etag based on current message data"""
-        if 'msg_to' in self._message_data:
-            return utilities.generate_etag(message_data['msg_to'],
-                                           message_data['msg_id'],
-                                           message_data['subject'],
-                                           message_data['body'])
 
     @property
     def health_endpoint(self):

@@ -67,7 +67,7 @@ class SaverTestCase(unittest.TestCase):
 
     def test_saved_msg_event_has_been_saved(self):
         """retrieves message event from database"""
-        message_event = {'msg_id': 'AMsgId', 'event': EventsApi.DRAFT_SAVED.value, 'date_time': ''}
+        message_event = {'msg_id': 'AMsgId', 'event': EventsApi.SENT.value, 'date_time': ''}
         with self.app.app_context():
             with current_app.test_request_context():
                 Saver().save_message(SecureMessage(msg_id='AMsgId'))
@@ -86,7 +86,7 @@ class SaverTestCase(unittest.TestCase):
         mock_session = mock.Mock(db.session)
         mock_session.commit.side_effect = SQLAlchemyError("Not Saved")
 
-        message_event = {'msg_id': 'AMsgId', 'event': EventsApi.DRAFT_SAVED.value, 'date_time': ''}
+        message_event = {'msg_id': 'AMsgId', 'event': EventsApi.SENT.value, 'date_time': ''}
         with self.app.app_context():
             with current_app.test_request_context():
                 with self.assertRaises(MessageSaveException):
@@ -102,7 +102,7 @@ class SaverTestCase(unittest.TestCase):
 
     def test_event_commit_exception_raises_MessageSaveException(self):
         """check event commit exception clears the session"""
-        message_event = {'msg_id': 'AMsgId', 'event': EventsApi.DRAFT_SAVED.value, 'date_time': ''}
+        message_event = {'msg_id': 'AMsgId', 'event': EventsApi.SENT.value, 'date_time': ''}
         with self.app.app_context():
             with current_app.test_request_context():
                 with self.assertRaises(MessageSaveException):

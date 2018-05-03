@@ -91,9 +91,9 @@ class SecureMessage(db.Model):
         """populate the labels and to and from if the user is internal"""
         try:
             if message['from_internal']:
-                respondent = [x.actor for x in self.statuses if x.label == Labels.INBOX.value or x.label == Labels.DRAFT_INBOX.value][0]
+                respondent = [x.actor for x in self.statuses if x.label == Labels.INBOX.value][0]
             else:
-                respondent = [x.actor for x in self.statuses if x.label == Labels.SENT.value or x.label == Labels.DRAFT.value][0]
+                respondent = [x.actor for x in self.statuses if x.label == Labels.SENT.value][0]
         except IndexError:
             logger.error("Could not determine respondent from message", msg_id=message["msg_id"])
             raise
@@ -112,17 +112,15 @@ class SecureMessage(db.Model):
     @staticmethod
     def _add_to_and_from(message, row):
         """Populate the message to and from"""
-        if row.label in [Labels.INBOX.value, Labels.DRAFT_INBOX.value]:
+        if row.label == Labels.INBOX.value:
             message['msg_to'].append(row.actor)
-        elif row.label in [Labels.SENT.value, Labels.DRAFT.value]:
+        elif row.label == Labels.SENT.value:
             message['msg_from'] = row.actor
 
     def _populate_events(self, message):
         for row in self.events:
             if row.event == EventsApi.SENT.value:
                 message['sent_date'] = str(row.date_time)
-            elif row.event == EventsApi.DRAFT_SAVED.value:
-                message['modified_date'] = str(row.date_time)
             elif row.event == EventsApi.READ.value:
                 message['read_date'] = str(row.date_time)
 

@@ -6,7 +6,7 @@ from werkzeug.exceptions import InternalServerError
 
 from secure_message.common.eventsapi import EventsApi
 from secure_message.common.labels import Labels
-from secure_message.repository.database import db, Status, SecureMessage
+from secure_message.repository.database import db, Status
 from secure_message.repository.saver import Saver
 
 logger = wrap_logger(logging.getLogger(__name__))
@@ -84,55 +84,3 @@ class Modifier:
             Saver().save_msg_event(message['msg_id'], EventsApi.READ.value)
         Modifier.remove_label(unread, message, user)
         return True
-
-    @staticmethod
-    def del_draft(draft_id):
-        """Remove draft from status table and secure message table"""
-        del_draft_status = f"DELETE FROM securemessage.status WHERE msg_id='{draft_id}' AND label='{Labels.DRAFT.value}'"
-        del_draft_event = f"DELETE FROM securemessage.events WHERE msg_id='{draft_id}'"
-        del_draft_inbox_status = f"DELETE FROM securemessage.status WHERE msg_id='{draft_id}' AND label='{Labels.DRAFT_INBOX.value}'"
-        del_draft_msg = f"DELETE FROM securemessage.secure_message WHERE msg_id='{draft_id}'"
-
-        try:
-            db.get_engine(app=db.get_app()).execute(del_draft_status)
-            db.get_engine(app=db.get_app()).execute(del_draft_inbox_status)
-            db.get_engine(app=db.get_app()).execute(del_draft_event)
-            db.get_engine(app=db.get_app()).execute(del_draft_msg)
-
-        except Exception as e:
-            logger.exception('Error deleting draft from database', msg_id=draft_id, error=e)
-            raise InternalServerError(description="Error deleting draft from database")
-
-    @staticmethod
-    def replace_current_draft(draft_id, draft, session=db.session):
-        """used to replace draft content in message table"""
-
-        try:
-            session.query(SecureMessage).filter_by(msg_id=draft_id).update({"subject": draft.subject,
-                                                                            "body": draft.body})
-            session.commit()
-        except Exception as e:
-            session.rollback()
-            logger.error('Error replacing message', msg_id=draft_id, error=e)
-            raise InternalServerError(description="Error replacing message")
-
-        Saver().save_msg_event(draft_id, EventsApi.DRAFT_SAVED.value)
-
-        if draft.msg_to is not None and draft.msg_to:
-            Modifier.replace_current_recipient_status(draft_id, draft.msg_to)
-
-    @staticmethod
-    def replace_current_recipient_status(draft_id, draft_to, session=db.session):
-        """used to replace the draft INBOX_DRAFT label"""
-        del_current_status = f"DELETE FROM securemessage.status WHERE msg_id='{draft_id}' AND label='{Labels.DRAFT_INBOX.value}'"
-        # NOQA TODO: Only handling first item in list.
-        new_status = Status(msg_id=draft_id, actor=draft_to[0], label=Labels.DRAFT_INBOX.value)
-
-        try:
-            db.get_engine(app=db.get_app()).execute(del_current_status)
-            session.add(new_status)
-            session.commit()
-        except Exception as e:
-            session.rollback()
-            logger.error('Error replacing label in database', label=Labels.DRAFT_INBOX.value, msg_id=draft_id, error=e)
-            raise InternalServerError(description="Error replacing DRAFT_INBOX label")
