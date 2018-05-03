@@ -1,7 +1,6 @@
 import unittest
 
-from flask import current_app, json
-from sqlalchemy import create_engine
+from flask import current_app
 
 from secure_message import constants
 from secure_message.application import create_app
@@ -10,7 +9,6 @@ from secure_message.authentication.jwe import Encrypter
 from secure_message.authentication.jwt import encode
 from secure_message.api_mocks.party_service_mock import PartyServiceMock
 from secure_message.services.service_toggles import internal_user_service, case_service, party
-from tests.app import test_utilities
 
 
 def _generate_encrypted_token():

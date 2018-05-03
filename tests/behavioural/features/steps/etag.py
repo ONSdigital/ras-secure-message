@@ -1,5 +1,4 @@
-import nose.tools
-from behave import given, then, when
+from behave import given, when
 
 
 @given("an etag is requested with an empty value")
