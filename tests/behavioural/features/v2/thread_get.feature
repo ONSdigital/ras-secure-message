@@ -7,11 +7,9 @@ Feature: Get thread by id Endpoint V2
     Given sending from respondent to internal <user>
       And   the message is sent V2
       And   sending from internal <user> to respondent
-      And   the message is read V2
       And   the thread id is set to the last returned thread id
       And   the message is sent V2
       And   sending from respondent to internal <user>
-      And   the message is read V2
       And   the thread id is set to the last returned thread id
       And   the message is sent V2
     When the thread is read
@@ -28,11 +26,9 @@ Feature: Get thread by id Endpoint V2
     Given sending from internal <user> to respondent
       And   the message is sent V2
       And sending from respondent to internal <user>
-      And   the message is read V2
       And   the thread id is set to the last returned thread id
       And   the message is sent V2
       And   sending from internal <user> to respondent
-      And   the message is read V2
       And   the thread id is set to the last returned thread id
       And   the message is sent V2
       And   the user is set as respondent

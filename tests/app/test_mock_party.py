@@ -34,45 +34,6 @@ class PartyTestCase(unittest.TestCase):
         case_service.use_mock_service()
         party.use_mock_service()
 
-    def test_message_by_id_replaces_uuids(self):
-        """Test get message by id endpoint replaces to and from with user details"""
-        data = {'msg_to': [constants.NON_SPECIFIC_INTERNAL_USER],
-                'msg_from': '0a7ad740-10d5-4ecb-b7ca-3c0384afb882',
-                'subject': 'MyMessage',
-                'body': 'hello',
-                'thread': "?",
-                'ru_id': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc',
-                'survey': test_utilities.BRES_SURVEY}
-
-        with self.app.app_context():
-            encrypted_token = _generate_encrypted_token()
-
-        self.headers = {'Content-Type': 'application/json', 'Authorization': encrypted_token}
-
-        self.engine = create_engine(self.app.config['SQLALCHEMY_DATABASE_URI'])
-
-        resp = self.client.post("http://localhost:5050/message/send", data=json.dumps(data), headers=self.headers)
-        resp_data = json.loads(resp.data)
-        msg_id = resp_data['msg_id']
-
-        message_resp = self.client.get(f'http://localhost:5050/message/{msg_id}', headers=self.headers)
-        message = json.loads(message_resp.data)
-
-        self.assertEqual(message['@msg_from'], {'telephone': '+443069990289',
-                                                'firstName': 'Vana',
-                                                'emailAddress': 'vana123@aol.com',
-                                                'id': '0a7ad740-10d5-4ecb-b7ca-3c0384afb882',
-                                                'status': 'ACTIVE',
-                                                'lastName': 'Oorschot',
-                                                'sampleUnitType': 'BI'
-                                                })
-
-        self.assertEqual(message['@msg_to'], [{"id": "GROUP",
-                                               "firstName": "ONS",
-                                               "lastName": "User",
-                                               "emailAddress": ""
-                                               }])
-
     def test_draft_get_return_user_details_for_to_and_from(self):
         """Test get draft replaces sender and recipient with user details"""
         data = {'msg_to': [constants.NON_SPECIFIC_INTERNAL_USER],
@@ -167,33 +128,6 @@ class PartyTestCase(unittest.TestCase):
         self.assertEqual(business_details[1]['id'], list_ru[1])
         self.assertEqual(business_details[2]['id'], list_ru[2])
         self.assertEqual(business_details[3]['id'], list_ru[3])
-
-    def test_get_message_returns_business_details(self):
-        """Test get message by id returns business details"""
-
-        data = {'msg_to': [constants.NON_SPECIFIC_INTERNAL_USER],
-                'msg_from': '0a7ad740-10d5-4ecb-b7ca-3c0384afb882',
-                'subject': 'MyMessage',
-                'body': 'hello',
-                'thread': "?",
-                'ru_id': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc',
-                'survey': test_utilities.BRES_SURVEY}
-
-        with self.app.app_context():
-            encrypted_token = _generate_encrypted_token()
-
-        self.headers = {'Content-Type': 'application/json', 'Authorization': encrypted_token}
-
-        self.engine = create_engine(self.app.config['SQLALCHEMY_DATABASE_URI'])
-
-        message_post = self.client.post("http://localhost:5050/message/send", data=json.dumps(data), headers=self.headers)
-        message_data = json.loads(message_post.data)
-        msg_id = message_data['msg_id']
-
-        message_get = self.client.get(f"http://localhost:5050/message/{msg_id}", headers=self.headers)
-        message = json.loads(message_get.data)
-
-        self.assertEqual(message['@ru_id']['name'], "Apple")
 
     def test_get_draft_returns_business_details(self):
         """Test get draft returns business details"""

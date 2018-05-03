@@ -6,11 +6,9 @@ from structlog import wrap_logger
 from werkzeug.exceptions import BadRequest
 
 from secure_message import constants
-from secure_message.authorization.authorizer import Authorizer
 from secure_message.common.alerts import AlertUser, AlertViaGovNotify, AlertViaLogging
 from secure_message.common.eventsapi import EventsApi
 from secure_message.common.labels import Labels
-from secure_message.common.utilities import add_users_and_business_details
 from secure_message.repository.modifier import Modifier
 from secure_message.repository.retriever import Retriever
 from secure_message.repository.saver import Saver
@@ -133,26 +131,6 @@ class MessageSend(Resource):
                 user_name = full_name
 
         return user_name
-
-
-class MessageById(Resource):
-    """Get and update message by id"""
-
-    @staticmethod
-    def get(message_id):
-        """Get message by id"""
-        logger.info("Getting individual message", user_uuid=g.user.user_uuid)
-        # check user is authorised to view message
-        message_service = Retriever()
-        message = message_service.retrieve_message(message_id, g.user)
-
-        message = add_users_and_business_details([message])[0]
-        if Authorizer().can_user_view_message(g.user, message):
-            return jsonify(message)
-        result = jsonify({'status': 'error'})
-        result.status_code = 403
-        logger.error('Error getting message by ID', msg_id=message_id, status_code=result.status_code)
-        return result
 
 
 class MessageModifyById(Resource):

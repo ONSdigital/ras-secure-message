@@ -175,13 +175,11 @@ Feature: Draft Save Endpoint
   Scenario: Respondent saves a draft  when it is retrieved it should have a thread id equal to the msg id
     Given sending from respondent to internal specific user
     When the message is saved as draft
-      And the message is read
     Then retrieved message thread id is equal to message id
 
   Scenario: Internal user saves a draft  when it is retrieved it should have a thread id equal to the msg id
     Given sending from internal specific user to respondent
     When the message is saved as draft
-      And the message is read
     Then retrieved message thread id is equal to message id
 
   Scenario: Respondent saves a draft verify a msg_id is returned
@@ -225,7 +223,6 @@ Feature: Draft Save Endpoint
     Given sending from respondent to internal specific user
       And  an etag is requested with an empty value
       And  the message is saved as draft
-      And  the message is read
       And  an etag is requested with a value of 'INVALIDETAG'
     When   the previously returned draft is modified
     Then   a conflict error status code (409) is returned
@@ -314,7 +311,6 @@ Feature: Draft Save Endpoint
     Given sending from internal specific user to respondent
       And  the message is sent
       And  the user is set as respondent
-      And  the message is read
       And  the from is set to respondent
       And  the to is set to internal specific user
       And  the body is set to '--New body--'
@@ -327,7 +323,6 @@ Feature: Draft Save Endpoint
     Given sending from internal specific user to respondent
       And  the message is sent
       And  the user is set as internal
-      And  the message is read
       And  the from is set to internal specific user
       And  the to is set to respondent
       And  the body is set to '--New body--'
@@ -343,7 +338,6 @@ Feature: Draft Save Endpoint
     Given sending from internal specific user to respondent
       And  the message is sent
       And  the user is set as respondent
-      And  the message is read
       And  the from is set to respondent
       And  the to is set to internal specific user
       And  the body is set to '--New body--'
