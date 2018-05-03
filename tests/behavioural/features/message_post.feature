@@ -128,13 +128,13 @@ Feature: Message Send Endpoint
     Then a bad request status code (400) is returned
 
 
-  Scenario: Respondent sends a message with a msg_id but is not a draft
+  Scenario: Respondent sends a message with a msg_id
     Given sending from respondent to internal bres user
       And  the msg_id is set to '12345678'
     When the message is sent
     Then a bad request status code (400) is returned
 
-  Scenario: Internal user sends a message with a msg_id but is not a draft
+  Scenario: Internal user sends a message with a msg_id
     Given sending from internal bres user to respondent
       And  the msg_id is set to '12345678'
     When the message is sent
@@ -167,4 +167,3 @@ Feature: Message Send Endpoint
       And  the to is set to 'someone_who_does_not_exist'
     When the message is sent
     Then a bad request status code (400) is returned
-

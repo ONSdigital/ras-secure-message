@@ -20,42 +20,12 @@ def step_impl_the_message_is_sent(context):
     context.bdd_helper.store_last_single_message_response_data(context.response)
 
 
-@given("the draft is sent as a message")
-@when("the draft is sent as a message")
-def step_impl_the_draft_is_sent_as_message(context):
-    """sends a message that was a draft as a message """
-    context.bdd_helper.message_data['msg_id'] = context.msg_id
-    step_impl_the_message_is_sent(context)
-    context.bdd_helper.message_data['msg_id'] = ""
-
-
 @given("'{message_count}' messages are sent")
 @when("'{message_count}' messages are sent")
 def step_impl_the_n_messages_are_sent(context, message_count):
     """sends a defined number of messages"""
     for i in range(0, int(message_count)):
         step_impl_the_message_is_sent(context)
-
-
-@given("the message is saved as draft")
-@when("the message is saved as draft")
-def step_impl_the_message_is_saved_as_draft(context):
-    """saves the current message data as a draft via  draft post """
-    context.bdd_helper.sent_messages.extend([copy.deepcopy(context.bdd_helper.message_data)])
-    context.response = context.client.post(context.bdd_helper.draft_post_url,
-                                           data=json.dumps(context.bdd_helper.message_data),
-                                           headers=context.bdd_helper.headers)
-    returned_data = json.loads(context.response.data)
-    _try_persist_msg_and_thread_id_to_context(context, returned_data)
-    context.bdd_helper.store_last_single_message_response_data(context.response)
-
-
-@given("'{draft_count}' drafts are sent")
-@when("'{draft_count}' drafts are sent")
-def step_impl_the_n_drafts_are_sent(context, draft_count):
-    """saves a specific number of drafts """
-    for i in range(0, int(draft_count)):
-        step_impl_the_message_is_saved_as_draft(context)
 
 
 @given("the message is read")
@@ -93,45 +63,6 @@ def step_impl_the_specific_message_id_is_retrieved_on_specific_msg_id(context, m
 
     context.response = context.client.put(url, data=json.dumps(context.bdd_helper.message_data),
                                           headers=context.bdd_helper.headers)
-    context.bdd_helper.store_last_single_message_response_data(context.response)
-
-
-@given("the previously returned draft is modified")
-@when("the previously returned draft is modified")
-def step_impl_update_draft_message(context):
-    """modify a previosly saved draft"""
-    _update_draft_message_with_specific_data_msg_id(context, context.msg_id)
-
-
-@given("the previously returned draft is modified where data message id does not match url")
-@when("the previously returned draft is modified where data message id does not match url")
-def step_impl_update_draft_message_msg_ids_mismatched(context):
-    """update a draft using data in the message body that does not match the url"""
-    _update_draft_message_with_specific_data_msg_id(context, '12345')
-
-
-def _update_draft_message_with_specific_data_msg_id(context, msg_id):
-    """helper function to update draft information on a specific message id"""
-    url = context.bdd_helper.draft_put_url.format(context.msg_id)
-    sent_data = context.bdd_helper.message_data
-    sent_data['msg_id'] = msg_id           # usually context.msg_id
-    context.bdd_helper.sent_messages.extend([sent_data])
-    context.response = context.client.put(url,
-                                          data=json.dumps(sent_data),
-                                          headers=context.bdd_helper.headers)
-    if context.response.status_code == 200:
-        context.bdd_helper.store_last_single_message_response_data(context.response)
-
-
-@given("the draft is read")
-@when("the draft is read")
-def step_impl_the_previously_saved_draft_is_retrieved(context):
-    """read a draft"""
-    url = context.bdd_helper.draft_get_url.format(context.msg_id)
-    context.response = context.client.get(url, headers=context.bdd_helper.headers)
-
-    returned_data = json.loads(context.response.data)
-    _try_persist_msg_and_thread_id_to_context(context, returned_data)
     context.bdd_helper.store_last_single_message_response_data(context.response)
 
 
@@ -179,48 +110,6 @@ def _step_impl_get_messages_with_filter(context, url):
     """helper function to get messages"""
     context.response = context.client.get(url, headers=context.bdd_helper.headers)
     context.bdd_helper.store_messages_response_data(context.response.data)
-
-
-@given("drafts are read")
-@when("drafts are read")
-def step_impl_drafts_are_read(context):
-    """read draft messages"""
-    url = context.bdd_helper.drafts_get_url
-    _step_impl_drafts_are_read(context, url)
-
-
-def _step_impl_drafts_are_read(context, url):
-    """ common function to read drafts"""
-    context.response = context.client.get(url, headers=context.bdd_helper.headers)
-    response_data = context.response.data
-    context.bdd_helper.store_messages_response_data(response_data)
-
-
-@given("drafts are read using current '{param_name}'")
-@when("drafts are read using current '{param_name}'")
-def step_impl_drafts_are_read_with_filter_of_current_param_value(context, param_name):
-    """read drafts, limiting them to messages that have a parameter with the same value as that in message data"""
-    param_value = context.bdd_helper.message_data[param_name]
-    param_name = 'cc' if param_name == 'collection_case' else param_name
-    param_name = 'ce' if param_name == 'collection_exercise' else param_name
-    param = f"?{param_name}={param_value}"
-    url = context.bdd_helper.messages_get_url + param
-    _step_impl_get_drafts_with_filter(context, url)
-
-
-def _step_impl_get_drafts_with_filter(context, url):
-    """common function to get grafts"""
-    context.response = context.client.get(url, headers=context.bdd_helper.headers)
-    context.bdd_helper.store_messages_response_data(context.response.data)
-
-
-@given("drafts with a label of  '{label_name}' are read")
-@when("drafts with a label of  '{label_name}' are read")
-def step_impl_drafts_are_read_with_filter_of_specific_label(context, label_name):
-    """reads drafts with a specified label"""
-    param = f"?label={label_name}"
-    url = context.bdd_helper.messages_get_url + param
-    _step_impl_get_drafts_with_filter(context, url)
 
 
 @given("the thread is read")
@@ -309,14 +198,6 @@ def step_impl_the_threads_in_specific_collection_case_exercise_are_returned(cont
     url = context.bdd_helper.threads_get_url + f"?ce={ce}"
     context.response = context.client.get(url, headers=context.bdd_helper.headers)
     context.bdd_helper.store_messages_response_data(context.response.data)
-
-
-@when("user accesses the /draft/save endpoint with using the PUT method")
-def step_impl_access_endpoint_with_wrong_method(context):
-    context.bdd_helper.sent_messages.extend([context.bdd_helper.message_data])
-    context.response = context.client.put(context.bdd_helper.draft_post_url,
-                                          data=json.dumps(context.bdd_helper.message_data),
-                                          headers=context.bdd_helper.headers)
 
 
 @when("user accesses the /health endpoint with using the POST method")
@@ -490,31 +371,6 @@ def step_impl_the_unread_messages_are_counted(context, label_name):
     context.bdd_helper.label_count = label_count
 
 
-@given("the message is saved as draft V2")
-@when("the message is saved as draft V2")
-def step_impl_the_message_is_saved_as_draft_v2(context):
-    """saves the current message data as a draft via  draft post """
-    context.bdd_helper.sent_messages.extend([copy.deepcopy(context.bdd_helper.message_data)])
-    context.response = context.client.post(context.bdd_helper.draft_post_v2_url,
-                                           data=json.dumps(context.bdd_helper.message_data),
-                                           headers=context.bdd_helper.headers)
-    returned_data = json.loads(context.response.data)
-    _try_persist_msg_and_thread_id_to_context(context, returned_data)
-    context.bdd_helper.store_last_single_message_response_data(context.response)
-
-
-@given("the draft is read V2")
-@when("the draft is read V2")
-def step_impl_the_previously_saved_draft_is_retrieved_v2(context):
-    """read a draft"""
-    url = context.bdd_helper.draft_get_v2_url.format(context.msg_id)
-    context.response = context.client.get(url, headers=context.bdd_helper.headers)
-
-    returned_data = json.loads(context.response.data)
-    _try_persist_msg_and_thread_id_to_context(context, returned_data)
-    context.bdd_helper.store_last_single_message_response_data(context.response)
-
-
 @when("the message labels are modified V2")
 @given("the message labels are modified V2")
 def step_impl_the_message_labels_are_modified_v2(context):
@@ -531,28 +387,3 @@ def step_impl_the_specific_message_id_is_retrieved_on_specific_msg_id_v2(context
     context.response = context.client.put(url, data=json.dumps(context.bdd_helper.message_data),
                                           headers=context.bdd_helper.headers)
     context.bdd_helper.store_last_single_message_response_data(context.response)
-
-
-@given("'{draft_count}' drafts are sent V2")
-@when("'{draft_count}' drafts are sent V2")
-def step_impl_the_n_drafts_are_sent_vw(context, draft_count):
-    """saves a specific number of drafts """
-    for i in range(0, int(draft_count)):
-        step_impl_the_message_is_saved_as_draft(context)
-
-
-@given("drafts are read V2")
-@when("drafts are read V2")
-def step_impl_drafts_are_read_v2(context):
-    """read draft messages"""
-    url = context.bdd_helper.drafts_get_v2_url
-    _step_impl_drafts_are_read(context, url)
-
-
-@given("the draft is sent as a message V2")
-@when("the draft is sent as a message V2")
-def step_impl_the_draft_is_sent_as_message_v2(context):
-    """sends a message that was a draft as a message """
-    context.bdd_helper.message_data['msg_id'] = context.msg_id
-    step_impl_the_message_is_sent_v2(context)
-    context.bdd_helper.message_data['msg_id'] = ""

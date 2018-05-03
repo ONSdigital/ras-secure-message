@@ -2,14 +2,6 @@ import nose.tools
 from behave import given, then, when
 
 
-@then("the response should include a valid etag")
-def step_impl_etag_should_be_sent_with_draft(context):
-    """validate that an etag of the correct length is in the response"""
-    etag = context.response.headers.get('ETag')
-    nose.tools.assert_is_not_none(etag)
-    nose.tools.assert_equal(len(etag), 40)
-
-
 @given("an etag is requested with an empty value")
 @when("an etag is requested with an empty value")
 def step_impl_etag_is_requested_with_empty_value(context):

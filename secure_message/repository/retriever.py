@@ -120,7 +120,6 @@ class Retriever:
             t = db.session.query(SecureMessage.thread_id, func.max(SecureMessage.id)  # pylint:disable=no-member
                                  .label('max_id')) \
                 .join(Events).join(Status) \
-                .filter(Status.label != "DRAFT_INBOX") \
                 .filter(or_(*actor_conditions)) \
                 .filter(Events.event == EventsApi.SENT.value) \
                 .group_by(SecureMessage.thread_id).subquery('t')
