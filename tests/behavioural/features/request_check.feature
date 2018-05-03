@@ -4,20 +4,6 @@ Feature: Checking all request pass authorisation
   Background: Reset database
     Given prepare for tests using 'mock' services
 
-  Scenario: A Respondent requests a message without a user being defined
-    Given sending from respondent to internal bres user
-      And  the message is sent
-    When  the user token is set to respondent with no user id
-      And the message is read
-    Then a bad request status code (400) is returned
-
-  Scenario: An internal user requests a message without a user being defined
-    Given sending from internal bres user to respondent
-      And  the message is sent
-    When  the user token is set to internal with no user id
-      And the message is read
-    Then a bad request status code (400) is returned
-
   Scenario: A Respondent posts a message without a user being defined
     Given sending from respondent to internal bres user
        And  the user token is set to respondent with no user id
@@ -42,20 +28,6 @@ Feature: Checking all request pass authorisation
       And the user token is set to internal with no user id
       And the message is sent
     When the message labels are modified
-    Then a bad request status code (400) is returned
-
-  Scenario: A respondent requests a message without a role being defined
-    Given sending from respondent to internal bres user
-      And the message is sent
-    When the user token is set to a respondent with no role associated
-      And the message is read
-    Then a bad request status code (400) is returned
-
-  Scenario: An internal user requests a message without a role being defined
-    Given sending from internal bres user to respondent
-      And the message is sent
-    When the user token is set to a internal user with no role associated
-      And the message is read
     Then a bad request status code (400) is returned
 
   Scenario: A Respondent modifies a message without a role being defined
@@ -85,8 +57,6 @@ Feature: Checking all request pass authorisation
     |       /health/db      |       PUT         |
     |    /health/details    |       PUT         |
     |    /health/details    |       POST        |
-    |       /message/id     |       POST        |
-    |       /message/id     |       PUT         |
     |   /message/id/modify  |       GET         |
     |   /message/id/modify  |       POST        |
     |     /message/send     |       PUT         |
