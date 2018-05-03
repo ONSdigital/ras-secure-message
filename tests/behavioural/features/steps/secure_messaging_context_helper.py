@@ -5,7 +5,6 @@ from flask import current_app, json
 from secure_message.authentication.jwe import Encrypter
 from secure_message.authentication.jwt import encode
 from secure_message import constants
-from secure_message.common import utilities
 
 
 class SecureMessagingContextHelper:
@@ -275,14 +274,6 @@ class SecureMessagingContextHelper:
     def set_message_data_to_a_prior_version(self, message_index):
         """extracts the data from a previoulsy sent request"""
         self._message_data = copy.deepcopy(self.sent_messages[message_index])
-
-    def get_etag(self, message_data):
-        """generates an etag based on current message data"""
-        if 'msg_to' in self._message_data:
-            return utilities.generate_etag(message_data['msg_to'],
-                                           message_data['msg_id'],
-                                           message_data['subject'],
-                                           message_data['body'])
 
     @property
     def health_endpoint(self):

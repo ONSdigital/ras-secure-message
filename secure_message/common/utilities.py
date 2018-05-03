@@ -1,5 +1,4 @@
 import collections
-import hashlib
 import logging
 import urllib.parse
 
@@ -69,23 +68,6 @@ def process_paginated_list(paginated_list, host_url, user, message_args, endpoin
             "href": f"{host_url}{endpoint}?{string_query_args}&page={message_args.page - 1}"}
 
     return messages, links
-
-
-def generate_etag(msg_to, msg_id, subject, body):
-    """Function used to create an ETag"""
-    if msg_to is None:
-        msg_to = []
-
-    msg_to_str = ' '.join(str(uuid) for uuid in msg_to)
-
-    data_to_hash = {'msg_to': msg_to_str,
-                    'msg_id': msg_id,
-                    'subject': subject,
-                    'body': body}
-
-    hash_object = hashlib.sha1(str(sorted(data_to_hash.items())).encode())
-
-    return hash_object.hexdigest()
 
 
 def get_business_details_by_ru(rus):

@@ -43,13 +43,13 @@ The api endpoints fall into 4 groups:
 
 See the endpoint descriptions for detailed usage of each field. This is an overview.
 
-* Message id . (msg_id) This is an id assigned to a message or draft when it is created . It is a uuid. Some endpoints expect a message id whilst others will error if a message id is presented.See each endpoint for details.
+* Message id . (msg_id) This is an id assigned to a message when it is created . It is a uuid. Some endpoints expect a message id whilst others will error if a message id is presented.See each endpoint for details.
 * Thread id . (thread_id) This is a unique identifier for a conversation. If a thread id is presented on message post then the api will assume that a message is part of an existing conversation.
 * From . (msg_from) This is the uuid of the actor that sent a message. If the actor is a respondent then it is their user uuid. If they are an internal user then it may be their user uuid ,  or it may be a constant 'BRES' for v1 messages.
 * To . (msg_to) These are the user uuids of the recipients of the message. Currently only one to user is supported. The message to can be as 'From' but with the addition that it can be the constant 'GROUP' to indicate that the message is being sent to a group handling the specific survey at the ons.
 * Subject . (subject) The subject of the message. Limited in the API to 100 characters , but since replies are prefixed with 'Re: ' then in practice it is 96 characters.
 * Body . (body) Up to 10000 characters.
-* Survey . (survey). This is the uuid of the survey . Mandatory when saving a message , optional for drafts.
+* Survey . (survey). This is the uuid of the survey . It is mandatory when saving a message.
 * Collection Case . (collection_case) uuid of the collection case. Can be used as a filter option (cc). Used to send to the case service to inform it that a newmessage has been sent on the case.
 * Collection Exercise .  (collection exercise) uuid of the collection exercise , can be used as a filter option (ce)
 * Reporting unit . (ru) uuid of the reporting unit . Can be used as a filter option.
@@ -57,8 +57,8 @@ See the endpoint descriptions for detailed usage of each field. This is an overv
     * SENT  Added to a mesage for the actor who sent the message
     * INBOX Added to the message for teh actor who received the message
     * UNREAD Added to a message to indicate that a message has not been read
-* page . Which page of the result set is to be returned when getting a list of messages/drafts/threads
-* limit . How many messages to return per page when getting a list of messages/drafts/threads.
+* page . Which page of the result set is to be returned when getting a list of messages/threads
+* limit . How many messages to return per page when getting a list of messages/threads.
 
 ## JWT ##
 
@@ -161,7 +161,7 @@ Note that if the user is a respondent the get messages returns messages which ma
             "collection_case": "ACollectionCase",
             "collection_exercise": "",
             "labels": [
-                "DRAFT"
+                "INBOX"
             ],
             "modified_date": "2017-10-03 15:51:32.961321",
             "msg_from": "BRES",
@@ -187,7 +187,7 @@ The messages post endpoint stores a secure message . If the recipient is a respo
 Note, the message post must have a Content-Type header of `application/json` , else it will return an error.
 Note, V2 uses messages , V1 uses message (singular)
 
-When a message is posted then typically no msg_id is supplied . If a msg_id is supplied then secure message will assume that the message was previously stored as a draft . It will then validate that it was a draft , send it and delete the draft. If it was not a draft and msg_id was set then it will return an error. Also there is an optional method to detect changes if multiple users edit a draft and then post. (See Drafts Put for description of Etags)
+When a message is posted, typically, no msg_id is supplied.
 
 #### Example JSON DATA for post Version 1
 
