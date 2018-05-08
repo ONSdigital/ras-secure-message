@@ -1,5 +1,5 @@
 import logging
-from flask import current_app, json
+from flask import current_app
 import requests
 from structlog import wrap_logger
 logger = wrap_logger(logging.getLogger(__name__))
@@ -40,7 +40,7 @@ class PartyService:
             party_data = requests.get(f"{current_app.config['RAS_PARTY_SERVICE']}party-api/v1/respondents/id/{uuid}",
                                       auth=current_app.config['BASIC_AUTH'], verify=False)
             if party_data.status_code == 200:
-                user_dict = json.loads(party_data.text)
+                user_dict = party_data.json()
                 self._users_cache[uuid] = user_dict
                 logger.debug(f"Party data retrieved for uuid:{uuid}")
             else:
