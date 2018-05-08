@@ -35,7 +35,6 @@ class SecureMessagingContextHelper:
 
     __ALTERNATIVE_INTERNAL_USER_SPECIFIC_USER_ID = "99951fcc-ed43-4cdb-ad1c-450f9986859b"
 
-    __INTERNAL_BRES_USER_TOKEN = {constants.USER_IDENTIFIER: "BRES", "role": "internal"}
     __INTERNAL_GROUP_USER_TOKEN = {constants.USER_IDENTIFIER: __INTERNAL_USER_GROUP, "role": "internal"}
     __INTERNAL_SPECIFIC_USER_TOKEN = {constants.USER_IDENTIFIER: __INTERNAL_USER_SPECIFIC_USER_ID, "role": "internal"}
     __ALTERNATIVE_SPECIFIC_USER_TOKEN = {constants.USER_IDENTIFIER: __ALTERNATIVE_INTERNAL_USER_SPECIFIC_USER_ID, "role": "internal"}
@@ -62,7 +61,7 @@ class SecureMessagingContextHelper:
     def __init__(self):
         self._token_data = {}
         self._headers = {'Content-Type': 'application/json', 'Authorization': ''}
-        self.token_data = SecureMessagingContextHelper.__INTERNAL_BRES_USER_TOKEN  # use attribute to set headers
+        self.token_data = SecureMessagingContextHelper.__INTERNAL_SPECIFIC_USER_TOKEN  # use attribute to set headers
         self._message_data = copy.deepcopy(SecureMessagingContextHelper.__default_message_data)
         self._sent_messages = []
         self._single_message_responses_data = []
@@ -128,10 +127,6 @@ class SecureMessagingContextHelper:
     @message_data.setter
     def message_data(self, value):
         self._message_data = value
-
-    @property       # return an internal user that the client is free to change
-    def internal_bres_user_token(self):
-        return copy.deepcopy(SecureMessagingContextHelper.__INTERNAL_BRES_USER_TOKEN)
 
     @property
     def internal_group_user_token(self):
@@ -216,10 +211,6 @@ class SecureMessagingContextHelper:
     @property
     def alternative_respondent_id(self):
         return copy.copy(SecureMessagingContextHelper.__ALTERNATIVE_RESPONDENT_USER_ID)
-
-    @property
-    def internal_id_bres_user(self):
-        return copy.copy(constants.BRES_USER)
 
     @property
     def internal_id_specific_user(self):
