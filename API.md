@@ -45,7 +45,7 @@ See the endpoint descriptions for detailed usage of each field. This is an overv
 
 * Message id . (msg_id) This is an id assigned to a message when it is created . It is a uuid. Some endpoints expect a message id whilst others will error if a message id is presented.See each endpoint for details.
 * Thread id . (thread_id) This is a unique identifier for a conversation. If a thread id is presented on message post then the api will assume that a message is part of an existing conversation.
-* From . (msg_from) This is the uuid of the actor that sent a message. If the actor is a respondent then it is their user uuid. If they are an internal user then it may be their user uuid.
+* From . (msg_from) This is the uuid of the actor that sent a message. If the actor is a respondent then it is their user uuid. If they are an internal user then it will be their user uuid.
 * To . (msg_to) These are the user uuids of the recipients of the message. Currently only one to user is supported. The message to can be as 'From' but with the addition that it can be the constant 'GROUP' to indicate that the message is being sent to a group handling the specific survey at the ons.
 * Subject . (subject) The subject of the message. Limited in the API to 100 characters , but since replies are prefixed with 'Re: ' then in practice it is 96 characters.
 * Body . (body) Up to 10000 characters.
@@ -290,7 +290,7 @@ Note V2 uses messages , V1 uses message (singular)
     ]
     }
 ```
-New messages will have a user uuid or 'GROUP' depending on how the message was stored. See Messages get for details of @msg_from, @msg_to and @ru
+Messages will have a user uuid or 'GROUP' depending on how the message was stored. See Messages get for details of @msg_from, @msg_to and @ru
 
 ## Modify Message Labels
 

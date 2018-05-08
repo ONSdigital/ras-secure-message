@@ -1,5 +1,4 @@
 import logging
-import ast
 from flask import current_app, json
 import requests
 from structlog import wrap_logger
@@ -23,7 +22,7 @@ class PartyService:
             party_data = requests.get(f"{current_app.config['RAS_PARTY_SERVICE']}party-api/v1/businesses/id/{ru}",
                                       auth=current_app.config['BASIC_AUTH'], verify=False)
             if party_data.status_code == 200:
-                ru_dict = json.loads(party_data.text)
+                ru_dict = party_data.json()
                 self._business_details_cache[ru] = ru_dict
                 logger.debug(f"Party data retrieved for ru:{ru}")
             else:
@@ -41,7 +40,7 @@ class PartyService:
             party_data = requests.get(f"{current_app.config['RAS_PARTY_SERVICE']}party-api/v1/respondents/id/{uuid}",
                                       auth=current_app.config['BASIC_AUTH'], verify=False)
             if party_data.status_code == 200:
-                user_dict = ast.literal_eval(json.loads(json.dumps(party_data.text)))
+                user_dict = json.loads(party_data.text)
                 self._users_cache[uuid] = user_dict
                 logger.debug(f"Party data retrieved for uuid:{uuid}")
             else:
