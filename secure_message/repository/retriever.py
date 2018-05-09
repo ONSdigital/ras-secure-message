@@ -21,8 +21,7 @@ class Retriever:
     def unread_message_count(user):
         """Count users unread messages"""
         logger.info("Getting unread message count", user_uuid=user.user_uuid)
-        status_conditions = []
-        status_conditions.append(Status.actor == str(user.user_uuid))
+        status_conditions = [Status.actor == str(user.user_uuid)]
         try:
             result = SecureMessage.query.join(Status).filter(and_(*status_conditions)).filter(
                 Status.label == 'UNREAD').count()
@@ -63,10 +62,7 @@ class Retriever:
     @staticmethod
     def _get_conditions_internal_user(survey, user):
         """Sets the conditions/predicates that are used by the query for the case of an internal actor"""
-        status_conditions = []
-        status_conditions.append(Status.actor == str(user.user_uuid))
-        status_conditions.append(Status.actor == constants.NON_SPECIFIC_INTERNAL_USER)
-        status_conditions.append(Status.actor == constants.BRES_USER)
+        status_conditions = [Status.actor == str(user.user_uuid), Status.actor == constants.NON_SPECIFIC_INTERNAL_USER]
         survey_conditions = []
         if survey:
             survey_conditions.append(SecureMessage.survey.in_(survey))
@@ -77,8 +73,7 @@ class Retriever:
     @staticmethod
     def _get_conditions_respondent(survey, user):
         """Sets the conditions/predicates that are used by the query for the case of an external actor"""
-        status_conditions = []
-        status_conditions.append(Status.actor == str(user.user_uuid))
+        status_conditions = [Status.actor == str(user.user_uuid)]
         survey_conditions = []
         if survey:
             survey_conditions.append(SecureMessage.survey.in_(survey))

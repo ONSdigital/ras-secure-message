@@ -1,6 +1,5 @@
 import logging
 from structlog import wrap_logger
-from secure_message import constants
 
 
 logger = wrap_logger(logging.getLogger(__name__))
@@ -103,13 +102,6 @@ class PartyServiceMock:
                                                                 "telephone": "+443069990250",
                                                                 "status": "ACTIVE",
                                                                 "sampleUnitType": "BI"},
-                       constants.BRES_USER: {"id": "BRES",
-                                             "firstName": "BRES",
-                                             "lastName": "",
-                                             "emailAddress": "",
-                                             "telephone": "",
-                                             "status": "",
-                                             "sampleUnitType": "BI"},
                        'AnotherSurvey': {"id": "AnotherSurvey",
                                          "firstName": "AnotherSurvey",
                                          "lastName": "",

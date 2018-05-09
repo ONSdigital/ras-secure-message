@@ -255,7 +255,7 @@ class MessageSchemaTestCase(unittest.TestCase):
 
     def test_msg_from_string(self):
         """marshalling message where msg_from field is string"""
-        self.json_message['msg_to'] = [constants.BRES_USER]
+        self.json_message['msg_to'] = [constants.NON_SPECIFIC_INTERNAL_USER]
         self.json_message['msg_from'] = "01b51fcc-ed43-4cdb-ad1c-450f9986859b"
         with self.app.app_context():
             g.user = User(self.json_message['msg_from'], 'respondent')

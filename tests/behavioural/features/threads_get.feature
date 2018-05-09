@@ -4,24 +4,24 @@ Feature: Get threads list Endpoint
     Given prepare for tests using 'mock' services
 
   Scenario: There are 3 conversations between respondent and internal , respondent attempts to read them
-    Given sending from respondent to internal bres user
+    Given sending from respondent to internal specific user
       And the message is sent
       And the message is sent
       And the message is sent
    When the threads are read
-    Then  a success status code (200) is returned
+    Then  a success status code 200 is returned
       And '3' messages are returned
 
   Scenario: There are 3 conversations between respondent and internal , internal attempts to read them
-    Given sending from respondent to internal bres user
+    Given sending from respondent to internal specific user
       And '3' messages are sent
      When   the user is set as internal
       And the threads are read
-    Then  a success status code (200) is returned
+    Then  a success status code 200 is returned
       And '3' messages are returned
 
   Scenario: There are 3 conversations between respondent and internal each with 2 messages, respondent attempts to read them
-    Given sending from respondent to internal bres user
+    Given sending from respondent to internal specific user
       And the message is sent
       And   the thread id is set to the last returned thread id
       And the message is sent
@@ -37,11 +37,11 @@ Feature: Get threads list Endpoint
       And the message is sent
 
    When the threads are read
-    Then  a success status code (200) is returned
+    Then  a success status code 200 is returned
       And '3' messages are returned
 
   Scenario: There are 3 conversations between respondent and internal each with 2 messages, internal user attempts to read them
-    Given sending from respondent to internal bres user
+    Given sending from respondent to internal specific user
       And the message is sent
       And   the thread id is set to the last returned thread id
       And the message is sent
@@ -58,11 +58,11 @@ Feature: Get threads list Endpoint
 
     When  the user is set as internal
       And the threads are read
-    Then  a success status code (200) is returned
+    Then  a success status code 200 is returned
       And '3' messages are returned
 
   Scenario: A respondent sends a very long message, the internal user sees a 100 character summary in their inbox
-    Given sending from internal bres user to respondent
+    Given sending from internal specific user to respondent
       And the message body is '5000' characters long
       And '1' messages are sent
     When the threads are read
