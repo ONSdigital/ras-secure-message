@@ -4,6 +4,7 @@
 ### Locust
 
 - Install locust, `make build` should do it, but if it's not in the pipfile then `pipenv install locustio`
+- Start the secure messaging service
 - `pipenv run locust -f /path/to/locustfile.py` - this will start a server on `http://localhost:8089` that uses the specified locustfile
 -  Go to the above url, specify the number of users and the spawn rate
 
