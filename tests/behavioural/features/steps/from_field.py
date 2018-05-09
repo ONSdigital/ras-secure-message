@@ -39,18 +39,11 @@ def step_impl_the_msg_from_is_set_to_alternative_respondent(context):
     step_impl_the_msg_from_is_set_to(context, context.bdd_helper.alternative_respondent_id)
 
 
-@given("the from is set to internal bres user")
-@when("the from is set to internal bres user")
-def step_impl_the_msg_from_is_set_to_internal_bres_user(context):
+@given("the from is set to internal non specific user")
+@when("the from is set to internal non specific user")
+def step_impl_the_msg_from_is_set_to_internal_non_specific_user(context):
     """set the from to the internal user as set in the helper """
-    step_impl_the_msg_from_is_set_to(context, context.bdd_helper.internal_id_bres_user)
-
-
-@given("the from is set to internal non bres user")
-@when("the from is set to internal non bres user")
-def step_impl_the_msg_from_is_set_to_internal_non_bres_user(context):
-    """set the from to the internal user as set in the helper """
-    step_impl_the_msg_from_is_set_to(context, context.bdd_helper.internal_id_specific_user)
+    step_impl_the_msg_from_is_set_to(context, context.bdd_helper.internal_id_group_user)
 
 
 @then("retrieved message msg_from is as was saved")

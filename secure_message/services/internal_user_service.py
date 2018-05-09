@@ -5,7 +5,7 @@ import requests
 from requests import HTTPError
 from structlog import wrap_logger
 
-from secure_message.constants import NON_SPECIFIC_INTERNAL_USER, BRES_USER
+from secure_message.constants import NON_SPECIFIC_INTERNAL_USER
 
 logger = wrap_logger(logging.getLogger(__name__))
 
@@ -14,8 +14,8 @@ class InternalUserService:
     @staticmethod
     def get_user_details(uuid):
         """gets the user details from the internal user service"""
-        if uuid in [NON_SPECIFIC_INTERNAL_USER, BRES_USER]:
-            return InternalUserService.get_non_specific_user_details(uuid)
+        if uuid == NON_SPECIFIC_INTERNAL_USER:
+            return InternalUserService.get_default_user_details(NON_SPECIFIC_INTERNAL_USER)
 
         logger.info("Getting user details from uaa", uuid=uuid)
         url = f"{current_app.config['UAA_URL']}/Users/{uuid}"
@@ -45,13 +45,13 @@ class InternalUserService:
             logger.info("Successfully retrieved and formatted user details", uuid=uuid)
             return user_details
         except KeyError:
-            user_details = InternalUserService._get_default_user(uuid)
+            user_details = InternalUserService.get_default_user_details(uuid)
             logger.exception("UAA didn't return all expected details", uuid=uuid)
 
             return user_details
 
     @staticmethod
-    def _get_default_user(uuid):
+    def get_default_user_details(uuid):
         user_details = {
             "id": uuid,
             "firstName": "ONS",
@@ -59,15 +59,3 @@ class InternalUserService:
             "emailAddress": ""
         }
         return user_details
-
-    @staticmethod
-    def get_non_specific_user_details(group):
-        if group == NON_SPECIFIC_INTERNAL_USER:
-            return InternalUserService._get_default_user(NON_SPECIFIC_INTERNAL_USER)
-
-        return {
-            "id": BRES_USER,
-            "firstName": "BRES",
-            "lastName": "",
-            "emailAddress": ""
-        }

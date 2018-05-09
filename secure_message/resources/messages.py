@@ -101,9 +101,6 @@ class MessageSend(Resource):
     @staticmethod
     def _get_user_name(user, message):
 
-        if message.msg_from == constants.BRES_USER:
-            return constants.BRES_USER
-
         user_name = 'Unknown user'
         user_data = internal_user_service.get_user_details(message.msg_from) if user.is_internal else party.get_user_details(message.msg_from)
 

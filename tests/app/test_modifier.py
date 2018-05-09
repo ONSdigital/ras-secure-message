@@ -26,14 +26,16 @@ class ModifyTestCaseHelper:
                 query = f'''INSERT INTO securemessage.secure_message(id, msg_id, subject, body, thread_id,
                         collection_case, ru_id, collection_exercise, survey) VALUES ({i}, '{msg_id}', 'test','test','',
                         'ACollectionCase', 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc', 'ACollectionExercise',
-                        'BRES')'''
+                        '{constants.NON_SPECIFIC_INTERNAL_USER}')'''
                 con.execute(query)
                 query = f'''INSERT INTO securemessage.status(label, msg_id, actor) VALUES('SENT', '{msg_id}',
                         '0a7ad740-10d5-4ecb-b7ca-3c0384afb882')'''
                 con.execute(query)
-                query = f"INSERT INTO securemessage.status(label, msg_id, actor) VALUES('INBOX', '{msg_id}', 'BRES')"
+                query = f"INSERT INTO securemessage.status(label, msg_id, actor) VALUES('INBOX', '{msg_id}', " \
+                        f"'{constants.NON_SPECIFIC_INTERNAL_USER}')"
                 con.execute(query)
-                query = f"INSERT INTO securemessage.status(label, msg_id, actor) VALUES('UNREAD', '{msg_id}', 'BRES')"
+                query = f"INSERT INTO securemessage.status(label, msg_id, actor) VALUES('UNREAD', '{msg_id}'," \
+                        f" '{constants.NON_SPECIFIC_INTERNAL_USER}')"
                 con.execute(query)
                 query = f'''INSERT INTO securemessage.events(event, msg_id, date_time)
                          VALUES('{EventsApi.SENT.value}', '{msg_id}', '2017-02-03 00:00:00')'''
@@ -160,27 +162,6 @@ class ModifyTestCase(unittest.TestCase, ModifyTestCaseHelper):
         self.assertEqual(Modifier._get_label_actor(user=self.user_internal, message=message_to_respondent),
                          'ce12b958-2a5f-44f4-a6da-861e59070a31')
         self.assertEqual(Modifier._get_label_actor(user=self.user_respondent, message=message_to_respondent),
-                         '0a7ad740-10d5-4ecb-b7ca-3c0384afb882')
-
-    def test_get_label_actor_to_bres_user(self):
-        user_bres = User(constants.BRES_USER, 'internal')
-        message_to_bres = {'msg_id': 'test2',
-                                     'msg_to': [constants.BRES_USER],
-                                     'msg_from': '0a7ad740-10d5-4ecb-b7ca-3c0384afb882',
-                                     'subject': 'MyMessage',
-                                     'body': 'hello',
-                                     'thread_id': '',
-                                     'collection_case': 'ACollectionCase',
-                                     'collection_exercise': 'ACollectionExercise',
-                                     'ru_id': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc',
-                                     'survey': test_utilities.BRES_SURVEY,
-                                     'from_internal': False}
-
-        self.assertEqual(Modifier._get_label_actor(user=user_bres, message=message_to_bres),
-                         constants.BRES_USER)
-        self.assertEqual(Modifier._get_label_actor(user=self.user_internal, message=message_to_bres),
-                         constants.BRES_USER)
-        self.assertEqual(Modifier._get_label_actor(user=self.user_respondent, message=message_to_bres),
                          '0a7ad740-10d5-4ecb-b7ca-3c0384afb882')
 
     def test_get_label_actor_to_group(self):

@@ -2,7 +2,7 @@ import nose.tools
 from behave import given, then, when
 from flask import json
 from secure_message import constants
-from secure_message.constants import BRES_USER, NON_SPECIFIC_INTERNAL_USER
+from secure_message.constants import NON_SPECIFIC_INTERNAL_USER
 
 
 @given("the to is set to '{msg_to}'")
@@ -39,13 +39,6 @@ def step_impl_the_msg_to_is_set_to_alternative_respondent(context):
     step_impl_the_msg_to_is_set_to(context, context.bdd_helper.alternative_respondent_id)
 
 
-@given("the to is set to internal bres user")
-@when("the to is set to internal bres user")
-def step_impl_the_msg_to_is_set_to_internal_bres_user(context):
-    """ set the msg to field in the message data to the internal user as specified in the helper"""
-    step_impl_the_msg_to_is_set_to(context, context.bdd_helper.internal_id_bres_user)
-
-
 @given("the to is set to respondent as a string not array")
 @when("the to is set to respondent as a string not array")
 def step_impl_the_msg_to_is_set_to_respondent_as_string_not_array(context):
@@ -53,11 +46,11 @@ def step_impl_the_msg_to_is_set_to_respondent_as_string_not_array(context):
     context.bdd_helper.message_data['msg_to'] = context.bdd_helper.respondent_id
 
 
-@given("the to is set to internal bres user user as a string not array")
-@when("the to is set to internal bres user user as a string not array")
+@given("the to is set to internal specific user as a string not array")
+@when("the to is set to internal specific user as a string not array")
 def step_impl_the_msg_to_is_set_to_internal_as_string_not_array(context):
     """set the message to to a string not an array"""
-    context.bdd_helper.message_data['msg_to'] = context.bdd_helper.internal_id_bres_user
+    context.bdd_helper.message_data['msg_to'] = context.bdd_helper.internal_id_specific_user
 
 
 @then("retrieved message msg_to is as was saved")
@@ -89,17 +82,6 @@ def step_impl_the_at_msg_to_is_set_to_internal_group_user(context):
     expected = {"id": NON_SPECIFIC_INTERNAL_USER,
                 "firstName": "ONS",
                 "lastName": "User",
-                "emailAddress": ""
-                }
-    nose.tools.assert_equal(msg_resp['@msg_to'][0], expected)
-
-
-@then("the at_msg_to is set correctly for bres user")
-def step_impl_the_at_msg_to_is_set_to_bres_user(context):
-    msg_resp = json.loads(context.response.data)
-    expected = {"id": BRES_USER,
-                "firstName": "BRES",
-                "lastName": "",
                 "emailAddress": ""
                 }
     nose.tools.assert_equal(msg_resp['@msg_to'][0], expected)
