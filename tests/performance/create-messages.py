@@ -22,6 +22,6 @@ for x in range(0, 50):
 
     try:
         response.raise_for_status()
-        print("Message {x} sucessfully sent")
+        print(f"Message {x} sucessfully sent")
     except HTTPError:
-        print("Message {x} failed to send")
+        print(f"Message {x} failed to send")

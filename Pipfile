@@ -22,12 +22,12 @@ requests = "*"
 retrying = "*"
 maya = "*"
 PyJWT = "*"
-locustio = "*"
 
 [dev-packages]
 pylint = "*"
 "flake8" = "*"
 behave = "*"
+locustio = "*"
 nose = "*"
 testfixtures = "*"
 requests-mock = "*"
