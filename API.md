@@ -68,8 +68,6 @@ this currently has two fields :
 * party_id which is how the user is identified, this should be the users uuid
 * role which is set to either 'internal' for ons staff or 'respondent' for respondents.
 
-The JWT usage does cause some issues in that currently it may or may not be encrypted. The secure message api relies on an environment variable called 'SM_JWT_ENCRYPT'. If this is set to 1 then it assumes the JWT is encrypted and attempts to decrypt it. If '0' then it skips the decryption. It is a common error to have this set incorrectly.
-
 After possible decryption, the service attempts to decode the JWT data . For that it uses an algorithm defined in config and a secret also defined in config. If the algorithm and/or secret are out of step between client and secure message service then the JWT will fail checks and the service will return a 500.
 
 Being able to get a response from a health or info endpoint but 500's from a message post or read is often an indicator that something in this area is not configured correctly. An easy check for config is to access the /health/details endpoint.
@@ -705,8 +703,7 @@ Similar to health but validates that the current databse connection is valid. He
 
 `GET /health/details`
 
-Returns more detailed information about secure message including some of the environment variables. This can
-be useful in determining JWT errors since it shows SM_JWT_ENCRYPT values. Bypasses all aspects of the JWT.
+Returns more detailed information about secure message including some of the environment variables. Bypasses all aspects of the JWT.
 
 
 #### Example JSON Response
@@ -737,7 +734,6 @@ be useful in determining JWT errors since it shows SM_JWT_ENCRYPT values. Bypass
   "RAS PARTY SERVICE HOST": "ras-party-service-sit.apps.devtest.onsclofo.uk",
   "RAS PARTY SERVICE PORT": "80",
   "RAS PARTY SERVICE PROTOCOL": "http",
-  "SM JWT ENCRYPT": "1",
   "SMS Log level": "DEBUG",
   "Using party service mock": false,
   "Version": "0.1.2"

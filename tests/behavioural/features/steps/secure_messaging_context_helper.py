@@ -1,8 +1,7 @@
 import copy
 
-from flask import current_app, json
+from flask import json
 
-from secure_message.authentication.jwe import Encrypter
 from secure_message.authentication.jwt import encode
 from secure_message import constants
 
@@ -93,15 +92,6 @@ class SecureMessagingContextHelper:
 
         self._thread_get_url_v2 = SecureMessagingContextHelper.__BASE_URL + "/v2/threads/{0}"
 
-    @staticmethod
-    def _encrypt_token_data(token_data):
-        """encrypts the token data"""
-        encrypter = Encrypter(_private_key=current_app.config['SM_USER_AUTHENTICATION_PRIVATE_KEY'],
-                              _private_key_password=current_app.config['SM_USER_AUTHENTICATION_PRIVATE_KEY_PASSWORD'],
-                              _public_key=current_app.config['SM_USER_AUTHENTICATION_PUBLIC_KEY'])
-        signed_jwt = encode(token_data)
-        return encrypter.encrypt_token(signed_jwt)
-
     @property
     def token_data(self):
         return self._token_data
@@ -110,7 +100,7 @@ class SecureMessagingContextHelper:
     def token_data(self, value):
         """Token data setter that makes sure that the headers are updated if the token data changes"""
         self._token_data = value
-        self._headers['Authorization'] = self._encrypt_token_data(self._token_data)
+        self._headers['Authorization'] = encode(self._token_data)
 
     @property
     def headers(self):

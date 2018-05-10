@@ -1,26 +1,9 @@
 import unittest
 
-from flask import current_app
-
-from secure_message import constants
 from secure_message.application import create_app
 from secure_message.common.utilities import get_business_details_by_ru
-from secure_message.authentication.jwe import Encrypter
-from secure_message.authentication.jwt import encode
 from secure_message.api_mocks.party_service_mock import PartyServiceMock
 from secure_message.services.service_toggles import internal_user_service, case_service, party
-
-
-def _generate_encrypted_token():
-    token_data = {constants.USER_IDENTIFIER: "0a7ad740-10d5-4ecb-b7ca-3c0384afb882",
-                  "role": "respondent"}
-
-    encrypter = Encrypter(_private_key=current_app.config['SM_USER_AUTHENTICATION_PRIVATE_KEY'],
-                          _private_key_password=current_app.config['SM_USER_AUTHENTICATION_PRIVATE_KEY_PASSWORD'],
-                          _public_key=current_app.config['SM_USER_AUTHENTICATION_PUBLIC_KEY'])
-    signed_jwt = encode(token_data)
-    encrypted_jwt = encrypter.encrypt_token(signed_jwt)
-    return encrypted_jwt
 
 
 class PartyTestCase(unittest.TestCase):

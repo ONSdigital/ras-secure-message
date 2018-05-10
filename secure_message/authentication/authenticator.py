@@ -1,6 +1,6 @@
 import logging
 
-from flask import Response, g, current_app
+from flask import Response, g
 from jwt.exceptions import InvalidTokenError
 from structlog import wrap_logger
 from werkzeug.exceptions import BadRequest
@@ -8,7 +8,6 @@ from werkzeug.exceptions import BadRequest
 from secure_message import constants
 from secure_message.validation.user import User
 from secure_message.authentication.jwt import decode
-from secure_message.authentication.jwe import Decrypter
 
 logger = wrap_logger(logging.getLogger(__name__))
 
@@ -26,18 +25,9 @@ def authenticate(headers):
 
 
 def check_jwt(token):
-    JWT_ENCRYPT = current_app.config['SM_JWT_ENCRYPT']
-    logger.debug('JWT Encryption (0=disabled, 1=enabled)', JWT_ENCRYPT=JWT_ENCRYPT)
     try:
-        if JWT_ENCRYPT == '1':
-            decrypter = Decrypter()
-            decrypted_jwt_token = decrypter.decrypt_token(token)
-            logger.debug('Decrypted JWT')
-            decoded_jwt_token = decode(decrypted_jwt_token)
-            logger.debug("Decoded JWT", user_uuid=decoded_jwt_token.get(constants.USER_IDENTIFIER))
-        else:
-            decoded_jwt_token = decode(token)
-            logger.debug("Decoded JWT", user_uuid=decoded_jwt_token.get(constants.USER_IDENTIFIER))
+        decoded_jwt_token = decode(token)
+        logger.debug("Decoded JWT", user_uuid=decoded_jwt_token.get(constants.USER_IDENTIFIER))
 
         if not decoded_jwt_token.get(constants.USER_IDENTIFIER):
             raise BadRequest(description="Missing user_uuid claim,"
