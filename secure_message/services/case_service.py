@@ -22,6 +22,6 @@ class CaseService:
                          reason=case_service_data.reason, text=case_service_data.text)
             return case_service_data.status_code
 
-        err = f"No case id for case involving user {user_name}, case event not called"
+        err = "No case id for case involving user, case event not called"
         logger.error(err)
         return {'error': err}, 400
