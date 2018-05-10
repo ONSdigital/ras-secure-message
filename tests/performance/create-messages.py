@@ -17,8 +17,11 @@ for x in range(0, 50):
         "collection_case": "",
         "survey": "02b9c366-7397-42f7-942a-76dc5876d86d"
     }
-    response = post("http://localhost:5050/v2/messages", headers={'Authorization': '<insert jwt here>',
-                    'Content-Type': 'application/json', 'Accept': 'application/json'}, data=json.dumps(message))
+    response = post("http://localhost:5050/v2/messages",
+                    headers={'Authorization': '<insert jwt here>',
+                             'Content-Type': 'application/json',
+                             'Accept': 'application/json'},
+                    data=json.dumps(message))
 
     try:
         response.raise_for_status()
