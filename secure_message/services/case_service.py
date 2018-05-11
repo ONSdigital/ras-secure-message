@@ -8,10 +8,10 @@ logger = wrap_logger(logging.getLogger(__name__))
 
 class CaseService:
     @staticmethod
-    def store_case_event(case_id, user_name):
+    def store_case_event(case_id, user_name, msg_id):
         """posts the data to the case service"""
 
-        if case_id.strip():
+        if case_id:
             json_data = {"description": "New Secure Message",
                          "category": "SECURE_MESSAGE_SENT",
                          "createdBy": user_name}
@@ -22,6 +22,6 @@ class CaseService:
                          reason=case_service_data.reason, text=case_service_data.text)
             return case_service_data.status_code
 
-        err = "No case id for case involving user, case event not called"
+        err = f"No case id for case involving msg_id: {msg_id}, case event not called"
         logger.error(err)
         return {'error': err}, 400
