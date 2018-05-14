@@ -6,7 +6,6 @@ from werkzeug.exceptions import BadRequest
 from secure_message.application import create_app
 from secure_message.authentication.authenticator import check_jwt, authenticate
 from secure_message.authentication.jwt import encode, decode
-from secure_message.authentication.jwe import Encrypter
 from secure_message import constants
 
 
@@ -23,13 +22,10 @@ class AuthenticationTestCase(unittest.TestCase):
         data = {constants.USER_IDENTIFIER: "ce12b958-2a5f-44f4-a6da-861e59070a31",
                 "role": "internal"}
 
-        encrypter = Encrypter(_private_key=self.app.config['SM_USER_AUTHENTICATION_PRIVATE_KEY'],
-                              _private_key_password=self.app.config['SM_USER_AUTHENTICATION_PRIVATE_KEY_PASSWORD'],
-                              _public_key=self.app.config['SM_USER_AUTHENTICATION_PUBLIC_KEY'])
         with self.app.app_context():
-            signed_jwt = encode(data)
-            encrypted_jwt = encrypter.encrypt_token(signed_jwt)
-            res = check_jwt(encrypted_jwt)
+            jwt = encode(data)
+            res = check_jwt(jwt)
+
         self.assertEqual(res, expected_res)
 
     def test_authentication_jwt_invalid_fail(self):
@@ -37,15 +33,11 @@ class AuthenticationTestCase(unittest.TestCase):
         expected_res = Response(response="Invalid token to access this Microservice Resource",
                                 status=400, mimetype="text/html")
 
-        encrypter = Encrypter(_private_key=self.app.config['SM_USER_AUTHENTICATION_PRIVATE_KEY'],
-                              _private_key_password=self.app.config['SM_USER_AUTHENTICATION_PRIVATE_KEY_PASSWORD'],
-                              _public_key=self.app.config['SM_USER_AUTHENTICATION_PUBLIC_KEY'])
-
-        encrypted_jwt = encrypter.encrypt_token('eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.'
-                                                'eyJSVSI6IjEyMzQ1Njc4OTEwIiwic3VydmV5IjoiQlJTIiwiQ0MiOiIxMiJ9.'
-                                                'uKn_qlmXLsYd_k1hNt2QfLabypLOXjO1_9cEuArJ-hE')
+        jwt = ('eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.'
+               'eyJSVSI6IjEyMzQ1Njc4OTEwIiwic3VydmV5IjoiQlJTIiwiQ0MiOiIxMiJ9.'
+               'uKn_qlmXLsYd_k1hNt2QfLabypLOXjO1_9cEuArJ-hE')
         with self.app.app_context():
-            res = check_jwt(encrypted_jwt)
+            res = check_jwt(jwt)
         self.assertEqual(res.response, expected_res.response)
 
     def test_authentication_jwt_user_urn_missing_fail(self):
@@ -53,23 +45,10 @@ class AuthenticationTestCase(unittest.TestCase):
 
         data = {}
 
-        encrypter = Encrypter(_private_key=self.app.config['SM_USER_AUTHENTICATION_PRIVATE_KEY'],
-                              _private_key_password=self.app.config['SM_USER_AUTHENTICATION_PRIVATE_KEY_PASSWORD'],
-                              _public_key=self.app.config['SM_USER_AUTHENTICATION_PUBLIC_KEY'])
         with self.app.app_context():
             signed_jwt = encode(data)
-            encrypted_jwt = encrypter.encrypt_token(signed_jwt)
             with self.assertRaises(BadRequest):
-                check_jwt(encrypted_jwt)
-
-    def test_authentication_jwt_not_encrypted_fail(self):
-        """Authenticate request using JWT without encryption"""
-
-        data = {constants.USER_IDENTIFIER: "12345678910"}
-
-        with self.app.app_context():
-            with self.assertRaises(BadRequest):
-                check_jwt(encode(data))
+                check_jwt(signed_jwt)
 
     def test_authenticate_request_with_correct_header_data(self):
         """Authenticate request using authenticate function and with correct header data"""
@@ -77,14 +56,9 @@ class AuthenticationTestCase(unittest.TestCase):
         data = {constants.USER_IDENTIFIER: "12345678910",
                 "role": "internal"}
 
-        encrypter = Encrypter(_private_key=self.app.config['SM_USER_AUTHENTICATION_PRIVATE_KEY'],
-                              _private_key_password=self.app.config['SM_USER_AUTHENTICATION_PRIVATE_KEY_PASSWORD'],
-                              _public_key=self.app.config['SM_USER_AUTHENTICATION_PUBLIC_KEY'])
-
         with self.app.app_context():
             signed_jwt = encode(data)
-            encrypted_jwt = encrypter.encrypt_token(signed_jwt)
-            res = authenticate(headers={'Authorization': encrypted_jwt})
+            res = authenticate(headers={'Authorization': signed_jwt})
         self.assertEqual(res, expected_res)
 
     def test_authenticate_request_with_incorrect_header_data(self):
@@ -114,7 +88,6 @@ class AuthenticationTestCase(unittest.TestCase):
 
         with self.app.app_context():
             signed_jwt = encode(data)
-            self.app.config['SM_JWT_ENCRYPT'] = 0
             res = check_jwt(signed_jwt)
         self.assertEqual(res, expected_res)
 

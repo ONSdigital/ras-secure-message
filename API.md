@@ -13,7 +13,7 @@
     * [Get Count of Unread Messages](#get-count-of-unread-messages)
 * Conversations
     * [Get conversation list](#get-conversation-list)
-    * [Get Conversation by Id](#get-onversation-by-id)
+    * [Get Conversation by Id](#get-conversation-by-id)
 * Health and Status
     * [Get Health](#get-health)
     * [Get Health With Database-status](#get-health-with-database-status)
@@ -26,7 +26,7 @@ The secure message service provides a method by which messages may be passed bet
 
 The 'secure' aspect alludes to it not being email , it uses a message store in a database within the ONS. So that the only time 'messages' leave is to be rendered on a web page.
 
-Messages are sent using an email-like set of characteristics ( From, To , Subject and Body). They also encompass ONS specific meta data such as survey, collection case, reporting unit and collection instrument.
+Messages are sent using an email-like set of characteristics (From, To, Subject and Body). They also encompass ONS specific meta data such as survey, collection case, reporting unit and collection instrument.
 
 The api uses UUIDs to define from, to, survey, collection case, reporting unit and collection exercise.
 
@@ -35,7 +35,7 @@ Each message is stored internally with a set of flags that indicate the state of
 The api endpoints fall into 4 groups:
 
 * Messages - These end points can be used to send a message , read a message, get a count of unread messages , and change a label on a message
-* Conversations - Messages can exist as part of a conversation . Messages within a conversation share the same thread identifier. Conversations/Threads can be obtained via a list of conversations or a specific conversation.
+* Conversations - Messages can exist as part of a conversation. Messages within a conversation share the same thread identifier. Conversations/Threads can be obtained via a list of conversations or a specific conversation.
 * Health and Information - Several endpoints are provided that can be used to view the health and status of the service
 
 
@@ -50,12 +50,12 @@ See the endpoint descriptions for detailed usage of each field. This is an overv
 * Subject . (subject) The subject of the message. Limited in the API to 100 characters , but since replies are prefixed with 'Re: ' then in practice it is 96 characters.
 * Body . (body) Up to 10000 characters.
 * Survey . (survey). This is the uuid of the survey . It is mandatory when saving a message.
-* Collection Case . (collection_case) uuid of the collection case. Can be used as a filter option (cc). Used to send to the case service to inform it that a newmessage has been sent on the case.
+* Collection Case . (collection_case) uuid of the collection case. Can be used as a filter option (cc). Used to send to the case service to inform it that a new message has been sent on the case.
 * Collection Exercise .  (collection exercise) uuid of the collection exercise , can be used as a filter option (ce)
 * Reporting unit . (ru) uuid of the reporting unit . Can be used as a filter option.
 * Labels . These can be used to set a status on a message , or retrieve messages with a specific label. Valid labels:
-    * SENT  Added to a mesage for the actor who sent the message
-    * INBOX Added to the message for teh actor who received the message
+    * SENT  Added to a message for the actor who sent the message
+    * INBOX Added to the message for the actor who received the message
     * UNREAD Added to a message to indicate that a message has not been read
 * page . Which page of the result set is to be returned when getting a list of messages/threads
 * limit . How many messages to return per page when getting a list of messages/threads.
@@ -63,14 +63,12 @@ See the endpoint descriptions for detailed usage of each field. This is an overv
 ## JWT ##
 
 All calls , except health , health details and info , require that a valid JWT be passed in an Authorization header.
-this currently has two fields :
+this currently has two fields:
 
 * party_id which is how the user is identified, this should be the users uuid
 * role which is set to either 'internal' for ons staff or 'respondent' for respondents.
 
-The JWT usage does cause some issues in that currently it may or may not be encrypted. The secure message api relies on an environment variable called 'SM_JWT_ENCRYPT'. If this is set to 1 then it assumes the JWT is encrypted and attempts to decrypt it. If '0' then it skips the decryption. It is a common error to have this set incorrectly.
-
-After possible decryption, the service attempts to decode the JWT data . For that it uses an algorithm defined in config and a secret also defined in config. If the algorithm and/or secret are out of step between client and secure message service then the JWT will fail checks and the service will return a 500.
+The algorithm and secret are defined in the configuration file. If the algorithm and/or secret are out of step between client and secure message service then the JWT will fail checks and the service will return a 500.
 
 Being able to get a response from a health or info endpoint but 500's from a message post or read is often an indicator that something in this area is not configured correctly. An easy check for config is to access the /health/details endpoint.
 
@@ -690,7 +688,7 @@ So persistent 500s whilst health returns is often an indicator of incorrect JWT 
 `GET /health/db`
 
 
-Similar to health but validates that the current databse connection is valid. Hence it is useful in various enviornments if database issues are suspected. Bypasses all aspects of the JWT.
+Similar to health but validates that the current database connection is valid. Hence it is useful in various environments if database issues are suspected. Bypasses all aspects of the JWT.
 
 
 #### Example JSON Response
@@ -705,8 +703,7 @@ Similar to health but validates that the current databse connection is valid. He
 
 `GET /health/details`
 
-Returns more detailed information about secure message including some of the environment variables. This can
-be useful in determining JWT errors since it shows SM_JWT_ENCRYPT values. Bypasses all aspects of the JWT.
+Returns more detailed information about secure message including some of the environment variables. Bypasses all aspects of the JWT.
 
 
 #### Example JSON Response
@@ -737,7 +734,6 @@ be useful in determining JWT errors since it shows SM_JWT_ENCRYPT values. Bypass
   "RAS PARTY SERVICE HOST": "ras-party-service-sit.apps.devtest.onsclofo.uk",
   "RAS PARTY SERVICE PORT": "80",
   "RAS PARTY SERVICE PROTOCOL": "http",
-  "SM JWT ENCRYPT": "1",
   "SMS Log level": "DEBUG",
   "Using party service mock": false,
   "Version": "0.1.2"

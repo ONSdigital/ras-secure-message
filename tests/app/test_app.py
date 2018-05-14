@@ -10,7 +10,6 @@ from secure_message import application, constants
 from secure_message.common.alerts import AlertUser, AlertViaGovNotify
 from secure_message.repository import database
 from secure_message.authentication.jwt import encode
-from secure_message.authentication.jwe import Encrypter
 from secure_message.services.service_toggles import case_service, party, internal_user_service
 from secure_message.resources.messages import MessageSend
 from secure_message.resources.messages import logger as message_logger
@@ -35,18 +34,13 @@ class FlaskTestCase(unittest.TestCase):
         token_data = {constants.USER_IDENTIFIER: constants.NON_SPECIFIC_INTERNAL_USER,
                       "role": "internal"}
 
-        encrypter = Encrypter(_private_key=self.app.config['SM_USER_AUTHENTICATION_PRIVATE_KEY'],
-                              _private_key_password=self.app.config['SM_USER_AUTHENTICATION_PRIVATE_KEY_PASSWORD'],
-                              _public_key=self.app.config['SM_USER_AUTHENTICATION_PUBLIC_KEY'])
-
         with self.app.app_context():
             signed_jwt = encode(token_data)
-            encrypted_jwt = encrypter.encrypt_token(signed_jwt)
 
         AlertUser.alert_method = mock.Mock(AlertViaLogging)
         self.app.config['NOTIFY_CASE_SERVICE'] = '1'
 
-        self.headers = {'Content-Type': 'application/json', 'Authorization': encrypted_jwt}
+        self.headers = {'Content-Type': 'application/json', 'Authorization': signed_jwt}
 
         self.test_message = {'msg_to': ['0a7ad740-10d5-4ecb-b7ca-3c0384afb882'],
                              'msg_from': constants.NON_SPECIFIC_INTERNAL_USER,
@@ -318,15 +312,10 @@ class FlaskTestCase(unittest.TestCase):
         token_data = {constants.USER_IDENTIFIER: "0a7ad740-10d5-4ecb-b7ca-3c0384afb882",
                       "role": "respondent"}
 
-        encrypter = Encrypter(_private_key=self.app.config['SM_USER_AUTHENTICATION_PRIVATE_KEY'],
-                              _private_key_password=self.app.config['SM_USER_AUTHENTICATION_PRIVATE_KEY_PASSWORD'],
-                              _public_key=self.app.config['SM_USER_AUTHENTICATION_PUBLIC_KEY'])
-
         with self.app.app_context():
             signed_jwt = encode(token_data)
-            encrypted_jwt = encrypter.encrypt_token(signed_jwt)
 
-        self.headers = {'Content-Type': 'application/json', 'Authorization': encrypted_jwt}
+        self.headers = {'Content-Type': 'application/json', 'Authorization': signed_jwt}
         url = "http://localhost:5050/message/send"
         self.client.post(url, data=json.dumps(self.test_message), headers=self.headers)
         mock_case.assert_called()
@@ -350,15 +339,10 @@ class FlaskTestCase(unittest.TestCase):
         token_data = {constants.USER_IDENTIFIER: "f62dfda8-73b0-4e0e-97cf-1b06327a6712",
                       "role": "internal"}
 
-        encrypter = Encrypter(_private_key=self.app.config['SM_USER_AUTHENTICATION_PRIVATE_KEY'],
-                              _private_key_password=self.app.config['SM_USER_AUTHENTICATION_PRIVATE_KEY_PASSWORD'],
-                              _public_key=self.app.config['SM_USER_AUTHENTICATION_PUBLIC_KEY'])
-
         with self.app.app_context():
             signed_jwt = encode(token_data)
-            encrypted_jwt = encrypter.encrypt_token(signed_jwt)
 
-        self.headers = {'Content-Type': 'application/json', 'Authorization': encrypted_jwt}
+        self.headers = {'Content-Type': 'application/json', 'Authorization': signed_jwt}
         url = "http://localhost:5050/v2/messages"
         self.client.post(url, data=json.dumps(self.test_message), headers=self.headers)
         mock_case.assert_called()

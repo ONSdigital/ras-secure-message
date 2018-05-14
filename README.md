@@ -32,7 +32,6 @@ Set environmental variables. Replace $SOURCE_ROOT with the parent directory of t
 
 ```
 RAS_SM_PATH=$SOURCE_ROOT/ras-secure-message
-SM_JWT_ENCRYPT = 1
 SMS_LOG_LEVEL = DEBUG
 ```
 
@@ -109,7 +108,6 @@ Environment variables available for configuration are listed below:
 | NOTIFICATION_API_KEY            | API key to use Gov Notify service                  | N/A
 | NOTIFICATION_TEMPLATE_ID        | Template id for Gov Notify service                 | N/A
 | NOTIFY_VIA_GOV_NOTIFY           | Toggle for using Gov Notify for notifications      | '1' (enable Gov Notify email notifications)
-| SM_JWT_ENCRYPT                  | Toggle to use encrypted tokens                     | '0'
 | NOTIFY_CASE_SERVICE             | Toggle to notify case service                      | '1' (enable notifying case service)
 | CLIENT_ID                       | ID of the client service in UAA                    | N/A
 | CLIENT_SECRET                   | Password of the client service in UAA              | N/A

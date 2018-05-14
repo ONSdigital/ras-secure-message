@@ -46,7 +46,6 @@ class HealthTestCase(unittest.TestCase):
                    'SMS Log level': '',
                    'API Functionality': '',
                    'Using party service mock': '',
-                   'SM JWT ENCRYPT': '',
                    'RAS PARTY SERVICE HOST': '',
                    'RAS PARTY SERVICE PORT': '',
                    'RAS PARTY SERVICE PROTOCOL': '',

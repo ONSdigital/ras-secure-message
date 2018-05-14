@@ -45,7 +45,6 @@ class HealthDetails(Resource):
                    'SMS Log level': current_app.config['SMS_LOG_LEVEL'],
                    'API Functionality': func_list,
                    'Using party service mock': party.using_mock,
-                   'SM JWT ENCRYPT': current_app.config['SM_JWT_ENCRYPT'],
                    'RAS PARTY SERVICE HOST': current_app.config['RAS_PARTY_SERVICE_HOST'],
                    'RAS PARTY SERVICE PORT': current_app.config['RAS_PARTY_SERVICE_PORT'],
                    'RAS PARTY SERVICE PROTOCOL': current_app.config['RAS_PARTY_SERVICE_PROTOCOL'],
