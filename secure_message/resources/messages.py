@@ -94,7 +94,7 @@ class MessageSend(Resource):
         if current_app.config['NOTIFY_CASE_SERVICE'] == '1':
             logger.info("Notifying case service", msg_id=message.msg_id)
             case_user = MessageSend._get_user_name(g.user, message)
-            case_service.store_case_event(message.collection_case, case_user)
+            case_service.store_case_event(message.collection_case, case_user, message.msg_id)
         else:
             logger.info('Case service notifications switched off, hence not sent', msg_id=message.msg_id)
 

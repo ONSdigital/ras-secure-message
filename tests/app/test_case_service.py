@@ -24,7 +24,7 @@ class CaseServiceTestCase(unittest.TestCase):
         sut = CaseService()
 
         with self.app.app_context():
-            result_status = sut.store_case_event('1234', 'user')
+            result_status = sut.store_case_event('1234', 'user', 'msg_id')
 
         self.assertEqual(result_status, 201)
 
