@@ -62,8 +62,8 @@ class Case(ServiceMockToggle):
     def __init__(self, use_mock=False):
         super().__init__(use_mock, CaseService, CaseServiceMock, 'Case')
 
-    def store_case_event(self, case_id, user_uuid):
-        return self._service.store_case_event(case_id, user_uuid)
+    def store_case_event(self, case_id, user_uuid, msg_id):
+        return self._service.store_case_event(case_id, user_uuid, msg_id)
 
 
 class InternalUser(ServiceMockToggle):
