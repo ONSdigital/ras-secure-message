@@ -1,12 +1,14 @@
+from datetime import datetime, timezone
 import logging
 
 from flask import jsonify
+from sqlalchemy.exc import SQLAlchemyError
 from structlog import wrap_logger
 from werkzeug.exceptions import InternalServerError
 
 from secure_message.common.eventsapi import EventsApi
 from secure_message.common.labels import Labels
-from secure_message.repository.database import db, Status
+from secure_message.repository.database import db, SecureMessage, Status
 from secure_message.repository.saver import Saver
 
 logger = wrap_logger(logging.getLogger(__name__))
@@ -76,11 +78,21 @@ class Modifier:
         return res
 
     @staticmethod
-    def del_unread(message, user):
+    def del_unread(message, user, session=db.session):
         """Remove unread label from status"""
         inbox = Labels.INBOX.value
         unread = Labels.UNREAD.value
         if inbox in message['labels'] and unread in message['labels'] and 'read_date' not in message:
+            # Save to both events and secure_message table for now.  In future, the save to the
+            # events table will be removed.
             Saver().save_msg_event(message['msg_id'], EventsApi.READ.value)
+            try:
+                result = SecureMessage.query.filter(SecureMessage.msg_id == message['msg_id'])
+                result.one().read_datetime = datetime.now(timezone.utc)
+                session.commit()
+            except SQLAlchemyError:
+                session.rollback()
+                logger.exception('Error adding read_datetime to message', msg_id=message['msg_id'])
+                raise InternalServerError(description="Error adding read_datetime to message")
         Modifier.remove_label(unread, message, user)
         return True
