@@ -22,6 +22,7 @@ requests = "*"
 retrying = "*"
 maya = "*"
 PyJWT = "*"
+alembic = "*"
 
 [dev-packages]
 pylint = "*"
