@@ -22,5 +22,5 @@ def upgrade():
 
 
 def downgrade():
-    op.drop_column('secure_message', 'sent_datetime')
-    op.drop_column('secure_message', 'read_datetime')
+    op.drop_column('secure_message', 'sent_datetime', schema='securemessage')
+    op.drop_column('secure_message', 'read_datetime', schema='securemessage')
