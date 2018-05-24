@@ -11,7 +11,7 @@ config = context.config
 
 # db location
 # config.set_main_option("sqlalchemy.url", 'postgresql://postgres:postgres@localhost:6432')
-config.set_main_option("sqlalchemy.url", Config.DATABASE_URI)
+config.set_main_option("sqlalchemy.url", Config.SECURE_MESSAGING_DATABASE_URL)
 
 # Interpret the config file for Python logging.
 # This line sets up loggers basically.
