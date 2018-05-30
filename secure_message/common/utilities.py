@@ -85,32 +85,57 @@ def add_to_and_from_details(messages):
     return messages
 
 
-def _get_from_details(message):
+def _get_from_details(messages):
+    uuid_external = []
+    uuid_to = []
+
+    len_list = len(messages)
+
+    for message in messages:
+        if message["from_internal"]:
+            message.update({"@msg_from": internal_user_service.get_user_details(message["msg_from"])})
+
+    for i in range(0, len_list):
+        if not messages[i]['from_internal']:
+            uuid_external.append(messages[i])
+    for uuid in uuid_external:
+        if uuid["msg_from"] not in uuid_to:
+            uuid_to.append(uuid["msg_from"])
+
+    to_details = party.get_user_details(uuid_to)
+
+    for message in messages:
+        if message in uuid_external:
+            message.update({'@msg_from': to_details[0]})
+
+    return messages
+
+
+def _get_to_details(messages):
     """looks up the details for the from users"""
-    logger.info("Getting user from details", is_internal=message['from_internal'], user_uuid=message['msg_from'])
-    if message['from_internal']:
-        from_details = internal_user_service.get_user_details(message['msg_from'])
-    else:
-        from_details = party.get_user_details(message['msg_from'])
-    return from_details
+    uuid_external = []
+    uuid_from = []
 
+    len_list = len(messages)
+    for message in messages:
+        if not message["from_internal"]:
+            message.update({"@msg_to": internal_user_service.get_user_details(message["msg_to"][0])})
 
-def _get_to_details(message):
-    """looks up the details of all the to users"""
-    user_details = []
-    if message['from_internal']:
-        to_user_details_finder = party.get_user_details
-    else:
-        to_user_details_finder = internal_user_service.get_user_details
+    for i in range(0, len_list):
+        if messages[i]['from_internal']:
+            uuid_external.append(messages[i])
 
-    for uuid in message['msg_to']:
+    for uuid in uuid_external:
+        if uuid["msg_to"] not in uuid_from:
+            uuid_from.append(uuid["msg_to"][0])
 
-        detail = to_user_details_finder(uuid)
+    from_details = party.get_user_details(uuid_from)
 
-        if detail:
-            user_details.append(detail)
+    for message in messages:
+        if message in uuid_external:
+            message.update({'@msg_to': from_details})
 
-    return user_details
+    return messages
 
 
 def add_business_details(messages):
@@ -131,7 +156,9 @@ def add_business_details(messages):
 
 def add_users_and_business_details(messages):
     """Add both user and business details to messages based on data from party service"""
-    messages = add_to_and_from_details(messages)
+    messages = _get_to_details(messages)
+    messages = _get_from_details(messages)
+    # messages = add_to_and_from_details(messages)
     logger.info("Sucessfully added to and from details")
     messages = add_business_details(messages)
     logger.info("Successfully added business details")
