@@ -1,6 +1,8 @@
+from datetime import datetime, timezone
 import logging
 
 from flask import jsonify
+from sqlalchemy.exc import SQLAlchemyError
 from structlog import wrap_logger
 from werkzeug.exceptions import InternalServerError
 
@@ -8,6 +10,7 @@ from secure_message.common.eventsapi import EventsApi
 from secure_message.common.labels import Labels
 from secure_message.repository.database import db, Status
 from secure_message.repository.saver import Saver
+from secure_message.services.internal_user_service import InternalUserService
 
 logger = wrap_logger(logging.getLogger(__name__))
 
@@ -84,3 +87,29 @@ class Modifier:
             Saver().save_msg_event(message['msg_id'], EventsApi.READ.value)
         Modifier.remove_label(unread, message, user)
         return True
+
+    @staticmethod
+    def add_closed_status_to_conversation(metadata, user, session=db.session):
+
+        detail = InternalUserService.get_user_details(user.user_uuid)
+        try:
+            metadata.is_closed = True
+            metadata.closed_at = datetime.now(timezone.utc)
+            metadata.closed_by = f"{detail.get('firstName')} {detail.get('lastName')}"
+            metadata.closed_by_uuid = user.user_uuid
+            session.commit()
+        except SQLAlchemyError:
+            session.rollback()
+            logger.exception("Error saving metadata to conversation")
+
+    @staticmethod
+    def remove_closed_status_from_conversation(metadata, user, session=db.session):
+        try:
+            metadata.is_closed = False
+            metadata.closed_at = None
+            metadata.closed_by = ''
+            metadata.closed_by_uuid = ''
+            session.commit()
+        except SQLAlchemyError:
+            session.rollback()
+            logger.exception("Error saving metadata to conversation")
