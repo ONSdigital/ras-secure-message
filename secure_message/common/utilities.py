@@ -73,18 +73,9 @@ def process_paginated_list(paginated_list, host_url, user, message_args, endpoin
 def get_business_details_by_ru(rus):
     """Function to retrieve business details from ru using the party service"""
 
-    details = []
+    detail = party.get_business_details(rus)
 
-    for ru in rus:
-
-        detail = party.get_business_details(ru)
-
-        if detail is not None:
-            details.append(detail)
-        else:
-            logger.info('No details found for RU ID', ru=ru)
-
-    return details
+    return detail
 
 
 def add_to_and_from_details(messages):

@@ -1,4 +1,6 @@
 import logging
+from urllib.parse import urlencode
+
 from flask import current_app
 import requests
 from structlog import wrap_logger
@@ -11,23 +13,14 @@ class PartyService:
         self._users_cache = {}
         self._business_details_cache = {}
 
-    def get_business_details(self, ru):
+    def get_business_details(self, rus):
         """Retrieves the business details from the party service"""
 
-        ru_dict = self._business_details_cache.get(ru)
+        payload = urlencode([("id", x) for x in rus])
 
-        if ru_dict is None:
-            logger.info(f"Party Service: retrieve party ru data for {ru}")
-
-            party_data = requests.get(f"{current_app.config['RAS_PARTY_SERVICE']}party-api/v1/businesses/id/{ru}",
-                                      auth=current_app.config['BASIC_AUTH'], verify=False)
-            if party_data.status_code == 200:
-                ru_dict = party_data.json()
-                self._business_details_cache[ru] = ru_dict
-                logger.debug(f"Party data retrieved for ru:{ru}")
-            else:
-                logger.debug(f"Party data failed for ru:{ru}", status_code=party_data.status_code, text=party_data.text,
-                             ru=ru)
+        party_data = requests.get(f"{current_app.config['RAS_PARTY_SERVICE']}party-api/v1/businesses",
+                                  auth=current_app.config['BASIC_AUTH'], verify=False, params=payload)
+        ru_dict = party_data.json()
 
         return ru_dict
 
