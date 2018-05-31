@@ -36,9 +36,9 @@ class PartyTestCase(unittest.TestCase):
 
         business_details = get_business_details_by_ru(list_ru)
 
-        self.assertEqual(business_details[0]['id'], list_ru[0])
+        self.assertEqual(business_details[0]['id'], list_ru[2])
         self.assertEqual(business_details[1]['id'], list_ru[1])
-        self.assertEqual(business_details[2]['id'], list_ru[2])
+        self.assertEqual(business_details[2]['id'], list_ru[0])
         self.assertEqual(business_details[3]['id'], list_ru[3])
 
     def test_get_user_details_returns_none_if_uuid_not_known(self):

@@ -9,16 +9,24 @@ class PartyServiceMock:
 
     def get_business_details(self, ru):
         """Return mock business details"""
-        business_details = self._business_details.get(ru)
-        if business_details is None:
+        business_details = []
+        for ru_id in self._business_details:
+            if ru_id in ru:
+                business_details.append(self._business_details.get(ru_id))
+        if not business_details:
             logger.error(f"no details for ru:{ru} found in mock party service")
+            business_details = None
         return business_details
 
     def get_user_details(self, uuid):
         """Return mock user details"""
-        user_details = self._respondent_ids.get(uuid)
-        if user_details is None:
+        user_details = []
+        for uuids in self._respondent_ids:
+            if uuids in uuid:
+                user_details.append(self._respondent_ids)
+        if not user_details:
             logger.error(f'Party service failed for uuid:{uuid}')
+            user_details = None
         return user_details
 
     _business_details = {'c614e64e-d981-4eba-b016-d9822f09a4fb': {"id": "c614e64e-d981-4eba-b016-d9822f09a4fb",
