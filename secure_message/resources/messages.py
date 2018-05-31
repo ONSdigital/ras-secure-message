@@ -39,6 +39,7 @@ class MessageSend(Resource):
         message = self._validate_post_data(post_data)
 
         if message.errors == {}:
+            logger.info("Message passed validation")
             self._message_save(message)
             # listener errors are logged but still a 201 reported
             MessageSend._alert_listeners(message.data)

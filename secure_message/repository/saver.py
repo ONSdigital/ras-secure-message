@@ -3,7 +3,7 @@ import logging
 from sqlalchemy.exc import SQLAlchemyError
 from structlog import wrap_logger
 from secure_message.exception.exceptions import MessageSaveException
-from secure_message.repository.database import db, Events, SecureMessage, Status
+from secure_message.repository.database import db, Conversation, Events, SecureMessage, Status
 
 logger = wrap_logger(logging.getLogger(__name__))
 
@@ -18,6 +18,14 @@ class Saver:
         db_message.set_from_domain_model(domain_message)
 
         try:
+            # We only want to do this if it's the first message in a conversation.
+            if db_message.msg_id == db_message.thread_id:
+                logger.info("Setting thread id", thread_id=db_message.thread_id)
+                conversation = Conversation()
+                conversation.thread_id = db_message.thread_id
+                session.add(conversation)
+                session.flush()
+
             session.add(db_message)
             session.commit()
         except SQLAlchemyError:

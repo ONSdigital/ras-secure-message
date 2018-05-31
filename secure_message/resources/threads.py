@@ -8,7 +8,8 @@ from werkzeug.exceptions import BadRequest
 
 from secure_message.common.utilities import get_options, process_paginated_list, add_users_and_business_details
 from secure_message.constants import THREAD_LIST_ENDPOINT
-from secure_message.repository.retriever import Retriever, Modifier
+from secure_message.repository.modifier import Modifier
+from secure_message.repository.retriever import Retriever
 
 logger = wrap_logger(logging.getLogger(__name__))
 
