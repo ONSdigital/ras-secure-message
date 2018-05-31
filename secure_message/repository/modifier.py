@@ -90,21 +90,31 @@ class Modifier:
 
     @staticmethod
     def add_closed_status_to_conversation(metadata, user, session=db.session):
+        bound_logger = logger.bind(thread_id=metadata.thread_id, user_id=user.user_uuid)
+        bound_logger.info("Getting user details")
+        user_details = InternalUserService.get_user_details(user.user_uuid)
+        bound_logger.info("Sucessfully retreived user details")
 
-        detail = InternalUserService.get_user_details(user.user_uuid)
         try:
+            bound_logger.info("Closing conversation")
             metadata.is_closed = True
             metadata.closed_at = datetime.now(timezone.utc)
-            metadata.closed_by = f"{detail.get('firstName')} {detail.get('lastName')}"
+            metadata.closed_by = f"{user_details.get('firstName')} {user_details.get('lastName')}"
             metadata.closed_by_uuid = user.user_uuid
             session.commit()
         except SQLAlchemyError:
             session.rollback()
-            logger.exception("Error saving metadata to conversation")
+            logger.exception("Error saving metadata")
+
+        bound_logger.info("Sucessfully closed conversation")
+        bound_logger.unbind('thread_id', 'user_id')
 
     @staticmethod
     def remove_closed_status_from_conversation(metadata, user, session=db.session):
+        bound_logger = logger.bind(thread_id=metadata.thread_id, user_id=user.user_uuid)
+
         try:
+            bound_logger.info("Re-opening conversation")
             metadata.is_closed = False
             metadata.closed_at = None
             metadata.closed_by = ''
@@ -113,3 +123,6 @@ class Modifier:
         except SQLAlchemyError:
             session.rollback()
             logger.exception("Error saving metadata to conversation")
+
+        bound_logger.info("Sucessfully re-opened conversation")
+        bound_logger.unbind('thread_id', 'user_id')

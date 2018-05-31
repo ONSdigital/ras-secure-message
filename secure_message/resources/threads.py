@@ -55,10 +55,10 @@ class ThreadById(Resource):
         msg_property, value = ThreadById._validate_request(request_data)
 
         logger.info("Getting metadata for thread", thread_id=thread_id, user_uuid=g.user.user_uuid)
-        metadata = Retriever().retrieve_thread_metadata(thread_id)
+        metadata = Retriever.retrieve_thread_metadata(thread_id)
         if msg_property == 'is_closed':
             if value:
-                if metadata.closed_by and metadata.closed_datetime:
+                if metadata.is_closed:
                     logger.info("Conversation already closed", thread_id=thread_id, user_uuid=g.user.user_uuid)
                     raise BadRequest(description="Conversation already closed")
                 logger.info("About to close conversation")
