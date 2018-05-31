@@ -23,19 +23,34 @@ class ThreadById(Resource):
         logger.info("Getting messages from thread", thread_id=thread_id, user_uuid=g.user.user_uuid)
 
         conversation = Retriever().retrieve_thread(thread_id, g.user)
+        conversation_metadata = Retriever().retrieve_thread_metadata(thread_id)
 
         logger.info("Successfully retrieved messages from thread", thread_id=thread_id, user_uuid=g.user.user_uuid)
         messages = []
         for message in conversation.all():
             msg = message.serialize(g.user, body_summary=False)
             messages.append(msg)
-        return jsonify({"messages": add_users_and_business_details(messages)})
+
+        if conversation_metadata.is_closed:
+            return jsonify({"messages": add_users_and_business_details(messages),
+                            "metadata": ThreadById._build_metadata(conversation_metadata)})
+        else:
+            return jsonify({"messages": add_users_and_business_details(messages)})
+
+    @staticmethod
+    def _build_metadata(conversation_metadata):
+        return {
+            "is_closed": conversation_metadata.is_closed,
+            "closed_by": conversation_metadata.closed_by,
+            "closed_by_uuid": conversation_metadata.closed_by_uuid,
+            "closed_on": conversation_metadata.closed_on
+        }
 
     @staticmethod
     def patch(thread_id):
-        """Modify every message in a thread with a status"""
+        """Modify conversation metadata"""
 
-        logger.info("Going to patch", thread_id=thread_id, user_uuid=g.user.user_uuid)
+        logger.info("Attempting to modify metadata for thread", thread_id=thread_id, user_uuid=g.user.user_uuid)
         request_data = request.form
         msg_property, value = ThreadById._validate_request(request_data)
 
@@ -44,13 +59,12 @@ class ThreadById(Resource):
         if msg_property == 'is_closed':
             if value:
                 if metadata.closed_by and metadata.closed_datetime:
-                    logger.info("Already closed")
-                    # FIXME: Is this the right way to throw this error?
-                    return jsonify({"error": "Conversation already closed"}), 400
+                    logger.info("Conversation already closed", thread_id=thread_id, user_uuid=g.user.user_uuid)
+                    raise BadRequest(description="Conversation already closed")
                 logger.info("About to close conversation")
                 Modifier.add_closed_status_to_conversation(metadata, g.user)
             else:
-                logger.info("About re-open conversation")
+                logger.info("About re-open conversation", thread_id=thread_id, user_uuid=g.user.user_uuid)
                 Modifier.remove_closed_status_from_conversation(metadata, g.user)
 
         logger.info("Thread metadata update successful", thread_id=thread_id, user_uuid=g.user.user_uuid)

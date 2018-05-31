@@ -156,11 +156,16 @@ class Retriever:
                                  .label('max_id')) \
                 .join(Events).join(Status) \
                 .filter(or_(and_(SecureMessage.from_internal.is_(False), Status.label == Labels.INBOX.value),  # NOQA
-                            and_(SecureMessage.from_internal.is_(True),
-                                 Status.label.in_([Labels.SENT.value]))
-                           )
-                       ) \
-                .group_by(SecureMessage.thread_id).subquery('t')
+                            and_(SecureMessage.from_internal.is_(True), Status.label == Labels.SENT.value))
+                        ).group_by(SecureMessage.thread_id).subquery('t')
+
+            u = db.session.query(SecureMessage.thread_id).join(Conversation) \
+                .filter(Conversation.is_closed.is_(True)).subquery('u')
+
+            if request_args.label == 'CLOSED':
+                conditions.append(SecureMessage.thread_id.in_(u))
+            else:
+                conditions.append(~SecureMessage.thread_id.in_(u))
 
             conditions.append(SecureMessage.thread_id == t.c.thread_id)
             conditions.append(SecureMessage.id == t.c.max_id)

@@ -39,6 +39,10 @@ class MessageSend(Resource):
         message = self._validate_post_data(post_data)
 
         if message.errors == {}:
+            if message.thread_id:
+                conversation_metadata = Retriever().retrieve_thread_metadata(message.thread_id)
+                if conversation_metadata.is_closed:
+                    raise BadRequest(description="Cannot reply to a closed conversation")
             logger.info("Message passed validation")
             self._message_save(message)
             # listener errors are logged but still a 201 reported
