@@ -1,6 +1,8 @@
+from datetime import datetime, timezone
 import logging
 
 from flask import jsonify
+from sqlalchemy.exc import SQLAlchemyError
 from structlog import wrap_logger
 from werkzeug.exceptions import InternalServerError
 
@@ -8,6 +10,7 @@ from secure_message.common.eventsapi import EventsApi
 from secure_message.common.labels import Labels
 from secure_message.repository.database import db, Status
 from secure_message.repository.saver import Saver
+from secure_message.services.internal_user_service import InternalUserService
 
 logger = wrap_logger(logging.getLogger(__name__))
 
@@ -84,3 +87,42 @@ class Modifier:
             Saver().save_msg_event(message['msg_id'], EventsApi.READ.value)
         Modifier.remove_label(unread, message, user)
         return True
+
+    @staticmethod
+    def close_conversation(metadata, user, session=db.session):
+        bound_logger = logger.bind(thread_id=metadata.thread_id, user_id=user.user_uuid)
+        bound_logger.info("Getting user details")
+        user_details = InternalUserService.get_user_details(user.user_uuid)
+        bound_logger.info("Sucessfully retreived user details")
+
+        try:
+            bound_logger.info("Closing conversation")
+            metadata.is_closed = True
+            metadata.closed_at = datetime.now(timezone.utc)
+            metadata.closed_by = f"{user_details.get('firstName')} {user_details.get('lastName')}"
+            metadata.closed_by_uuid = user.user_uuid
+            session.commit()
+        except SQLAlchemyError:
+            session.rollback()
+            logger.exception("Error saving metadata")
+
+        bound_logger.info("Sucessfully closed conversation")
+        bound_logger.unbind('thread_id', 'user_id')
+
+    @staticmethod
+    def open_conversation(metadata, user, session=db.session):
+        bound_logger = logger.bind(thread_id=metadata.thread_id, user_id=user.user_uuid)
+
+        try:
+            bound_logger.info("Re-opening conversation")
+            metadata.is_closed = False
+            metadata.closed_at = None
+            metadata.closed_by = ''
+            metadata.closed_by_uuid = ''
+            session.commit()
+        except SQLAlchemyError:
+            session.rollback()
+            logger.exception("Error saving metadata to conversation")
+
+        bound_logger.info("Sucessfully re-opened conversation")
+        bound_logger.unbind('thread_id', 'user_id')

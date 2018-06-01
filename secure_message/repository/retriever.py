@@ -3,13 +3,14 @@ import logging
 from flask import jsonify
 from sqlalchemy import and_, func, or_
 from sqlalchemy.exc import SQLAlchemyError
+from sqlalchemy.orm.exc import NoResultFound, MultipleResultsFound
 from structlog import wrap_logger
 from werkzeug.exceptions import InternalServerError, NotFound
 
 from secure_message import constants
 from secure_message.common.eventsapi import EventsApi
 from secure_message.common.labels import Labels
-from secure_message.repository.database import db, Events, SecureMessage, Status
+from secure_message.repository.database import db, Conversation, Events, SecureMessage, Status
 
 logger = wrap_logger(logging.getLogger(__name__))
 
@@ -155,11 +156,16 @@ class Retriever:
                                  .label('max_id')) \
                 .join(Events).join(Status) \
                 .filter(or_(and_(SecureMessage.from_internal.is_(False), Status.label == Labels.INBOX.value),  # NOQA
-                            and_(SecureMessage.from_internal.is_(True),
-                                 Status.label.in_([Labels.SENT.value]))
-                           )
-                       ) \
-                .group_by(SecureMessage.thread_id).subquery('t')
+                            and_(SecureMessage.from_internal.is_(True), Status.label == Labels.SENT.value))
+                        ).group_by(SecureMessage.thread_id).subquery('t')
+
+            u = db.session.query(SecureMessage.thread_id).join(Conversation) \
+                .filter(Conversation.is_closed.is_(True)).subquery('u')
+
+            if request_args.label == 'CLOSED':
+                conditions.append(SecureMessage.thread_id.in_(u))
+            else:
+                conditions.append(~SecureMessage.thread_id.in_(u))
 
             conditions.append(SecureMessage.thread_id == t.c.thread_id)
             conditions.append(SecureMessage.id == t.c.max_id)
@@ -241,6 +247,18 @@ class Retriever:
             raise InternalServerError(description="Error retrieving conversation from database")
 
         return result
+
+    @staticmethod
+    def retrieve_conversation_metadata(thread_id):
+        result = Conversation.query.filter(Conversation.thread_id == thread_id)
+        try:
+            return result.one()
+        except NoResultFound:
+            logger.info("No conversation found", thread_id=thread_id)
+            raise NotFound(description=f"Conversation with thread_id '{thread_id}' does not exist")
+        except MultipleResultsFound:
+            logger.error("Mulitple results found for conversation", thread_id=thread_id)
+            raise
 
     @staticmethod
     def check_db_connection():
