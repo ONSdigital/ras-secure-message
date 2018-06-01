@@ -30,8 +30,8 @@ class SecureMessage(db.Model):
     collection_exercise = Column("collection_exercise", String(constants.MAX_COLLECTION_EXERCISE_LEN + 1))
     survey = Column("survey", String(constants.MAX_SURVEY_LEN + 1))
     from_internal = Column('from_internal', Boolean())
-    sent_datetime = Column('sent_datetime', DateTime())
-    read_datetime = Column('read_datetime', DateTime())
+    sent_at = Column('sent_datetime', DateTime())
+    read_at = Column('read_datetime', DateTime())
 
     statuses = relationship('Status', backref='secure_message', lazy="dynamic")
     events = relationship('Events', backref='secure_message', order_by='Events.date_time', lazy="dynamic")
@@ -39,7 +39,7 @@ class SecureMessage(db.Model):
     __table_args__ = (Index("idx_ru_survey_cc", "ru_id", "survey", "collection_case", "collection_exercise"), )
 
     def __init__(self, msg_id="", subject="", body="", thread_id="", collection_case='',
-                 ru_id='', survey='', collection_exercise='', from_internal=False, read_datetime=None):
+                 ru_id='', survey='', collection_exercise='', from_internal=False, read_at=None):
 
         logger.debug(f"Initialised Secure Message entity: msg_id: {id}")
         self.msg_id = msg_id
@@ -51,8 +51,8 @@ class SecureMessage(db.Model):
         self.survey = survey
         self.collection_exercise = collection_exercise
         self.from_internal = from_internal
-        self.sent_datetime = datetime.now(timezone.utc)
-        self.read_datetime = read_datetime
+        self.sent_at = datetime.now(timezone.utc)
+        self.read_at = read_at
 
     def set_from_domain_model(self, domain_model):
         """set dbMessage attributes to domain_model attributes"""

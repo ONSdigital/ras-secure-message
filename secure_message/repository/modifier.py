@@ -88,12 +88,12 @@ class Modifier:
                 event = Events(msg_id=message['msg_id'], event=EventsApi.READ.value)
                 session.add(event)
                 result = SecureMessage.query.filter(SecureMessage.msg_id == message['msg_id']).one()
-                result.read_datetime = datetime.now(timezone.utc)
+                result.read_at = datetime.now(timezone.utc)
                 session.add(result)
                 session.commit()
             except SQLAlchemyError:
                 session.rollback()
-                logger.exception('Error adding read_datetime to message', msg_id=message['msg_id'])
-                raise InternalServerError(description="Error adding read_datetime to message")
+                logger.exception('Error adding read information to message', msg_id=message['msg_id'])
+                raise InternalServerError(description="Error adding read information to message")
         Modifier.remove_label(unread, message, user)
         return True
