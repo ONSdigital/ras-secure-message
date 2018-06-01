@@ -89,7 +89,7 @@ class Modifier:
         return True
 
     @staticmethod
-    def add_closed_status_to_conversation(metadata, user, session=db.session):
+    def close_conversation(metadata, user, session=db.session):
         bound_logger = logger.bind(thread_id=metadata.thread_id, user_id=user.user_uuid)
         bound_logger.info("Getting user details")
         user_details = InternalUserService.get_user_details(user.user_uuid)
@@ -110,7 +110,7 @@ class Modifier:
         bound_logger.unbind('thread_id', 'user_id')
 
     @staticmethod
-    def remove_closed_status_from_conversation(metadata, user, session=db.session):
+    def open_conversation(metadata, user, session=db.session):
         bound_logger = logger.bind(thread_id=metadata.thread_id, user_id=user.user_uuid)
 
         try:

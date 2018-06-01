@@ -40,7 +40,7 @@ class MessageSend(Resource):
 
         if message.errors == {}:
             if message.thread_id:
-                conversation_metadata = Retriever.retrieve_thread_metadata(message.thread_id)
+                conversation_metadata = Retriever.retrieve_conversation_metadata(message.thread_id)
                 if conversation_metadata.is_closed:
                     raise BadRequest(description="Cannot reply to a closed conversation")
             logger.info("Message passed validation")

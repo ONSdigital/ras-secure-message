@@ -249,12 +249,12 @@ class Retriever:
         return result
 
     @staticmethod
-    def retrieve_thread_metadata(thread_id):
+    def retrieve_conversation_metadata(thread_id):
         result = Conversation.query.filter(Conversation.thread_id == thread_id)
         try:
             return result.one()
         except NoResultFound:
-            logger.error("No conversation found", thread_id=thread_id)
+            logger.info("No conversation found", thread_id=thread_id)
             raise NotFound(description=f"Conversation with thread_id '{thread_id}' does not exist")
         except MultipleResultsFound:
             logger.error("Mulitple results found for conversation", thread_id=thread_id)
