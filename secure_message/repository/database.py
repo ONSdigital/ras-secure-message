@@ -30,8 +30,8 @@ class SecureMessage(db.Model):
     collection_exercise = Column("collection_exercise", String(constants.MAX_COLLECTION_EXERCISE_LEN + 1))
     survey = Column("survey", String(constants.MAX_SURVEY_LEN + 1))
     from_internal = Column('from_internal', Boolean())
-    sent_at = Column('sent_datetime', DateTime())
-    read_at = Column('read_datetime', DateTime())
+    sent_at = Column('sent_at', DateTime())
+    read_at = Column('read_at', DateTime())
 
     statuses = relationship('Status', backref='secure_message', lazy="dynamic")
     events = relationship('Events', backref='secure_message', order_by='Events.date_time', lazy="dynamic")
