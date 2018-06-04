@@ -104,7 +104,7 @@ class ModifyTestCase(unittest.TestCase, ModifyTestCaseHelper):
                 message_service = Retriever()
                 modifier = Modifier()
                 message = message_service.retrieve_message(msg_id, self.user_internal)
-                modifier.del_unread(message, self.user_internal)
+                modifier.mark_message_as_read(message, self.user_internal)
                 message = message_service.retrieve_message(msg_id, self.user_internal)
                 self.assertIsNotNone(message['read_date'])
 
@@ -123,12 +123,12 @@ class ModifyTestCase(unittest.TestCase, ModifyTestCaseHelper):
                 message_service = Retriever()
                 modifier = Modifier()
                 message = message_service.retrieve_message(msg_id, self.user_internal)
-                modifier.del_unread(message, self.user_internal)
+                modifier.mark_message_as_read(message, self.user_internal)
                 message = message_service.retrieve_message(msg_id, self.user_internal)
                 read_date_set = message['read_date']
                 modifier.add_unread(message, self.user_internal)
                 message = message_service.retrieve_message(msg_id, self.user_internal)
-                modifier.del_unread(message, self.user_internal)
+                modifier.mark_message_as_read(message, self.user_internal)
                 message = message_service.retrieve_message(msg_id, self.user_internal)
                 self.assertEqual(message['read_date'], read_date_set)
 
