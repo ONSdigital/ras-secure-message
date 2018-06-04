@@ -42,48 +42,48 @@ class ThreadById(Resource):
     @staticmethod
     def patch(thread_id):
         """Modify conversation metadata"""
-
-        logger.info("Getting metadata for thread", thread_id=thread_id, user_uuid=g.user.user_uuid)
+        bound_logger = logger.bind(thread_id=thread_id, user_uuid=g.user.user_uuid)
+        bound_logger.info("Getting metadata for thread")
         if request.headers['Content-Type'].lower() != 'application/json':
-            logger.info('Request must set accept content type "application/json" in header.')
+            bound_logger.info('Request must set accept content type "application/json" in header.')
             raise BadRequest(description="'application/json' content type in header missing")
 
-        logger.info("Attempting to modify metadata for thread", thread_id=thread_id, user_uuid=g.user.user_uuid)
+        bound_logger.info("Attempting to modify metadata for thread")
         request_data = request.get_json()
         metadata = Retriever.retrieve_conversation_metadata(thread_id)
         ThreadById._validate_request(request_data, metadata)
 
         if request_data.get('is_closed'):
-            logger.info("About to close conversation")
+            bound_logger.info("About to close conversation")
             Modifier.close_conversation(metadata, g.user)
         elif not request_data.get('is_closed'):
-            logger.info("About re-open conversation", thread_id=thread_id, user_uuid=g.user.user_uuid)
+            bound_logger.info("About re-open conversation")
             Modifier.open_conversation(metadata, g.user)
 
-        logger.info("Thread metadata update successful", thread_id=thread_id, user_uuid=g.user.user_uuid)
+        bound_logger.info("Thread metadata update successful")
+        bound_logger.unbind('thread_id', 'user_uuid')
         return '', 204
 
     @staticmethod
     def _validate_request(request_data, metadata):
         """Used to validate data within request body for ModifyById"""
+
         if not g.user.is_internal:
-            logger.info("Thread modification is forbidden")
+            logger.info("Thread modification is forbidden", thread_id=metadata.id, user_uuid=g.user.user_uuid)
             abort(403)
         # Check if it's empty
         if not request_data:
-            logger.error('No properties provided')
+            logger.error('No properties provided', thread_id=metadata.id, user_uuid=g.user.user_uuid)
             raise BadRequest(description="No properties provided")
         if not isinstance(request_data['is_closed'], bool):
-            logger.error('Invalid value provided')
+            logger.error('Invalid value provided', thread_id=metadata.id, user_uuid=g.user.user_uuid)
             raise BadRequest(description="Invalid label provided")
         if metadata.is_closed and request_data['is_closed'] is True:
             logger.info("Conversation already closed", thread_id=metadata.id, user_uuid=g.user.user_uuid)
             raise BadRequest(description="Conversation already closed")
         if not metadata.is_closed and request_data['is_closed'] is False:
-            logger.info("Conversation already closed", thread_id=metadata.id, user_uuid=g.user.user_uuid)
+            logger.info("Conversation already open", thread_id=metadata.id, user_uuid=g.user.user_uuid)
             raise BadRequest(description="Conversation already open")
-
-        return 'is_closed', request_data['is_closed']
 
 
 class ThreadList(Resource):
