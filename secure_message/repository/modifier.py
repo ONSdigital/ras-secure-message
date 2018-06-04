@@ -111,7 +111,7 @@ class Modifier:
 
     @staticmethod
     def open_conversation(metadata, user, session=db.session):
-        bound_logger = logger.bind(converation_id=metadata.id, user_id=user.user_uuid)
+        bound_logger = logger.bind(conversation_id=metadata.id, user_id=user.user_uuid)
 
         try:
             bound_logger.info("Re-opening conversation")
