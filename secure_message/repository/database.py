@@ -30,7 +30,7 @@ class SecureMessage(db.Model):
     collection_exercise = Column("collection_exercise", String(constants.MAX_COLLECTION_EXERCISE_LEN + 1))
     survey = Column("survey", String(constants.MAX_SURVEY_LEN + 1))
     from_internal = Column('from_internal', Boolean())
-    sent_at = Column('sent_at', DateTime())
+    sent_at = Column('sent_at', DateTime(), default=datetime.utcnow)
     read_at = Column('read_at', DateTime())
 
     statuses = relationship('Status', backref='secure_message', lazy="dynamic")
@@ -51,7 +51,6 @@ class SecureMessage(db.Model):
         self.survey = survey
         self.collection_exercise = collection_exercise
         self.from_internal = from_internal
-        self.sent_at = datetime.now(timezone.utc)
         self.read_at = read_at
 
     def set_from_domain_model(self, domain_model):

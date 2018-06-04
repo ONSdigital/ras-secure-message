@@ -77,7 +77,7 @@ class Modifier:
         return res
 
     @staticmethod
-    def del_unread(message, user, session=db.session):
+    def mark_message_as_read(message, user, session=db.session):
         """Remove unread label from status"""
         inbox = Labels.INBOX.value
         unread = Labels.UNREAD.value
