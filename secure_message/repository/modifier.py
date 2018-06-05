@@ -1,4 +1,4 @@
-from datetime import datetime, timezone
+from datetime import datetime
 import logging
 
 from flask import jsonify
@@ -87,9 +87,9 @@ class Modifier:
             try:
                 event = Events(msg_id=message['msg_id'], event=EventsApi.READ.value)
                 session.add(event)
-                result = SecureMessage.query.filter(SecureMessage.msg_id == message['msg_id']).one()
-                result.read_at = datetime.now(timezone.utc)
-                session.add(result)
+                secure_message = SecureMessage.query.filter(SecureMessage.msg_id == message['msg_id']).one()
+                secure_message.read_at = datetime.utcnow()
+                session.add(secure_message)
                 session.commit()
             except SQLAlchemyError:
                 session.rollback()
