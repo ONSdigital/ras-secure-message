@@ -22,8 +22,8 @@ from secure_message.logger_config import logger_initial_config
 from secure_message.repository import database
 from secure_message.resources.health import DatabaseHealth, Health, HealthDetails
 from secure_message.resources.info import Info
-from secure_message.resources.messages import MessageCounter, MessageModifyById, MessageSend
-from secure_message.resources.threads import ThreadById, ThreadList
+from secure_message.resources.messages import MessageModifyById, MessageSend
+from secure_message.resources.threads import ThreadById, ThreadCounter, ThreadList
 
 logger = wrap_logger(logging.getLogger(__name__))
 
@@ -56,10 +56,10 @@ def create_app(config=None):
     api.add_resource(MessageSend, '/message/send', '/v2/messages')
     api.add_resource(MessageModifyById, '/message/<message_id>/modify',
                      '/v2/messages/modify/<message_id>')
-    api.add_resource(MessageCounter, '/v2/messages/count')
 
     api.add_resource(ThreadList, '/threads')
     api.add_resource(ThreadById, '/thread/<thread_id>', '/v2/threads/<thread_id>')
+    api.add_resource(ThreadCounter, '/v2/messages/count')
 
     app.oauth_client_token_expires_at = maya.now()
 
