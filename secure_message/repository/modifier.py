@@ -86,13 +86,13 @@ class Modifier:
             # events table will be removed.
             try:
                 event = Events(msg_id=message['msg_id'], event=EventsApi.READ.value)
-                db.session.add(event)  # pylint: disable=maybe-no-member
+                db.session.add(event)
                 secure_message = SecureMessage.query.filter(SecureMessage.msg_id == message['msg_id']).one()
                 secure_message.read_at = datetime.utcnow()
-                db.session.add(secure_message)  # pylint: disable=maybe-no-member
-                db.session.commit()  # pylint: disable=maybe-no-member
+                db.session.add(secure_message)
+                db.session.commit()
             except SQLAlchemyError:
-                db.session.rollback()  # pylint: disable=maybe-no-member
+                db.session.rollback()
                 logger.exception('Error adding read information to message', msg_id=message['msg_id'])
                 raise InternalServerError(description="Error adding read information to message")
         Modifier.remove_label(unread, message, user)
