@@ -15,7 +15,6 @@ class PartyServiceMock:
                 business_details.append(self._business_details.get(ru_id))
         if not business_details:
             logger.error(f"no details for ru:{ru} found in mock party service")
-            business_details = None
         return business_details
 
     def get_user_details(self, uuid):

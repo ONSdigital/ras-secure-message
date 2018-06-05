@@ -22,7 +22,7 @@ class PartyTestCase(unittest.TestCase):
         self.app.testing = True
 
     @requests_mock.mock()
-    def test_mulitple_ru_hitting_part_service(self, mock_request):
+    def test_multiple_ru_hitting_party_service(self, mock_request):
         """Test get business details sends a request and returns data"""
         ru = ["1234", "5678"]
         texts = '[{"something": "else"}, {"something": "else"}]'
@@ -30,9 +30,47 @@ class PartyTestCase(unittest.TestCase):
         mock_request.get(business_data_url, status_code=200, reason="OK", text=texts)
         sut = PartyService()
         with self.app.app_context():
-            results =sut.get_business_details(ru)
+            results = sut.get_business_details(ru)
 
         self.assertTrue(results, texts)
+
+    @requests_mock.mock()
+    def test_multiple_user_uuids_hitting_party_service(self, mock_request):
+        """Test get business details sends a request and returns data"""
+        ru = ["c614e64e-d981-4eba-b016-d9822f09a4fb", "c614e64e-d981-4eba-b016-d9822f09a4f2"]
+        texts = '[{"something": "else"}, {"something": "else"}]'
+        business_data_url = f"{self.app.config['RAS_PARTY_SERVICE']}party-api/v1/respondents?id={ru[0]}&id={ru[1]}"
+        mock_request.get(business_data_url, status_code=200, reason="OK", text=texts)
+        sut = PartyService()
+        with self.app.app_context():
+            results = sut.get_user_details(ru)
+
+        self.assertTrue(results, texts)
+
+    @requests_mock.mock()
+    def test_multiple_business_uuid_one_invalid(self, mock_request):
+        """Test get business details sends a request and returns data"""
+        ru = ["c614e64e-d981-4eba-b016-d9822f09a4fb", "12345"]
+        texts = "error"
+        business_data_url = f"{self.app.config['RAS_PARTY_SERVICE']}party-api/v1/businesses?id={ru[0]}&id={ru[1]}"
+        mock_request.get(business_data_url, status_code=400, reason="Invalid uuid", text=texts)
+        sut = PartyService()
+        with self.app.app_context():
+            results = sut.get_business_details(ru)
+
+        self.assertEqual(results, [])
+
+    @requests_mock.mock()
+    def test_multiple_business_uuid_one_not_found(self, mock_request):
+        """Test get business details sends a request and returns data"""
+        ru = ["c614e64e-d981-4eba-b016-d9822f09a4fb", "c614e64e-d981-4eba-b016-d9822f09a4f2"]
+        business_data_url = f"{self.app.config['RAS_PARTY_SERVICE']}party-api/v1/businesses?id={ru[0]}&id={ru[1]}"
+        mock_request.get(business_data_url, status_code=200, text='{"something": "else"}')
+        sut = PartyService()
+        with self.app.app_context():
+            results = sut.get_business_details(ru)
+
+        self.assertEqual(results, {"something": "else"})
 
     @requests_mock.mock()
     def test_results_returned_from_get_business_get_executed_twice_for_different_ru(self, mock_request):
@@ -54,7 +92,7 @@ class PartyTestCase(unittest.TestCase):
     @requests_mock.mock()
     def test_results_returned_from_get_business_details_returned_as_expected(self, mock_request):
         """Test get business details sends a request and returns data"""
-        ru = ['b08c07c3-df28-4283-bb4c-c048729ce372']
+        ru = ["b08c07c3-df28-4283-bb4c-c048729ce372"]
         business_data_url = f"{self.app.config['RAS_PARTY_SERVICE']}party-api/v1/businesses?id={ru[0]}"
         mock_request.get(business_data_url, status_code=200, reason="OK", text='{"something": "else"}')
         sut = PartyService()
@@ -86,7 +124,7 @@ class PartyTestCase(unittest.TestCase):
         with self.app.app_context():
             result_data = sut.get_business_details(ru)
 
-        self.assertIsNone(result_data)
+        self.assertEqual(result_data, [])
 
     @requests_mock.mock()
     def test_get_user_details_for_internal_user(self, mock_request):

@@ -10,40 +10,41 @@ logger = wrap_logger(logging.getLogger(__name__))
 class PartyService:
 
     def __init__(self):
-        self._users_cache = {}
-        self._business_details_cache = {}
+        self._users_cache = []
 
     @staticmethod
     def get_business_details(rus):
         """Retrieves the business details from the party service"""
-        ru_dict = None
+        ru_list = []
         payload = urlencode([("id", x) for x in rus])
 
         party_data = requests.get(f"{current_app.config['RAS_PARTY_SERVICE']}party-api/v1/businesses",
                                   auth=current_app.config['BASIC_AUTH'], verify=False, params=payload)
         if party_data.status_code == 200:
-            ru_dict = party_data.json()
+            ru_list = party_data.json()
             logger.debug(f"Party data retrieved for ru:{rus}")
         else:
             logger.debug(f"Party data failed for ru:{rus}", status_code=party_data.status_code, text=party_data.text,
                          ru=rus)
+        return ru_list
 
-        return ru_dict
+    def get_user_details(self, uuid):
+        """Retrieves the user details from the party service"""
+        user_list = None
+        if self._users_cache:
+            user_list = self._users_cache
+        if user_list is None:
+            payload = urlencode([("id", x) for x in uuid])
 
-    @staticmethod
-    def get_user_details(uuid):
+            party_data = requests.get(f"{current_app.config['RAS_PARTY_SERVICE']}party-api/v1/respondents",
+                                      auth=current_app.config['BASIC_AUTH'], verify=False, params=payload)
+            if party_data.status_code == 200:
+                user_list = party_data.json()
+                self._users_cache = user_list
+                logger.debug(f"Party data retrieved for uuid:{uuid}")
+            else:
+                logger.error(f'Party service failed for uuid:{uuid}', status_code=party_data.status_code,
+                             text=party_data.text,
+                             uuid=uuid)
 
-        ru_dict = None
-        payload = urlencode([("id", x) for x in uuid])
-
-        party_data = requests.get(f"{current_app.config['RAS_PARTY_SERVICE']}party-api/v1/respondents",
-                                  auth=current_app.config['BASIC_AUTH'], verify=False, params=payload)
-        if party_data.status_code == 200:
-            ru_dict = party_data.json()
-            logger.debug(f"Party data retrieved for uuid:{uuid}")
-        else:
-            logger.error(f'Party service failed for uuid:{uuid}', status_code=party_data.status_code,
-                         text=party_data.text,
-                         uuid=uuid)
-
-        return ru_dict
+        return user_list
