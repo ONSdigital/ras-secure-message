@@ -53,12 +53,13 @@ class ThreadById(Resource):
         metadata = Retriever.retrieve_conversation_metadata(thread_id)
         ThreadById._validate_request(request_data, metadata)
 
-        if request_data.get('is_closed'):
-            bound_logger.info("About to close conversation")
-            Modifier.close_conversation(metadata, g.user)
-        elif not request_data.get('is_closed'):
-            bound_logger.info("About re-open conversation")
-            Modifier.open_conversation(metadata, g.user)
+        if 'is_closed' in request_data:
+            if request_data.get('is_closed'):
+                bound_logger.info("About to close conversation")
+                Modifier.close_conversation(metadata, g.user)
+            else:
+                bound_logger.info("About re-open conversation")
+                Modifier.open_conversation(metadata, g.user)
 
         bound_logger.info("Thread metadata update successful")
         bound_logger.unbind('thread_id', 'user_uuid')
@@ -67,23 +68,26 @@ class ThreadById(Resource):
     @staticmethod
     def _validate_request(request_data, metadata):
         """Used to validate data within request body for ModifyById"""
-
+        bound_logger = logger.bind(thread_id=metadata.id, user_uuid=g.user.user_uuid)
         if not g.user.is_internal:
-            logger.info("Thread modification is forbidden", thread_id=metadata.id, user_uuid=g.user.user_uuid)
+            bound_logger.info("Thread modification is forbidden")
             abort(403)
         # Check if it's empty
         if not request_data:
-            logger.error('No properties provided', thread_id=metadata.id, user_uuid=g.user.user_uuid)
+            bound_logger.error('No properties provided')
             raise BadRequest(description="No properties provided")
         if not isinstance(request_data['is_closed'], bool):
-            logger.error('Invalid value provided', thread_id=metadata.id, user_uuid=g.user.user_uuid)
+            bound_logger.error('Invalid value provided')
             raise BadRequest(description="Invalid label provided")
         if metadata.is_closed and request_data['is_closed'] is True:
-            logger.info("Conversation already closed", thread_id=metadata.id, user_uuid=g.user.user_uuid)
+            bound_logger.info("Conversation already closed")
             raise BadRequest(description="Conversation already closed")
         if not metadata.is_closed and request_data['is_closed'] is False:
-            logger.info("Conversation already open", thread_id=metadata.id, user_uuid=g.user.user_uuid)
+            bound_logger.info("Conversation already open")
             raise BadRequest(description="Conversation already open")
+
+        bound_logger.info("Thread validation successful")
+        bound_logger.unbind('thread_id', 'user_uuid')
 
 
 class ThreadList(Resource):
