@@ -89,7 +89,7 @@ class Modifier:
         return True
 
     @staticmethod
-    def close_conversation(metadata, user, session=db.session):
+    def close_conversation(metadata, user):
         bound_logger = logger.bind(conversation_id=metadata.id, user_id=user.user_uuid)
         bound_logger.info("Getting user details")
         user_details = InternalUserService.get_user_details(user.user_uuid)
@@ -101,9 +101,9 @@ class Modifier:
             metadata.closed_at = datetime.now(timezone.utc)
             metadata.closed_by = f"{user_details.get('firstName')} {user_details.get('lastName')}"
             metadata.closed_by_uuid = user.user_uuid
-            session.commit()
+            db.session.commit()
         except SQLAlchemyError:
-            session.rollback()
+            db.session.rollback()
             logger.exception("Error saving metadata")
 
         bound_logger.info("Sucessfully closed conversation")
