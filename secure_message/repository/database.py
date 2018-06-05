@@ -53,6 +53,11 @@ class SecureMessage(db.Model):
         self.from_internal = from_internal
         self.read_at = read_at
 
+    def __repr__(self):
+        return f'<SecureMessage(msg_id={self.msg_id} subject={self.subject} body={self.body} thread_id={self.thread_id}' \
+               f' collection_case={self.collection_case} ru_id={self.ru_id} collection_exercise={self.collection_exercise}' \
+               f' survey={self.survey} from_internal={self.from_internal} sent_at={self.sent_at} read_at={self.read_at})>'
+
     def set_from_domain_model(self, domain_model):
         """set dbMessage attributes to domain_model attributes"""
         self.msg_id = domain_model.msg_id
