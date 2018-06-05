@@ -35,6 +35,13 @@ class RetrieverTestCaseHelper:
                     '{thread_id}', '{collection_case}', '{ru_id}', '{survey}', '{collection_exercise}', '{from_internal}')'''
             con.execute(query)
 
+    def add_conversation(self, id):
+        """ Populate the conversation table"""
+
+        with self.engine.connect() as con:
+            query = f"INSERT INTO securemessage.conversation(id) VALUES('{id}')"
+            con.execute(query)
+
     def add_status(self, label, msg_id, actor):
         """ Populate the status table"""
 
@@ -80,7 +87,9 @@ class RetrieverTestCaseHelper:
 
             if single:
                 msg_id = str(uuid.uuid4())
+                self.add_conversation(id="ThreadId")
                 self.add_secure_message(msg_id=msg_id, from_internal=False)
+
                 self.add_status(label="SENT", msg_id=msg_id, actor=external_actor)
                 self.add_status(label="INBOX", msg_id=msg_id, actor=internal_actor)
                 self.add_status(label="UNREAD", msg_id=msg_id, actor=internal_actor)
@@ -121,7 +130,7 @@ class RetrieverTestCaseHelper:
         month = 1
         day = 1
 
-        for _ in range(no_of_threads):
+        for i in range(no_of_threads):
             if day < 22:
                 day += 1
             elif month < 12:
@@ -135,6 +144,8 @@ class RetrieverTestCaseHelper:
             msg_id = str(uuid.uuid4())
             thread_id = msg_id
             threads.append(thread_id)
+            if i == 0:
+                self.add_conversation(id=thread_id)
             self.add_secure_message(msg_id=msg_id, thread_id=thread_id, survey=test_utilities.BRES_SURVEY, from_internal=False)
             self.add_status(label="SENT", msg_id=msg_id, actor=external_actor)
             self.add_status(label="INBOX", msg_id=msg_id, actor=internal_actor)

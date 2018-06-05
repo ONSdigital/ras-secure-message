@@ -23,8 +23,12 @@ class ModifyTestCaseHelper:
         with self.engine.connect() as con:
             for i in range(record_count):
                 msg_id = str(uuid.uuid4())
+                # Only the first message in a thread needs a entry in the conversation table
+                if i == 0:
+                    query = f'''INSERT INTO securemessage.conversation(id, is_closed, closed_by, closed_by_uuid) VALUES('{msg_id}', false, '', '')'''
+                    con.execute(query)
                 query = f'''INSERT INTO securemessage.secure_message(id, msg_id, subject, body, thread_id,
-                        collection_case, ru_id, collection_exercise, survey) VALUES ({i}, '{msg_id}', 'test','test','',
+                        collection_case, ru_id, collection_exercise, survey) VALUES ({i}, '{msg_id}', 'test','test','{msg_id}',
                         'ACollectionCase', 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc', 'ACollectionExercise',
                         '{constants.NON_SPECIFIC_INTERNAL_USER}')'''
                 con.execute(query)
