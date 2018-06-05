@@ -77,7 +77,7 @@ class Modifier:
         return res
 
     @staticmethod
-    def mark_message_as_read(message, user, session=db.session):
+    def mark_message_as_read(message, user):
         """Remove unread label from status"""
         inbox = Labels.INBOX.value
         unread = Labels.UNREAD.value
@@ -86,13 +86,13 @@ class Modifier:
             # events table will be removed.
             try:
                 event = Events(msg_id=message['msg_id'], event=EventsApi.READ.value)
-                session.add(event)
+                db.session.add(event)  # pylint: disable=maybe-no-member
                 secure_message = SecureMessage.query.filter(SecureMessage.msg_id == message['msg_id']).one()
                 secure_message.read_at = datetime.utcnow()
-                session.add(secure_message)
-                session.commit()
+                db.session.add(secure_message)  # pylint: disable=maybe-no-member
+                db.session.commit()  # pylint: disable=maybe-no-member
             except SQLAlchemyError:
-                session.rollback()
+                db.session.rollback()  # pylint: disable=maybe-no-member
                 logger.exception('Error adding read information to message', msg_id=message['msg_id'])
                 raise InternalServerError(description="Error adding read information to message")
         Modifier.remove_label(unread, message, user)
