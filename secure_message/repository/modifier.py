@@ -110,7 +110,7 @@ class Modifier:
         bound_logger.unbind('conversation_id', 'user_id')
 
     @staticmethod
-    def open_conversation(metadata, user, session=db.session):
+    def open_conversation(metadata, user):
         bound_logger = logger.bind(conversation_id=metadata.id, user_id=user.user_uuid)
 
         try:
@@ -119,9 +119,9 @@ class Modifier:
             metadata.closed_at = None
             metadata.closed_by = ''
             metadata.closed_by_uuid = ''
-            session.commit()
+            db.session.commit()
         except SQLAlchemyError:
-            session.rollback()
+            db.session.rollback()
             logger.exception("Error saving metadata to conversation")
 
         bound_logger.info("Sucessfully re-opened conversation")
