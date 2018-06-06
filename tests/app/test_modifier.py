@@ -1,3 +1,4 @@
+import datetime
 import unittest
 import uuid
 
@@ -9,6 +10,7 @@ from secure_message import constants
 from secure_message.application import create_app
 from secure_message.common.eventsapi import EventsApi
 from secure_message.repository import database
+from secure_message.repository.database import SecureMessage
 from secure_message.repository.modifier import Modifier
 from secure_message.repository.retriever import Retriever
 from secure_message.validation.user import User
@@ -18,7 +20,7 @@ from tests.app import test_utilities
 class ModifyTestCaseHelper:
     """Helper class for Modify Tests"""
 
-    def populate_database(self, record_count=0):
+    def populate_database(self, record_count=0, mark_as_read=True):
         """Adds a sppecified number of Messages to the db"""
         with self.engine.connect() as con:
             for i in range(record_count):
@@ -44,9 +46,10 @@ class ModifyTestCaseHelper:
                 query = f'''INSERT INTO securemessage.events(event, msg_id, date_time)
                          VALUES('{EventsApi.SENT.value}', '{msg_id}', '2017-02-03 00:00:00')'''
                 con.execute(query)
-                query = f'''INSERT INTO securemessage.events(event, msg_id, date_time)
-                        VALUES('{EventsApi.READ.value}', '{msg_id}', '2017-02-03 00:00:00')'''
-                con.execute(query)
+                if mark_as_read:
+                    query = f'''INSERT INTO securemessage.events(event, msg_id, date_time)
+                            VALUES('{EventsApi.READ.value}', '{msg_id}', '2017-02-03 00:00:00')'''
+                    con.execute(query)
 
 
 class ModifyTestCase(unittest.TestCase, ModifyTestCaseHelper):
@@ -95,22 +98,20 @@ class ModifyTestCase(unittest.TestCase, ModifyTestCaseHelper):
 
     def test_read_date_is_set(self):
         """testing message read_date is set when unread label is removed"""
-        self.populate_database(1)
-        with self.engine.connect() as con:
-            query = 'SELECT msg_id FROM securemessage.secure_message LIMIT 1'
-            query_x = con.execute(query)
-            names = []
-            for row in query_x:
-                names.append(row[0])
+        self.populate_database(1, mark_as_read=False)
         with self.app.app_context():
-            with current_app.test_request_context():
-                msg_id = str(names[0])
-                message_service = Retriever()
-                modifier = Modifier()
-                message = message_service.retrieve_message(msg_id, self.user_internal)
-                modifier.del_unread(message, self.user_internal)
-                message = message_service.retrieve_message(msg_id, self.user_internal)
-                self.assertIsNotNone(message['read_date'])
+            msg_id = SecureMessage.query.one().msg_id
+            serialised_message = Retriever.retrieve_message(msg_id, self.user_internal)
+            Modifier.mark_message_as_read(serialised_message, self.user_internal)
+            serialised_message = Retriever.retrieve_message(msg_id, self.user_internal)
+            db_message = SecureMessage.query.filter(SecureMessage.msg_id == serialised_message['msg_id']).one()
+
+            self.assertIsNotNone(serialised_message['read_date'])
+            self.assertTrue(isinstance(db_message.read_at, datetime.datetime))
+            # Test that timestamp on read message is less than 3 seconds old to prove it
+            # was only just created
+            delta = datetime.datetime.utcnow() - db_message.read_at
+            self.assertTrue(delta.total_seconds() < 3)
 
     def test_read_date_is_not_reset(self):
         """testing message read_date is not reset when unread label is removed again"""
@@ -127,12 +128,12 @@ class ModifyTestCase(unittest.TestCase, ModifyTestCaseHelper):
                 message_service = Retriever()
                 modifier = Modifier()
                 message = message_service.retrieve_message(msg_id, self.user_internal)
-                modifier.del_unread(message, self.user_internal)
+                modifier.mark_message_as_read(message, self.user_internal)
                 message = message_service.retrieve_message(msg_id, self.user_internal)
                 read_date_set = message['read_date']
                 modifier.add_unread(message, self.user_internal)
                 message = message_service.retrieve_message(msg_id, self.user_internal)
-                modifier.del_unread(message, self.user_internal)
+                modifier.mark_message_as_read(message, self.user_internal)
                 message = message_service.retrieve_message(msg_id, self.user_internal)
                 self.assertEqual(message['read_date'], read_date_set)
 
