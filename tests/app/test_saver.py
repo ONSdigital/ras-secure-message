@@ -48,7 +48,7 @@ class SaverTestCase(unittest.TestCase):
         message_status = {'msg_id': 'AMsgId', 'actor': 'Tej'}
         with self.app.app_context():
             with current_app.test_request_context():
-                Saver().save_message(SecureMessage(msg_id='AMsgId'))
+                Saver().save_message(SecureMessage(msg_id='AMsgId', thread_id='AMsgId'))
                 Saver().save_msg_status(message_status['actor'], message_status['msg_id'], 'INBOX, UNREAD')
                 result = SecureMessage.query.filter(SecureMessage.msg_id == 'AMsgId').one()
                 self.assertTrue(isinstance(result.sent_at, datetime.datetime))
@@ -79,7 +79,7 @@ class SaverTestCase(unittest.TestCase):
         message_event = {'msg_id': 'AMsgId', 'event': EventsApi.SENT.value, 'date_time': ''}
         with self.app.app_context():
             with current_app.test_request_context():
-                Saver().save_message(SecureMessage(msg_id='AMsgId'))
+                Saver().save_message(SecureMessage(msg_id='AMsgId', thread_id='AMsgId'))
                 Saver().save_msg_event(message_event['msg_id'], message_event['event'])
 
         with self.engine.connect() as con:
