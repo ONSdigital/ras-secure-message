@@ -234,15 +234,6 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
                 with self.assertRaises(NotFound):
                     Retriever().retrieve_message(message_id, self.user_internal)
 
-    def test_msg_returned_with_msg_id_msg_not_in_database(self):
-        """retrieves message using id"""
-        message_id = "21"
-        self.populate_database(20)
-        with self.app.app_context():
-            with current_app.test_request_context():
-                with self.assertRaises(NotFound):
-                    Retriever().retrieve_message(message_id, self.user_internal)
-
     def test_correct_labels_returned_internal(self):
         """retrieves message using id and checks the labels are correct"""
         self.populate_database(1)
@@ -339,11 +330,12 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
 
     def test_thread_returned_in_desc_order(self):
         """check thread returned in correct order"""
-        self.populate_database(3, add_reply=True)
+
+        thread_id = self.create_thread(no_of_messages=6)
 
         with self.app.app_context():
             with current_app.test_request_context():
-                response = Retriever().retrieve_thread('ThreadId', self.user_respondent)
+                response = Retriever().retrieve_thread(thread_id, self.user_respondent)
                 self.assertEqual(len(response.all()), 6)
 
                 sent = [str(message.events[0].date_time) for message in response.all()]
@@ -361,8 +353,8 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
 
     def test_thread_list_returned_in_descending_order_respondent(self):
         """retrieves threads from database in desc sent_date order for respondent"""
-        self.create_threads(5)
-        self.populate_database(5, single=False, multiple_users=True)
+        for _ in range(5):
+            self.create_thread(no_of_messages=2)
 
         with self.app.app_context():
             with current_app.test_request_context():
@@ -383,7 +375,8 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
 
     def test_thread_list_returned_in_descending_order_internal(self):
         """retrieves threads from database in desc sent_date order for internal user"""
-        self.create_threads(5)
+        for i in range(5):
+            self.create_thread(no_of_messages=3)
 
         with self.app.app_context():
             with current_app.test_request_context():
