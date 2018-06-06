@@ -57,115 +57,6 @@ class RetrieverTestCaseHelper:
                     f" VALUES('{event}', '{msg_id}', '{date_time}')"
             con.execute(query)
 
-    def del_status(self, label, msg_id, actor):
-        """ Delete a specific row from status table"""
-
-        with self.engine.connect() as con:
-            query = f"DELETE FROM securemessage.status WHERE label = " \
-                    f"'{label}' AND msg_id = '{msg_id}' AND actor = '{actor}'"
-            con.execute(query)
-
-    def populate_database(self, no_of_messages=0, single=True, add_reply=False, multiple_users=False,
-                          external_actor=default_external_actor,
-                          internal_actor=default_internal_actor):
-        """ Populate the db with a specified number of messages and optionally replies , multiple users"""
-
-        year = 2016
-        month = 1
-        day = 1
-
-        for _ in range(no_of_messages):
-            if day < 22:
-                day += 1
-            elif month < 12:
-                day = 1
-                month += 1
-            else:
-                day = 1
-                month = 1
-                year += 1
-
-            msg_id = str(uuid.uuid4())
-            self.add_conversation(id=msg_id)
-
-            if single:
-                self.add_secure_message(msg_id=msg_id, thread_id=msg_id, from_internal=False)
-
-                self.add_status(label="SENT", msg_id=msg_id, actor=external_actor)
-                self.add_status(label="INBOX", msg_id=msg_id, actor=internal_actor)
-                self.add_status(label="UNREAD", msg_id=msg_id, actor=internal_actor)
-
-                self.add_event(event=EventsApi.SENT.value, msg_id=msg_id, date_time=datetime(year, month, day))
-                day = day + 1
-
-            if add_reply:
-                self.del_status(label="UNREAD", msg_id=msg_id, actor=internal_actor)
-                self.add_event(event=EventsApi.READ.value, msg_id=msg_id, date_time=datetime(year, month, day))
-                day = day + 1
-                msg_id = str(uuid.uuid4())
-                self.add_secure_message(msg_id=msg_id, thread_id=msg_id, from_internal=True)
-                self.add_status(label="SENT", msg_id=msg_id, actor=internal_actor)
-                self.add_status(label="INBOX", msg_id=msg_id, actor=external_actor)
-                self.add_status(label="UNREAD", msg_id=msg_id, actor=external_actor)
-
-                self.add_event(event=EventsApi.SENT.value, msg_id=msg_id, date_time=datetime(year, month, day))
-                day = day + 1
-
-            if multiple_users:
-                msg_id = str(uuid.uuid4())
-                self.add_secure_message(msg_id=msg_id, thread_id="AnotherThreadId",
-                                        collection_case="AnotherCollectionCase", collection_exercise="AnotherCollectionExercise",
-                                        ru_id='0a6018a0-3e67-4407-b120-780932434b36', survey="AnotherSurvey", from_internal=False)
-                self.add_status(label="SENT", msg_id=msg_id, actor="1a7ad740-10d5-4ecb-b7ca-fb8823c0384a")
-                self.add_status(label="INBOX", msg_id=msg_id, actor="11111111-10d5-4ecb-b7ca-fb8823c0384a")
-                self.add_status(label="UNREAD", msg_id=msg_id, actor="11111111-10d5-4ecb-b7ca-fb8823c0384a")
-
-                self.add_event(event=EventsApi.SENT.value, msg_id=msg_id, date_time=datetime(year, month, day))
-                day = day + 1
-
-    def create_threads(self, no_of_threads=1, external_actor=default_external_actor,
-                       internal_actor=default_internal_actor):
-        """ Populate the db with a specified number of messages and optionally replies , multiple users"""
-        threads = []
-        year = 2016
-        month = 1
-        day = 1
-
-        for i in range(no_of_threads):
-            if day < 22:
-                day += 1
-            elif month < 12:
-                day = 1
-                month += 1
-            else:
-                day = 1
-                month = 1
-                year += 1
-
-            msg_id = str(uuid.uuid4())
-            thread_id = msg_id
-            threads.append(thread_id)
-            if i == 0:
-                self.add_conversation(id=thread_id)
-            self.add_secure_message(msg_id=msg_id, thread_id=thread_id, survey=test_utilities.BRES_SURVEY, from_internal=False)
-            self.add_status(label="SENT", msg_id=msg_id, actor=external_actor)
-            self.add_status(label="INBOX", msg_id=msg_id, actor=internal_actor)
-
-            self.add_event(event=EventsApi.SENT.value, msg_id=msg_id, date_time=datetime(year, month, day))
-            day += 1
-            self.add_event(event=EventsApi.READ.value, msg_id=msg_id, date_time=datetime(year, month, day))
-            day += 1
-            msg_id = str(uuid.uuid4())
-            self.add_secure_message(msg_id=msg_id, thread_id=thread_id,
-                                    survey=test_utilities.BRES_SURVEY, from_internal=True)
-            self.add_status(label="SENT", msg_id=msg_id, actor=internal_actor)
-            self.add_status(label="UNREAD", msg_id=msg_id, actor=external_actor)
-            self.add_status(label="INBOX", msg_id=msg_id, actor=external_actor)
-            self.add_event(event=EventsApi.SENT.value, msg_id=msg_id, date_time=datetime(year, month, day))
-            day += 1
-
-        return threads
-
     def create_thread(self, no_of_messages=1, external_actor=default_external_actor, internal_actor=default_internal_actor):
         """Populate the db with a thread with a specified number of messages"""
 
@@ -213,7 +104,7 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
 
     def test_msg_returned_with_msg_id_true(self):
         """retrieves message using id"""
-        self.populate_database(20)
+        self.create_thread(no_of_messages=2)
         with self.engine.connect() as con:
             query = 'SELECT msg_id FROM securemessage.secure_message LIMIT 1'
             query_x = con.execute(query)
@@ -223,7 +114,7 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
             with self.app.app_context():
                 with current_app.test_request_context():
                     msg_id = str(names[0])
-                    response = Retriever().retrieve_message(msg_id, self.user_internal)
+                    response = Retriever.retrieve_message(msg_id, self.user_internal)
                     self.assertEqual(response['msg_id'], str(names[0]))
 
     def test_msg_returned_with_msg_id_returns_404(self):
@@ -236,7 +127,7 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
 
     def test_correct_labels_returned_internal(self):
         """retrieves message using id and checks the labels are correct"""
-        self.populate_database(1)
+        self.create_thread()
         with self.engine.connect() as con:
             query = 'SELECT msg_id FROM securemessage.secure_message LIMIT 1'
             query_x = con.execute(query)
@@ -253,7 +144,7 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
 
     def test_correct_labels_returned_external(self):
         """retrieves message using id and checks the labels are correct"""
-        self.populate_database(1)
+        self.create_thread()
         with self.engine.connect() as con:
             query = 'SELECT msg_id FROM securemessage.secure_message LIMIT 1'
             query_x = con.execute(query)
@@ -270,7 +161,7 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
 
     def test_correct_to_and_from_returned_internal_user(self):
         """retrieves message using id and checks the to and from urns are correct"""
-        self.populate_database(1, internal_actor=self.user_internal.user_uuid)
+        self.create_thread(internal_actor=self.user_internal.user_uuid)
         with self.engine.connect() as con:
             query = 'SELECT msg_id FROM securemessage.secure_message LIMIT 1'
             query_x = con.execute(query)
@@ -287,7 +178,7 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
 
     def test_sent_date_returned_for_message(self):
         """retrieves message using id and checks the sent date returned"""
-        self.populate_database(1)
+        self.create_thread()
         with self.engine.connect() as con:
             query = 'SELECT msg_id FROM securemessage.secure_message LIMIT 1'
             query_x = con.execute(query)
