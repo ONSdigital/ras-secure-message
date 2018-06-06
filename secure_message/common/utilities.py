@@ -70,16 +70,26 @@ def process_paginated_list(paginated_list, host_url, user, message_args, endpoin
     return messages, links
 
 
-def _get_from_details(messages):
+def get_from_details(messages):
     """looks up the details for the from users"""
+    update_internal_messages_from(messages)
+    from_details = party.get_user_details(get_messages_from_external(messages))
+    external_messages = [x for x in messages if x['from_internal'] is False]
+
+    for message in messages:
+        if message in external_messages:
+            message.update({'@msg_from': from_details[0]})
+
+    return messages
+
+
+def get_messages_from_external(messages):
     external_msgs = []
     uuid_from = []
 
     len_list = len(messages)
 
-    for message in messages:
-        if message["from_internal"]:
-            message.update({"@msg_from": internal_user_service.get_user_details(message["msg_from"])})
+    update_internal_messages_from(messages)
 
     for i in range(0, len_list):
         if not messages[i]['from_internal']:
@@ -88,21 +98,20 @@ def _get_from_details(messages):
         if uuid["msg_from"] not in uuid_from:
             uuid_from.append(uuid["msg_from"])
 
-    from_details = party.get_user_details(uuid_from)
+
+def update_internal_messages_from(messages):
 
     for message in messages:
-        if message in external_msgs:
-            message.update({'@msg_from': from_details[0]})
-
-    return messages
+        if message["from_internal"]:
+            message.update({"@msg_from": internal_user_service.get_user_details(message["msg_from"])})
 
 
-def _get_to_details(messages):
+def get_to_details(messages):
     """looks up the details for the to users"""
 
-    update_external_messages(messages)
+    update_external_messages_to(messages)
 
-    to_details = party.get_user_details(get_internal_uuid(messages))
+    to_details = party.get_user_details(get_internal_messages_to_uuid(messages))
     internal_messages = [x for x in messages if x['from_internal'] is True]
 
     for msg in messages:
@@ -112,14 +121,14 @@ def _get_to_details(messages):
     return messages
 
 
-def update_external_messages(messages):
+def update_external_messages_to(messages):
 
     for message in messages:
         if not message["from_internal"]:
             message.update({"@msg_to": internal_user_service.get_user_details(message["msg_to"][0])})
 
 
-def get_internal_uuid(messages):
+def get_internal_messages_to_uuid(messages):
     msgs = []
     uuid_to = []
     len_list = len(messages)
@@ -132,6 +141,7 @@ def get_internal_uuid(messages):
         if uuid["msg_to"][0] not in uuid_to:
             uuid_to.append(uuid["msg_to"][0])
     return uuid_to
+
 
 def add_business_details(messages):
     """Adds business details"""
@@ -151,8 +161,8 @@ def add_business_details(messages):
 
 def add_users_and_business_details(messages):
     """Add both user and business details to messages based on data from party service"""
-    messages = _get_to_details(messages)
-    messages = _get_from_details(messages)
+    messages = get_to_details(messages)
+    messages = get_from_details(messages)
     logger.info("Successfully added to and from details")
     messages = add_business_details(messages)
     logger.info("Successfully added business details")
