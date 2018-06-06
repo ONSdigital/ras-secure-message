@@ -14,7 +14,7 @@ def get_args(page=1, limit=100, surveys=None, cc="", ru="", label="", desc=True,
 
 
 class UtilitiesTestCase(unittest.TestCase):
-    """Test cases for party service"""
+    """Test cases for Utilities"""
 
     def setUp(self):
         """setup test environment"""
@@ -62,9 +62,9 @@ class UtilitiesTestCase(unittest.TestCase):
                  'collection_exercise': '',
                  'from_internal': True,
                  'labels': ['INBOX'],
-                 'msg_from': 'c8059a4d-5de0-4551-bdf2-09c8d1fe896e',
+                 'msg_from': ['GROUP'],
                  'msg_id': '048ffdb5-18f0-46f0-bfa0-ea298521c513',
-                 'msg_to': ['GROUP'],
+                 'msg_to': 'c8059a4d-5de0-4551-bdf2-09c8d1fe896e',
                  'read_date': '2018-06-05 15:23:39.898317',
                  'ru_id': '6c141ebb-10d1-4065-ac3e-ef5b5c95d251',
                  'sent_date': '2018-06-05 15:23:38.025084',
@@ -74,15 +74,16 @@ class UtilitiesTestCase(unittest.TestCase):
 
     def test_dictionary_update_for_message_to(self):
         self.assertNotIn('@msg_to', self.messages[0])
-        update_external_messages_to(self.messages)
+        with self.app.app_context():
+            update_external_messages_to(self.messages)
         self.assertIn('@msg_to', self.messages[0])
 
     @requests_mock.mock()
     def test_dictionary_update_for_message_from(self, mock_request):
-        uuid = "c8059a4d-5de0-4551-bdf2-09c8d1fe896e"
+        uuid = ['GROUP']
         url = f"{self.app.config['UAA_URL']}/Users/{uuid}"
         mock_request.get(url, status_code=200, json=self.user_info)
-        self.assertNotIn('@msg_to', self.messages[1])
+        self.assertNotIn('@msg_from', self.messages[1])
         with self.app.app_context():
             update_internal_messages_from(self.messages)
         self.assertIn('@msg_from', self.messages[1])
