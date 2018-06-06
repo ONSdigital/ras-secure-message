@@ -85,10 +85,11 @@ class RetrieverTestCaseHelper:
                 month = 1
                 year += 1
 
+            msg_id = str(uuid.uuid4())
+            self.add_conversation(id=msg_id)
+
             if single:
-                msg_id = str(uuid.uuid4())
-                self.add_conversation(id="ThreadId")
-                self.add_secure_message(msg_id=msg_id, from_internal=False)
+                self.add_secure_message(msg_id=msg_id, thread_id=msg_id, from_internal=False)
 
                 self.add_status(label="SENT", msg_id=msg_id, actor=external_actor)
                 self.add_status(label="INBOX", msg_id=msg_id, actor=internal_actor)
@@ -102,7 +103,7 @@ class RetrieverTestCaseHelper:
                 self.add_event(event=EventsApi.READ.value, msg_id=msg_id, date_time=datetime(year, month, day))
                 day = day + 1
                 msg_id = str(uuid.uuid4())
-                self.add_secure_message(msg_id=msg_id, from_internal=True)
+                self.add_secure_message(msg_id=msg_id, thread_id=msg_id, from_internal=True)
                 self.add_status(label="SENT", msg_id=msg_id, actor=internal_actor)
                 self.add_status(label="INBOX", msg_id=msg_id, actor=external_actor)
                 self.add_status(label="UNREAD", msg_id=msg_id, actor=external_actor)
