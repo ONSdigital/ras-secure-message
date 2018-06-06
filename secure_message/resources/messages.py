@@ -157,7 +157,7 @@ class MessageModifyById(Resource):
             return False
         if action == 'add':
             return Modifier.add_unread(message, user)
-        return Modifier.del_unread(message, user)
+        return Modifier.mark_message_as_read(message, user)
 
     @staticmethod
     def _validate_request(request_data):

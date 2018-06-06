@@ -1,3 +1,4 @@
+import datetime
 import unittest
 from unittest import mock
 
@@ -42,14 +43,22 @@ class SaverTestCase(unittest.TestCase):
                 with self.assertRaises(MessageSaveException):
                     Saver().save_message(self.test_message, mock_session)
 
-    def test_saved_msg_status_has_been_saved(self):
+    def test_saved_msg_status_and_sent_time_has_been_saved(self):
         """retrieves message status from database"""
         message_status = {'msg_id': 'AMsgId', 'actor': 'Tej'}
         with self.app.app_context():
             with current_app.test_request_context():
                 Saver().save_message(SecureMessage(msg_id='AMsgId'))
                 Saver().save_msg_status(message_status['actor'], message_status['msg_id'], 'INBOX, UNREAD')
+                result = SecureMessage.query.filter(SecureMessage.msg_id == 'AMsgId').one()
+                self.assertTrue(isinstance(result.sent_at, datetime.datetime))
+                # Test that sent_at timestamp on message is less than 3 seconds old to prove it
+                # was only just created
+                delta = datetime.datetime.utcnow() - result.sent_at
+                self.assertTrue(delta.total_seconds() < 3)
 
+        # This is horrible and barely tests anything... needs to be rewritten to test
+        # WHAT statuses are in the database, not just that is literally anything there
         with self.engine.connect() as con:
             request = con.execute('SELECT * FROM securemessage.status')
             for row in request:
