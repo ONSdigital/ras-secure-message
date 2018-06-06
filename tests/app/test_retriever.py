@@ -166,6 +166,30 @@ class RetrieverTestCaseHelper:
 
         return threads
 
+    def create_thread(self, no_of_messages=1, external_actor=default_external_actor, internal_actor=default_internal_actor):
+        """Populate the db with a thread with a specified number of messages"""
+
+        msg_id = str(uuid.uuid4())
+        thread_id = msg_id
+        self.add_conversation(id=thread_id)
+        self.add_secure_message(msg_id=msg_id, thread_id=thread_id, survey=test_utilities.BRES_SURVEY, from_internal=False)
+        self.add_status(label="SENT", msg_id=msg_id, actor=external_actor)
+        self.add_status(label="INBOX", msg_id=msg_id, actor=internal_actor)
+        self.add_event(event=EventsApi.SENT.value, msg_id=msg_id, date_time=datetime.utcnow())
+        self.add_event(event=EventsApi.READ.value, msg_id=msg_id, date_time=datetime.utcnow())
+
+        if no_of_messages > 1:
+            for i in range(no_of_messages - 1):
+                msg_id = str(uuid.uuid4())
+                self.add_secure_message(msg_id=msg_id, thread_id=thread_id,
+                                        survey=test_utilities.BRES_SURVEY, from_internal=True)
+                self.add_status(label="SENT", msg_id=msg_id, actor=internal_actor)
+                self.add_status(label="UNREAD", msg_id=msg_id, actor=external_actor)
+                self.add_status(label="INBOX", msg_id=msg_id, actor=external_actor)
+                self.add_event(event=EventsApi.SENT.value, msg_id=msg_id, date_time=datetime.utcnow())
+
+        return thread_id
+
 
 class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
     """Test case for message retrieval"""
@@ -288,7 +312,7 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
 
     def test_read_date_returned_for_message(self):
         """retrieves message using id and checks the read date returned"""
-        self.populate_database(1, add_reply=True)
+        self.create_thread(no_of_messages=2)
         with self.engine.connect() as con:
             query = "SELECT securemessage.secure_message.msg_id FROM securemessage.secure_message " \
                     "JOIN securemessage.events ON securemessage.secure_message.msg_id = securemessage.events.msg_id " \
@@ -306,11 +330,11 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
 
     def test_all_msg_returned_for_thread_id(self):
         """retrieves messages for thread_id from database"""
-        self.populate_database(3, add_reply=True)
+        thread_id = self.create_thread(no_of_messages=6)
 
         with self.app.app_context():
             with current_app.test_request_context():
-                response = Retriever().retrieve_thread('ThreadId', self.user_respondent)
+                response = Retriever().retrieve_thread(thread_id, self.user_respondent)
                 self.assertEqual(len(response.all()), 6)
 
     def test_thread_returned_in_desc_order(self):
@@ -380,7 +404,8 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
 
     def test_latest_message_from_each_thread_chosen_desc(self):
         """checks the message chosen for each thread is the latest message within that thread"""
-        self.create_threads(5)
+        for i in range(5):
+            self.create_thread(no_of_messages=3)
 
         with self.app.app_context():
             with current_app.test_request_context():
