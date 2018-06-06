@@ -1,5 +1,6 @@
-import requests_mock
 import unittest
+
+import requests_mock
 
 from secure_message.application import create_app, get_client_token
 from secure_message.common.utilities import MessageArgs, update_external_messages_to, update_internal_messages_from
@@ -42,35 +43,34 @@ class UtilitiesTestCase(unittest.TestCase):
                  'verified': True,
                  'zoneId': 'uaa'}
 
-    messages = [{
-        'body': 'Reply body from respondent',
-        'collection_case': '',
-        'collection_exercise': '',
-        'from_internal': False,
-        'labels': ['INBOX'],
-        'msg_from': 'c8059a4d-5de0-4551-bdf2-09c8d1fe896e',
-        'msg_id': '048ffdb5-18f0-46f0-bfa0-ea298521c513',
-        'msg_to': ['GROUP'],
-        'read_date': '2018-06-05 15:23:39.898317',
-        'ru_id': '6c141ebb-10d1-4065-ac3e-ef5b5c95d251',
-        'sent_date': '2018-06-05 15:23:38.025084',
-        'subject': 'Message to ONS',
-        'survey': 'cb8accda-6118-4d3b-85a3-149e28960c54',
-        'thread_id': '53a430f1-de21-4279-b17e-1bfb4c4813a6'}, {
-        'body': 'Reply body from respondent',
-        'collection_case': '',
-        'collection_exercise': '',
-        'from_internal': True,
-        'labels': ['INBOX'],
-        'msg_from': 'c8059a4d-5de0-4551-bdf2-09c8d1fe896e',
-        'msg_id': '048ffdb5-18f0-46f0-bfa0-ea298521c513',
-        'msg_to': ['GROUP'],
-        'read_date': '2018-06-05 15:23:39.898317',
-        'ru_id': '6c141ebb-10d1-4065-ac3e-ef5b5c95d251',
-        'sent_date': '2018-06-05 15:23:38.025084',
-        'subject': 'Message to ONS',
-        'survey': 'cb8accda-6118-4d3b-85a3-149e28960c54',
-        'thread_id': '53a430f1-de21-4279-b17e-1bfb4c4813a6'}]
+    messages = [{'body': 'Reply body from respondent',
+                 'collection_case': '',
+                 'collection_exercise': '',
+                 'from_internal': False,
+                 'labels': ['INBOX'],
+                 'msg_from': 'c8059a4d-5de0-4551-bdf2-09c8d1fe896e',
+                 'msg_id': '048ffdb5-18f0-46f0-bfa0-ea298521c513',
+                 'msg_to': ['GROUP'],
+                 'read_date': '2018-06-05 15:23:39.898317',
+                 'ru_id': '6c141ebb-10d1-4065-ac3e-ef5b5c95d251',
+                 'sent_date': '2018-06-05 15:23:38.025084',
+                 'subject': 'Message to ONS',
+                 'survey': 'cb8accda-6118-4d3b-85a3-149e28960c54',
+                 'thread_id': '53a430f1-de21-4279-b17e-1bfb4c4813a6'},
+                {'body': 'Reply body from respondent',
+                 'collection_case': '',
+                 'collection_exercise': '',
+                 'from_internal': True,
+                 'labels': ['INBOX'],
+                 'msg_from': 'c8059a4d-5de0-4551-bdf2-09c8d1fe896e',
+                 'msg_id': '048ffdb5-18f0-46f0-bfa0-ea298521c513',
+                 'msg_to': ['GROUP'],
+                 'read_date': '2018-06-05 15:23:39.898317',
+                 'ru_id': '6c141ebb-10d1-4065-ac3e-ef5b5c95d251',
+                 'sent_date': '2018-06-05 15:23:38.025084',
+                 'subject': 'Message to ONS',
+                 'survey': 'cb8accda-6118-4d3b-85a3-149e28960c54',
+                 'thread_id': '53a430f1-de21-4279-b17e-1bfb4c4813a6'}]
 
     def test_dictionary_update_for_message_to(self):
         self.assertNotIn('@msg_to', self.messages[0])
