@@ -97,10 +97,10 @@ def get_messages_from_external(messages):
     for uuid in external_msgs:
         if uuid["msg_from"] not in uuid_from:
             uuid_from.append(uuid["msg_from"])
+    return uuid_from
 
 
 def update_internal_messages_from(messages):
-
     for message in messages:
         if message["from_internal"]:
             message.update({"@msg_from": internal_user_service.get_user_details(message["msg_from"])})
@@ -122,7 +122,6 @@ def get_to_details(messages):
 
 
 def update_external_messages_to(messages):
-
     for message in messages:
         if not message["from_internal"]:
             message.update({"@msg_to": internal_user_service.get_user_details(message["msg_to"][0])})
