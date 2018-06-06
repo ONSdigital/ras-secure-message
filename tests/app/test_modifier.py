@@ -8,6 +8,7 @@ from werkzeug.exceptions import InternalServerError
 
 from secure_message import constants
 from secure_message.application import create_app
+from secure_message.services.service_toggles import internal_user_service, party, case_service
 from secure_message.common.eventsapi import EventsApi
 from secure_message.repository import database
 from secure_message.repository.database import SecureMessage
@@ -22,6 +23,7 @@ class ModifyTestCaseHelper:
 
     def populate_database(self, record_count=0, mark_as_read=True):
         """Adds a sppecified number of Messages to the db"""
+        msg_id = str(uuid.uuid4())
         with self.engine.connect() as con:
             for i in range(record_count):
                 msg_id = str(uuid.uuid4())
@@ -51,17 +53,20 @@ class ModifyTestCaseHelper:
                             VALUES('{EventsApi.READ.value}', '{msg_id}', '2017-02-03 00:00:00')'''
                     con.execute(query)
 
+        return msg_id
+
 
 class ModifyTestCase(unittest.TestCase, ModifyTestCaseHelper):
     """Test case for message retrieval"""
 
     def setUp(self):
         """setup test environment"""
+
         self.app = create_app()
+
         self.app.testing = True
         self.engine = create_engine(self.app.config['SQLALCHEMY_DATABASE_URI'])
-        self.MESSAGE_LIST_ENDPOINT = "http://localhost:5050/messages"
-        self.MESSAGE_BY_ID_ENDPOINT = "http://localhost:5050/message/"
+
         with self.app.app_context():
             database.db.init_app(current_app)
             database.db.drop_all()
@@ -70,6 +75,26 @@ class ModifyTestCase(unittest.TestCase, ModifyTestCaseHelper):
 
         self.user_internal = User('ce12b958-2a5f-44f4-a6da-861e59070a31', 'internal')
         self.user_respondent = User('0a7ad740-10d5-4ecb-b7ca-3c0384afb882', 'respondent')
+
+    def test_close_conversation(self):
+        """Test close conversation works"""
+        msg_id = self.populate_database(1)
+        with self.app.app_context():
+            internal_user_service.use_mock_service()
+            print(internal_user_service.using_mock)
+            # msg_id is the same as thread id for a conversation of 1
+            metadata = Retriever.retrieve_conversation_metadata(msg_id)
+            Modifier.close_conversation(metadata, self.user_internal)
+            metadata = Retriever.retrieve_conversation_metadata(msg_id)
+
+            self.assertTrue(metadata.is_closed)
+            self.assertEqual(metadata.closed_by, "Selphie Tilmitt")
+            self.assertEqual(metadata.closed_by_uuid, "ce12b958-2a5f-44f4-a6da-861e59070a31")
+            self.assertTrue(isinstance(metadata.closed_at, datetime.datetime))
+            # Test that timestamp on read message is less than 3 seconds old to prove it
+            # was only just created
+            delta = datetime.datetime.utcnow() - metadata.closed_at
+            self.assertTrue(delta.total_seconds() < 3)
 
     def test_two_unread_labels_are_added_to_message(self):
         """testing duplicate message labels are not added to the database"""
@@ -98,9 +123,8 @@ class ModifyTestCase(unittest.TestCase, ModifyTestCaseHelper):
 
     def test_read_date_is_set(self):
         """testing message read_date is set when unread label is removed"""
-        self.populate_database(1, mark_as_read=False)
+        msg_id = self.populate_database(1, mark_as_read=False)
         with self.app.app_context():
-            msg_id = SecureMessage.query.one().msg_id
             serialised_message = Retriever.retrieve_message(msg_id, self.user_internal)
             Modifier.mark_message_as_read(serialised_message, self.user_internal)
             serialised_message = Retriever.retrieve_message(msg_id, self.user_internal)
@@ -125,16 +149,14 @@ class ModifyTestCase(unittest.TestCase, ModifyTestCaseHelper):
         with self.app.app_context():
             with current_app.test_request_context():
                 msg_id = str(names[0])
-                message_service = Retriever()
-                modifier = Modifier()
-                message = message_service.retrieve_message(msg_id, self.user_internal)
-                modifier.mark_message_as_read(message, self.user_internal)
-                message = message_service.retrieve_message(msg_id, self.user_internal)
+                message = Retriever.retrieve_message(msg_id, self.user_internal)
+                Modifier.mark_message_as_read(message, self.user_internal)
+                message = Retriever.retrieve_message(msg_id, self.user_internal)
                 read_date_set = message['read_date']
-                modifier.add_unread(message, self.user_internal)
-                message = message_service.retrieve_message(msg_id, self.user_internal)
-                modifier.mark_message_as_read(message, self.user_internal)
-                message = message_service.retrieve_message(msg_id, self.user_internal)
+                Modifier.add_unread(message, self.user_internal)
+                message = Retriever.retrieve_message(msg_id, self.user_internal)
+                Modifier.mark_message_as_read(message, self.user_internal)
+                message = Retriever.retrieve_message(msg_id, self.user_internal)
                 self.assertEqual(message['read_date'], read_date_set)
 
     def test_exception_for_add_label_raises(self):

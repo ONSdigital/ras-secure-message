@@ -9,7 +9,7 @@ from werkzeug.exceptions import InternalServerError
 from secure_message.common.eventsapi import EventsApi
 from secure_message.common.labels import Labels
 from secure_message.repository.database import db, SecureMessage, Status, Events
-from secure_message.services.internal_user_service import InternalUserService
+from secure_message.services.service_toggles import internal_user_service
 
 
 logger = wrap_logger(logging.getLogger(__name__))
@@ -104,7 +104,8 @@ class Modifier:
     def close_conversation(metadata, user):
         bound_logger = logger.bind(conversation_id=metadata.id, user_id=user.user_uuid)
         bound_logger.info("Getting user details")
-        user_details = InternalUserService.get_user_details(user.user_uuid)
+
+        user_details = internal_user_service.get_user_details(user.user_uuid)
         bound_logger.info("Sucessfully retreived user details")
 
         try:
