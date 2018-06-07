@@ -137,5 +137,5 @@ class Modifier:
             db.session.rollback()
             logger.exception("Error saving metadata to conversation")
 
-        bound_logger.info("Sucessfully re-opened conversation")
+        bound_logger.info("Successfully re-opened conversation")
         bound_logger.unbind('conversation_id', 'user_id')
