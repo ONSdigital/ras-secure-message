@@ -50,7 +50,7 @@ class UtilitiesTestCase(unittest.TestCase):
                  'labels': ['INBOX'],
                  'msg_from': 'c8059a4d-5de0-4551-bdf2-09c8d1fe896e',
                  'msg_id': '048ffdb5-18f0-46f0-bfa0-ea298521c513',
-                 'msg_to': ['GROUP'],
+                 'msg_to': ['bca50ef9-ff50-44b1-adf5-b6728e0bd360'],
                  'read_date': '2018-06-05 15:23:39.898317',
                  'ru_id': '6c141ebb-10d1-4065-ac3e-ef5b5c95d251',
                  'sent_date': '2018-06-05 15:23:38.025084',
@@ -62,9 +62,9 @@ class UtilitiesTestCase(unittest.TestCase):
                  'collection_exercise': '',
                  'from_internal': True,
                  'labels': ['INBOX'],
-                 'msg_from': ['GROUP'],
+                 'msg_from': '0a9d1f65-f561-43a2-86db-9bf93f4d66dc',
                  'msg_id': '048ffdb5-18f0-46f0-bfa0-ea298521c513',
-                 'msg_to': 'c8059a4d-5de0-4551-bdf2-09c8d1fe896e',
+                 'msg_to': ['c8059a4d-5de0-4551-bdf2-09c8d1fe896e'],
                  'read_date': '2018-06-05 15:23:39.898317',
                  'ru_id': '6c141ebb-10d1-4065-ac3e-ef5b5c95d251',
                  'sent_date': '2018-06-05 15:23:38.025084',
@@ -72,7 +72,11 @@ class UtilitiesTestCase(unittest.TestCase):
                  'survey': 'cb8accda-6118-4d3b-85a3-149e28960c54',
                  'thread_id': '53a430f1-de21-4279-b17e-1bfb4c4813a6'}]
 
-    def test_dictionary_update_for_message_to(self):
+    @requests_mock.mock()
+    def test_dictionary_update_for_message_to(self, mock_request):
+        uuid = 'bca50ef9-ff50-44b1-adf5-b6728e0bd360'
+        url = f"{self.app.config['UAA_URL']}/Users/{uuid}"
+        mock_request.get(url, status_code=200, json=self.user_info)
         self.assertNotIn('@msg_to', self.messages[0])
         with self.app.app_context():
             update_external_messages_to(self.messages)
@@ -80,7 +84,7 @@ class UtilitiesTestCase(unittest.TestCase):
 
     @requests_mock.mock()
     def test_dictionary_update_for_message_from(self, mock_request):
-        uuid = ['GROUP']
+        uuid = '0a9d1f65-f561-43a2-86db-9bf93f4d66dc'
         url = f"{self.app.config['UAA_URL']}/Users/{uuid}"
         mock_request.get(url, status_code=200, json=self.user_info)
         self.assertNotIn('@msg_from', self.messages[1])
