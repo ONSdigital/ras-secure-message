@@ -22,8 +22,7 @@ class ModifyTestCaseHelper:
     """Helper class for Modify Tests"""
 
     def populate_database(self, record_count=0, mark_as_read=True):
-        """Adds a sppecified number of Messages to the db"""
-        msg_id = str(uuid.uuid4())
+        """Adds a specified number of Messages to the db"""
         with self.engine.connect() as con:
             for i in range(record_count):
                 msg_id = str(uuid.uuid4())
@@ -113,6 +112,7 @@ class ModifyTestCase(unittest.TestCase, ModifyTestCaseHelper):
             self.assertTrue(delta.total_seconds() < 3)
 
     def test_open_conversation(self):
+        """Test re-opening conversation works"""
         id = self.add_conversation(is_closed=True)
         with self.app.app_context():
             # msg_id is the same as thread id for a conversation of 1
@@ -128,14 +128,10 @@ class ModifyTestCase(unittest.TestCase, ModifyTestCaseHelper):
         """testing duplicate message labels are not added to the database"""
         self.populate_database(1)
         with self.engine.connect() as con:
-            query = 'SELECT msg_id FROM securemessage.secure_message LIMIT 1'
-            query_x = con.execute(query)
-            names = []
-            for row in query_x:
-                names.append(row[0])
+            query = con.execute('SELECT msg_id FROM securemessage.secure_message LIMIT 1')
+            msg_id = query.first()[0]
         with self.app.app_context():
             with current_app.test_request_context():
-                msg_id = str(names[0])
                 message_service = Retriever()
                 message = message_service.retrieve_message(msg_id, self.user_internal)
                 modifier = Modifier()
@@ -169,14 +165,10 @@ class ModifyTestCase(unittest.TestCase, ModifyTestCaseHelper):
         """testing message read_date is not reset when unread label is removed again"""
         self.populate_database(1)
         with self.engine.connect() as con:
-            query = 'SELECT msg_id FROM securemessage.secure_message LIMIT 1'
-            query_x = con.execute(query)
-            names = []
-            for row in query_x:
-                names.append(row[0])
+            query = con.execute('SELECT msg_id FROM securemessage.secure_message LIMIT 1')
+            msg_id = query.first()[0]
         with self.app.app_context():
             with current_app.test_request_context():
-                msg_id = str(names[0])
                 message = Retriever.retrieve_message(msg_id, self.user_internal)
                 Modifier.mark_message_as_read(message, self.user_internal)
                 message = Retriever.retrieve_message(msg_id, self.user_internal)
