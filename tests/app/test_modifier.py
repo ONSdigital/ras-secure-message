@@ -8,7 +8,7 @@ from werkzeug.exceptions import InternalServerError
 
 from secure_message import constants
 from secure_message.application import create_app
-from secure_message.services.service_toggles import internal_user_service, party, case_service
+from secure_message.services.service_toggles import internal_user_service
 from secure_message.common.eventsapi import EventsApi
 from secure_message.repository import database
 from secure_message.repository.database import SecureMessage
@@ -55,6 +55,23 @@ class ModifyTestCaseHelper:
 
         return msg_id
 
+    def add_conversation(self, id=str(uuid.uuid4()), is_closed=False, closed_by='', closed_by_uuid='', closed_at=None):
+        """ Populate the conversation table"""
+        # If conversation created needs to be closed, values are generated for you.  These can be overrriden by passing them
+        # into function (i.e., if you need a specific name, but don't care about anything else, then only pass in 'closed_by')
+        if is_closed:
+            if not closed_by:
+                closed_by = "Some person"
+            if not closed_by_uuid:
+                closed_by_uuid = str(uuid.uuid4())
+            if not closed_at:
+                closed_at = datetime.datetime.utcnow()
+        with self.engine.connect() as con:
+            query = f'''INSERT INTO securemessage.conversation(id, is_closed, closed_by, closed_by_uuid, closed_at) VALUES('{id}',
+                    '{is_closed}', '{closed_by}', '{closed_by_uuid}', '{closed_at}')'''
+            con.execute(query)
+        return id
+
 
 class ModifyTestCase(unittest.TestCase, ModifyTestCaseHelper):
     """Test case for message retrieval"""
@@ -81,7 +98,6 @@ class ModifyTestCase(unittest.TestCase, ModifyTestCaseHelper):
         msg_id = self.populate_database(1)
         with self.app.app_context():
             internal_user_service.use_mock_service()
-            print(internal_user_service.using_mock)
             # msg_id is the same as thread id for a conversation of 1
             metadata = Retriever.retrieve_conversation_metadata(msg_id)
             Modifier.close_conversation(metadata, self.user_internal)
@@ -95,6 +111,18 @@ class ModifyTestCase(unittest.TestCase, ModifyTestCaseHelper):
             # was only just created
             delta = datetime.datetime.utcnow() - metadata.closed_at
             self.assertTrue(delta.total_seconds() < 3)
+
+    def test_open_conversation(self):
+        id = self.add_conversation(is_closed=True)
+        with self.app.app_context():
+            # msg_id is the same as thread id for a conversation of 1
+            metadata = Retriever.retrieve_conversation_metadata(id)
+            Modifier.open_conversation(metadata, self.user_internal)
+            metadata = Retriever.retrieve_conversation_metadata(id)
+            self.assertFalse(metadata.is_closed)
+            self.assertEqual(metadata.closed_by, "")
+            self.assertEqual(metadata.closed_by_uuid, "")
+            self.assertIsNone(metadata.closed_at)
 
     def test_two_unread_labels_are_added_to_message(self):
         """testing duplicate message labels are not added to the database"""

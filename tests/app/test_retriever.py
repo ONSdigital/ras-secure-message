@@ -125,6 +125,14 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
                 with self.assertRaises(NotFound):
                     Retriever().retrieve_message(message_id, self.user_internal)
 
+    def test_get_nonexistant_conversation_returns_404(self):
+        """retrieves message using id that doesn't exist"""
+        random_uuid = str(uuid.uuid4())
+        with self.app.app_context():
+            with current_app.test_request_context():
+                with self.assertRaises(NotFound):
+                    Retriever().retrieve_conversation_metadata(random_uuid)
+
     def test_correct_labels_returned_internal(self):
         """retrieves message using id and checks the labels are correct"""
         self.create_thread()
@@ -139,7 +147,7 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
                 with current_app.test_request_context():
                     msg_id = str(names[0])
                     response = Retriever().retrieve_message(msg_id, self.user_internal)
-                    labels = ['INBOX', 'UNREAD']
+                    labels = ['INBOX']
                     self.assertCountEqual(response['labels'], labels)
 
     def test_correct_labels_returned_external(self):
