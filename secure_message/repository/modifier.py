@@ -106,7 +106,7 @@ class Modifier:
         bound_logger.info("Getting user details")
 
         user_details = internal_user_service.get_user_details(user.user_uuid)
-        bound_logger.info("Sucessfully retreived user details")
+        bound_logger.info("Successfully retrieved user details")
 
         try:
             bound_logger.info("Closing conversation")
@@ -119,7 +119,7 @@ class Modifier:
             db.session.rollback()
             logger.exception("Error saving metadata")
 
-        bound_logger.info("Sucessfully closed conversation")
+        bound_logger.info("Successfully closed conversation")
         bound_logger.unbind('conversation_id', 'user_id')
 
     @staticmethod

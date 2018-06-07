@@ -58,7 +58,7 @@ class ThreadById(Resource):
                 bound_logger.info("About to close conversation")
                 Modifier.close_conversation(metadata, g.user)
             else:
-                bound_logger.info("About re-open conversation")
+                bound_logger.info("About to re-open conversation")
                 Modifier.open_conversation(metadata, g.user)
 
         bound_logger.info("Thread metadata update successful")

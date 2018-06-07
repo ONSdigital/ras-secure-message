@@ -254,7 +254,7 @@ class Retriever:
         except MultipleResultsFound:
             # We should never hit this code, but if we somehow did then a 500 would be accurate
             # as something would be seriously wrong in the database.
-            logger.error("Mulitple results found for conversation", thread_id=thread_id)
+            logger.error("Multiple results found for conversation", thread_id=thread_id)
             abort(500)
 
     @staticmethod
