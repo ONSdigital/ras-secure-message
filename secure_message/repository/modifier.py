@@ -117,7 +117,8 @@ class Modifier:
             db.session.commit()
         except SQLAlchemyError:
             db.session.rollback()
-            logger.exception("Error saving metadata")
+            logger.exception("Database error occured while closing conversation")
+            raise InternalServerError(description="Database error occured while closing conversation")
 
         bound_logger.info("Successfully closed conversation")
         bound_logger.unbind('conversation_id', 'user_id')
@@ -135,7 +136,8 @@ class Modifier:
             db.session.commit()
         except SQLAlchemyError:
             db.session.rollback()
-            logger.exception("Error saving metadata to conversation")
+            logger.exception("Database error occured while opening conversation")
+            raise InternalServerError(description="Database error occured while opening conversation")
 
         bound_logger.info("Successfully re-opened conversation")
         bound_logger.unbind('conversation_id', 'user_id')

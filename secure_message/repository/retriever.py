@@ -1,9 +1,9 @@
 import logging
 
-from flask import abort, jsonify
+from flask import jsonify
 from sqlalchemy import and_, func, or_
 from sqlalchemy.exc import SQLAlchemyError
-from sqlalchemy.orm.exc import NoResultFound, MultipleResultsFound
+from sqlalchemy.orm.exc import NoResultFound
 from structlog import wrap_logger
 from werkzeug.exceptions import InternalServerError, NotFound
 
@@ -250,12 +250,7 @@ class Retriever:
             return result.one()
         except NoResultFound:
             logger.info("No conversation found", thread_id=thread_id)
-            raise NotFound(description=f"Conversation with thread_id '{thread_id}' does not exist")
-        except MultipleResultsFound:
-            # We should never hit this code, but if we somehow did then a 500 would be accurate
-            # as something would be seriously wrong in the database.
-            logger.error("Multiple results found for conversation", thread_id=thread_id)
-            abort(500)
+            return None
 
     @staticmethod
     def check_db_connection():

@@ -23,6 +23,8 @@ class ThreadById(Resource):
 
         conversation = Retriever().retrieve_thread(thread_id, g.user)
         conversation_metadata = Retriever.retrieve_conversation_metadata(thread_id)
+        if conversation_metadata is None:
+            abort(404)
 
         logger.info("Successfully retrieved messages from thread", thread_id=thread_id, user_uuid=g.user.user_uuid)
         messages = []
@@ -37,7 +39,8 @@ class ThreadById(Resource):
                             "closed_by_uuid": conversation_metadata.closed_by_uuid,
                             "closed_at": conversation_metadata.closed_at})
 
-        return jsonify({"messages": add_users_and_business_details(messages)})
+        return jsonify({"messages": add_users_and_business_details(messages),
+                        "is_closed": False})
 
     @staticmethod
     def patch(thread_id):
@@ -54,6 +57,8 @@ class ThreadById(Resource):
         bound_logger.info("Retrieving metadata for thread")
         request_data = request.get_json()
         metadata = Retriever.retrieve_conversation_metadata(thread_id)
+        if metadata is None:
+            abort(404)
         ThreadById._validate_request(request_data, metadata)
 
         bound_logger.info("Attempting to modify metadata for thread")

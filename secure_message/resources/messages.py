@@ -1,6 +1,6 @@
 import logging
 
-from flask import request, jsonify, g, current_app, make_response
+from flask import abort, request, jsonify, g, current_app, make_response
 from flask_restful import Resource
 from structlog import wrap_logger
 from werkzeug.exceptions import BadRequest
@@ -34,8 +34,10 @@ class MessageSend(Resource):
 
         if 'msg_id' in post_data:
             raise BadRequest(description="Message can not include msg_id")
-        if post_data.get('thread_id') in post_data:
+        if post_data.get('thread_id'):
             conversation_metadata = Retriever.retrieve_conversation_metadata(post_data.get('thread_id'))
+            if conversation_metadata is None:
+                abort(404)
             if conversation_metadata.is_closed:
                 raise BadRequest(description="Cannot reply to a closed conversation")
 
