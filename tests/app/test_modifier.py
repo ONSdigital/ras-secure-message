@@ -54,7 +54,7 @@ class ModifyTestCaseHelper:
 
         return msg_id
 
-    def add_conversation(self, id=str(uuid.uuid4()), is_closed=False, closed_by='', closed_by_uuid='', closed_at=None):
+    def add_conversation(self, conversation_id=str(uuid.uuid4()), is_closed=False, closed_by='', closed_by_uuid='', closed_at=None):
         """ Populate the conversation table"""
         # If conversation created needs to be closed, values are generated for you.  These can be overrriden by passing them
         # into function (i.e., if you need a specific name, but don't care about anything else, then only pass in 'closed_by')
@@ -66,7 +66,7 @@ class ModifyTestCaseHelper:
             if not closed_at:
                 closed_at = datetime.datetime.utcnow()
         with self.engine.connect() as con:
-            query = f'''INSERT INTO securemessage.conversation(id, is_closed, closed_by, closed_by_uuid, closed_at) VALUES('{id}',
+            query = f'''INSERT INTO securemessage.conversation(id, is_closed, closed_by, closed_by_uuid, closed_at) VALUES('{conversation_id}',
                     '{is_closed}', '{closed_by}', '{closed_by_uuid}', '{closed_at}')'''
             con.execute(query)
         return id
@@ -113,12 +113,12 @@ class ModifyTestCase(unittest.TestCase, ModifyTestCaseHelper):
 
     def test_open_conversation(self):
         """Test re-opening conversation works"""
-        id = self.add_conversation(is_closed=True)
+        conversation_id = self.add_conversation(is_closed=True)
         with self.app.app_context():
             # msg_id is the same as thread id for a conversation of 1
-            metadata = Retriever.retrieve_conversation_metadata(id)
+            metadata = Retriever.retrieve_conversation_metadata(conversation_id)
             Modifier.open_conversation(metadata, self.user_internal)
-            metadata = Retriever.retrieve_conversation_metadata(id)
+            metadata = Retriever.retrieve_conversation_metadata(conversation_id)
             self.assertFalse(metadata.is_closed)
             self.assertEqual(metadata.closed_by, "")
             self.assertEqual(metadata.closed_by_uuid, "")

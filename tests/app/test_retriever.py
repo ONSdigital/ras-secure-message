@@ -35,11 +35,11 @@ class RetrieverTestCaseHelper:
                     '{thread_id}', '{collection_case}', '{ru_id}', '{survey}', '{collection_exercise}', '{from_internal}')'''
             con.execute(query)
 
-    def add_conversation(self, id):
+    def add_conversation(self, conversation_id):
         """ Populate the conversation table"""
 
         with self.engine.connect() as con:
-            query = f"INSERT INTO securemessage.conversation(id) VALUES('{id}')"
+            query = f"INSERT INTO securemessage.conversation(id) VALUES('{conversation_id}')"
             con.execute(query)
 
     def add_status(self, label, msg_id, actor):
@@ -70,7 +70,7 @@ class RetrieverTestCaseHelper:
         self.add_event(event=EventsApi.READ.value, msg_id=msg_id, date_time=datetime.utcnow())
 
         if no_of_messages > 1:
-            for i in range(no_of_messages - 1):
+            for _ in range(no_of_messages - 1):
                 msg_id = str(uuid.uuid4())
                 self.add_secure_message(msg_id=msg_id, thread_id=thread_id,
                                         survey=test_utilities.BRES_SURVEY, from_internal=True)
@@ -247,7 +247,7 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
 
     def test_thread_list_returned_in_descending_order_internal(self):
         """retrieves threads from database in desc sent_date order for internal user"""
-        for i in range(5):
+        for _ in range(5):
             self.create_thread(no_of_messages=3)
 
         with self.app.app_context():
