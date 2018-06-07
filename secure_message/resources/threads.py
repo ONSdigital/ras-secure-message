@@ -52,7 +52,7 @@ class ThreadById(Resource):
             abort(403)
         if request.headers['Content-Type'].lower() != 'application/json':
             bound_logger.info('Request must set accept content type "application/json" in header.')
-            raise BadRequest(description="'application/json' content type in header missing")
+            raise BadRequest(description='Request must set accept content type "application/json" in header.')
 
         bound_logger.info("Retrieving metadata for thread")
         request_data = request.get_json()
