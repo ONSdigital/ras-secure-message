@@ -1,6 +1,7 @@
 import datetime
 import unittest
 from unittest import mock
+import uuid
 
 from flask import current_app
 from sqlalchemy import create_engine
@@ -63,6 +64,21 @@ class SaverTestCase(unittest.TestCase):
             request = con.execute('SELECT * FROM securemessage.status')
             for row in request:
                 self.assertTrue(row is not None)
+
+    def test_saved_new_thread_creates_entry_in_conversation_table(self):
+        """retrieves message status from database"""
+        with self.app.app_context():
+                random_uuid = str(uuid.uuid4())
+                Saver.save_message(SecureMessage(msg_id=random_uuid, thread_id=random_uuid))
+                with self.engine.connect() as con:
+                    request = con.execute('SELECT * FROM securemessage.conversation')
+                    row = request.fetchone()
+                    # Newly created record should be mostly empty
+                    self.assertEqual(row['id'], random_uuid)
+                    self.assertFalse(row['is_closed'])
+                    self.assertEqual(row['closed_by'], '')
+                    self.assertEqual(row['closed_by_uuid'], '')
+                    self.assertIsNone(row['closed_at'])
 
     def test_save_msg_status_raises_message_save_exception_on_db_error(self):
         """Tests MessageSaveException generated if db commit fails saving message"""
