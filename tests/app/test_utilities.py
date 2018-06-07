@@ -21,10 +21,6 @@ class UtilitiesTestCase(unittest.TestCase):
         self.app = create_app()
         self.app.testing = True
 
-        self.app.oauth_client_token = get_client_token(self.app.config['CLIENT_ID'],
-                                                       self.app.config['CLIENT_SECRET'],
-                                                       self.app.config['UAA_URL'])
-
     user_info = {'id': 'bca50ef9-ff50-44b1-adf5-b6728e0bd360',
                  'lastLogonTime': 1528278309563,
                  'meta': {'created': '2018-06-06T09:36:31.509Z',
@@ -38,8 +34,8 @@ class UtilitiesTestCase(unittest.TestCase):
                  'origin': 'uaa',
                  'passwordLastModified': '2018-06-06T09:36:31.000Z',
                  'previousLogonTime': 1528278248442,
-                 'schemas': ['urn:scim:schemas:core:1.0'],
-                 'userName': 'uaa_user',
+                 'schemas': ['Schema'],
+                 'userName': 'John shaw',
                  'verified': True,
                  'zoneId': 'uaa'}
 
@@ -75,19 +71,31 @@ class UtilitiesTestCase(unittest.TestCase):
     @requests_mock.mock()
     def test_dictionary_update_for_message_to(self, mock_request):
         uuid = 'bca50ef9-ff50-44b1-adf5-b6728e0bd360'
-        url = f"{self.app.config['UAA_URL']}/Users/{uuid}"
-        mock_request.get(url, status_code=200, json=self.user_info)
+        uaa_url = f"{self.app.config['UAA_URL']}/Users/{uuid}"
+        config_uaa = f"{self.app.config['UAA_URL']}/oauth/token?grant_type=client_credentials&response_type=" \
+                     "token&token_format=opaque"
+        mock_request.post(config_uaa, headers={'Content-Type': 'application/x-www-form-urlencoded',
+                                               'Accept': 'application/json'}, status_code=200,
+                          json={"access_token": "test"})
+        self.app.oauth_client_token = get_client_token("123", "secret", self.app.config['UAA_URL'])
+        mock_request.get(uaa_url, status_code=200, json=self.user_info)
         self.assertNotIn('@msg_to', self.messages[0])
         with self.app.app_context():
             update_external_messages_to(self.messages)
-        self.assertIn('@msg_to', self.messages[0])
+            self.assertIn('@msg_to', self.messages[0])
 
     @requests_mock.mock()
     def test_dictionary_update_for_message_from(self, mock_request):
+        config_uaa = f"{self.app.config['UAA_URL']}/oauth/token?grant_type=client_credentials&response_type=" \
+                     "token&token_format=opaque"
+        mock_request.post(config_uaa, headers={'Content-Type': 'application/x-www-form-urlencoded',
+                                               'Accept': 'application/json'}, status_code=200,
+                          json={"access_token": "test"})
+        self.app.oauth_client_token = get_client_token("123", "secret", self.app.config['UAA_URL'])
         uuid = '0a9d1f65-f561-43a2-86db-9bf93f4d66dc'
         url = f"{self.app.config['UAA_URL']}/Users/{uuid}"
         mock_request.get(url, status_code=200, json=self.user_info)
         self.assertNotIn('@msg_from', self.messages[1])
         with self.app.app_context():
             update_internal_messages_from(self.messages)
-        self.assertIn('@msg_from', self.messages[1])
+            self.assertIn('@msg_from', self.messages[1])
