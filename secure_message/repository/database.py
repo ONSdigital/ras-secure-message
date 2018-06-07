@@ -189,7 +189,7 @@ class Conversation(db.Model):
     closed_by_uuid = Column('closed_by_uuid', String(length=60))
     closed_at = Column('closed_at', DateTime())
 
-    def __init__(self, is_closed=False, closed_by='', closed_by_uuid='', closed_at=None):
+    def __init__(self, is_closed=False, closed_by=None, closed_by_uuid=None, closed_at=None):
         self.is_closed = is_closed
         self.closed_by = closed_by
         self.closed_by_uuid = closed_by_uuid

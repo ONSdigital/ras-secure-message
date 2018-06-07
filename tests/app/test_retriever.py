@@ -62,7 +62,7 @@ class RetrieverTestCaseHelper:
 
         msg_id = str(uuid.uuid4())
         thread_id = msg_id
-        self.add_conversation(id=thread_id)
+        self.add_conversation(conversation_id=thread_id)
         self.add_secure_message(msg_id=msg_id, thread_id=thread_id, survey=test_utilities.BRES_SURVEY, from_internal=False)
         self.add_status(label="SENT", msg_id=msg_id, actor=external_actor)
         self.add_status(label="INBOX", msg_id=msg_id, actor=internal_actor)

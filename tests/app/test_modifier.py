@@ -69,7 +69,7 @@ class ModifyTestCaseHelper:
             query = f'''INSERT INTO securemessage.conversation(id, is_closed, closed_by, closed_by_uuid, closed_at) VALUES('{conversation_id}',
                     '{is_closed}', '{closed_by}', '{closed_by_uuid}', '{closed_at}')'''
             con.execute(query)
-        return id
+        return conversation_id
 
 
 class ModifyTestCase(unittest.TestCase, ModifyTestCaseHelper):

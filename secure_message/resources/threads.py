@@ -43,23 +43,26 @@ class ThreadById(Resource):
     def patch(thread_id):
         """Modify conversation metadata"""
         bound_logger = logger.bind(thread_id=thread_id, user_uuid=g.user.user_uuid)
-        bound_logger.info("Getting metadata for thread")
+        bound_logger.info("Validating request")
+        if not g.user.is_internal:
+            bound_logger.info("Thread modification is forbidden")
+            abort(403)
         if request.headers['Content-Type'].lower() != 'application/json':
             bound_logger.info('Request must set accept content type "application/json" in header.')
             raise BadRequest(description="'application/json' content type in header missing")
 
-        bound_logger.info("Attempting to modify metadata for thread")
+        bound_logger.info("Retrieving metadata for thread")
         request_data = request.get_json()
         metadata = Retriever.retrieve_conversation_metadata(thread_id)
         ThreadById._validate_request(request_data, metadata)
 
-        if 'is_closed' in request_data:
-            if request_data.get('is_closed'):
-                bound_logger.info("About to close conversation")
-                Modifier.close_conversation(metadata, g.user)
-            else:
-                bound_logger.info("About to re-open conversation")
-                Modifier.open_conversation(metadata, g.user)
+        bound_logger.info("Attempting to modify metadata for thread")
+        if request_data.get('is_closed'):
+            bound_logger.info("About to close conversation")
+            Modifier.close_conversation(metadata, g.user)
+        else:
+            bound_logger.info("About to re-open conversation")
+            Modifier.open_conversation(metadata, g.user)
 
         bound_logger.info("Thread metadata update successful")
         bound_logger.unbind('thread_id', 'user_uuid')
@@ -67,11 +70,8 @@ class ThreadById(Resource):
 
     @staticmethod
     def _validate_request(request_data, metadata):
-        """Used to validate data within request body for ModifyById"""
+        """Used to validate data within request body"""
         bound_logger = logger.bind(thread_id=metadata.id, user_uuid=g.user.user_uuid)
-        if not g.user.is_internal:
-            bound_logger.info("Thread modification is forbidden")
-            abort(403)
         # Check if it's empty
         if not request_data:
             bound_logger.error('No properties provided')

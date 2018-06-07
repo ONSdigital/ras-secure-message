@@ -76,8 +76,8 @@ class SaverTestCase(unittest.TestCase):
                 # Newly created record should be mostly empty
                 self.assertEqual(row['id'], random_uuid)
                 self.assertFalse(row['is_closed'])
-                self.assertEqual(row['closed_by'], '')
-                self.assertEqual(row['closed_by_uuid'], '')
+                self.assertIsNone(row['closed_by'])
+                self.assertIsNone(row['closed_by_uuid'])
                 self.assertIsNone(row['closed_at'])
 
     def test_save_msg_status_raises_message_save_exception_on_db_error(self):
