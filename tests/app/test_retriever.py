@@ -126,8 +126,8 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
         random_uuid = str(uuid.uuid4())
         with self.app.app_context():
             with current_app.test_request_context():
-                    result = Retriever.retrieve_conversation_metadata(random_uuid)
-                    self.assertIsNone(result)
+                result = Retriever.retrieve_conversation_metadata(random_uuid)
+                self.assertIsNone(result)
 
     def test_correct_labels_returned_internal(self):
         """retrieves message using id and checks the labels are correct"""
@@ -269,7 +269,7 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
 
     def test_latest_message_from_each_thread_chosen_desc(self):
         """checks the message chosen for each thread is the latest message within that thread"""
-        for i in range(5):
+        for _ in range(5):
             self.create_thread(no_of_messages=3)
 
         with self.app.app_context():

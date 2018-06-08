@@ -1,9 +1,9 @@
 import logging
 
+from werkzeug.exceptions import BadRequest
 from flask import abort, g, jsonify, request
 from flask_restful import Resource
 from structlog import wrap_logger
-from werkzeug.exceptions import BadRequest
 
 from secure_message.common.utilities import get_options, process_paginated_list, add_users_and_business_details
 from secure_message.constants import THREAD_LIST_ENDPOINT
