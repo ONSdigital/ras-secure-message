@@ -117,7 +117,7 @@ class Modifier:
             db.session.commit()
         except SQLAlchemyError:
             db.session.rollback()
-            logger.exception("Database error occured while closing conversation")
+            bound_logger.exception("Database error occured while closing conversation")
             raise InternalServerError(description="Database error occured while closing conversation")
 
         bound_logger.info("Successfully closed conversation")
@@ -136,7 +136,7 @@ class Modifier:
             db.session.commit()
         except SQLAlchemyError:
             db.session.rollback()
-            logger.exception("Database error occured while opening conversation")
+            bound_logger.exception("Database error occured while opening conversation")
             raise InternalServerError(description="Database error occured while opening conversation")
 
         bound_logger.info("Successfully re-opened conversation")

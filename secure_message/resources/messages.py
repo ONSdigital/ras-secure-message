@@ -1,6 +1,6 @@
 import logging
 
-from flask import abort, request, jsonify, g, current_app, make_response
+from flask import request, jsonify, g, current_app, make_response
 from flask_restful import Resource
 from structlog import wrap_logger
 from werkzeug.exceptions import BadRequest
@@ -36,9 +36,10 @@ class MessageSend(Resource):
             raise BadRequest(description="Message can not include msg_id")
         if post_data.get('thread_id'):
             conversation_metadata = Retriever.retrieve_conversation_metadata(post_data.get('thread_id'))
-            if conversation_metadata is None:
-                abort(404)
-            if conversation_metadata.is_closed:
+            # Ideally here we'd return a 404 if there isn't a record in the comversation table.  But until we
+            # ensure there is a record in here for every thread_id in the secure_message table, we just have to
+            # assume that it's fine if it's empty.
+            if conversation_metadata and conversation_metadata.is_closed:
                 raise BadRequest(description="Cannot reply to a closed conversation")
 
         post_data['from_internal'] = g.user.is_internal
