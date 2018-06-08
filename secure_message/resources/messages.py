@@ -193,19 +193,3 @@ class MessageModifyById(Resource):
             raise BadRequest(description=f"Invalid action requested: {action}")
 
         return action, label
-
-
-class MessageCounter(Resource):
-    """Get count of unread messages using v2 endpoint"""
-    @staticmethod
-    def get():
-        survey = request.args.getlist('survey')
-        if request.args.get('label'):
-            label = str(request.args.get('label'))
-            if label.lower() == 'unread':
-                return jsonify(name=label, total=Retriever().message_count_by_survey(g.user, survey, label))
-            else:
-                logger.debug('Invalid label name', name=label, request=request.url)
-                raise BadRequest(description="Invalid label")
-        else:
-            return jsonify(total=Retriever().message_count_by_survey(g.user, survey))

@@ -7,7 +7,6 @@ from sqlalchemy.orm.exc import NoResultFound
 from structlog import wrap_logger
 from werkzeug.exceptions import InternalServerError, NotFound
 
-from secure_message import constants
 from secure_message.common.eventsapi import EventsApi
 from secure_message.common.labels import Labels
 from secure_message.repository.database import db, Conversation, Events, SecureMessage, Status
@@ -32,12 +31,20 @@ class Retriever:
         return result
 
     @staticmethod
-    def message_count_by_survey(user, survey, label=None):
-        """Count users messages for a specific survey"""
-        if user.is_internal:
-            status_conditions, survey_conditions = Retriever._get_conditions_internal_user(survey, user)
+    def thread_count_by_survey(user, survey, label=None):
+        """Count users threads for a specific survey"""
+
+        survey_conditions = []
+
+        if survey:
+            survey_conditions.append(SecureMessage.survey.in_(survey))
         else:
-            status_conditions, survey_conditions = Retriever._get_conditions_respondent(survey, user)
+            survey_conditions.append(True)
+
+        status_conditions = []
+
+        if not user.is_internal:
+            status_conditions = [Status.actor == str(user.user_uuid)]
 
         if label:
             try:
@@ -46,42 +53,19 @@ class Retriever:
                     filter(and_(*survey_conditions)). \
                     filter(Status.label == label).count()
             except Exception as e:
-                logger.error('Error retrieving count of unread messages from database', error=e)
-                raise InternalServerError(description="Error retrieving count of unread messages from database")
+                logger.error('Error retrieving count of unread threads from database', error=e)
+                raise InternalServerError(description="Error retrieving count of unread threads from database")
             return result
 
         try:
-            result = SecureMessage.query.join(Status).\
-                filter(or_(*status_conditions)).\
+            result = SecureMessage.query.join(Status). \
+                filter(or_(*status_conditions)). \
                 filter(and_(*survey_conditions)).\
                 distinct(SecureMessage.thread_id).count()
         except Exception as e:
-            logger.error('Error retrieving count of messages by survey from database', error=e)
-            raise InternalServerError(description="Error retrieving count of unread messages from database")
+            logger.error('Error retrieving count of threads by survey from database', error=e)
+            raise InternalServerError(description="Error retrieving count of unread threads from database")
         return result
-
-    @staticmethod
-    def _get_conditions_internal_user(survey, user):
-        """Sets the conditions/predicates that are used by the query for the case of an internal actor"""
-        status_conditions = [Status.actor == str(user.user_uuid), Status.actor == constants.NON_SPECIFIC_INTERNAL_USER]
-        survey_conditions = []
-        if survey:
-            survey_conditions.append(SecureMessage.survey.in_(survey))
-        else:
-            survey_conditions.append(True)
-        return status_conditions, survey_conditions
-
-    @staticmethod
-    def _get_conditions_respondent(survey, user):
-        """Sets the conditions/predicates that are used by the query for the case of an external actor"""
-        status_conditions = [Status.actor == str(user.user_uuid)]
-        survey_conditions = []
-        if survey:
-            survey_conditions.append(SecureMessage.survey.in_(survey))
-        else:
-            survey_conditions.append(True)
-
-        return status_conditions, survey_conditions
 
     @staticmethod
     def retrieve_thread_list(user, request_args):
