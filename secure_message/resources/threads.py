@@ -1,6 +1,7 @@
 import logging
 
 from flask import g, jsonify, request
+from werkzeug.exceptions import BadRequest
 from flask_restful import Resource
 from structlog import wrap_logger
 
@@ -43,3 +44,19 @@ class ThreadList(Resource):
         messages, links = process_paginated_list(result, request.host_url, g.user, message_args, THREAD_LIST_ENDPOINT)
         messages = add_users_and_business_details(messages)
         return jsonify({"messages": messages, "_links": links})
+
+
+class ThreadCounter(Resource):
+    """Get count of unread messages using v2 endpoint"""
+    @staticmethod
+    def get():
+        survey = request.args.getlist('survey')
+        if request.args.get('label'):
+            label = str(request.args.get('label'))
+            if label.lower() == 'unread':
+                return jsonify(name=label, total=Retriever().thread_count_by_survey(g.user, survey, label))
+            else:
+                logger.debug('Invalid label name', name=label, request=request.url)
+                raise BadRequest(description="Invalid label")
+        else:
+            return jsonify(total=Retriever().thread_count_by_survey(g.user, survey))
