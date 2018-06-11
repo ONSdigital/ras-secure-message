@@ -10,9 +10,6 @@ logger = wrap_logger(logging.getLogger(__name__))
 
 class PartyService:
 
-    def __init__(self):
-        self._users_cache = []
-
     @staticmethod
     def get_business_details(rus):
         """Retrieves the business details from the party service"""
@@ -29,27 +26,23 @@ class PartyService:
                          ru=rus)
         return ru_list
 
-    def get_user_details(self, uuid):
+    @staticmethod
+    def get_user_details(uuid):
         """Retrieves the user details from the party service"""
-        user_list = None
-        if self._users_cache:
-            user_list = self._users_cache
-        if user_list is None:
-            payload = urlencode([("id", x) for x in uuid])
 
-            party_data = requests.get(f"{current_app.config['RAS_PARTY_SERVICE']}party-api/v1/respondents",
-                                      auth=current_app.config['BASIC_AUTH'], verify=False, params=payload)
-            try:
-                party_data.raise_for_status()
-            except HTTPError:
-                logger.exception('Failed to retrieve data from party service',
-                                 status_code=party_data.status_code,
-                                 text=party_data.text,
-                                 uuid=uuid)
-                return user_list
+        payload = urlencode([("id", x) for x in uuid])
+        response = requests.get(f"{current_app.config['RAS_PARTY_SERVICE']}party-api/v1/respondents",
+                                auth=current_app.config['BASIC_AUTH'], verify=False, params=payload)
+        try:
+            response.raise_for_status()
+        except HTTPError:
+            logger.exception('Failed to retrieve data from party service',
+                             status_code=response.status_code,
+                             text=response.text,
+                             uuid=uuid)
+            return []
 
-            user_list = party_data.json()
-            self._users_cache = user_list
-            logger.debug("Party data successfully retrieved", uuid=uuid)
+        user_list = response.json()
+        logger.debug("Party data successfully retrieved", uuid=uuid)
 
         return user_list

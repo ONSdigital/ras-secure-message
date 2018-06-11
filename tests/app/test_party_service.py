@@ -171,7 +171,7 @@ class PartyTestCase(unittest.TestCase):
         with self.app.app_context():
             result_data = sut.get_user_details(ru)
 
-        self.assertIsNone(result_data)
+        self.assertEqual(result_data, [])
 
 
 if __name__ == '__main__':
