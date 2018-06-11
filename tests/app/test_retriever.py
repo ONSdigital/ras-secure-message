@@ -302,7 +302,8 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
 
     def test_thread_count_by_survey(self):
         """checks that the returned thread count is the same for every internal user"""
-        self.create_threads(5)
+        for _ in range(5):
+            self.create_thread(no_of_messages=2)
 
         with self.app.app_context():
             with current_app.test_request_context():
