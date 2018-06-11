@@ -20,4 +20,16 @@ except SQLAlchemyError:
     session.rollback()
     print("Problem!")
 
+try:
+    messages_without_sent_at = session.query(SecureMessage).filter(SecureMessage.read_at == None).all() # noqa
+    for message in messages_without_sent_at:
+        sent_event = session.query(Events).filter(and_(message.msg_id == Events.msg_id, Events.event == 'Read')).one_or_none()
+        message.sent_at = sent_event.date_time
+        session.add(message)
+
+    session.commit()
+except SQLAlchemyError:
+    session.rollback()
+    print("Problem!")
+
 # TODO, same thing, but with READ events
