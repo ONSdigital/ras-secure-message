@@ -36,11 +36,11 @@ class RetrieverTestCaseHelper:
                     '{thread_id}', '{collection_case}', '{ru_id}', '{survey}', '{collection_exercise}', '{from_internal}')'''
             con.execute(query)
 
-    def add_conversation(self, conversation_id):
+    def add_conversation(self, conversation_id, is_closed):
         """ Populate the conversation table"""
 
         with self.engine.connect() as con:
-            query = f"INSERT INTO securemessage.conversation(id) VALUES('{conversation_id}')"
+            query = f"INSERT INTO securemessage.conversation(id, is_closed) VALUES('{conversation_id}', '{is_closed}')"
             con.execute(query)
 
     def add_status(self, label, msg_id, actor):
@@ -63,7 +63,7 @@ class RetrieverTestCaseHelper:
 
         msg_id = str(uuid.uuid4())
         thread_id = msg_id
-        self.add_conversation(conversation_id=thread_id)
+        self.add_conversation(conversation_id=thread_id, is_closed=False)
         self.add_secure_message(msg_id=msg_id, thread_id=thread_id, survey=test_utilities.BRES_SURVEY, from_internal=False)
         self.add_status(label="SENT", msg_id=msg_id, actor=external_actor)
         self.add_status(label="INBOX", msg_id=msg_id, actor=internal_actor)
@@ -266,6 +266,7 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
                         date.append(serialized_msg['modified_date'])
 
                 desc_date = sorted(date, reverse=True)
+                print(len(date))
                 self.assertEqual(len(date), 5)
                 self.assertListEqual(desc_date, date)
 

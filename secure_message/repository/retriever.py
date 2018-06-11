@@ -9,7 +9,7 @@ from werkzeug.exceptions import InternalServerError, NotFound
 
 from secure_message.common.eventsapi import EventsApi
 from secure_message.common.labels import Labels
-from secure_message.repository.database import db, Conversation, Events, SecureMessage, Status
+from secure_message.repository.database import Conversation, db, Events, SecureMessage, Status
 
 logger = wrap_logger(logging.getLogger(__name__))
 
@@ -138,12 +138,8 @@ class Retriever:
         try:
             t = db.session.query(SecureMessage.thread_id, func.max(SecureMessage.id)  # pylint:disable=no-member
                                  .label('max_id')) \
-                .join(Events).join(Status) \
-                .filter(or_(and_(SecureMessage.from_internal.is_(False), Status.label == Labels.INBOX.value),  # NOQA
-                            and_(SecureMessage.from_internal.is_(True),
-                                 Status.label.in_([Labels.SENT.value]))
-                           )
-                       ) \
+                .join(Conversation) \
+                .filter(Conversation.is_closed.is_(request_args.is_closed)) \
                 .group_by(SecureMessage.thread_id).subquery('t')
 
             conditions.append(SecureMessage.thread_id == t.c.thread_id)
