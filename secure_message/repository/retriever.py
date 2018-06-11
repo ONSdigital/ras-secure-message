@@ -99,9 +99,9 @@ class Retriever:
         try:
             t = db.session.query(SecureMessage.thread_id, func.max(SecureMessage.id)  # pylint:disable=no-member
                                  .label('max_id')) \
-                .join(Events).join(Status) \
+                .join(Conversation) \
                 .filter(or_(*actor_conditions)) \
-                .filter(Events.event == EventsApi.SENT.value) \
+                .filter(Conversation.is_closed.is_(request_args.is_closed)) \
                 .group_by(SecureMessage.thread_id).subquery('t')
 
             conditions.append(SecureMessage.thread_id == t.c.thread_id)
