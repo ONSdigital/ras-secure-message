@@ -3,6 +3,7 @@ from urllib.parse import urlencode
 
 from flask import current_app
 import requests
+from requests import HTTPError
 from structlog import wrap_logger
 logger = wrap_logger(logging.getLogger(__name__))
 
@@ -38,13 +39,17 @@ class PartyService:
 
             party_data = requests.get(f"{current_app.config['RAS_PARTY_SERVICE']}party-api/v1/respondents",
                                       auth=current_app.config['BASIC_AUTH'], verify=False, params=payload)
-            if party_data.status_code == 200:
-                user_list = party_data.json()
-                self._users_cache = user_list
-                logger.debug(f"Party data retrieved for uuid:{uuid}")
-            else:
-                logger.error(f'Party service failed for uuid:{uuid}', status_code=party_data.status_code,
-                             text=party_data.text,
-                             uuid=uuid)
+            try:
+                party_data.raise_for_status()
+            except HTTPError:
+                logger.exception('Failed to retrieve data from party service',
+                                 status_code=party_data.status_code,
+                                 text=party_data.text,
+                                 uuid=uuid)
+                return user_list
+
+            user_list = party_data.json()
+            self._users_cache = user_list
+            logger.debug("Party data successfully retrieved", uuid=uuid)
 
         return user_list
