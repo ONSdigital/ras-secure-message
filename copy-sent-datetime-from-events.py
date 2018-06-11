@@ -19,3 +19,5 @@ try:
 except SQLAlchemyError:
     session.rollback()
     print("Problem!")
+
+# TODO, same thing, but with READ events
