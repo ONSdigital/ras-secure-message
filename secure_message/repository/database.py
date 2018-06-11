@@ -137,7 +137,7 @@ class Status(db.Model):
     """Label Assignment table model"""
     __tablename__ = "status"
 
-    id = Column('id', Integer(), primary_key=True, index=True)
+    id = Column('id', Integer(), primary_key=True)
     label = Column('label', String(constants.MAX_STATUS_LABEL_LEN + 1))
     msg_id = Column('msg_id', String(constants.MAX_MSG_ID_LEN + 1), ForeignKey('secure_message.msg_id'))
     actor = Column('actor', String(constants.MAX_STATUS_ACTOR_LEN + 1))
@@ -183,7 +183,7 @@ class Conversation(db.Model):
     """Conversation table model"""
     __tablename__ = "conversation"
 
-    id = Column('id', String(length=60), primary_key=True)
+    id = Column('id', String(length=60), primary_key=True, index=True)
     is_closed = Column('is_closed', Boolean())
     closed_by = Column('closed_by', String())
     closed_by_uuid = Column('closed_by_uuid', String(length=60))
