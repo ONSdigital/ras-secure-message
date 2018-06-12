@@ -72,9 +72,9 @@ def process_paginated_list(paginated_list, host_url, user, message_args, endpoin
 
 def get_from_details(messages):
     """looks up the details for the from users"""
-    update_internal_messages_from(messages)
+    messages = update_internal_messages_from(messages)
     from_details = party.get_users_details(get_messages_from_external(messages))
-    external_messages = [x for x in messages if x['from_internal'] is False]
+    external_messages = [message for message in messages if message['from_internal'] is False]
 
     for message in messages:
         if message in external_messages:
@@ -84,16 +84,10 @@ def get_from_details(messages):
 
 
 def get_messages_from_external(messages):
-    external_msgs = []
     uuid_from = []
 
-    len_list = len(messages)
-
-    update_internal_messages_from(messages)
-
-    for i in range(0, len_list):
-        if not messages[i]['from_internal']:
-            external_msgs.append(messages[i])
+    messages = update_internal_messages_from(messages)
+    external_msgs = [message for message in messages if message['from_internal'] is False]
     for uuid in external_msgs:
         if uuid["msg_from"] not in uuid_from:
             uuid_from.append(uuid["msg_from"])
@@ -104,19 +98,20 @@ def update_internal_messages_from(messages):
     for message in messages:
         if message["from_internal"]:
             message.update({"@msg_from": internal_user_service.get_user_details(message["msg_from"])})
+    return messages
 
 
 def get_to_details(messages):
     """looks up the details for the to users"""
 
-    update_external_messages_to(messages)
+    messages = update_external_messages_to(messages)
 
     to_details = party.get_users_details(get_internal_messages_to_uuid(messages))
-    internal_messages = [x for x in messages if x['from_internal'] is True]
+    internal_messages = [message for message in messages if message['from_internal'] is True]
 
-    for msg in messages:
-        if msg in internal_messages:
-            msg.update({'@msg_to': to_details})
+    for message in messages:
+        if message in internal_messages:
+            message.update({'@msg_to': to_details})
 
     return messages
 
@@ -125,17 +120,15 @@ def update_external_messages_to(messages):
     for message in messages:
         if not message["from_internal"]:
             message.update({"@msg_to": internal_user_service.get_user_details(message["msg_to"][0])})
+    return messages
 
 
 def get_internal_messages_to_uuid(messages):
     msgs = []
     uuid_to = []
-    len_list = len(messages)
-
-    for i in range(0, len_list):
-        if messages[i]['from_internal']:
-            msgs.append(messages[i])
-
+    for message in messages:
+        if message['from_internal']:
+            msgs.append(message)
     for uuid in msgs:
         if uuid["msg_to"][0] not in uuid_to:
             uuid_to.append(uuid["msg_to"][0])
