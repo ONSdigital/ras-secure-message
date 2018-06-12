@@ -131,8 +131,8 @@ class Modifier:
             bound_logger.info("Re-opening conversation")
             metadata.is_closed = False
             metadata.closed_at = None
-            metadata.closed_by = ''
-            metadata.closed_by_uuid = ''
+            metadata.closed_by = None
+            metadata.closed_by_uuid = None
             db.session.commit()
         except SQLAlchemyError:
             db.session.rollback()
