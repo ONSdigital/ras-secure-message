@@ -79,9 +79,14 @@ class ThreadById(Resource):
         if not request_data:
             bound_logger.error('No properties provided')
             raise BadRequest(description="No properties provided")
+        try:
+            request_data['is_closed']
+        except KeyError:
+            bound_logger.error('Invalid properties provided')
+            raise BadRequest(description="Only 'is_closed' property may be provided")
         if not isinstance(request_data['is_closed'], bool):
             bound_logger.error('Invalid value provided')
-            raise BadRequest(description="Invalid label provided")
+            raise BadRequest(description="Invalid value provided")
         if metadata.is_closed and request_data['is_closed'] is True:
             bound_logger.info("Conversation already closed")
             raise BadRequest(description="Conversation already closed")
