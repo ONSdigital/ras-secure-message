@@ -7,11 +7,11 @@ logger = wrap_logger(logging.getLogger(__name__))
 
 class PartyServiceMock:
 
-    def get_business_details(self, ru):
+    def get_business_details(self, ru_ids):
         """Return mock business details"""
-        business_details = [self._business_details.get(ru_id) for ru_id in self._business_details if ru_id in ru]
+        business_details = [self._business_details.get(ru_id) for ru_id in self._business_details if ru_id in ru_ids]
         if not business_details:
-            logger.error(f"no details for ru:{ru} found in mock party service")
+            logger.error("At least 1 ru_id missing in mock party service", ru_ids=ru_ids)
         return business_details
 
     def get_user_details(self, uuid):

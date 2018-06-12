@@ -145,13 +145,13 @@ def get_internal_messages_to_uuid(messages):
 def add_business_details(messages):
     """Adds business details"""
 
-    ru_list = []
+    ru_ids = []
 
     for message in messages:
-        if message['ru_id'] not in ru_list:
-            ru_list.append(message['ru_id'])
+        if message['ru_id'] not in ru_ids:
+            ru_ids.append(message['ru_id'])
 
-    business_details = party.get_business_details(ru_list)
+    business_details = party.get_business_details(ru_ids)
 
     for message in messages:
         message['@ru_id'] = next((business for business in business_details if business["id"] == message['ru_id']), None)
