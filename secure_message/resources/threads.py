@@ -35,7 +35,7 @@ class ThreadById(Resource):
                             "is_closed": conversation_metadata.is_closed,
                             "closed_by": conversation_metadata.closed_by,
                             "closed_by_uuid": conversation_metadata.closed_by_uuid,
-                            "closed_at": conversation_metadata.closed_at})
+                            "closed_at": conversation_metadata.closed_at.isoformat()})
 
         return jsonify({"messages": add_users_and_business_details(messages),
                         "is_closed": False})
