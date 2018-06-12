@@ -26,11 +26,18 @@ class PartyService:
                          ru=rus)
         return ru_list
 
-    @staticmethod
-    def get_user_details(uuid):
-        """Retrieves the user details from the party service"""
+    def get_user_details(self, uuid):
+        """Retrieves the user details from the party service after converting single
+        uuid into a list of one"""
+        return self._get_the_user_details([uuid])
 
-        payload = urlencode([("id", x) for x in uuid])
+    def get_users_details(self, uuids):
+        """Retrieves the user details from the party service"""
+        return self._get_the_user_details(uuids)
+
+    @staticmethod
+    def _get_the_user_details(uuids):
+        payload = urlencode([("id", x) for x in uuids])
         response = requests.get(f"{current_app.config['RAS_PARTY_SERVICE']}party-api/v1/respondents",
                                 auth=current_app.config['BASIC_AUTH'], verify=False, params=payload)
         try:
@@ -39,10 +46,10 @@ class PartyService:
             logger.exception('Failed to retrieve data from party service',
                              status_code=response.status_code,
                              text=response.text,
-                             uuid=uuid)
+                             uuids=uuids)
             return []
 
         user_list = response.json()
-        logger.debug("Party data successfully retrieved", uuid=uuid)
+        logger.debug("Party data successfully retrieved", uuids=uuids)
 
         return user_list

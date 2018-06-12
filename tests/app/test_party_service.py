@@ -43,7 +43,7 @@ class PartyTestCase(unittest.TestCase):
         mock_request.get(business_data_url, status_code=200, reason="OK", text=texts)
         sut = PartyService()
         with self.app.app_context():
-            results = sut.get_user_details(ru)
+            results = sut.get_users_details(ru)
 
         self.assertTrue(results, texts)
 
@@ -131,8 +131,7 @@ class PartyTestCase(unittest.TestCase):
         """Test get user details sends a request and receives back data"""
         sut = PartyService()
         ru = [constants.NON_SPECIFIC_INTERNAL_USER]
-        user_data_url = f"{self.app.config['RAS_PARTY_SERVICE']}party-api/v1/respondents?id=" \
-                        f"{ru[0]}"
+        user_data_url = f"{self.app.config['RAS_PARTY_SERVICE']}party-api/v1/respondents?id={ru[0]}"
         expected_result = {'emailAddress': '',
                            'firstName': constants.NON_SPECIFIC_INTERNAL_USER,
                            'id': constants.NON_SPECIFIC_INTERNAL_USER,
@@ -143,7 +142,7 @@ class PartyTestCase(unittest.TestCase):
 
         mock_request.get(user_data_url, status_code=200, reason="OK", json=expected_result)
         with self.app.app_context():
-            result_data = sut.get_user_details(ru)
+            result_data = sut.get_users_details(ru)
 
         self.assertEqual(result_data, expected_result)
 
@@ -156,7 +155,7 @@ class PartyTestCase(unittest.TestCase):
         mock_request.get(user_data_url, status_code=200, reason="OK", text='{"Test": "test"}')
 
         with self.app.app_context():
-            result_data = sut.get_user_details(ru)
+            result_data = sut.get_users_details(ru)
 
         self.assertEqual(result_data, {"Test": "test"})
 
@@ -169,7 +168,7 @@ class PartyTestCase(unittest.TestCase):
         mock_request.get(user_data_url, status_code=401, reason="unauthorised", text="Unauthorized access")
 
         with self.app.app_context():
-            result_data = sut.get_user_details(ru)
+            result_data = sut.get_users_details(ru)
 
         self.assertEqual(result_data, [])
 

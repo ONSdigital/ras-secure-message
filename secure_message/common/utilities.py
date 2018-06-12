@@ -73,7 +73,7 @@ def process_paginated_list(paginated_list, host_url, user, message_args, endpoin
 def get_from_details(messages):
     """looks up the details for the from users"""
     update_internal_messages_from(messages)
-    from_details = party.get_user_details(get_messages_from_external(messages))
+    from_details = party.get_users_details(get_messages_from_external(messages))
     external_messages = [x for x in messages if x['from_internal'] is False]
 
     for message in messages:
@@ -111,7 +111,7 @@ def get_to_details(messages):
 
     update_external_messages_to(messages)
 
-    to_details = party.get_user_details(get_internal_messages_to_uuid(messages))
+    to_details = party.get_users_details(get_internal_messages_to_uuid(messages))
     internal_messages = [x for x in messages if x['from_internal'] is True]
 
     for msg in messages:

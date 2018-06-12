@@ -55,6 +55,9 @@ class Party(ServiceMockToggle):
     def get_user_details(self, uuid):
         return self._service.get_user_details(uuid)
 
+    def get_users_details(self, user_details):
+        return self._service.get_users_details(user_details)
+
 
 class Case(ServiceMockToggle):
     """A case service acts as an interface to mocked or real Case Services via its ServiceMockToggle base"""
