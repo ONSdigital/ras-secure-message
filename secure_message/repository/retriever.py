@@ -3,12 +3,13 @@ import logging
 from flask import jsonify
 from sqlalchemy import and_, func, or_
 from sqlalchemy.exc import SQLAlchemyError
+from sqlalchemy.orm.exc import NoResultFound
 from structlog import wrap_logger
 from werkzeug.exceptions import InternalServerError, NotFound
 
 from secure_message.common.eventsapi import EventsApi
 from secure_message.common.labels import Labels
-from secure_message.repository.database import db, Events, SecureMessage, Status
+from secure_message.repository.database import db, Conversation, Events, SecureMessage, Status
 
 logger = wrap_logger(logging.getLogger(__name__))
 
@@ -225,6 +226,15 @@ class Retriever:
             raise InternalServerError(description="Error retrieving conversation from database")
 
         return result
+
+    @staticmethod
+    def retrieve_conversation_metadata(thread_id):
+        result = Conversation.query.filter(Conversation.id == thread_id)
+        try:
+            return result.one()
+        except NoResultFound:
+            logger.info("No conversation found", thread_id=thread_id)
+            return None
 
     @staticmethod
     def check_db_connection():

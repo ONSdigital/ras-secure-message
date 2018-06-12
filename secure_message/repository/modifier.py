@@ -9,6 +9,8 @@ from werkzeug.exceptions import InternalServerError
 from secure_message.common.eventsapi import EventsApi
 from secure_message.common.labels import Labels
 from secure_message.repository.database import db, SecureMessage, Status, Events
+from secure_message.services.service_toggles import internal_user_service
+
 
 logger = wrap_logger(logging.getLogger(__name__))
 
@@ -97,3 +99,45 @@ class Modifier:
                 raise InternalServerError(description="Error adding read information to message")
         Modifier.remove_label(unread, message, user)
         return True
+
+    @staticmethod
+    def close_conversation(metadata, user):
+        bound_logger = logger.bind(conversation_id=metadata.id, user_id=user.user_uuid)
+        bound_logger.info("Getting user details")
+
+        user_details = internal_user_service.get_user_details(user.user_uuid)
+        bound_logger.info("Successfully retrieved user details")
+
+        try:
+            bound_logger.info("Closing conversation")
+            metadata.is_closed = True
+            metadata.closed_at = datetime.utcnow()
+            metadata.closed_by = f"{user_details.get('firstName')} {user_details.get('lastName')}"
+            metadata.closed_by_uuid = user.user_uuid
+            db.session.commit()
+        except SQLAlchemyError:
+            db.session.rollback()
+            bound_logger.exception("Database error occured while closing conversation")
+            raise InternalServerError(description="Database error occured while closing conversation")
+
+        bound_logger.info("Successfully closed conversation")
+        bound_logger.unbind('conversation_id', 'user_id')
+
+    @staticmethod
+    def open_conversation(metadata, user):
+        bound_logger = logger.bind(conversation_id=metadata.id, user_id=user.user_uuid)
+
+        try:
+            bound_logger.info("Re-opening conversation")
+            metadata.is_closed = False
+            metadata.closed_at = None
+            metadata.closed_by = None
+            metadata.closed_by_uuid = None
+            db.session.commit()
+        except SQLAlchemyError:
+            db.session.rollback()
+            bound_logger.exception("Database error occured while opening conversation")
+            raise InternalServerError(description="Database error occured while opening conversation")
+
+        bound_logger.info("Successfully re-opened conversation")
+        bound_logger.unbind('conversation_id', 'user_id')

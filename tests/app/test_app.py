@@ -2,6 +2,7 @@ import unittest
 from unittest import mock
 from unittest.mock import patch
 from datetime import datetime, timezone
+import uuid
 
 from flask import current_app, json
 from sqlalchemy import create_engine
@@ -31,16 +32,21 @@ class FlaskTestCase(unittest.TestCase):
 
         AlertUser.alert_method = mock.Mock(AlertViaGovNotify)
 
-        token_data = {constants.USER_IDENTIFIER: constants.NON_SPECIFIC_INTERNAL_USER,
-                      "role": "internal"}
+        internal_token_data = {constants.USER_IDENTIFIER: constants.NON_SPECIFIC_INTERNAL_USER,
+                               "role": "internal"}
+
+        external_token_data = {constants.USER_IDENTIFIER: str(uuid.uuid4()),
+                               "role": "respondent"}
 
         with self.app.app_context():
-            signed_jwt = encode(token_data)
+            internal_signed_jwt = encode(internal_token_data)
+            external_signed_jwt = encode(external_token_data)
 
         AlertUser.alert_method = mock.Mock(AlertViaLogging)
         self.app.config['NOTIFY_CASE_SERVICE'] = '1'
 
-        self.headers = {'Content-Type': 'application/json', 'Authorization': signed_jwt}
+        self.internal_user_header = {'Content-Type': 'application/json', 'Authorization': internal_signed_jwt}
+        self.external_user_header = {'Content-Type': 'application/json', 'Authorization': external_signed_jwt}
 
         self.test_message = {'msg_to': ['0a7ad740-10d5-4ecb-b7ca-3c0384afb882'],
                              'msg_from': constants.NON_SPECIFIC_INTERNAL_USER,
@@ -77,7 +83,7 @@ class FlaskTestCase(unittest.TestCase):
                 'create_date': datetime.now(timezone.utc),
                 'read_date': datetime.now(timezone.utc)}
 
-        self.client.post(url, data=json.dumps(data), headers=self.headers)
+        self.client.post(url, data=json.dumps(data), headers=self.internal_user_header)
 
         with self.engine.connect() as con:
             request = con.execute('SELECT * FROM securemessage.secure_message WHERE id = (SELECT MAX(id) FROM securemessage.secure_message)')
@@ -90,7 +96,7 @@ class FlaskTestCase(unittest.TestCase):
         # post json message written up in the ui
         url = "http://localhost:5050/message/send"
 
-        self.client.post(url, data=json.dumps(self.test_message), headers=self.headers)
+        self.client.post(url, data=json.dumps(self.test_message), headers=self.internal_user_header)
         engine = create_engine(self.app.config['SECURE_MESSAGING_DATABASE_URL'], echo=True)
         with engine.connect() as con:
             request = con.execute('SELECT * FROM securemessage.secure_message WHERE id = (SELECT MAX(id) FROM securemessage.secure_message)')
@@ -98,13 +104,32 @@ class FlaskTestCase(unittest.TestCase):
             for row in request:
                 self.assertEqual(len(row['msg_id']), 36)
 
+    def test_thread_patch_without_content_type_in_header_fails(self):
+        """check default_msg_id is stored when messageSend endpoint called with no msg_id"""
+        # post json message written up in the ui
+        url = "http://localhost:5050/v2/threads/f1a5e99c-8edf-489a-9c72-6cabe6c387fc"
+        header_copy = self.internal_user_header.copy()
+        header_copy.pop('Content-Type')
+        response = self.client.patch(url, data=json.dumps({"is_closed": True}), headers=header_copy)
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(json.loads(response.get_data()), {'message': 'Request must set accept content type "application/json" in header.'})
+
+    def test_thread_patch_as_external_user_fails(self):
+        """check default_msg_id is stored when messageSend endpoint called with no msg_id"""
+        # post json message written up in the ui
+        url = "http://localhost:5050/v2/threads/f1a5e99c-8edf-489a-9c72-6cabe6c387fc"
+        response = self.client.patch(url, data=json.dumps({"is_closed": True}), headers=self.external_user_header)
+        self.assertEqual(response.status_code, 403)
+        error_message = "You don't have the permission to access the requested resource. It is either read-protected or not readable by the server."
+        self.assertEqual(json.loads(response.get_data()), {'message': error_message})
+
     def test_reply_to_existing_message_has_same_thread_id_and_different_message_id_as_original(self):
         """check a reply gets same thread id as original"""
         # post json message written up in the ui
 
         url = "http://localhost:5050/message/send"
 
-        self.client.post(url, data=json.dumps(self.test_message), headers=self.headers)
+        self.client.post(url, data=json.dumps(self.test_message), headers=self.internal_user_header)
 
         # Now read back the message to get the thread ID
 
@@ -115,7 +140,7 @@ class FlaskTestCase(unittest.TestCase):
                 self.test_message['thread_id'] = row['thread_id']
 
         # Now submit a new message as a reply , Message Id empty , thread id same as last one
-        self.client.post(url, data=json.dumps(self.test_message), headers=self.headers)
+        self.client.post(url, data=json.dumps(self.test_message), headers=self.internal_user_header)
 
         # Now read back the two messages
         original_msg_id = original_thread_id = reply_msg_id = reply_thread_id = ''
@@ -151,7 +176,7 @@ class FlaskTestCase(unittest.TestCase):
                         'ru_id': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc',
                         'survey': test_utilities.BRES_SURVEY}
         try:
-            self.client.post(url, data=json.dumps(test_message), headers=self.headers)
+            self.client.post(url, data=json.dumps(test_message), headers=self.internal_user_header)
             self.assertTrue(True)  # i.e no exception
         except Exception as e:
             self.fail(f"post raised unexpected exception: {e}")
@@ -160,7 +185,7 @@ class FlaskTestCase(unittest.TestCase):
         """posts to message send end point to ensure labels are saved as expected"""
         url = "http://localhost:5050/message/send"
 
-        response = self.client.post(url, data=json.dumps(self.test_message), headers=self.headers)
+        response = self.client.post(url, data=json.dumps(self.test_message), headers=self.internal_user_header)
         data = json.loads(response.data)
 
         with self.engine.connect() as con:
@@ -173,7 +198,7 @@ class FlaskTestCase(unittest.TestCase):
         """posts to message send end point to ensure events are saved as expected"""
         url = "http://localhost:5050/message/send"
 
-        response = self.client.post(url, data=json.dumps(self.test_message), headers=self.headers)
+        response = self.client.post(url, data=json.dumps(self.test_message), headers=self.internal_user_header)
         data = json.loads(response.data)
 
         with self.engine.connect() as con:
@@ -185,7 +210,7 @@ class FlaskTestCase(unittest.TestCase):
         """posts to message send end point to ensure labels are saved as expected"""
         url = "http://localhost:5050/message/send"
 
-        response = self.client.post(url, data=json.dumps(self.test_message), headers=self.headers)
+        response = self.client.post(url, data=json.dumps(self.test_message), headers=self.internal_user_header)
         data = json.loads(response.data)
         # dereferencing msg_to for purpose of test
         with self.engine.connect() as con:
@@ -199,7 +224,7 @@ class FlaskTestCase(unittest.TestCase):
         """posts to message send end point to ensure survey is saved for internal user"""
         url = "http://localhost:5050/message/send"
 
-        response = self.client.post(url, data=json.dumps(self.test_message), headers=self.headers)
+        response = self.client.post(url, data=json.dumps(self.test_message), headers=self.internal_user_header)
         data = json.loads(response.data)
 
         with self.engine.connect() as con:
@@ -215,7 +240,7 @@ class FlaskTestCase(unittest.TestCase):
 
         self.app.config['NOTIFY_CASE_SERVICE'] = '0'
         url = "http://localhost:5050/message/send"
-        self.client.post(url, data=json.dumps(self.test_message), headers=self.headers)
+        self.client.post(url, data=json.dumps(self.test_message), headers=self.internal_user_header)
         self.assertFalse(case.called)
 
     @patch.object(case_service, 'store_case_event')
@@ -225,7 +250,7 @@ class FlaskTestCase(unittest.TestCase):
         self.app.config["NOTIFY_VIA_GOV_NOTIFY"] = '0'
         self.app.config['NOTIFY_CASE_SERVICE'] = '1'
         url = "http://localhost:5050/message/send"
-        self.client.post(url, data=json.dumps(self.test_message), headers=self.headers)
+        self.client.post(url, data=json.dumps(self.test_message), headers=self.internal_user_header)
         self.assertTrue(case.called)
 
     @patch.object(message_logger, 'error')
@@ -234,7 +259,7 @@ class FlaskTestCase(unittest.TestCase):
         """Test exceptions in alerting do not prevent a response indicating success"""
         self.app.config['NOTIFY_CASE_SERVICE'] = '0'
         url = "http://localhost:5050/message/send"
-        result = self.client.post(url, data=json.dumps(self.test_message), headers=self.headers)
+        result = self.client.post(url, data=json.dumps(self.test_message), headers=self.internal_user_header)
         self.assertTrue(mock_logger.called)
         self.assertTrue(result.status_code == 201)
 
@@ -249,7 +274,7 @@ class FlaskTestCase(unittest.TestCase):
         """Test if Email Address is missing no attempt will be made to send email """
 
         url = "http://localhost:5050/message/send"
-        self.client.post(url, data=json.dumps(self.test_message), headers=self.headers)
+        self.client.post(url, data=json.dumps(self.test_message), headers=self.internal_user_header)
         self.assertFalse(mock_alerter.called)
 
     @patch.object(PartyServiceMock, 'get_user_details', return_value=({"id": "f62dfda8-73b0-4e0e-97cf-1b06327a6712",
@@ -264,7 +289,7 @@ class FlaskTestCase(unittest.TestCase):
         """Test if Email Address is zero length no attempt will be made to send email """
 
         url = "http://localhost:5050/message/send"
-        self.client.post(url, data=json.dumps(self.test_message), headers=self.headers)
+        self.client.post(url, data=json.dumps(self.test_message), headers=self.internal_user_header)
         self.assertFalse(mock_alerter.called)
 
     @patch.object(PartyServiceMock, 'get_user_details', return_value=({"id": "f62dfda8-73b0-4e0e-97cf-1b06327a6712",
@@ -279,7 +304,7 @@ class FlaskTestCase(unittest.TestCase):
         """Test if Email Address is zero length no attempt will be made to send email """
 
         url = "http://localhost:5050/message/send"
-        self.client.post(url, data=json.dumps(self.test_message), headers=self.headers)
+        self.client.post(url, data=json.dumps(self.test_message), headers=self.internal_user_header)
         self.assertFalse(mock_alerter.called)
 
     @patch.object(PartyServiceMock, 'get_user_details', return_value=({"id": "cantFindThis"}, 400))
@@ -288,7 +313,7 @@ class FlaskTestCase(unittest.TestCase):
         """Test if Email Address is zero length no attempt will be made to send email """
 
         url = "http://localhost:5050/message/send"
-        self.client.post(url, data=json.dumps(self.test_message), headers=self.headers)
+        self.client.post(url, data=json.dumps(self.test_message), headers=self.internal_user_header)
         self.assertFalse(mock_alerter.called)
 
     @patch.object(PartyServiceMock, 'get_user_details', return_value=({"id": "f62dfda8-73b0-4e0e-97cf-1b06327a6712",
@@ -315,9 +340,9 @@ class FlaskTestCase(unittest.TestCase):
         with self.app.app_context():
             signed_jwt = encode(token_data)
 
-        self.headers = {'Content-Type': 'application/json', 'Authorization': signed_jwt}
+        self.internal_user_header = {'Content-Type': 'application/json', 'Authorization': signed_jwt}
         url = "http://localhost:5050/message/send"
-        self.client.post(url, data=json.dumps(self.test_message), headers=self.headers)
+        self.client.post(url, data=json.dumps(self.test_message), headers=self.internal_user_header)
         mock_case.assert_called()
 
     @patch.object(InternalUserServiceMock, 'get_user_details', return_value=({"id": "f62dfda8-73b0-4e0e-97cf-1b06327a6712",
@@ -342,9 +367,9 @@ class FlaskTestCase(unittest.TestCase):
         with self.app.app_context():
             signed_jwt = encode(token_data)
 
-        self.headers = {'Content-Type': 'application/json', 'Authorization': signed_jwt}
+        self.internal_user_header = {'Content-Type': 'application/json', 'Authorization': signed_jwt}
         url = "http://localhost:5050/v2/messages"
-        self.client.post(url, data=json.dumps(self.test_message), headers=self.headers)
+        self.client.post(url, data=json.dumps(self.test_message), headers=self.internal_user_header)
         mock_case.assert_called()
 
 
