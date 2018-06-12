@@ -30,7 +30,7 @@ class ThreadById(Resource):
             msg = message.serialize(g.user, body_summary=False)
             messages.append(msg)
 
-        if conversation_metadata is not None and conversation_metadata.is_closed:
+        if conversation_metadata and conversation_metadata.is_closed:
             return jsonify({"messages": add_users_and_business_details(messages),
                             "is_closed": conversation_metadata.is_closed,
                             "closed_by": conversation_metadata.closed_by,
@@ -79,9 +79,7 @@ class ThreadById(Resource):
         if not request_data:
             bound_logger.error('No properties provided')
             raise BadRequest(description="No properties provided")
-        try:
-            request_data['is_closed']
-        except KeyError:
+        if 'is_closed' not in request_data:
             bound_logger.error('Invalid properties provided')
             raise BadRequest(description="Only 'is_closed' property may be provided")
         if not isinstance(request_data['is_closed'], bool):
