@@ -20,6 +20,7 @@ from tests.app.test_utilities import BRES_SURVEY, get_args
 class RetrieverTestCaseHelper:
 
     default_internal_actor = 'internal_actor'
+    second_internal_actor = 'second_internal_actor'
     default_external_actor = 'external_actor'
 
     """Helper class for Retriever Tests"""
@@ -171,6 +172,7 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
             self.db = database.db
 
         self.user_internal = User(RetrieverTestCaseHelper.default_internal_actor, 'internal')
+        self.second_user_internal = User(RetrieverTestCaseHelper.second_internal_actor, 'internal2')
         self.user_respondent = User(RetrieverTestCaseHelper.default_external_actor, 'respondent')
         party.use_mock_service()
         self.app.config['NOTIFY_CASE_SERVICE'] = '1'
@@ -395,6 +397,16 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
                     thread = Retriever().retrieve_thread(thread_ids[x], self.user_internal)
                     self.assertEqual(date[x], str(thread.all()[0].events[0].date_time))
                     self.assertEqual(msg_ids[x], thread.all()[0].events[0].msg_id)
+
+    def test_thread_count_by_survey(self):
+        """checks that the returned thread count is the same for every internal user"""
+        self.create_threads(5)
+
+        with self.app.app_context():
+            with current_app.test_request_context():
+                thread_count_internal = Retriever().thread_count_by_survey(self.user_internal, BRES_SURVEY)
+                thread_count_second_internal = Retriever().thread_count_by_survey(self.second_user_internal, BRES_SURVEY)
+                self.assertEqual(thread_count_internal, thread_count_second_internal)
 
 
 if __name__ == '__main__':
