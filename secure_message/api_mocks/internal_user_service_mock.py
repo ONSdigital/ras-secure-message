@@ -29,6 +29,12 @@ class InternalUserServiceMock:
                 "lastName": "flinstone",
                 "emailAddress": "mock@email.com"
             },
+            "ce12b958-2a5f-44f4-a6da-861e59070a31": {
+                "id": "ce12b958-2a5f-44f4-a6da-861e59070a31",
+                "firstName": "Selphie",
+                "lastName": "Tilmitt",
+                "emailAddress": "selphie@mockemail.com"
+            },
             "Tej": {
                 "id": "Tej",
                 "firstName": "Tejas",

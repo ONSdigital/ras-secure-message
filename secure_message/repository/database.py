@@ -24,7 +24,7 @@ class SecureMessage(db.Model):
     msg_id = Column("msg_id", String(constants.MAX_MSG_ID_LEN), unique=True, index=True)
     subject = Column("subject", String(constants.MAX_SUBJECT_LEN + 1))
     body = Column("body", String(constants.MAX_BODY_LEN + 1))
-    thread_id = Column("thread_id", String(constants.MAX_THREAD_LEN + 1), index=True)
+    thread_id = Column("thread_id", String(constants.MAX_THREAD_LEN + 1), ForeignKey('conversation.id'), index=True)
     collection_case = Column("collection_case", String(constants.MAX_COLLECTION_CASE_LEN + 1))
     ru_id = Column("ru_id", String(constants.MAX_RU_ID_LEN + 1))
     collection_exercise = Column("collection_exercise", String(constants.MAX_COLLECTION_EXERCISE_LEN + 1))
@@ -177,3 +177,20 @@ class Events(db.Model):
         self.msg_id = msg_id
         self.event = event
         self.date_time = datetime.now(timezone.utc)
+
+
+class Conversation(db.Model):
+    """Conversation table model"""
+    __tablename__ = "conversation"
+
+    id = Column('id', String(length=60), primary_key=True, index=True)
+    is_closed = Column('is_closed', Boolean())
+    closed_by = Column('closed_by', String())
+    closed_by_uuid = Column('closed_by_uuid', String(length=60))
+    closed_at = Column('closed_at', DateTime())
+
+    def __init__(self, is_closed=False, closed_by=None, closed_by_uuid=None, closed_at=None):
+        self.is_closed = is_closed
+        self.closed_by = closed_by
+        self.closed_by_uuid = closed_by_uuid
+        self.closed_at = closed_at
