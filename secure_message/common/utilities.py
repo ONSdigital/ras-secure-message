@@ -81,7 +81,7 @@ def get_to_details(messages):
             message.update({"@msg_to": internal_user_service.get_user_details(message["msg_to"][0])})
 
     # Then resolve msg_to details for messages going from ONS user (internal) to respondant (external)
-    to_details = party.get_users_details(get_external_user_uuid_list_from_internal_messages(messages))
+    to_details = party.get_users_details(get_external_user_uuid_list_from_msg_to_key_in_internal_messages(messages))
     internal_messages = [message for message in messages if message['from_internal'] is True]
 
     for message in messages:
@@ -93,8 +93,13 @@ def get_to_details(messages):
 
 def get_from_details(messages):
     """looks up the details for the from users"""
-    messages = update_internal_messages_from(messages)
-    from_details = party.get_users_details(get_messages_from_external(messages))
+    # First resolve msg_from details for messages going from ONS user (internal) to respondant (external)
+    for message in messages:
+        if message["from_internal"]:
+            message.update({"@msg_from": internal_user_service.get_user_details(message["msg_from"])})
+
+    # Then resolve msg_from details for messages going from respondant (external) to ONS user (internal)
+    from_details = party.get_users_details(get_external_user_uuid_list_from_msg_from_key_in_external_messages(messages))
     external_messages = [message for message in messages if message['from_internal'] is False]
 
     for message in messages:
@@ -104,11 +109,10 @@ def get_from_details(messages):
     return messages
 
 
-def get_messages_from_external(messages):
+def get_external_user_uuid_list_from_msg_from_key_in_external_messages(messages):
     """Compiles a list of all unique the external user (respondant) uuids from a list of messages"""
     uuid_from = []
 
-    messages = update_internal_messages_from(messages)
     external_msgs = [message for message in messages if message['from_internal'] is False]
     for uuid in external_msgs:
         if uuid["msg_from"] not in uuid_from:
@@ -116,16 +120,7 @@ def get_messages_from_external(messages):
     return uuid_from
 
 
-def update_internal_messages_from(messages):
-    """Adds a @msg_from key to a message dict that contains details about the internal user
-    the message was from"""
-    for message in messages:
-        if message["from_internal"]:
-            message.update({"@msg_from": internal_user_service.get_user_details(message["msg_from"])})
-    return messages
-
-
-def get_external_user_uuid_list_from_internal_messages(messages):
+def get_external_user_uuid_list_from_msg_to_key_in_internal_messages(messages):
     """Creates a list of unique uuids for external (respondant) users from a list of messages"""
     uuid_to = []
     internal_messages = [message for message in messages if message['from_internal'] is True]
