@@ -1,8 +1,7 @@
+import copy
 import unittest
 
-import requests_mock
-
-from secure_message.application import create_app, get_client_token
+from secure_message.application import create_app
 from secure_message.common.utilities import MessageArgs, get_to_details, get_from_details, add_business_details
 from secure_message.services.service_toggles import party, internal_user_service
 
@@ -24,116 +23,180 @@ class UtilitiesTestCase(unittest.TestCase):
         party.use_mock_service()
         internal_user_service.use_mock_service()
 
-    user_info = {'id': 'bca50ef9-ff50-44b1-adf5-b6728e0bd360',
-                 'lastLogonTime': 1528278309563,
-                 'meta': {'created': '2018-06-06T09:36:31.509Z',
-                          'lastModified': '2018-06-06T09:36:31.509Z',
-                          'version': 0},
-                 'name': {'name': 'John',
-                          'givenName': 'Shaw',
-                          'familyName': 'Shaw'},
-                 'emails': [{'value': 'uaa_user',
-                             'primary': False}],
-                 'origin': 'uaa',
-                 'passwordLastModified': '2018-06-06T09:36:31.000Z',
-                 'previousLogonTime': 1528278248442,
-                 'schemas': ['Schema'],
-                 'userName': 'John shaw',
-                 'verified': True,
-                 'zoneId': 'uaa'}
+    messages_external_first = [{'body': 'Reply body from respondent',
+                                'collection_case': '',
+                                'collection_exercise': '',
+                                'from_internal': False,
+                                'labels': ['INBOX'],
+                                'msg_from': '0a7ad740-10d5-4ecb-b7ca-3c0384afb882',
+                                'msg_id': '048ffdb5-18f0-46f0-bfa0-ea298521c513',
+                                'msg_to': ['01b51fcc-ed43-4cdb-ad1c-450f9986859b'],
+                                'read_date': '2018-06-05 15:23:39.898317',
+                                'ru_id': '6c141ebb-10d1-4065-ac3e-ef5b5c95d251',
+                                'sent_date': '2018-06-05 15:23:38.025084',
+                                'subject': 'Message to ONS',
+                                'survey': 'cb8accda-6118-4d3b-85a3-149e28960c54',
+                                'thread_id': '53a430f1-de21-4279-b17e-1bfb4c4813a6'},
+                               {'body': 'Reply body from internal user',
+                                'collection_case': '',
+                                'collection_exercise': '',
+                                'from_internal': True,
+                                'labels': ['INBOX'],
+                                'msg_from': '01b51fcc-ed43-4cdb-ad1c-450f9986859b',
+                                'msg_id': '048ffdb5-18f0-46f0-bfa0-ea298521c513',
+                                'msg_to': ['0a7ad740-10d5-4ecb-b7ca-3c0384afb882'],
+                                'read_date': '2018-06-05 15:23:39.898317',
+                                'ru_id': '6c141ebb-10d1-4065-ac3e-ef5b5c95d251',
+                                'sent_date': '2018-06-05 15:23:38.025084',
+                                'subject': 'Message to ONS',
+                                'survey': 'cb8accda-6118-4d3b-85a3-149e28960c54',
+                                'thread_id': '53a430f1-de21-4279-b17e-1bfb4c4813a6'}]
 
-    messages = [{'body': 'Reply body from respondent',
-                 'collection_case': '',
-                 'collection_exercise': '',
-                 'from_internal': False,
-                 'labels': ['INBOX'],
-                 'msg_from': '0a7ad740-10d5-4ecb-b7ca-3c0384afb882',
-                 'msg_id': '048ffdb5-18f0-46f0-bfa0-ea298521c513',
-                 'msg_to': ['01b51fcc-ed43-4cdb-ad1c-450f9986859b'],
-                 'read_date': '2018-06-05 15:23:39.898317',
-                 'ru_id': '6c141ebb-10d1-4065-ac3e-ef5b5c95d251',
-                 'sent_date': '2018-06-05 15:23:38.025084',
-                 'subject': 'Message to ONS',
-                 'survey': 'cb8accda-6118-4d3b-85a3-149e28960c54',
-                 'thread_id': '53a430f1-de21-4279-b17e-1bfb4c4813a6'},
-                {'body': 'Reply body from internal user',
-                 'collection_case': '',
-                 'collection_exercise': '',
-                 'from_internal': True,
-                 'labels': ['INBOX'],
-                 'msg_from': '01b51fcc-ed43-4cdb-ad1c-450f9986859b',
-                 'msg_id': '048ffdb5-18f0-46f0-bfa0-ea298521c513',
-                 'msg_to': ['0a7ad740-10d5-4ecb-b7ca-3c0384afb882'],
-                 'read_date': '2018-06-05 15:23:39.898317',
-                 'ru_id': '6c141ebb-10d1-4065-ac3e-ef5b5c95d251',
-                 'sent_date': '2018-06-05 15:23:38.025084',
-                 'subject': 'Message to ONS',
-                 'survey': 'cb8accda-6118-4d3b-85a3-149e28960c54',
-                 'thread_id': '53a430f1-de21-4279-b17e-1bfb4c4813a6'}]
+    messages_internal_first = [{'body': 'Reply body from internal user',
+                                'collection_case': '',
+                                'collection_exercise': '',
+                                'from_internal': True,
+                                'labels': ['INBOX'],
+                                'msg_from': '01b51fcc-ed43-4cdb-ad1c-450f9986859b',
+                                'msg_id': '048ffdb5-18f0-46f0-bfa0-ea298521c513',
+                                'msg_to': ['0a7ad740-10d5-4ecb-b7ca-3c0384afb882'],
+                                'read_date': '2018-06-05 15:23:39.898317',
+                                'ru_id': '6c141ebb-10d1-4065-ac3e-ef5b5c95d251',
+                                'sent_date': '2018-06-05 15:23:38.025084',
+                                'subject': 'Message to ONS',
+                                'survey': 'cb8accda-6118-4d3b-85a3-149e28960c54',
+                                'thread_id': '53a430f1-de21-4279-b17e-1bfb4c4813a6'},
+                               {'body': 'Reply body from respondent',
+                                'collection_case': '',
+                                'collection_exercise': '',
+                                'from_internal': False,
+                                'labels': ['INBOX'],
+                                'msg_from': '0a7ad740-10d5-4ecb-b7ca-3c0384afb882',
+                                'msg_id': '048ffdb5-18f0-46f0-bfa0-ea298521c513',
+                                'msg_to': ['01b51fcc-ed43-4cdb-ad1c-450f9986859b'],
+                                'read_date': '2018-06-05 15:23:39.898317',
+                                'ru_id': '6c141ebb-10d1-4065-ac3e-ef5b5c95d251',
+                                'sent_date': '2018-06-05 15:23:38.025084',
+                                'subject': 'Message to ONS',
+                                'survey': 'cb8accda-6118-4d3b-85a3-149e28960c54',
+                                'thread_id': '53a430f1-de21-4279-b17e-1bfb4c4813a6'}]
 
     internal_user_record = {'id': '01b51fcc-ed43-4cdb-ad1c-450f9986859b', 'firstName': 'fred', 'lastName': 'flinstone', 'emailAddress': 'mock@email.com'}
 
-    external_user_record = [{"id": "0a7ad740-10d5-4ecb-b7ca-3c0384afb882", "firstName": "Vana", "lastName": "Oorschot",
-                            "emailAddress": "vana123@aol.com", "telephone": "+443069990289", "status": "ACTIVE", "sampleUnitType": "BI"}]
+    external_user_record = {"id": "0a7ad740-10d5-4ecb-b7ca-3c0384afb882", "firstName": "Vana", "lastName": "Oorschot",
+                            "emailAddress": "vana123@aol.com", "telephone": "+443069990289", "status": "ACTIVE", "sampleUnitType": "BI"}
 
-    completed_to_details = [{'body': 'Reply body from respondent', 'collection_case': '', 'collection_exercise': '', 'from_internal': False,
-                             'labels': ['INBOX'], 'msg_from': '0a7ad740-10d5-4ecb-b7ca-3c0384afb882', 'msg_id': '048ffdb5-18f0-46f0-bfa0-ea298521c513',
-                             'msg_to': ['01b51fcc-ed43-4cdb-ad1c-450f9986859b'], 'read_date': '2018-06-05 15:23:39.898317',
-                             'ru_id': '6c141ebb-10d1-4065-ac3e-ef5b5c95d251', 'sent_date': '2018-06-05 15:23:38.025084', 'subject': 'Message to ONS',
-                             'survey': 'cb8accda-6118-4d3b-85a3-149e28960c54', 'thread_id': '53a430f1-de21-4279-b17e-1bfb4c4813a6',
-                             '@msg_to': {'id': '01b51fcc-ed43-4cdb-ad1c-450f9986859b', 'firstName': 'fred',
-                                         'lastName': 'flinstone', 'emailAddress': 'mock@email.com'}},
-                            {'body': 'Reply body from internal user', 'collection_case': '', 'collection_exercise': '', 'from_internal': True,
-                             'labels': ['INBOX'], 'msg_from': '01b51fcc-ed43-4cdb-ad1c-450f9986859b', 'msg_id': '048ffdb5-18f0-46f0-bfa0-ea298521c513',
-                             'msg_to': ['0a7ad740-10d5-4ecb-b7ca-3c0384afb882'], 'read_date': '2018-06-05 15:23:39.898317',
-                             'ru_id': '6c141ebb-10d1-4065-ac3e-ef5b5c95d251', 'sent_date': '2018-06-05 15:23:38.025084', 'subject': 'Message to ONS',
-                             'survey': 'cb8accda-6118-4d3b-85a3-149e28960c54', 'thread_id': '53a430f1-de21-4279-b17e-1bfb4c4813a6',
-                             '@msg_to': [{'id': '0a7ad740-10d5-4ecb-b7ca-3c0384afb882', 'firstName': 'Vana', 'lastName': 'Oorschot',
-                                          'emailAddress': 'vana123@aol.com', 'telephone': '+443069990289', 'status': 'ACTIVE', 'sampleUnitType': 'BI'}]}]
+    @unittest.skip("rework")
+    def test_get_business_details(self):
+        messages_business_internal_first_copy = copy.deepcopy(self.messages_internal_first)
 
-    def test_get_to_details(self):
-        self.assertNotIn('@msg_to', self.messages[0])
-        self.assertNotIn('@msg_to', self.messages[1])
         with self.app.app_context():
-            result = get_to_details(self.messages)
-            self.assertIn('@msg_to', result[0])
+            result = add_business_details(messages_business_internal_first_copy)
+            print(result)
+            self.assertEqual(result, [])
+
+    def test_get_from_details_with_external_message_first(self):
+
+        populated_message = [{'body': 'Reply body from respondent', 'collection_case': '', 'collection_exercise': '', 'from_internal': False,
+                              'labels': ['INBOX'], 'msg_from': '0a7ad740-10d5-4ecb-b7ca-3c0384afb882', 'msg_id': '048ffdb5-18f0-46f0-bfa0-ea298521c513', 'msg_to': ['01b51fcc-ed43-4cdb-ad1c-450f9986859b'], 'read_date': '2018-06-05 15:23:39.898317', 'ru_id': '6c141ebb-10d1-4065-ac3e-ef5b5c95d251', 'sent_date': '2018-06-05 15:23:38.025084', 'subject': 'Message to ONS', 'survey': 'cb8accda-6118-4d3b-85a3-149e28960c54', 'thread_id': '53a430f1-de21-4279-b17e-1bfb4c4813a6', '@msg_from': {'id': '0a7ad740-10d5-4ecb-b7ca-3c0384afb882', 'firstName': 'Vana', 'lastName': 'Oorschot', 'emailAddress': 'vana123@aol.com', 'telephone': '+443069990289', 'status': 'ACTIVE', 'sampleUnitType': 'BI'}},
+                             {'body': 'Reply body from internal user', 'collection_case': '', 'collection_exercise': '', 'from_internal': True,
+                              'labels': ['INBOX'], 'msg_from': '01b51fcc-ed43-4cdb-ad1c-450f9986859b', 'msg_id': '048ffdb5-18f0-46f0-bfa0-ea298521c513', 'msg_to': ['0a7ad740-10d5-4ecb-b7ca-3c0384afb882'], 'read_date': '2018-06-05 15:23:39.898317', 'ru_id': '6c141ebb-10d1-4065-ac3e-ef5b5c95d251', 'sent_date': '2018-06-05 15:23:38.025084', 'subject': 'Message to ONS', 'survey': 'cb8accda-6118-4d3b-85a3-149e28960c54', 'thread_id': '53a430f1-de21-4279-b17e-1bfb4c4813a6', '@msg_from': {'id': '01b51fcc-ed43-4cdb-ad1c-450f9986859b', 'firstName': 'fred', 'lastName': 'flinstone', 'emailAddress': 'mock@email.com'}}]
+
+        messages_from_external_first_copy = copy.deepcopy(self.messages_external_first)
+        for message in messages_from_external_first_copy:
+            self.assertNotIn('@msg_from', message)
+
+        with self.app.app_context():
+            result = get_from_details(messages_from_external_first_copy)
+            for message in result:
+                self.assertIn('@msg_from', message)
+
+            self.assertEqual(result[0]['@msg_from'], self.external_user_record)
+            self.assertEqual(result[1]['@msg_from'], self.internal_user_record)
+
+            print(result)
+            self.assertEqual(result[0], populated_message[0])
+            self.assertEqual(result[1], populated_message[1])
+
+    def test_get_from_details_with_internal_message_first(self):
+
+        populated_message = [{'body': 'Reply body from internal user', 'collection_case': '', 'collection_exercise': '', 'from_internal': True, 'labels': ['INBOX'], 'msg_from': '01b51fcc-ed43-4cdb-ad1c-450f9986859b', 'msg_id': '048ffdb5-18f0-46f0-bfa0-ea298521c513', 'msg_to': ['0a7ad740-10d5-4ecb-b7ca-3c0384afb882'], 'read_date': '2018-06-05 15:23:39.898317', 'ru_id': '6c141ebb-10d1-4065-ac3e-ef5b5c95d251', 'sent_date': '2018-06-05 15:23:38.025084', 'subject': 'Message to ONS', 'survey': 'cb8accda-6118-4d3b-85a3-149e28960c54', 'thread_id': '53a430f1-de21-4279-b17e-1bfb4c4813a6', '@msg_from': {'id': '01b51fcc-ed43-4cdb-ad1c-450f9986859b', 'firstName': 'fred', 'lastName': 'flinstone', 'emailAddress': 'mock@email.com'}},
+                             {'body': 'Reply body from respondent', 'collection_case': '', 'collection_exercise': '', 'from_internal': False, 'labels': ['INBOX'], 'msg_from': '0a7ad740-10d5-4ecb-b7ca-3c0384afb882', 'msg_id': '048ffdb5-18f0-46f0-bfa0-ea298521c513', 'msg_to': ['01b51fcc-ed43-4cdb-ad1c-450f9986859b'], 'read_date': '2018-06-05 15:23:39.898317', 'ru_id': '6c141ebb-10d1-4065-ac3e-ef5b5c95d251', 'sent_date': '2018-06-05 15:23:38.025084', 'subject': 'Message to ONS', 'survey': 'cb8accda-6118-4d3b-85a3-149e28960c54', 'thread_id': '53a430f1-de21-4279-b17e-1bfb4c4813a6', '@msg_from': {'id': '0a7ad740-10d5-4ecb-b7ca-3c0384afb882', 'firstName': 'Vana', 'lastName': 'Oorschot', 'emailAddress': 'vana123@aol.com', 'telephone': '+443069990289', 'status': 'ACTIVE', 'sampleUnitType': 'BI'}}]
+
+        messages_from_internal_first_copy = copy.deepcopy(self.messages_internal_first)
+        for message in messages_from_internal_first_copy:
+            self.assertNotIn('@msg_from', message)
+        with self.app.app_context():
+            result = get_from_details(messages_from_internal_first_copy)
+            for message in result:
+                self.assertIn('@msg_from', message)
+            self.assertEqual(result[0]['@msg_from'], self.internal_user_record)
+            self.assertEqual(result[1]['@msg_from'], self.external_user_record)
+
+            print(result)
+            self.assertEqual(result[0], populated_message[0])
+            self.assertEqual(result[1], populated_message[1])
+
+    def test_get_to_details_with_external_message_first(self):
+
+        populated_message = [{'body': 'Reply body from respondent', 'collection_case': '', 'collection_exercise': '', 'from_internal': False,
+                              'labels': ['INBOX'], 'msg_from': '0a7ad740-10d5-4ecb-b7ca-3c0384afb882', 'msg_id': '048ffdb5-18f0-46f0-bfa0-ea298521c513',
+                              'msg_to': ['01b51fcc-ed43-4cdb-ad1c-450f9986859b'], 'read_date': '2018-06-05 15:23:39.898317',
+                              'ru_id': '6c141ebb-10d1-4065-ac3e-ef5b5c95d251', 'sent_date': '2018-06-05 15:23:38.025084', 'subject': 'Message to ONS',
+                              'survey': 'cb8accda-6118-4d3b-85a3-149e28960c54', 'thread_id': '53a430f1-de21-4279-b17e-1bfb4c4813a6',
+                              '@msg_to': {'id': '01b51fcc-ed43-4cdb-ad1c-450f9986859b', 'firstName': 'fred',
+                                          'lastName': 'flinstone', 'emailAddress': 'mock@email.com'}},
+                             {'body': 'Reply body from internal user', 'collection_case': '', 'collection_exercise': '', 'from_internal': True,
+                              'labels': ['INBOX'], 'msg_from': '01b51fcc-ed43-4cdb-ad1c-450f9986859b', 'msg_id': '048ffdb5-18f0-46f0-bfa0-ea298521c513',
+                              'msg_to': ['0a7ad740-10d5-4ecb-b7ca-3c0384afb882'], 'read_date': '2018-06-05 15:23:39.898317',
+                              'ru_id': '6c141ebb-10d1-4065-ac3e-ef5b5c95d251', 'sent_date': '2018-06-05 15:23:38.025084', 'subject': 'Message to ONS',
+                              'survey': 'cb8accda-6118-4d3b-85a3-149e28960c54', 'thread_id': '53a430f1-de21-4279-b17e-1bfb4c4813a6',
+                              '@msg_to': [{'id': '0a7ad740-10d5-4ecb-b7ca-3c0384afb882', 'firstName': 'Vana', 'lastName': 'Oorschot',
+                                           'emailAddress': 'vana123@aol.com', 'telephone': '+443069990289', 'status': 'ACTIVE', 'sampleUnitType': 'BI'}]}]
+
+        messages_to_external_first_copy = copy.deepcopy(self.messages_external_first)
+        for message in messages_to_external_first_copy:
+            self.assertNotIn('@msg_to', message)
+
+        with self.app.app_context():
+            result = get_to_details(messages_to_external_first_copy)
+            for message in result:
+                self.assertIn('@msg_to', message)
+
             self.assertEqual(result[0]['@msg_to'], self.internal_user_record)
-            self.assertIn('@msg_to', result[1])
-            self.assertEqual(result[1]['@msg_to'], self.external_user_record)
+            self.assertEqual(result[1]['@msg_to'], [self.external_user_record])
 
-            self.assertEqual(result[0], self.completed_to_details[0])
-            self.assertEqual(result[1], self.completed_to_details[1])
+            self.assertEqual(result[0], populated_message[0])
+            self.assertEqual(result[1], populated_message[1])
 
-    @requests_mock.mock()
-    @unittest.skip("Needs rewriting")
-    def test_get_from_details(self, mock_request):
-        config_uaa = f"{self.app.config['UAA_URL']}/oauth/token?grant_type=client_credentials&response_type=" \
-                     "token&token_format=opaque"
-        mock_request.post(config_uaa, headers={'Content-Type': 'application/x-www-form-urlencoded',
-                                               'Accept': 'application/json'}, status_code=200,
-                          json={"access_token": "test"})
-        self.app.oauth_client_token = get_client_token("123", "secret", self.app.config['UAA_URL'])
-        uuid = '0a9d1f65-f561-43a2-86db-9bf93f4d66dc'
-        url = f"{self.app.config['UAA_URL']}/Users/{uuid}"
-        mock_request.get(url, status_code=200, json=self.user_info)
-        self.assertNotIn('@msg_from', self.messages[1])
+    def test_get_to_details_with_internal_message_first(self):
+
+        populated_message = [{'body': 'Reply body from internal user', 'collection_case': '', 'collection_exercise': '', 'from_internal': True,
+                              'labels': ['INBOX'], 'msg_from': '01b51fcc-ed43-4cdb-ad1c-450f9986859b', 'msg_id': '048ffdb5-18f0-46f0-bfa0-ea298521c513',
+                              'msg_to': ['0a7ad740-10d5-4ecb-b7ca-3c0384afb882'], 'read_date': '2018-06-05 15:23:39.898317',
+                              'ru_id': '6c141ebb-10d1-4065-ac3e-ef5b5c95d251', 'sent_date': '2018-06-05 15:23:38.025084', 'subject': 'Message to ONS',
+                              'survey': 'cb8accda-6118-4d3b-85a3-149e28960c54', 'thread_id': '53a430f1-de21-4279-b17e-1bfb4c4813a6',
+                              '@msg_to': [{'id': '0a7ad740-10d5-4ecb-b7ca-3c0384afb882', 'firstName': 'Vana', 'lastName': 'Oorschot',
+                                           'emailAddress': 'vana123@aol.com', 'telephone': '+443069990289', 'status': 'ACTIVE', 'sampleUnitType': 'BI'}]},
+                             {'body': 'Reply body from respondent', 'collection_case': '', 'collection_exercise': '', 'from_internal': False,
+                              'labels': ['INBOX'], 'msg_from': '0a7ad740-10d5-4ecb-b7ca-3c0384afb882', 'msg_id': '048ffdb5-18f0-46f0-bfa0-ea298521c513',
+                              'msg_to': ['01b51fcc-ed43-4cdb-ad1c-450f9986859b'], 'read_date': '2018-06-05 15:23:39.898317',
+                              'ru_id': '6c141ebb-10d1-4065-ac3e-ef5b5c95d251', 'sent_date': '2018-06-05 15:23:38.025084', 'subject': 'Message to ONS',
+                              'survey': 'cb8accda-6118-4d3b-85a3-149e28960c54', 'thread_id': '53a430f1-de21-4279-b17e-1bfb4c4813a6',
+                              '@msg_to': {'id': '01b51fcc-ed43-4cdb-ad1c-450f9986859b', 'firstName': 'fred', 'lastName': 'flinstone',
+                                          'emailAddress': 'mock@email.com'}}]
+
+        messages_to_internal_first_copy = copy.deepcopy(self.messages_internal_first)
+        for message in messages_to_internal_first_copy:
+            self.assertNotIn('@msg_to', message)
+
         with self.app.app_context():
-            get_from_details(self.messages)
-            self.assertIn('@msg_from', self.messages[1])
+            result = get_to_details(messages_to_internal_first_copy)
+            for message in result:
+                self.assertIn('@msg_to', message)
 
-    @requests_mock.mock()
-    @unittest.skip("Needs rewriting")
-    def test_get_business_details(self, mock_request):
-        config_uaa = f"{self.app.config['UAA_URL']}/oauth/token?grant_type=client_credentials&response_type=" \
-                     "token&token_format=opaque"
-        mock_request.post(config_uaa, headers={'Content-Type': 'application/x-www-form-urlencoded',
-                                               'Accept': 'application/json'}, status_code=200,
-                          json={"access_token": "test"})
-        self.app.oauth_client_token = get_client_token("123", "secret", self.app.config['UAA_URL'])
-        uuid = '0a9d1f65-f561-43a2-86db-9bf93f4d66dc'
-        url = f"{self.app.config['UAA_URL']}/Users/{uuid}"
-        mock_request.get(url, status_code=200, json=self.user_info)
-        self.assertNotIn('@msg_from', self.messages[1])
-        with self.app.app_context():
-            add_business_details(self.messages)
-            self.assertIn('@msg_from', self.messages[1])
+            self.assertEqual(result[0]['@msg_to'], [self.external_user_record])
+            self.assertEqual(result[1]['@msg_to'], self.internal_user_record)
+
+            self.assertEqual(result[0], populated_message[0])
+            self.assertEqual(result[1], populated_message[1])
