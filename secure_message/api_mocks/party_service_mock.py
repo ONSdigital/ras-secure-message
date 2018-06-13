@@ -19,7 +19,7 @@ class PartyServiceMock:
 
     def get_users_details(self, uuids):
         """Return mock user details"""
-        user_details = [self._respondent_ids for uuid in self._respondent_ids if uuid in uuids]
+        user_details = [self._respondent_ids[uuid] for uuid in self._respondent_ids if uuid in uuids]
         if not user_details:
             logger.error(f'Party service failed for uuid:{uuids}')
             user_details = None
