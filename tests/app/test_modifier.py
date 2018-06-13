@@ -121,8 +121,8 @@ class ModifyTestCase(unittest.TestCase, ModifyTestCaseHelper):
             Modifier.open_conversation(metadata, self.user_internal)
             metadata = Retriever.retrieve_conversation_metadata(conversation_id)
             self.assertFalse(metadata.is_closed)
-            self.assertEqual(metadata.closed_by, "")
-            self.assertEqual(metadata.closed_by_uuid, "")
+            self.assertIsNone(metadata.closed_by)
+            self.assertIsNone(metadata.closed_by_uuid)
             self.assertIsNone(metadata.closed_at)
 
     def test_two_unread_labels_are_added_to_message(self):
