@@ -8,6 +8,7 @@ from werkzeug.exceptions import InternalServerError
 
 from secure_message import constants
 from secure_message.application import create_app
+from secure_message.services.service_toggles import internal_user_service
 from secure_message.common.eventsapi import EventsApi
 from secure_message.repository import database
 from secure_message.repository.database import SecureMessage
@@ -21,12 +22,17 @@ class ModifyTestCaseHelper:
     """Helper class for Modify Tests"""
 
     def populate_database(self, record_count=0, mark_as_read=True):
-        """Adds a sppecified number of Messages to the db"""
+        """Adds a specified number of Messages to the db in a single thread"""
+        thread_id = str(uuid.uuid4())
         with self.engine.connect() as con:
             for i in range(record_count):
                 msg_id = str(uuid.uuid4())
+                # Only the first message in a thread needs a entry in the conversation table
+                if i == 0:
+                    query = f'''INSERT INTO securemessage.conversation(id, is_closed, closed_by, closed_by_uuid) VALUES('{thread_id}', false, '', '')'''
+                    con.execute(query)
                 query = f'''INSERT INTO securemessage.secure_message(id, msg_id, subject, body, thread_id,
-                        collection_case, ru_id, collection_exercise, survey) VALUES ({i}, '{msg_id}', 'test','test','',
+                        collection_case, ru_id, collection_exercise, survey) VALUES ({i}, '{msg_id}', 'test','test','{thread_id}',
                         'ACollectionCase', 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc', 'ACollectionExercise',
                         '{constants.NON_SPECIFIC_INTERNAL_USER}')'''
                 con.execute(query)
@@ -47,17 +53,37 @@ class ModifyTestCaseHelper:
                             VALUES('{EventsApi.READ.value}', '{msg_id}', '2017-02-03 00:00:00')'''
                     con.execute(query)
 
+        return thread_id
+
+    def add_conversation(self, conversation_id=str(uuid.uuid4()), is_closed=False, closed_by='', closed_by_uuid='', closed_at=None):
+        """ Populate the conversation table"""
+        # If conversation created needs to be closed, values are generated for you.  These can be overrriden by passing them
+        # into function (i.e., if you need a specific name, but don't care about anything else, then only pass in 'closed_by')
+        if is_closed:
+            if not closed_by:
+                closed_by = "Some person"
+            if not closed_by_uuid:
+                closed_by_uuid = str(uuid.uuid4())
+            if not closed_at:
+                closed_at = datetime.datetime.utcnow()
+        with self.engine.connect() as con:
+            query = f'''INSERT INTO securemessage.conversation(id, is_closed, closed_by, closed_by_uuid, closed_at) VALUES('{conversation_id}',
+                    '{is_closed}', '{closed_by}', '{closed_by_uuid}', '{closed_at}')'''
+            con.execute(query)
+        return conversation_id
+
 
 class ModifyTestCase(unittest.TestCase, ModifyTestCaseHelper):
     """Test case for message retrieval"""
 
     def setUp(self):
         """setup test environment"""
+
         self.app = create_app()
+
         self.app.testing = True
         self.engine = create_engine(self.app.config['SQLALCHEMY_DATABASE_URI'])
-        self.MESSAGE_LIST_ENDPOINT = "http://localhost:5050/messages"
-        self.MESSAGE_BY_ID_ENDPOINT = "http://localhost:5050/message/"
+
         with self.app.app_context():
             database.db.init_app(current_app)
             database.db.drop_all()
@@ -67,18 +93,46 @@ class ModifyTestCase(unittest.TestCase, ModifyTestCaseHelper):
         self.user_internal = User('ce12b958-2a5f-44f4-a6da-861e59070a31', 'internal')
         self.user_respondent = User('0a7ad740-10d5-4ecb-b7ca-3c0384afb882', 'respondent')
 
+    def test_close_conversation(self):
+        """Test close conversation works"""
+        conversation_id = self.populate_database(1)
+        with self.app.app_context():
+            internal_user_service.use_mock_service()
+            # msg_id is the same as thread id for a conversation of 1
+            metadata = Retriever.retrieve_conversation_metadata(conversation_id)
+            Modifier.close_conversation(metadata, self.user_internal)
+            metadata = Retriever.retrieve_conversation_metadata(conversation_id)
+
+            self.assertTrue(metadata.is_closed)
+            self.assertEqual(metadata.closed_by, "Selphie Tilmitt")
+            self.assertEqual(metadata.closed_by_uuid, "ce12b958-2a5f-44f4-a6da-861e59070a31")
+            self.assertTrue(isinstance(metadata.closed_at, datetime.datetime))
+            # Test that timestamp on read message is less than 3 seconds old to prove it
+            # was only just created
+            delta = datetime.datetime.utcnow() - metadata.closed_at
+            self.assertTrue(delta.total_seconds() < 3)
+
+    def test_open_conversation(self):
+        """Test re-opening conversation works"""
+        conversation_id = self.add_conversation(is_closed=True)
+        with self.app.app_context():
+            # msg_id is the same as thread id for a conversation of 1
+            metadata = Retriever.retrieve_conversation_metadata(conversation_id)
+            Modifier.open_conversation(metadata, self.user_internal)
+            metadata = Retriever.retrieve_conversation_metadata(conversation_id)
+            self.assertFalse(metadata.is_closed)
+            self.assertIsNone(metadata.closed_by)
+            self.assertIsNone(metadata.closed_by_uuid)
+            self.assertIsNone(metadata.closed_at)
+
     def test_two_unread_labels_are_added_to_message(self):
         """testing duplicate message labels are not added to the database"""
         self.populate_database(1)
         with self.engine.connect() as con:
-            query = 'SELECT msg_id FROM securemessage.secure_message LIMIT 1'
-            query_x = con.execute(query)
-            names = []
-            for row in query_x:
-                names.append(row[0])
+            query = con.execute('SELECT msg_id FROM securemessage.secure_message LIMIT 1')
+            msg_id = query.first()[0]
         with self.app.app_context():
             with current_app.test_request_context():
-                msg_id = str(names[0])
                 message_service = Retriever()
                 message = message_service.retrieve_message(msg_id, self.user_internal)
                 modifier = Modifier()
@@ -94,12 +148,12 @@ class ModifyTestCase(unittest.TestCase, ModifyTestCaseHelper):
 
     def test_read_date_is_set(self):
         """testing message read_date is set when unread label is removed"""
-        self.populate_database(1, mark_as_read=False)
+        thread_id = self.populate_database(1, mark_as_read=False)
         with self.app.app_context():
-            msg_id = SecureMessage.query.one().msg_id
-            serialised_message = Retriever.retrieve_message(msg_id, self.user_internal)
+            thread = Retriever.retrieve_thread(thread_id, self.user_respondent).all()
+            serialised_message = Retriever.retrieve_message(thread[0].msg_id, self.user_internal)
             Modifier.mark_message_as_read(serialised_message, self.user_internal)
-            serialised_message = Retriever.retrieve_message(msg_id, self.user_internal)
+            serialised_message = Retriever.retrieve_message(thread[0].msg_id, self.user_internal)
             db_message = SecureMessage.query.filter(SecureMessage.msg_id == serialised_message['msg_id']).one()
 
             self.assertIsNotNone(serialised_message['read_date'])
@@ -113,24 +167,18 @@ class ModifyTestCase(unittest.TestCase, ModifyTestCaseHelper):
         """testing message read_date is not reset when unread label is removed again"""
         self.populate_database(1)
         with self.engine.connect() as con:
-            query = 'SELECT msg_id FROM securemessage.secure_message LIMIT 1'
-            query_x = con.execute(query)
-            names = []
-            for row in query_x:
-                names.append(row[0])
+            query = con.execute('SELECT msg_id FROM securemessage.secure_message LIMIT 1')
+            msg_id = query.first()[0]
         with self.app.app_context():
             with current_app.test_request_context():
-                msg_id = str(names[0])
-                message_service = Retriever()
-                modifier = Modifier()
-                message = message_service.retrieve_message(msg_id, self.user_internal)
-                modifier.mark_message_as_read(message, self.user_internal)
-                message = message_service.retrieve_message(msg_id, self.user_internal)
+                message = Retriever.retrieve_message(msg_id, self.user_internal)
+                Modifier.mark_message_as_read(message, self.user_internal)
+                message = Retriever.retrieve_message(msg_id, self.user_internal)
                 read_date_set = message['read_date']
-                modifier.add_unread(message, self.user_internal)
-                message = message_service.retrieve_message(msg_id, self.user_internal)
-                modifier.mark_message_as_read(message, self.user_internal)
-                message = message_service.retrieve_message(msg_id, self.user_internal)
+                Modifier.add_unread(message, self.user_internal)
+                message = Retriever.retrieve_message(msg_id, self.user_internal)
+                Modifier.mark_message_as_read(message, self.user_internal)
+                message = Retriever.retrieve_message(msg_id, self.user_internal)
                 self.assertEqual(message['read_date'], read_date_set)
 
     def test_exception_for_add_label_raises(self):

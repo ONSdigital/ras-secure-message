@@ -34,11 +34,19 @@ class MessageSend(Resource):
 
         if 'msg_id' in post_data:
             raise BadRequest(description="Message can not include msg_id")
+        if post_data.get('thread_id'):
+            conversation_metadata = Retriever.retrieve_conversation_metadata(post_data.get('thread_id'))
+            # Ideally here we'd return a 404 if there isn't a record in the comversation table.  But until we
+            # ensure there is a record in here for every thread_id in the secure_message table, we just have to
+            # assume that it's fine if it's empty.
+            if conversation_metadata and conversation_metadata.is_closed:
+                raise BadRequest(description="Cannot reply to a closed conversation")
 
         post_data['from_internal'] = g.user.is_internal
         message = self._validate_post_data(post_data)
 
         if message.errors == {}:
+            logger.info("Message passed validation")
             self._message_save(message)
             # listener errors are logged but still a 201 reported
             MessageSend._alert_listeners(message.data)
