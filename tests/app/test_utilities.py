@@ -3,7 +3,7 @@ import unittest
 import requests_mock
 
 from secure_message.application import create_app, get_client_token
-from secure_message.common.utilities import MessageArgs, update_external_messages_to, update_internal_messages_from
+from secure_message.common.utilities import MessageArgs, update_internal_messages_from
 
 BRES_SURVEY = "33333333-22222-3333-4444-88dc018a1a4c"
 
@@ -67,22 +67,6 @@ class UtilitiesTestCase(unittest.TestCase):
                  'subject': 'Message to ONS',
                  'survey': 'cb8accda-6118-4d3b-85a3-149e28960c54',
                  'thread_id': '53a430f1-de21-4279-b17e-1bfb4c4813a6'}]
-
-    @requests_mock.mock()
-    def test_dictionary_update_for_message_to(self, mock_request):
-        uuid = 'bca50ef9-ff50-44b1-adf5-b6728e0bd360'
-        uaa_url = f"{self.app.config['UAA_URL']}/Users/{uuid}"
-        config_uaa = f"{self.app.config['UAA_URL']}/oauth/token?grant_type=client_credentials&response_type=" \
-                     "token&token_format=opaque"
-        mock_request.post(config_uaa, headers={'Content-Type': 'application/x-www-form-urlencoded',
-                                               'Accept': 'application/json'}, status_code=200,
-                          json={"access_token": "test"})
-        self.app.oauth_client_token = get_client_token("123", "secret", self.app.config['UAA_URL'])
-        mock_request.get(uaa_url, status_code=200, json=self.user_info)
-        self.assertNotIn('@msg_to', self.messages[0])
-        with self.app.app_context():
-            update_external_messages_to(self.messages)
-            self.assertIn('@msg_to', self.messages[0])
 
     @requests_mock.mock()
     def test_dictionary_update_for_message_from(self, mock_request):
