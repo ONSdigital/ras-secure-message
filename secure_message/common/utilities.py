@@ -81,7 +81,7 @@ def get_to_details(messages):
             message.update({"@msg_to": [internal_user_service.get_user_details(message["msg_to"][0])]})
 
     # Then resolve msg_to details for messages going from ONS user (internal) to respondant (external)
-    to_details = party.get_users_details(get_external_user_uuid_list_from_msg_to_key_in_internal_messages(messages))
+    to_details = party.get_users_details(get_external_user_uuid_list(messages))
     internal_messages = [message for message in messages if message['from_internal'] is True]
 
     for message in messages:
@@ -99,7 +99,7 @@ def get_from_details(messages):
             message.update({"@msg_from": internal_user_service.get_user_details(message["msg_from"])})
 
     # Then resolve msg_from details for messages going from respondant (external) to ONS user (internal)
-    from_details = party.get_users_details(get_external_user_uuid_list_from_msg_from_key_in_external_messages(messages))
+    from_details = party.get_users_details(get_external_user_uuid_list(messages))
     external_messages = [message for message in messages if message['from_internal'] is False]
 
     for message in messages:
@@ -109,25 +109,20 @@ def get_from_details(messages):
     return messages
 
 
-def get_external_user_uuid_list_from_msg_from_key_in_external_messages(messages):
+def get_external_user_uuid_list(messages):
     """Compiles a list of all unique the external user (respondant) uuids from a list of messages"""
-    uuid_from = []
+    external_user_uuids = []
 
     external_msgs = [message for message in messages if message['from_internal'] is False]
     for uuid in external_msgs:
-        if uuid["msg_from"] not in uuid_from:
-            uuid_from.append(uuid["msg_from"])
-    return uuid_from
+        if uuid["msg_from"] not in external_user_uuids:
+            external_user_uuids.append(uuid["msg_from"])
 
-
-def get_external_user_uuid_list_from_msg_to_key_in_internal_messages(messages):
-    """Creates a list of unique uuids for external (respondant) users from a list of messages"""
-    uuid_to = []
     internal_messages = [message for message in messages if message['from_internal'] is True]
     for uuid in internal_messages:
-        if uuid["msg_to"][0] not in uuid_to:
-            uuid_to.append(uuid["msg_to"][0])
-    return uuid_to
+        if uuid["msg_to"][0] not in external_user_uuids:
+            external_user_uuids.append(uuid["msg_to"][0])
+    return external_user_uuids
 
 
 def add_business_details(messages):
