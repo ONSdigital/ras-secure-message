@@ -75,19 +75,17 @@ def get_to_details(messages):
     Every msg_to uuid is resolved to include details of the user.
     """
 
-    # First resolve msg_to details for messages going from respondant (external) to ONS user (internal)
+    external_user_details = party.get_users_details(get_external_user_uuid_list(messages))
     for message in messages:
         if not message["from_internal"]:
             message.update({"@msg_to": [internal_user_service.get_user_details(message["msg_to"][0])]})
-
-    # Then resolve msg_to details for messages going from ONS user (internal) to respondant (external)
-    to_details = party.get_users_details(get_external_user_uuid_list(messages))
-    internal_messages = [message for message in messages if message['from_internal'] is True]
-
-    for message in messages:
-        if message in internal_messages:
-            message.update({'@msg_to': to_details})
-
+        else:
+            for detail in external_user_details:
+                if detail['id'] == message['msg_to'][0]:
+                    message.update({'@msg_to': [detail]})
+                    break
+                # What happens if there isn't a record returned? Do we error? Do we provide an empty @msg_to?
+                # Do we not provide the element at all? The last one is probably the wrong option..
     return messages
 
 
@@ -99,12 +97,14 @@ def get_from_details(messages):
             message.update({"@msg_from": internal_user_service.get_user_details(message["msg_from"])})
 
     # Then resolve msg_from details for messages going from respondant (external) to ONS user (internal)
-    from_details = party.get_users_details(get_external_user_uuid_list(messages))
+    external_user_details = party.get_users_details(get_external_user_uuid_list(messages))
     external_messages = [message for message in messages if message['from_internal'] is False]
 
     for message in messages:
         if message in external_messages:
-            message.update({'@msg_from': from_details[0]})
+            # This needs changing, at the minute, when it matches it'll dump every user into msg_to, where it needs
+            # to find the uuid that matches the message and only put that single one in
+            message.update({'@msg_from': external_user_details[0]})
 
     return messages
 
