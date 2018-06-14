@@ -73,6 +73,11 @@ def process_paginated_list(paginated_list, host_url, user, message_args, endpoin
 def get_to_details(messages):
     """Adds a @msg_to key every message in a list of messages.
     Every msg_to uuid is resolved to include details of the user.
+
+    If the call for the internal user id fails, an exception will be thrown.
+    If the external user id cannot be found in the list that we got from the party service.  There
+    won't be a @msg_to value returned in the payload.  The API documentation notes that these elements
+    aren't guaranteed to be provided so we're not breaking the contract by doing this.
     """
 
     external_user_details = party.get_users_details(get_external_user_uuid_list(messages))
@@ -84,13 +89,19 @@ def get_to_details(messages):
                 if detail['id'] == message['msg_to'][0]:
                     message.update({'@msg_to': [detail]})
                     break
-                # What happens if there isn't a record returned? Do we error? Do we provide an empty @msg_to?
-                # Do we not provide the element at all? The last one is probably the wrong option..
+
     return messages
 
 
 def get_from_details(messages):
-    """looks up the details for the from users"""
+    """Adds a @msg_from key every message in a list of messages.
+    Every msg_to uuid is resolved to include details of the user.
+
+    If the call for the internal user id fails, an exception will be thrown.
+    If the external user id cannot be found in the list that we got from the party service.  There
+    won't be a @msg_from value returned in the payload.  The API documentation notes that these elements
+    aren't guaranteed to be provided so we're not breaking the contract by doing this.
+    """
     external_user_details = party.get_users_details(get_external_user_uuid_list(messages))
     for message in messages:
         if message["from_internal"]:
@@ -100,8 +111,6 @@ def get_from_details(messages):
                 if detail['id'] == message['msg_from']:
                     message.update({'@msg_from': detail})
                     break
-                # What happens if there isn't a record returned? Do we error? Do we provide an empty @msg_from?
-                # Do we not provide the element at all? The last one is probably the wrong option..
     return messages
 
 
