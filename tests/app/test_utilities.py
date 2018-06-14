@@ -5,9 +5,8 @@ from secure_message.application import create_app
 from secure_message.common.utilities import MessageArgs, get_to_details, get_from_details, add_business_details
 from secure_message.services.service_toggles import party, internal_user_service
 
-BRES_SURVEY = "33333333-22222-3333-4444-88dc018a1a4c"
 
-
+# get_args is being used a helper for other tests.  This needs needs to stop.
 def get_args(page=1, limit=100, surveys=None, cc="", ru="", label="", desc=True, ce=""):
     return MessageArgs(page=page, limit=limit, ru_id=ru, surveys=surveys, cc=cc, label=label,
                        desc=desc, ce=ce)
@@ -173,7 +172,6 @@ class UtilitiesTestCase(unittest.TestCase):
             self.assertEqual(result[0]['@msg_from'], self.external_user_record)
             self.assertEqual(result[1]['@msg_from'], self.internal_user_record)
 
-            print(result)
             self.assertEqual(result[0], populated_message[0])
             self.assertEqual(result[1], populated_message[1])
 
@@ -204,7 +202,6 @@ class UtilitiesTestCase(unittest.TestCase):
             self.assertEqual(result[0]['@msg_from'], self.internal_user_record)
             self.assertEqual(result[1]['@msg_from'], self.external_user_record)
 
-            print(result)
             self.assertEqual(result[0], populated_message[0])
             self.assertEqual(result[1], populated_message[1])
 
@@ -215,8 +212,8 @@ class UtilitiesTestCase(unittest.TestCase):
                               'msg_to': ['01b51fcc-ed43-4cdb-ad1c-450f9986859b'], 'read_date': '2018-06-05 15:23:39.898317',
                               'ru_id': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc', 'sent_date': '2018-06-05 15:23:38.025084', 'subject': 'Message to ONS',
                               'survey': 'cb8accda-6118-4d3b-85a3-149e28960c54', 'thread_id': '53a430f1-de21-4279-b17e-1bfb4c4813a6',
-                              '@msg_to': {'id': '01b51fcc-ed43-4cdb-ad1c-450f9986859b', 'firstName': 'fred',
-                                          'lastName': 'flinstone', 'emailAddress': 'mock@email.com'}},
+                              '@msg_to': [{'id': '01b51fcc-ed43-4cdb-ad1c-450f9986859b', 'firstName': 'fred',
+                                          'lastName': 'flinstone', 'emailAddress': 'mock@email.com'}]},
                              {'body': 'Reply body from internal user', 'collection_case': '', 'collection_exercise': '', 'from_internal': True,
                               'labels': ['INBOX'], 'msg_from': '01b51fcc-ed43-4cdb-ad1c-450f9986859b', 'msg_id': '048ffdb5-18f0-46f0-bfa0-ea298521c513',
                               'msg_to': ['0a7ad740-10d5-4ecb-b7ca-3c0384afb882'], 'read_date': '2018-06-05 15:23:39.898317',
@@ -234,7 +231,7 @@ class UtilitiesTestCase(unittest.TestCase):
             for message in result:
                 self.assertIn('@msg_to', message)
 
-            self.assertEqual(result[0]['@msg_to'], self.internal_user_record)
+            self.assertEqual(result[0]['@msg_to'], [self.internal_user_record])
             self.assertEqual(result[1]['@msg_to'], [self.external_user_record])
 
             self.assertEqual(result[0], populated_message[0])
@@ -254,8 +251,8 @@ class UtilitiesTestCase(unittest.TestCase):
                               'msg_to': ['01b51fcc-ed43-4cdb-ad1c-450f9986859b'], 'read_date': '2018-06-05 15:23:39.898317',
                               'ru_id': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc', 'sent_date': '2018-06-05 15:23:38.025084', 'subject': 'Message to ONS',
                               'survey': 'cb8accda-6118-4d3b-85a3-149e28960c54', 'thread_id': '53a430f1-de21-4279-b17e-1bfb4c4813a6',
-                              '@msg_to': {'id': '01b51fcc-ed43-4cdb-ad1c-450f9986859b', 'firstName': 'fred', 'lastName': 'flinstone',
-                                          'emailAddress': 'mock@email.com'}}]
+                              '@msg_to': [{'id': '01b51fcc-ed43-4cdb-ad1c-450f9986859b', 'firstName': 'fred', 'lastName': 'flinstone',
+                                          'emailAddress': 'mock@email.com'}]}]
 
         messages_to_internal_first_copy = copy.deepcopy(self.messages_internal_first)
         for message in messages_to_internal_first_copy:
@@ -267,7 +264,7 @@ class UtilitiesTestCase(unittest.TestCase):
                 self.assertIn('@msg_to', message)
 
             self.assertEqual(result[0]['@msg_to'], [self.external_user_record])
-            self.assertEqual(result[1]['@msg_to'], self.internal_user_record)
+            self.assertEqual(result[1]['@msg_to'], [self.internal_user_record])
 
             self.assertEqual(result[0], populated_message[0])
             self.assertEqual(result[1], populated_message[1])

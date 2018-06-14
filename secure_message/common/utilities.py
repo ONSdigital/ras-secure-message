@@ -78,7 +78,7 @@ def get_to_details(messages):
     # First resolve msg_to details for messages going from respondant (external) to ONS user (internal)
     for message in messages:
         if not message["from_internal"]:
-            message.update({"@msg_to": internal_user_service.get_user_details(message["msg_to"][0])})
+            message.update({"@msg_to": [internal_user_service.get_user_details(message["msg_to"][0])]})
 
     # Then resolve msg_to details for messages going from ONS user (internal) to respondant (external)
     to_details = party.get_users_details(get_external_user_uuid_list_from_msg_to_key_in_internal_messages(messages))
