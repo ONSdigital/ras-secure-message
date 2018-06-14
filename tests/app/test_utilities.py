@@ -213,7 +213,7 @@ class UtilitiesTestCase(unittest.TestCase):
                               'ru_id': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc', 'sent_date': '2018-06-05 15:23:38.025084', 'subject': 'Message to ONS',
                               'survey': 'cb8accda-6118-4d3b-85a3-149e28960c54', 'thread_id': '53a430f1-de21-4279-b17e-1bfb4c4813a6',
                               '@msg_to': [{'id': '01b51fcc-ed43-4cdb-ad1c-450f9986859b', 'firstName': 'fred',
-                                          'lastName': 'flinstone', 'emailAddress': 'mock@email.com'}]},
+                                           'lastName': 'flinstone', 'emailAddress': 'mock@email.com'}]},
                              {'body': 'Reply body from internal user', 'collection_case': '', 'collection_exercise': '', 'from_internal': True,
                               'labels': ['INBOX'], 'msg_from': '01b51fcc-ed43-4cdb-ad1c-450f9986859b', 'msg_id': '048ffdb5-18f0-46f0-bfa0-ea298521c513',
                               'msg_to': ['0a7ad740-10d5-4ecb-b7ca-3c0384afb882'], 'read_date': '2018-06-05 15:23:39.898317',
@@ -252,7 +252,7 @@ class UtilitiesTestCase(unittest.TestCase):
                               'ru_id': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc', 'sent_date': '2018-06-05 15:23:38.025084', 'subject': 'Message to ONS',
                               'survey': 'cb8accda-6118-4d3b-85a3-149e28960c54', 'thread_id': '53a430f1-de21-4279-b17e-1bfb4c4813a6',
                               '@msg_to': [{'id': '01b51fcc-ed43-4cdb-ad1c-450f9986859b', 'firstName': 'fred', 'lastName': 'flinstone',
-                                          'emailAddress': 'mock@email.com'}]}]
+                                           'emailAddress': 'mock@email.com'}]}]
 
         messages_to_internal_first_copy = copy.deepcopy(self.messages_internal_first)
         for message in messages_to_internal_first_copy:
