@@ -178,6 +178,9 @@ class Events(db.Model):
         self.event = event
         self.date_time = datetime.now(timezone.utc)
 
+    def __repr__(self):
+        return f'<Events(msg_id={self.msg_id} event={self.event}, date_time={self.date_time}'
+
 
 class Conversation(db.Model):
     """Conversation table model"""
