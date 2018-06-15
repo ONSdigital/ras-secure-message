@@ -131,8 +131,7 @@ def get_external_user_uuid_list(messages):
 
 
 def add_business_details(messages):
-    """Adds business details"""
-
+    """Adds a @ru_id key every message in a list of messages."""
     ru_ids = []
 
     for message in messages:
