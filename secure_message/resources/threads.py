@@ -21,7 +21,7 @@ class ThreadById(Resource):
         """Get messages by thread id"""
         logger.info("Getting messages from thread", thread_id=thread_id, user_uuid=g.user.user_uuid)
 
-        conversation = Retriever().retrieve_thread(thread_id, g.user)
+        conversation = Retriever.retrieve_thread(thread_id, g.user)
         conversation_metadata = Retriever.retrieve_conversation_metadata(thread_id)
 
         logger.info("Successfully retrieved messages from thread", thread_id=thread_id, user_uuid=g.user.user_uuid)
@@ -104,7 +104,7 @@ class ThreadList(Resource):
         """Get thread list"""
         logger.info("Getting list of threads for user", user_uuid=g.user.user_uuid)
         message_args = get_options(request.args)
-        result = Retriever().retrieve_thread_list(g.user, message_args)
+        result = Retriever.retrieve_thread_list(g.user, message_args)
 
         logger.info("Successfully retrieved threads for user", user_uuid=g.user.user_uuid)
         messages, links = process_paginated_list(result, request.host_url, g.user, message_args, THREAD_LIST_ENDPOINT)
@@ -120,9 +120,9 @@ class ThreadCounter(Resource):
         if request.args.get('label'):
             label = str(request.args.get('label'))
             if label.lower() == 'unread':
-                return jsonify(name=label, total=Retriever().thread_count_by_survey(g.user, survey, label))
+                return jsonify(name=label, total=Retriever.thread_count_by_survey(g.user, survey, label))
             else:
                 logger.debug('Invalid label name', name=label, request=request.url)
                 raise BadRequest(description="Invalid label")
         else:
-            return jsonify(total=Retriever().thread_count_by_survey(g.user, survey))
+            return jsonify(total=Retriever.thread_count_by_survey(g.user, survey))

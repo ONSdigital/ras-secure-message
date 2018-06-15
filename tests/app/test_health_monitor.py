@@ -35,7 +35,7 @@ class HealthTestCase(unittest.TestCase):
         with self.app.app_context():
             database.db.drop_all()
             with current_app.test_request_context():
-                response = Retriever().check_db_connection()
+                response = Retriever.check_db_connection()
                 self.assertEqual(response.status_code, 500)
 
     def test_keys_in_app_details_true(self):
