@@ -8,12 +8,12 @@
 * Messages
     * [Get Message List](#get-message-list)
     * [Send Message](#send-message)
-    * [Get Message by Id](#get-message-by-id)
     * [Modify Message Labels](#modify-message-labels)
     * [Get Count of Unread Messages](#get-count-of-unread-messages)
 * Conversations
     * [Get conversation list](#get-conversation-list)
     * [Get Conversation by Id](#get-conversation-by-id)
+    * [Patch Conversation Metadata](#patch-conversation)
 * Health and Status
     * [Get Health](#get-health)
     * [Get Health With Database-status](#get-health-with-database-status)
@@ -230,65 +230,6 @@ Note if the message is a new message ( not a reply to an existing one) then the 
     "thread_id": "f0bf34fd-f5bd-4a17-a641-7ad976fef140"
 }
 ```
-
-## Get Message by Id
-
-`GET /message/{id} or /v2/messages/<message_id>`
-
-&mdash; When an individual message is requested by message id, it returns the specific message by the message id.
-Note V2 uses messages , V1 uses message (singular)
-#### Example JSON Response
-
-```json
-{ "@msg_from": {
-        "emailAddress": "",
-        "firstName": "BRES",
-        "id": "BRES",
-        "lastName": "",
-        "sampleUnitType": "BI",
-        "status": "",
-        "telephone": ""
-    },
-    "@msg_to": [
-        {
-            "associations": [
-                {
-                    "enrolments": [
-                        {
-                            "enrolmentStatus": "ENABLED",
-                            "name": "Survey Name",
-                            "surveyId": "cb0711c3-0ac8-41d3-ae0e-567e5ea1ef87"
-                        }
-                    ],
-                    "partyId": "86b7a550-0f22-444a-be3c-9824b0ad5450",
-                    "sampleUnitRef": "50012345678"
-                }
-            ],
-            "emailAddress": "name@email.co.uk",
-            "firstName": "FirstName",
-            "id": "a0e833fe-8a2d-4293-903b-4b826732e079",
-            "lastName": "LastName",
-            "sampleUnitType": "BI",
-            "status": "ACTIVE",
-            "telephone": "07832323234"
-        }
-    ],
-    "@ru_id": null,
-    "_links": "",
-    "body": "Test internal message",
-    "collection_case": "ACollectionCase",
-    "collection_exercise": "",
-    "labels": [
-        "SENT"
-    ],
-    "msg_from": "BRES",
-    "msg_id": "5a43b35d-0b28-4b60-9070-4f27e799b280",
-    "msg_to": [
-        "a0e833fe-8a2d-4293-903b-4b826732e079"
-    ]
-    }
-```
-Messages will have a user uuid or 'GROUP' depending on how the message was stored. See Messages get for details of @msg_from, @msg_to and @ru
 
 ## Modify Message Labels
 
@@ -670,6 +611,40 @@ Note, V2 messages should have survey_id, collection_case and use either a uuid o
 Note, See message get for descriptions of @msg_from, @msg_to and @ru
 [Get Message List](#get-message-list)
 
+## Patch Conversation Metadata
+
+`PATCH /thread/{thread_id} or /v2/threads/<thread_id>`
+
+Note V2 uses threads, V1 uses thread (singular).
+This is used to add/remove metadata to a conversation.  Below is a list of the parameters that can be
+patched:
+
+
+| Variable | Type| Notes |
+| :---: | :---: | :--: |
+| is_closed | `boolean` | Only internal users are allowed to close conversations.
+
+Only the parameters you want to patch should be included in the call.
+
+
+#### Example JSON payload
+```json
+{
+    "is_closed": true
+}
+```
+
+There is no example response as a successful call will return a 204 with no extra content.
+Below is a list of possible return values:
+
+| Status | Notes |
+| :---: | :---: |
+| 204 | Successful call |
+| 400 | Incorrect payload data supplied |
+| 403 | Unauthorised.  |
+| 404 | Thread id supplied not found in the database |
+| 500 | Server-side error |
+
 ## Get Health
 
 `GET /health`
@@ -715,14 +690,10 @@ Returns more detailed information about secure message including some of the env
     "/health/details": "Rest endpoint to provide application details",
     "/info": "Rest endpoint to provide application information",
     "/labels": "Get a count of unread messages",
-    "/message/<message_id>": "Get and update message by id",
     "/message/<message_id>/modify": "Update message status by id",
     "/message/send": "Send message for a user",
-    "/messages": "Return a list of messages for the user",
     "/thread/<thread_id>": "Return list of messages for user",
     "/threads": "Return a list of threads for the user",
-    "/v2/messages": "Send A message using the V2 endpoint",
-    "/v2/messages/<message_id>": "Get and update message by id",
     "/v2/messages/count": "Get count of unread messages using v2 endpoint",
     "/v2/messages/modify/<message_id>": "Update message status by id",
     "/v2/threads/<thread_id>": "Return list of messages for user"
