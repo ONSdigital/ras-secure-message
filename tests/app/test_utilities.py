@@ -2,7 +2,7 @@ import copy
 import unittest
 
 from secure_message.application import create_app
-from secure_message.common.utilities import MessageArgs, get_to_details, get_from_details, add_business_details
+from secure_message.common.utilities import MessageArgs, add_to_details, add_from_details, add_business_details
 from secure_message.services.service_toggles import party, internal_user_service
 
 
@@ -143,7 +143,7 @@ class UtilitiesTestCase(unittest.TestCase):
             self.assertEqual(result[0], populated_message[0])
             self.assertEqual(result[1], populated_message[1])
 
-    def test_get_from_details_with_external_message_first(self):
+    def test_add_from_details_with_external_message_first(self):
 
         populated_message = [{'body': 'Reply body from respondent', 'collection_case': '', 'collection_exercise': '', 'from_internal': False,
                               'labels': ['INBOX'], 'msg_from': '0a7ad740-10d5-4ecb-b7ca-3c0384afb882', 'msg_id': '048ffdb5-18f0-46f0-bfa0-ea298521c513',
@@ -165,7 +165,7 @@ class UtilitiesTestCase(unittest.TestCase):
             self.assertNotIn('@msg_from', message)
 
         with self.app.app_context():
-            result = get_from_details(messages_from_external_first_copy)
+            result = add_from_details(messages_from_external_first_copy)
             for message in result:
                 self.assertIn('@msg_from', message)
 
@@ -175,7 +175,7 @@ class UtilitiesTestCase(unittest.TestCase):
             self.assertEqual(result[0], populated_message[0])
             self.assertEqual(result[1], populated_message[1])
 
-    def test_get_from_details_with_internal_message_first(self):
+    def test_add_from_details_with_internal_message_first(self):
 
         populated_message = [{'body': 'Reply body from internal user', 'collection_case': '', 'collection_exercise': '', 'from_internal': True,
                               'labels': ['INBOX'], 'msg_from': '01b51fcc-ed43-4cdb-ad1c-450f9986859b', 'msg_id': '048ffdb5-18f0-46f0-bfa0-ea298521c513',
@@ -196,7 +196,7 @@ class UtilitiesTestCase(unittest.TestCase):
         for message in messages_from_internal_first_copy:
             self.assertNotIn('@msg_from', message)
         with self.app.app_context():
-            result = get_from_details(messages_from_internal_first_copy)
+            result = add_from_details(messages_from_internal_first_copy)
             for message in result:
                 self.assertIn('@msg_from', message)
             self.assertEqual(result[0]['@msg_from'], self.internal_user_record)
@@ -205,7 +205,7 @@ class UtilitiesTestCase(unittest.TestCase):
             self.assertEqual(result[0], populated_message[0])
             self.assertEqual(result[1], populated_message[1])
 
-    def test_get_to_details_with_external_message_first(self):
+    def test_add_to_details_with_external_message_first(self):
 
         populated_message = [{'body': 'Reply body from respondent', 'collection_case': '', 'collection_exercise': '', 'from_internal': False,
                               'labels': ['INBOX'], 'msg_from': '0a7ad740-10d5-4ecb-b7ca-3c0384afb882', 'msg_id': '048ffdb5-18f0-46f0-bfa0-ea298521c513',
@@ -227,7 +227,7 @@ class UtilitiesTestCase(unittest.TestCase):
             self.assertNotIn('@msg_to', message)
 
         with self.app.app_context():
-            result = get_to_details(messages_to_external_first_copy)
+            result = add_to_details(messages_to_external_first_copy)
             for message in result:
                 self.assertIn('@msg_to', message)
 
@@ -237,7 +237,7 @@ class UtilitiesTestCase(unittest.TestCase):
             self.assertEqual(result[0], populated_message[0])
             self.assertEqual(result[1], populated_message[1])
 
-    def test_get_to_details_with_internal_message_first(self):
+    def test_add_to_details_with_internal_message_first(self):
 
         populated_message = [{'body': 'Reply body from internal user', 'collection_case': '', 'collection_exercise': '', 'from_internal': True,
                               'labels': ['INBOX'], 'msg_from': '01b51fcc-ed43-4cdb-ad1c-450f9986859b', 'msg_id': '048ffdb5-18f0-46f0-bfa0-ea298521c513',
@@ -259,7 +259,7 @@ class UtilitiesTestCase(unittest.TestCase):
             self.assertNotIn('@msg_to', message)
 
         with self.app.app_context():
-            result = get_to_details(messages_to_internal_first_copy)
+            result = add_to_details(messages_to_internal_first_copy)
             for message in result:
                 self.assertIn('@msg_to', message)
 

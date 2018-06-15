@@ -27,8 +27,7 @@ class PartyService:
         return response.json()
 
     def get_user_details(self, uuid):
-        """Retrieves the user details from the party service after converting single
-        uuid into a list of one"""
+        """Retrieves the user details from the party service for a single uuid"""
         return self._get_user_details_from_party_service([uuid])
 
     def get_users_details(self, uuids):

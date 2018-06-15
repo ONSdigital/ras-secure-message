@@ -70,7 +70,7 @@ def process_paginated_list(paginated_list, host_url, user, message_args, endpoin
     return messages, links
 
 
-def get_to_details(messages):
+def add_to_details(messages):
     """Adds a @msg_to key every message in a list of messages.
     Every msg_to uuid is resolved to include details of the user.
 
@@ -93,7 +93,7 @@ def get_to_details(messages):
     return messages
 
 
-def get_from_details(messages):
+def add_from_details(messages):
     """Adds a @msg_from key every message in a list of messages.
     Every msg_to uuid is resolved to include details of the user.
 
@@ -119,9 +119,9 @@ def get_external_user_uuid_list(messages):
     external_user_uuids = []
 
     external_msgs = [message for message in messages if message['from_internal'] is False]
-    for uuid in external_msgs:
-        if uuid["msg_from"] not in external_user_uuids:
-            external_user_uuids.append(uuid["msg_from"])
+    for message in external_msgs:
+        if message["msg_from"] not in external_user_uuids:
+            external_user_uuids.append(message["msg_from"])
 
     internal_messages = [message for message in messages if message['from_internal'] is True]
     for uuid in internal_messages:
@@ -147,8 +147,8 @@ def add_business_details(messages):
 
 def add_users_and_business_details(messages):
     """Add both user and business details to messages based on data from party service"""
-    messages = get_to_details(messages)
-    messages = get_from_details(messages)
+    messages = add_to_details(messages)
+    messages = add_from_details(messages)
     logger.info("Successfully added to and from details")
     messages = add_business_details(messages)
     logger.info("Successfully added business details")
