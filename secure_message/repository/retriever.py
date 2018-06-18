@@ -31,7 +31,7 @@ class Retriever:
         return result
 
     @staticmethod
-    def thread_count_by_survey(user, survey, is_closed, label=None):
+    def thread_count_by_survey(survey, is_closed):
         """Count users threads for a specific survey"""
 
         survey_conditions = []
@@ -40,23 +40,6 @@ class Retriever:
             survey_conditions.append(SecureMessage.survey.in_(survey))
         else:
             survey_conditions.append(True)
-
-        status_conditions = []
-
-        if not user.is_internal:
-            status_conditions = [Status.actor == str(user.user_uuid)]
-
-        if label:
-            try:
-                result = SecureMessage.query.join(Status) \
-                    .filter(or_(*status_conditions)) \
-                    .filter(and_(*survey_conditions)) \
-                    .filter(Status.label == label) \
-                    .count()
-            except Exception as e:
-                logger.error('Error retrieving count of unread threads from database', error=e)
-                raise InternalServerError(description="Error retrieving count of unread threads from database")
-            return result
 
         try:
             result = SecureMessage.query.join(Conversation) \

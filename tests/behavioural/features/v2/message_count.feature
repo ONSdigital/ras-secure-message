@@ -63,22 +63,3 @@ Examples: user type
 | user        |
 | specific user |
 | group        |
-
-
-Scenario Outline: Respondent sends multiple messages to internal on different surveys internal reads inbox messages
-                  with no survey specified , count should be all messaegs
-Given sending from respondent to internal <user>
-  And the survey is set to 'Survey1'
-  And '5' messages are sent
-  And the survey is set to 'Survey2'
-  And '4' messages are sent using V2
-  And the survey is set to 'Survey3'
-  And '3' messages are sent using V2
-  And the user is set as internal <user>
-When the count of messages with 'UNREAD' label is made V2
-Then the returned label count was '12' V2
-
-Examples: user type
-| user        |
-| specific user |
-| group        |

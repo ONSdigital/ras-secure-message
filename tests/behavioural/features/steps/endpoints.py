@@ -353,18 +353,7 @@ def step_impl_messages_are_read_with_specific_survey(context, survey):
 @given("the count of  messages with '{label_name}' label in survey '{survey}' is made V2")
 def step_impl_the_messages_for_specific_survey_are_counted_for_survey(context, label_name, survey):
     """access the messages_count endpoint to get the count of unread messages"""
-    url = context.bdd_helper.messages_get_unread_count_v2_url + f"?label={label_name}&survey={survey}"
-    context.response = context.client.get(url, headers=context.bdd_helper.headers)
-    response_data = context.response.data
-    label_count = json.loads(response_data)["total"]
-    context.bdd_helper.label_count = label_count
-
-
-@when("the count of messages with '{label_name}' label is made V2")
-@given("the count of messages with '{label_name}' label is made V2")
-def step_impl_the_unread_messages_are_counted(context, label_name):
-    """access the messages_count endpoint to get the count of unread messages"""
-    url = context.bdd_helper.messages_get_unread_count_v2_url + f"?label={label_name}"
+    url = context.bdd_helper.messages_get_unread_count_v2_url + f"?survey={survey}&is_closed=False"
     context.response = context.client.get(url, headers=context.bdd_helper.headers)
     response_data = context.response.data
     label_count = json.loads(response_data)["total"]
