@@ -102,15 +102,15 @@ def add_from_details(messages):
     won't be a @msg_from value returned in the payload.  The API documentation notes that these elements
     aren't guaranteed to be provided so we're not breaking the contract by doing this.
     """
-    external_user_details = party.get_users_details(get_external_user_uuid_list(messages))
+    external_user_details = {}
+    for user in party.get_users_details(get_external_user_uuid_list(messages)):
+        external_user_details[user['id']] = user
     for message in messages:
         if message["from_internal"]:
             message.update({"@msg_from": internal_user_service.get_user_details(message["msg_from"])})
         else:
-            for detail in external_user_details:
-                if detail['id'] == message['msg_from']:
-                    message.update({'@msg_from': detail})
-                    break
+            if external_user_details.get(message['msg_from']):
+                message.update({'@msg_from': external_user_details.get(message['msg_from'])})
     return messages
 
 
