@@ -1,3 +1,4 @@
+from distutils.util import strtobool
 import logging
 
 from werkzeug.exceptions import BadRequest
@@ -116,13 +117,15 @@ class ThreadCounter(Resource):
     """Get count of unread messages using v2 endpoint"""
     @staticmethod
     def get():
-        message_args = get_options(request.args)
+        surveys = request.args.getlist('survey')
+        is_closed = bool(strtobool(request.args.get('is_closed')))
+
         if request.args.get('label'):
             label = str(request.args.get('label'))
             if label.lower() == 'unread':
-                return jsonify(name=label, total=Retriever().thread_count_by_survey(g.user, message_args, label))
+                return jsonify(name=label, total=Retriever().thread_count_by_survey(g.user, surveys, is_closed, label))
             else:
                 logger.debug('Invalid label name', name=label, request=request.url)
                 raise BadRequest(description="Invalid label")
         else:
-            return jsonify(total=Retriever().thread_count_by_survey(g.user, message_args))
+            return jsonify(total=Retriever().thread_count_by_survey(g.user, surveys, is_closed))

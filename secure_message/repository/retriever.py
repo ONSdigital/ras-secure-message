@@ -31,13 +31,13 @@ class Retriever:
         return result
 
     @staticmethod
-    def thread_count_by_survey(user, message_args, label=None):
+    def thread_count_by_survey(user, survey, is_closed, label=None):
         """Count users threads for a specific survey"""
 
         survey_conditions = []
 
-        if message_args.surveys:
-            survey_conditions.append(SecureMessage.survey.in_(message_args.surveys))
+        if survey:
+            survey_conditions.append(SecureMessage.survey.in_(survey))
         else:
             survey_conditions.append(True)
 
@@ -60,7 +60,8 @@ class Retriever:
 
         try:
             result = SecureMessage.query.join(Conversation) \
-                .filter(Conversation.is_closed.is_(message_args.is_closed)) \
+                .filter(Conversation.is_closed.is_(is_closed)) \
+                .filter(*survey_conditions) \
                 .distinct(SecureMessage.thread_id) \
                 .count()
         except Exception as e:
