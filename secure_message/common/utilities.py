@@ -116,27 +116,25 @@ def add_from_details(messages):
 
 def get_external_user_uuid_list(messages):
     """Compiles a list of all unique the external user (respondant) uuids from a list of messages"""
-    external_user_uuids = []
+    external_user_uuids = set()
 
     external_msgs = [message for message in messages if message['from_internal'] is False]
     for message in external_msgs:
-        if message["msg_from"] not in external_user_uuids:
-            external_user_uuids.append(message["msg_from"])
+        external_user_uuids.add(message["msg_from"])
 
     internal_messages = [message for message in messages if message['from_internal'] is True]
     for uuid in internal_messages:
-        if uuid["msg_to"][0] not in external_user_uuids:
-            external_user_uuids.append(uuid["msg_to"][0])
+        external_user_uuids.add(uuid["msg_to"][0])
+
     return external_user_uuids
 
 
 def add_business_details(messages):
     """Adds a @ru_id key every message in a list of messages."""
-    ru_ids = []
+    ru_ids = set()
 
     for message in messages:
-        if message['ru_id'] not in ru_ids:
-            ru_ids.append(message['ru_id'])
+        ru_ids.add(message['ru_id'])
 
     business_details = party.get_business_details(ru_ids)
 
