@@ -31,13 +31,13 @@ class Retriever:
         return result
 
     @staticmethod
-    def thread_count_by_survey(user, survey, label=None):
+    def thread_count_by_survey(user, message_args, label=None):
         """Count users threads for a specific survey"""
 
         survey_conditions = []
 
-        if survey:
-            survey_conditions.append(SecureMessage.survey.in_(survey))
+        if message_args.surveys:
+            survey_conditions.append(SecureMessage.survey.in_(message_args.surveys))
         else:
             survey_conditions.append(True)
 
@@ -48,23 +48,24 @@ class Retriever:
 
         if label:
             try:
-                result = SecureMessage.query.join(Status). \
-                    filter(or_(*status_conditions)). \
-                    filter(and_(*survey_conditions)). \
-                    filter(Status.label == label).count()
+                result = SecureMessage.query.join(Status) \
+                    .filter(or_(*status_conditions)) \
+                    .filter(and_(*survey_conditions)) \
+                    .filter(Status.label == label) \
+                    .count()
             except Exception as e:
                 logger.error('Error retrieving count of unread threads from database', error=e)
                 raise InternalServerError(description="Error retrieving count of unread threads from database")
             return result
 
         try:
-            result = SecureMessage.query.join(Status). \
-                filter(or_(*status_conditions)). \
-                filter(and_(*survey_conditions)).\
-                distinct(SecureMessage.thread_id).count()
+            result = SecureMessage.query.join(Conversation) \
+                .filter(Conversation.is_closed.is_(message_args.is_closed)) \
+                .distinct(SecureMessage.thread_id) \
+                .count()
         except Exception as e:
             logger.error('Error retrieving count of threads by survey from database', error=e)
-            raise InternalServerError(description="Error retrieving count of unread threads from database")
+            raise InternalServerError(description="Error retrieving count of threads from database")
         return result
 
     @staticmethod

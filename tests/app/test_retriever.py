@@ -8,6 +8,7 @@ from werkzeug.exceptions import NotFound
 
 from secure_message.application import create_app
 from secure_message.common.eventsapi import EventsApi
+from secure_message.common.utilities import MessageArgs
 from secure_message.repository import database
 from secure_message.repository.retriever import Retriever
 from secure_message.constants import MESSAGE_QUERY_LIMIT
@@ -308,8 +309,12 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
 
         with self.app.app_context():
             with current_app.test_request_context():
-                thread_count_internal = Retriever().thread_count_by_survey(self.user_internal, BRES_SURVEY)
-                thread_count_second_internal = Retriever().thread_count_by_survey(self.second_user_internal, BRES_SURVEY)
+                message_args = MessageArgs(page=1, limit=2000, ru_id=None, surveys=[BRES_SURVEY],
+                                           cc=None, label=None, desc=True, ce=None, is_closed=False)
+                thread_count_internal = Retriever().thread_count_by_survey(self.user_internal,
+                                                                           message_args)
+                thread_count_second_internal = Retriever().thread_count_by_survey(self.second_user_internal,
+                                                                                  message_args)
                 self.assertEqual(thread_count_internal, thread_count_second_internal)
 
 

@@ -116,13 +116,13 @@ class ThreadCounter(Resource):
     """Get count of unread messages using v2 endpoint"""
     @staticmethod
     def get():
-        survey = request.args.getlist('survey')
+        message_args = get_options(request.args)
         if request.args.get('label'):
             label = str(request.args.get('label'))
             if label.lower() == 'unread':
-                return jsonify(name=label, total=Retriever().thread_count_by_survey(g.user, survey, label))
+                return jsonify(name=label, total=Retriever().thread_count_by_survey(g.user, message_args, label))
             else:
                 logger.debug('Invalid label name', name=label, request=request.url)
                 raise BadRequest(description="Invalid label")
         else:
-            return jsonify(total=Retriever().thread_count_by_survey(g.user, survey))
+            return jsonify(total=Retriever().thread_count_by_survey(g.user, message_args))
