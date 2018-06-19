@@ -85,7 +85,6 @@ class Retriever:
             t = db.session.query(SecureMessage.thread_id, func.max(SecureMessage.id)  # pylint:disable=no-member
                                  .label('max_id')) \
                 .join(Conversation) \
-                .filter(or_(*actor_conditions)) \
                 .filter(Conversation.is_closed.is_(request_args.is_closed)) \
                 .group_by(SecureMessage.thread_id).subquery('t')
 
@@ -159,19 +158,17 @@ class Retriever:
     def retrieve_thread(thread_id, user):
         if user.is_respondent:
             logger.info("Retrieving messages in thread for respondent", thread_id=thread_id, user_uuid=user.user_uuid)
-            return Retriever._retrieve_thread_for_respondent(thread_id, user)
+            return Retriever._retrieve_thread_for_respondent(thread_id)
         logger.info("Retrieving messages in thread for internal user", thread_id=thread_id, user_uuid=user.user_uuid)
         return Retriever._retrieve_thread_for_internal_user(thread_id)
 
     @staticmethod
-    def _retrieve_thread_for_respondent(thread_id, user):
-        """returns paginated list of messages for thread id fora respondent"""
+    def _retrieve_thread_for_respondent(thread_id):
+        """returns list of messages for thread id for a respondent"""
         try:
-            result = SecureMessage.query.join(Events).join(Status) \
+            result = SecureMessage.query.join(Conversation) \
                 .filter(SecureMessage.thread_id == thread_id) \
-                .filter(Status.actor == user.user_uuid) \
-                .filter(Events.event == EventsApi.SENT.value) \
-                .order_by(Status.id.desc())
+                .order_by(SecureMessage.id.desc())
 
             if not result.all():
                 logger.debug('Thread does not exist', thread_id=thread_id)
