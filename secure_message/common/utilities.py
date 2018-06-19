@@ -30,7 +30,7 @@ def get_options(args):
     if args.get('desc') == 'false':
         fields['desc'] = False
 
-    if args.get('is_closed') == 'True':
+    if args.get('is_closed') == 'true':
         fields['is_closed'] = True
 
     return MessageArgs(page=fields['page'], limit=fields['limit'], ru_id=fields['ru_id'],
