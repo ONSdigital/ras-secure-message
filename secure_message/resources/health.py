@@ -25,7 +25,7 @@ class DatabaseHealth(Resource):
 
     @staticmethod
     def get():
-        return Retriever().check_db_connection()
+        return Retriever.check_db_connection()
 
 
 class HealthDetails(Resource):
