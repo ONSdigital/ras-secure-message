@@ -133,11 +133,9 @@ class ModifyTestCase(unittest.TestCase, ModifyTestCaseHelper):
             msg_id = query.first()[0]
         with self.app.app_context():
             with current_app.test_request_context():
-                message_service = Retriever()
-                message = message_service.retrieve_message(msg_id, self.user_internal)
-                modifier = Modifier()
-                modifier.add_unread(message, self.user_internal)
-                modifier.add_unread(message, self.user_internal)
+                message = Retriever.retrieve_message(msg_id, self.user_internal)
+                Modifier.add_unread(message, self.user_internal)
+                Modifier.add_unread(message, self.user_internal)
         with self.engine.connect() as con:
             query = f"SELECT count(label) FROM securemessage.status WHERE msg_id = '{msg_id}' AND label = 'UNREAD'"
             query_x = con.execute(query)
