@@ -115,7 +115,7 @@ def add_from_details(messages):
 
 
 def get_external_user_uuid_list(messages):
-    """Compiles a list of all unique the external user (respondant) uuids from a list of messages"""
+    """Compiles a list of all unique the external user (respondent) uuids from a list of messages"""
     external_user_uuids = set()
 
     external_msgs = [message for message in messages if message['from_internal'] is False]

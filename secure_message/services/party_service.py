@@ -23,7 +23,7 @@ class PartyService:
                          ru_ids=ru_ids)
             return []
 
-        logger.debug("Business details sucessfully retrieved", ru_ids=ru_ids)
+        logger.debug("Business details successfully retrieved", ru_ids=ru_ids)
         return response.json()
 
     def get_user_details(self, uuid):
