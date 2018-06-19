@@ -58,13 +58,12 @@ class MessageSend(Resource):
     @staticmethod
     def _message_save(message):
         """Saves the message to the database along with the subsequent status and audit"""
-        save = Saver()
-        save.save_message(message.data)
-        save.save_msg_event(message.data.msg_id, EventsApi.SENT.value)
+        Saver.save_message(message.data)
+        Saver.save_msg_event(message.data.msg_id, EventsApi.SENT.value)
 
-        save.save_msg_status(message.data.msg_from, message.data.msg_id, Labels.SENT.value)
-        save.save_msg_status(message.data.msg_to[0], message.data.msg_id, Labels.INBOX.value)
-        save.save_msg_status(message.data.msg_to[0], message.data.msg_id, Labels.UNREAD.value)
+        Saver.save_msg_status(message.data.msg_from, message.data.msg_id, Labels.SENT.value)
+        Saver.save_msg_status(message.data.msg_to[0], message.data.msg_id, Labels.INBOX.value)
+        Saver.save_msg_status(message.data.msg_to[0], message.data.msg_id, Labels.UNREAD.value)
 
     @staticmethod
     def _validate_post_data(post_data):
@@ -131,7 +130,7 @@ class MessageModifyById(Resource):
 
         request_data = request.get_json()
         action, label = MessageModifyById._validate_request(request_data)
-        message = Retriever().retrieve_message(message_id, g.user)
+        message = Retriever.retrieve_message(message_id, g.user)
 
         if label == Labels.UNREAD.value:
             resp = MessageModifyById._try_modify_unread(action, message, g.user)
