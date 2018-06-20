@@ -120,4 +120,4 @@ class ThreadCounter(Resource):
         surveys = request.args.getlist('survey')
         is_closed = bool(strtobool(request.args.get('is_closed')))
 
-        return jsonify(total=Retriever.thread_count_by_survey(surveys, is_closed))
+        return jsonify(total=Retriever.thread_count_by_survey(g.user, surveys, is_closed))

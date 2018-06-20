@@ -31,10 +31,10 @@ class Retriever:
         return result
 
     @staticmethod
-    def thread_count_by_survey(survey, is_closed):
+    def thread_count_by_survey(user, survey, is_closed):
         """Count users threads for a specific survey"""
 
-        if not g.user.is_internal:
+        if not user.is_internal:
             logger.info("Thread count should be internal users only", user_uuid=g.user.user_uuid)
             abort(403)
 
