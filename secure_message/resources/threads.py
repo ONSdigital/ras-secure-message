@@ -118,7 +118,7 @@ class ThreadCounter(Resource):
     @staticmethod
     def get():
         surveys = request.args.getlist('survey')
-        is_closed = bool(strtobool(request.args.get('is_closed')))
+        is_closed = bool(strtobool(request.args.get('is_closed', 'False')))
 
         if not g.user.is_internal:
             logger.info("Thread count should be internal users only", user_uuid=g.user.user_uuid)
