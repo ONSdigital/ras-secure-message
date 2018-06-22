@@ -15,11 +15,12 @@ from secure_message.repository.database import SecureMessage
 from secure_message.repository.modifier import Modifier
 from secure_message.repository.retriever import Retriever
 from secure_message.validation.user import User
-from tests.app import test_utilities
 
 
 class ModifyTestCaseHelper:
     """Helper class for Modify Tests"""
+
+    BRES_SURVEY = "33333333-22222-3333-4444-88dc018a1a4c"
 
     def populate_database(self, record_count=0, mark_as_read=True):
         """Adds a specified number of Messages to the db in a single thread"""
@@ -203,7 +204,7 @@ class ModifyTestCase(unittest.TestCase, ModifyTestCaseHelper):
                                  'collection_case': 'ACollectionCase',
                                  'collection_exercise': 'ACollectionExercise',
                                  'ru_id': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc',
-                                 'survey': test_utilities.BRES_SURVEY,
+                                 'survey': self.BRES_SURVEY,
                                  'from_internal': True}
 
         self.assertEqual(Modifier._get_label_actor(user=self.user_internal, message=message_to_respondent),
@@ -221,7 +222,7 @@ class ModifyTestCase(unittest.TestCase, ModifyTestCaseHelper):
                                      'collection_case': 'ACollectionCase',
                                      'collection_exercise': 'ACollectionExercise',
                                      'ru_id': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc',
-                                     'survey': test_utilities.BRES_SURVEY,
+                                     'survey': self.BRES_SURVEY,
                                      'from_internal': False}
 
         self.assertEqual(Modifier._get_label_actor(user=self.user_internal, message=message_to_internal_group),
@@ -239,7 +240,7 @@ class ModifyTestCase(unittest.TestCase, ModifyTestCaseHelper):
                                     'collection_case': 'ACollectionCase',
                                     'collection_exercise': 'ACollectionExercise',
                                     'ru_id': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc',
-                                    'survey': test_utilities.BRES_SURVEY,
+                                    'survey': self.BRES_SURVEY,
                                     'from_internal': False}
 
         self.assertEqual(Modifier._get_label_actor(user=self.user_internal, message=message_to_internal_user),
@@ -255,7 +256,7 @@ class ModifyTestCase(unittest.TestCase, ModifyTestCaseHelper):
                                   'collection_case': 'ACollectionCase',
                                   'collection_exercise': 'ACollectionExercise',
                                   'ru_id': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc',
-                                  'survey': test_utilities.BRES_SURVEY,
+                                  'survey': self.BRES_SURVEY,
                                   'from_internal': False}
 
         with self.assertRaises(InternalServerError):

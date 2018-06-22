@@ -1,7 +1,6 @@
 import unittest
 
 import requests_mock
-from secure_message import constants
 from secure_message.application import create_app
 from secure_message.services.party_service import PartyService
 
@@ -21,122 +20,139 @@ class PartyTestCase(unittest.TestCase):
         self.app = create_app()
         self.app.testing = True
 
+    # Get business details tests
     @requests_mock.mock()
-    def test_results_returned_from_get_business_get_executed_just_once_for_the_same_ru(self, mock_request):
-        """Test get business details sends a request and returns data"""
-        ru = "1234"
-        business_data_url = f"{self.app.config['RAS_PARTY_SERVICE']}party-api/v1/businesses/id/{ru}"
-        mock_request.get(business_data_url, status_code=200, reason="OK", text='{"something": "else"}')
-        sut = PartyService()
+    def test_get_business_details_single_id_success(self, mock_request):
+        """Test get business details with a single uuid"""
+        ru_ids = ["b08c07c3-df28-4283-bb4c-c048729ce372"]
+        business_data_url = f"{self.app.config['RAS_PARTY_SERVICE']}party-api/v1/businesses?id={ru_ids[0]}"
+        mock_request.get(business_data_url, status_code=200, reason="OK", text='{}')
 
-        for retries in range(0, 2):
-
-            with self.app.app_context():
-                sut.get_business_details(ru)
+        with self.app.app_context():
+            PartyService().get_business_details(ru_ids)
 
         self.assertTrue(mock_request.call_count == 1)
 
     @requests_mock.mock()
-    def test_results_returned_from_get_business_get_executed_twice_for_different_ru(self, mock_request):
-        """Test get business details sends a request and returns data"""
-        ru = "1234"
+    def test_get_business_details_multiple_id_success(self, mock_request):
+        """Test get business details with a multiple uuids at once"""
+        ru_ids = ["c614e64e-d981-4eba-b016-d9822f09a4fb", "c614e64e-d981-4eba-b016-d9822f09a4f2"]
+        business_data_url = f"{self.app.config['RAS_PARTY_SERVICE']}party-api/v1/businesses?id={ru_ids[0]}&id={ru_ids[1]}"
+        mock_request.get(business_data_url, status_code=200, reason="OK", text='{}')
+        with self.app.app_context():
+            PartyService().get_business_details(ru_ids)
 
-        sut = PartyService()
-        count = 0
-        for retries in range(0, 2):
-            count += 1
-            ru += str(count)
-            business_data_url = f"{self.app.config['RAS_PARTY_SERVICE']}party-api/v1/businesses/id/{ru}"
-            mock_request.get(business_data_url, status_code=200, reason="OK", text='{"something": "else"}')
-
-            with self.app.app_context():
-                sut.get_business_details(ru)
-
-        self.assertTrue(mock_request.call_count == 2)
+        self.assertTrue(mock_request.call_count == 1)
 
     @requests_mock.mock()
-    def test_results_returned_from_get_business_details_returned_as_expected(self, mock_request):
-        """Test get business details sends a request and returns data"""
-        ru = "1234"
-        business_data_url = f"{self.app.config['RAS_PARTY_SERVICE']}party-api/v1/businesses/id/{ru}"
-        mock_request.get(business_data_url, status_code=200, reason="OK", text='{"something": "else"}')
-        sut = PartyService()
-
+    def test_get_business_details_client_error(self, mock_request):
+        """Test get business details fails and returns an empty list when a non-uuid is sent"""
+        ru_ids = ["not_a_uuid"]
+        business_data_url = f"{self.app.config['RAS_PARTY_SERVICE']}party-api/v1/businesses?id={ru_ids[0]}"
+        mock_request.get(business_data_url, status_code=400, reason="Invalid uuid", text='{"error": "text"}')
         with self.app.app_context():
-            result_data = sut.get_business_details(ru)
+            result = PartyService().get_business_details(ru_ids)
 
-        self.assertEqual(result_data, {"something": "else"})
+        self.assertEqual(result, [])
+        self.assertTrue(mock_request.call_count == 1)
 
     @requests_mock.mock()
-    def test_get_business_details_converts_error_list_to_errors_dictionary(self, mock_request):
-        """Test get business details and returns correctly from a list"""
-        ru = "1234"
-        business_data_url = f"{self.app.config['RAS_PARTY_SERVICE']}party-api/v1/businesses/id/{ru}"
-        sut = PartyService()
-        mock_request.get(business_data_url, status_code=200, reason="OK", text='[{"errors": "test"}]')
-
+    def test_get_business_details_unauthorised_failure(self, mock_request):
+        """Test get business details fails and returns and empty list when the client is unauthorised to access the party service"""
+        ru_ids = ["1234"]
+        business_data_url = f"{self.app.config['RAS_PARTY_SERVICE']}party-api/v1/businesses?id={ru_ids[0]}"
+        mock_request.get(business_data_url, status_code=401, reason="unauthorised", text='{}')
         with self.app.app_context():
-            result_data = sut.get_business_details(ru)
+            result_data = PartyService().get_business_details(ru_ids)
 
-        self.assertEqual(result_data, [{"errors": "test"}])
+        self.assertEqual(result_data, [])
+        self.assertTrue(mock_request.call_count == 1)
+
+    # Get user (singular) details tests
+    @requests_mock.mock()
+    def test_get_user_details_success(self, mock_request):
+        """Test get user details with a single uuid"""
+        user_id = "c614e64e-d981-4eba-b016-d9822f09a4fb"
+        user_data_url = f"{self.app.config['RAS_PARTY_SERVICE']}party-api/v1/respondents?id={user_id}"
+        mock_request.get(user_data_url, status_code=200, reason="OK", text='{}')
+        with self.app.app_context():
+            PartyService().get_user_details(user_id)
+
+        self.assertTrue(mock_request.call_count == 1)
 
     @requests_mock.mock()
-    def test_get_business_details_fails_business_data_is_none(self, mock_request):
-        """Test get business details and returns correctly from a list"""
-        ru = "1234"
-        business_data_url = f"{self.app.config['RAS_PARTY_SERVICE']}party-api/v1/businesses/id/{ru}"
-        sut = PartyService()
-        mock_request.get(business_data_url, status_code=401, reason="unauthorised", text='Unauthorized Access')
-
+    def test_get_user_details_client_error(self, mock_request):
+        """Test get user details fails and returns an empty list when a non-uuid is sent"""
+        user_id = "not_a_uuid"
+        user_data_url = f"{self.app.config['RAS_PARTY_SERVICE']}party-api/v1/respondents?id={user_id}"
+        mock_request.get(user_data_url, status_code=400, reason="Invalid uuid", text='{}')
         with self.app.app_context():
-            result_data = sut.get_business_details(ru)
+            result = PartyService().get_user_details(user_id)
 
-        self.assertIsNone(result_data)
+        self.assertEqual(result, [])
+        self.assertTrue(mock_request.call_count == 1)
 
     @requests_mock.mock()
-    def test_get_user_details_for_internal_user(self, mock_request):
-        """Test get user details sends a request and receives back data"""
-        sut = PartyService()
-        user_data_url = f"{self.app.config['RAS_PARTY_SERVICE']}party-api/v1/respondents/id/" \
-                        f"{constants.NON_SPECIFIC_INTERNAL_USER}"
-        expected_result = {'emailAddress': '',
-                           'firstName': constants.NON_SPECIFIC_INTERNAL_USER,
-                           'id': constants.NON_SPECIFIC_INTERNAL_USER,
-                           'lastName': '',
-                           'sampleUnitType': 'BI',
-                           'status': '',
-                           'telephone': ''}
-
-        mock_request.get(user_data_url, status_code=200, reason="OK", json=expected_result)
+    def test_get_user_details_unauthorised_failure(self, mock_request):
+        """Test get user details fails and returns and empty list when the client is unauthorised to access the party service"""
+        user_ids = ['NotBres']
+        user_data_url = f"{self.app.config['RAS_PARTY_SERVICE']}party-api/v1/respondents?id={user_ids[0]}"
+        mock_request.get(user_data_url, status_code=401, reason="unauthorised", text='{}')
 
         with self.app.app_context():
-            result_data = sut.get_user_details(constants.NON_SPECIFIC_INTERNAL_USER)
+            result_data = PartyService().get_users_details(user_ids)
 
-        self.assertEqual(result_data, expected_result)
+        self.assertEqual(result_data, [])
+        self.assertTrue(mock_request.call_count == 1)
+
+    # Get users (plural) details tests
+    @requests_mock.mock()
+    def test_get_users_details_single_id_success(self, mock_request):
+        """Test get users details sends a request and receives back data"""
+        user_ids = ["c614e64e-d981-4eba-b016-d9822f09a4fb"]
+        user_data_url = f"{self.app.config['RAS_PARTY_SERVICE']}party-api/v1/respondents?id={user_ids[0]}"
+        mock_request.get(user_data_url, status_code=200, reason="OK", text='{}')
+
+        with self.app.app_context():
+            PartyService().get_users_details(user_ids)
+
+        self.assertTrue(mock_request.call_count == 1)
 
     @requests_mock.mock()
-    def test_get_user_details_calls_party_service_for_respondent(self, mock_request):
-        """Test get user details sends a request and receives back data"""
-        sut = PartyService()
-        user_data_url = f"{self.app.config['RAS_PARTY_SERVICE']}party-api/v1/respondents/id/NotBres"
-        mock_request.get(user_data_url, status_code=200, reason="OK", text='{"Test": "test"}')
-
+    def test_get_users_details_multiple_id_success(self, mock_request):
+        """Test get users details with a multiple uuids at once"""
+        user_ids = ["c614e64e-d981-4eba-b016-d9822f09a4fb", "c614e64e-d981-4eba-b016-d9822f09a4f2"]
+        user_data_url = f"{self.app.config['RAS_PARTY_SERVICE']}party-api/v1/respondents?id={user_ids[0]}&id={user_ids[1]}"
+        mock_request.get(user_data_url, status_code=200, reason="OK", text='{}')
         with self.app.app_context():
-            result_data = sut.get_user_details('NotBres')
+            PartyService().get_users_details(user_ids)
 
-        self.assertEqual(result_data, {"Test": "test"})
+        self.assertTrue(mock_request.call_count == 1)
 
     @requests_mock.mock()
-    def test_get_user_details_is_none_for_unauthorised_party_service_access(self, mock_request):
-        """Test get user details sends a request and receives back data"""
-        sut = PartyService()
-        user_data_url = f"{self.app.config['RAS_PARTY_SERVICE']}party-api/v1/respondents/id/NotBres"
-        mock_request.get(user_data_url, status_code=401, reason="unauthorised", text="Unauthorized access")
+    def test_get_users_details_client_error(self, mock_request):
+        """Test get users details fails and returns an empty list when a non-uuid is sent"""
+        user_ids = ["not_a_uuid"]
+        user_data_url = f"{self.app.config['RAS_PARTY_SERVICE']}party-api/v1/respondents?id={user_ids[0]}"
+        mock_request.get(user_data_url, status_code=400, reason="Invalid uuid", text='{}')
+        with self.app.app_context():
+            result = PartyService().get_users_details(user_ids)
+
+        self.assertEqual(result, [])
+        self.assertTrue(mock_request.call_count == 1)
+
+    @requests_mock.mock()
+    def test_get_users_details_unauthorised_failure(self, mock_request):
+        """Test get users details fails and returns and empty list when the client is unauthorised to access the party service"""
+        user_ids = ['1234', '4567']
+        user_data_url = f"{self.app.config['RAS_PARTY_SERVICE']}party-api/v1/respondents?id={user_ids[0]}&id={user_ids[1]}"
+        mock_request.get(user_data_url, status_code=401, reason="unauthorised", text='{}')
 
         with self.app.app_context():
-            result_data = sut.get_user_details('NotBres')
+            result_data = PartyService().get_users_details(user_ids)
 
-        self.assertIsNone(result_data)
+        self.assertEqual(result_data, [])
+        self.assertTrue(mock_request.call_count == 1)
 
 
 if __name__ == '__main__':

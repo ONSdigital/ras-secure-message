@@ -1,7 +1,6 @@
 import unittest
 
 from secure_message.application import create_app
-from secure_message.common.utilities import get_business_details_by_ru
 from secure_message.api_mocks.party_service_mock import PartyServiceMock
 from secure_message.services.service_toggles import internal_user_service, case_service, party
 
@@ -20,7 +19,7 @@ class PartyTestCase(unittest.TestCase):
 
         list_ru = ['f1a5e99c-8edf-489a-9c72-6cabe6c387fc']
 
-        business_details = get_business_details_by_ru(list_ru)
+        business_details = party.get_business_details(list_ru)
 
         self.assertEqual(business_details[0]['id'], list_ru[0])
         self.assertEqual(business_details[0]['name'], "Apple")
@@ -34,12 +33,10 @@ class PartyTestCase(unittest.TestCase):
                    'b3ba864b-7cbc-4f44-84fe-88dc018a1a4c'
                    ]
 
-        business_details = get_business_details_by_ru(list_ru)
+        business_details = party.get_business_details(list_ru)
 
-        self.assertEqual(business_details[0]['id'], list_ru[0])
-        self.assertEqual(business_details[1]['id'], list_ru[1])
-        self.assertEqual(business_details[2]['id'], list_ru[2])
-        self.assertEqual(business_details[3]['id'], list_ru[3])
+        for detail in business_details:
+            self.assertIn(detail['id'], list_ru)
 
     def test_get_user_details_returns_none_if_uuid_not_known(self):
         user = 'SomeoneWhoClearlyDoesNotExist'
@@ -51,7 +48,7 @@ class PartyTestCase(unittest.TestCase):
         uuid = 'ABusinessThatDoesNotExist'
         sut = PartyServiceMock()
         result_data = sut.get_business_details(uuid)
-        self.assertIsNone(result_data)
+        self.assertEqual(result_data, [])
 
 
 if __name__ == '__main__':
