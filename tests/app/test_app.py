@@ -18,11 +18,12 @@ from secure_message.common.alerts import AlertViaLogging
 from secure_message.api_mocks.party_service_mock import PartyServiceMock
 from secure_message.api_mocks.case_service_mock import CaseServiceMock
 from secure_message.api_mocks.internal_user_service_mock import InternalUserServiceMock
-from tests.app import test_utilities
 
 
 class FlaskTestCase(unittest.TestCase):
     """Test case for application endpoints"""
+
+    BRES_SURVEY = "33333333-22222-3333-4444-88dc018a1a4c"
 
     def setUp(self):
         """setup test environment"""
@@ -56,7 +57,7 @@ class FlaskTestCase(unittest.TestCase):
                              'collection_case': 'ACollectionCase',
                              'collection_exercise': 'ACollectionExercise',
                              'ru_id': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc',
-                             'survey': test_utilities.BRES_SURVEY}
+                             'survey': self.BRES_SURVEY}
 
         with self.app.app_context():
             database.db.init_app(current_app)
@@ -174,7 +175,7 @@ class FlaskTestCase(unittest.TestCase):
                         'collection_case': 'ACollectionCase',
                         'collection_exercise': 'ACollectionExercise',
                         'ru_id': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc',
-                        'survey': test_utilities.BRES_SURVEY}
+                        'survey': self.BRES_SURVEY}
         try:
             self.client.post(url, data=json.dumps(test_message), headers=self.internal_user_header)
             self.assertTrue(True)  # i.e no exception
@@ -332,7 +333,7 @@ class FlaskTestCase(unittest.TestCase):
                                   'collection_case': 'ACollectionCase',
                                   'collection_exercise': 'ACollectionExercise',
                                   'ru_id': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc',
-                                  'survey': test_utilities.BRES_SURVEY})
+                                  'survey': self.BRES_SURVEY})
 
         token_data = {constants.USER_IDENTIFIER: "0a7ad740-10d5-4ecb-b7ca-3c0384afb882",
                       "role": "respondent"}
@@ -359,7 +360,7 @@ class FlaskTestCase(unittest.TestCase):
                                   'collection_case': 'ACollectionCase',
                                   'collection_exercise': 'ACollectionExercise',
                                   'ru_id': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc',
-                                  'survey': test_utilities.BRES_SURVEY})
+                                  'survey': self.BRES_SURVEY})
 
         token_data = {constants.USER_IDENTIFIER: "f62dfda8-73b0-4e0e-97cf-1b06327a6712",
                       "role": "internal"}

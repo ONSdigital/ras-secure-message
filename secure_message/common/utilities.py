@@ -70,68 +70,73 @@ def process_paginated_list(paginated_list, host_url, user, message_args, endpoin
     return messages, links
 
 
-def get_business_details_by_ru(rus):
-    """Function to retrieve business details from ru using the party service"""
+def add_to_details(messages):
+    """Adds a @msg_to key every message in a list of messages.
+    Every msg_to uuid is resolved to include details of the user.
 
-    details = []
+    If the call for the internal user id fails, an exception will be thrown.
+    If the external user id cannot be found in the list that we got from the party service.  There
+    won't be a @msg_to value returned in the payload.  The API documentation notes that these elements
+    aren't guaranteed to be provided so we're not breaking the contract by doing this.
+    """
+    external_user_details = {}
+    for user in party.get_users_details(get_external_user_uuid_list(messages)):
+        external_user_details[user['id']] = user
 
-    for ru in rus:
-
-        detail = party.get_business_details(ru)
-
-        if detail is not None:
-            details.append(detail)
-        else:
-            logger.info('No details found for RU ID', ru=ru)
-
-    return details
-
-
-def add_to_and_from_details(messages):
-    """Adds user details for sender and recipient"""
     for message in messages:
-        message.update({'@msg_from': _get_from_details(message), '@msg_to': _get_to_details(message)})
+        if not message["from_internal"]:
+            message.update({"@msg_to": [internal_user_service.get_user_details(message["msg_to"][0])]})
+        else:
+            if external_user_details.get(message['msg_to'][0]):
+                message.update({'@msg_to': [external_user_details.get(message['msg_to'][0])]})
+
     return messages
 
 
-def _get_from_details(message):
-    """looks up the details for the from users"""
-    logger.info("Getting user from details", is_internal=message['from_internal'], user_uuid=message['msg_from'])
-    if message['from_internal']:
-        from_details = internal_user_service.get_user_details(message['msg_from'])
-    else:
-        from_details = party.get_user_details(message['msg_from'])
-    return from_details
+def add_from_details(messages):
+    """Adds a @msg_from key every message in a list of messages.
+    Every msg_to uuid is resolved to include details of the user.
+
+    If the call for the internal user id fails, an exception will be thrown.
+    If the external user id cannot be found in the list that we got from the party service.  There
+    won't be a @msg_from value returned in the payload.  The API documentation notes that these elements
+    aren't guaranteed to be provided so we're not breaking the contract by doing this.
+    """
+    external_user_details = {}
+    for user in party.get_users_details(get_external_user_uuid_list(messages)):
+        external_user_details[user['id']] = user
+    for message in messages:
+        if message["from_internal"]:
+            message.update({"@msg_from": internal_user_service.get_user_details(message["msg_from"])})
+        else:
+            if external_user_details.get(message['msg_from']):
+                message.update({'@msg_from': external_user_details.get(message['msg_from'])})
+    return messages
 
 
-def _get_to_details(message):
-    """looks up the details of all the to users"""
-    user_details = []
-    if message['from_internal']:
-        to_user_details_finder = party.get_user_details
-    else:
-        to_user_details_finder = internal_user_service.get_user_details
+def get_external_user_uuid_list(messages):
+    """Compiles a list of all unique the external user (respondent) uuids from a list of messages"""
+    external_user_uuids = set()
 
-    for uuid in message['msg_to']:
+    external_msgs = [message for message in messages if message['from_internal'] is False]
+    for message in external_msgs:
+        external_user_uuids.add(message["msg_from"])
 
-        detail = to_user_details_finder(uuid)
+    internal_messages = [message for message in messages if message['from_internal'] is True]
+    for uuid in internal_messages:
+        external_user_uuids.add(uuid["msg_to"][0])
 
-        if detail:
-            user_details.append(detail)
-
-    return user_details
+    return external_user_uuids
 
 
 def add_business_details(messages):
-    """Adds business details"""
-
-    ru_list = []
+    """Adds a @ru_id key every message in a list of messages."""
+    ru_ids = set()
 
     for message in messages:
-        if message['ru_id'] not in ru_list:
-            ru_list.append(message['ru_id'])
+        ru_ids.add(message['ru_id'])
 
-    business_details = get_business_details_by_ru(ru_list)
+    business_details = party.get_business_details(ru_ids)
 
     for message in messages:
         message['@ru_id'] = next((business for business in business_details if business["id"] == message['ru_id']), None)
@@ -140,8 +145,9 @@ def add_business_details(messages):
 
 def add_users_and_business_details(messages):
     """Add both user and business details to messages based on data from party service"""
-    messages = add_to_and_from_details(messages)
-    logger.info("Sucessfully added to and from details")
+    messages = add_to_details(messages)
+    messages = add_from_details(messages)
+    logger.info("Successfully added to and from details")
     messages = add_business_details(messages)
     logger.info("Successfully added business details")
     return messages

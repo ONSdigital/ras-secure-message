@@ -13,8 +13,7 @@ from secure_message.repository.retriever import Retriever
 from secure_message.constants import MESSAGE_QUERY_LIMIT
 from secure_message.services.service_toggles import party
 from secure_message.validation.user import User
-from tests.app import test_utilities
-from tests.app.test_utilities import BRES_SURVEY, get_args
+from tests.app.test_utilities import get_args
 
 
 class RetrieverTestCaseHelper:
@@ -22,6 +21,7 @@ class RetrieverTestCaseHelper:
     default_internal_actor = 'internal_actor'
     second_internal_actor = 'second_internal_actor'
     default_external_actor = 'external_actor'
+    BRES_SURVEY = "33333333-22222-3333-4444-88dc018a1a4c"
 
     """Helper class for Retriever Tests"""
     def add_secure_message(self, msg_id, subject="test", body="test", thread_id="ThreadId",
@@ -64,7 +64,7 @@ class RetrieverTestCaseHelper:
         msg_id = str(uuid.uuid4())
         thread_id = msg_id
         self.add_conversation(conversation_id=thread_id)
-        self.add_secure_message(msg_id=msg_id, thread_id=thread_id, survey=test_utilities.BRES_SURVEY, from_internal=False)
+        self.add_secure_message(msg_id=msg_id, thread_id=thread_id, survey=self.BRES_SURVEY, from_internal=False)
         self.add_status(label="SENT", msg_id=msg_id, actor=external_actor)
         self.add_status(label="INBOX", msg_id=msg_id, actor=internal_actor)
         self.add_event(event=EventsApi.SENT.value, msg_id=msg_id, date_time=datetime.utcnow())
@@ -74,7 +74,7 @@ class RetrieverTestCaseHelper:
             for _ in range(no_of_messages - 1):
                 msg_id = str(uuid.uuid4())
                 self.add_secure_message(msg_id=msg_id, thread_id=thread_id,
-                                        survey=test_utilities.BRES_SURVEY, from_internal=True)
+                                        survey=self.BRES_SURVEY, from_internal=True)
                 self.add_status(label="SENT", msg_id=msg_id, actor=internal_actor)
                 self.add_status(label="UNREAD", msg_id=msg_id, actor=external_actor)
                 self.add_status(label="INBOX", msg_id=msg_id, actor=external_actor)
@@ -307,8 +307,8 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
 
         with self.app.app_context():
             with current_app.test_request_context():
-                thread_count_internal = Retriever.thread_count_by_survey(self.user_internal, BRES_SURVEY)
-                thread_count_second_internal = Retriever.thread_count_by_survey(self.second_user_internal, BRES_SURVEY)
+                thread_count_internal = Retriever.thread_count_by_survey(self.user_internal, self.BRES_SURVEY)
+                thread_count_second_internal = Retriever.thread_count_by_survey(self.second_user_internal, self.BRES_SURVEY)
                 self.assertEqual(thread_count_internal, thread_count_second_internal)
 
 

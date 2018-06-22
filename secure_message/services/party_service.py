@@ -1,49 +1,52 @@
 import logging
+from urllib.parse import urlencode
+
 from flask import current_app
 import requests
+from requests import HTTPError
 from structlog import wrap_logger
 logger = wrap_logger(logging.getLogger(__name__))
 
 
 class PartyService:
 
-    def __init__(self):
-        self._users_cache = {}
-        self._business_details_cache = {}
-
-    def get_business_details(self, ru):
+    @staticmethod
+    def get_business_details(ru_ids):
         """Retrieves the business details from the party service"""
+        params = urlencode([("id", ru_id) for ru_id in ru_ids])
+        response = requests.get(f"{current_app.config['RAS_PARTY_SERVICE']}party-api/v1/businesses",
+                                auth=current_app.config['BASIC_AUTH'], verify=False, params=params)
+        try:
+            response.raise_for_status()
+        except HTTPError:
+            logger.debug("Business detail retrieval failed", status_code=response.status_code, text=response.text,
+                         ru_ids=ru_ids)
+            return []
 
-        ru_dict = self._business_details_cache.get(ru)
-
-        if ru_dict is None:
-            logger.info(f"Party Service: retrieve party ru data for {ru}")
-
-            party_data = requests.get(f"{current_app.config['RAS_PARTY_SERVICE']}party-api/v1/businesses/id/{ru}",
-                                      auth=current_app.config['BASIC_AUTH'], verify=False)
-            if party_data.status_code == 200:
-                ru_dict = party_data.json()
-                self._business_details_cache[ru] = ru_dict
-                logger.debug(f"Party data retrieved for ru:{ru}")
-            else:
-                logger.debug(f"Party data failed for ru:{ru}", status_code=party_data.status_code, text=party_data.text,
-                             ru=ru)
-
-        return ru_dict
+        logger.debug("Business details successfully retrieved", ru_ids=ru_ids)
+        return response.json()
 
     def get_user_details(self, uuid):
+        """Retrieves the user details from the party service for a single uuid"""
+        return self._get_user_details_from_party_service([uuid])
 
-        user_dict = self._users_cache.get(uuid)
+    def get_users_details(self, uuids):
+        """Retrieves the user details from the party service"""
+        return self._get_user_details_from_party_service(uuids)
 
-        if user_dict is None:
-            logger.info(f"Party Service: retrieve party user data for {uuid}")
-            party_data = requests.get(f"{current_app.config['RAS_PARTY_SERVICE']}party-api/v1/respondents/id/{uuid}",
-                                      auth=current_app.config['BASIC_AUTH'], verify=False)
-            if party_data.status_code == 200:
-                user_dict = party_data.json()
-                self._users_cache[uuid] = user_dict
-                logger.debug(f"Party data retrieved for uuid:{uuid}")
-            else:
-                logger.error(f'Party service failed for uuid:{uuid}', status_code=party_data.status_code, text=party_data.text,
-                             uuid=uuid)
-        return user_dict
+    @staticmethod
+    def _get_user_details_from_party_service(uuids):
+        params = urlencode([("id", uuid) for uuid in uuids])
+        response = requests.get(f"{current_app.config['RAS_PARTY_SERVICE']}party-api/v1/respondents",
+                                auth=current_app.config['BASIC_AUTH'], verify=False, params=params)
+        try:
+            response.raise_for_status()
+        except HTTPError:
+            logger.exception('Failed to retrieve data from party service',
+                             status_code=response.status_code,
+                             text=response.text,
+                             uuids=uuids)
+            return []
+
+        logger.debug("Party data successfully retrieved", uuids=uuids)
+        return response.json()
