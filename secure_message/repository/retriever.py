@@ -1,6 +1,6 @@
 import logging
 
-from flask import abort, g, jsonify
+from flask import jsonify
 from sqlalchemy import and_, func, or_
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm.exc import NoResultFound
@@ -31,12 +31,8 @@ class Retriever:
         return result
 
     @staticmethod
-    def thread_count_by_survey(user, survey, is_closed):
+    def thread_count_by_survey(survey, is_closed):
         """Count users threads for a specific survey"""
-
-        if not user.is_internal:
-            logger.info("Thread count should be internal users only", user_uuid=g.user.user_uuid)
-            abort(403)
 
         survey_conditions = []
 

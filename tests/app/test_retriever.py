@@ -308,8 +308,8 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
 
         with self.app.app_context():
             with current_app.test_request_context():
-                thread_count_internal = Retriever.thread_count_by_survey(self.user_internal, BRES_SURVEY, False)
-                thread_count_second_internal = Retriever.thread_count_by_survey(self.user_internal, BRES_SURVEY, False)
+                thread_count_internal = Retriever.thread_count_by_survey(BRES_SURVEY, False)
+                thread_count_second_internal = Retriever.thread_count_by_survey(BRES_SURVEY, False)
                 self.assertEqual(thread_count_internal, thread_count_second_internal)
 
 
