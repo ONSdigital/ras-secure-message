@@ -9,7 +9,7 @@ from werkzeug.exceptions import InternalServerError, NotFound
 
 from secure_message.common.eventsapi import EventsApi
 from secure_message.common.labels import Labels
-from secure_message.repository.database import db, Conversation, Events, SecureMessage, Status
+from secure_message.repository.database import Conversation, db, Events, SecureMessage, Status
 
 logger = wrap_logger(logging.getLogger(__name__))
 
@@ -31,7 +31,7 @@ class Retriever:
         return result
 
     @staticmethod
-    def thread_count_by_survey(user, survey, label=None):
+    def thread_count_by_survey(survey, is_closed):
         """Count users threads for a specific survey"""
 
         survey_conditions = []
@@ -41,30 +41,15 @@ class Retriever:
         else:
             survey_conditions.append(True)
 
-        status_conditions = []
-
-        if not user.is_internal:
-            status_conditions = [Status.actor == str(user.user_uuid)]
-
-        if label:
-            try:
-                result = SecureMessage.query.join(Status). \
-                    filter(or_(*status_conditions)). \
-                    filter(and_(*survey_conditions)). \
-                    filter(Status.label == label).count()
-            except Exception as e:
-                logger.error('Error retrieving count of unread threads from database', error=e)
-                raise InternalServerError(description="Error retrieving count of unread threads from database")
-            return result
-
         try:
-            result = SecureMessage.query.join(Status). \
-                filter(or_(*status_conditions)). \
-                filter(and_(*survey_conditions)).\
-                distinct(SecureMessage.thread_id).count()
+            result = SecureMessage.query.join(Conversation) \
+                .filter(Conversation.is_closed.is_(is_closed)) \
+                .filter(*survey_conditions) \
+                .distinct(SecureMessage.thread_id) \
+                .count()
         except Exception as e:
             logger.error('Error retrieving count of threads by survey from database', error=e)
-            raise InternalServerError(description="Error retrieving count of unread threads from database")
+            raise InternalServerError(description="Error retrieving count of threads from database")
         return result
 
     @staticmethod
@@ -99,9 +84,8 @@ class Retriever:
         try:
             t = db.session.query(SecureMessage.thread_id, func.max(SecureMessage.id)  # pylint:disable=no-member
                                  .label('max_id')) \
-                .join(Events).join(Status) \
-                .filter(or_(*actor_conditions)) \
-                .filter(Events.event == EventsApi.SENT.value) \
+                .join(Conversation) \
+                .filter(Conversation.is_closed.is_(request_args.is_closed)) \
                 .group_by(SecureMessage.thread_id).subquery('t')
 
             conditions.append(SecureMessage.thread_id == t.c.thread_id)
@@ -138,12 +122,8 @@ class Retriever:
         try:
             t = db.session.query(SecureMessage.thread_id, func.max(SecureMessage.id)  # pylint:disable=no-member
                                  .label('max_id')) \
-                .join(Events).join(Status) \
-                .filter(or_(and_(SecureMessage.from_internal.is_(False), Status.label == Labels.INBOX.value),  # NOQA
-                            and_(SecureMessage.from_internal.is_(True),
-                                 Status.label.in_([Labels.SENT.value]))
-                           )
-                       ) \
+                .join(Conversation) \
+                .filter(Conversation.is_closed.is_(request_args.is_closed)) \
                 .group_by(SecureMessage.thread_id).subquery('t')
 
             conditions.append(SecureMessage.thread_id == t.c.thread_id)
@@ -178,19 +158,17 @@ class Retriever:
     def retrieve_thread(thread_id, user):
         if user.is_respondent:
             logger.info("Retrieving messages in thread for respondent", thread_id=thread_id, user_uuid=user.user_uuid)
-            return Retriever._retrieve_thread_for_respondent(thread_id, user)
+            return Retriever._retrieve_thread_for_respondent(thread_id)
         logger.info("Retrieving messages in thread for internal user", thread_id=thread_id, user_uuid=user.user_uuid)
         return Retriever._retrieve_thread_for_internal_user(thread_id)
 
     @staticmethod
-    def _retrieve_thread_for_respondent(thread_id, user):
-        """returns paginated list of messages for thread id fora respondent"""
+    def _retrieve_thread_for_respondent(thread_id):
+        """returns list of messages for thread id for a respondent"""
         try:
-            result = SecureMessage.query.join(Events).join(Status) \
+            result = SecureMessage.query.join(Conversation) \
                 .filter(SecureMessage.thread_id == thread_id) \
-                .filter(Status.actor == user.user_uuid) \
-                .filter(Events.event == EventsApi.SENT.value) \
-                .order_by(Status.id.desc())
+                .order_by(SecureMessage.id.desc())
 
             if not result.all():
                 logger.debug('Thread does not exist', thread_id=thread_id)

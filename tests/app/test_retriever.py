@@ -36,11 +36,11 @@ class RetrieverTestCaseHelper:
                     '{thread_id}', '{collection_case}', '{ru_id}', '{survey}', '{collection_exercise}', '{from_internal}')'''
             con.execute(query)
 
-    def add_conversation(self, conversation_id):
+    def add_conversation(self, conversation_id, is_closed=False):
         """ Populate the conversation table"""
 
         with self.engine.connect() as con:
-            query = f"INSERT INTO securemessage.conversation(id) VALUES('{conversation_id}')"
+            query = f"INSERT INTO securemessage.conversation(id, is_closed) VALUES('{conversation_id}', '{is_closed}')"
             con.execute(query)
 
     def add_status(self, label, msg_id, actor):
@@ -266,6 +266,7 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
                         date.append(serialized_msg['modified_date'])
 
                 desc_date = sorted(date, reverse=True)
+                print(len(date))
                 self.assertEqual(len(date), 5)
                 self.assertListEqual(desc_date, date)
 
@@ -307,8 +308,8 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
 
         with self.app.app_context():
             with current_app.test_request_context():
-                thread_count_internal = Retriever.thread_count_by_survey(self.user_internal, self.BRES_SURVEY)
-                thread_count_second_internal = Retriever.thread_count_by_survey(self.second_user_internal, self.BRES_SURVEY)
+                thread_count_internal = Retriever.thread_count_by_survey(self.BRES_SURVEY, False)
+                thread_count_second_internal = Retriever.thread_count_by_survey(self.BRES_SURVEY, False)
                 self.assertEqual(thread_count_internal, thread_count_second_internal)
 
 
