@@ -63,11 +63,6 @@ class Retriever:
     @staticmethod
     def _retrieve_respondent_thread_list(request_args, user):
         conditions = []
-        actor_conditions = []
-
-        if user.is_respondent:
-            logger.info("Retrieving list of threads for respondent", user_uuid=user.user_uuid)
-            actor_conditions.append(Status.actor == str(user.user_uuid))
 
         if request_args.ru_id:
             conditions.append(SecureMessage.ru_id == request_args.ru_id)
