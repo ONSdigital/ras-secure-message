@@ -21,6 +21,7 @@ class RetrieverTestCaseHelper:
     default_internal_actor = 'internal_actor'
     second_internal_actor = 'second_internal_actor'
     default_external_actor = 'external_actor'
+    second_external_actor = 'second_external_actor'
     BRES_SURVEY = "33333333-22222-3333-4444-88dc018a1a4c"
 
     """Helper class for Retriever Tests"""
@@ -99,8 +100,9 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
             self.db = database.db
 
         self.user_internal = User(RetrieverTestCaseHelper.default_internal_actor, 'internal')
-        self.second_user_internal = User(RetrieverTestCaseHelper.second_internal_actor, 'internal2')
+        self.second_user_internal = User(RetrieverTestCaseHelper.second_internal_actor, 'internal')
         self.user_respondent = User(RetrieverTestCaseHelper.default_external_actor, 'respondent')
+        self.second_user_respondent = User(RetrieverTestCaseHelper.second_external_actor, 'respondent')
         party.use_mock_service()
         self.app.config['NOTIFY_CASE_SERVICE'] = '1'
 
@@ -311,6 +313,52 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
                 thread_count_internal = Retriever.thread_count_by_survey(self.BRES_SURVEY, False)
                 thread_count_second_internal = Retriever.thread_count_by_survey(self.BRES_SURVEY, False)
                 self.assertEqual(thread_count_internal, thread_count_second_internal)
+
+    def test_respondent_can_only_see_their_messages(self):
+        """tests that a respondent can only see their messages i.e. they should not
+        see any messages sent to another respondent"""
+        first_respondent_thread_id = self.create_thread(
+            no_of_messages=1,
+            external_actor=self.default_external_actor,
+            internal_actor=self.default_internal_actor
+        )
+        second_respondent_thread_id = self.create_thread(
+            no_of_messages=1,
+            external_actor=self.second_external_actor,
+            internal_actor=self.default_internal_actor
+        )
+
+        with self.app.app_context():
+            with current_app.test_request_context():
+                args = get_args()
+                first_respondent_thread_list = Retriever.retrieve_thread_list(self.user_respondent, args)
+                self.assertEqual(first_respondent_thread_list.total, 1)
+                second_respondent_thread_list = Retriever.retrieve_thread_list(self.second_user_respondent, args)
+                self.assertEqual(second_respondent_thread_list.total, 1)
+                internal_thread_list = Retriever.retrieve_thread_list(self.user_internal, args)
+                self.assertEqual(internal_thread_list.total, 2)
+
+                # first respondent can retrieve the message they sent
+                first_respondent_thread = Retriever.retrieve_thread(
+                    first_respondent_thread_id,
+                    self.user_respondent
+                )
+                self.assertIsNotNone(first_respondent_thread)
+
+                # second respondent can retrieve the message they sent
+                second_respondent_thread = Retriever.retrieve_thread(
+                    second_respondent_thread_id,
+                    self.second_user_respondent
+                )
+                self.assertIsNotNone(second_respondent_thread)
+
+                # first respondent shouldn't be able to retrieve second respondent's message
+                with self.assertRaises(NotFound):
+                    Retriever.retrieve_thread(first_respondent_thread_id, self.second_user_respondent)
+
+                # second respondent shouldn't be able to retrieve first respondent's message
+                with self.assertRaises(NotFound):
+                    Retriever.retrieve_thread(second_respondent_thread_id, self.user_respondent)
 
 
 if __name__ == '__main__':

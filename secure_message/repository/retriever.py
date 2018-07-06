@@ -63,11 +63,6 @@ class Retriever:
     @staticmethod
     def _retrieve_respondent_thread_list(request_args, user):
         conditions = []
-        actor_conditions = []
-
-        if user.is_respondent:
-            logger.info("Retrieving list of threads for respondent", user_uuid=user.user_uuid)
-            actor_conditions.append(Status.actor == str(user.user_uuid))
 
         if request_args.ru_id:
             conditions.append(SecureMessage.ru_id == request_args.ru_id)
@@ -85,6 +80,8 @@ class Retriever:
             t = db.session.query(SecureMessage.thread_id, func.max(SecureMessage.id)  # pylint:disable=no-member
                                  .label('max_id')) \
                 .join(Conversation) \
+                .join(Status) \
+                .filter(Status.actor == user.user_uuid) \
                 .filter(Conversation.is_closed.is_(request_args.is_closed)) \
                 .group_by(SecureMessage.thread_id).subquery('t')
 
@@ -158,16 +155,18 @@ class Retriever:
     def retrieve_thread(thread_id, user):
         if user.is_respondent:
             logger.info("Retrieving messages in thread for respondent", thread_id=thread_id, user_uuid=user.user_uuid)
-            return Retriever._retrieve_thread_for_respondent(thread_id)
+            return Retriever._retrieve_thread_for_respondent(thread_id, user)
         logger.info("Retrieving messages in thread for internal user", thread_id=thread_id, user_uuid=user.user_uuid)
         return Retriever._retrieve_thread_for_internal_user(thread_id)
 
     @staticmethod
-    def _retrieve_thread_for_respondent(thread_id):
+    def _retrieve_thread_for_respondent(thread_id, user):
         """returns list of messages for thread id for a respondent"""
         try:
             result = SecureMessage.query.join(Conversation) \
+                .join(Status) \
                 .filter(SecureMessage.thread_id == thread_id) \
+                .filter(Status.actor == user.user_uuid) \
                 .order_by(SecureMessage.id.desc())
 
             if not result.all():
