@@ -254,6 +254,21 @@ class FlaskTestCase(unittest.TestCase):
         self.client.post(url, data=json.dumps(self.test_message), headers=self.internal_user_header)
         self.assertTrue(case.called)
 
+    @patch.object(PartyServiceMock, 'get_user_details', return_value=({"id": "f62dfda8-73b0-4e0e-97cf-1b06327a6712",
+                                                                       "firstName": "Bhavana",
+                                                                       "emailAddress": "example@example.com",
+                                                                       "lastName": "Lincoln",
+                                                                       "telephone": "+443069990888",
+                                                                       "status": "ACTIVE",
+                                                                       "sampleUnitType": "BI"}, 200))
+    @patch.object(AlertViaLogging, 'send')
+    def test_notify_called(self, mock_alerter, _):
+        """Test that Notify is called when sending a new secure message """
+
+        url = "http://localhost:5050/message/send"
+        self.client.post(url, data=json.dumps(self.test_message), headers=self.internal_user_header)
+        self.assertTrue(mock_alerter.called)
+
     @patch.object(message_logger, 'error')
     @patch.object(MessageSend, '_try_send_alert_email', side_effect=Exception('SomethingBad'))
     def test_exception_in_alert_listeners_raises_exception_but_returns_201(self, mock_sender, mock_logger):
