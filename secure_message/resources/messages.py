@@ -86,8 +86,8 @@ class MessageSend(Resource):
         if g.user.is_internal:
             party_data = party.get_user_details(message.msg_to[0])  # NOQA TODO avoid 2 lookups (see validate)
             if party_data:
-                if 'emailAddress' in party_data and party_data['emailAddress'].strip():
-                    recipient_email = party_data['emailAddress'].strip()
+                if 'emailAddress' in party_data[0] and party_data[0]['emailAddress'].strip():
+                    recipient_email = party_data[0]['emailAddress'].strip()
                     alert_method = AlertViaLogging() if current_app.config['NOTIFY_VIA_GOV_NOTIFY'] == '0' else AlertViaGovNotify()
                     alert_user = AlertUser(alert_method)
                     alert_user.send(recipient_email, message.msg_id)
