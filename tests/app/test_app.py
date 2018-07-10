@@ -262,7 +262,7 @@ class FlaskTestCase(unittest.TestCase):
                                                                        "status": "ACTIVE",
                                                                        "sampleUnitType": "BI"}, 200))
     @patch.object(AlertViaLogging, 'send')
-    def test_notify_called(self, mock_alerter, mock_party):
+    def test_notify_called(self, mock_alerter, _):
         """Test that Notify is called when sending a new secure message """
 
         url = "http://localhost:5050/message/send"
