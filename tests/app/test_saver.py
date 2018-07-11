@@ -117,7 +117,7 @@ class SaverTestCase(unittest.TestCase):
                 with self.assertRaises(MessageSaveException):
                     Saver().save_msg_event(message_event['msg_id'], message_event['event'], mock_session)
 
-    def test_status_commit_exception_raises_MessageSaveException(self):
+    def test_status_commit_exception_raises_message_save_exception(self):
         """check status commit exception clears the session"""
         message_status = {'msg_id': 'AMsgId', 'actor': 'Tej'}
         with self.app.app_context():
@@ -125,7 +125,7 @@ class SaverTestCase(unittest.TestCase):
                 with self.assertRaises(MessageSaveException):
                     Saver().save_msg_status(message_status['actor'], message_status['msg_id'], 'INBOX, UNREAD')
 
-    def test_event_commit_exception_raises_MessageSaveException(self):
+    def test_event_commit_exception_raises_message_save_exception(self):
         """check event commit exception clears the session"""
         message_event = {'msg_id': 'AMsgId', 'event': EventsApi.SENT.value, 'date_time': ''}
         with self.app.app_context():
