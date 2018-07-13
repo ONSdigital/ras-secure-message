@@ -36,7 +36,7 @@ class CaseServiceIntegrationTestCase(unittest.TestCase):
         self.assertEqual(status_code, 201)
 
     @unittest.SkipTest
-    def test_createdBy_under_limit(self):
+    def test_created_by_under_limit(self):
         """Post data to case_service"""
         sut = case_service
         sut.use_real_service()
@@ -46,7 +46,7 @@ class CaseServiceIntegrationTestCase(unittest.TestCase):
         self.assertEqual(status_code, 201)
 
     @unittest.SkipTest
-    def test_createdBy_over_limit(self):
+    def test_created_by_over_limit(self):
         """Post data to case_service"""
         sut = case_service
         sut.use_real_service()
@@ -56,7 +56,7 @@ class CaseServiceIntegrationTestCase(unittest.TestCase):
         self.assertEqual(status_code, 400)
 
     @unittest.SkipTest
-    def test_createdBy_is_empty(self):
+    def test_created_by_is_empty(self):
         """Post data to case_service"""
         sut = case_service
         sut.use_real_service()
@@ -66,7 +66,7 @@ class CaseServiceIntegrationTestCase(unittest.TestCase):
         self.assertEqual(status_code, 400)
 
     @unittest.SkipTest
-    def test_createdBy_is_None(self):
+    def test_created_by_is_none(self):
         """Post data to case_service"""
         sut = case_service
         sut.use_real_service()

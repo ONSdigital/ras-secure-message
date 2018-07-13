@@ -236,7 +236,7 @@ class FlaskTestCase(unittest.TestCase):
                 self.assertTrue(row is not None)
 
     @patch.object(case_service, 'store_case_event')
-    def test_case_service_not_called_on_sent_if_NotifyCaseService_is_not_set(self, case):
+    def test_case_service_not_called_on_sent_if_notify_case_service_is_not_set(self, case):
         """Test case service not called if not set to do so in config"""
 
         self.app.config['NOTIFY_CASE_SERVICE'] = '0'
@@ -245,7 +245,7 @@ class FlaskTestCase(unittest.TestCase):
         self.assertFalse(case.called)
 
     @patch.object(case_service, 'store_case_event')
-    def test_case_service_called_on_sent_if_NotifyCaseService_is_set(self, case):
+    def test_case_service_called_on_sent_if_notify_case_service_is_set(self, case):
         """Test case service called if set to do so in config """
 
         self.app.config["NOTIFY_VIA_GOV_NOTIFY"] = '0'
@@ -332,12 +332,12 @@ class FlaskTestCase(unittest.TestCase):
         self.client.post(url, data=json.dumps(self.test_message), headers=self.internal_user_header)
         self.assertFalse(mock_alerter.called)
 
-    @patch.object(PartyServiceMock, 'get_user_details', return_value=({"id": "f62dfda8-73b0-4e0e-97cf-1b06327a6712",
-                                                                       "emailAddress": "   ",
-                                                                       "lastName": "",
-                                                                       "telephone": "+443069990888",
-                                                                       "status": "ACTIVE",
-                                                                       "sampleUnitType": "BI"}))
+    @patch.object(PartyServiceMock, 'get_user_details', return_value=([{"id": "f62dfda8-73b0-4e0e-97cf-1b06327a6712",
+                                                                        "emailAddress": "   ",
+                                                                        "lastName": "",
+                                                                        "telephone": "+443069990888",
+                                                                        "status": "ACTIVE",
+                                                                        "sampleUnitType": "BI"}]))
     @patch.object(CaseServiceMock, 'store_case_event')
     def test_if_respondent_has_no_first_name_or_last_name_then_unknown_user_passed_to_case_service(self, mock_case, mock_party):
         """Test if party data has no name for the user then a constant of 'Unknown user' is used"""
@@ -361,7 +361,8 @@ class FlaskTestCase(unittest.TestCase):
         self.client.post(url, data=json.dumps(self.test_message), headers=self.internal_user_header)
         mock_case.assert_called()
 
-    @patch.object(InternalUserServiceMock, 'get_user_details', return_value=({"id": "f62dfda8-73b0-4e0e-97cf-1b06327a6712",
+    @patch.object(InternalUserServiceMock, 'get_user_details', return_value=({"id": "f62dfda8-73b0-4e0e-97cf-"
+                                                                                    "1b06327a6712",
                                                                               "emailAddress": "   ",
                                                                               "lastName": "",
                                                                               "telephone": "+443069990888"}))

@@ -109,11 +109,13 @@ class MessageSend(Resource):
     def _get_user_name(user, message):
 
         user_name = 'Unknown user'
-        user_data = internal_user_service.get_user_details(message.msg_from) if user.is_internal else party.get_user_details(message.msg_from)
+        is_internal_user = user.is_internal
+        user_data = internal_user_service.get_user_details(message.msg_from) if is_internal_user else party.\
+            get_user_details(message.msg_from)
 
         if user_data:
-            first_name = user_data.get('firstName', '')
-            last_name = user_data.get('lastName', '')
+            first_name = user_data.get('firstName', '') if is_internal_user else user_data[0].get('firstName', '')
+            last_name = user_data.get('lastName', '') if is_internal_user else user_data[0].get('lastName', '')
             full_name = f'{first_name} {last_name}'.strip()
             if full_name:
                 user_name = full_name
