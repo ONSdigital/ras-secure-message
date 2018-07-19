@@ -351,7 +351,6 @@ class UtilitiesTestCase(unittest.TestCase):
             self.assertEqual(result[1], populated_message[1])
 
     def test_add_users_and_business_details_empty_messages_raises_Value_Error(self):
-        messages = None
 
         with self.app.app_context(), self.assertRaises(ValueError):
-                add_users_and_business_details(messages)
+            add_users_and_business_details(messages=None)
