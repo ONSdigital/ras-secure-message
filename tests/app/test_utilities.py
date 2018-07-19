@@ -352,5 +352,5 @@ class UtilitiesTestCase(unittest.TestCase):
 
     def test_add_users_and_business_details_empty_messages_raises_Value_Error(self):
 
-        with self.app.app_context(), self.assertRaises(ValueError):
+        with self.assertRaises(ValueError):
             add_users_and_business_details(messages=None)
