@@ -2,7 +2,8 @@ import copy
 import unittest
 
 from secure_message.application import create_app
-from secure_message.common.utilities import MessageArgs, add_to_details, add_from_details, add_business_details
+from secure_message.common.utilities import MessageArgs, add_to_details, add_from_details, add_business_details, \
+    add_users_and_business_details
 from secure_message.services.service_toggles import party, internal_user_service
 
 
@@ -348,3 +349,9 @@ class UtilitiesTestCase(unittest.TestCase):
 
             self.assertEqual(result[0], populated_message[0])
             self.assertEqual(result[1], populated_message[1])
+
+    def test_add_users_and_business_details_empty_messages_raises_Value_Error(self):
+        messages = None
+
+        with self.app.app_context(), self.assertRaises(ValueError):
+                add_users_and_business_details(messages)
