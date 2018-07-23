@@ -109,7 +109,8 @@ class ThreadList(Resource):
 
         logger.info("Successfully retrieved threads for user", user_uuid=g.user.user_uuid)
         messages, links = process_paginated_list(result, request.host_url, g.user, message_args, THREAD_LIST_ENDPOINT)
-        messages = add_users_and_business_details(messages)
+        if messages:
+            messages = add_users_and_business_details(messages)
         return jsonify({"messages": messages, "_links": links})
 
 

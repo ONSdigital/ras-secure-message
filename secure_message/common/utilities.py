@@ -148,6 +148,8 @@ def add_business_details(messages):
 
 def add_users_and_business_details(messages):
     """Add both user and business details to messages based on data from party service"""
+    if not messages:
+        raise ValueError('messages is a required parameter and must not be empty')
     messages = add_to_details(messages)
     messages = add_from_details(messages)
     logger.info("Successfully added to and from details")
