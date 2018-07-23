@@ -148,7 +148,7 @@ def add_business_details(messages):
 
 def add_users_and_business_details(messages):
     """Add both user and business details to messages based on data from party service"""
-    if messages is None:
+    if not messages:
         raise ValueError('messages is required')
     messages = add_to_details(messages)
     messages = add_from_details(messages)
