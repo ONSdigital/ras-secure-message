@@ -138,7 +138,7 @@ def get_client_token(client_id, client_secret, url):
             logger.info("Retrying client token retrieval in 1 seconds.")
             sleep(1)
             return get_client_token(client_id, client_secret, url)
-        elif 400 <= e.response.status_code < 500:
+        if 400 <= e.response.status_code < 500:
             logger.warning("Client error encountered. Shutting down.")
             sys.exit(1)
     except requests.RequestException as e:
