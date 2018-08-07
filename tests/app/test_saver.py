@@ -32,7 +32,6 @@ class SaverTestCase(unittest.TestCase):
             database.db.drop_all()
             database.db.create_all()
             self.db = database.db
-        app.config['NOTIFY_CASE_SERVICE'] = '1'
         self.app = app
 
     def test_save_message_raises_message_save_exception_on_db_error(self):

@@ -4,7 +4,7 @@ from datetime import datetime, timezone
 from flask import g
 
 from secure_message import constants
-from secure_message.services.service_toggles import internal_user_service, party, case_service
+from secure_message.services.service_toggles import internal_user_service, party
 from secure_message.validation.domain import Message, MessageSchema
 from secure_message.validation.user import User
 from secure_message.application import create_app
@@ -19,7 +19,6 @@ class MessageTestCase(unittest.TestCase):
         self.now = datetime.now(timezone.utc)
         internal_user_service.use_mock_service()
         party.use_mock_service()
-        case_service.use_mock_service()
 
     def test_message(self):
         """creating Message object"""
@@ -87,7 +86,6 @@ class MessageSchemaTestCase(unittest.TestCase):
         self.now = datetime.now(timezone.utc)
         internal_user_service.use_mock_service()
         party.use_mock_service()
-        case_service.use_mock_service()
         self.app = create_app()
 
     def test_valid_message_passes_validation(self):

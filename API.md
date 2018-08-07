@@ -699,7 +699,6 @@ Returns more detailed information about secure message including some of the env
     "/v2/threads/<thread_id>": "Return list of messages for user"
   },
   "APP Log Level": "INFO",
-  "NOTIFY CASE SERVICE": "1",
   "NOTIFY VIA GOV NOTIFY": "0",
   "Name": "ras-secure-message",
   "RAS PARTY SERVICE HOST": "ras-party-service-sit.apps.devtest.onsclofo.uk",

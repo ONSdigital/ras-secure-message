@@ -48,7 +48,6 @@ class HealthDetails(Resource):
                    'RAS PARTY SERVICE HOST': current_app.config['RAS_PARTY_SERVICE_HOST'],
                    'RAS PARTY SERVICE PORT': current_app.config['RAS_PARTY_SERVICE_PORT'],
                    'RAS PARTY SERVICE PROTOCOL': current_app.config['RAS_PARTY_SERVICE_PROTOCOL'],
-                   'NOTIFY VIA GOV NOTIFY': current_app.config['NOTIFY_VIA_GOV_NOTIFY'],
-                   'NOTIFY CASE SERVICE': current_app.config['NOTIFY_CASE_SERVICE']}
+                   'NOTIFY VIA GOV NOTIFY': current_app.config['NOTIFY_VIA_GOV_NOTIFY']}
 
         return jsonify(details)

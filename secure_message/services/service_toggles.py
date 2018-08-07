@@ -2,10 +2,8 @@ import logging
 
 from structlog import wrap_logger
 
-from secure_message.api_mocks.case_service_mock import CaseServiceMock
 from secure_message.api_mocks.internal_user_service_mock import InternalUserServiceMock
 from secure_message.api_mocks.party_service_mock import PartyServiceMock
-from secure_message.services.case_service import CaseService
 from secure_message.services.internal_user_service import InternalUserService
 from secure_message.services.party_service import PartyService
 
@@ -59,16 +57,6 @@ class Party(ServiceMockToggle):
         return self._service.get_users_details(uuids)
 
 
-class Case(ServiceMockToggle):
-    """A case service acts as an interface to mocked or real Case Services via its ServiceMockToggle base"""
-
-    def __init__(self, use_mock=False):
-        super().__init__(use_mock, CaseService, CaseServiceMock, 'Case')
-
-    def store_case_event(self, case_id, user_uuid, msg_id):
-        return self._service.store_case_event(case_id, user_uuid, msg_id)
-
-
 class InternalUser(ServiceMockToggle):
     """An internal user service mock to authenticate users"""
 
@@ -80,9 +68,5 @@ class InternalUser(ServiceMockToggle):
 
 
 party = Party(False)
-
-
-case_service = Case(False)
-
 
 internal_user_service = InternalUser(False)

@@ -2,7 +2,7 @@ from behave import given, then, when
 from flask import current_app
 import nose.tools
 
-from secure_message.services.service_toggles import party, case_service, internal_user_service
+from secure_message.services.service_toggles import party, internal_user_service
 from secure_message.repository import database
 from tests.behavioural.features.steps.secure_messaging_context_helper import SecureMessagingContextHelper
 
@@ -15,11 +15,9 @@ def step_impl_prepare_for_tests(context, service_type):
         context.bdd_helper = SecureMessagingContextHelper()
     if service_type.lower() == 'real':
         party.use_real_service()
-        case_service.use_real_service()
         internal_user_service.use_real_service()
     else:
         party.use_mock_service()
-        case_service.use_mock_service()
         internal_user_service.use_mock_service()
 
 
@@ -36,12 +34,6 @@ def step_impl_reset_db(context):
 def step_impl_use_mock_party_service(context):
     """Use mock party service tests."""
     party.use_mock_service()
-
-
-@given("using mock case service")
-def step_impl_use_mock_case_service(context):
-    """Use mock case service."""
-    case_service.use_mock_service()
 
 
 @given("using mock internal user service")

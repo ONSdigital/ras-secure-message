@@ -104,7 +104,6 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
         self.user_respondent = User(RetrieverTestCaseHelper.default_external_actor, 'respondent')
         self.second_user_respondent = User(RetrieverTestCaseHelper.second_external_actor, 'respondent')
         party.use_mock_service()
-        self.app.config['NOTIFY_CASE_SERVICE'] = '1'
 
     def test_msg_returned_with_msg_id_true(self):
         """retrieves message using id"""
