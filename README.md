@@ -114,7 +114,7 @@ Environment variables available for configuration are listed below:
 | USE_UAA                         | Sets whether a client token should be retrieved    | 1
 
 
-For each external application which secure-message communicates with there are 3 environment variables e.g. for the RM case service:
+For each external application which secure-message communicates with there are 3 environment variables e.g. for the RAS Party service:
 
 | Environment Variable              | Description                         | Default
 |-----------------------------------|-------------------------------------|-------------------------------
