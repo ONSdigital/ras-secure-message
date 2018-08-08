@@ -50,7 +50,6 @@ See the endpoint descriptions for detailed usage of each field. This is an overv
 * Subject . (subject) The subject of the message. Limited in the API to 100 characters , but since replies are prefixed with 'Re: ' then in practice it is 96 characters.
 * Body . (body) Up to 10000 characters.
 * Survey . (survey). This is the uuid of the survey . It is mandatory when saving a message.
-* Collection Case . (collection_case) uuid of the collection case. Can be used as a filter option (cc).
 * Collection Exercise .  (collection exercise) uuid of the collection exercise , can be used as a filter option (ce)
 * Reporting unit . (ru) uuid of the reporting unit . Can be used as a filter option.
 * Labels . These can be used to set a status on a message , or retrieve messages with a specific label. Valid labels:
