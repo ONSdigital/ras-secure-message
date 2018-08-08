@@ -50,7 +50,7 @@ See the endpoint descriptions for detailed usage of each field. This is an overv
 * Subject . (subject) The subject of the message. Limited in the API to 100 characters , but since replies are prefixed with 'Re: ' then in practice it is 96 characters.
 * Body . (body) Up to 10000 characters.
 * Survey . (survey). This is the uuid of the survey . It is mandatory when saving a message.
-* Collection Case . (collection_case) uuid of the collection case. Can be used as a filter option (cc). Used to send to the case service to inform it that a new message has been sent on the case.
+* Collection Case . (collection_case) uuid of the collection case. Can be used as a filter option (cc).
 * Collection Exercise .  (collection exercise) uuid of the collection exercise , can be used as a filter option (ce)
 * Reporting unit . (ru) uuid of the reporting unit . Can be used as a filter option.
 * Labels . These can be used to set a status on a message , or retrieve messages with a specific label. Valid labels:
@@ -180,7 +180,7 @@ Note the message response contains @msg_from , @msg_to and @ru . These hold valu
 
 `POST /message/send or '/v2/messages'
 
-The messages post endpoint stores a secure message . If the recipient is a respondent it will also send an email via Notify.Gov. Then inform the case service that a message has been sent
+The messages post endpoint stores a secure message . If the recipient is a respondent it will also send an email via Notify.Gov.
 
 Note, the message post must have a Content-Type header of `application/json` , else it will return an error.
 Note, V2 uses messages , V1 uses message (singular)
@@ -206,7 +206,7 @@ When a message is posted, typically, no msg_id is supplied.
 * msg_from - The current user uuid
 * thread_id - Should be set to the thread id of the message being replied to if the message is a reply, else left empty
 * survey - Should be the uuid of the survey . This was ignored in V1 but is now critical in V2 so that we can restrict messages by survey
-* collection_case - Will now be mandatory . It was optional in V1 but always set. Its main use is to be passed to the case service to inform it that a message has been sent
+* collection_case - The uuid of the collection case. Can be used as a filter option (cc).
 
 ```json
 {

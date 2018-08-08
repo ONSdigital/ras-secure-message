@@ -72,7 +72,7 @@ class MessageSend(Resource):
 
     @staticmethod
     def _alert_listeners(message):
-        """used to alert user and case service once messages have been saved"""
+        """used to alert user once messages have been saved"""
         try:
             MessageSend._try_send_alert_email(message)
         except Exception as e:  # NOQA pylint:disable=broad-except
