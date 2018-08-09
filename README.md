@@ -108,24 +108,22 @@ Environment variables available for configuration are listed below:
 | NOTIFICATION_API_KEY            | API key to use Gov Notify service                  | N/A
 | NOTIFICATION_TEMPLATE_ID        | Template id for Gov Notify service                 | N/A
 | NOTIFY_VIA_GOV_NOTIFY           | Toggle for using Gov Notify for notifications      | '1' (enable Gov Notify email notifications)
-| NOTIFY_CASE_SERVICE             | Toggle to notify case service                      | '1' (enable notifying case service)
 | CLIENT_ID                       | ID of the client service in UAA                    | N/A
 | CLIENT_SECRET                   | Password of the client service in UAA              | N/A
 | UAA_URL                         | URL of a UAA instance                              | N/A
 | USE_UAA                         | Sets whether a client token should be retrieved    | 1
 
 
-For each external application which secure-message communicates with there are 3 environment variables e.g. for the RM case service:
+For each external application which secure-message communicates with there are 3 environment variables e.g. for the RAS Party service:
 
-| Environment Variable            | Description                       | Default
-|---------------------------------|-----------------------------------|-------------------------------
-| RM_CASE_SERVICE_HOST            | Host address for RM case service  | 'http'
-| RM_CASE_SERVICE_PORT            | Port for RM case service          | 'localhost'
-| RM_CASE_SERVICE_PROTOCOL        | Protocol used for RM case service | '8171'
+| Environment Variable              | Description                         | Default
+|-----------------------------------|-------------------------------------|-------------------------------
+| RAS_PARTY_SERVICE_HOST            | Host address for RAS party service  | 'http'
+| RAS_PARTY_SERVICE_PORT            | Port for RAS party service          | 'localhost'
+| RAS_PARTY_SERVICE_PROTOCOL        | Protocol used for RAS party service | '8081'
 
 The services these variables exist for are listed below with the beginnings of their variables and their github links:
 
 | Service                         | Start of variables          | Github
 |---------------------------------|-----------------------------|-----------------------------
-| Case service                    | RM_CASE_SERVICE             | https://github.com/ONSdigital/rm-case-service
 | Party service                   | RAS_PARTY_SERVICE           | https://github.com/ONSdigital/ras-party

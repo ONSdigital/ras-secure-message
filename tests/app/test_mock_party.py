@@ -2,7 +2,7 @@ import unittest
 
 from secure_message.application import create_app
 from secure_message.api_mocks.party_service_mock import PartyServiceMock
-from secure_message.services.service_toggles import internal_user_service, case_service, party
+from secure_message.services.service_toggles import internal_user_service, party
 
 
 class PartyTestCase(unittest.TestCase):
@@ -11,7 +11,6 @@ class PartyTestCase(unittest.TestCase):
         self.app = create_app()
         self.client = self.app.test_client()
         internal_user_service.use_mock_service()
-        case_service.use_mock_service()
         party.use_mock_service()
 
     def test_get_business_details_by_ru(self):

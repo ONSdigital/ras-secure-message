@@ -11,13 +11,11 @@ from secure_message import application, constants
 from secure_message.common.alerts import AlertUser, AlertViaGovNotify
 from secure_message.repository import database
 from secure_message.authentication.jwt import encode
-from secure_message.services.service_toggles import case_service, party, internal_user_service
+from secure_message.services.service_toggles import party, internal_user_service
 from secure_message.resources.messages import MessageSend
 from secure_message.resources.messages import logger as message_logger
 from secure_message.common.alerts import AlertViaLogging
 from secure_message.api_mocks.party_service_mock import PartyServiceMock
-from secure_message.api_mocks.case_service_mock import CaseServiceMock
-from secure_message.api_mocks.internal_user_service_mock import InternalUserServiceMock
 
 
 class FlaskTestCase(unittest.TestCase):
@@ -44,7 +42,6 @@ class FlaskTestCase(unittest.TestCase):
             external_signed_jwt = encode(external_token_data)
 
         AlertUser.alert_method = mock.Mock(AlertViaLogging)
-        self.app.config['NOTIFY_CASE_SERVICE'] = '1'
 
         self.internal_user_header = {'Content-Type': 'application/json', 'Authorization': internal_signed_jwt}
         self.external_user_header = {'Content-Type': 'application/json', 'Authorization': external_signed_jwt}
@@ -66,7 +63,6 @@ class FlaskTestCase(unittest.TestCase):
             self.db = database.db
 
         party.use_mock_service()
-        case_service.use_mock_service()
         internal_user_service.use_mock_service()
 
     def test_that_checks_post_request_is_within_database(self):
@@ -235,25 +231,6 @@ class FlaskTestCase(unittest.TestCase):
             for row in request:
                 self.assertTrue(row is not None)
 
-    @patch.object(case_service, 'store_case_event')
-    def test_case_service_not_called_on_sent_if_notify_case_service_is_not_set(self, case):
-        """Test case service not called if not set to do so in config"""
-
-        self.app.config['NOTIFY_CASE_SERVICE'] = '0'
-        url = "http://localhost:5050/message/send"
-        self.client.post(url, data=json.dumps(self.test_message), headers=self.internal_user_header)
-        self.assertFalse(case.called)
-
-    @patch.object(case_service, 'store_case_event')
-    def test_case_service_called_on_sent_if_notify_case_service_is_set(self, case):
-        """Test case service called if set to do so in config """
-
-        self.app.config["NOTIFY_VIA_GOV_NOTIFY"] = '0'
-        self.app.config['NOTIFY_CASE_SERVICE'] = '1'
-        url = "http://localhost:5050/message/send"
-        self.client.post(url, data=json.dumps(self.test_message), headers=self.internal_user_header)
-        self.assertTrue(case.called)
-
     @patch.object(PartyServiceMock, 'get_user_details', return_value=({"id": "f62dfda8-73b0-4e0e-97cf-1b06327a6712",
                                                                        "firstName": "Bhavana",
                                                                        "emailAddress": "example@example.com",
@@ -273,7 +250,6 @@ class FlaskTestCase(unittest.TestCase):
     @patch.object(MessageSend, '_try_send_alert_email', side_effect=Exception('SomethingBad'))
     def test_exception_in_alert_listeners_raises_exception_but_returns_201(self, mock_sender, mock_logger):
         """Test exceptions in alerting do not prevent a response indicating success"""
-        self.app.config['NOTIFY_CASE_SERVICE'] = '0'
         url = "http://localhost:5050/message/send"
         result = self.client.post(url, data=json.dumps(self.test_message), headers=self.internal_user_header)
         self.assertTrue(mock_logger.called)
@@ -331,63 +307,6 @@ class FlaskTestCase(unittest.TestCase):
         url = "http://localhost:5050/message/send"
         self.client.post(url, data=json.dumps(self.test_message), headers=self.internal_user_header)
         self.assertFalse(mock_alerter.called)
-
-    @patch.object(PartyServiceMock, 'get_user_details', return_value=([{"id": "f62dfda8-73b0-4e0e-97cf-1b06327a6712",
-                                                                        "emailAddress": "   ",
-                                                                        "lastName": "",
-                                                                        "telephone": "+443069990888",
-                                                                        "status": "ACTIVE",
-                                                                        "sampleUnitType": "BI"}]))
-    @patch.object(CaseServiceMock, 'store_case_event')
-    def test_if_respondent_has_no_first_name_or_last_name_then_unknown_user_passed_to_case_service(self, mock_case, mock_party):
-        """Test if party data has no name for the user then a constant of 'Unknown user' is used"""
-        self.test_message.update({'msg_to': [constants.NON_SPECIFIC_INTERNAL_USER],
-                                  'msg_from': '0a7ad740-10d5-4ecb-b7ca-3c0384afb882',
-                                  'subject': 'MyMessage',
-                                  'body': 'hello',
-                                  'collection_case': 'ACollectionCase',
-                                  'collection_exercise': 'ACollectionExercise',
-                                  'ru_id': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc',
-                                  'survey': self.BRES_SURVEY})
-
-        token_data = {constants.USER_IDENTIFIER: "0a7ad740-10d5-4ecb-b7ca-3c0384afb882",
-                      "role": "respondent"}
-
-        with self.app.app_context():
-            signed_jwt = encode(token_data)
-
-        self.internal_user_header = {'Content-Type': 'application/json', 'Authorization': signed_jwt}
-        url = "http://localhost:5050/message/send"
-        self.client.post(url, data=json.dumps(self.test_message), headers=self.internal_user_header)
-        mock_case.assert_called()
-
-    @patch.object(InternalUserServiceMock, 'get_user_details', return_value=({"id": "f62dfda8-73b0-4e0e-97cf-"
-                                                                                    "1b06327a6712",
-                                                                              "emailAddress": "   ",
-                                                                              "lastName": "",
-                                                                              "telephone": "+443069990888"}))
-    @patch.object(CaseServiceMock, 'store_case_event')
-    def test_if_internal_user_has_no_first_name_or_last_name_then_unknown_user_passed_to_case_service(self, mock_case, mock_party):
-        """Test if party data has no name for the user then a constant of 'Unknown user' is used"""
-        self.test_message.update({'msg_to': ['0a7ad740-10d5-4ecb-b7ca-3c0384afb882'],
-                                  'msg_from': 'f62dfda8-73b0-4e0e-97cf-1b06327a6712',
-                                  'subject': 'MyMessage',
-                                  'body': 'hello',
-                                  'collection_case': 'ACollectionCase',
-                                  'collection_exercise': 'ACollectionExercise',
-                                  'ru_id': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc',
-                                  'survey': self.BRES_SURVEY})
-
-        token_data = {constants.USER_IDENTIFIER: "f62dfda8-73b0-4e0e-97cf-1b06327a6712",
-                      "role": "internal"}
-
-        with self.app.app_context():
-            signed_jwt = encode(token_data)
-
-        self.internal_user_header = {'Content-Type': 'application/json', 'Authorization': signed_jwt}
-        url = "http://localhost:5050/v2/messages"
-        self.client.post(url, data=json.dumps(self.test_message), headers=self.internal_user_header)
-        mock_case.assert_called()
 
 
 if __name__ == '__main__':

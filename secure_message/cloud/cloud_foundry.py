@@ -6,7 +6,7 @@ import cfenv
 RegexType = type(re.compile(''))
 
 
-class ONSCloudFoundry(object):
+class ONSCloudFoundry:
 
     def __init__(self):
         #   Monkey patch cfenv so it can handle a list match
