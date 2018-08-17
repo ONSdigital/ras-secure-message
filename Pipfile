@@ -22,6 +22,8 @@ requests = "*"
 retrying = "*"
 maya = "*"
 PyJWT = "*"
+requestsdefaulter = {git = "https://github.com/ONSdigital/requestsdefaulter.git", editable = true}
+flask-zipkin = "*"
 
 [dev-packages]
 pylint = "*"
