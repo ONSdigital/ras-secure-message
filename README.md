@@ -94,27 +94,24 @@ $ curl http://127.0.0.1:5050/health
 
 Environment variables available for configuration are listed below:
 
-| Environment Variable            | Description                                                   | Default
-|---------------------------------|---------------------------------------------------------------|-------------------------------
-| NAME                            | Name of application                                           | 'ras-secure-message'
-| VERSION                         | Version number of application                                 | '0.1.3' (manually update as application updates)
-| SMS_LOG_LEVEL                   | Log level for the application                                 | 'DEBUG'
-| SECURITY_USER_NAME              | Username for basic auth                                       | N/A
-| SECURITY_USER_PASSWORD          | Password for basic auth                                       | N/A
-| JWT_ALGORITHM                   | Algorithm used to code JWT                                    | 'HS256'
-| JWT_SECRET                      | SECRET used to code JWT                                       | N/A
-| SECURE_MESSAGING_DATABASE_URL   | Database URI                                                  | postgresql://postgres:postgres@localhost:5432
-| NOTIFICATION_SERVICE_ID         | Service id to use Gov Notify service                          | N/A
-| NOTIFICATION_API_KEY            | API key to use Gov Notify service                             | N/A
-| NOTIFICATION_TEMPLATE_ID        | Template id for Gov Notify service                            | N/A
-| NOTIFY_VIA_GOV_NOTIFY           | Toggle for using Gov Notify for notifications                 | '1' (enable Gov Notify email notifications)
-| CLIENT_ID                       | ID of the client service in UAA                               | N/A
-| CLIENT_SECRET                   | Password of the client service in UAA                         | N/A
-| UAA_URL                         | URL of a UAA instance                                         | N/A
-| USE_UAA                         | Sets whether a client token should be retrieved               | 1
-| ZIPKIN_DISABLE                  | Totally disable Zipkin (including tracing headers)            | False
-| ZIPKIN_DSN                      | Zipkin Sample API URL (e.g. http://zipkin:9411/api/v1/spans)  | None
-| ZIPKIN_SAMPLE_RATE              | Percentage of requests to send to zipkin span API             | 0
+| Environment Variable            | Description                                        | Default
+|---------------------------------|----------------------------------------------------|-------------------------------
+| NAME                            | Name of application                                | 'ras-secure-message'
+| VERSION                         | Version number of application                      | '0.1.3' (manually update as application updates)
+| SMS_LOG_LEVEL                   | Log level for the application                      | 'DEBUG'
+| SECURITY_USER_NAME              | Username for basic auth                            | N/A
+| SECURITY_USER_PASSWORD          | Password for basic auth                            | N/A
+| JWT_ALGORITHM                   | Algorithm used to code JWT                         | 'HS256'
+| JWT_SECRET                      | SECRET used to code JWT                            | N/A
+| SECURE_MESSAGING_DATABASE_URL   | Database URI                                       | postgresql://postgres:postgres@localhost:5432
+| NOTIFICATION_SERVICE_ID         | Service id to use Gov Notify service               | N/A
+| NOTIFICATION_API_KEY            | API key to use Gov Notify service                  | N/A
+| NOTIFICATION_TEMPLATE_ID        | Template id for Gov Notify service                 | N/A
+| NOTIFY_VIA_GOV_NOTIFY           | Toggle for using Gov Notify for notifications      | '1' (enable Gov Notify email notifications)
+| CLIENT_ID                       | ID of the client service in UAA                    | N/A
+| CLIENT_SECRET                   | Password of the client service in UAA              | N/A
+| UAA_URL                         | URL of a UAA instance                              | N/A
+| USE_UAA                         | Sets whether a client token should be retrieved    | 1
 
 
 For each external application which secure-message communicates with there are 3 environment variables e.g. for the RAS Party service:
