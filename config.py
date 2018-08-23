@@ -1,5 +1,6 @@
 import os
 import logging
+from distutils.util import strtobool
 
 from structlog import wrap_logger
 
@@ -45,6 +46,11 @@ class Config:
 
     # SQLAlchemy configuration
     SQLALCHEMY_POOL_SIZE = os.getenv('SQLALCHEMY_POOL_SIZE', 5)
+
+    # Zipkin
+    ZIPKIN_DISABLE = bool(strtobool(os.getenv("ZIPKIN_DISABLE", "False")))
+    ZIPKIN_DSN = os.getenv("ZIPKIN_DSN", None)
+    ZIPKIN_SAMPLE_RATE = int(os.getenv("ZIPKIN_SAMPLE_RATE", 0))
 
     # JWT authentication config
     SM_JWT_ALGORITHM = os.getenv('JWT_ALGORITHM', 'HS256')
