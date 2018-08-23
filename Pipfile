@@ -22,6 +22,8 @@ requests = "*"
 retrying = "*"
 maya = "*"
 PyJWT = "*"
+requestsdefaulter = "*"
+flask-zipkin = "*"
 
 [dev-packages]
 pylint = "*"

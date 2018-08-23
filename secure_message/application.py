@@ -2,12 +2,14 @@ import logging
 import os
 import sys
 from time import sleep
+import requestsdefaulter
 
 from flask import Flask, request
 from flask import json, jsonify
 from flask_restful import Api
 from flask_cors import CORS
 import maya
+from flask_zipkin import Zipkin
 from retrying import retry
 import requests
 from requests.adapters import HTTPAdapter
@@ -30,8 +32,13 @@ logger = wrap_logger(logging.getLogger(__name__))
 
 def create_app(config=None):
     app = Flask(__name__)
+    app.name = "ras-secure-message"
     app_config = f"config.{config or os.getenv('APP_SETTINGS', 'Config')}"
     app.config.from_object(app_config)
+
+    # Zipkin
+    zipkin = Zipkin(app=app, sample_rate=app.config.get("ZIPKIN_SAMPLE_RATE"))
+    requestsdefaulter.default_headers(zipkin.create_http_headers_for_new_span)
 
     logger_initial_config(service_name='ras-secure-message', log_level=app.config.get('SMS_LOG_LEVEL'))
 
