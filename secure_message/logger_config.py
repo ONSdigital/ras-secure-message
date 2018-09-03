@@ -37,7 +37,7 @@ def logger_initial_config(service_name=None,
         event_dict['service'] = service_name
         return event_dict
 
-    def zipkin_ids(event_dict):
+    def zipkin_ids(logger, method_name, event_dict):
         event_dict['zipkin_trace_id'] = ''
         event_dict['zipkin_span_id'] = ''
         if not flask.has_app_context():
