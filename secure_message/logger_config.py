@@ -14,7 +14,7 @@ def logger_initial_config(service_name=None,
                           log_level=None,
                           logger_format=None,
                           logger_date_format=None):
-
+    # pylint: skip-file
     if not logger_date_format:
         logger_date_format = os.getenv('LOGGING_DATE_FORMAT', "%Y-%m-%dT%H:%M%s")
     if not log_level:
@@ -37,7 +37,7 @@ def logger_initial_config(service_name=None,
         event_dict['service'] = service_name
         return event_dict
 
-    def zipkin_ids(logger, method_name, event_dict):
+    def zipkin_ids(event_dict):
         event_dict['zipkin_trace_id'] = ''
         event_dict['zipkin_span_id'] = ''
         if not flask.has_app_context():
