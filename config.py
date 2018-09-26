@@ -35,13 +35,9 @@ class Config:
 
     # EMAIL NOTIFICATION SETTINGS
     NOTIFICATION_SERVICE_ID = os.getenv('SERVICE_ID')
-    NOTIFICATION_API_KEY = os.getenv('NOTIFICATION_API_KEY')
     NOTIFICATION_COMBINED_KEY = f'key-name-{NOTIFICATION_SERVICE_ID}-{NOTIFICATION_API_KEY}'
-    NOTIFICATION_TEMPLATE_ID = os.getenv('NOTIFICATION_TEMPLATE_ID')
     NOTIFICATION_DEV_EMAIL = os.getenv('NOTIFICATION_DEV_EMAIL', 'notanemail@email.com')
-    NOTIFY_VIA_GOV_NOTIFY = os.getenv('NOTIFY_VIA_GOV_NOTIFY', '1')
-    RM_NOTIFY_GATEWAY_URL = os.getenv(
-        'RM_NOTIFY_GATEWAY_URL', "http://notifygatewaysvc-dev.apps.devtest.onsclofo.uk/emails/")
+    RM_NOTIFY_GATEWAY_URL = os.getenv('RM_NOTIFY_GATEWAY_URL')
     REQUESTS_POST_TIMEOUT = os.getenv('REQUESTS_POST_TIMEOUT', 20)
 
     # SQLAlchemy configuration
@@ -106,7 +102,7 @@ class DevConfig(Config):
     # uaa
     CLIENT_ID = os.getenv('CLIENT_ID', 'secure_message')
     CLIENT_SECRET = os.getenv('CLIENT_SECRET', 'password')
-    UAA_URL = os.getenv('UAA_URL', 'http://uaa-dev.apps.devtest.onsclofo.uk')
+    UAA_URL = os.getenv('UAA_URL', 'http://localhost:9080')
     USE_UAA = int(os.getenv('USE_UAA', 1))
 
 
