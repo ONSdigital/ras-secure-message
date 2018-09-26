@@ -35,6 +35,9 @@ class Config:
 
     # EMAIL NOTIFICATION SETTINGS
     NOTIFICATION_SERVICE_ID = os.getenv('SERVICE_ID')
+    NOTIFY_VIA_GOV_NOTIFY = os.getenv('NOTIFY_VIA_GOV_NOTIFY')
+    NOTIFICATION_API_KEY = os.getenv('NOTIFICATION_API_KEY')
+    NOTIFICATION_TEMPLATE_ID = os.getenv('NOTIFICATION_TEMPLATE_ID')
     NOTIFICATION_COMBINED_KEY = f'key-name-{NOTIFICATION_SERVICE_ID}-{NOTIFICATION_API_KEY}'
     NOTIFICATION_DEV_EMAIL = os.getenv('NOTIFICATION_DEV_EMAIL', 'notanemail@email.com')
     RM_NOTIFY_GATEWAY_URL = os.getenv('RM_NOTIFY_GATEWAY_URL')
@@ -69,9 +72,6 @@ class Config:
 
     # These should always be set in the environment on prod
     JWT_ALGORITHM = os.getenv('JWT_ALGORITHM')
-    NOTIFY_VIA_GOV_NOTIFY = os.getenv('NOTIFY_VIA_GOV_NOTIFY')
-    NOTIFICATION_API_KEY = os.getenv('NOTIFICATION_API_KEY')
-    NOTIFICATION_TEMPLATE_ID = os.getenv('NOTIFICATION_TEMPLATE_ID')
     SERVICE_ID = os.getenv('SERVICE_ID')
 
     # Basic auth parameters
