@@ -43,7 +43,7 @@ class AlertsTestCase(unittest.TestCase):
             alert_user.send('test@email.com', 'myReference')
 
         mock_notify_gateway_post.assert_called_once_with(
-            'http://notifygatewaysvc-dev.apps.devtest.onsclofo.uk/emails/test_notification_template_id',
+            'http://localhost:8151/emails/test_notification_template_id',
             auth=("admin", "secret"), json={"emailAddress": "test@email.com", "reference": "myReference"},
             timeout=20)
 
@@ -59,7 +59,7 @@ class AlertsTestCase(unittest.TestCase):
             alert_user.send('test@email.com', 'myReference')
 
         mock_notify_gateway_post.assert_called_once_with(
-            'http://notifygatewaysvc-dev.apps.devtest.onsclofo.uk/emails/test_notification_template_id',
+            'http://localhost:8151/emails/test_notification_template_id',
             auth=("admin", "secret"), json={"emailAddress": "test@email.com", "reference": "myReference"},
             timeout=20)
 

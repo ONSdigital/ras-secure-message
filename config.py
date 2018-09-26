@@ -94,6 +94,7 @@ class DevConfig(Config):
     NOTIFICATION_API_KEY = os.getenv('NOTIFICATION_API_KEY', 'test_notification_api_key')
     NOTIFICATION_TEMPLATE_ID = os.getenv(
         'NOTIFICATION_TEMPLATE_ID', 'test_notification_template_id')
+    RM_NOTIFY_GATEWAY_URL = os.getenv('RM_NOTIFY_GATEWAY_URL', 'http://localhost:5181/emails')
     SECURITY_USER_NAME = os.getenv('SECURITY_USER_NAME', 'admin')
     SECURITY_USER_PASSWORD = os.getenv('SECURITY_USER_PASSWORD', 'secret')
     BASIC_AUTH = (SECURITY_USER_NAME, SECURITY_USER_PASSWORD)

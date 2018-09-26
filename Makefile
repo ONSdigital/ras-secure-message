@@ -11,6 +11,6 @@ lint:
 	pipenv run pylint --output-format=colorized -j 0 --reports=n ./secure_message
 	pipenv check ./secure_message ./tests
 
-test:
+test: lint
 	pipenv run behave --format progress
 	export APP_SETTINGS=TestConfig && pipenv run pytest && unset APP_SETTINGS
