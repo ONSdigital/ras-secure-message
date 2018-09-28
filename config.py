@@ -35,13 +35,12 @@ class Config:
 
     # EMAIL NOTIFICATION SETTINGS
     NOTIFICATION_SERVICE_ID = os.getenv('SERVICE_ID')
+    NOTIFY_VIA_GOV_NOTIFY = os.getenv('NOTIFY_VIA_GOV_NOTIFY')
     NOTIFICATION_API_KEY = os.getenv('NOTIFICATION_API_KEY')
-    NOTIFICATION_COMBINED_KEY = f'key-name-{NOTIFICATION_SERVICE_ID}-{NOTIFICATION_API_KEY}'
     NOTIFICATION_TEMPLATE_ID = os.getenv('NOTIFICATION_TEMPLATE_ID')
+    NOTIFICATION_COMBINED_KEY = f'key-name-{NOTIFICATION_SERVICE_ID}-{NOTIFICATION_API_KEY}'
     NOTIFICATION_DEV_EMAIL = os.getenv('NOTIFICATION_DEV_EMAIL', 'notanemail@email.com')
-    NOTIFY_VIA_GOV_NOTIFY = os.getenv('NOTIFY_VIA_GOV_NOTIFY', '1')
-    RM_NOTIFY_GATEWAY_URL = os.getenv(
-        'RM_NOTIFY_GATEWAY_URL', "http://notifygatewaysvc-dev.apps.devtest.onsclofo.uk/emails/")
+    RM_NOTIFY_GATEWAY_URL = os.getenv('RM_NOTIFY_GATEWAY_URL')
     REQUESTS_POST_TIMEOUT = os.getenv('REQUESTS_POST_TIMEOUT', 20)
 
     # SQLAlchemy configuration
@@ -73,9 +72,6 @@ class Config:
 
     # These should always be set in the environment on prod
     JWT_ALGORITHM = os.getenv('JWT_ALGORITHM')
-    NOTIFY_VIA_GOV_NOTIFY = os.getenv('NOTIFY_VIA_GOV_NOTIFY')
-    NOTIFICATION_API_KEY = os.getenv('NOTIFICATION_API_KEY')
-    NOTIFICATION_TEMPLATE_ID = os.getenv('NOTIFICATION_TEMPLATE_ID')
     SERVICE_ID = os.getenv('SERVICE_ID')
 
     # Basic auth parameters
@@ -98,6 +94,7 @@ class DevConfig(Config):
     NOTIFICATION_API_KEY = os.getenv('NOTIFICATION_API_KEY', 'test_notification_api_key')
     NOTIFICATION_TEMPLATE_ID = os.getenv(
         'NOTIFICATION_TEMPLATE_ID', 'test_notification_template_id')
+    RM_NOTIFY_GATEWAY_URL = os.getenv('RM_NOTIFY_GATEWAY_URL', 'http://localhost:5181/emails/')
     SECURITY_USER_NAME = os.getenv('SECURITY_USER_NAME', 'admin')
     SECURITY_USER_PASSWORD = os.getenv('SECURITY_USER_PASSWORD', 'secret')
     BASIC_AUTH = (SECURITY_USER_NAME, SECURITY_USER_PASSWORD)
@@ -106,7 +103,7 @@ class DevConfig(Config):
     # uaa
     CLIENT_ID = os.getenv('CLIENT_ID', 'secure_message')
     CLIENT_SECRET = os.getenv('CLIENT_SECRET', 'password')
-    UAA_URL = os.getenv('UAA_URL', 'http://uaa-dev.apps.devtest.onsclofo.uk')
+    UAA_URL = os.getenv('UAA_URL', 'http://localhost:9080')
     USE_UAA = int(os.getenv('USE_UAA', 1))
 
 
