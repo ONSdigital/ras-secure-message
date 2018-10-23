@@ -14,7 +14,7 @@ class AlertViaGovNotify:
     """Notify Api handler"""
 
     @staticmethod
-    def send(email, reference):
+    def send(email, reference, survey_id, party_id):
 
         notification = {
             "emailAddress": email,
@@ -27,18 +27,18 @@ class AlertViaGovNotify:
                                  json=notification)
 
         if response.status_code != 201:
-            raise RasNotifyException(code=500)
+            raise RasNotifyException(code=500, survey_id=survey_id, party_id=party_id)
         else:
             logger.info('Sent secure message email notification, via RM Notify-Gateway to GOV.UK Notify.',
-                        message_id=response.json()["id"])
+                        message_id=response.json()["id"], survey_id=survey_id, party_id=party_id)
 
 
 class AlertViaLogging:
     """Alert goes via gov notify (0) or via logs (1)"""
 
     @staticmethod
-    def send(email, reference):
-        logger.info(f'email details {email}, {reference}')
+    def send(email, reference, survey_id, party_id):
+        logger.info(f'email details {email}, {reference}, survey={survey_id} and party_id={party_id}')
 
 
 class AlertUser:
@@ -48,5 +48,5 @@ class AlertUser:
         if alerter is not None:
             self.alert_method = alerter
 
-    def send(self, email, reference):
-        self.alert_method.send(email, reference)
+    def send(self, email, reference, survey_id, party_id):
+        self.alert_method.send(email, reference, survey_id=survey_id, party_id=party_id)
