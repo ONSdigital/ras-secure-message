@@ -22,7 +22,7 @@ class MessageSaveException(HTTPException):
 
 
 class RasNotifyException(MessageSaveException):
-    def __init__(self, survey_id, party_id, code=500):
+    def __init__(self, survey_id=None, party_id=None, code=500):
         MessageSaveException.__init__(self, 'There was a problem sending a notification via RM Notify-Gateway to '
                                             'GOV.UK Notify', survey_id=survey_id, party_id=party_id, status_code=code)
         logger.error(self.description)

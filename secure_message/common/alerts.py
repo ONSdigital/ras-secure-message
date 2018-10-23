@@ -48,5 +48,5 @@ class AlertUser:
         if alerter is not None:
             self.alert_method = alerter
 
-    def send(self, email, reference, survey_id, party_id):
+    def send(self, email, reference, survey_id=None, party_id=None):
         self.alert_method.send(email, reference, survey_id=survey_id, party_id=party_id)
