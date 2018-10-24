@@ -37,8 +37,8 @@ class AlertViaLogging:
     """Alert goes via gov notify (0) or via logs (1)"""
 
     @staticmethod
-    def send(email, msg_id, survey_id, party_id):
-        logger.info(f'email details email={email}, msg_id={msg_id}, survey={survey_id} and party_id={party_id}')
+    def send(_, msg_id, survey_id, party_id):
+        logger.info('Email sent', msg_id=msg_id, survey=survey_id, party_id=party_id)
 
 
 class AlertUser:
