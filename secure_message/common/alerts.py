@@ -14,11 +14,11 @@ class AlertViaGovNotify:
     """Notify Api handler"""
 
     @staticmethod
-    def send(email, reference, survey_id, party_id):
+    def send(email, msg_id, survey_id, party_id):
 
         notification = {
             "emailAddress": email,
-            "reference": reference
+            "reference": msg_id
         }
 
         url = urlparse.urljoin(current_app.config['RM_NOTIFY_GATEWAY_URL'], current_app.config['NOTIFICATION_TEMPLATE_ID'])
@@ -37,8 +37,8 @@ class AlertViaLogging:
     """Alert goes via gov notify (0) or via logs (1)"""
 
     @staticmethod
-    def send(email, reference, survey_id, party_id):
-        logger.info(f'email details {email}, {reference}, survey={survey_id} and party_id={party_id}')
+    def send(email, msg_id, survey_id, party_id):
+        logger.info(f'email details email={email}, msg_id={msg_id}, survey={survey_id} and party_id={party_id}')
 
 
 class AlertUser:
@@ -48,5 +48,5 @@ class AlertUser:
         if alerter is not None:
             self.alert_method = alerter
 
-    def send(self, email, reference, survey_id=None, party_id=None):
-        self.alert_method.send(email, reference, survey_id=survey_id, party_id=party_id)
+    def send(self, email, msg_id, survey_id=None, party_id=None):
+        self.alert_method.send(email, msg_id, survey_id=survey_id, party_id=party_id)
