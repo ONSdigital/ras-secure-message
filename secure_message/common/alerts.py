@@ -26,6 +26,7 @@ class AlertViaGovNotify:
         response = requests.post(url, auth=current_app.config['BASIC_AUTH'], timeout=current_app.config['REQUESTS_POST_TIMEOUT'],
                                  json=notification)
 
+        # If a 500 error does occur, it won't be shown to the user and the exception will just be swallowed
         if response.status_code != 201:
             raise RasNotifyException(code=500, survey_id=survey_id, party_id=party_id)
         else:
