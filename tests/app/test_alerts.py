@@ -19,7 +19,8 @@ class AlertsTestCase(unittest.TestCase):
         """sending email notification"""
         sut = AlertUser(Mock(AlertViaGovNotify))
         sut.send(self.app.config['NOTIFICATION_DEV_EMAIL'], None)
-        sut.alert_method.send.assert_called_with(self.app.config['NOTIFICATION_DEV_EMAIL'], None)
+        sut.alert_method.send.assert_called_with(self.app.config['NOTIFICATION_DEV_EMAIL'], None,
+                                                 survey_id=None, party_id=None)
 
     def test_init_with_alerter_params_sets_alert_method(self):
         """test uses alert_method from constructor if provided"""
