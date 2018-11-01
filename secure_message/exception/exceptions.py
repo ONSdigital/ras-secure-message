@@ -16,7 +16,7 @@ class MessageSaveException(HTTPException):
 
     def __init__(self, message, survey_id=None, party_id=None, status_code=None):
         HTTPException.__init__(self)
-        self.description = message, survey_id, party_id
+        self.description = {'message': message, 'survey_id': survey_id, 'party_id': party_id}
         if status_code is not None:
             self.code = status_code
 
