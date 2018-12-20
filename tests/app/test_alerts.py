@@ -48,7 +48,7 @@ class AlertsTestCase(unittest.TestCase):
         mock_notify_gateway_post.assert_called_once_with(
             'http://localhost:5181/emails/test_notification_template_id',
             auth=("admin", "secret"), json={"emailAddress": "test@email.com", "reference": "myReference",
-                                            "personalisation": self.personalisation,},
+                                            "personalisation": self.personalisation},
             timeout=20)
 
     @mock.patch('requests.post')
