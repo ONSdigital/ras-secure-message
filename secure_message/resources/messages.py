@@ -99,7 +99,7 @@ class MessageSend(Resource):
 
     @staticmethod
     def create_message_url(thread_id):
-        url = f'{current_app.config["RAS_FRONTSTAGE_SERVICE"]}secure-message/thread/{thread_id}'
+        url = f'{current_app.config["RAS_FRONTSTAGE_SERVICE"]}secure-message/thread/{thread_id}#latest-message'
         return {"MESSAGE_URL": url}
 
     @staticmethod
