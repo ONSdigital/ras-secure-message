@@ -162,7 +162,7 @@ def step_impl_the_threads_are_read(context):
 
 @when('the threads are read with my_conversations set true')
 def step_impl_the_threads_are_read_with_my_conversations_set_true(context):
-    url = context.bdd_helper.threads_get_url+f"?my_conversations=true"
+    url = context.bdd_helper.threads_get_url + f"?my_conversations=true"
     context.response = context.client.get(url, headers=context.bdd_helper.headers)
     context.bdd_helper.store_messages_response_data(context.response.data)
 
