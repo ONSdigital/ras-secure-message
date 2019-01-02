@@ -133,7 +133,7 @@ class Retriever:
                 conditions.append(Status.msg_id == SecureMessage.msg_id)
 
             result = SecureMessage.query.filter(and_(*conditions)) \
-                    .order_by(t.c.max_id.desc()).paginate(request_args.page, request_args.limit, False)
+                .order_by(t.c.max_id.desc()).paginate(request_args.page, request_args.limit, False)
 
         except SQLAlchemyError:
             logger.exception('Error retrieving messages from database')
