@@ -29,10 +29,10 @@ class SecureMessagingContextHelper:
     __DEFAULT_COLLECTION_EXERCISE = 'collection exercise1'
     __ALTERNATE_COLLECTION_EXERCISE = 'AnotherCollectionExercise'
 
-    __INTERNAL_USER_SPECIFIC_USER_ID = "SomeStringUntilWeGetIds"
+    __INTERNAL_USER_SPECIFIC_USER_ID = "SpecificInternalUserId"
     __INTERNAL_USER_GROUP = constants.NON_SPECIFIC_INTERNAL_USER
 
-    __ALTERNATIVE_INTERNAL_USER_SPECIFIC_USER_ID = "99951fcc-ed43-4cdb-ad1c-450f9986859b"
+    __ALTERNATIVE_INTERNAL_USER_SPECIFIC_USER_ID = "AlternateSpecificInternalUserId"
 
     __INTERNAL_GROUP_USER_TOKEN = {constants.USER_IDENTIFIER: __INTERNAL_USER_GROUP, "role": "internal"}
     __INTERNAL_SPECIFIC_USER_TOKEN = {constants.USER_IDENTIFIER: __INTERNAL_USER_SPECIFIC_USER_ID, "role": "internal"}

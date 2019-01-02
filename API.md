@@ -281,12 +281,18 @@ This gives a count of messages that have not been read for a specific user. Ther
 
 `GET /threads`
 
-This returns a list of conversations , showing the latest message in a conversation .
-This is currently implemented but not used in production. Hence should be treated with caution.
-
+This returns the latest message in each conversation(aka thread) that satisfies the passed in
+criteria.
 It can use the same filter arguments as Get Messages, and returns the latest message in each thread that satisfies
-the criteria passed in .
-[Get Message List](#get-message-list)
+the criteria passed in [Get Message List](#get-message-list)
+
+Additional parameters above those on Get Message List:  
+
+is_closed=true  if set then only returns conversations that have been marked as closed, else returns open
+conversations
+
+my_conversations=true  . If set then for an internal user will only retrieve conversations where they were an actor in the 
+latest message on the thread. I.e they sent the message or it was sent specifically to them. If set true when the user is a respondent then it returns a 400 
 
 
 
