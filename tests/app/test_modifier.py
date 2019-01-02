@@ -94,6 +94,9 @@ class ModifyTestCase(unittest.TestCase, ModifyTestCaseHelper):
         self.user_internal = User('ce12b958-2a5f-44f4-a6da-861e59070a31', 'internal')
         self.user_respondent = User('0a7ad740-10d5-4ecb-b7ca-3c0384afb882', 'respondent')
 
+    def tearDown(self):
+        self.engine.dispose()
+
     def test_close_conversation(self):
         """Test close conversation works"""
         conversation_id = self.populate_database(1)

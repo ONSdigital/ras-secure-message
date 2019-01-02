@@ -105,6 +105,9 @@ class ThreadList(Resource):
         """Get thread list"""
         logger.info("Getting list of threads for user", user_uuid=g.user.user_uuid)
         message_args = get_options(request.args)
+
+        ThreadList._validate_request(message_args, g.user)
+
         result = Retriever.retrieve_thread_list(g.user, message_args)
 
         logger.info("Successfully retrieved threads for user", user_uuid=g.user.user_uuid)
@@ -112,6 +115,12 @@ class ThreadList(Resource):
         if messages:
             messages = add_users_and_business_details(messages)
         return jsonify({"messages": messages, "_links": links})
+
+    @staticmethod
+    def _validate_request(request_args, user):
+        if request_args.my_conversations and user.is_respondent:
+            logger.error('My conversations option not available to respondents')
+            raise BadRequest(description="My conversations option not available to respondents")
 
 
 class ThreadCounter(Resource):

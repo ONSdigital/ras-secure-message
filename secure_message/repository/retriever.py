@@ -117,6 +117,7 @@ class Retriever:
             conditions.append(SecureMessage.collection_exercise == request_args.ce)
 
         try:
+
             t = db.session.query(SecureMessage.thread_id, func.max(SecureMessage.id)  # pylint:disable=no-member
                                  .label('max_id')) \
                 .join(Conversation) \
@@ -126,8 +127,13 @@ class Retriever:
             conditions.append(SecureMessage.thread_id == t.c.thread_id)
             conditions.append(SecureMessage.id == t.c.max_id)
 
+            # If my_conversations make sure that the user is an actor in the last message in the thread
+            if request_args.my_conversations:
+                conditions.append(Status.actor == user.user_uuid)
+                conditions.append(Status.msg_id == SecureMessage.msg_id)
+
             result = SecureMessage.query.filter(and_(*conditions)) \
-                .order_by(t.c.max_id.desc()).paginate(request_args.page, request_args.limit, False)
+                    .order_by(t.c.max_id.desc()).paginate(request_args.page, request_args.limit, False)
 
         except SQLAlchemyError:
             logger.exception('Error retrieving messages from database')

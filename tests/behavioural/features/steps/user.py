@@ -2,6 +2,7 @@ from behave import given, when
 from tests.behavioural.features.steps.from_field import step_impl_the_msg_from_is_set_to_respondent
 from tests.behavioural.features.steps.from_field import step_impl_the_msg_from_is_set_to_internal_specific_user
 from tests.behavioural.features.steps.from_field import step_impl_the_msg_from_is_set_to_internal_group_user
+from tests.behavioural.features.steps.from_field import step_impl_the_msg_from_is_set_to_alternate_internal_specific_user
 
 from tests.behavioural.features.steps.to_field import step_impl_the_msg_to_is_set_to_respondent
 from tests.behavioural.features.steps.to_field import step_impl_the_msg_to_is_set_to_internal_group_user
@@ -113,6 +114,15 @@ def step_impl_prepare_to_send_from_internal_specific_user_to_respondent(context)
     """set the message from to the internal user as defined in the helper"""
     step_impl_the_user_is_internal_specific_user(context)
     step_impl_the_msg_from_is_set_to_internal_specific_user(context)
+    step_impl_the_msg_to_is_set_to_respondent(context)
+
+
+@given("sending from alternate internal specific user to respondent")
+@when("sending from alternate internal specific user to respondent")
+def step_impl_prepare_to_send_from_alternate_internal_specific_user_to_respondent(context):
+    """set the message from to the alternate internal user as defined in the helper"""
+    step_impl_the_user_is_set_to_alternative_internal_specific_user(context)
+    step_impl_the_msg_from_is_set_to_alternate_internal_specific_user(context)
     step_impl_the_msg_to_is_set_to_respondent(context)
 
 
