@@ -22,11 +22,3 @@ Feature: Message Send V2 Endpoint
     | user        |
     | specific user |
     | group        |
-
-  Scenario:Respondent tries to retrieve a conversation that they are not part of via thread id
-    Given sending from respondent to internal specific user
-      And   the message is sent
-      And   the thread id is set to the last returned thread id
-    When the user is set as alternative respondent
-     And  the thread is read
-    Then a not found status code 404 is returned

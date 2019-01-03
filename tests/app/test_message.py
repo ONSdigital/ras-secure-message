@@ -1,7 +1,7 @@
 import unittest
 from datetime import datetime, timezone
 
-from flask import g
+from flask import g, current_app
 
 from secure_message import constants
 from secure_message.services.service_toggles import internal_user_service, party
@@ -280,8 +280,8 @@ class MessageSchemaTestCase(unittest.TestCase):
             message_send = MessageSend()
             response = message_send._create_message_url(self.threadId)
 
-        self.assertTrue(response == {'MESSAGE_URL': 'http://localhost:8082/secure-message/thread/'
-                                                    'threadid#latest-message'})
+            self.assertTrue(response == {'MESSAGE_URL': f'{current_app.config["RAS_FRONTSTAGE_SERVICE"]}'
+                                                        f'secure-message/thread/{self.threadId}#latest-message'})
 
 
 if __name__ == '__main__':
