@@ -9,6 +9,7 @@ from secure_message.validation.domain import Message, MessageSchema
 from secure_message.validation.user import User
 from secure_message.application import create_app
 from secure_message.constants import MAX_SUBJECT_LEN, MAX_BODY_LEN, MAX_THREAD_LEN
+from secure_message.resources.messages import MessageSend
 
 
 class MessageTestCase(unittest.TestCase):
@@ -272,6 +273,15 @@ class MessageSchemaTestCase(unittest.TestCase):
             errors = schema.load(self.json_message)[1]
 
         self.assertTrue(errors == {'msg_to': ['NotAValidUser is not a valid respondent.']})
+
+    def test_message_url_is_created_correctly(self):
+        self.threadId = 'threadid'
+        with self.app.app_context():
+            message_send = MessageSend()
+            response = message_send._create_message_url(self.threadId)
+
+        self.assertTrue(response == {'MESSAGE_URL': 'http://localhost:8082/secure-message/thread/'
+                                                    'threadid#latest-message'})
 
 
 if __name__ == '__main__':

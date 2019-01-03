@@ -89,7 +89,7 @@ class MessageSend(Resource):
                     recipient_email = party_data[0]['emailAddress'].strip()
                     alert_method = AlertViaLogging() if current_app.config['NOTIFY_VIA_GOV_NOTIFY'] == '0' else AlertViaGovNotify()
                     alert_user = AlertUser(alert_method)
-                    personalisation = MessageSend.create_message_url(message.thread_id)
+                    personalisation = MessageSend._create_message_url(message.thread_id)
                     alert_user.send(recipient_email, message.msg_id, personalisation=personalisation,
                                     survey_id=message.survey, party_id=party_data[0]['id'])
                 else:
@@ -98,7 +98,7 @@ class MessageSend(Resource):
         return party_data
 
     @staticmethod
-    def create_message_url(thread_id):
+    def _create_message_url(thread_id):
         url = f'{current_app.config["RAS_FRONTSTAGE_SERVICE"]}secure-message/thread/{thread_id}#latest-message'
         return {"MESSAGE_URL": url}
 
