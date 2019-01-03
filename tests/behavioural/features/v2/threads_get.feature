@@ -382,3 +382,11 @@ Feature: Get threads list Endpoint V2
     When the threads in are read with filters for both default and alternate surveys
     Then  a success status code 200 is returned
       And  '2' messages are returned
+
+  Scenario:Respondent tries to retrieve a conversation that they are not part of via thread id
+    Given sending from respondent to internal specific user
+      And   the message is sent
+      And   the thread id is set to the last returned thread id
+    When the user is set as alternative respondent
+     And  the thread is read
+    Then a not found status code 404 is returned
