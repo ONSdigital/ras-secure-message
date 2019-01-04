@@ -129,9 +129,13 @@ class ThreadCounter(Resource):
     def get():
         surveys = request.args.getlist('survey')
         is_closed = bool(strtobool(request.args.get('is_closed', 'False')))
+        my_conversations = bool(strtobool(request.args.get('my_conversations', 'False')))
+        cc = request.args.get('cc', None)
+        ce = request.args.get('ce', None)
+        ru = request.args.get('ru_id', None)
 
         if not g.user.is_internal:
             logger.info("Thread count should be internal users only", user_uuid=g.user.user_uuid)
             abort(403)
 
-        return jsonify(total=Retriever.thread_count_by_survey(surveys, is_closed))
+        return jsonify(total=Retriever.thread_count_by_survey(surveys, is_closed, g.user, my_conversations, ru, cc, ce))

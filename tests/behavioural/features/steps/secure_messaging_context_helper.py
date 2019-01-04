@@ -66,7 +66,7 @@ class SecureMessagingContextHelper:
         self._single_message_responses_data = []
         self._messages_responses_data = []
         self._last_saved_message_data = None
-        self._last_saved_label_count = 0
+        self._last_returned_thread_count = 0
 
         # Urls
 
@@ -87,7 +87,7 @@ class SecureMessagingContextHelper:
         self._message_post_url_v2 = SecureMessagingContextHelper.__BASE_URL + "/v2/messages"
         self._message_get_url_v2 = SecureMessagingContextHelper.__BASE_URL + "/v2/messages/{0}"
         self._messages_get_url_v2 = SecureMessagingContextHelper.__BASE_URL + "/v2/messages"
-        self._message_get_unread_count_url_v2 = SecureMessagingContextHelper.__BASE_URL + "/v2/messages/count"
+        self._threads_get_count_url_v2 = SecureMessagingContextHelper.__BASE_URL + "/v2/messages/count"
         self._message_put_url_v2 = SecureMessagingContextHelper.__BASE_URL + "/v2/messages/modify/{}"
 
         self._thread_get_url_v2 = SecureMessagingContextHelper.__BASE_URL + "/v2/threads/{0}"
@@ -183,16 +183,16 @@ class SecureMessagingContextHelper:
         return self._messages_get_url_v2
 
     @property
-    def messages_get_unread_count_v2_url(self):
-        return self._message_get_unread_count_url_v2
-
-    @property
     def message_put_v2_url(self):
         return self._message_put_url_v2
 
     @property
     def thread_get_v2_url(self):
         return self._thread_get_url_v2
+
+    @property
+    def threads_get_count_url_v2(self):
+        return self._threads_get_count_url_v2
 
     @property
     def respondent_id(self):
@@ -223,12 +223,12 @@ class SecureMessagingContextHelper:
         self._last_saved_message_data = copy.deepcopy(value)
 
     @property
-    def label_count(self):
-        return self._last_saved_label_count
+    def thread_count(self):
+        return self._last_returned_thread_count
 
-    @label_count.setter
-    def label_count(self, value):
-        self._last_saved_label_count = int(value)
+    @thread_count.setter
+    def thread_count(self, value):
+        self._last_returned_thread_count = int(value)
 
     @property
     def sent_messages(self):
