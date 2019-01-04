@@ -302,16 +302,39 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
                     self.assertEqual(date[x], str(thread.all()[0].events[0].date_time))
                     self.assertEqual(msg_ids[x], thread.all()[0].events[0].msg_id)
 
-    def test_thread_count_by_survey(self):
-        """checks that the returned thread count is the same for every internal user"""
+    def test_thread_count_by_survey_my_conversations_off(self):
+        """checks that the returned thread count is the same for every internal user
+        even if they are not part of the conversations"""
         for _ in range(5):
             self.create_thread(no_of_messages=2)
 
         with self.app.app_context():
             with current_app.test_request_context():
-                thread_count_internal = Retriever.thread_count_by_survey(self.BRES_SURVEY, False)
-                thread_count_second_internal = Retriever.thread_count_by_survey(self.BRES_SURVEY, False)
+                thread_count_internal = Retriever.thread_count_by_survey([self.BRES_SURVEY], False,
+                                                                         User(self.default_internal_actor,
+                                                                              role='internal'))
+                thread_count_second_internal = Retriever.thread_count_by_survey([self.BRES_SURVEY], False,
+                                                                                User(self.second_internal_actor,
+                                                                                     role='internal'))
                 self.assertEqual(thread_count_internal, thread_count_second_internal)
+
+    def test_thread_count_by_survey_my_conversations_on(self):
+        """checks that the returned thread count is the same for every internal user
+        even if they are not part of the conversations"""
+        for _ in range(5):
+            self.create_thread(no_of_messages=2)
+
+        with self.app.app_context():
+            with current_app.test_request_context():
+                thread_count_internal = Retriever.thread_count_by_survey([self.BRES_SURVEY], False,
+                                                                         User(self.default_internal_actor,
+                                                                              role='internal'), my_conversations=True)
+                thread_count_second_internal = Retriever.thread_count_by_survey([self.BRES_SURVEY], False,
+                                                                                User(self.second_internal_actor,
+                                                                                     role='internal'),
+                                                                                my_conversations=True)
+                self.assertEqual(thread_count_internal, 5)
+                self.assertEqual(thread_count_second_internal, 0)
 
     def test_respondent_can_only_see_their_messages(self):
         """tests that a respondent can only see their messages i.e. they should not

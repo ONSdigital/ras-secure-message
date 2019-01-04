@@ -336,14 +336,15 @@ Feature: Get threads list Endpoint V2
     | group        |
 
 
- Scenario Outline: A respondent sends a very long message, the internal user sees a 100 character summary in their inbox
-    Given sending from internal <user> to respondent
+ Scenario: A respondent sends a very long message, the internal user sees a 100 character summary in their inbox
+    Given sending from respondent to internal group
       And the message body is '5000' characters long
       And '1' messages are sent using V2
     When the threads are read
     Then the message bodies are '100' characters or less
 
-    Scenario: There is a conversation between internal user and respondent, the last message being a message sent from
+
+  Scenario: There is a conversation between internal user and respondent, the last message being a message sent from
               Internal to tests/behavioural/features/v2/threads_get.feature:425respondent. A second internal person reads the conversation, they should see the message
               sent from internal to respondent
     Given sending from respondent to internal group

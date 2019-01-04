@@ -450,6 +450,31 @@ Note V2 will have either uuids or 'GROUP' for the user ids, and a uuid for the s
 For descriptions of @msg_from, @msg_to and @ru see messages get
 [Get Message List](#get-message-list)
 
+## Get Conversations count  
+
+`GET /messages/count`
+
+This returns a count of the conversations that satisfy the search criteria. Available search criteria matches those on get threads:
+
+* survey . If set then only conversations regarding this survey will be considered. Defaults to all surveys
+
+* is_closed . If set True then only closed conversations will be considered. Defaults to false if omitted.
+
+* my_conversations. If set True then will only return conversations where the currently signed in user is an actor in the last message of the conversation.
+
+* ru_id . If set then restrict conversations to those regarding a specific ru
+
+* cc . If set then restricts the conversations to a specific collection case
+
+* ce . If set then restricts the conversations to a specific collction exercise
+
+#### Example JSON Response
+```json
+{
+  "total":14,
+}
+
+```
 ## Get Conversation by Id
 
 `GET /thread/{thread_id} or /v2/threads/<thread_id>`

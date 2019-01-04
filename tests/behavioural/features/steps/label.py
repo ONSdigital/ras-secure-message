@@ -39,15 +39,15 @@ def step_impl_the_response_thread_should_not_have_named_label(context, label):
     nose.tools.assert_false(label in response['messages'][0]['labels'])
 
 
-@then("the response message should a label count of '{label_count}'")
+@then("the response message should a label count of '{thread_count}'")
 def step_impl_the_response_message_should_have_specific_label_count(context, label_count):
     """validate that the label count in the response matches a specific number"""
     response = json.loads(context.response.data)
     nose.tools.assert_equal(len(response['labels']), int(label_count))
 
 
-@then("the response thread should a label count of '{label_count}'")
-def step_impl_the_response_thread_should_have_specific_label_count(context, label_count):
+@then("the response should have a label count of '{label_count}'")
+def step_impl_the_response_should_have_specific_label_count(context, label_count):
     """validate that the label count in the response matches a specific number"""
     response = json.loads(context.response.data)
     nose.tools.assert_equal(len(response['messages'][0]['labels']), int(label_count))
@@ -86,7 +86,7 @@ def step_impl_n_messages_have_specific_label(context, message_count, label):
 
 # V2 Below
 
-@then("the returned label count was '{label_count}' V2")
-def step_impl_n_messages_have_specific_label_v2(context, label_count):
+@then("the returned label count was '{thread_count}' V2")
+def step_impl_n_messages_have_specific_label_v2(context, thread_count):
     """validate that a specific number of messages in a reply have a specific label"""
-    nose.tools.assert_equal(int(label_count), context.bdd_helper.label_count)
+    nose.tools.assert_equal(int(thread_count), context.bdd_helper.thread_count)
