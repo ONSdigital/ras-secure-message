@@ -15,11 +15,13 @@ class AlertsTestCase(unittest.TestCase):
         self.app = create_app()
         self.app.testing = True
 
+    personalisation = {"RANDOM_URL": "randomemail"}
+
     def test_alert_user_send_if_forwarded_to_alert_method(self):
         """sending email notification"""
         sut = AlertUser(Mock(AlertViaGovNotify))
-        sut.send(self.app.config['NOTIFICATION_DEV_EMAIL'], None)
-        sut.alert_method.send.assert_called_with(self.app.config['NOTIFICATION_DEV_EMAIL'], None,
+        sut.send(self.app.config['NOTIFICATION_DEV_EMAIL'], personalisation=self.personalisation, msg_id=None)
+        sut.alert_method.send.assert_called_with(self.app.config['NOTIFICATION_DEV_EMAIL'], None, self.personalisation,
                                                  survey_id=None, party_id=None)
 
     def test_init_with_alerter_params_sets_alert_method(self):
@@ -41,11 +43,12 @@ class AlertsTestCase(unittest.TestCase):
 
         alert_user = AlertUser(AlertViaGovNotify)
         with self.app.app_context():
-            alert_user.send('test@email.com', 'myReference')
+            alert_user.send('test@email.com', 'myReference', self.personalisation)
 
         mock_notify_gateway_post.assert_called_once_with(
             'http://localhost:5181/emails/test_notification_template_id',
-            auth=("admin", "secret"), json={"emailAddress": "test@email.com", "reference": "myReference"},
+            auth=("admin", "secret"), json={"emailAddress": "test@email.com", "reference": "myReference",
+                                            "personalisation": self.personalisation},
             timeout=20)
 
     @mock.patch('requests.post')
@@ -57,11 +60,12 @@ class AlertsTestCase(unittest.TestCase):
         alert_user = AlertUser(AlertViaGovNotify)
 
         with self.app.app_context(), self.assertRaises(RasNotifyException):
-            alert_user.send('test@email.com', 'myReference')
+            alert_user.send('test@email.com', 'myReference', self.personalisation,)
 
         mock_notify_gateway_post.assert_called_once_with(
             'http://localhost:5181/emails/test_notification_template_id',
-            auth=("admin", "secret"), json={"emailAddress": "test@email.com", "reference": "myReference"},
+            auth=("admin", "secret"), json={"emailAddress": "test@email.com", "reference": "myReference",
+                                            "personalisation": self.personalisation},
             timeout=20)
 
 
