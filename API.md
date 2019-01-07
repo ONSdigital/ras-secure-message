@@ -177,7 +177,7 @@ Note the message response contains @msg_from , @msg_to and @ru . These hold valu
 
 ## Send Message ##
 
-`POST /message/send or '/v2/messages'
+`POST /message/send or '/v2/messages`
 
 The messages post endpoint stores a secure message . If the recipient is a respondent it will also send an email via Notify.Gov.
 
