@@ -31,35 +31,34 @@ class Retriever:
         return result
 
     @staticmethod
-    def thread_count_by_survey(surveys, is_closed, user, my_conversations=False, ru_id=None, cc=None, ce=None):
+    def thread_count_by_survey(request_args, user):
         """Count users threads for a specific survey"""
 
         conditions = []
 
-        if surveys:
-            conditions.append(SecureMessage.survey.in_(surveys))
+        if request_args.surveys:
+            conditions.append(SecureMessage.survey.in_(request_args.surveys))
 
-        if ru_id:
-            conditions.append(SecureMessage.ru_id == ru_id)
+        if request_args.ru_id:
+            conditions.append(SecureMessage.ru_id == request_args.ru_id)
 
-        if cc:
-            conditions.append(SecureMessage.collection_case == cc)
+        if request_args.cc:
+            conditions.append(SecureMessage.collection_case == request_args.cc)
 
-        if ce:
-            conditions.append(SecureMessage.collection_exercise == ce)
+        if request_args.ce:
+            conditions.append(SecureMessage.collection_exercise == request_args.ce)
 
         try:
-
             t = db.session.query(SecureMessage.thread_id, func.max(SecureMessage.id)  # pylint:disable=no-member
                                  .label('max_id')) \
                 .join(Conversation) \
-                .filter(Conversation.is_closed.is_(is_closed)) \
+                .filter(Conversation.is_closed.is_(request_args.is_closed)) \
                 .group_by(SecureMessage.thread_id).subquery('t')
 
             conditions.append(SecureMessage.thread_id == t.c.thread_id)
             conditions.append(SecureMessage.id == t.c.max_id)
 
-            if my_conversations:
+            if request_args.my_conversations:
                 conditions.append(Status.actor == user.user_uuid)
                 conditions.append(Status.msg_id == SecureMessage.msg_id)
 
@@ -135,7 +134,6 @@ class Retriever:
             conditions.append(SecureMessage.collection_exercise == request_args.ce)
 
         try:
-
             t = db.session.query(SecureMessage.thread_id, func.max(SecureMessage.id)  # pylint:disable=no-member
                                  .label('max_id')) \
                 .join(Conversation) \
