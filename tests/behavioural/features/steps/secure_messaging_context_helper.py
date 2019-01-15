@@ -23,16 +23,16 @@ class SecureMessagingContextHelper:
     __DEFAULT_SURVEY = '33333333-22222-3333-4444-88dc018a1a4c'
     __ALTERNATE_SURVEY = '11111111-22222-3333-4444-88dc018a1a4c'
 
-    __DEFAULT_COLLECTION_CASE = 'collection case1'
-    __ALTERNATE_COLLECTION_CASE = 'AnotherCollectionCase'
+    __DEFAULT_COLLECTION_CASE = 'collection case1'             # UUID in real use, string for testing clarity
+    __ALTERNATE_COLLECTION_CASE = 'AnotherCollectionCase'      # UUID in real use, string for testing clarity
 
-    __DEFAULT_COLLECTION_EXERCISE = 'collection exercise1'
-    __ALTERNATE_COLLECTION_EXERCISE = 'AnotherCollectionExercise'
+    __DEFAULT_COLLECTION_EXERCISE = 'collection exercise1'     # UUID in real use, string for testing clarity
+    __ALTERNATE_COLLECTION_EXERCISE = 'AnotherCollectionExercise'  # UUID in real use, string for testing clarity
 
-    __INTERNAL_USER_SPECIFIC_USER_ID = "SpecificInternalUserId"
+    __INTERNAL_USER_SPECIFIC_USER_ID = "SpecificInternalUserId"  # UUID in real use, string for testing clarity
     __INTERNAL_USER_GROUP = constants.NON_SPECIFIC_INTERNAL_USER
 
-    __ALTERNATIVE_INTERNAL_USER_SPECIFIC_USER_ID = "AlternateSpecificInternalUserId"
+    __ALTERNATIVE_INTERNAL_USER_SPECIFIC_USER_ID = "AlternateSpecificInternalUserId"  # UUID in real use, string clarity
 
     __INTERNAL_GROUP_USER_TOKEN = {constants.USER_IDENTIFIER: __INTERNAL_USER_GROUP, "role": "internal"}
     __INTERNAL_SPECIFIC_USER_TOKEN = {constants.USER_IDENTIFIER: __INTERNAL_USER_SPECIFIC_USER_ID, "role": "internal"}
