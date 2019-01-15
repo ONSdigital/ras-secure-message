@@ -348,7 +348,7 @@ def step_impl_messages_are_read_with_specific_survey(context, survey):
 @given("the count of open threads in survey '{survey}' is made V2")
 def step_impl_the_open_threads_count_for_specific_survey_are_counted(context, survey):
     """access the messages_count endpoint to get the count of unread conversations"""
-    url = context.bdd_helper.threads_get_count_url_v2 + f"?survey={survey}&is_closed=False"
+    url = context.bdd_helper.threads_get_count_url_v2 + f"?survey={survey}&is_closed=false"
     context.response = context.client.get(url, headers=context.bdd_helper.headers)
     response_data = context.response.data
     context.bdd_helper.thread_count = json.loads(response_data)["total"]
@@ -358,7 +358,7 @@ def step_impl_the_open_threads_count_for_specific_survey_are_counted(context, su
 @given("the count of open threads is made V2")
 def step_impl_the_open_threads_count_are_counted(context):
     """access the messages_count endpoint to get the count of unread conversations"""
-    url = context.bdd_helper.threads_get_count_url_v2 + f"?is_closed=False"
+    url = context.bdd_helper.threads_get_count_url_v2 + f"?is_closed=false"
     context.response = context.client.get(url, headers=context.bdd_helper.headers)
     response_data = context.response.data
     context.bdd_helper.thread_count = json.loads(response_data)["total"]
@@ -368,7 +368,7 @@ def step_impl_the_open_threads_count_are_counted(context):
 @given("the count of open threads for current user is made")
 def step_impl_my_open_threads_count_are_counted(context):
     """access the messages_count endpoint to get the count of my unread conversations"""
-    url_args = f"?is_closed=False&my_conversations=True"
+    url_args = f"?is_closed=false&my_conversations=true"
     _step_impl_get_threads_count(context, url_args)
 
 
@@ -376,7 +376,7 @@ def step_impl_my_open_threads_count_are_counted(context):
 @given("the count of open threads for current user and ce of '{ce}' is made")
 def step_impl_my_open_threads_count_are_counted_by_ce(context, ce):
     """access the messages_count endpoint to get the count of my unread conversations"""
-    url_args = f"?is_closed=False&my_conversations=True&ce={ce}"
+    url_args = f"?is_closed=false&my_conversations=true&ce={ce}"
     _step_impl_get_threads_count(context, url_args)
 
 
@@ -384,7 +384,7 @@ def step_impl_my_open_threads_count_are_counted_by_ce(context, ce):
 @given("the count of open threads for current user and cc of '{cc}' is made")
 def step_impl_my_open_threads_count_are_counted_by_cc(context, cc):
     """access the messages_count endpoint to get the count of my unread conversations"""
-    url_args = f"?is_closed=False&my_conversations=True&cc={cc}"
+    url_args = f"?is_closed=false&my_conversations=true&cc={cc}"
     _step_impl_get_threads_count(context, url_args)
 
 
@@ -392,14 +392,14 @@ def step_impl_my_open_threads_count_are_counted_by_cc(context, cc):
 @given("the count of open threads for current user and ru of '{ru}' is made")
 def step_impl_my_open_threads_count_are_counted_by_ru(context, ru):
     """access the messages_count endpoint to get the count of my unread conversations"""
-    url_args = f"?is_closed=False&my_conversations=True&ru_id={ru}"
+    url_args = f"?is_closed=false&my_conversations=true&ru_id={ru}"
     _step_impl_get_threads_count(context, url_args)
 
 
 @when("the count of closed threads for current user is made")
 @given("the count of closed threads for current user is made")
 def step_impl_my_closed_threads_count_are_counted(context):
-    url_args = f"?is_closed=True&my_conversations=True"
+    url_args = f"?is_closed=true&my_conversations=true"
     _step_impl_get_threads_count(context, url_args)
 
 

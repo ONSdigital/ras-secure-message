@@ -119,7 +119,7 @@ class ThreadList(Resource):
     @staticmethod
     def _validate_request(request_args, user):
         if request_args.my_conversations and user.is_respondent:
-            logger.error('My conversations option not available to respondents')
+            logger.error('My conversations option not available to respondents', user_uuid=user.user_uuid)
             raise BadRequest(description="My conversations option not available to respondents")
 
 
@@ -127,15 +127,11 @@ class ThreadCounter(Resource):
     """Get count of all open or closed messages"""
     @staticmethod
     def get():
-        surveys = request.args.getlist('survey')
-        is_closed = bool(strtobool(request.args.get('is_closed', 'False')))
-        my_conversations = bool(strtobool(request.args.get('my_conversations', 'False')))
-        cc = request.args.get('cc', None)
-        ce = request.args.get('ce', None)
-        ru = request.args.get('ru_id', None)
-
         if not g.user.is_internal:
             logger.info("Thread count should be internal users only", user_uuid=g.user.user_uuid)
             abort(403)
 
-        return jsonify(total=Retriever.thread_count_by_survey(surveys, is_closed, g.user, my_conversations, ru, cc, ce))
+        logger.info("Getting count of threads for user", user_uuid=g.user.user_uuid)
+        message_args = get_options(request.args)
+
+        return jsonify(total=Retriever.thread_count_by_survey(message_args, g.user))

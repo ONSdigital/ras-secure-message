@@ -288,11 +288,13 @@ the criteria passed in [Get Message List](#get-message-list)
 
 Additional parameters above those on Get Message List:  
 
-is_closed=true  if set then only returns conversations that have been marked as closed, else returns open
+```
+is_closed           If set and value = 'true' then only returns conversations that have been marked as closed, else returns open
 conversations
 
-my_conversations=true  . If set then for an internal user will only retrieve conversations where they were an actor in the 
+my_conversations    If set and value ='true' then for an internal user will only retrieve conversations where they were an actor in the 
 latest message on the thread. I.e they sent the message or it was sent specifically to them. If set true when the user is a respondent then it returns a 400 
+```
 
 
 
@@ -454,19 +456,21 @@ For descriptions of @msg_from, @msg_to and @ru see messages get
 
 `GET /messages/count`
 
-This returns a count of the conversations that satisfy the search criteria. Available search criteria matches those on get threads:
+This returns a count of the conversations that satisfy the search criteria. 
+Available search criteria matches those on get threads:
+```
+survey          If set then only conversations regarding this survey will be considered. Defaults to all surveys
 
-* survey . If set then only conversations regarding this survey will be considered. Defaults to all surveys
+is_closed       If set true then only closed conversations will be considered. Defaults to false if omitted.
 
-* is_closed . If set True then only closed conversations will be considered. Defaults to false if omitted.
+my_conversations If set true then will only return conversations where the currently signed in user is an actor in the last message of the conversation.
 
-* my_conversations. If set True then will only return conversations where the currently signed in user is an actor in the last message of the conversation.
+ru_id           If set then restrict conversations to those regarding a specific ru
 
-* ru_id . If set then restrict conversations to those regarding a specific ru
+cc              If set then restricts the conversations to a specific collection case
 
-* cc . If set then restricts the conversations to a specific collection case
-
-* ce . If set then restricts the conversations to a specific collction exercise
+ce              If set then restricts the conversations to a specific collction exercise
+```
 
 #### Example JSON Response
 ```json

@@ -8,6 +8,7 @@ from werkzeug.exceptions import NotFound
 
 from secure_message.application import create_app
 from secure_message.common.eventsapi import EventsApi
+from secure_message.common.utilities import MessageArgs
 from secure_message.repository import database
 from secure_message.repository.retriever import Retriever
 from secure_message.constants import MESSAGE_QUERY_LIMIT
@@ -305,15 +306,28 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
     def test_thread_count_by_survey_my_conversations_off(self):
         """checks that the returned thread count is the same for every internal user
         even if they are not part of the conversations"""
+        request_args = MessageArgs(
+            page=0,
+            limit=100,
+            ru_id=None,
+            cc=None,
+            label=None,
+            desc=None,
+            ce=None,
+            surveys=[self.BRES_SURVEY],
+            is_closed=False,
+            my_conversations=False)
+
         for _ in range(5):
             self.create_thread(no_of_messages=2)
 
         with self.app.app_context():
             with current_app.test_request_context():
-                thread_count_internal = Retriever.thread_count_by_survey([self.BRES_SURVEY], False,
+
+                thread_count_internal = Retriever.thread_count_by_survey(request_args,
                                                                          User(self.default_internal_actor,
                                                                               role='internal'))
-                thread_count_second_internal = Retriever.thread_count_by_survey([self.BRES_SURVEY], False,
+                thread_count_second_internal = Retriever.thread_count_by_survey(request_args,
                                                                                 User(self.second_internal_actor,
                                                                                      role='internal'))
                 self.assertEqual(thread_count_internal, thread_count_second_internal)
@@ -321,18 +335,29 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
     def test_thread_count_by_survey_my_conversations_on(self):
         """checks that the returned thread count is the same for every internal user
         even if they are not part of the conversations"""
+        request_args = MessageArgs(
+            page=0,
+            limit=100,
+            ru_id=None,
+            cc=None,
+            label=None,
+            desc=None,
+            ce=None,
+            surveys=[self.BRES_SURVEY],
+            is_closed=False,
+            my_conversations=True)
+
         for _ in range(5):
             self.create_thread(no_of_messages=2)
 
         with self.app.app_context():
             with current_app.test_request_context():
-                thread_count_internal = Retriever.thread_count_by_survey([self.BRES_SURVEY], False,
+                thread_count_internal = Retriever.thread_count_by_survey(request_args,
                                                                          User(self.default_internal_actor,
-                                                                              role='internal'), my_conversations=True)
-                thread_count_second_internal = Retriever.thread_count_by_survey([self.BRES_SURVEY], False,
+                                                                              role='internal'))
+                thread_count_second_internal = Retriever.thread_count_by_survey(request_args,
                                                                                 User(self.second_internal_actor,
-                                                                                     role='internal'),
-                                                                                my_conversations=True)
+                                                                                     role='internal'))
                 self.assertEqual(thread_count_internal, 5)
                 self.assertEqual(thread_count_second_internal, 0)
 
