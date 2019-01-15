@@ -1,4 +1,3 @@
-from distutils.util import strtobool
 import logging
 
 from werkzeug.exceptions import BadRequest
