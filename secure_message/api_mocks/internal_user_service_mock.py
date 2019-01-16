@@ -47,10 +47,16 @@ class InternalUserServiceMock:
                 "lastName": "",
                 "emailAddress": "mock@email.com"
             },
-            "SomeStringUntilWeGetIds": {
-                "id": "SomeStringUntilWeGetIds",
-                "firstName": "MadeUpUser",
-                "lastName": "",
+            "SpecificInternalUserId": {
+                "id": "SpecificInternalUserId",
+                "firstName": "Internal",
+                "lastName": "User",
+                "emailAddress": "mock@email.com"
+            },
+            "AlternateSpecificInternalUserId": {
+                "id": "AlternateSpecificInternalUserId",
+                "firstName": "alternate",
+                "lastName": "Internal_user",
                 "emailAddress": "mock@email.com"
             }
         }

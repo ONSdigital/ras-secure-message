@@ -88,3 +88,53 @@ Feature: Get threads list Endpoint
    When the user is set to alternative internal specific user
     And the threads are read
    Then  '50' messages have a 'SENT' label
+
+  Scenario: The respondent attempts to get conversation list with my_conversations argument set. 400 should be returned
+    Given the user is set as respondent
+    When  the threads are read with my_conversations set true
+    Then a bad request status code 400 is returned
+
+  Scenario: There are 10 conversations each from 2 internal users. Internal user gets threads using my conversations, they only see theirs
+    Given  sending from internal specific user to respondent
+     And  '10' messages are sent using V2
+     And  sending from alternate internal specific user to respondent
+     And '9' messages are sent using V2
+    When  the threads are read with my_conversations set true
+    Then  a success status code 200 is returned
+     And '9' messages are returned
+     And  all messages are from alternate internal specific user
+
+  Scenario: Two internal users in a conversation with a respondent, with my_conversations set true then the last one will see it in conversation list
+    Given sending from respondent to internal specific user
+      And the message is sent
+      And sending from internal specific user to respondent
+      And the thread id is set to the last returned thread id
+      And the message is sent
+      And sending from alternate internal specific user to respondent
+      And the thread id is set to the last returned thread id
+      And the message is sent
+    When  the threads are read with my_conversations set true
+    Then  a success status code 200 is returned
+     And '1' messages are returned
+     And  all messages are from alternate internal specific user
+
+  Scenario: Two internal users in a conversation with a respondent, with my_conversations set true then the first  one will NOT see it in conversation list
+    Given sending from respondent to internal specific user
+      And the message is sent
+      And sending from internal specific user to respondent
+      And the thread id is set to the last returned thread id
+      And the message is sent
+      And sending from alternate internal specific user to respondent
+      And the thread id is set to the last returned thread id
+      And the message is sent
+      And the user is set as internal specific user
+    When  the threads are read with my_conversations set true
+    Then  a success status code 200 is returned
+     And '0' messages are returned
+
+  Scenario: Respondent sends to Group , internal user should not see them in threads when using my_conversations
+      Given sending from respondent to internal group
+        And the message is sent
+      When  the user is set as internal specific user
+        And the threads are read with my_conversations set true
+      Then  '0' messages are returned

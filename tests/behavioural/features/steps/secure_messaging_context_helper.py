@@ -23,16 +23,16 @@ class SecureMessagingContextHelper:
     __DEFAULT_SURVEY = '33333333-22222-3333-4444-88dc018a1a4c'
     __ALTERNATE_SURVEY = '11111111-22222-3333-4444-88dc018a1a4c'
 
-    __DEFAULT_COLLECTION_CASE = 'collection case1'
-    __ALTERNATE_COLLECTION_CASE = 'AnotherCollectionCase'
+    __DEFAULT_COLLECTION_CASE = 'collection case1'             # UUID in real use, string for testing clarity
+    __ALTERNATE_COLLECTION_CASE = 'AnotherCollectionCase'      # UUID in real use, string for testing clarity
 
-    __DEFAULT_COLLECTION_EXERCISE = 'collection exercise1'
-    __ALTERNATE_COLLECTION_EXERCISE = 'AnotherCollectionExercise'
+    __DEFAULT_COLLECTION_EXERCISE = 'collection exercise1'     # UUID in real use, string for testing clarity
+    __ALTERNATE_COLLECTION_EXERCISE = 'AnotherCollectionExercise'  # UUID in real use, string for testing clarity
 
-    __INTERNAL_USER_SPECIFIC_USER_ID = "SomeStringUntilWeGetIds"
+    __INTERNAL_USER_SPECIFIC_USER_ID = "SpecificInternalUserId"  # UUID in real use, string for testing clarity
     __INTERNAL_USER_GROUP = constants.NON_SPECIFIC_INTERNAL_USER
 
-    __ALTERNATIVE_INTERNAL_USER_SPECIFIC_USER_ID = "99951fcc-ed43-4cdb-ad1c-450f9986859b"
+    __ALTERNATIVE_INTERNAL_USER_SPECIFIC_USER_ID = "AlternateSpecificInternalUserId"  # UUID in real use, string clarity
 
     __INTERNAL_GROUP_USER_TOKEN = {constants.USER_IDENTIFIER: __INTERNAL_USER_GROUP, "role": "internal"}
     __INTERNAL_SPECIFIC_USER_TOKEN = {constants.USER_IDENTIFIER: __INTERNAL_USER_SPECIFIC_USER_ID, "role": "internal"}
@@ -66,7 +66,7 @@ class SecureMessagingContextHelper:
         self._single_message_responses_data = []
         self._messages_responses_data = []
         self._last_saved_message_data = None
-        self._last_saved_label_count = 0
+        self._last_returned_thread_count = 0
 
         # Urls
 
@@ -87,7 +87,7 @@ class SecureMessagingContextHelper:
         self._message_post_url_v2 = SecureMessagingContextHelper.__BASE_URL + "/v2/messages"
         self._message_get_url_v2 = SecureMessagingContextHelper.__BASE_URL + "/v2/messages/{0}"
         self._messages_get_url_v2 = SecureMessagingContextHelper.__BASE_URL + "/v2/messages"
-        self._message_get_unread_count_url_v2 = SecureMessagingContextHelper.__BASE_URL + "/v2/messages/count"
+        self._threads_get_count_url_v2 = SecureMessagingContextHelper.__BASE_URL + "/v2/messages/count"
         self._message_put_url_v2 = SecureMessagingContextHelper.__BASE_URL + "/v2/messages/modify/{}"
 
         self._thread_get_url_v2 = SecureMessagingContextHelper.__BASE_URL + "/v2/threads/{0}"
@@ -183,16 +183,16 @@ class SecureMessagingContextHelper:
         return self._messages_get_url_v2
 
     @property
-    def messages_get_unread_count_v2_url(self):
-        return self._message_get_unread_count_url_v2
-
-    @property
     def message_put_v2_url(self):
         return self._message_put_url_v2
 
     @property
     def thread_get_v2_url(self):
         return self._thread_get_url_v2
+
+    @property
+    def threads_get_count_url_v2(self):
+        return self._threads_get_count_url_v2
 
     @property
     def respondent_id(self):
@@ -223,12 +223,12 @@ class SecureMessagingContextHelper:
         self._last_saved_message_data = copy.deepcopy(value)
 
     @property
-    def label_count(self):
-        return self._last_saved_label_count
+    def thread_count(self):
+        return self._last_returned_thread_count
 
-    @label_count.setter
-    def label_count(self, value):
-        self._last_saved_label_count = int(value)
+    @thread_count.setter
+    def thread_count(self, value):
+        self._last_returned_thread_count = int(value)
 
     @property
     def sent_messages(self):

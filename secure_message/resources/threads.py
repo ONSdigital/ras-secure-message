@@ -1,4 +1,3 @@
-from distutils.util import strtobool
 import logging
 
 from werkzeug.exceptions import BadRequest
@@ -105,6 +104,9 @@ class ThreadList(Resource):
         """Get thread list"""
         logger.info("Getting list of threads for user", user_uuid=g.user.user_uuid)
         message_args = get_options(request.args)
+
+        ThreadList._validate_request(message_args, g.user)
+
         result = Retriever.retrieve_thread_list(g.user, message_args)
 
         logger.info("Successfully retrieved threads for user", user_uuid=g.user.user_uuid)
@@ -113,16 +115,22 @@ class ThreadList(Resource):
             messages = add_users_and_business_details(messages)
         return jsonify({"messages": messages, "_links": links})
 
+    @staticmethod
+    def _validate_request(request_args, user):
+        if request_args.my_conversations and user.is_respondent:
+            logger.error('My conversations option not available to respondents', user_uuid=user.user_uuid)
+            raise BadRequest(description="My conversations option not available to respondents")
+
 
 class ThreadCounter(Resource):
     """Get count of all open or closed messages"""
     @staticmethod
     def get():
-        surveys = request.args.getlist('survey')
-        is_closed = bool(strtobool(request.args.get('is_closed', 'False')))
-
         if not g.user.is_internal:
             logger.info("Thread count should be internal users only", user_uuid=g.user.user_uuid)
             abort(403)
 
-        return jsonify(total=Retriever.thread_count_by_survey(surveys, is_closed))
+        logger.info("Getting count of threads for user", user_uuid=g.user.user_uuid)
+        message_args = get_options(request.args)
+
+        return jsonify(total=Retriever.thread_count_by_survey(message_args, g.user))

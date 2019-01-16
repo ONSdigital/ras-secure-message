@@ -281,12 +281,20 @@ This gives a count of messages that have not been read for a specific user. Ther
 
 `GET /threads`
 
-This returns a list of conversations , showing the latest message in a conversation .
-This is currently implemented but not used in production. Hence should be treated with caution.
-
+This returns the latest message in each conversation(aka thread) that satisfies the passed in
+criteria.
 It can use the same filter arguments as Get Messages, and returns the latest message in each thread that satisfies
-the criteria passed in .
-[Get Message List](#get-message-list)
+the criteria passed in [Get Message List](#get-message-list)
+
+Additional parameters above those on Get Message List:  
+
+```
+is_closed           If set and value = 'true' then only returns conversations that have been marked as closed, else returns open
+conversations
+
+my_conversations    If set and value ='true' then for an internal user will only retrieve conversations where they were an actor in the 
+latest message on the thread. I.e they sent the message or it was sent specifically to them. If set true when the user is a respondent then it returns a 400 
+```
 
 
 
@@ -444,6 +452,33 @@ Note V2 will have either uuids or 'GROUP' for the user ids, and a uuid for the s
 For descriptions of @msg_from, @msg_to and @ru see messages get
 [Get Message List](#get-message-list)
 
+## Get Conversations count  
+
+`GET /messages/count`
+
+This returns a count of the conversations that satisfy the search criteria. 
+Available search criteria matches those on get threads:
+```
+survey          If set then only conversations regarding this survey will be considered. Defaults to all surveys
+
+is_closed       If set true then only closed conversations will be considered. Defaults to false if omitted.
+
+my_conversations If set true then will only return conversations where the currently signed in user is an actor in the last message of the conversation.
+
+ru_id           If set then restrict conversations to those regarding a specific ru
+
+cc              If set then restricts the conversations to a specific collection case
+
+ce              If set then restricts the conversations to a specific collction exercise
+```
+
+#### Example JSON Response
+```json
+{
+  "total":14,
+}
+
+```
 ## Get Conversation by Id
 
 `GET /thread/{thread_id} or /v2/threads/<thread_id>`

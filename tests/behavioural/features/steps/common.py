@@ -55,6 +55,11 @@ def step_impl_n_messages_returned(context, message_count):
     nose.tools.assert_equal(int(message_count), len(context.bdd_helper.messages_responses_data[0]['messages']))
 
 
+@then("the thread count is '{thread_count}' threads")
+def sep_impl_thread_count_validate(context, thread_count):
+    nose.tools.assert_equal(int(thread_count), context.bdd_helper.thread_count)
+
+
 @given("debug step")
 @when("debug step")
 @then("debug step")

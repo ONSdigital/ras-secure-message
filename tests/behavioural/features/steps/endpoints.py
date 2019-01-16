@@ -1,6 +1,7 @@
 import copy
+import nose.tools
 
-from behave import given, when
+from behave import given, when, then
 from flask import json
 
 
@@ -125,19 +126,6 @@ def step_impl_the_thread_is_read(context):
     context.bdd_helper.store_messages_response_data(context.response.data)
 
 
-@given("the last '{message_count}' messages of thread are read")
-@when("the last '{message_count}' messages of thread are read")
-def step_impl_the_last_n_messages_of_thread_are_read(context):
-    """read a specific thread based on context thread id"""
-    url = context.bdd_helper.thread_get_url.format(context.thread_id)
-    context.response = context.client.get(url, headers=context.bdd_helper.headers)
-
-    returned_data = json.loads(context.response.data)
-    _try_persist_msg_and_thread_id_to_context(context, returned_data)
-
-    context.bdd_helper.store_messages_response_data(context.response.data)
-
-
 def _try_persist_msg_and_thread_id_to_context(context, returned_data):
     """common function used to extract msg_id and thread_id from returned messages"""
     if 'msg_id' in returned_data:
@@ -156,6 +144,13 @@ def _try_persist_msg_and_thread_id_to_context(context, returned_data):
 def step_impl_the_threads_are_read(context):
     """reads a list of threads"""
     url = context.bdd_helper.threads_get_url.format(context.thread_id)
+    context.response = context.client.get(url, headers=context.bdd_helper.headers)
+    context.bdd_helper.store_messages_response_data(context.response.data)
+
+
+@when('the threads are read with my_conversations set true')
+def step_impl_the_threads_are_read_with_my_conversations_set_true(context):
+    url = context.bdd_helper.threads_get_url + f"?my_conversations=true"
     context.response = context.client.get(url, headers=context.bdd_helper.headers)
     context.bdd_helper.store_messages_response_data(context.response.data)
 
@@ -349,15 +344,78 @@ def step_impl_messages_are_read_with_specific_survey(context, survey):
     _step_impl_get_messages_with_filter(context, url)
 
 
-@when("the count of  messages with '{label_name}' label in survey '{survey}' is made V2")
-@given("the count of  messages with '{label_name}' label in survey '{survey}' is made V2")
-def step_impl_the_messages_for_specific_survey_are_counted_for_survey(context, label_name, survey):
-    """access the messages_count endpoint to get the count of unread messages"""
-    url = context.bdd_helper.messages_get_unread_count_v2_url + f"?survey={survey}&is_closed=False"
+@when("the count of open threads in survey '{survey}' is made V2")
+@given("the count of open threads in survey '{survey}' is made V2")
+def step_impl_the_open_threads_count_for_specific_survey_are_counted(context, survey):
+    """access the messages_count endpoint to get the count of unread conversations"""
+    url = context.bdd_helper.threads_get_count_url_v2 + f"?survey={survey}&is_closed=false"
     context.response = context.client.get(url, headers=context.bdd_helper.headers)
     response_data = context.response.data
-    label_count = json.loads(response_data)["total"]
-    context.bdd_helper.label_count = label_count
+    context.bdd_helper.thread_count = json.loads(response_data)["total"]
+
+
+@when("the count of open threads is made")
+@given("the count of open threads is made V2")
+def step_impl_the_open_threads_count_are_counted(context):
+    """access the messages_count endpoint to get the count of unread conversations"""
+    url = context.bdd_helper.threads_get_count_url_v2 + f"?is_closed=false"
+    context.response = context.client.get(url, headers=context.bdd_helper.headers)
+    response_data = context.response.data
+    context.bdd_helper.thread_count = json.loads(response_data)["total"]
+
+
+@when("the count of open threads for current user is made")
+@given("the count of open threads for current user is made")
+def step_impl_my_open_threads_count_are_counted(context):
+    """access the messages_count endpoint to get the count of my unread conversations"""
+    url_args = f"?is_closed=false&my_conversations=true"
+    _step_impl_get_threads_count(context, url_args)
+
+
+@when("the count of open threads for current user and ce of '{ce}' is made")
+@given("the count of open threads for current user and ce of '{ce}' is made")
+def step_impl_my_open_threads_count_are_counted_by_ce(context, ce):
+    """access the messages_count endpoint to get the count of my unread conversations"""
+    url_args = f"?is_closed=false&my_conversations=true&ce={ce}"
+    _step_impl_get_threads_count(context, url_args)
+
+
+@when("the count of open threads for current user and cc of '{cc}' is made")
+@given("the count of open threads for current user and cc of '{cc}' is made")
+def step_impl_my_open_threads_count_are_counted_by_cc(context, cc):
+    """access the messages_count endpoint to get the count of my unread conversations"""
+    url_args = f"?is_closed=false&my_conversations=true&cc={cc}"
+    _step_impl_get_threads_count(context, url_args)
+
+
+@when("the count of open threads for current user and ru of '{ru}' is made")
+@given("the count of open threads for current user and ru of '{ru}' is made")
+def step_impl_my_open_threads_count_are_counted_by_ru(context, ru):
+    """access the messages_count endpoint to get the count of my unread conversations"""
+    url_args = f"?is_closed=false&my_conversations=true&ru_id={ru}"
+    _step_impl_get_threads_count(context, url_args)
+
+
+@when("the count of closed threads for current user is made")
+@given("the count of closed threads for current user is made")
+def step_impl_my_closed_threads_count_are_counted(context):
+    url_args = f"?is_closed=true&my_conversations=true"
+    _step_impl_get_threads_count(context, url_args)
+
+
+def _step_impl_get_threads_count(context, args):
+    url = context.bdd_helper.threads_get_count_url_v2 + args
+    context.response = context.client.get(url, headers=context.bdd_helper.headers)
+    response_data = context.response.data
+    if context.response.status_code == 200:
+        context.bdd_helper.thread_count = json.loads(response_data)["total"]
+    else:
+        context.bdd_helper.thread_count = -1
+
+
+@then("A count of '{count}' is returned")
+def step_impl_the_return_count_is(context, count):
+    nose.tools.assert_equal(count, context.bdd_helper.last_saved_message_data['msg_to'])
 
 
 @when("the message labels are modified V2")
