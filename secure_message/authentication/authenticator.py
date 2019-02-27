@@ -20,14 +20,14 @@ def authenticate(headers):
         return res
 
     res = Response(response="Authorization header required.", status=400, mimetype="text/html")
-    logger.debug('Authorization header not supplied.')
+    logger.error('Authorization header not supplied.')
     return res
 
 
 def check_jwt(token):
     try:
         decoded_jwt_token = decode(token)
-        logger.debug("Decoded JWT", user_uuid=decoded_jwt_token.get(constants.USER_IDENTIFIER))
+        logger.info("Decoded JWT", user_uuid=decoded_jwt_token.get(constants.USER_IDENTIFIER))
 
         if not decoded_jwt_token.get(constants.USER_IDENTIFIER):
             raise BadRequest(description="Missing user_uuid claim,"

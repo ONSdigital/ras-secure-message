@@ -192,7 +192,7 @@ class Retriever:
                 .order_by(SecureMessage.id.desc())
 
             if not result.all():
-                logger.debug('Thread does not exist', thread_id=thread_id)
+                logger.info('Thread does not exist', thread_id=thread_id)
                 raise NotFound(description=f"Conversation with thread_id '{thread_id}' does not exist")
 
         except SQLAlchemyError:
@@ -217,7 +217,7 @@ class Retriever:
                 .order_by(Status.id.desc())
 
             if not result.all():
-                logger.debug('Thread does not exist', thread_id=thread_id)
+                logger.info('Thread does not exist', thread_id=thread_id)
                 raise NotFound(description=f"Conversation with thread_id '{thread_id}' does not exist")
 
         except SQLAlchemyError:
