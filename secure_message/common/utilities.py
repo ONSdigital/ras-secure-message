@@ -78,7 +78,7 @@ def process_paginated_list(paginated_list, host_url, user, message_args, endpoin
 
 
 def add_to_details(messages):
-    """Adds a @msg_to key every message in a list of messages.
+    """Adds a @msg_to key to every message in a list of messages.
     Every msg_to uuid is resolved to include details of the user.
 
     If the call for the internal user id fails, an exception will be thrown.
@@ -101,7 +101,7 @@ def add_to_details(messages):
 
 
 def add_from_details(messages):
-    """Adds a @msg_from key every message in a list of messages.
+    """Adds a @msg_from key to every message in a list of messages.
     Every msg_to uuid is resolved to include details of the user.
 
     If the call for the internal user id fails, an exception will be thrown.
