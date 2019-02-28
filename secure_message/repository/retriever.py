@@ -192,8 +192,8 @@ class Retriever:
                 .order_by(SecureMessage.id.desc())
 
             if not result.all():
-                logger.info('Thread does not exist', thread_id=thread_id)
-                raise NotFound(description=f"Conversation with thread_id '{thread_id}' does not exist")
+                logger.error('Thread not retrieved for respondent', thread_id=thread_id, user_id=user.user_uuid)
+                raise NotFound(description=f"Conversation with thread_id '{thread_id}' not retrieved")
 
         except SQLAlchemyError:
             logger.exception('Error retrieving conversation from database')
@@ -217,11 +217,11 @@ class Retriever:
                 .order_by(Status.id.desc())
 
             if not result.all():
-                logger.info('Thread does not exist', thread_id=thread_id)
-                raise NotFound(description=f"Conversation with thread_id '{thread_id}' does not exist")
+                logger.error('Thread not retrieved for internal user', thread_id=thread_id)
+                raise NotFound(description=f"Conversation with thread_id '{thread_id}' not retrieved")
 
         except SQLAlchemyError:
-            logger.exception('Error retrieving conversation from database')
+            logger.exception(f"Error retrieving conversation from database thread_id '{thread_id}'")
             raise InternalServerError(description="Error retrieving conversation from database")
 
         return result

@@ -1,4 +1,5 @@
 import collections
+import json
 import logging
 import urllib.parse
 
@@ -85,17 +86,31 @@ def add_to_details(messages):
     If the external user id cannot be found in the list that we got from the party service.  There
     won't be a @msg_to value returned in the payload.  The API documentation notes that these elements
     aren't guaranteed to be provided so we're not breaking the contract by doing this.
+
+    Note:28th Feb 2019. Try except blocks added to try and identify cause of IndexError seen in splunk logs
+    No functionality added, just log and raise.
     """
     external_user_details = {}
-    for user in party.get_users_details(get_external_user_uuid_list(messages)):
+
+    try:
+        external_users = get_external_user_uuid_list(messages)
+    except IndexError:
+        logger.exception(f"Exception getting external user uuids for messages:'{json.dumps(messages)}'")
+        raise
+
+    for user in party.get_users_details(external_users):
         external_user_details[user['id']] = user
 
     for message in messages:
-        if not message["from_internal"]:
-            message.update({"@msg_to": [internal_user_service.get_user_details(message["msg_to"][0])]})
-        else:
-            if external_user_details.get(message['msg_to'][0]):
-                message.update({'@msg_to': [external_user_details.get(message['msg_to'][0])]})
+        try:
+            if not message["from_internal"]:
+                message.update({"@msg_to": [internal_user_service.get_user_details(message["msg_to"][0])]})
+            else:
+                if external_user_details.get(message['msg_to'][0]):
+                    message.update({'@msg_to': [external_user_details.get(message['msg_to'][0])]})
+        except IndexError:
+            logger.exception(f"Exception adding to details message:'{json.dumps(message)}'")
+            raise
 
     return messages
 
@@ -113,11 +128,15 @@ def add_from_details(messages):
     for user in party.get_users_details(get_external_user_uuid_list(messages)):
         external_user_details[user['id']] = user
     for message in messages:
-        if message["from_internal"]:
-            message.update({"@msg_from": internal_user_service.get_user_details(message["msg_from"])})
-        else:
-            if external_user_details.get(message['msg_from']):
-                message.update({'@msg_from': external_user_details.get(message['msg_from'])})
+        try:
+            if message["from_internal"]:
+                message.update({"@msg_from": internal_user_service.get_user_details(message["msg_from"])})
+            else:
+                if external_user_details.get(message['msg_from']):
+                    message.update({'@msg_from': external_user_details.get(message['msg_from'])})
+        except IndexError:
+            logger.exception(f"Exception adding from details message:'{json.dumps(message)}'")
+            raise
     return messages
 
 
