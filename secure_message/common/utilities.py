@@ -93,9 +93,7 @@ def add_to_details(messages):
 
     external_user_details = {}
 
-    external_users = get_external_user_uuid_list(messages)
-
-    for user in party.get_users_details(external_users):
+    for user in party.get_users_details(get_external_user_uuid_list(messages)):
         external_user_details[user['id']] = user
 
     for message in messages:
@@ -115,7 +113,7 @@ def add_to_details(messages):
                 if msg_to_details:
                     message.update({'@msg_to': [msg_to_details]})
                 else:
-                    logger.info("No details found for message to", msg_to=msg_to)
+                    logger.info("No details found for the message recipient", msg_to=msg_to)
 
         except IndexError:
             logger.exception("Exception adding to details", msg_to=msg_to, from_internal=from_internal)
