@@ -87,29 +87,38 @@ def add_to_details(messages):
     won't be a @msg_to value returned in the payload.  The API documentation notes that these elements
     aren't guaranteed to be provided so we're not breaking the contract by doing this.
 
-    Note:28th Feb 2019. Try except blocks added to try and identify cause of IndexError seen in splunk logs
-    No functionality added, just log and raise.
+    Note: Several of these lines of code could be combined into a more succinct view, spreading them out
+    is deliberate so that log stack traces are better able to identify the cause of log errors
     """
+
     external_user_details = {}
 
-    try:
-        external_users = get_external_user_uuid_list(messages)
-    except IndexError:
-        logger.exception(f"Exception getting external user uuids for messages:'{json.dumps(messages)}'")
-        raise
+    external_users = get_external_user_uuid_list(messages)
 
     for user in party.get_users_details(external_users):
         external_user_details[user['id']] = user
 
     for message in messages:
+
+        msg_to = None
+        from_internal = None
+
         try:
-            if not message["from_internal"]:
-                message.update({"@msg_to": [internal_user_service.get_user_details(message["msg_to"][0])]})
+            msg_to = message["msg_to"][0]
+            from_internal = message["from_internal"]
+
+            if not from_internal:
+                msg_to_details = internal_user_service.get_user_details(msg_to)
+                message.update({"@msg_to": [msg_to_details]})
             else:
-                if external_user_details.get(message['msg_to'][0]):
-                    message.update({'@msg_to': [external_user_details.get(message['msg_to'][0])]})
+                msg_to_details = external_user_details.get(msg_to)
+                if msg_to_details:
+                    message.update({'@msg_to': [msg_to_details]})
+                else:
+                    logger.info("No details found for message to", msg_to=msg_to)
+
         except IndexError:
-            logger.exception(f"Exception adding to details message:'{json.dumps(message)}'")
+            logger.exception("Exception adding to details", msg_to=msg_to, from_internal=from_internal)
             raise
 
     return messages

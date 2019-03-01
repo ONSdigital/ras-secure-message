@@ -20,7 +20,7 @@ class PartyService:
             response.raise_for_status()
         except HTTPError:
             logger.info("Business detail retrieval failed", status_code=response.status_code, text=response.text,
-                         ru_ids=ru_ids)
+                        ru_ids=ru_ids)
             return []
 
         logger.info("Business details successfully retrieved", ru_ids=ru_ids)
