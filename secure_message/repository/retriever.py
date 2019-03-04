@@ -218,11 +218,11 @@ class Retriever:
 
             if not result.all():
                 logger.error('Thread not retrieved for internal user', thread_id=thread_id)
-                raise NotFound(description="Conversation with not retrieved", thread_id=thread_id)
+                raise NotFound(description=f"Conversation with thread_id {thread_id} not retrieved")
 
         except SQLAlchemyError:
             logger.exception("Error retrieving conversation from database", thread_id=thread_id)
-            raise InternalServerError(description="Error retrieving conversation from database")
+            raise InternalServerError(description=f"Error retrieving conversation '{thread_id}' from database")
 
         return result
 
