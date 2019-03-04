@@ -134,15 +134,21 @@ def add_from_details(messages):
     external_user_details = {}
     for user in party.get_users_details(get_external_user_uuid_list(messages)):
         external_user_details[user['id']] = user
+
+    msg_from = None
+    from_internal = None
+
     for message in messages:
         try:
-            if message["from_internal"]:
-                message.update({"@msg_from": internal_user_service.get_user_details(message["msg_from"])})
+            msg_from = message["msg_from"]
+            from_internal = message["from_internal"]
+            if from_internal:
+                message.update({"@msg_from": internal_user_service.get_user_details(msg_from)})
             else:
                 if external_user_details.get(message['msg_from']):
-                    message.update({'@msg_from': external_user_details.get(message['msg_from'])})
+                    message.update({'@msg_from': external_user_details.get(msg_from)})
         except IndexError:
-            logger.exception(f"Exception adding from details message:'{json.dumps(message)}'")
+            logger.exception("Exception adding from details message", msg_from=msg_from, from_internal=from_internal)
             raise
     return messages
 
