@@ -36,7 +36,7 @@ class MessageSend(Resource):
             raise BadRequest(description="Message can not include msg_id")
         if post_data.get('thread_id'):
             conversation_metadata = Retriever.retrieve_conversation_metadata(post_data.get('thread_id'))
-            # Ideally here we'd return a 404 if there isn't a record in the comversation table.  But until we
+            # Ideally, we'd return a 404 if there isn't a record in the conversation table.  But until we
             # ensure there is a record in here for every thread_id in the secure_message table, we just have to
             # assume that it's fine if it's empty.
             if conversation_metadata and conversation_metadata.is_closed:

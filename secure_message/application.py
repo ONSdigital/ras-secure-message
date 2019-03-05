@@ -123,7 +123,7 @@ def get_client_token(client_id, client_secret, url):
     s.mount(get_token_url, HTTPAdapter(max_retries=15))
 
     try:
-        logger.debug("Attempting to GET client token from UAA")
+        logger.info("Attempting to GET client token from UAA")
         response = s.post(get_token_url,
                           headers=headers,
                           params=payload,
@@ -131,7 +131,7 @@ def get_client_token(client_id, client_secret, url):
         response.raise_for_status()
 
         try:
-            logger.debug("Decoding client token response json")
+            logger.info("Decoding client token response json")
             return response.json()
         except ValueError:
             logger.exception("Failed to decode response JSON. Retrying in 10 seconds.")
