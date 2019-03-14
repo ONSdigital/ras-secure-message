@@ -19,11 +19,11 @@ class PartyService:
         try:
             response.raise_for_status()
         except HTTPError:
-            logger.debug("Business detail retrieval failed", status_code=response.status_code, text=response.text,
-                         ru_ids=ru_ids)
+            logger.info("Business detail retrieval failed", status_code=response.status_code, text=response.text,
+                        ru_ids=ru_ids)
             return []
 
-        logger.debug("Business details successfully retrieved", ru_ids=ru_ids)
+        logger.info("Business details successfully retrieved", ru_ids=ru_ids)
         return response.json()
 
     def get_user_details(self, uuid):
@@ -48,5 +48,5 @@ class PartyService:
                              uuids=uuids)
             return []
 
-        logger.debug("Party data successfully retrieved", uuids=uuids)
+        logger.info("Party data successfully retrieved", uuids=uuids)
         return response.json()

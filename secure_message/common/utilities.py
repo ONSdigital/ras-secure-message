@@ -78,30 +78,51 @@ def process_paginated_list(paginated_list, host_url, user, message_args, endpoin
 
 
 def add_to_details(messages):
-    """Adds a @msg_to key every message in a list of messages.
+    """Adds a @msg_to key to every message in a list of messages.
     Every msg_to uuid is resolved to include details of the user.
 
     If the call for the internal user id fails, an exception will be thrown.
     If the external user id cannot be found in the list that we got from the party service.  There
     won't be a @msg_to value returned in the payload.  The API documentation notes that these elements
     aren't guaranteed to be provided so we're not breaking the contract by doing this.
+
+    Note: Several of these lines of code could be combined into a more succinct view, spreading them out
+    is deliberate so that log stack traces are better able to identify the cause of log errors
     """
+
     external_user_details = {}
+
     for user in party.get_users_details(get_external_user_uuid_list(messages)):
         external_user_details[user['id']] = user
 
     for message in messages:
-        if not message["from_internal"]:
-            message.update({"@msg_to": [internal_user_service.get_user_details(message["msg_to"][0])]})
-        else:
-            if external_user_details.get(message['msg_to'][0]):
-                message.update({'@msg_to': [external_user_details.get(message['msg_to'][0])]})
+
+        msg_to = None
+        from_internal = None
+
+        try:
+            msg_to = message["msg_to"][0]
+            from_internal = message["from_internal"]
+
+            if not from_internal:
+                msg_to_details = internal_user_service.get_user_details(msg_to)
+                message.update({"@msg_to": [msg_to_details]})
+            else:
+                msg_to_details = external_user_details.get(msg_to)
+                if msg_to_details:
+                    message.update({'@msg_to': [msg_to_details]})
+                else:
+                    logger.info("No details found for the message recipient", msg_to=msg_to)
+
+        except IndexError:
+            logger.exception("Exception adding to details", msg_to=msg_to, from_internal=from_internal)
+            raise
 
     return messages
 
 
 def add_from_details(messages):
-    """Adds a @msg_from key every message in a list of messages.
+    """Adds a @msg_from key to every message in a list of messages.
     Every msg_to uuid is resolved to include details of the user.
 
     If the call for the internal user id fails, an exception will be thrown.
@@ -112,12 +133,22 @@ def add_from_details(messages):
     external_user_details = {}
     for user in party.get_users_details(get_external_user_uuid_list(messages)):
         external_user_details[user['id']] = user
+
+    msg_from = None
+    from_internal = None
+
     for message in messages:
-        if message["from_internal"]:
-            message.update({"@msg_from": internal_user_service.get_user_details(message["msg_from"])})
-        else:
-            if external_user_details.get(message['msg_from']):
-                message.update({'@msg_from': external_user_details.get(message['msg_from'])})
+        try:
+            msg_from = message["msg_from"]
+            from_internal = message["from_internal"]
+            if from_internal:
+                message.update({"@msg_from": internal_user_service.get_user_details(msg_from)})
+            else:
+                if external_user_details.get(message['msg_from']):
+                    message.update({'@msg_from': external_user_details.get(msg_from)})
+        except IndexError:
+            logger.exception("Exception adding from details message", msg_from=msg_from, from_internal=from_internal)
+            raise
     return messages
 
 

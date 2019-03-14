@@ -25,6 +25,9 @@ after_success:
 branches:
     only:
         - master
+env:
+  global:
+    - PIPENV_IGNORE_VIRTUALENVS=1
 
 addons:
   postgresql: "9.6"
