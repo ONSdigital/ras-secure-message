@@ -35,6 +35,36 @@ class PartyService:
         return self._get_user_details_from_party_service(uuids)
 
     @staticmethod
+    def does_user_have_claim(user_id, bus_id, survey_id):
+        """Returns true of the user id has a claim on the bus_id, survey_id combination
+         False if not.
+
+         Rather than inspect the respondent data it defers to Party Service for the precise logic
+         to determine what constitutes a valid claim so as to maintain separation of concerns and
+         avoid future maintenance issues.
+        """
+        params = {"respondent_id": user_id, "bus_id": bus_id, "survey_id": survey_id}
+
+        response = requests.get(f"{current_app.config['RAS_PARTY_SERVICE']}party-api/v1/respondents/claim",
+                                auth=current_app.config['BASIC_AUTH'], verify=False, params=urlencode(params))
+        try:
+            response.raise_for_status()
+        except HTTPError:
+            logger.exception('Failed to validate claim data with party service',
+                             status_code=response.status_code,
+                             text=response.text,
+                             respondent_id=user_id,
+                             bus_id=bus_id,
+                             survey_id=survey_id)
+            return []
+
+        logger.info("claim response", response_data=response.content)
+        claim_response = response.content.decode("utf-8")
+        logger.info("Party claim data successfully retrieved ", respondent_id=user_id,
+                    bus_id=bus_id, survey_id=survey_id, response=claim_response)
+        return claim_response.lower() == 'valid'
+
+    @staticmethod
     def _get_user_details_from_party_service(uuids):
         params = urlencode([("id", uuid) for uuid in uuids])
         response = requests.get(f"{current_app.config['RAS_PARTY_SERVICE']}party-api/v1/respondents",

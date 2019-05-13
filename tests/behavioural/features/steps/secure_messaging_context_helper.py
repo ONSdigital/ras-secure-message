@@ -22,6 +22,9 @@ class SecureMessagingContextHelper:
 
     __DEFAULT_SURVEY = '33333333-22222-3333-4444-88dc018a1a4c'
     __ALTERNATE_SURVEY = '11111111-22222-3333-4444-88dc018a1a4c'
+    __ADDITIONAL_SURVEY_1 = 'additional_survey_1'
+    __ADDITIONAL_SURVEY_2 = 'additional_survey_2'
+    __ADDITIONAL_SURVEY_3 = 'additional_survey_3'
 
     __DEFAULT_COLLECTION_CASE = 'collection case1'             # UUID in real use, string for testing clarity
     __ALTERNATE_COLLECTION_CASE = 'AnotherCollectionCase'      # UUID in real use, string for testing clarity
@@ -67,6 +70,7 @@ class SecureMessagingContextHelper:
         self._messages_responses_data = []
         self._last_saved_message_data = None
         self._last_returned_thread_count = 0
+        self.additional_respondent_claims = {}
 
         # Urls
 
@@ -145,6 +149,18 @@ class SecureMessagingContextHelper:
     @property
     def alternate_survey(self):
         return copy.copy(SecureMessagingContextHelper.__ALTERNATE_SURVEY)
+
+    @property
+    def additional_survey_1(self):
+        return copy.copy(SecureMessagingContextHelper.__ADDITIONAL_SURVEY_1)
+
+    @property
+    def additional_survey_2(self):
+        return copy.copy(SecureMessagingContextHelper.__ADDITIONAL_SURVEY_2)
+
+    @property
+    def additional_survey_3(self):
+        return copy.copy(SecureMessagingContextHelper.__ADDITIONAL_SURVEY_3)
 
     @property
     def message_post_url(self):
@@ -268,6 +284,10 @@ class SecureMessagingContextHelper:
     def health_details_endpoint(self):
         return self._health_details_endpoint
 
+    @property
+    def default_ru(self):
+        return copy.copy(self.__DEFAULT_RU)
+
     def use_alternate_ru(self):
         self._message_data['ru_id'] = SecureMessagingContextHelper.__ALTERNATE_RU
 
@@ -291,3 +311,7 @@ class SecureMessagingContextHelper:
 
     def use_default_collection_exercise(self):
         self._message_data['collection_exercise'] = SecureMessagingContextHelper.__DEFAULT_COLLECTION_EXERCISE
+
+    def add_additional_respondent_claim(self, bus_id, survey):
+        """Add an ru/survey pair to the additional claims """
+        self.additional_respondent_claims[bus_id] = survey
