@@ -52,7 +52,7 @@ class MessageSend(Resource):
         # Validate claim
         if not self._has_valid_claim(g.user, message.data):
             logger.error("Message send failed", error="Invalid claim")
-            return make_response(jsonify("Invalid claim"), 400)
+            return make_response(jsonify("Invalid claim"), 403)
 
         logger.info("Message passed validation")
         self._message_save(message)
