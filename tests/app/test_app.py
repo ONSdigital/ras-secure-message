@@ -37,7 +37,7 @@ class AppTestCase(unittest.TestCase):
                                "role": "internal"}
 
         external_token_data = {constants.USER_IDENTIFIER: AppTestCase.SPECIFIC_EXTERNAL_USER,
-                               "role": "respondent", "claims": [{'bus_id': AppTestCase.TEST_RU,
+                               "role": "respondent", "claims": [{'business_id': AppTestCase.TEST_RU,
                                                                  'surveys': [AppTestCase.BRES_SURVEY]
                                                                  }]
                                }
@@ -82,7 +82,7 @@ class AppTestCase(unittest.TestCase):
                 'thread': "?",
                 'ru_id': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc',
                 'create_date': datetime.now(timezone.utc),
-                'survey': 'a-survey-id'}
+                'survey': 'a-uuid-for-the-survey'}
 
         response = self.client.post(url, data=json.dumps(data), headers=self.internal_user_header)
         self.assertEqual(response.status_code, 201)  # check post has succeeded

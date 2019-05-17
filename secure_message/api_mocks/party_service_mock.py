@@ -24,17 +24,17 @@ class PartyServiceMock:
             user_details = None
         return user_details
 
-    def does_user_have_claim(self, user_id, bus_id, survey_id):
+    def does_user_have_claim(self, user_id, business_id, survey_id):
         user_details = self._respondent_ids[user_id]
         associations = user_details['associations']
-        is_enrolled = self._is_user_enrolled_on_survey(associations, bus_id, survey_id)
+        is_enrolled = self._is_user_enrolled_on_survey(associations, business_id, survey_id)
         return user_details['status'] == 'ACTIVE' and is_enrolled
 
     @staticmethod
-    def _is_user_enrolled_on_survey(associations, bus_id, survey_id):
+    def _is_user_enrolled_on_survey(associations, business_id, survey_id):
         for association in associations:
             surveys = [v['surveyId'] for v in association['enrolments'] if v['enrolmentStatus'] == 'ENABLED']
-            if survey_id in surveys and association['partyId'] == bus_id:
+            if survey_id in surveys and association['partyId'] == business_id:
                 return True
 
         return False

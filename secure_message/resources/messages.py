@@ -45,7 +45,7 @@ class MessageSend(Resource):
         post_data['from_internal'] = g.user.is_internal
         message = self._validate_post_data(post_data)
 
-        if message.errors != {}:
+        if message.errors:
             logger.error('Message send failed', errors=message.errors)
             return make_response(jsonify(message.errors), 400)
 

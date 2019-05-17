@@ -51,42 +51,42 @@ class PartyTestCase(unittest.TestCase):
 
     def test_get_does_user_have_claim_returns_true_if_known(self):
         user_id = "ab123456-ce17-40c2-a8fc-abcdef123456"
-        bus_id = "b3ba864b-7cbc-4f44-84fe-88dc018a1a4c"
+        business_id = "b3ba864b-7cbc-4f44-84fe-88dc018a1a4c"
         survey_id = "cb0711c3-0ac8-41d3-ae0e-567e5ea1ef87"
         sut = PartyServiceMock()
-        result = sut.does_user_have_claim(user_id, bus_id, survey_id)
+        result = sut.does_user_have_claim(user_id, business_id, survey_id)
         self.assertTrue(result)
 
-    def test_get_does_user_have_claim_returns_false_for_unknown_bus_id(self):
+    def test_get_does_user_have_claim_returns_false_for_unknown_business_id(self):
         user_id = "ab123456-ce17-40c2-a8fc-abcdef123456"
-        bus_id = "somethingunknown"
+        business_id = "somethingunknown"
         survey_id = "cb0711c3-0ac8-41d3-ae0e-567e5ea1ef87"
         sut = PartyServiceMock()
-        result = sut.does_user_have_claim(user_id, bus_id, survey_id)
+        result = sut.does_user_have_claim(user_id, business_id, survey_id)
         self.assertFalse(result)
 
     def test_get_does_user_have_claim_returns_false_for_unknown_survey_id(self):
         user_id = "ab123456-ce17-40c2-a8fc-abcdef123456"
-        bus_id = "b3ba864b-7cbc-4f44-84fe-88dc018a1a4c"
+        business_id = "b3ba864b-7cbc-4f44-84fe-88dc018a1a4c"
         survey_id = "not known"
         sut = PartyServiceMock()
-        result = sut.does_user_have_claim(user_id, bus_id, survey_id)
+        result = sut.does_user_have_claim(user_id, business_id, survey_id)
         self.assertFalse(result)
 
     def test_get_does_user_have_claim_returns_false_for_not_active_user(self):
         user_id = "inactive_user"
-        bus_id = "b3ba864b-7cbc-4f44-84fe-88dc018a1a4c"
+        business_id = "b3ba864b-7cbc-4f44-84fe-88dc018a1a4c"
         survey_id = "cb0711c3-0ac8-41d3-ae0e-567e5ea1ef87"
         sut = PartyServiceMock()
-        result = sut.does_user_have_claim(user_id, bus_id, survey_id)
+        result = sut.does_user_have_claim(user_id, business_id, survey_id)
         self.assertFalse(result)
 
     def test_get_does_user_have_claim_returns_false_for_not_enabled(self):
         user_id = "not_enabled"
-        bus_id = "b3ba864b-7cbc-4f44-84fe-88dc018a1a4c"
+        business_id = "b3ba864b-7cbc-4f44-84fe-88dc018a1a4c"
         survey_id = "cb0711c3-0ac8-41d3-ae0e-567e5ea1ef87"
         sut = PartyServiceMock()
-        result = sut.does_user_have_claim(user_id, bus_id, survey_id)
+        result = sut.does_user_have_claim(user_id, business_id, survey_id)
         self.assertFalse(result)
 
 

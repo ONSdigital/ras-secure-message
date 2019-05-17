@@ -312,6 +312,6 @@ class SecureMessagingContextHelper:
     def use_default_collection_exercise(self):
         self._message_data['collection_exercise'] = SecureMessagingContextHelper.__DEFAULT_COLLECTION_EXERCISE
 
-    def add_additional_respondent_claim(self, bus_id, survey):
+    def add_additional_respondent_claim(self, business_id, survey):
         """Add an ru/survey pair to the additional claims """
-        self.additional_respondent_claims[bus_id] = survey
+        self.additional_respondent_claims[business_id] = survey
