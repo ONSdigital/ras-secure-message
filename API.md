@@ -268,6 +268,8 @@ Note there is only an UNREAD label , absence of `UNREAD` is interpreted as the m
 
 This gives a count of messages that have not been read for a specific user. There are no current requirements around internal users.
 
+NOTE: This endpoint does not appear to be used anywhere, and is redundant.
+
 #### Example JSON Response
 
 ```json
