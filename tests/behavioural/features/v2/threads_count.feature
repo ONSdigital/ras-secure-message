@@ -3,12 +3,12 @@ Feature: Threads count endpoint V2
   Background: Reset database
     Given prepare for tests using 'mock' services
 
-  Scenario Outline: Respondent sending multiple valid messages to group , non specific user should have same number of threads
+  Scenario Outline: Respondent sending multiple valid messages to internal , internal user should have same number of threads
     Given sending from respondent to internal group
-      And the survey is set to 'SomeSurvey'
+      And survey set to default survey
     When '5' messages are sent using V2
       And the user is set as internal <user>
-      And the count of open threads in survey 'SomeSurvey' is made V2
+      And the count of open threads in default survey is made
     Then the returned label count was '5' V2
 
     Examples: user type
@@ -19,12 +19,12 @@ Feature: Threads count endpoint V2
 
 Scenario Outline: Respondent sends multiple messages to internal , some to group/user,  internal reads unread messages , validate threads count
 Given sending from respondent to internal group
-  And the survey is set to 'SomeSurvey'
+  And survey set to default survey
   And '5' messages are sent
   And sending from respondent to internal <user>
   And '4' messages are sent using V2
   And the user is set as internal <user>
-When the count of open threads in survey 'SomeSurvey' is made V2
+  And the count of open threads in default survey is made
 Then the returned label count was '9' V2
 
 Examples: user type
@@ -35,14 +35,14 @@ Examples: user type
 
 Scenario Outline: Respondent sends multiple messages to internal on different surveys internal reads inbox messages , count should be correct for each survey
 Given sending from respondent to internal <user>
-  And the survey is set to 'Survey1'
+  And the survey is set to 'additional_survey_1'
   And '5' messages are sent
-  And the survey is set to 'Survey2'
+  And the survey is set to 'additional_survey_2'
   And '4' messages are sent using V2
-  And the survey is set to 'Survey3'
+  And the survey is set to 'additional_survey_3'
   And '3' messages are sent using V2
   And the user is set as internal <user>
-When the count of open threads in survey 'Survey2' is made V2
+When the count of open threads in survey 'additional_survey_2' is made V2
 Then the thread count is '4' threads
 
 Examples: user type
@@ -127,12 +127,12 @@ Scenario: Respondent sends messages to different cc, internal user filters by cc
 
 Scenario: Respondent sends messages to different ru, internal user filters by ru
   Given sending from respondent to internal specific user
-    And the ru is set to 'ru1'
+    And the ru is set to 'additional_ru1'
     And the message is sent V2
-    And the ru is set to 'ru1'
+    And the ru is set to 'additional_ru1'
     And the message is sent V2
-    And the ru is set to 'ru2'
+    And the ru is set to 'additional_ru2'
     And the message is sent V2
   When  the user is set as internal specific user
-    And the count of open threads for current user and ru of 'ru1' is made
+    And the count of open threads for current user and ru of 'additional_ru1' is made
   Then  the thread count is '2' threads

@@ -167,3 +167,19 @@ Feature: Message Send Endpoint
       And  the to is set to 'someone_who_does_not_exist'
     When the message is sent
     Then a bad request status code 400 is returned
+
+  Scenario: Respondent sends a message for an ru they have no claim for , user should receive 403
+   Given the user is set as respondent
+    And  the from is set to respondent
+    And  the to is set to internal specific user
+    And the ru is set to 'An ru that they cannot have a claim for'
+   When the message is sent
+   Then a forbidden status code 403 is returned
+
+ Scenario: Respondent sends a message for a survey they have no claim for , user should receive 403
+   Given the user is set as respondent
+    And  the from is set to respondent
+    And  the to is set to internal specific user
+    And the survey is set to 'Some survey they cannot have a claim for'
+   When the message is sent
+   Then a forbidden status code 403 is returned

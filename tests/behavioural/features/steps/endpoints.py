@@ -354,6 +354,16 @@ def step_impl_the_open_threads_count_for_specific_survey_are_counted(context, su
     context.bdd_helper.thread_count = json.loads(response_data)["total"]
 
 
+@when("the count of open threads in default survey is made")
+@given("the count of open threads in default survey is made")
+def step_impl_the_open_threads_count_for_default_survey_are_counted(context):
+    """access the messages_count endpoint to get the count of unread conversations"""
+    url = context.bdd_helper.threads_get_count_url_v2 + f"?survey={context.bdd_helper.default_survey}&is_closed=false"
+    context.response = context.client.get(url, headers=context.bdd_helper.headers)
+    response_data = context.response.data
+    context.bdd_helper.thread_count = json.loads(response_data)["total"]
+
+
 @when("the count of open threads is made")
 @given("the count of open threads is made V2")
 def step_impl_the_open_threads_count_are_counted(context):

@@ -133,3 +133,27 @@ def step_impl_prepare_to_send_from_rinternal_group_to_respondent(context):
     step_impl_the_user_is_internal_group_user(context)
     step_impl_the_msg_from_is_set_to_internal_group_user(context)
     step_impl_the_msg_to_is_set_to_respondent(context)
+
+
+@given("the respondent has an additional claim for alternate survey on the default ru")
+def step_impl_the_respondent_has_additional_claim_for_alternate_survey_on_default_ru(context):
+    step_impl_the_respondent_has_additional_claim(context, context.bdd_helper.default_ru,
+                                                  context.bdd_helper.alternate_survey)
+
+
+@given("the respondent has an additional claim for survey: '{survey}' on the default ru")
+def step_impl_the_respondent_has_additional_claim_on_default_ru(context, survey):
+    step_impl_the_respondent_has_additional_claim(context, context.bdd_helper.default_ru, survey)
+
+
+@given("the respondent has an additional claim of ru:'{ru}' and survey: '{survey}'")
+def step_impl_the_respondent_has_additional_claim(context, ru, survey):
+    """set the user to the default respondent as saved in the helper"""
+    with context.app.app_context():
+        context.bdd_helper.add_additional_respondent_claim(ru, survey)
+
+
+@given("the respondent has an additional claim for ru: '{ru}' on the default survey")
+def step_impl_the_respondent_has_additional_claim_on_ru_on_default_survey(context, ru):
+    with context.app.app_context():
+        context.bdd_helper.add_additional_respondent_claim(ru, context.bdd_helper.default_survey)
