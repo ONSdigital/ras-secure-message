@@ -2,7 +2,6 @@ import unittest
 from unittest import mock
 from unittest.mock import patch
 from datetime import datetime, timezone
-import uuid
 
 from flask import current_app, json
 from sqlalchemy import create_engine
@@ -18,10 +17,13 @@ from secure_message.common.alerts import AlertViaLogging
 from secure_message.api_mocks.party_service_mock import PartyServiceMock
 
 
-class FlaskTestCase(unittest.TestCase):
+class AppTestCase(unittest.TestCase):
     """Test case for application endpoints"""
 
     BRES_SURVEY = "33333333-22222-3333-4444-88dc018a1a4c"
+    SPECIFIC_INTERNAL_USER = "SpecificInternalUserId"
+    SPECIFIC_EXTERNAL_USER = "0a7ad740-10d5-4ecb-b7ca-3c0384afb882"
+    TEST_RU = 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc'
 
     def setUp(self):
         """setup test environment"""
@@ -31,11 +33,14 @@ class FlaskTestCase(unittest.TestCase):
 
         AlertUser.alert_method = mock.Mock(AlertViaGovNotify)
 
-        internal_token_data = {constants.USER_IDENTIFIER: constants.NON_SPECIFIC_INTERNAL_USER,
+        internal_token_data = {constants.USER_IDENTIFIER: AppTestCase.SPECIFIC_INTERNAL_USER,
                                "role": "internal"}
 
-        external_token_data = {constants.USER_IDENTIFIER: str(uuid.uuid4()),
-                               "role": "respondent"}
+        external_token_data = {constants.USER_IDENTIFIER: AppTestCase.SPECIFIC_EXTERNAL_USER,
+                               "role": "respondent", "claims": [{'business_id': AppTestCase.TEST_RU,
+                                                                 'surveys': [AppTestCase.BRES_SURVEY]
+                                                                 }]
+                               }
 
         with self.app.app_context():
             internal_signed_jwt = encode(internal_token_data)
@@ -47,7 +52,7 @@ class FlaskTestCase(unittest.TestCase):
         self.external_user_header = {'Content-Type': 'application/json', 'Authorization': external_signed_jwt}
 
         self.test_message = {'msg_to': ['0a7ad740-10d5-4ecb-b7ca-3c0384afb882'],
-                             'msg_from': constants.NON_SPECIFIC_INTERNAL_USER,
+                             'msg_from': AppTestCase.SPECIFIC_INTERNAL_USER,
                              'subject': 'MyMessage',
                              'body': 'hello',
                              'thread_id': "",
@@ -67,24 +72,25 @@ class FlaskTestCase(unittest.TestCase):
 
     def test_that_checks_post_request_is_within_database(self):
         """check messages from messageSend endpoint saved in database correctly"""
-        # check if json message is inside the database
 
         url = "http://localhost:5050/message/send"
 
         data = {'msg_to': ['0a7ad740-10d5-4ecb-b7ca-3c0384afb882'],
-                'msg_from': 'ce12b958-2a5f-44f4-a6da-861e59070a31',
+                'msg_from': AppTestCase.SPECIFIC_INTERNAL_USER,
                 'subject': 'MyMessage',
                 'body': 'hello',
                 'thread': "?",
                 'ru_id': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc',
                 'create_date': datetime.now(timezone.utc),
-                'read_date': datetime.now(timezone.utc)}
+                'survey': 'a-uuid-for-the-survey'}
 
-        self.client.post(url, data=json.dumps(data), headers=self.internal_user_header)
+        response = self.client.post(url, data=json.dumps(data), headers=self.internal_user_header)
+        self.assertEqual(response.status_code, 201)  # check post has succeeded
 
         with self.engine.connect() as con:
-            request = con.execute('SELECT * FROM securemessage.secure_message WHERE id = (SELECT MAX(id) FROM securemessage.secure_message)')
-            for row in request:
+            db_data = con.execute('SELECT * FROM securemessage.secure_message WHERE id = (SELECT MAX(id) FROM securemessage.secure_message)')
+            self.assertEqual(db_data.rowcount, 1)
+            for row in db_data:
                 data = {"subject": row['subject'], "body": row['body']}
                 self.assertEqual({'subject': 'MyMessage', 'body': 'hello'}, data)
 
@@ -96,9 +102,9 @@ class FlaskTestCase(unittest.TestCase):
         self.client.post(url, data=json.dumps(self.test_message), headers=self.internal_user_header)
         engine = create_engine(self.app.config['SECURE_MESSAGING_DATABASE_URL'], echo=True)
         with engine.connect() as con:
-            request = con.execute('SELECT * FROM securemessage.secure_message WHERE id = (SELECT MAX(id) FROM securemessage.secure_message)')
-
-            for row in request:
+            db_data = con.execute('SELECT * FROM securemessage.secure_message WHERE id = (SELECT MAX(id) FROM securemessage.secure_message)')
+            self.assertEqual(db_data.rowcount, 1)
+            for row in db_data:
                 self.assertEqual(len(row['msg_id']), 36)
 
     def test_thread_patch_without_content_type_in_header_fails(self):
@@ -132,8 +138,8 @@ class FlaskTestCase(unittest.TestCase):
 
         engine = create_engine(self.app.config['SECURE_MESSAGING_DATABASE_URL'], echo=True)
         with engine.connect() as con:
-            request = con.execute('SELECT * FROM securemessage.secure_message WHERE id = (SELECT MAX(id) FROM securemessage.secure_message)')
-            for row in request:
+            db_data = con.execute('SELECT * FROM securemessage.secure_message WHERE id = (SELECT MAX(id) FROM securemessage.secure_message)')
+            for row in db_data:
                 self.test_message['thread_id'] = row['thread_id']
 
         # Now submit a new message as a reply , Message Id empty , thread id same as last one
@@ -186,9 +192,9 @@ class FlaskTestCase(unittest.TestCase):
         data = json.loads(response.data)
 
         with self.engine.connect() as con:
-            request = con.execute("SELECT * FROM securemessage.status WHERE label='SENT' AND msg_id='{0}' AND actor='{1}'"
+            db_data = con.execute("SELECT * FROM securemessage.status WHERE label='SENT' AND msg_id='{0}' AND actor='{1}'"
                                   .format(data['msg_id'], self.test_message['survey']))
-            for row in request:
+            for row in db_data:
                 self.assertTrue(row is not None)
 
     def test_message_post_stores_events_correctly_for_message(self):
@@ -199,8 +205,8 @@ class FlaskTestCase(unittest.TestCase):
         data = json.loads(response.data)
 
         with self.engine.connect() as con:
-            request = con.execute(f"SELECT * FROM securemessage.events WHERE event='Sent' AND msg_id='{data['msg_id']}'")
-            for row in request:
+            db_data = con.execute(f"SELECT * FROM securemessage.events WHERE event='Sent' AND msg_id='{data['msg_id']}'")
+            for row in db_data:
                 self.assertTrue(row is not None)
 
     def test_message_post_stores_labels_correctly_for_recipient_of_message(self):
@@ -211,10 +217,10 @@ class FlaskTestCase(unittest.TestCase):
         data = json.loads(response.data)
         # dereferencing msg_to for purpose of test
         with self.engine.connect() as con:
-            request = con.execute("SELECT * FROM securemessage.status WHERE "
+            db_data = con.execute("SELECT * FROM securemessage.status WHERE "
                                   "label='INBOX' OR label='UNREAD' AND msg_id='{0}'"
                                   " AND actor='{1}'".format(data['msg_id'], self.test_message['msg_to'][0]))
-            for row in request:
+            for row in db_data:
                 self.assertTrue(row is not None)
 
     def test_message_post_stores_status_correctly_for_internal_user(self):
@@ -225,10 +231,10 @@ class FlaskTestCase(unittest.TestCase):
         data = json.loads(response.data)
 
         with self.engine.connect() as con:
-            request = con.execute("SELECT * FROM securemessage.status WHERE "
+            db_data = con.execute("SELECT * FROM securemessage.status WHERE "
                                   "msg_id='{0}' AND actor='{1}' AND label='SENT'"
                                   .format(data['msg_id'], self.test_message['survey']))
-            for row in request:
+            for row in db_data:
                 self.assertTrue(row is not None)
 
     @patch.object(PartyServiceMock, 'get_user_details', return_value=({"id": "f62dfda8-73b0-4e0e-97cf-1b06327a6712",
