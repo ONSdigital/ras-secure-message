@@ -27,7 +27,7 @@ class MessageSend(Resource):
     def post(self):
         """used to handle POST requests to send a message"""
         logger.info("Message send POST request.")
-        if request.headers['Content-Type'].lower() != 'application/json':
+        if request.headers.get('Content-Type', '').lower() != 'application/json':
             # API only returns JSON
             logger.info('Request must set accept content type "application/json" in header.')
         post_data = request.get_json(force=True)

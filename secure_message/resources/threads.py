@@ -48,7 +48,7 @@ class ThreadById(Resource):
         if not g.user.is_internal:
             bound_logger.info("Thread modification is forbidden")
             abort(403)
-        if request.headers['Content-Type'].lower() != 'application/json':
+        if request.headers.get('Content-Type', '').lower() != 'application/json':
             bound_logger.info('Request must set accept content type "application/json" in header.')
             raise BadRequest(description='Request must set accept content type "application/json" in header.')
 
