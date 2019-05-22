@@ -31,10 +31,10 @@ class AlertViaGovNotify:
         # If a 500 error does occur, it won't be shown to the user and the exception will just be swallowed
         if response.status_code != 201:
             raise RasNotifyException(code=500, survey_id=survey_id, party_id=party_id)
-        else:
-            logger.info('Sent secure message email notification, via RM Notify-Gateway to GOV.UK Notify.',
-                        message_id=response.json()["id"], survey_id=survey_id, party_id=party_id,
-                        personalisation=personalisation)
+
+        logger.info('Sent secure message email notification, via RM Notify-Gateway to GOV.UK Notify.',
+                    message_id=response.json()["id"], survey_id=survey_id, party_id=party_id,
+                    personalisation=personalisation)
 
 
 class AlertViaLogging:
