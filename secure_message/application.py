@@ -183,7 +183,7 @@ def log_request():
     headers = ''.join(header_list)
 
     req_data = request.data
-    if req_data is None or req_data is b'':    # pylint:disable=literal-comparison
+    if req_data is None or req_data == b'':
         req_data = 'Empty'
     else:
         req_data = json.loads(req_data)
