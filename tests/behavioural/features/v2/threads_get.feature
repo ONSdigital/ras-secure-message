@@ -390,4 +390,4 @@ Feature: Get threads list Endpoint V2
       And   the thread id is set to the last returned thread id
     When the user is set as alternative respondent
      And  the thread is read
-    Then  forbidden status code 403 is returned
+    Then  a forbidden status code 403 is returned
