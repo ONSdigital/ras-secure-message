@@ -4,7 +4,7 @@ from datetime import datetime
 
 from flask import current_app
 from sqlalchemy import create_engine
-from werkzeug.exceptions import NotFound
+from werkzeug.exceptions import NotFound, Forbidden
 
 from secure_message.application import create_app
 from secure_message.common.eventsapi import EventsApi
@@ -400,11 +400,11 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
                 self.assertIsNotNone(second_respondent_thread)
 
                 # first respondent shouldn't be able to retrieve second respondent's message
-                with self.assertRaises(NotFound):
+                with self.assertRaises(Forbidden):
                     Retriever.retrieve_thread(first_respondent_thread_id, self.second_user_respondent)
 
                 # second respondent shouldn't be able to retrieve first respondent's message
-                with self.assertRaises(NotFound):
+                with self.assertRaises(Forbidden):
                     Retriever.retrieve_thread(second_respondent_thread_id, self.user_respondent)
 
 
