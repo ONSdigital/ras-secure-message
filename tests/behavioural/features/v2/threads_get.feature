@@ -120,24 +120,24 @@ Feature: Get threads list Endpoint V2
                     each with different survey_id validate , that only 2 messages returned when we restrict by survey
 
     Given sending from respondent to internal <user>
-      And the survey is set to 'Survey1'
+      And the survey is set to 'additional_survey_1'
       And the message is sent V2
       And the thread id is set to the last returned thread id
       And the message is sent V2
 
       And the thread_id is set to empty
-      And the survey is set to 'Survey2'
+      And the survey is set to 'additional_survey_2'
       And the message is sent V2
       And the thread id is set to the last returned thread id
       And the message is sent V2
 
       And the thread_id is set to empty
-      And the survey is set to 'Survey1'
+      And the survey is set to 'additional_survey_1'
       And the message is sent V2
       And the thread id is set to the last returned thread id
       And the message is sent V2
 
-    When the threads in survey 'Survey1' are read
+    When the threads in survey 'additional_survey_1' are read
     Then  a success status code 200 is returned
       And  '2' messages are returned
 
@@ -184,24 +184,24 @@ Feature: Get threads list Endpoint V2
                     each with different ru validate , that only 2 messages returned when we restrict by ru
 
     Given sending from respondent to internal <user>
-      And the ru is set to 'ru1'
+      And the ru is set to 'additional_ru1'
       And the message is sent V2
       And the thread id is set to the last returned thread id
       And the message is sent V2
 
       And the thread_id is set to empty
-      And the ru is set to 'ru2'
+      And the ru is set to 'additional_ru2'
       And the message is sent V2
       And the thread id is set to the last returned thread id
       And the message is sent V2
 
       And the thread_id is set to empty
-      And the ru is set to 'ru1'
+      And the ru is set to 'additional_ru1'
       And the message is sent V2
       And the thread id is set to the last returned thread id
       And the message is sent V2
 
-    When the threads with ru 'ru1' are read
+    When the threads with ru 'additional_ru1' are read
     Then  a success status code 200 is returned
       And  '2' messages are returned
 

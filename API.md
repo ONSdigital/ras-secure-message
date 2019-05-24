@@ -52,7 +52,7 @@ See the endpoint descriptions for detailed usage of each field. This is an overv
 * Survey . (survey). This is the uuid of the survey . It is mandatory when saving a message.
 * Collection Exercise .  (collection exercise) uuid of the collection exercise , can be used as a filter option (ce)
 * Reporting unit . (ru) uuid of the reporting unit . Can be used as a filter option.
-* Labels . These can be used to set a status on a message , or retrieve messages with a specific label. Valid labels:
+* Labels . These can be used to set a status on a message, or retrieve messages with a specific label. Valid labels:
     * SENT  Added to a message for the actor who sent the message
     * INBOX Added to the message for the actor who received the message
     * UNREAD Added to a message to indicate that a message has not been read
@@ -267,6 +267,8 @@ Note there is only an UNREAD label , absence of `UNREAD` is interpreted as the m
 `GET /labels?name=unread`
 
 This gives a count of messages that have not been read for a specific user. There are no current requirements around internal users.
+
+NOTE: This endpoint does not appear to be used anywhere, and is redundant.
 
 #### Example JSON Response
 
