@@ -1,10 +1,14 @@
 FROM python:3.6-slim
 
-WORKDIR /app
-COPY . /app
-EXPOSE 5050
-RUN apt-get update -y && apt-get install -y python-pip && apt-get update -y && apt-get install -y curl
-RUN pip3 install pipenv && pipenv install --deploy --system
+RUN apt-get update && apt-get install -y build-essential curl
+RUN pip install pipenv
 
-ENTRYPOINT ["python3"]
-CMD ["run.py"]
+WORKDIR /app
+EXPOSE 5050
+CMD ["python", "run.py"]
+
+HEALTHCHECK --interval=1m30s --timeout=10s --retries=3 \
+  CMD curl -f http://localhost:5050/info || exit 1
+
+COPY . /app
+RUN pipenv install --deploy --system
