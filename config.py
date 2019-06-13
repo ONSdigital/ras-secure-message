@@ -17,11 +17,10 @@ class Config:
     It contains a full default configuration
     All configuration may be overridden by setting the appropriate environment variable name.
     """
-    NAME = os.getenv('NAME', 'ras-secure-message')
-    VERSION = os.getenv('VERSION', '0.15.0')
+    VERSION = '0.15.0'
 
     SECURE_MESSAGING_DATABASE_URL = os.getenv(
-        'SECURE_MESSAGING_DATABASE_URL', 'postgresql://postgres:postgres@localhost:5432')
+        'SECURE_MESSAGING_DATABASE_URL', 'postgresql://postgres:postgres@localhost:6432')
 
     if cf.detected:
         logger.info('Cloud Foundry environment identified.',

@@ -84,9 +84,7 @@ def step_impl_n_messages_have_specific_label(context, message_count, label):
     nose.tools.assert_equal(int(message_count), label_count)
 
 
-# V2 Below
-
-@then("the returned label count was '{thread_count}' V2")
-def step_impl_n_messages_have_specific_label_v2(context, thread_count):
+@then("the returned label count was '{thread_count}'")
+def step_impl_n_specific_label_count(context, thread_count):
     """validate that a specific number of messages in a reply have a specific label"""
     nose.tools.assert_equal(int(thread_count), context.bdd_helper.thread_count)
