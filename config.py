@@ -20,7 +20,7 @@ class Config:
     VERSION = '0.15.0'
 
     SECURE_MESSAGING_DATABASE_URL = os.getenv(
-        'SECURE_MESSAGING_DATABASE_URL', 'postgresql://postgres:postgres@localhost:6432')
+        'SECURE_MESSAGING_DATABASE_URL', 'postgresql://postgres:postgres@localhost:5432')
 
     if cf.detected:
         logger.info('Cloud Foundry environment identified.',
