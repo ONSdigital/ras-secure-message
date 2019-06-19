@@ -77,7 +77,7 @@ in a non obvious way.*
 Run the behave tests with:
 ```bash
 pipenv run behave # Runs all of the tests
-pipenv run behave tests/behavioural/features/v2/thread_get.feature # Runs individual feature test
+pipenv run behave tests/behavioural/features/thread_get.feature # Runs individual feature test
 ```
 
 
@@ -96,8 +96,6 @@ Environment variables available for configuration are listed below:
 
 | Environment Variable            | Description                                                   | Default
 |---------------------------------|---------------------------------------------------------------|-------------------------------
-| NAME                            | Name of application                                           | 'ras-secure-message'
-| VERSION                         | Version number of application                                 | '0.1.3' (manually update as application updates)
 | SMS_LOG_LEVEL                   | Log level for the application                                 | 'DEBUG'
 | SECURITY_USER_NAME              | Username for basic auth                                       | N/A
 | SECURITY_USER_PASSWORD          | Password for basic auth                                       | N/A

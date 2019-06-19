@@ -73,7 +73,7 @@ class AppTestCase(unittest.TestCase):
     def test_that_checks_post_request_is_within_database(self):
         """check messages from messageSend endpoint saved in database correctly"""
 
-        url = "http://localhost:5050/message/send"
+        url = "http://localhost:5050/messages"
 
         data = {'msg_to': ['0a7ad740-10d5-4ecb-b7ca-3c0384afb882'],
                 'msg_from': AppTestCase.SPECIFIC_INTERNAL_USER,
@@ -97,7 +97,7 @@ class AppTestCase(unittest.TestCase):
     def test_post_request_stores_uuid_in_msg_id_if_message_post_called_with_no_msg_id_set(self):
         """check default_msg_id is stored when messageSend endpoint called with no msg_id"""
         # post json message written up in the ui
-        url = "http://localhost:5050/message/send"
+        url = "http://localhost:5050/messages"
 
         self.client.post(url, data=json.dumps(self.test_message), headers=self.internal_user_header)
         engine = create_engine(self.app.config['SECURE_MESSAGING_DATABASE_URL'], echo=True)
@@ -110,7 +110,7 @@ class AppTestCase(unittest.TestCase):
     def test_thread_patch_without_content_type_in_header_fails(self):
         """check default_msg_id is stored when messageSend endpoint called with no msg_id"""
         # post json message written up in the ui
-        url = "http://localhost:5050/v2/threads/f1a5e99c-8edf-489a-9c72-6cabe6c387fc"
+        url = "http://localhost:5050/threads/f1a5e99c-8edf-489a-9c72-6cabe6c387fc"
         header_copy = self.internal_user_header.copy()
         header_copy.pop('Content-Type')
         response = self.client.patch(url, data=json.dumps({"is_closed": True}), headers=header_copy)
@@ -120,7 +120,7 @@ class AppTestCase(unittest.TestCase):
     def test_thread_patch_as_external_user_fails(self):
         """check default_msg_id is stored when messageSend endpoint called with no msg_id"""
         # post json message written up in the ui
-        url = "http://localhost:5050/v2/threads/f1a5e99c-8edf-489a-9c72-6cabe6c387fc"
+        url = "http://localhost:5050/threads/f1a5e99c-8edf-489a-9c72-6cabe6c387fc"
         response = self.client.patch(url, data=json.dumps({"is_closed": True}), headers=self.external_user_header)
         self.assertEqual(response.status_code, 403)
         error_message = "You don't have the permission to access the requested resource. It is either read-protected or not readable by the server."
@@ -130,7 +130,7 @@ class AppTestCase(unittest.TestCase):
         """check a reply gets same thread id as original"""
         # post json message written up in the ui
 
-        url = "http://localhost:5050/message/send"
+        url = "http://localhost:5050/messages"
 
         self.client.post(url, data=json.dumps(self.test_message), headers=self.internal_user_header)
 
@@ -168,7 +168,7 @@ class AppTestCase(unittest.TestCase):
 
     def test_missing_thread_id_does_not_cause_exception(self):
         """posts to message send end point without 'thread_id'"""
-        url = "http://localhost:5050/message/send"
+        url = "http://localhost:5050/messages"
 
         test_message = {'msg_to': ['0a7ad740-10d5-4ecb-b7ca-3c0384afb882'],
                         'msg_from': 'ce12b958-2a5f-44f4-a6da-861e59070a31',
@@ -186,7 +186,7 @@ class AppTestCase(unittest.TestCase):
 
     def test_message_post_stores_labels_correctly_for_sender_of_message(self):
         """posts to message send end point to ensure labels are saved as expected"""
-        url = "http://localhost:5050/message/send"
+        url = "http://localhost:5050/messages"
 
         response = self.client.post(url, data=json.dumps(self.test_message), headers=self.internal_user_header)
         data = json.loads(response.data)
@@ -199,7 +199,7 @@ class AppTestCase(unittest.TestCase):
 
     def test_message_post_stores_events_correctly_for_message(self):
         """posts to message send end point to ensure events are saved as expected"""
-        url = "http://localhost:5050/message/send"
+        url = "http://localhost:5050/messages"
 
         response = self.client.post(url, data=json.dumps(self.test_message), headers=self.internal_user_header)
         data = json.loads(response.data)
@@ -211,7 +211,7 @@ class AppTestCase(unittest.TestCase):
 
     def test_message_post_stores_labels_correctly_for_recipient_of_message(self):
         """posts to message send end point to ensure labels are saved as expected"""
-        url = "http://localhost:5050/message/send"
+        url = "http://localhost:5050/messages"
 
         response = self.client.post(url, data=json.dumps(self.test_message), headers=self.internal_user_header)
         data = json.loads(response.data)
@@ -225,7 +225,7 @@ class AppTestCase(unittest.TestCase):
 
     def test_message_post_stores_status_correctly_for_internal_user(self):
         """posts to message send end point to ensure survey is saved for internal user"""
-        url = "http://localhost:5050/message/send"
+        url = "http://localhost:5050/messages"
 
         response = self.client.post(url, data=json.dumps(self.test_message), headers=self.internal_user_header)
         data = json.loads(response.data)
@@ -248,7 +248,7 @@ class AppTestCase(unittest.TestCase):
     def test_notify_called(self, mock_alerter, _):
         """Test that Notify is called when sending a new secure message """
 
-        url = "http://localhost:5050/message/send"
+        url = "http://localhost:5050/messages"
         self.client.post(url, data=json.dumps(self.test_message), headers=self.internal_user_header)
         self.assertTrue(mock_alerter.called)
 
@@ -256,7 +256,7 @@ class AppTestCase(unittest.TestCase):
     @patch.object(MessageSend, '_try_send_alert_email', side_effect=Exception('SomethingBad'))
     def test_exception_in_alert_listeners_raises_exception_but_returns_201(self, mock_sender, mock_logger):
         """Test exceptions in alerting do not prevent a response indicating success"""
-        url = "http://localhost:5050/message/send"
+        url = "http://localhost:5050/messages"
         result = self.client.post(url, data=json.dumps(self.test_message), headers=self.internal_user_header)
         self.assertTrue(mock_logger.called)
         self.assertTrue(result.status_code == 201)
@@ -271,7 +271,7 @@ class AppTestCase(unittest.TestCase):
     def test_if_user_has_no_email_address_no_email_sent(self, mock_alerter, mock_party):
         """Test if Email Address is missing no attempt will be made to send email """
 
-        url = "http://localhost:5050/message/send"
+        url = "http://localhost:5050/messages"
         self.client.post(url, data=json.dumps(self.test_message), headers=self.internal_user_header)
         self.assertFalse(mock_alerter.called)
 
@@ -286,7 +286,7 @@ class AppTestCase(unittest.TestCase):
     def test_if_user_has_zero_length_email_address_no_email_sent(self, mock_alerter, mock_party):
         """Test if Email Address is zero length no attempt will be made to send email """
 
-        url = "http://localhost:5050/message/send"
+        url = "http://localhost:5050/messages"
         self.client.post(url, data=json.dumps(self.test_message), headers=self.internal_user_header)
         self.assertFalse(mock_alerter.called)
 
@@ -301,7 +301,7 @@ class AppTestCase(unittest.TestCase):
     def test_if_user_has_only_whitespace_in_email_address_no_email_sent(self, mock_alerter, mock_party):
         """Test if Email Address is zero length no attempt will be made to send email """
 
-        url = "http://localhost:5050/message/send"
+        url = "http://localhost:5050/messages"
         self.client.post(url, data=json.dumps(self.test_message), headers=self.internal_user_header)
         self.assertFalse(mock_alerter.called)
 
@@ -310,7 +310,7 @@ class AppTestCase(unittest.TestCase):
     def test_if_user_unknown_in_party_service_no_email_sent(self, mock_alerter, mock_party):
         """Test if Email Address is zero length no attempt will be made to send email """
 
-        url = "http://localhost:5050/message/send"
+        url = "http://localhost:5050/messages"
         self.client.post(url, data=json.dumps(self.test_message), headers=self.internal_user_header)
         self.assertFalse(mock_alerter.called)
 

@@ -52,8 +52,6 @@ def step_impl_retrieved_msg_from_is_as_saved(context):
     msg_resp = json.loads(context.response.data)
     nose.tools.assert_equal(msg_resp['msg_from'], context.bdd_helper.last_saved_message_data['msg_from'])
 
-# V2 Steps below
-
 
 @given("the from is set to internal group")
 @when("the from is set to internal group")

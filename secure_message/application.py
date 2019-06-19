@@ -40,7 +40,7 @@ def create_app(config=None):
     zipkin = Zipkin(app=app, sample_rate=app.config.get("ZIPKIN_SAMPLE_RATE"))
     requestsdefaulter.default_headers(zipkin.create_http_headers_for_new_span)
 
-    logger_initial_config(service_name='ras-secure-message', log_level=app.config.get('SMS_LOG_LEVEL'))
+    logger_initial_config()
 
     missing_vars = [var for var in app.config['NON_DEFAULT_VARIABLES']
                     if app.config.get(var) is None]
@@ -60,13 +60,12 @@ def create_app(config=None):
     api.add_resource(HealthDetails, '/health/details')
     api.add_resource(Info, '/info')
 
-    api.add_resource(MessageSend, '/message/send', '/v2/messages')
-    api.add_resource(MessageModifyById, '/message/<message_id>/modify',
-                     '/v2/messages/modify/<message_id>')
+    api.add_resource(MessageSend, '/messages')
+    api.add_resource(MessageModifyById, '/messages/modify/<message_id>')
 
     api.add_resource(ThreadList, '/threads')
-    api.add_resource(ThreadById, '/thread/<thread_id>', '/v2/threads/<thread_id>')
-    api.add_resource(ThreadCounter, '/v2/messages/count')
+    api.add_resource(ThreadById, '/threads/<thread_id>')
+    api.add_resource(ThreadCounter, '/messages/count')
 
     app.oauth_client_token_expires_at = maya.now()
 

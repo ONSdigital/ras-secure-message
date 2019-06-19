@@ -60,8 +60,6 @@ def step_impl_retrieved_msg_to_is_as_saved(context):
     nose.tools.assert_equal(msg_resp['msg_to'], context.bdd_helper.last_saved_message_data['msg_to'])
 
 
-# V2 Steps below
-
 @given("the to is set to internal group")
 @when("the to is set to internal group")
 def step_impl_the_msg_to_is_set_to_internal_group_user(context):

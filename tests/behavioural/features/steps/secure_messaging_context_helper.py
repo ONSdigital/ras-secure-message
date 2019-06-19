@@ -74,27 +74,17 @@ class SecureMessagingContextHelper:
 
         # Urls
 
-        self._message_post_url = SecureMessagingContextHelper.__BASE_URL + "/message/send"
+        self._message_post_url = SecureMessagingContextHelper.__BASE_URL + "/messages"
         self._message_get_url = SecureMessagingContextHelper.__BASE_URL + "/message/{0}"
-        self._message_put_url = SecureMessagingContextHelper.__BASE_URL + "/message/{}/modify"
-        self._messages_get_url = SecureMessagingContextHelper.__BASE_URL + "/messages"
+        self._message_put_url = SecureMessagingContextHelper.__BASE_URL + "/messages/modify/{}"
+        self._threads_get_count_url = SecureMessagingContextHelper.__BASE_URL + "/messages/count"
 
-        self._thread_get_url = SecureMessagingContextHelper.__BASE_URL + "/thread/{0}"
+        self._thread_get_url = SecureMessagingContextHelper.__BASE_URL + "/threads/{0}"
         self._threads_get_url = SecureMessagingContextHelper.__BASE_URL + "/threads"
 
         self._health_endpoint = SecureMessagingContextHelper.__BASE_URL + "/health"
         self._health_db_endpoint = SecureMessagingContextHelper.__BASE_URL + "/health/db"
         self._health_details_endpoint = SecureMessagingContextHelper.__BASE_URL + "/health/details"
-
-        # V2 urls
-
-        self._message_post_url_v2 = SecureMessagingContextHelper.__BASE_URL + "/v2/messages"
-        self._message_get_url_v2 = SecureMessagingContextHelper.__BASE_URL + "/v2/messages/{0}"
-        self._messages_get_url_v2 = SecureMessagingContextHelper.__BASE_URL + "/v2/messages"
-        self._threads_get_count_url_v2 = SecureMessagingContextHelper.__BASE_URL + "/v2/messages/count"
-        self._message_put_url_v2 = SecureMessagingContextHelper.__BASE_URL + "/v2/messages/modify/{}"
-
-        self._thread_get_url_v2 = SecureMessagingContextHelper.__BASE_URL + "/v2/threads/{0}"
 
     @property
     def token_data(self):
@@ -171,10 +161,6 @@ class SecureMessagingContextHelper:
         return self._message_get_url
 
     @property
-    def messages_get_url(self):
-        return self._messages_get_url
-
-    @property
     def message_put_url(self):
         return self._message_put_url
 
@@ -187,28 +173,8 @@ class SecureMessagingContextHelper:
         return self._threads_get_url
 
     @property
-    def message_post_v2_url(self):
-        return self._message_post_url_v2
-
-    @property
-    def message_get_v2_url(self):
-        return self._message_get_url_v2
-
-    @property
-    def messages_get_v2_url(self):
-        return self._messages_get_url_v2
-
-    @property
-    def message_put_v2_url(self):
-        return self._message_put_url_v2
-
-    @property
-    def thread_get_v2_url(self):
-        return self._thread_get_url_v2
-
-    @property
-    def threads_get_count_url_v2(self):
-        return self._threads_get_count_url_v2
+    def threads_get_count_url(self):
+        return self._threads_get_count_url
 
     @property
     def respondent_id(self):
