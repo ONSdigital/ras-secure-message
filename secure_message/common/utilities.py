@@ -96,10 +96,6 @@ def add_to_details(messages):
         external_user_details[user['id']] = user
 
     for message in messages:
-
-        msg_to = None
-        from_internal = None
-
         try:
             msg_to = message["msg_to"][0]
             from_internal = message["from_internal"]
@@ -134,9 +130,6 @@ def add_from_details(messages):
     for user in party.get_users_details(get_external_user_uuid_list(messages)):
         external_user_details[user['id']] = user
 
-    msg_from = None
-    from_internal = None
-
     for message in messages:
         try:
             msg_from = message["msg_from"]
@@ -168,7 +161,7 @@ def get_external_user_uuid_list(messages):
 
 
 def add_business_details(messages):
-    """Adds a @ru_id key every message in a list of messages."""
+    """Adds a @ru_id key to every message in a list of messages."""
     ru_ids = set()
 
     for message in messages:

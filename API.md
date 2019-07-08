@@ -52,7 +52,7 @@ See the endpoint descriptions for detailed usage of each field. This is an overv
 * Survey . (survey). This is the uuid of the survey . It is mandatory when saving a message.
 * Collection Exercise .  (collection exercise) uuid of the collection exercise , can be used as a filter option (ce)
 * Reporting unit . (ru) uuid of the reporting unit . Can be used as a filter option.
-* Labels . These can be used to set a status on a message , or retrieve messages with a specific label. Valid labels:
+* Labels . These can be used to set a status on a message, or retrieve messages with a specific label. Valid labels:
     * SENT  Added to a message for the actor who sent the message
     * INBOX Added to the message for the actor who received the message
     * UNREAD Added to a message to indicate that a message has not been read
@@ -74,7 +74,7 @@ Being able to get a response from a health or info endpoint but 500's from a mes
 
 ## Get Message List ##
 
-`GET /messages  or /v2/messages`
+`GET /messages`
 
 Retrieves a list of messages based on the selected parameters passed on the query string.
 
@@ -93,7 +93,7 @@ Retrieves a list of messages based on the selected parameters passed on the quer
 | limit | `int` | 2 | maximum number of messages to return per page |
 | page  | 'int' | 1 | which page of data to return |
 
-   * An example of using one the above would be: `GET /messages?limit=2` , `/v2/messages?limit=20`    
+   * An example of using one the above would be: `GET /messages?limit=2`
    * Using multiple parameters: `GET /messages?limit=2&label=INBOX&survey=12345678981047653839`
 
 Note that if the user is a respondent the get messages returns messages which match the uuid of the user passed in the JWT and that satisfy any additional filter criteria. If the user is internal then it matches messages sent to all internal users that satisfy the additional filter criteria . Typically that would be restricted by survey_id so that only messages  of a specific survey are returned.
@@ -177,12 +177,11 @@ Note the message response contains @msg_from , @msg_to and @ru . These hold valu
 
 ## Send Message ##
 
-`POST /message/send or '/v2/messages`
+`POST /messages`
 
 The messages post endpoint stores a secure message . If the recipient is a respondent it will also send an email via Notify.Gov.
 
 Note, the message post must have a Content-Type header of `application/json` , else it will return an error.
-Note, V2 uses messages , V1 uses message (singular)
 
 When a message is posted, typically, no msg_id is supplied.
 
@@ -204,7 +203,7 @@ When a message is posted, typically, no msg_id is supplied.
 * msg_to - Should be set to a specific user uuid if known , else to the constant 'GROUP' if sending to an unknown user in ONS
 * msg_from - The current user uuid
 * thread_id - Should be set to the thread id of the message being replied to if the message is a reply, else left empty
-* survey - Should be the uuid of the survey . This was ignored in V1 but is now critical in V2 so that we can restrict messages by survey
+* survey - Should be the uuid of the survey.
 * collection_case - The uuid of the collection case. Can be used as a filter option (cc).
 
 ```json
@@ -232,9 +231,7 @@ Note if the message is a new message ( not a reply to an existing one) then the 
 
 ## Modify Message Labels
 
-`PUT message/{id}/modify or /v2/messages/modify/<message_id>`  
-
-Note V2 uses messages , V1 uses message (singular)
+`PUT /messages/modify/<message_id>`  
 
 This is used to modify the labels (aka status) associated with a message.
 Currently only limited label names and actions are supported. It is typically used to mark a message as read/unread.
@@ -268,6 +265,8 @@ Note there is only an UNREAD label , absence of `UNREAD` is interpreted as the m
 
 This gives a count of messages that have not been read for a specific user. There are no current requirements around internal users.
 
+NOTE: This endpoint does not appear to be used anywhere, and is redundant.
+
 #### Example JSON Response
 
 ```json
@@ -299,7 +298,7 @@ latest message on the thread. I.e they sent the message or it was sent specifica
 
 
 #### Example JSON Response
-Note V2 will have either uuids or 'GROUP' for the user ids, and a uuid for the survey id
+Note, the response will have either uuids or 'GROUP' for the user ids, and a uuid for the survey id
 ```json
 {
   "_links": {
@@ -481,9 +480,8 @@ ce              If set then restricts the conversations to a specific collction 
 ```
 ## Get Conversation by Id
 
-`GET /thread/{thread_id} or /v2/threads/<thread_id>`
+`GET /threads/<thread_id>`
 
-Note V2 uses threads, V1 uses thread (singular)
 This has been implemented but not used in production, hence should be treated with caution.
 This returns all messages on a specific thread.
 
@@ -491,15 +489,15 @@ Note there is a known bug here. That is messages are ordered by date of entry wh
 sub conversations are in progress (i.e two internal users replying on a thread ).
 
 #### Example JSON Response
-Note, V2 messages should have survey_id, collection_case and use either a uuid or "GROUP" for the internal user.
+Messages should have survey_id, collection_case and use either a uuid or "GROUP" for the internal user.
 ```json
 {
   "_links": {
     "first": {
-      "href": "http://localhost:5050/thread/78e3caa6-2e27-4ad3-bd38-168b2cc3ef5d"
+      "href": "http://localhost:5050/threads/78e3caa6-2e27-4ad3-bd38-168b2cc3ef5d"
     },
     "self": {
-      "href": "http://localhost:5050/thread/78e3caa6-2e27-4ad3-bd38-168b2cc3ef5d?page=1&limit=20"
+      "href": "http://localhost:5050/threads/78e3caa6-2e27-4ad3-bd38-168b2cc3ef5d?page=1&limit=20"
     }
   },
   "messages": [
@@ -647,9 +645,8 @@ Note, See message get for descriptions of @msg_from, @msg_to and @ru
 
 ## Patch Conversation Metadata
 
-`PATCH /thread/{thread_id} or /v2/threads/<thread_id>`
+`PATCH /threads/<thread_id>`
 
-Note V2 uses threads, V1 uses thread (singular).
 This is used to add/remove metadata to a conversation.  Below is a list of the parameters that can be
 patched:
 
@@ -724,13 +721,11 @@ Returns more detailed information about secure message including some of the env
     "/health/details": "Rest endpoint to provide application details",
     "/info": "Rest endpoint to provide application information",
     "/labels": "Get a count of unread messages",
-    "/message/<message_id>/modify": "Update message status by id",
     "/message/send": "Send message for a user",
-    "/thread/<thread_id>": "Return list of messages for user",
+    "/threads/<thread_id>": "Return list of messages for user",
     "/threads": "Return a list of threads for the user",
-    "/v2/messages/count": "Get count of unread messages using v2 endpoint",
-    "/v2/messages/modify/<message_id>": "Update message status by id",
-    "/v2/threads/<thread_id>": "Return list of messages for user"
+    "/messages/count": "Get count of unread messages",
+    "/messages/modify/<message_id>": "Update message status by id",
   },
   "APP Log Level": "INFO",
   "NOTIFY VIA GOV NOTIFY": "0",

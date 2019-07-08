@@ -17,8 +17,7 @@ class Config:
     It contains a full default configuration
     All configuration may be overridden by setting the appropriate environment variable name.
     """
-    NAME = os.getenv('NAME', 'ras-secure-message')
-    VERSION = os.getenv('VERSION', '0.14.0')
+    VERSION = '1.0.0'
 
     SECURE_MESSAGING_DATABASE_URL = os.getenv(
         'SECURE_MESSAGING_DATABASE_URL', 'postgresql://postgres:postgres@localhost:5432')
@@ -42,9 +41,6 @@ class Config:
     NOTIFICATION_DEV_EMAIL = os.getenv('NOTIFICATION_DEV_EMAIL', 'notanemail@email.com')
     RM_NOTIFY_GATEWAY_URL = os.getenv('RM_NOTIFY_GATEWAY_URL')
     REQUESTS_POST_TIMEOUT = os.getenv('REQUESTS_POST_TIMEOUT', 20)
-
-    # SQLAlchemy configuration
-    SQLALCHEMY_POOL_SIZE = os.getenv('SQLALCHEMY_POOL_SIZE', 5)
 
     # Zipkin
     ZIPKIN_DISABLE = bool(strtobool(os.getenv("ZIPKIN_DISABLE", "False")))

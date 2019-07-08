@@ -2,7 +2,6 @@ import unittest
 from unittest import mock
 from unittest.mock import patch
 from datetime import datetime, timezone
-import uuid
 
 from flask import current_app, json
 from sqlalchemy import create_engine
@@ -18,10 +17,13 @@ from secure_message.common.alerts import AlertViaLogging
 from secure_message.api_mocks.party_service_mock import PartyServiceMock
 
 
-class FlaskTestCase(unittest.TestCase):
+class AppTestCase(unittest.TestCase):
     """Test case for application endpoints"""
 
     BRES_SURVEY = "33333333-22222-3333-4444-88dc018a1a4c"
+    SPECIFIC_INTERNAL_USER = "SpecificInternalUserId"
+    SPECIFIC_EXTERNAL_USER = "0a7ad740-10d5-4ecb-b7ca-3c0384afb882"
+    TEST_RU = 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc'
 
     def setUp(self):
         """setup test environment"""
@@ -31,11 +33,14 @@ class FlaskTestCase(unittest.TestCase):
 
         AlertUser.alert_method = mock.Mock(AlertViaGovNotify)
 
-        internal_token_data = {constants.USER_IDENTIFIER: constants.NON_SPECIFIC_INTERNAL_USER,
+        internal_token_data = {constants.USER_IDENTIFIER: AppTestCase.SPECIFIC_INTERNAL_USER,
                                "role": "internal"}
 
-        external_token_data = {constants.USER_IDENTIFIER: str(uuid.uuid4()),
-                               "role": "respondent"}
+        external_token_data = {constants.USER_IDENTIFIER: AppTestCase.SPECIFIC_EXTERNAL_USER,
+                               "role": "respondent", "claims": [{'business_id': AppTestCase.TEST_RU,
+                                                                 'surveys': [AppTestCase.BRES_SURVEY]
+                                                                 }]
+                               }
 
         with self.app.app_context():
             internal_signed_jwt = encode(internal_token_data)
@@ -47,7 +52,7 @@ class FlaskTestCase(unittest.TestCase):
         self.external_user_header = {'Content-Type': 'application/json', 'Authorization': external_signed_jwt}
 
         self.test_message = {'msg_to': ['0a7ad740-10d5-4ecb-b7ca-3c0384afb882'],
-                             'msg_from': constants.NON_SPECIFIC_INTERNAL_USER,
+                             'msg_from': AppTestCase.SPECIFIC_INTERNAL_USER,
                              'subject': 'MyMessage',
                              'body': 'hello',
                              'thread_id': "",
@@ -67,44 +72,45 @@ class FlaskTestCase(unittest.TestCase):
 
     def test_that_checks_post_request_is_within_database(self):
         """check messages from messageSend endpoint saved in database correctly"""
-        # check if json message is inside the database
 
-        url = "http://localhost:5050/message/send"
+        url = "http://localhost:5050/messages"
 
         data = {'msg_to': ['0a7ad740-10d5-4ecb-b7ca-3c0384afb882'],
-                'msg_from': 'ce12b958-2a5f-44f4-a6da-861e59070a31',
+                'msg_from': AppTestCase.SPECIFIC_INTERNAL_USER,
                 'subject': 'MyMessage',
                 'body': 'hello',
                 'thread': "?",
                 'ru_id': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc',
                 'create_date': datetime.now(timezone.utc),
-                'read_date': datetime.now(timezone.utc)}
+                'survey': 'a-uuid-for-the-survey'}
 
-        self.client.post(url, data=json.dumps(data), headers=self.internal_user_header)
+        response = self.client.post(url, data=json.dumps(data), headers=self.internal_user_header)
+        self.assertEqual(response.status_code, 201)  # check post has succeeded
 
         with self.engine.connect() as con:
-            request = con.execute('SELECT * FROM securemessage.secure_message WHERE id = (SELECT MAX(id) FROM securemessage.secure_message)')
-            for row in request:
+            db_data = con.execute('SELECT * FROM securemessage.secure_message WHERE id = (SELECT MAX(id) FROM securemessage.secure_message)')
+            self.assertEqual(db_data.rowcount, 1)
+            for row in db_data:
                 data = {"subject": row['subject'], "body": row['body']}
                 self.assertEqual({'subject': 'MyMessage', 'body': 'hello'}, data)
 
     def test_post_request_stores_uuid_in_msg_id_if_message_post_called_with_no_msg_id_set(self):
         """check default_msg_id is stored when messageSend endpoint called with no msg_id"""
         # post json message written up in the ui
-        url = "http://localhost:5050/message/send"
+        url = "http://localhost:5050/messages"
 
         self.client.post(url, data=json.dumps(self.test_message), headers=self.internal_user_header)
         engine = create_engine(self.app.config['SECURE_MESSAGING_DATABASE_URL'], echo=True)
         with engine.connect() as con:
-            request = con.execute('SELECT * FROM securemessage.secure_message WHERE id = (SELECT MAX(id) FROM securemessage.secure_message)')
-
-            for row in request:
+            db_data = con.execute('SELECT * FROM securemessage.secure_message WHERE id = (SELECT MAX(id) FROM securemessage.secure_message)')
+            self.assertEqual(db_data.rowcount, 1)
+            for row in db_data:
                 self.assertEqual(len(row['msg_id']), 36)
 
     def test_thread_patch_without_content_type_in_header_fails(self):
         """check default_msg_id is stored when messageSend endpoint called with no msg_id"""
         # post json message written up in the ui
-        url = "http://localhost:5050/v2/threads/f1a5e99c-8edf-489a-9c72-6cabe6c387fc"
+        url = "http://localhost:5050/threads/f1a5e99c-8edf-489a-9c72-6cabe6c387fc"
         header_copy = self.internal_user_header.copy()
         header_copy.pop('Content-Type')
         response = self.client.patch(url, data=json.dumps({"is_closed": True}), headers=header_copy)
@@ -114,7 +120,7 @@ class FlaskTestCase(unittest.TestCase):
     def test_thread_patch_as_external_user_fails(self):
         """check default_msg_id is stored when messageSend endpoint called with no msg_id"""
         # post json message written up in the ui
-        url = "http://localhost:5050/v2/threads/f1a5e99c-8edf-489a-9c72-6cabe6c387fc"
+        url = "http://localhost:5050/threads/f1a5e99c-8edf-489a-9c72-6cabe6c387fc"
         response = self.client.patch(url, data=json.dumps({"is_closed": True}), headers=self.external_user_header)
         self.assertEqual(response.status_code, 403)
         error_message = "You don't have the permission to access the requested resource. It is either read-protected or not readable by the server."
@@ -124,7 +130,7 @@ class FlaskTestCase(unittest.TestCase):
         """check a reply gets same thread id as original"""
         # post json message written up in the ui
 
-        url = "http://localhost:5050/message/send"
+        url = "http://localhost:5050/messages"
 
         self.client.post(url, data=json.dumps(self.test_message), headers=self.internal_user_header)
 
@@ -132,8 +138,8 @@ class FlaskTestCase(unittest.TestCase):
 
         engine = create_engine(self.app.config['SECURE_MESSAGING_DATABASE_URL'], echo=True)
         with engine.connect() as con:
-            request = con.execute('SELECT * FROM securemessage.secure_message WHERE id = (SELECT MAX(id) FROM securemessage.secure_message)')
-            for row in request:
+            db_data = con.execute('SELECT * FROM securemessage.secure_message WHERE id = (SELECT MAX(id) FROM securemessage.secure_message)')
+            for row in db_data:
                 self.test_message['thread_id'] = row['thread_id']
 
         # Now submit a new message as a reply , Message Id empty , thread id same as last one
@@ -162,7 +168,7 @@ class FlaskTestCase(unittest.TestCase):
 
     def test_missing_thread_id_does_not_cause_exception(self):
         """posts to message send end point without 'thread_id'"""
-        url = "http://localhost:5050/message/send"
+        url = "http://localhost:5050/messages"
 
         test_message = {'msg_to': ['0a7ad740-10d5-4ecb-b7ca-3c0384afb882'],
                         'msg_from': 'ce12b958-2a5f-44f4-a6da-861e59070a31',
@@ -180,55 +186,55 @@ class FlaskTestCase(unittest.TestCase):
 
     def test_message_post_stores_labels_correctly_for_sender_of_message(self):
         """posts to message send end point to ensure labels are saved as expected"""
-        url = "http://localhost:5050/message/send"
+        url = "http://localhost:5050/messages"
 
         response = self.client.post(url, data=json.dumps(self.test_message), headers=self.internal_user_header)
         data = json.loads(response.data)
 
         with self.engine.connect() as con:
-            request = con.execute("SELECT * FROM securemessage.status WHERE label='SENT' AND msg_id='{0}' AND actor='{1}'"
+            db_data = con.execute("SELECT * FROM securemessage.status WHERE label='SENT' AND msg_id='{0}' AND actor='{1}'"
                                   .format(data['msg_id'], self.test_message['survey']))
-            for row in request:
+            for row in db_data:
                 self.assertTrue(row is not None)
 
     def test_message_post_stores_events_correctly_for_message(self):
         """posts to message send end point to ensure events are saved as expected"""
-        url = "http://localhost:5050/message/send"
+        url = "http://localhost:5050/messages"
 
         response = self.client.post(url, data=json.dumps(self.test_message), headers=self.internal_user_header)
         data = json.loads(response.data)
 
         with self.engine.connect() as con:
-            request = con.execute(f"SELECT * FROM securemessage.events WHERE event='Sent' AND msg_id='{data['msg_id']}'")
-            for row in request:
+            db_data = con.execute(f"SELECT * FROM securemessage.events WHERE event='Sent' AND msg_id='{data['msg_id']}'")
+            for row in db_data:
                 self.assertTrue(row is not None)
 
     def test_message_post_stores_labels_correctly_for_recipient_of_message(self):
         """posts to message send end point to ensure labels are saved as expected"""
-        url = "http://localhost:5050/message/send"
+        url = "http://localhost:5050/messages"
 
         response = self.client.post(url, data=json.dumps(self.test_message), headers=self.internal_user_header)
         data = json.loads(response.data)
         # dereferencing msg_to for purpose of test
         with self.engine.connect() as con:
-            request = con.execute("SELECT * FROM securemessage.status WHERE "
+            db_data = con.execute("SELECT * FROM securemessage.status WHERE "
                                   "label='INBOX' OR label='UNREAD' AND msg_id='{0}'"
                                   " AND actor='{1}'".format(data['msg_id'], self.test_message['msg_to'][0]))
-            for row in request:
+            for row in db_data:
                 self.assertTrue(row is not None)
 
     def test_message_post_stores_status_correctly_for_internal_user(self):
         """posts to message send end point to ensure survey is saved for internal user"""
-        url = "http://localhost:5050/message/send"
+        url = "http://localhost:5050/messages"
 
         response = self.client.post(url, data=json.dumps(self.test_message), headers=self.internal_user_header)
         data = json.loads(response.data)
 
         with self.engine.connect() as con:
-            request = con.execute("SELECT * FROM securemessage.status WHERE "
+            db_data = con.execute("SELECT * FROM securemessage.status WHERE "
                                   "msg_id='{0}' AND actor='{1}' AND label='SENT'"
                                   .format(data['msg_id'], self.test_message['survey']))
-            for row in request:
+            for row in db_data:
                 self.assertTrue(row is not None)
 
     @patch.object(PartyServiceMock, 'get_user_details', return_value=({"id": "f62dfda8-73b0-4e0e-97cf-1b06327a6712",
@@ -242,7 +248,7 @@ class FlaskTestCase(unittest.TestCase):
     def test_notify_called(self, mock_alerter, _):
         """Test that Notify is called when sending a new secure message """
 
-        url = "http://localhost:5050/message/send"
+        url = "http://localhost:5050/messages"
         self.client.post(url, data=json.dumps(self.test_message), headers=self.internal_user_header)
         self.assertTrue(mock_alerter.called)
 
@@ -250,7 +256,7 @@ class FlaskTestCase(unittest.TestCase):
     @patch.object(MessageSend, '_try_send_alert_email', side_effect=Exception('SomethingBad'))
     def test_exception_in_alert_listeners_raises_exception_but_returns_201(self, mock_sender, mock_logger):
         """Test exceptions in alerting do not prevent a response indicating success"""
-        url = "http://localhost:5050/message/send"
+        url = "http://localhost:5050/messages"
         result = self.client.post(url, data=json.dumps(self.test_message), headers=self.internal_user_header)
         self.assertTrue(mock_logger.called)
         self.assertTrue(result.status_code == 201)
@@ -265,7 +271,7 @@ class FlaskTestCase(unittest.TestCase):
     def test_if_user_has_no_email_address_no_email_sent(self, mock_alerter, mock_party):
         """Test if Email Address is missing no attempt will be made to send email """
 
-        url = "http://localhost:5050/message/send"
+        url = "http://localhost:5050/messages"
         self.client.post(url, data=json.dumps(self.test_message), headers=self.internal_user_header)
         self.assertFalse(mock_alerter.called)
 
@@ -280,7 +286,7 @@ class FlaskTestCase(unittest.TestCase):
     def test_if_user_has_zero_length_email_address_no_email_sent(self, mock_alerter, mock_party):
         """Test if Email Address is zero length no attempt will be made to send email """
 
-        url = "http://localhost:5050/message/send"
+        url = "http://localhost:5050/messages"
         self.client.post(url, data=json.dumps(self.test_message), headers=self.internal_user_header)
         self.assertFalse(mock_alerter.called)
 
@@ -295,7 +301,7 @@ class FlaskTestCase(unittest.TestCase):
     def test_if_user_has_only_whitespace_in_email_address_no_email_sent(self, mock_alerter, mock_party):
         """Test if Email Address is zero length no attempt will be made to send email """
 
-        url = "http://localhost:5050/message/send"
+        url = "http://localhost:5050/messages"
         self.client.post(url, data=json.dumps(self.test_message), headers=self.internal_user_header)
         self.assertFalse(mock_alerter.called)
 
@@ -304,7 +310,7 @@ class FlaskTestCase(unittest.TestCase):
     def test_if_user_unknown_in_party_service_no_email_sent(self, mock_alerter, mock_party):
         """Test if Email Address is zero length no attempt will be made to send email """
 
-        url = "http://localhost:5050/message/send"
+        url = "http://localhost:5050/messages"
         self.client.post(url, data=json.dumps(self.test_message), headers=self.internal_user_header)
         self.assertFalse(mock_alerter.called)
 

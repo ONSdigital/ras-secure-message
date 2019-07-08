@@ -3,6 +3,26 @@ Feature: Message Send Endpoint
   Background: Reset database
     Given prepare for tests using 'mock' services
 
+  Scenario Outline: Respondent sending a valid message to specific user and receiving a 201
+    Given sending from respondent to internal <user>
+    When the message is sent
+    Then a created status code 201 is returned
+
+    Examples: user type
+    | user        |
+    | specific user |
+    | group        |
+
+  Scenario Outline: Internal user  sending a valid message to respondent user and receiving a 201
+    Given sending from internal <user> to respondent
+    When the message is sent
+    Then a created status code 201 is returned
+
+    Examples: user type
+    | user        |
+    | specific user |
+    | group        |
+
   Scenario: Respondent sending a valid message to an internal user and receiving a 201
     Given sending from respondent to internal specific user
     When the message is sent
@@ -167,3 +187,19 @@ Feature: Message Send Endpoint
       And  the to is set to 'someone_who_does_not_exist'
     When the message is sent
     Then a bad request status code 400 is returned
+
+  Scenario: Respondent sends a message for an ru they have no claim for , user should receive 403
+   Given the user is set as respondent
+    And  the from is set to respondent
+    And  the to is set to internal specific user
+    And the ru is set to 'An ru that they cannot have a claim for'
+   When the message is sent
+   Then a forbidden status code 403 is returned
+
+ Scenario: Respondent sends a message for a survey they have no claim for , user should receive 403
+   Given the user is set as respondent
+    And  the from is set to respondent
+    And  the to is set to internal specific user
+    And the survey is set to 'Some survey they cannot have a claim for'
+   When the message is sent
+   Then a forbidden status code 403 is returned
