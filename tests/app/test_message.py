@@ -28,7 +28,7 @@ class MessageTestCase(unittest.TestCase):
         sut_str = repr(sut)
         expected = '<Message(msg_id=AMsgId msg_to=[\'to\'] msg_from=from subject=subject body=body thread_id=5 collection_case=ACollectionCase ' \
                    'ru_id=f1a5e99c-8edf-489a-9c72-6cabe6c387fc collection_exercise=CollectionExercise survey=ASurveyType from_internal=False)>'
-        self.assertEqual(sut_str, expected)
+        self.assertEquals(sut_str, expected)
 
     def test_message_with_different_collection_case_not_equal(self):
         """testing two different Message objects are not equal"""
@@ -197,7 +197,7 @@ class MessageSchemaTestCase(unittest.TestCase):
             g.user = User(self.json_message['msg_from'], 'respondent')
             schema = MessageSchema()
             sut = schema.load(self.json_message)
-        self.assertEqual(len(sut.data.msg_id), 36)
+        self.assertEquals(len(sut.data.msg_id), 36)
 
     def test_setting_read_date_field_causes_error(self):
         """marshalling message with no thread_id field"""
