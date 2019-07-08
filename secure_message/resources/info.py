@@ -20,7 +20,7 @@ class Info(Resource):
             with open('git_info') as io:
                 _health_check = json.loads(io.read())
 
-        info = {"name": current_app.config['NAME'],
+        info = {"name": 'ras-secure-message',
                 "version": current_app.config['VERSION'], }
 
         info = dict(_health_check, **info)

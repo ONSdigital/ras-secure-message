@@ -27,7 +27,7 @@ class MessageSend(Resource):
     def post(self):
         """used to handle POST requests to send a message"""
         logger.info("Message send POST request.")
-        if request.headers['Content-Type'].lower() != 'application/json':
+        if request.headers.get('Content-Type', '').lower() != 'application/json':
             # API only returns JSON
             logger.info('Request must set accept content type "application/json" in header.')
         post_data = request.get_json(force=True)
@@ -45,15 +45,26 @@ class MessageSend(Resource):
         post_data['from_internal'] = g.user.is_internal
         message = self._validate_post_data(post_data)
 
-        if message.errors == {}:
-            logger.info("Message passed validation")
-            self._message_save(message)
-            # listener errors are logged but still a 201 reported
-            MessageSend._alert_listeners(message.data)
-            return make_response(jsonify({'status': '201', 'msg_id': message.data.msg_id, 'thread_id': message.data.thread_id}), 201)
+        if message.errors:
+            logger.error('Message send failed', errors=message.errors)
+            return make_response(jsonify(message.errors), 400)
 
-        logger.error('Message send failed', errors=message.errors)
-        return make_response(jsonify(message.errors), 400)
+        # Validate claim
+        if not self._has_valid_claim(g.user, message.data):
+            logger.error("Message send failed", error="Invalid claim")
+            return make_response(jsonify("Invalid claim"), 403)
+
+        logger.info("Message passed validation")
+        self._message_save(message)
+        # listener errors are logged but still a 201 reported
+        MessageSend._alert_listeners(message.data)
+        return make_response(jsonify({'status': '201', 'msg_id': message.data.msg_id, 'thread_id': message.data.thread_id}), 201)
+
+    @staticmethod
+    def _has_valid_claim(user, message):
+        """Validates that the user has a valid claim to interact with the business and survey in the post data
+        internal users have claims to everything, respondents need to check against party"""
+        return user.is_internal or party.does_user_have_claim(user.user_uuid, message.ru_id, message.survey)
 
     @staticmethod
     def _message_save(message):
@@ -99,7 +110,7 @@ class MessageSend(Resource):
 
     @staticmethod
     def _create_message_url(thread_id):
-        url = f'{current_app.config["RAS_FRONTSTAGE_SERVICE"]}secure-message/thread/{thread_id}#latest-message'
+        url = f'{current_app.config["RAS_FRONTSTAGE_SERVICE"]}secure-message/threads/{thread_id}#latest-message'
         return {"MESSAGE_URL": url}
 
     @staticmethod

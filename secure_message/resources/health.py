@@ -40,7 +40,7 @@ class HealthDetails(Resource):
             if rule.endpoint != 'static':
                 func_list[rule.rule] = current_app.view_functions[rule.endpoint].__doc__
 
-        details = {'Name': current_app.config['NAME'],
+        details = {'Name': 'ras-secure-message',
                    'Version': current_app.config['VERSION'],
                    'SMS Log level': current_app.config['SMS_LOG_LEVEL'],
                    'API Functionality': func_list,

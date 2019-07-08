@@ -22,6 +22,9 @@ class SecureMessagingContextHelper:
 
     __DEFAULT_SURVEY = '33333333-22222-3333-4444-88dc018a1a4c'
     __ALTERNATE_SURVEY = '11111111-22222-3333-4444-88dc018a1a4c'
+    __ADDITIONAL_SURVEY_1 = 'additional_survey_1'
+    __ADDITIONAL_SURVEY_2 = 'additional_survey_2'
+    __ADDITIONAL_SURVEY_3 = 'additional_survey_3'
 
     __DEFAULT_COLLECTION_CASE = 'collection case1'             # UUID in real use, string for testing clarity
     __ALTERNATE_COLLECTION_CASE = 'AnotherCollectionCase'      # UUID in real use, string for testing clarity
@@ -67,30 +70,21 @@ class SecureMessagingContextHelper:
         self._messages_responses_data = []
         self._last_saved_message_data = None
         self._last_returned_thread_count = 0
+        self.additional_respondent_claims = {}
 
         # Urls
 
-        self._message_post_url = SecureMessagingContextHelper.__BASE_URL + "/message/send"
+        self._message_post_url = SecureMessagingContextHelper.__BASE_URL + "/messages"
         self._message_get_url = SecureMessagingContextHelper.__BASE_URL + "/message/{0}"
-        self._message_put_url = SecureMessagingContextHelper.__BASE_URL + "/message/{}/modify"
-        self._messages_get_url = SecureMessagingContextHelper.__BASE_URL + "/messages"
+        self._message_put_url = SecureMessagingContextHelper.__BASE_URL + "/messages/modify/{}"
+        self._threads_get_count_url = SecureMessagingContextHelper.__BASE_URL + "/messages/count"
 
-        self._thread_get_url = SecureMessagingContextHelper.__BASE_URL + "/thread/{0}"
+        self._thread_get_url = SecureMessagingContextHelper.__BASE_URL + "/threads/{0}"
         self._threads_get_url = SecureMessagingContextHelper.__BASE_URL + "/threads"
 
         self._health_endpoint = SecureMessagingContextHelper.__BASE_URL + "/health"
         self._health_db_endpoint = SecureMessagingContextHelper.__BASE_URL + "/health/db"
         self._health_details_endpoint = SecureMessagingContextHelper.__BASE_URL + "/health/details"
-
-        # V2 urls
-
-        self._message_post_url_v2 = SecureMessagingContextHelper.__BASE_URL + "/v2/messages"
-        self._message_get_url_v2 = SecureMessagingContextHelper.__BASE_URL + "/v2/messages/{0}"
-        self._messages_get_url_v2 = SecureMessagingContextHelper.__BASE_URL + "/v2/messages"
-        self._threads_get_count_url_v2 = SecureMessagingContextHelper.__BASE_URL + "/v2/messages/count"
-        self._message_put_url_v2 = SecureMessagingContextHelper.__BASE_URL + "/v2/messages/modify/{}"
-
-        self._thread_get_url_v2 = SecureMessagingContextHelper.__BASE_URL + "/v2/threads/{0}"
 
     @property
     def token_data(self):
@@ -147,16 +141,24 @@ class SecureMessagingContextHelper:
         return copy.copy(SecureMessagingContextHelper.__ALTERNATE_SURVEY)
 
     @property
+    def additional_survey_1(self):
+        return copy.copy(SecureMessagingContextHelper.__ADDITIONAL_SURVEY_1)
+
+    @property
+    def additional_survey_2(self):
+        return copy.copy(SecureMessagingContextHelper.__ADDITIONAL_SURVEY_2)
+
+    @property
+    def additional_survey_3(self):
+        return copy.copy(SecureMessagingContextHelper.__ADDITIONAL_SURVEY_3)
+
+    @property
     def message_post_url(self):
         return self._message_post_url
 
     @property
     def message_get_url(self):
         return self._message_get_url
-
-    @property
-    def messages_get_url(self):
-        return self._messages_get_url
 
     @property
     def message_put_url(self):
@@ -171,28 +173,8 @@ class SecureMessagingContextHelper:
         return self._threads_get_url
 
     @property
-    def message_post_v2_url(self):
-        return self._message_post_url_v2
-
-    @property
-    def message_get_v2_url(self):
-        return self._message_get_url_v2
-
-    @property
-    def messages_get_v2_url(self):
-        return self._messages_get_url_v2
-
-    @property
-    def message_put_v2_url(self):
-        return self._message_put_url_v2
-
-    @property
-    def thread_get_v2_url(self):
-        return self._thread_get_url_v2
-
-    @property
-    def threads_get_count_url_v2(self):
-        return self._threads_get_count_url_v2
+    def threads_get_count_url(self):
+        return self._threads_get_count_url
 
     @property
     def respondent_id(self):
@@ -268,6 +250,10 @@ class SecureMessagingContextHelper:
     def health_details_endpoint(self):
         return self._health_details_endpoint
 
+    @property
+    def default_ru(self):
+        return copy.copy(self.__DEFAULT_RU)
+
     def use_alternate_ru(self):
         self._message_data['ru_id'] = SecureMessagingContextHelper.__ALTERNATE_RU
 
@@ -291,3 +277,7 @@ class SecureMessagingContextHelper:
 
     def use_default_collection_exercise(self):
         self._message_data['collection_exercise'] = SecureMessagingContextHelper.__DEFAULT_COLLECTION_EXERCISE
+
+    def add_additional_respondent_claim(self, business_id, survey):
+        """Add an ru/survey pair to the additional claims """
+        self.additional_respondent_claims[business_id] = survey

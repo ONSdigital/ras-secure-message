@@ -5,7 +5,7 @@ from sqlalchemy import and_, func, or_
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm.exc import NoResultFound
 from structlog import wrap_logger
-from werkzeug.exceptions import InternalServerError, NotFound
+from werkzeug.exceptions import InternalServerError, NotFound, Forbidden
 
 from secure_message.common.eventsapi import EventsApi
 from secure_message.common.labels import Labels
@@ -187,13 +187,21 @@ class Retriever:
         try:
             result = SecureMessage.query.join(Conversation) \
                 .join(Status) \
-                .filter(SecureMessage.thread_id == thread_id) \
-                .filter(Status.actor == user.user_uuid) \
+                .filter(SecureMessage.thread_id == thread_id)
+
+            if not result.all():
+                logger.info('Thread does not exist', thread_id=thread_id, user_id=user.user_uuid)
+                raise NotFound(description=f"Conversation with thread_id '{thread_id}' does not exist")
+
+            result = result.filter(Status.actor == user.user_uuid) \
                 .order_by(SecureMessage.id.desc())
 
             if not result.all():
-                logger.error('Thread not retrieved for respondent', thread_id=thread_id, user_id=user.user_uuid)
-                raise NotFound(description=f"Conversation with thread_id '{thread_id}' not retrieved")
+                logger.error('Thread found, but respondent does not have access', thread_id=thread_id,
+                             user_id=user.user_uuid)
+                raise Forbidden(
+                    description=f"User {user.user_uuid} is not authorised to view conversation with thread_id: "
+                                f"'{thread_id}'")
 
         except SQLAlchemyError:
             logger.exception('Error retrieving conversation from database')
