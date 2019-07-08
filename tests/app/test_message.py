@@ -11,6 +11,7 @@ from secure_message.application import create_app
 from secure_message.constants import MAX_SUBJECT_LEN, MAX_BODY_LEN, MAX_THREAD_LEN
 from secure_message.resources.messages import MessageSend
 
+
 class MessageTestCase(unittest.TestCase):
     """Test case for Messages"""
 
