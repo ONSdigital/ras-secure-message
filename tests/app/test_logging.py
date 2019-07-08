@@ -4,6 +4,7 @@ from io import StringIO
 
 from flask import g
 
+from secure_message import constants
 from secure_message.validation.domain import MessageSchema
 from secure_message.application import create_app
 from secure_message.validation.user import User
@@ -24,10 +25,11 @@ class LoggingTestCase(unittest.TestCase):
         """logging message endpoint"""
         out = StringIO()
         sys.stdout = out
-        message = {'msg_to': 'richard', 'msg_from': 'torrance', 'subject': 'hello', 'body': 'hello world',
+        message = {'msg_to': [constants.NON_SPECIFIC_INTERNAL_USER], 'msg_from': 'gemma', 'ru_id': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc',
+                   'survey': 'BRES', 'subject': 'hello', 'body': 'hello world',
                    'thread_id': ''}
         with self.app.app_context():
-            g.user = User('torrence', 'respondent')
+            g.user = User('gemma', 'respondent')
             schema = MessageSchema()
             schema.load(message)
         output = out.getvalue().strip()
