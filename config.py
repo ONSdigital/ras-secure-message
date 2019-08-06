@@ -17,7 +17,7 @@ class Config:
     It contains a full default configuration
     All configuration may be overridden by setting the appropriate environment variable name.
     """
-    VERSION = '1.0.0'
+    VERSION = '1.0.1'
 
     SECURE_MESSAGING_DATABASE_URL = os.getenv(
         'SECURE_MESSAGING_DATABASE_URL', 'postgresql://postgres:postgres@localhost:5432')
