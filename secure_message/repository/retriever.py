@@ -165,7 +165,7 @@ class Retriever:
         try:
             result = db_model.query.filter_by(msg_id=message_id).first()
             if result is None:
-                logger.error('Message ID not found', message_id=message_id)
+                logger.info('Message ID not found', message_id=message_id)
                 raise NotFound(description=f"Message with msg_id '{message_id}' does not exist")
         except SQLAlchemyError:
             logger.exception('Error retrieving message from database')
@@ -197,7 +197,7 @@ class Retriever:
                 .order_by(SecureMessage.id.desc())
 
             if not result.all():
-                logger.error('Thread found, but respondent does not have access', thread_id=thread_id,
+                logger.info('Thread found, but respondent does not have access', thread_id=thread_id,
                              user_id=user.user_uuid)
                 raise Forbidden(
                     description=f"User {user.user_uuid} is not authorised to view conversation with thread_id: "
@@ -225,7 +225,7 @@ class Retriever:
                 .order_by(Status.id.desc())
 
             if not result.all():
-                logger.error('Thread not retrieved for internal user', thread_id=thread_id)
+                logger.info('Thread not retrieved for internal user', thread_id=thread_id)
                 raise NotFound(description=f"Conversation with thread_id {thread_id} not retrieved")
 
         except SQLAlchemyError:

@@ -46,12 +46,12 @@ class MessageSend(Resource):
         message = self._validate_post_data(post_data)
 
         if message.errors:
-            logger.error('Message send failed', errors=message.errors)
+            logger.info('Message send failed', errors=message.errors)
             return make_response(jsonify(message.errors), 400)
 
         # Validate claim
         if not self._has_valid_claim(g.user, message.data):
-            logger.error("Message send failed", error="Invalid claim")
+            logger.info("Message send failed", error="Invalid claim")
             return make_response(jsonify("Invalid claim"), 403)
 
         logger.info("Message passed validation")
@@ -180,25 +180,25 @@ class MessageModifyById(Resource):
     def _validate_request(request_data):
         """Used to validate data within request body for ModifyById"""
         if 'label' not in request_data:
-            logger.error('No label provided')
+            logger.info('No label provided')
             raise BadRequest(description="No label provided")
 
         label = request_data["label"]
         if label not in Labels.label_list.value:  # NOQA pylint:disable=unsupported-membership-test
-            logger.error('Invalid label provided', label=label)
+            logger.info('Invalid label provided', label=label)
             raise BadRequest(description=f"Invalid label provided: {label}")
 
         if label != Labels.UNREAD.value:
-            logger.error('Non modifiable label provided', label=label)
+            logger.info('Non modifiable label provided', label=label)
             raise BadRequest(description=f"Non modifiable label provided: {label}")
 
         if 'action' not in request_data:
-            logger.error('No action provided')
+            logger.info('No action provided')
             raise BadRequest(description="No action provided")
 
         action = request_data["action"]
         if action not in ["add", "remove"]:
-            logger.error('Invalid action requested', action=action)
+            logger.info('Invalid action requested', action=action)
             raise BadRequest(description=f"Invalid action requested: {action}")
 
         return action, label

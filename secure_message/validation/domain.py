@@ -64,7 +64,7 @@ class MessageSchema(Schema):
     @validates_schema
     def validate_to_from_not_equal(self, data):   # NOQA pylint:disable=no-self-use
         if 'msg_to' in data.keys() and 'msg_from' in data.keys() and data['msg_to'][0] == data['msg_from']:
-            logger.error('Message to and message from cannot be the same', message_to=data['msg_to'][0], message_from=data['msg_from'])
+            logger.info('Message to and message from cannot be the same', message_to=data['msg_to'][0], message_from=data['msg_from'])
             raise ValidationError("msg_to and msg_from fields can not be the same.")
 
     @validates("msg_to")
@@ -73,11 +73,11 @@ class MessageSchema(Schema):
             self.validate_non_zero_field_length("msg_to", len(item), constants.MAX_TO_LEN)
             if g.user.is_internal:  # internal user must be sending to a respondent
                 if not g.user.is_valid_respondent(item):
-                    logger.error('Not a valid respondent', user=item)
+                    logger.info('Not a valid respondent', user=item)
                     raise ValidationError(f"{item} is not a valid respondent.")
             else:  # Respondent sending to internal
                 if not (msg_to[0] == constants.NON_SPECIFIC_INTERNAL_USER or g.user.is_valid_internal_user(msg_to[0])):
-                    logger.error('Not a valid internal user', user=item)
+                    logger.info('Not a valid internal user', user=item)
                     raise ValidationError(f"{item} is not a valid internal user.")
 
     @validates("msg_from")
@@ -85,8 +85,8 @@ class MessageSchema(Schema):
         self.validate_non_zero_field_length("msg_from", len(msg_from), constants.MAX_FROM_LEN)
 
         if msg_from != g.user.user_uuid:
-            logger.error('Users can only send messages from themselves',
-                         message_from=msg_from, user_uuid=g.user.user_uuid)
+            logger.info('Users can only send messages from themselves',
+                        message_from=msg_from, user_uuid=g.user.user_uuid)
             raise ValidationError(f"You are not authorised to send a message on behalf of user or work group {msg_from}")
 
     @validates("body")
@@ -126,12 +126,12 @@ class MessageSchema(Schema):
     @staticmethod
     def validate_not_present(data, field_name):
         if field_name in data.keys():
-            logger.error('Field cannot be set', field_name=field_name)
+            logger.info('Field cannot be set', field_name=field_name)
             raise ValidationError(f"{field_name} can not be set")
 
     def validate_non_zero_field_length(self, field_name, length, max_field_len):
         if length <= 0:
-            logger.error('Field not populated', field_name=field_name)
+            logger.info('Field not populated', field_name=field_name)
             if field_name == "Body":
                 field_name = "message"
             raise ValidationError(f'Please enter a {field_name.lower()}')
@@ -140,5 +140,5 @@ class MessageSchema(Schema):
     @staticmethod
     def validate_field_length(field_name, length, max_field_len, data=None):
         if length > max_field_len:
-            logger.error('Field is too large', field_name=field_name, length=length, max_field_len=max_field_len)
+            logger.info('Field is too large', field_name=field_name, length=length, max_field_len=max_field_len)
             raise ValidationError(f'{field_name} field length must not be greater than {max_field_len}', field_name, [], data)
