@@ -198,7 +198,7 @@ class Retriever:
 
             if not result.all():
                 logger.info('Thread found, but respondent does not have access', thread_id=thread_id,
-                             user_id=user.user_uuid)
+                            user_id=user.user_uuid)
                 raise Forbidden(
                     description=f"User {user.user_uuid} is not authorised to view conversation with thread_id: "
                                 f"'{thread_id}'")
