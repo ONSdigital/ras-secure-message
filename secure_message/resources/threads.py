@@ -77,13 +77,13 @@ class ThreadById(Resource):
         bound_logger = logger.bind(thread_id=metadata.id, user_uuid=g.user.user_uuid)
         # Check if it's empty
         if not request_data:
-            bound_logger.error('No properties provided')
+            bound_logger.info('No properties provided')
             raise BadRequest(description="No properties provided")
         if 'is_closed' not in request_data:
-            bound_logger.error('Invalid properties provided')
+            bound_logger.info('Invalid properties provided')
             raise BadRequest(description="Only 'is_closed' property may be provided")
         if not isinstance(request_data['is_closed'], bool):
-            bound_logger.error('Invalid value provided')
+            bound_logger.info('Invalid value provided')
             raise BadRequest(description="Invalid value provided")
         if metadata.is_closed and request_data['is_closed'] is True:
             bound_logger.info("Conversation already closed")
@@ -118,7 +118,7 @@ class ThreadList(Resource):
     @staticmethod
     def _validate_request(request_args, user):
         if request_args.my_conversations and user.is_respondent:
-            logger.error('My conversations option not available to respondents', user_uuid=user.user_uuid)
+            logger.info('My conversations option not available to respondents', user_uuid=user.user_uuid)
             raise BadRequest(description="My conversations option not available to respondents")
 
 
