@@ -7,9 +7,8 @@ from secure_message.common.utilities import MessageArgs, add_to_details, add_fro
 from secure_message.services.service_toggles import party, internal_user_service
 
 
-# get_args is being used a helper for other tests.  This needs needs to stop.
 def get_args(page=1, limit=100, surveys=None, cc="", ru="", label="", desc=True, ce="", is_closed=False,
-             my_conversations=False):
+             my_conversations=False, new_respondent_conversations=False):
     return MessageArgs(page=page,
                        limit=limit,
                        surveys=surveys,
@@ -19,7 +18,8 @@ def get_args(page=1, limit=100, surveys=None, cc="", ru="", label="", desc=True,
                        desc=desc,
                        ce=ce,
                        is_closed=is_closed,
-                       my_conversations=my_conversations)
+                       my_conversations=my_conversations,
+                       new_respondent_conversations=new_respondent_conversations)
 
 
 class UtilitiesTestCase(unittest.TestCase):

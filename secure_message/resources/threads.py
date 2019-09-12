@@ -121,6 +121,10 @@ class ThreadList(Resource):
             logger.info('My conversations option not available to respondents', user_uuid=user.user_uuid)
             raise BadRequest(description="My conversations option not available to respondents")
 
+        if request_args.new_respondent_conversations and user.is_respondent:
+            logger.info('New respondent conversation option not available to respondents', user_uuid=user.user_uuid)
+            raise BadRequest(description="New respondent conversation option not available to respondents")
+
 
 class ThreadCounter(Resource):
     """Get count of all open or closed messages"""

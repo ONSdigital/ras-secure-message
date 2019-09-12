@@ -7,6 +7,7 @@ from sqlalchemy.orm.exc import NoResultFound
 from structlog import wrap_logger
 from werkzeug.exceptions import InternalServerError, NotFound, Forbidden
 
+from secure_message.constants import NON_SPECIFIC_INTERNAL_USER
 from secure_message.common.eventsapi import EventsApi
 from secure_message.common.labels import Labels
 from secure_message.repository.database import Conversation, db, Events, SecureMessage, Status
@@ -147,6 +148,11 @@ class Retriever:
             if request_args.my_conversations:
                 conditions.append(Status.actor == user.user_uuid)
                 conditions.append(Status.msg_id == SecureMessage.msg_id)
+
+            # If new_respondent_conversations the actor should be NON_SPECIFIC_INTERNAL_USER i.e Group
+            if request_args.new_respondent_conversations:
+                conditions.append(Status.msg_id == SecureMessage.msg_id)
+                conditions.append(Status.actor == NON_SPECIFIC_INTERNAL_USER)
 
             result = SecureMessage.query.filter(and_(*conditions)) \
                 .order_by(t.c.max_id.desc()).paginate(request_args.page, request_args.limit, False)
