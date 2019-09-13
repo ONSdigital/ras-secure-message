@@ -296,6 +296,12 @@ def step_impl_my_closed_threads_count_are_counted(context):
     _step_impl_get_threads_count(context, url_args)
 
 
+@when("the count of threads for new respondent conversations is made")
+def step_impl_new_respondent_conversations_thread_count_are_counted(context):
+    url_args = f"?new_respondent_conversations=true"
+    _step_impl_get_threads_count(context, url_args)
+
+
 def _step_impl_get_threads_count(context, args):
     url = context.bdd_helper.threads_get_count_url + args
     context.response = context.client.get(url, headers=context.bdd_helper.headers)

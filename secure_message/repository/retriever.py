@@ -63,6 +63,10 @@ class Retriever:
                 conditions.append(Status.actor == user.user_uuid)
                 conditions.append(Status.msg_id == SecureMessage.msg_id)
 
+            if request_args.new_respondent_conversations:
+                conditions.append(Status.msg_id == SecureMessage.msg_id)
+                conditions.append(Status.actor == NON_SPECIFIC_INTERNAL_USER)
+
             result = SecureMessage.query.filter(and_(*conditions)).distinct(SecureMessage.msg_id).count()
 
         except Exception as e:
