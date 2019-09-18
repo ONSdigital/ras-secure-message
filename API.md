@@ -443,7 +443,7 @@ Note, the response will have either uuids or 'GROUP' for the user ids, and a uui
 For descriptions of @msg_from, @msg_to and @ru see messages get
 [Get Message List](#get-message-list)
 
-h2: Get Conversations count  
+h2: ## Get Conversations count  
 
 `GET /messages/count`
 
