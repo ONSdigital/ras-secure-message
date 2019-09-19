@@ -9,11 +9,11 @@
     * [Get Message List](#get-message-list)
     * [Send Message](#send-message)
     * [Modify Message Labels](#modify-message-labels)
-    * [Get Count of Unread Messages](#get-count-of-unread-messages)
 * Conversations
     * [Get conversation list](#get-conversation-list)
-    * [Get Conversation by Id](#get-conversation-by-id)
-    * [Patch Conversation Metadata](#patch-conversation)
+    * [Get conversation list](#get-conversation-list)
+    * [Get conversations count](#get-conversations-count)
+    * [Patch Conversation Metadata](#patch-conversation-metadata)
 * Health and Status
     * [Get Health](#get-health)
     * [Get Health With Database-status](#get-health-with-database-status)
@@ -70,7 +70,6 @@ this currently has two fields:
 The algorithm and secret are defined in the configuration file. If the algorithm and/or secret are out of step between client and secure message service then the JWT will fail checks and the service will return a 500.
 
 Being able to get a response from a health or info endpoint but 500's from a message post or read is often an indicator that something in this area is not configured correctly. An easy check for config is to access the /health/details endpoint.
-
 
 ## Get Message List ##
 
