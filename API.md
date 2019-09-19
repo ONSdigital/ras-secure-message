@@ -288,7 +288,6 @@ latest message on the thread. I.e they sent the message or it was sent specifica
 ```
 
 
-
 #### Example JSON Response
 Note, the response will have either uuids or 'GROUP' for the user ids, and a uuid for the survey id
 ```json
@@ -443,7 +442,7 @@ Note, the response will have either uuids or 'GROUP' for the user ids, and a uui
 For descriptions of @msg_from, @msg_to and @ru see messages get
 [Get Message List](#get-message-list)
 
-h2: ## Get Conversations count  
+## Get Conversations count  
 
 `GET /messages/count`
 
@@ -468,10 +467,11 @@ ce              If set then restricts the conversations to a specific collction 
 #### Example JSON Response
 ```json
 {
-  "total":14,
+  "total":14
 }
 
 ```
+
 ## Get Conversation by Id
 
 `GET /threads/<thread_id>`
@@ -719,7 +719,7 @@ Returns more detailed information about secure message including some of the env
     "/threads/<thread_id>": "Return list of messages for user",
     "/threads": "Return a list of threads for the user",
     "/messages/count": "Get count of unread messages",
-    "/messages/modify/<message_id>": "Update message status by id",
+    "/messages/modify/<message_id>": "Update message status by id"
   },
   "APP Log Level": "INFO",
   "NOTIFY VIA GOV NOTIFY": "0",
@@ -732,6 +732,7 @@ Returns more detailed information about secure message including some of the env
   "Version": "0.1.2"
 }
 ```
+
 ## Get Service Version
 
 `GET /info`
