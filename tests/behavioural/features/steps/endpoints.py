@@ -95,6 +95,13 @@ def step_impl_the_threads_are_read_with_my_conversations_set_true(context):
     context.bdd_helper.store_messages_response_data(context.response.data)
 
 
+@when('the threads are read with new_respondent_conversations set true')
+def step_impl_the_threads_are_read_with_new_respondent_conversations_set_true(context):
+    url = context.bdd_helper.threads_get_url + f"?new_respondent_conversations=true"
+    context.response = context.client.get(url, headers=context.bdd_helper.headers)
+    context.bdd_helper.store_messages_response_data(context.response.data)
+
+
 @when("the threads in survey '{survey}' are read")
 @given("the threads in survey '{survey}' are read")
 def step_impl_the_threads_in_specific_survey_are_returned(context, survey):
@@ -286,6 +293,12 @@ def step_impl_my_open_threads_count_are_counted_by_ru(context, ru):
 @given("the count of closed threads for current user is made")
 def step_impl_my_closed_threads_count_are_counted(context):
     url_args = f"?is_closed=true&my_conversations=true"
+    _step_impl_get_threads_count(context, url_args)
+
+
+@when("the count of threads for new respondent conversations is made")
+def step_impl_new_respondent_conversations_thread_count_are_counted(context):
+    url_args = f"?new_respondent_conversations=true"
     _step_impl_get_threads_count(context, url_args)
 
 

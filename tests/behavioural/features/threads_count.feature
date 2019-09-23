@@ -74,13 +74,42 @@ Scenario: Internal user gets threads count with both is_closed and my_conversati
    And the count of closed threads for current user is made
   Then the thread count is '0' threads
 
+Scenario: Respondent starts 4 conversations Internal user gets threads count with new_respondent_conversations set
+   Given sending from respondent to internal group
+   And '4' messages are sent
+  When the user is set to alternative internal specific user
+   And the count of threads for new respondent conversations is made
+  Then the thread count is '4' threads
+
+Scenario: Respondent 2 conversations each with 2 messages, Internal user gets threads count with new_respondent_conversations set
+   Given sending from respondent to internal group
+   And the message is sent
+   And the thread id is set to the last returned thread id
+   And the message is sent
+   And the thread_id is set to empty
+   And the message is sent
+   And the thread id is set to the last returned thread id
+   And the message is sent
+  When the user is set to alternative internal specific user
+   And the count of threads for new respondent conversations is made
+  Then the thread count is '2' threads
+
+Scenario: 2 Respondents start conversations , Internal user gets threads count with new_respondent_conversations set
+   Given sending from respondent to internal group
+   And the message is sent
+   And the message is sent
+   And the user is set as alternative respondent
+   And the message is sent
+   And the message is sent
+  When the user is set to alternative internal specific user
+   And the count of threads for new respondent conversations is made
+  Then the thread count is '2' threads
 
 Scenario: respondent gets threads count
   Given sending from respondent to internal specific user
    And '7' messages are sent
   When the count of open threads for current user is made
   Then a forbidden status code 403 is returned
-
 
 Scenario: two internal users send to a respondent
   Given sending from internal specific user to respondent

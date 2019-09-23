@@ -9,11 +9,11 @@
     * [Get Message List](#get-message-list)
     * [Send Message](#send-message)
     * [Modify Message Labels](#modify-message-labels)
-    * [Get Count of Unread Messages](#get-count-of-unread-messages)
 * Conversations
     * [Get conversation list](#get-conversation-list)
-    * [Get Conversation by Id](#get-conversation-by-id)
-    * [Patch Conversation Metadata](#patch-conversation)
+    * [Get conversation list](#get-conversation-list)
+    * [Get conversations count](#get-conversations-count)
+    * [Patch Conversation Metadata](#patch-conversation-metadata)
 * Health and Status
     * [Get Health](#get-health)
     * [Get Health With Database-status](#get-health-with-database-status)
@@ -70,7 +70,6 @@ this currently has two fields:
 The algorithm and secret are defined in the configuration file. If the algorithm and/or secret are out of step between client and secure message service then the JWT will fail checks and the service will return a 500.
 
 Being able to get a response from a health or info endpoint but 500's from a message post or read is often an indicator that something in this area is not configured correctly. An easy check for config is to access the /health/details endpoint.
-
 
 ## Get Message List ##
 
@@ -288,7 +287,6 @@ latest message on the thread. I.e they sent the message or it was sent specifica
 ```
 
 
-
 #### Example JSON Response
 Note, the response will have either uuids or 'GROUP' for the user ids, and a uuid for the survey id
 ```json
@@ -456,6 +454,8 @@ is_closed       If set true then only closed conversations will be considered. D
 
 my_conversations If set true then will only return conversations where the currently signed in user is an actor in the last message of the conversation.
 
+new_respondent_conversations If set true then only counts new conversations by the respondent. I.e ones not replied to
+
 ru_id           If set then restrict conversations to those regarding a specific ru
 
 cc              If set then restricts the conversations to a specific collection case
@@ -466,10 +466,11 @@ ce              If set then restricts the conversations to a specific collction 
 #### Example JSON Response
 ```json
 {
-  "total":14,
+  "total":14
 }
 
 ```
+
 ## Get Conversation by Id
 
 `GET /threads/<thread_id>`
@@ -717,7 +718,7 @@ Returns more detailed information about secure message including some of the env
     "/threads/<thread_id>": "Return list of messages for user",
     "/threads": "Return a list of threads for the user",
     "/messages/count": "Get count of unread messages",
-    "/messages/modify/<message_id>": "Update message status by id",
+    "/messages/modify/<message_id>": "Update message status by id"
   },
   "APP Log Level": "INFO",
   "NOTIFY VIA GOV NOTIFY": "0",
@@ -730,6 +731,7 @@ Returns more detailed information about secure message including some of the env
   "Version": "0.1.2"
 }
 ```
+
 ## Get Service Version
 
 `GET /info`

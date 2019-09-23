@@ -8,14 +8,17 @@ from secure_message.constants import MESSAGE_BY_ID_ENDPOINT, MESSAGE_LIST_ENDPOI
 from secure_message.services.service_toggles import party, internal_user_service
 
 logger = wrap_logger(logging.getLogger(__name__))
-MessageArgs = collections.namedtuple('MessageArgs', 'page limit ru_id surveys cc label desc ce is_closed my_conversations')
+MessageArgs = collections.namedtuple(
+    'MessageArgs',
+    'page limit ru_id surveys cc label desc ce is_closed my_conversations new_respondent_conversations')
 
 
 def get_options(args):
     """extract options from request , allow label to be set by caller"""
 
     fields = {'page': 1, 'limit': MESSAGE_QUERY_LIMIT, 'ru_id': None, 'surveys': None,
-              'desc': True, 'cc': None, 'label': None, 'ce': None, 'is_closed': False, 'my_conversations': False}
+              'desc': True, 'cc': None, 'label': None, 'ce': None, 'is_closed': False,
+              'my_conversations': False, 'new_respondent_conversations': False}
 
     for field in ['cc', 'ce', 'ru_id', 'label']:
         if args.get(field):
@@ -36,10 +39,14 @@ def get_options(args):
     if args.get('my_conversations') == 'true':
         fields['my_conversations'] = True
 
+    if args.get('new_respondent_conversations') == 'true':
+        fields['new_respondent_conversations'] = True
+
     return MessageArgs(page=fields['page'], limit=fields['limit'], ru_id=fields['ru_id'],
                        surveys=fields['surveys'], cc=fields['cc'], label=fields['label'],
                        desc=fields['desc'], ce=fields['ce'], is_closed=fields['is_closed'],
-                       my_conversations=fields['my_conversations'])
+                       my_conversations=fields['my_conversations'],
+                       new_respondent_conversations=fields['new_respondent_conversations'])
 
 
 def generate_string_query_args(args):

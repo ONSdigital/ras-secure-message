@@ -526,3 +526,30 @@ Scenario Outline: There are 3 conversations between respondent and internal , re
     When the user is set as alternative respondent
      And  the thread is read
     Then  a forbidden status code 403 is returned
+
+  Scenario: Internal user looks for new respondent message when one exists
+    Given sending from respondent to internal group
+    And the message is sent
+    When the user is set as internal specific user
+    And the threads are read with new_respondent_conversations set true
+    Then  '1' messages are returned
+
+  Scenario: Internal user looks for new respondent message when last message was replied to exists
+    Given sending from respondent to internal group
+      And the message is sent
+    When sending from internal specific user to respondent
+      And the thread id is set to the last returned thread id
+      And the message is sent
+      And the threads are read with new_respondent_conversations set true
+    Then  '0' messages are returned
+
+  Scenario: Respondent attempts to filter by new respondent message
+    Given the user is set as respondent
+    When the threads are read with new_respondent_conversations set true
+    Then a bad request status code 400 is returned
+
+  Scenario: Internal user starts a conversation and then looks for new_respondent_conversations
+    Given sending from internal specific user to respondent
+      And the message is sent
+    When the threads are read with new_respondent_conversations set true
+    Then  '0' messages are returned

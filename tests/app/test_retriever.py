@@ -316,7 +316,8 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
             ce=None,
             surveys=[self.BRES_SURVEY],
             is_closed=False,
-            my_conversations=False)
+            my_conversations=False,
+            new_respondent_conversations=False)
 
         for _ in range(5):
             self.create_thread(no_of_messages=2)
@@ -345,7 +346,8 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
             ce=None,
             surveys=[self.BRES_SURVEY],
             is_closed=False,
-            my_conversations=True)
+            my_conversations=True,
+            new_respondent_conversations=False)
 
         for _ in range(5):
             self.create_thread(no_of_messages=2)
