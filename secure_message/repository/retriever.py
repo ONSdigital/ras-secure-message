@@ -155,8 +155,9 @@ class Retriever:
 
             # If new_respondent_conversations the actor should be NON_SPECIFIC_INTERNAL_USER i.e Group
             if request_args.new_respondent_conversations:
-                conditions.append(Status.msg_id == SecureMessage.msg_id)
                 conditions.append(Status.actor == NON_SPECIFIC_INTERNAL_USER)
+                conditions.append(Status.label == Labels.INBOX.value)
+                conditions.append(Status.msg_id == SecureMessage.msg_id)
 
             result = SecureMessage.query.filter(and_(*conditions)) \
                 .order_by(t.c.max_id.desc()).paginate(request_args.page, request_args.limit, False)
