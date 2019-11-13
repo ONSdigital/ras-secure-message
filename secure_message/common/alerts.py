@@ -22,7 +22,7 @@ class AlertViaGovNotify:
             "reference": msg_id
         }
 
-        url = urlparse.urljoin(current_app.config['RM_NOTIFY_GATEWAY_URL'],
+        url = urlparse.urljoin(current_app.config['NOTIFY_GATEWAY_URL'],
                                current_app.config['NOTIFICATION_TEMPLATE_ID'])
 
         response = requests.post(url, auth=current_app.config['BASIC_AUTH'],

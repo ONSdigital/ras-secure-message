@@ -14,7 +14,7 @@ class PartyService:
     def get_business_details(ru_ids):
         """Retrieves the business details from the party service"""
         params = urlencode([("id", ru_id) for ru_id in ru_ids])
-        response = requests.get(f"{current_app.config['RAS_PARTY_SERVICE']}party-api/v1/businesses",
+        response = requests.get(f"{current_app.config['PARTY_SERVICE']}party-api/v1/businesses",
                                 auth=current_app.config['BASIC_AUTH'], verify=False, params=params)
         try:
             response.raise_for_status()
@@ -45,7 +45,7 @@ class PartyService:
         """
         params = {"respondent_id": user_id, "business_id": business_id, "survey_id": survey_id}
 
-        response = requests.get(f"{current_app.config['RAS_PARTY_SERVICE']}party-api/v1/respondents/claim",
+        response = requests.get(f"{current_app.config['PARTY_SERVICE']}party-api/v1/respondents/claim",
                                 auth=current_app.config['BASIC_AUTH'], verify=False, params=urlencode(params))
         try:
             response.raise_for_status()
@@ -67,7 +67,7 @@ class PartyService:
     @staticmethod
     def _get_user_details_from_party_service(uuids):
         params = urlencode([("id", uuid) for uuid in uuids])
-        response = requests.get(f"{current_app.config['RAS_PARTY_SERVICE']}party-api/v1/respondents",
+        response = requests.get(f"{current_app.config['PARTY_SERVICE']}party-api/v1/respondents",
                                 auth=current_app.config['BASIC_AUTH'], verify=False, params=params)
         try:
             response.raise_for_status()
