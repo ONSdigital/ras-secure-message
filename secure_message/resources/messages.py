@@ -32,9 +32,6 @@ class MessageSend(Resource):
             logger.info('Request must set accept content type "application/json" in header.')
         post_data = request.get_json(force=True)
 
-        logger.info("Here!!!!!!!!!--------------!!!!!!!!!here")
-        logger.info(post_data)
-
         if 'msg_id' in post_data:
             raise BadRequest(description="Message can not include msg_id")
         if post_data.get('thread_id'):
@@ -49,7 +46,6 @@ class MessageSend(Resource):
             # assume that it's fine if it's empty.
             if conversation_metadata and conversation_metadata.is_closed:
                 raise BadRequest(description="Cannot reply to a closed conversation")
-
 
         post_data['from_internal'] = g.user.is_internal
         message = self._validate_post_data(post_data)
