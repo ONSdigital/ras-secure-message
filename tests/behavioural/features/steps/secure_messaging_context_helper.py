@@ -48,6 +48,10 @@ class SecureMessagingContextHelper:
     __ALTERNATIVE_RESPONDENT_USER_TOKEN = {constants.USER_IDENTIFIER: __ALTERNATIVE_RESPONDENT_USER_ID,
                                            "role": "respondent"}
 
+    __DELETED_RESPONDENT_USER_ID = "778f60f6-5b5f-4617-b71b-26c0607c769c"
+    __DELETED_RESPONDENT_USER_TOKEN = {constants.USER_IDENTIFIER: __DELETED_RESPONDENT_USER_ID,
+                                       "role": "respondent"}
+
     __BASE_URL = "http://localhost:5050"
 
     __default_message_data = data = {'msg_to': ['0a7ad740-10d5-4ecb-b7ca-3c0384afb882'],
