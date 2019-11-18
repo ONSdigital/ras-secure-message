@@ -137,6 +137,10 @@ class SecureMessagingContextHelper:
         return copy.deepcopy(SecureMessagingContextHelper.__ALTERNATIVE_RESPONDENT_USER_TOKEN)
 
     @property
+    def deleted_respondent_user_token(self):
+        return copy.deepcopy(SecureMessagingContextHelper.__DELETED_RESPONDENT_USER_TOKEN)
+
+    @property
     def default_survey(self):
         return copy.copy(SecureMessagingContextHelper.__DEFAULT_SURVEY)
 
@@ -187,6 +191,10 @@ class SecureMessagingContextHelper:
     @property
     def alternative_respondent_id(self):
         return copy.copy(SecureMessagingContextHelper.__ALTERNATIVE_RESPONDENT_USER_ID)
+
+    @property
+    def deleted_respondent_id(self):
+        return copy.copy(SecureMessagingContextHelper.__DELETED_RESPONDENT_USER_ID)
 
     @property
     def internal_id_specific_user(self):
