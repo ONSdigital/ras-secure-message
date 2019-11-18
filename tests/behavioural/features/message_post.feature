@@ -147,7 +147,6 @@ Feature: Message Send Endpoint
     When the message is sent
     Then a bad request status code 400 is returned
 
-
   Scenario: Respondent sends a message with a msg_id
     Given sending from respondent to internal specific user
       And  the msg_id is set to '12345678'
@@ -203,3 +202,10 @@ Feature: Message Send Endpoint
     And the survey is set to 'Some survey they cannot have a claim for'
    When the message is sent
    Then a forbidden status code 403 is returned
+
+  Scenario: Internal user sending a message with a non-existent a 404 error
+    Given the user is set as internal
+    And the to is set to a deleted respondent
+    And the thread_id is set to '9fef9d17-8846-48bc-ab4d-dc8af4197e95'
+    When the message is sent
+    Then a not found status code 404 is returned
