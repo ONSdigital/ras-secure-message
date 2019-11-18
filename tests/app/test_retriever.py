@@ -27,15 +27,15 @@ class RetrieverTestCaseHelper:
 
     """Helper class for Retriever Tests"""
     def add_secure_message(self, msg_id, subject="test", body="test", thread_id="ThreadId",
-                           collection_case="ACollectionCase", ru_id="f1a5e99c-8edf-489a-9c72-6cabe6c387fc",
+                           collection_case="ACollectionCase", business_id="f1a5e99c-8edf-489a-9c72-6cabe6c387fc",
                            survey=BRES_SURVEY, collection_exercise='CollectionExercise', from_internal=False):
 
         """ Populate the secure_message table"""
 
         with self.engine.connect() as con:
             query = f'''INSERT INTO securemessage.secure_message(msg_id, subject, body, thread_id,
-                    collection_case, ru_id, survey, collection_exercise, from_internal) VALUES ('{msg_id}', '{subject}','{body}',
-                    '{thread_id}', '{collection_case}', '{ru_id}', '{survey}', '{collection_exercise}', '{from_internal}')'''
+                    collection_case, business_id, survey, collection_exercise, from_internal) VALUES ('{msg_id}', '{subject}','{body}',
+                    '{thread_id}', '{collection_case}', '{business_id}', '{survey}', '{collection_exercise}', '{from_internal}')'''
             con.execute(query)
 
     def add_conversation(self, conversation_id, is_closed=False):
@@ -309,7 +309,7 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
         request_args = MessageArgs(
             page=0,
             limit=100,
-            ru_id=None,
+            business_id=None,
             cc=None,
             label=None,
             desc=None,
@@ -339,7 +339,7 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
         request_args = MessageArgs(
             page=0,
             limit=100,
-            ru_id=None,
+            business_id=None,
             cc=None,
             label=None,
             desc=None,

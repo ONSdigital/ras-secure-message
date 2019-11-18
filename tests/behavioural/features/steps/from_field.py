@@ -46,13 +46,6 @@ def step_impl_the_msg_from_is_set_to_internal_non_specific_user(context):
     step_impl_the_msg_from_is_set_to(context, context.bdd_helper.internal_id_group_user)
 
 
-@then("retrieved message msg_from is as was saved")
-def step_impl_retrieved_msg_from_is_as_saved(context):
-    """validate that the response message from field matches that submitted"""
-    msg_resp = json.loads(context.response.data)
-    nose.tools.assert_equal(msg_resp['msg_from'], context.bdd_helper.last_saved_message_data['msg_from'])
-
-
 @given("the from is set to internal group")
 @when("the from is set to internal group")
 def step_impl_the_msg_from_is_set_to_internal_group_user(context):
@@ -60,18 +53,18 @@ def step_impl_the_msg_from_is_set_to_internal_group_user(context):
     step_impl_the_msg_from_is_set_to(context, context.bdd_helper.internal_id_group_user)
 
 
-@given("the from is set to internal specific user")
-@when("the from is set to internal specific user")
-def step_impl_the_msg_from_is_set_to_internal_specific_user(context):
-    """ set the msg from field in the message data to the specific internal user as specified in the helper"""
-    step_impl_the_msg_from_is_set_to(context, context.bdd_helper.internal_id_specific_user)
-
-
 @given("the from is set to alternate internal specific user")
 @when("the from is set to alternate internal specific user")
 def step_impl_the_msg_from_is_set_to_alternate_internal_specific_user(context):
     """ set the msg from field in the message data to the alternate specific internal user as specified in the helper"""
     step_impl_the_msg_from_is_set_to(context, context.bdd_helper.alternative_internal_id_specific_user)
+
+
+@given("the from is set to internal specific user")
+@when("the from is set to internal specific user")
+def step_impl_the_msg_from_is_set_to_internal_specific_user(context):
+    """ set the msg from field in the message data to the specific internal user as specified in the helper"""
+    step_impl_the_msg_from_is_set_to(context, context.bdd_helper.internal_id_specific_user)
 
 
 @then("all messages are from alternate internal specific user")

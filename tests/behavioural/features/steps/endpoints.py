@@ -118,10 +118,10 @@ def step_impl_the_threads_in_default_and_alternate_are_returned(context):
     context.bdd_helper.store_messages_response_data(context.response.data)
 
 
-@when("the threads with ru '{ru_id}' are read")
-@given("the threads with ru '{ru_id}' are read")
-def step_impl_the_threads_in_specific_ru_id_are_returned(context, ru_id):
-    url = context.bdd_helper.threads_get_url + f"?ru_id={ru_id}"
+@when("the threads with business_id '{business_id}' are read")
+@given("the threads with business_id '{business_id}' are read")
+def step_impl_the_threads_in_specific_business_id_are_returned(context, business_id):
+    url = context.bdd_helper.threads_get_url + f"?business_id={business_id}"
     context.response = context.client.get(url, headers=context.bdd_helper.headers)
     context.bdd_helper.store_messages_response_data(context.response.data)
 
@@ -281,11 +281,10 @@ def step_impl_my_open_threads_count_are_counted_by_cc(context, cc):
     _step_impl_get_threads_count(context, url_args)
 
 
-@when("the count of open threads for current user and ru of '{ru}' is made")
-@given("the count of open threads for current user and ru of '{ru}' is made")
-def step_impl_my_open_threads_count_are_counted_by_ru(context, ru):
+@when("the count of open threads for current user and business_id of '{business_id}' is made")
+def step_impl_my_open_threads_count_are_counted_by_ru(context, business_id):
     """access the messages_count endpoint to get the count of my unread conversations"""
-    url_args = f"?is_closed=false&my_conversations=true&ru_id={ru}"
+    url_args = f"?is_closed=false&my_conversations=true&business_id={business_id}"
     _step_impl_get_threads_count(context, url_args)
 
 

@@ -1,0 +1,1 @@
+ALTER TABLE securemessage.secure_message RENAME COLUMN ru_id TO business_id;

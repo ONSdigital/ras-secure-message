@@ -47,8 +47,8 @@ class Party(ServiceMockToggle):
     def __init__(self, use_mock=False):
         super().__init__(use_mock, PartyService, PartyServiceMock, 'Party')
 
-    def get_business_details(self, ru_ids):
-        return self._service.get_business_details(ru_ids)
+    def get_business_details(self, business_ids):
+        return self._service.get_business_details(business_ids)
 
     def get_user_details(self, uuid):
         return self._service.get_user_details(uuid)

@@ -11,19 +11,19 @@ logger = wrap_logger(logging.getLogger(__name__))
 class PartyService:
 
     @staticmethod
-    def get_business_details(ru_ids):
+    def get_business_details(business_ids):
         """Retrieves the business details from the party service"""
-        params = urlencode([("id", ru_id) for ru_id in ru_ids])
+        params = urlencode([("id", business_id) for business_id in business_ids])
         response = requests.get(f"{current_app.config['RAS_PARTY_SERVICE']}party-api/v1/businesses",
                                 auth=current_app.config['BASIC_AUTH'], verify=False, params=params)
         try:
             response.raise_for_status()
         except HTTPError:
             logger.info("Business detail retrieval failed", status_code=response.status_code, text=response.text,
-                        ru_ids=ru_ids)
+                        business_ids=business_ids)
             return []
 
-        logger.info("Business details successfully retrieved", ru_ids=ru_ids)
+        logger.info("Business details successfully retrieved", business_ids=business_ids)
         return response.json()
 
     def get_user_details(self, uuid):
