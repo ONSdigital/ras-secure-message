@@ -156,12 +156,12 @@ Scenario: Respondent sends messages to different cc, internal user filters by cc
 
 Scenario: Respondent sends messages to different ru, internal user filters by ru
   Given sending from respondent to internal specific user
-    And the ru is set to 'additional_ru1'
+    And the business_id is set to 'additional_ru1'
     And the message is sent
-    And the ru is set to 'additional_ru1'
+    And the business_id is set to 'additional_ru1'
     And the message is sent
-    And the ru is set to 'additional_ru2'
+    And the business_id is set to 'additional_ru2'
     And the message is sent
   When  the user is set as internal specific user
-    And the count of open threads for current user and ru of 'additional_ru1' is made
+    And the count of open threads for current user and business_id of 'additional_ru1' is made
   Then  the thread count is '2' threads

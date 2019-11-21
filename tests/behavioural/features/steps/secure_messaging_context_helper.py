@@ -17,8 +17,8 @@ class SecureMessagingContextHelper:
     The dunder constants are used to specify constants for use in steps in a single place
 
     """
-    __DEFAULT_RU = 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc'
-    __ALTERNATE_RU = 'b3ba864b-7cbc-4f44-84fe-88dc018a1a4c'
+    __DEFAULT_BUSINESS_ID = 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc'
+    __ALTERNATE_BUSINESS_ID = 'b3ba864b-7cbc-4f44-84fe-88dc018a1a4c'
 
     __DEFAULT_SURVEY = '33333333-22222-3333-4444-88dc018a1a4c'
     __ALTERNATE_SURVEY = '11111111-22222-3333-4444-88dc018a1a4c'
@@ -61,7 +61,7 @@ class SecureMessagingContextHelper:
                                      'thread_id': '',
                                      'collection_case': __DEFAULT_COLLECTION_CASE,
                                      'collection_exercise': __DEFAULT_COLLECTION_EXERCISE,
-                                     'ru_id': __DEFAULT_RU,
+                                     'business_id': __DEFAULT_BUSINESS_ID,
                                      'survey': __DEFAULT_SURVEY}
 
     def __init__(self):
@@ -263,14 +263,14 @@ class SecureMessagingContextHelper:
         return self._health_details_endpoint
 
     @property
-    def default_ru(self):
-        return copy.copy(self.__DEFAULT_RU)
+    def default_business_id(self):
+        return copy.copy(self.__DEFAULT_BUSINESS_ID)
 
-    def use_alternate_ru(self):
-        self._message_data['ru_id'] = SecureMessagingContextHelper.__ALTERNATE_RU
+    def use_alternate_business_id(self):
+        self._message_data['business_id'] = SecureMessagingContextHelper.__ALTERNATE_BUSINESS_ID
 
-    def use_default_ru(self):
-        self._message_data['ru_id'] = SecureMessagingContextHelper.__DEFAULT_RU
+    def use_default_business_id(self):
+        self._message_data['business_id'] = SecureMessagingContextHelper.__DEFAULT_BUSINESS_ID
 
     def use_alternate_survey(self):
         self._message_data['survey'] = SecureMessagingContextHelper.__ALTERNATE_SURVEY

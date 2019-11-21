@@ -15,7 +15,7 @@ class Message:
     """Class to hold message attributes"""
 
     def __init__(self, msg_from, subject, body, msg_to='', thread_id=None, msg_id='', collection_case='',
-                 survey='', ru_id='', collection_exercise='', from_internal=False):
+                 survey='', business_id='', collection_exercise='', from_internal=False):
 
         self.msg_id = str(uuid.uuid4()) if not msg_id else msg_id  # If empty msg_id assign to a uuid
         self.msg_to = None if not msg_to else msg_to
@@ -24,14 +24,14 @@ class Message:
         self.body = body
         self.thread_id = self.msg_id if not thread_id else thread_id  # If empty thread_id then set to message id
         self.collection_case = collection_case
-        self.ru_id = ru_id
+        self.business_id = business_id
         self.collection_exercise = collection_exercise
         self.survey = survey
         self.from_internal = from_internal
 
     def __repr__(self):
         return f'<Message(msg_id={self.msg_id} msg_to={self.msg_to} msg_from={self.msg_from} subject={self.subject}' \
-               f' body={self.body} thread_id={self.thread_id} collection_case={self.collection_case} ru_id={self.ru_id}' \
+               f' body={self.body} thread_id={self.thread_id} collection_case={self.collection_case} business_id={self.business_id}' \
                f' collection_exercise={self.collection_exercise} survey={self.survey} from_internal={self.from_internal})>'
 
     def __eq__(self, other):
@@ -50,7 +50,7 @@ class MessageSchema(Schema):
     subject = fields.Str(required=True)
     thread_id = fields.Str(allow_none=True)
     collection_case = fields.Str(allow_none=True)
-    ru_id = fields.Str(required=True)
+    business_id = fields.Str(required=True)
     survey = fields.Str(required=True)
     collection_exercise = fields.Str(allow_none=True)
     from_internal = fields.Boolean(allow_none=True)
@@ -106,9 +106,9 @@ class MessageSchema(Schema):
     def validate_survey(self, survey):
         self.validate_non_zero_field_length("Survey", len(survey), constants.MAX_SURVEY_LEN)
 
-    @validates("ru_id")
-    def validate_ru_id(self, ru_id):
-        self.validate_non_zero_field_length("ru_id", len(ru_id), constants.MAX_RU_ID_LEN)
+    @validates("business_id")
+    def validate_business_id(self, business_id):
+        self.validate_non_zero_field_length("business_id", len(business_id), constants.MAX_BUSINESS_ID_LEN)
 
     @validates("collection_case")
     def validate_collection_case(self, collection_case):

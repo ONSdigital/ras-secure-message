@@ -40,8 +40,8 @@ class Retriever:
         if request_args.surveys:
             conditions.append(SecureMessage.survey.in_(request_args.surveys))
 
-        if request_args.ru_id:
-            conditions.append(SecureMessage.ru_id == request_args.ru_id)
+        if request_args.business_id:
+            conditions.append(SecureMessage.business_id == request_args.business_id)
 
         if request_args.cc:
             conditions.append(SecureMessage.collection_case == request_args.cc)
@@ -86,8 +86,8 @@ class Retriever:
     def _retrieve_respondent_thread_list(request_args, user):
         conditions = []
 
-        if request_args.ru_id:
-            conditions.append(SecureMessage.ru_id == request_args.ru_id)
+        if request_args.business_id:
+            conditions.append(SecureMessage.business_id == request_args.business_id)
 
         if request_args.surveys:
             conditions.append(SecureMessage.survey.in_(request_args.surveys))
@@ -126,8 +126,8 @@ class Retriever:
 
         logger.info("Retrieving list of threads for internal user", user_uuid=user.user_uuid)
 
-        if request_args.ru_id:
-            conditions.append(SecureMessage.ru_id == request_args.ru_id)
+        if request_args.business_id:
+            conditions.append(SecureMessage.business_id == request_args.business_id)
 
         if request_args.surveys:
             conditions.append(SecureMessage.survey.in_(request_args.surveys))

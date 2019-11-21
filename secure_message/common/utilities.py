@@ -10,17 +10,17 @@ from secure_message.services.service_toggles import party, internal_user_service
 logger = wrap_logger(logging.getLogger(__name__))
 MessageArgs = collections.namedtuple(
     'MessageArgs',
-    'page limit ru_id surveys cc label desc ce is_closed my_conversations new_respondent_conversations')
+    'page limit business_id surveys cc label desc ce is_closed my_conversations new_respondent_conversations')
 
 
 def get_options(args):
     """extract options from request , allow label to be set by caller"""
 
-    fields = {'page': 1, 'limit': MESSAGE_QUERY_LIMIT, 'ru_id': None, 'surveys': None,
+    fields = {'page': 1, 'limit': MESSAGE_QUERY_LIMIT, 'business_id': None, 'surveys': None,
               'desc': True, 'cc': None, 'label': None, 'ce': None, 'is_closed': False,
               'my_conversations': False, 'new_respondent_conversations': False}
 
-    for field in ['cc', 'ce', 'ru_id', 'label']:
+    for field in ['cc', 'ce', 'business_id', 'label']:
         if args.get(field):
             fields[field] = str(args.get(field))
 
@@ -42,7 +42,7 @@ def get_options(args):
     if args.get('new_respondent_conversations') == 'true':
         fields['new_respondent_conversations'] = True
 
-    return MessageArgs(page=fields['page'], limit=fields['limit'], ru_id=fields['ru_id'],
+    return MessageArgs(page=fields['page'], limit=fields['limit'], business_id=fields['business_id'],
                        surveys=fields['surveys'], cc=fields['cc'], label=fields['label'],
                        desc=fields['desc'], ce=fields['ce'], is_closed=fields['is_closed'],
                        my_conversations=fields['my_conversations'],
@@ -168,16 +168,16 @@ def get_external_user_uuid_list(messages):
 
 
 def add_business_details(messages):
-    """Adds a @ru_id key to every message in a list of messages."""
-    ru_ids = set()
+    """Adds a @business_details key to every message in a list of messages."""
+    business_ids = set()
 
     for message in messages:
-        ru_ids.add(message['ru_id'])
+        business_ids.add(message['business_id'])
 
-    business_details = party.get_business_details(ru_ids)
+    business_details = party.get_business_details(business_ids)
 
     for message in messages:
-        message['@ru_id'] = next((business for business in business_details if business["id"] == message['ru_id']), None)
+        message['@business_details'] = next((business for business in business_details if business["id"] == message['business_id']), None)
     return messages
 
 

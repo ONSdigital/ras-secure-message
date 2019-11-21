@@ -20,7 +20,7 @@ follow the steps below.
 ran previously should have some reporting units set up for this.  After sending the message, you will need to copy the following details from it into the create-messages.py file:
   - msg_from
   - msg_to
-  - ru_id
+  - business_id
   - survey
 - Finally, run the script.
 

@@ -13,7 +13,7 @@ for x in range(0, 50):
         "subject": subject,
         "body": body,
         "thread_id": "",
-        "ru_id": "47e5859b-5d18-4c73-a91c-05491f6c6167",
+        "business_id": "47e5859b-5d18-4c73-a91c-05491f6c6167",
         "collection_case": "",
         "survey": "02b9c366-7397-42f7-942a-76dc5876d86d"
     }

@@ -6,11 +6,11 @@ logger = wrap_logger(logging.getLogger(__name__))
 
 class PartyServiceMock:
 
-    def get_business_details(self, ru_ids):
+    def get_business_details(self, business_ids):
         """Return mock business details"""
-        business_details = [self._business_details.get(ru_id) for ru_id in self._business_details if ru_id in ru_ids]
+        business_details = [self._business_details.get(business_id) for business_id in self._business_details if business_id in business_ids]
         if not business_details:
-            logger.error("At least 1 ru_id missing in mock party service", ru_ids=ru_ids)
+            logger.error("At least 1 business_id missing in mock party service", business_ids=business_ids)
         return business_details
 
     def get_user_details(self, uuid):
@@ -47,7 +47,7 @@ class PartyServiceMock:
                                                                   "name": "Apricot"},
                          '0a6018a0-3e67-4407-b120-780932434b36': {"id": "0a6018a0-3e67-4407-b120-780932434b36",
                                                                   "name": "Asparagus"},
-                         '3b136c4b-7a14-4904-9e01-13364dd7b973': {"ru_id": "3b136c4b-7a14-4904-9e01-13364dd7b973",
+                         '3b136c4b-7a14-4904-9e01-13364dd7b973': {"business_id": "3b136c4b-7a14-4904-9e01-13364dd7b973",
                                                                   "business_name": "Bolts & Ratchet Ltd"},
                          'b3ba864b-7cbc-4f44-84fe-88dc018a1a4c': {"associations": [{"enrolments":
                                                                                     [{"enrolmentStatus": "ENABLED",

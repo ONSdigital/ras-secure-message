@@ -187,15 +187,15 @@ Feature: Message Send Endpoint
     When the message is sent
     Then a bad request status code 400 is returned
 
-  Scenario: Respondent sends a message for an ru they have no claim for , user should receive 403
+  Scenario: Respondent sends a message for an business_id they have no claim for, user should receive 403
    Given the user is set as respondent
     And  the from is set to respondent
     And  the to is set to internal specific user
-    And the ru is set to 'An ru that they cannot have a claim for'
+    And the business_id is set to 'An business_id that they cannot have a claim for'
    When the message is sent
    Then a forbidden status code 403 is returned
 
- Scenario: Respondent sends a message for a survey they have no claim for , user should receive 403
+ Scenario: Respondent sends a message for a survey they have no claim for, user should receive 403
    Given the user is set as respondent
     And  the from is set to respondent
     And  the to is set to internal specific user
