@@ -3,7 +3,7 @@ import logging
 from flask import request, jsonify, g, current_app, make_response
 from flask_restful import Resource
 from structlog import wrap_logger
-from werkzeug.exceptions import BadRequest
+from werkzeug.exceptions import BadRequest, NotFound
 
 from secure_message import constants
 from secure_message.common.alerts import AlertUser, AlertViaGovNotify, AlertViaLogging
@@ -32,16 +32,6 @@ class MessageSend(Resource):
             logger.info('Request must set accept content type "application/json" in header.')
         post_data = request.get_json(force=True)
 
-        if 'msg_id' in post_data:
-            raise BadRequest(description="Message can not include msg_id")
-        if post_data.get('thread_id'):
-            conversation_metadata = Retriever.retrieve_conversation_metadata(post_data.get('thread_id'))
-            # Ideally, we'd return a 404 if there isn't a record in the conversation table.  But until we
-            # ensure there is a record in here for every thread_id in the secure_message table, we just have to
-            # assume that it's fine if it's empty.
-            if conversation_metadata and conversation_metadata.is_closed:
-                raise BadRequest(description="Cannot reply to a closed conversation")
-
         post_data['from_internal'] = g.user.is_internal
         message = self._validate_post_data(post_data)
 
@@ -64,7 +54,7 @@ class MessageSend(Resource):
     def _has_valid_claim(user, message):
         """Validates that the user has a valid claim to interact with the business and survey in the post data
         internal users have claims to everything, respondents need to check against party"""
-        return user.is_internal or party.does_user_have_claim(user.user_uuid, message.ru_id, message.survey)
+        return user.is_internal or party.does_user_have_claim(user.user_uuid, message.business_id, message.survey)
 
     @staticmethod
     def _message_save(message):
@@ -78,7 +68,24 @@ class MessageSend(Resource):
 
     @staticmethod
     def _validate_post_data(post_data):
+        if 'msg_id' in post_data:
+            raise BadRequest(description="Message can not include msg_id")
+
         message = MessageSchema().load(post_data)
+
+        if post_data.get('thread_id'):
+            if post_data['from_internal'] and not party.get_users_details(post_data['msg_to']):
+                # If an internal person is sending a message to a respondent, we need to check that they exist.
+                # If they don't exist (because they've been deleted) then we raise a NotFound exception as the
+                # respondent can't be found in the system.
+                raise NotFound(description="Respondent not found")
+
+            conversation_metadata = Retriever.retrieve_conversation_metadata(post_data.get('thread_id'))
+            # Ideally, we'd return a 404 if there isn't a record in the conversation table.  But until we
+            # ensure there is a record in here for every thread_id in the secure_message table, we just have to
+            # assume that it's fine if it's empty.
+            if conversation_metadata and conversation_metadata.is_closed:
+                raise BadRequest(description="Cannot reply to a closed conversation")
         return message
 
     @staticmethod

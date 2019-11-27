@@ -24,34 +24,34 @@ class PartyTestCase(unittest.TestCase):
     @requests_mock.mock()
     def test_get_business_details_single_id_success(self, mock_request):
         """Test get business details with a single uuid"""
-        ru_ids = ["b08c07c3-df28-4283-bb4c-c048729ce372"]
-        business_data_url = f"{self.app.config['PARTY_SERVICE']}party-api/v1/businesses?id={ru_ids[0]}"
+        business_ids = ["b08c07c3-df28-4283-bb4c-c048729ce372"]
+        business_data_url = f"{self.app.config['PARTY_SERVICE']}party-api/v1/businesses?id={business_ids[0]}"
         mock_request.get(business_data_url, status_code=200, reason="OK", text='{}')
 
         with self.app.app_context():
-            PartyService().get_business_details(ru_ids)
+            PartyService().get_business_details(business_ids)
 
         self.assertTrue(mock_request.call_count == 1)
 
     @requests_mock.mock()
     def test_get_business_details_multiple_id_success(self, mock_request):
         """Test get business details with a multiple uuids at once"""
-        ru_ids = ["c614e64e-d981-4eba-b016-d9822f09a4fb", "c614e64e-d981-4eba-b016-d9822f09a4f2"]
-        business_data_url = f"{self.app.config['PARTY_SERVICE']}party-api/v1/businesses?id={ru_ids[0]}&id={ru_ids[1]}"
+        business_ids = ["c614e64e-d981-4eba-b016-d9822f09a4fb", "c614e64e-d981-4eba-b016-d9822f09a4f2"]
+        business_data_url = f"{self.app.config['PARTY_SERVICE']}party-api/v1/businesses?id={business_ids[0]}&id={business_ids[1]}"
         mock_request.get(business_data_url, status_code=200, reason="OK", text='{}')
         with self.app.app_context():
-            PartyService().get_business_details(ru_ids)
+            PartyService().get_business_details(business_ids)
 
         self.assertTrue(mock_request.call_count == 1)
 
     @requests_mock.mock()
     def test_get_business_details_client_error(self, mock_request):
         """Test get business details fails and returns an empty list when a non-uuid is sent"""
-        ru_ids = ["not_a_uuid"]
-        business_data_url = f"{self.app.config['PARTY_SERVICE']}party-api/v1/businesses?id={ru_ids[0]}"
+        business_ids = ["not_a_uuid"]
+        business_data_url = f"{self.app.config['PARTY_SERVICE']}party-api/v1/businesses?id={business_ids[0]}"
         mock_request.get(business_data_url, status_code=400, reason="Invalid uuid", text='{"error": "text"}')
         with self.app.app_context():
-            result = PartyService().get_business_details(ru_ids)
+            result = PartyService().get_business_details(business_ids)
 
         self.assertEqual(result, [])
         self.assertTrue(mock_request.call_count == 1)
@@ -59,11 +59,11 @@ class PartyTestCase(unittest.TestCase):
     @requests_mock.mock()
     def test_get_business_details_unauthorised_failure(self, mock_request):
         """Test get business details fails and returns and empty list when the client is unauthorised to access the party service"""
-        ru_ids = ["1234"]
-        business_data_url = f"{self.app.config['PARTY_SERVICE']}party-api/v1/businesses?id={ru_ids[0]}"
+        business_ids = ["1234"]
+        business_data_url = f"{self.app.config['PARTY_SERVICE']}party-api/v1/businesses?id={business_ids[0]}"
         mock_request.get(business_data_url, status_code=401, reason="unauthorised", text='{}')
         with self.app.app_context():
-            result_data = PartyService().get_business_details(ru_ids)
+            result_data = PartyService().get_business_details(business_ids)
 
         self.assertEqual(result_data, [])
         self.assertTrue(mock_request.call_count == 1)

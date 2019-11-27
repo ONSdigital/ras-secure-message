@@ -13,29 +13,28 @@ class PartyTestCase(unittest.TestCase):
         internal_user_service.use_mock_service()
         party.use_mock_service()
 
-    def test_get_business_details_by_ru(self):
-        """Test get details for one business using ru_id"""
+    def test_get_business_details_by_business_id(self):
+        """Test get details for one business using business_id"""
 
-        list_ru = ['f1a5e99c-8edf-489a-9c72-6cabe6c387fc']
+        list_business_id = ['f1a5e99c-8edf-489a-9c72-6cabe6c387fc']
 
-        business_details = party.get_business_details(list_ru)
+        business_details = party.get_business_details(list_business_id)
 
-        self.assertEqual(business_details[0]['id'], list_ru[0])
+        self.assertEqual(business_details[0]['id'], list_business_id[0])
         self.assertEqual(business_details[0]['name'], "Apple")
 
-    def test_get_business_details_multiple_ru(self):
-        """Test business details are returned for multiple ru's"""
+    def test_get_business_details_multiple_business_id(self):
+        """Test business details are returned for multiple business_id's"""
 
-        list_ru = ['0a6018a0-3e67-4407-b120-780932434b36',
-                   'f1a5e99c-8edf-489a-9c72-6cabe6c387fc',
-                   'c614e64e-d981-4eba-b016-d9822f09a4fb',
-                   'b3ba864b-7cbc-4f44-84fe-88dc018a1a4c'
-                   ]
+        list_business_id = ['0a6018a0-3e67-4407-b120-780932434b36',
+                            'f1a5e99c-8edf-489a-9c72-6cabe6c387fc',
+                            'c614e64e-d981-4eba-b016-d9822f09a4fb',
+                            'b3ba864b-7cbc-4f44-84fe-88dc018a1a4c']
 
-        business_details = party.get_business_details(list_ru)
+        business_details = party.get_business_details(list_business_id)
 
         for detail in business_details:
-            self.assertIn(detail['id'], list_ru)
+            self.assertIn(detail['id'], list_business_id)
 
     def test_get_user_details_returns_none_if_uuid_not_known(self):
         user = 'SomeoneWhoClearlyDoesNotExist'
@@ -43,7 +42,7 @@ class PartyTestCase(unittest.TestCase):
         result_data = sut.get_user_details(user)
         self.assertIsNone(result_data)
 
-    def test_get_business_details_returns_none_if_ru_not_known(self):
+    def test_get_business_details_returns_none_if_business_id_not_known(self):
         uuid = 'ABusinessThatDoesNotExist'
         sut = PartyServiceMock()
         result_data = sut.get_business_details(uuid)

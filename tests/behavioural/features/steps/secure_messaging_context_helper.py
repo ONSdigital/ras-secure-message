@@ -17,8 +17,8 @@ class SecureMessagingContextHelper:
     The dunder constants are used to specify constants for use in steps in a single place
 
     """
-    __DEFAULT_RU = 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc'
-    __ALTERNATE_RU = 'b3ba864b-7cbc-4f44-84fe-88dc018a1a4c'
+    __DEFAULT_BUSINESS_ID = 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc'
+    __ALTERNATE_BUSINESS_ID = 'b3ba864b-7cbc-4f44-84fe-88dc018a1a4c'
 
     __DEFAULT_SURVEY = '33333333-22222-3333-4444-88dc018a1a4c'
     __ALTERNATE_SURVEY = '11111111-22222-3333-4444-88dc018a1a4c'
@@ -48,6 +48,10 @@ class SecureMessagingContextHelper:
     __ALTERNATIVE_RESPONDENT_USER_TOKEN = {constants.USER_IDENTIFIER: __ALTERNATIVE_RESPONDENT_USER_ID,
                                            "role": "respondent"}
 
+    __DELETED_RESPONDENT_USER_ID = "778f60f6-5b5f-4617-b71b-26c0607c769c"
+    __DELETED_RESPONDENT_USER_TOKEN = {constants.USER_IDENTIFIER: __DELETED_RESPONDENT_USER_ID,
+                                       "role": "respondent"}
+
     __BASE_URL = "http://localhost:5050"
 
     __default_message_data = data = {'msg_to': ['0a7ad740-10d5-4ecb-b7ca-3c0384afb882'],
@@ -57,7 +61,7 @@ class SecureMessagingContextHelper:
                                      'thread_id': '',
                                      'collection_case': __DEFAULT_COLLECTION_CASE,
                                      'collection_exercise': __DEFAULT_COLLECTION_EXERCISE,
-                                     'ru_id': __DEFAULT_RU,
+                                     'business_id': __DEFAULT_BUSINESS_ID,
                                      'survey': __DEFAULT_SURVEY}
 
     def __init__(self):
@@ -133,6 +137,10 @@ class SecureMessagingContextHelper:
         return copy.deepcopy(SecureMessagingContextHelper.__ALTERNATIVE_RESPONDENT_USER_TOKEN)
 
     @property
+    def deleted_respondent_user_token(self):
+        return copy.deepcopy(SecureMessagingContextHelper.__DELETED_RESPONDENT_USER_TOKEN)
+
+    @property
     def default_survey(self):
         return copy.copy(SecureMessagingContextHelper.__DEFAULT_SURVEY)
 
@@ -183,6 +191,10 @@ class SecureMessagingContextHelper:
     @property
     def alternative_respondent_id(self):
         return copy.copy(SecureMessagingContextHelper.__ALTERNATIVE_RESPONDENT_USER_ID)
+
+    @property
+    def deleted_respondent_id(self):
+        return copy.copy(SecureMessagingContextHelper.__DELETED_RESPONDENT_USER_ID)
 
     @property
     def internal_id_specific_user(self):
@@ -251,14 +263,14 @@ class SecureMessagingContextHelper:
         return self._health_details_endpoint
 
     @property
-    def default_ru(self):
-        return copy.copy(self.__DEFAULT_RU)
+    def default_business_id(self):
+        return copy.copy(self.__DEFAULT_BUSINESS_ID)
 
-    def use_alternate_ru(self):
-        self._message_data['ru_id'] = SecureMessagingContextHelper.__ALTERNATE_RU
+    def use_alternate_business_id(self):
+        self._message_data['business_id'] = SecureMessagingContextHelper.__ALTERNATE_BUSINESS_ID
 
-    def use_default_ru(self):
-        self._message_data['ru_id'] = SecureMessagingContextHelper.__DEFAULT_RU
+    def use_default_business_id(self):
+        self._message_data['business_id'] = SecureMessagingContextHelper.__DEFAULT_BUSINESS_ID
 
     def use_alternate_survey(self):
         self._message_data['survey'] = SecureMessagingContextHelper.__ALTERNATE_SURVEY

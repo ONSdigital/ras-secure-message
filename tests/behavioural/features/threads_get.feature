@@ -283,28 +283,28 @@ Scenario Outline: There are 3 conversations between respondent and internal , re
     | group        |
 
 
-  Scenario Outline: There are 3 conversations between an internal user and respondent each with 2  messages ,
-                    each with different ru validate , that only 2 messages returned when we restrict by ru
+  Scenario Outline: There are 3 conversations between an internal user and respondent each with 2 messages,
+                    each with different business_ids, Validate that only 2 messages returned when we restrict by business_id
 
     Given sending from internal <user> to respondent
-      And the ru is set to 'ru1'
+      And the business_id is set to 'ru1'
       And the message is sent
       And the thread id is set to the last returned thread id
       And the message is sent
 
       And the thread_id is set to empty
-      And the ru is set to 'ru2'
+      And the business_id is set to 'ru2'
       And the message is sent
       And the thread id is set to the last returned thread id
       And the message is sent
 
       And the thread_id is set to empty
-      And the ru is set to 'ru1'
+      And the business_id is set to 'ru1'
       And the message is sent
       And the thread id is set to the last returned thread id
       And the message is sent
 
-    When the threads with ru 'ru1' are read
+    When the threads with business_id 'ru1' are read
     Then  a success status code 200 is returned
       And  '2' messages are returned
 
@@ -315,28 +315,28 @@ Scenario Outline: There are 3 conversations between respondent and internal , re
     | group        |
 
 
-  Scenario Outline: There are 3 conversations between an respondent and internal user each with 2  messages ,
-                    each with different ru validate , that only 2 messages returned when we restrict by ru
+  Scenario Outline: There are 3 conversations between an respondent and internal user each with 2 messages,
+                    each with different business_ids. Validate that only 2 messages returned when we restrict by business_id
 
     Given sending from respondent to internal <user>
-      And the ru is set to 'additional_ru1'
+      And the business_id is set to 'additional_ru1'
       And the message is sent
       And the thread id is set to the last returned thread id
       And the message is sent
 
       And the thread_id is set to empty
-      And the ru is set to 'additional_ru2'
+      And the business_id is set to 'additional_ru2'
       And the message is sent
       And the thread id is set to the last returned thread id
       And the message is sent
 
       And the thread_id is set to empty
-      And the ru is set to 'additional_ru1'
+      And the business_id is set to 'additional_ru1'
       And the message is sent
       And the thread id is set to the last returned thread id
       And the message is sent
 
-    When the threads with ru 'additional_ru1' are read
+    When the threads with business_id 'additional_ru1' are read
     Then  a success status code 200 is returned
       And  '2' messages are returned
 

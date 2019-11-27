@@ -39,6 +39,13 @@ def step_impl_the_msg_to_is_set_to_alternative_respondent(context):
     step_impl_the_msg_to_is_set_to(context, context.bdd_helper.alternative_respondent_id)
 
 
+@given("the to is set to a deleted respondent")
+@when("the to is set to a deleted respondent")
+def step_impl_the_msg_to_is_set_to_deleted_respondent(context):
+    """ set the msg to field in the message data to the respondent as specified in the helper"""
+    step_impl_the_msg_to_is_set_to(context, context.bdd_helper.deleted_respondent_id)
+
+
 @given("the to is set to respondent as a string not array")
 @when("the to is set to respondent as a string not array")
 def step_impl_the_msg_to_is_set_to_respondent_as_string_not_array(context):

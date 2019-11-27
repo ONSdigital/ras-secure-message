@@ -23,7 +23,6 @@ class AppTestCase(unittest.TestCase):
     BRES_SURVEY = "33333333-22222-3333-4444-88dc018a1a4c"
     SPECIFIC_INTERNAL_USER = "SpecificInternalUserId"
     SPECIFIC_EXTERNAL_USER = "0a7ad740-10d5-4ecb-b7ca-3c0384afb882"
-    TEST_RU = 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc'
 
     def setUp(self):
         """setup test environment"""
@@ -37,7 +36,7 @@ class AppTestCase(unittest.TestCase):
                                "role": "internal"}
 
         external_token_data = {constants.USER_IDENTIFIER: AppTestCase.SPECIFIC_EXTERNAL_USER,
-                               "role": "respondent", "claims": [{'business_id': AppTestCase.TEST_RU,
+                               "role": "respondent", "claims": [{'business_id': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc',
                                                                  'surveys': [AppTestCase.BRES_SURVEY]
                                                                  }]
                                }
@@ -58,7 +57,7 @@ class AppTestCase(unittest.TestCase):
                              'thread_id': "",
                              'collection_case': 'ACollectionCase',
                              'collection_exercise': 'ACollectionExercise',
-                             'ru_id': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc',
+                             'business_id': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc',
                              'survey': self.BRES_SURVEY}
 
         with self.app.app_context():
@@ -80,7 +79,7 @@ class AppTestCase(unittest.TestCase):
                 'subject': 'MyMessage',
                 'body': 'hello',
                 'thread': "?",
-                'ru_id': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc',
+                'business_id': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc',
                 'create_date': datetime.now(timezone.utc),
                 'survey': 'a-uuid-for-the-survey'}
 
@@ -176,7 +175,7 @@ class AppTestCase(unittest.TestCase):
                         'body': 'hello',
                         'collection_case': 'ACollectionCase',
                         'collection_exercise': 'ACollectionExercise',
-                        'ru_id': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc',
+                        'business_id': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc',
                         'survey': self.BRES_SURVEY}
         try:
             self.client.post(url, data=json.dumps(test_message), headers=self.internal_user_header)

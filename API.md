@@ -6,19 +6,19 @@
 * [Message Fields](#message-fields)
 * [JWT](#jwt)
 * Messages
-    * [Get Message List](#get-message-list)
-    * [Send Message](#send-message)
-    * [Modify Message Labels](#modify-message-labels)
+  * [Get Message List](#get-message-list)
+  * [Send Message](#send-message)
+  * [Modify Message Labels](#modify-message-labels)
 * Conversations
-    * [Get conversation list](#get-conversation-list)
-    * [Get conversation list](#get-conversation-list)
-    * [Get conversations count](#get-conversations-count)
-    * [Patch Conversation Metadata](#patch-conversation-metadata)
+  * [Get conversation list](#get-conversation-list)
+  * [Get conversation list](#get-conversation-list)
+  * [Get conversations count](#get-conversations-count)
+  * [Patch Conversation Metadata](#patch-conversation-metadata)
 * Health and Status
-    * [Get Health](#get-health)
-    * [Get Health With Database-status](#get-health-with-database-status)
-    * [Get Service Details](#get-service-details)
-    * [Get Service Version](#get-service-version)
+  * [Get Health](#get-health)
+  * [Get Health With Database-status](#get-health-with-database-status)
+  * [Get Service Details](#get-service-details)
+  * [Get Service Version](#get-service-version)
 
 ## Overview
 
@@ -38,7 +38,6 @@ The api endpoints fall into 4 groups:
 * Conversations - Messages can exist as part of a conversation. Messages within a conversation share the same thread identifier. Conversations/Threads can be obtained via a list of conversations or a specific conversation.
 * Health and Information - Several endpoints are provided that can be used to view the health and status of the service
 
-
 ### Message Fields
 
 See the endpoint descriptions for detailed usage of each field. This is an overview.
@@ -53,13 +52,13 @@ See the endpoint descriptions for detailed usage of each field. This is an overv
 * Collection Exercise .  (collection exercise) uuid of the collection exercise , can be used as a filter option (ce)
 * Reporting unit . (ru) uuid of the reporting unit . Can be used as a filter option.
 * Labels . These can be used to set a status on a message, or retrieve messages with a specific label. Valid labels:
-    * SENT  Added to a message for the actor who sent the message
-    * INBOX Added to the message for the actor who received the message
-    * UNREAD Added to a message to indicate that a message has not been read
+  * SENT  Added to a message for the actor who sent the message
+  * INBOX Added to the message for the actor who received the message
+  * UNREAD Added to a message to indicate that a message has not been read
 * page . Which page of the result set is to be returned when getting a list of messages/threads
 * limit . How many messages to return per page when getting a list of messages/threads.
 
-## JWT ##
+## JWT
 
 All calls , except health , health details and info , require that a valid JWT be passed in an Authorization header.
 this currently has two fields:
@@ -71,7 +70,7 @@ The algorithm and secret are defined in the configuration file. If the algorithm
 
 Being able to get a response from a health or info endpoint but 500's from a message post or read is often an indicator that something in this area is not configured correctly. An easy check for config is to access the /health/details endpoint.
 
-## Get Message List ##
+## Get Message List
 
 `GET /messages`
 
@@ -84,7 +83,7 @@ Retrieves a list of messages based on the selected parameters passed on the quer
 | `**Variable**` | `**Type**` | `**Example Value**` | `**Notes**` |
 | :---: | :---: | :---: | :---: |
 | cc (collection_case) | `string` | 0000000000000000 | optionally restrict by collection case |
-| ru_id | `string` | aaa1aa1a-1aa1-1111-aa11-11a11aa111aa | optionally restrict by ru id  |
+| business_id | `string` | aaa1aa1a-1aa1-1111-aa11-11a11aa111aa | optionally restrict by ru id  |
 | survey | `string` | aaa1aa1a-1aa1-1111-aa11-11a11aa111aa | optionally restrict by survey  |
 | label | `string` | INBOX/SENT | used to select types of messages to return e.g SENT or INBOX |
 | ce (collection_exercise) | `string`| aaa1aa1a-1aa1-1111-aa11-11a11aa111aa | optionally restrict by collection exercise |
@@ -92,12 +91,12 @@ Retrieves a list of messages based on the selected parameters passed on the quer
 | limit | `int` | 2 | maximum number of messages to return per page |
 | page  | 'int' | 1 | which page of data to return |
 
-   * An example of using one the above would be: `GET /messages?limit=2`
-   * Using multiple parameters: `GET /messages?limit=2&label=INBOX&survey=12345678981047653839`
+* An example of using one the above would be: `GET /messages?limit=2`
+* Using multiple parameters: `GET /messages?limit=2&label=INBOX&survey=12345678981047653839`
 
 Note that if the user is a respondent the get messages returns messages which match the uuid of the user passed in the JWT and that satisfy any additional filter criteria. If the user is internal then it matches messages sent to all internal users that satisfy the additional filter criteria . Typically that would be restricted by survey_id so that only messages  of a specific survey are returned.
 
-#### Example JSON Response
+### Example JSON Response
 
 ```json
 {
@@ -147,7 +146,7 @@ Note that if the user is a respondent the get messages returns messages which ma
                     "telephone": "07832323234"
                 }
             ],
-            "@ru_id": null,
+            "@business_details": null,
             "_links": {
                 "self": {
                     "href": "http://localhost:5050/message/ae46748b-c6e6-4859-a57a-86e01db2dcbc"
@@ -165,16 +164,17 @@ Note that if the user is a respondent the get messages returns messages which ma
             "msg_to": [
                 "ef7737df-2097-4a73-a530-e98dba7bf28f"
             ],
-            "ru_id": "f1a5e99c-8edf-489a-9c72-6cabe6c387fc",
+            "business_id": "f1a5e99c-8edf-489a-9c72-6cabe6c387fc",
             "subject": "Test uuid",
             "survey": "BRES",
             "thread_id": "ae46748b-c6e6-4859-a57a-86e01db2dcbc"
         }
 ]}
 ```
-Note the message response contains @msg_from , @msg_to and @ru . These hold values that the secure message api has resolved from the party service or the user authentication service. They are not guaranteed to be populated if the service is not available or if the message was sent to 'GROUP'
 
-## Send Message ##
+Note the message response contains @msg_from , @msg_to and @business_details . These hold values that the secure message api has resolved from the party service or the user authentication service. They are not guaranteed to be populated if the service is not available or if the message was sent to 'GROUP'
+
+## Send Message
 
 `POST /messages`
 
@@ -184,7 +184,7 @@ Note, the message post must have a Content-Type header of `application/json` , e
 
 When a message is posted, typically, no msg_id is supplied.
 
-#### Example JSON DATA for post Version 1
+### Example JSON DATA for post Version 1
 
 ```json
 {
@@ -193,12 +193,14 @@ When a message is posted, typically, no msg_id is supplied.
   "subject": "Test uuid",
   "body": "Test uuid",
   "thread_id": "",
-  "ru_id": "f1a5e99c-8edf-489a-9c72-6cabe6c387fc",
+  "business_id": "f1a5e99c-8edf-489a-9c72-6cabe6c387fc",
   "collection_case": "ACollectionCase",
   "survey": "BRES"
 }
 ```
-#### Example JSON DATA for post Version 2
+
+### Example JSON DATA for post Version 2
+
 * msg_to - Should be set to a specific user uuid if known , else to the constant 'GROUP' if sending to an unknown user in ONS
 * msg_from - The current user uuid
 * thread_id - Should be set to the thread id of the message being replied to if the message is a reply, else left empty
@@ -212,12 +214,14 @@ When a message is posted, typically, no msg_id is supplied.
   "subject": "Test uuid",
   "body": "Test uuid",
   "thread_id": "",
-  "ru_id": "f1a5e99c-8edf-489a-9c72-6cabe6c387fc",
-  "collection_case": "ACollectionCase",        
+  "business_id": "f1a5e99c-8edf-489a-9c72-6cabe6c387fc",
+  "collection_case": "ACollectionCase",
   "survey": "2346e99c-8edf-489a-9c72-6cabe6c387fc"
 }
 ```
-#### Example JSON Response version 1 and 2
+
+### Example JSON Response version 1 and 2
+
 Note if the message is a new message ( not a reply to an existing one) then the thread_id and the message_id will be the same. This indicates that this message is the first in a conversation. Subsequent messages in a conversation will have their own msg_id but all share the same thread_id
 
 ```json
@@ -240,8 +244,7 @@ Valid actions : `add`,`remove` . Other actions will result in errors.
 
 Note there is only an UNREAD label , absence of `UNREAD` is interpreted as the message has been read
 
-
-#### Example JSON DATA for put
+### Example JSON DATA for put
 
 ```json
 {
@@ -250,20 +253,11 @@ Note there is only an UNREAD label , absence of `UNREAD` is interpreted as the m
 }
 ```
 
-#### Example JSON Response
+### Example JSON Response
 
 ```json
 {
     "status": "ok"
-}
-```
-
-#### Example JSON Response
-
-```json
-{
-    "name": "unread",
-    "total": 39
 }
 ```
 
@@ -278,17 +272,14 @@ the criteria passed in [Get Message List](#get-message-list)
 
 Additional parameters above those on Get Message List:  
 
-```
-is_closed           If set and value = 'true' then only returns conversations that have been marked as closed, else returns open
-conversations
+* is_closed           If set and value = 'true' then only returns conversations that have been marked as closed, else returns open conversations
+* my_conversations    If set and value ='true' then for an internal user will only retrieve conversations where they were an actor in the
+latest message on the thread. I.e they sent the message or it was sent specifically to them. If set true when the user is a respondent then it returns a 400
 
-my_conversations    If set and value ='true' then for an internal user will only retrieve conversations where they were an actor in the 
-latest message on the thread. I.e they sent the message or it was sent specifically to them. If set true when the user is a respondent then it returns a 400 
-```
+### Example JSON Response
 
-
-#### Example JSON Response
 Note, the response will have either uuids or 'GROUP' for the user ids, and a uuid for the survey id
+
 ```json
 {
   "_links": {
@@ -318,7 +309,7 @@ Note, the response will have either uuids or 'GROUP' for the user ids, and a uui
           "lastName": ""
         }
       ],
-      "@ru_id": {
+      "@business_details": {
         "id": "f1a5e99c-8edf-489a-9c72-6cabe6c387fc",
         "name": "Apple"
       },
@@ -339,7 +330,7 @@ Note, the response will have either uuids or 'GROUP' for the user ids, and a uui
       "msg_to": [
         "BRES"
       ],
-      "ru_id": "f1a5e99c-8edf-489a-9c72-6cabe6c387fc",
+      "business_id": "f1a5e99c-8edf-489a-9c72-6cabe6c387fc",
       "sent_date": "2018-02-22 14:54:25.637222",
       "subject": "Hello World",
       "survey": "33333333-22222-3333-4444-88dc018a1a4c",
@@ -363,7 +354,7 @@ Note, the response will have either uuids or 'GROUP' for the user ids, and a uui
           "lastName": ""
         }
       ],
-      "@ru_id": {
+      "@business_details": {
         "id": "f1a5e99c-8edf-489a-9c72-6cabe6c387fc",
         "name": "Apple"
       },
@@ -384,7 +375,7 @@ Note, the response will have either uuids or 'GROUP' for the user ids, and a uui
       "msg_to": [
         "BRES"
       ],
-      "ru_id": "f1a5e99c-8edf-489a-9c72-6cabe6c387fc",
+      "business_id": "f1a5e99c-8edf-489a-9c72-6cabe6c387fc",
       "sent_date": "2018-02-22 14:54:25.616215",
       "subject": "Hello World",
       "survey": "33333333-22222-3333-4444-88dc018a1a4c",
@@ -408,7 +399,7 @@ Note, the response will have either uuids or 'GROUP' for the user ids, and a uui
           "lastName": ""
         }
       ],
-      "@ru_id": {
+      "@business_details": {
         "id": "f1a5e99c-8edf-489a-9c72-6cabe6c387fc",
         "name": "Apple"
       },
@@ -429,7 +420,7 @@ Note, the response will have either uuids or 'GROUP' for the user ids, and a uui
       "msg_to": [
         "BRES"
       ],
-      "ru_id": "f1a5e99c-8edf-489a-9c72-6cabe6c387fc",
+      "business_id": "f1a5e99c-8edf-489a-9c72-6cabe6c387fc",
       "sent_date": "2018-02-22 14:54:25.576722",
       "subject": "Hello World",
       "survey": "33333333-22222-3333-4444-88dc018a1a4c",
@@ -438,32 +429,27 @@ Note, the response will have either uuids or 'GROUP' for the user ids, and a uui
   ]
 }
 ```
-For descriptions of @msg_from, @msg_to and @ru see messages get
+
+For descriptions of @msg_from, @msg_to and @business_details see messages get
 [Get Message List](#get-message-list)
 
 ## Get Conversations count  
 
 `GET /messages/count`
 
-This returns a count of the conversations that satisfy the search criteria. 
+This returns a count of the conversations that satisfy the search criteria.
 Available search criteria matches those on get threads:
-```
-survey          If set then only conversations regarding this survey will be considered. Defaults to all surveys
 
-is_closed       If set true then only closed conversations will be considered. Defaults to false if omitted.
+* survey - If set then only conversations regarding this survey will be considered. Defaults to all surveys
+* is_closed - If set true then only closed conversations will be considered. Defaults to false if omitted.
+* my_conversations - If set true then will only return conversations where the currently signed in user is an actor in the last message of the conversation.
+* new_respondent_conversations - If set true then only counts new conversations by the respondent. I.e ones not replied to
+* business_id - If set then restrict conversations to those regarding a specific ru
+* cc - If set then restricts the conversations to a specific collection case
+* ce - If set then restricts the conversations to a specific collction exercise
 
-my_conversations If set true then will only return conversations where the currently signed in user is an actor in the last message of the conversation.
+### Example JSON Response
 
-new_respondent_conversations If set true then only counts new conversations by the respondent. I.e ones not replied to
-
-ru_id           If set then restrict conversations to those regarding a specific ru
-
-cc              If set then restricts the conversations to a specific collection case
-
-ce              If set then restricts the conversations to a specific collction exercise
-```
-
-#### Example JSON Response
 ```json
 {
   "total":14
@@ -481,8 +467,10 @@ This returns all messages on a specific thread.
 Note there is a known bug here. That is messages are ordered by date of entry which may not be correct if several
 sub conversations are in progress (i.e two internal users replying on a thread ).
 
-#### Example JSON Response
+### Example JSON Response
+
 Messages should have survey_id, collection_case and use either a uuid or "GROUP" for the internal user.
+
 ```json
 {
   "_links": {
@@ -512,7 +500,7 @@ Messages should have survey_id, collection_case and use either a uuid or "GROUP"
           "lastName": ""
         }
       ],
-      "@ru_id": {
+      "@business_details": {
         "id": "f1a5e99c-8edf-489a-9c72-6cabe6c387fc",
         "name": "Apple"
       },
@@ -533,7 +521,7 @@ Messages should have survey_id, collection_case and use either a uuid or "GROUP"
       "msg_to": [
         "BRES"
       ],
-      "ru_id": "f1a5e99c-8edf-489a-9c72-6cabe6c387fc",
+      "business_id": "f1a5e99c-8edf-489a-9c72-6cabe6c387fc",
       "sent_date": "2018-02-22 15:02:07.230759",
       "subject": "Hello World",
       "survey": "33333333-22222-3333-4444-88dc018a1a4c",
@@ -557,7 +545,7 @@ Messages should have survey_id, collection_case and use either a uuid or "GROUP"
           "telephone": "+443069990854"
         }
       ],
-      "@ru_id": {
+      "@business_details": {
         "id": "f1a5e99c-8edf-489a-9c72-6cabe6c387fc",
         "name": "Apple"
       },
@@ -579,7 +567,7 @@ Messages should have survey_id, collection_case and use either a uuid or "GROUP"
       "msg_to": [
         "01b51fcc-ed43-4cdb-ad1c-450f9986859b"
       ],
-      "ru_id": "f1a5e99c-8edf-489a-9c72-6cabe6c387fc",
+      "business_id": "f1a5e99c-8edf-489a-9c72-6cabe6c387fc",
       "sent_date": "2018-02-22 15:02:07.190032",
       "subject": "Hello World",
       "survey": "33333333-22222-3333-4444-88dc018a1a4c",
@@ -603,7 +591,7 @@ Messages should have survey_id, collection_case and use either a uuid or "GROUP"
           "lastName": ""
         }
       ],
-      "@ru_id": {
+      "@business_details": {
         "id": "f1a5e99c-8edf-489a-9c72-6cabe6c387fc",
         "name": "Apple"
       },
@@ -624,7 +612,7 @@ Messages should have survey_id, collection_case and use either a uuid or "GROUP"
       "msg_to": [
         "BRES"
       ],
-      "ru_id": "f1a5e99c-8edf-489a-9c72-6cabe6c387fc",
+      "business_id": "f1a5e99c-8edf-489a-9c72-6cabe6c387fc",
       "sent_date": "2018-02-22 15:02:07.133519",
       "subject": "Hello World",
       "survey": "33333333-22222-3333-4444-88dc018a1a4c",
@@ -633,7 +621,8 @@ Messages should have survey_id, collection_case and use either a uuid or "GROUP"
   ]
 }
 ```
-Note, See message get for descriptions of @msg_from, @msg_to and @ru
+
+Note, See message get for descriptions of @msg_from, @msg_to and @business_details
 [Get Message List](#get-message-list)
 
 ## Patch Conversation Metadata
@@ -643,15 +632,14 @@ Note, See message get for descriptions of @msg_from, @msg_to and @ru
 This is used to add/remove metadata to a conversation.  Below is a list of the parameters that can be
 patched:
 
-
 | Variable | Type| Notes |
 | :---: | :---: | :--: |
 | is_closed | `boolean` | Only internal users are allowed to close conversations.
 
 Only the parameters you want to patch should be included in the call.
 
+### Example JSON payload
 
-#### Example JSON payload
 ```json
 {
     "is_closed": true
@@ -676,8 +664,8 @@ Below is a list of possible return values:
 Returns a simple indicator that the service is running. It is useful since it bypasses all aspects of the JWT.
 So persistent 500s whilst health returns is often an indicator of incorrect JWT configuration.
 
+### Example JSON Response
 
-#### Example JSON Response
 ```json
 {"status" : "healthy"}
 ```
@@ -686,11 +674,10 @@ So persistent 500s whilst health returns is often an indicator of incorrect JWT 
 
 `GET /health/db`
 
-
 Similar to health but validates that the current database connection is valid. Hence it is useful in various environments if database issues are suspected. Bypasses all aspects of the JWT.
 
+### Example JSON Response
 
-#### Example JSON Response
 ```json
 {
   "errors" : "none",
@@ -704,8 +691,8 @@ Similar to health but validates that the current database connection is valid. H
 
 Returns more detailed information about secure message including some of the environment variables. Bypasses all aspects of the JWT.
 
+### Example JSON Response
 
-#### Example JSON Response
 ```json
   {
   "API Functionality": {
@@ -738,7 +725,8 @@ Returns more detailed information about secure message including some of the env
 
 Similar to the health endpoints, it was added for consistency between services. Bypasses all aspects of JWT.
 
-#### Example JSON Response
+### Example JSON Response
+
 ```json
 {
   "name": "ras-secure-message",

@@ -20,9 +20,9 @@ def step_impl_verify_additional_to_data_matches_that_from_party_service(context)
     nose.tools.assert_equal(msg_resp['@msg_to'][0], party_data)
 
 
-@then("retrieved message additional ru_id data matches that from party service")
-def step_impl_verify_additional_ru_id_to_data_matches_that_from_party_service(context):
-    """validate that the additional @ru_id data matches that obtained from the party service"""
+@then("retrieved message additional business_id data matches that from party service")
+def step_impl_verify_additional_business_id_to_data_matches_that_from_party_service(context):
+    """validate that the additional @business_details data matches that obtained from the party service"""
     msg_resp = json.loads(context.response.data)
-    party_data = party.get_business_details(msg_resp['ru_id'])
-    nose.tools.assert_equal(msg_resp['@ru_id'], party_data)
+    party_data = party.get_business_details(msg_resp['business_id'])
+    nose.tools.assert_equal(msg_resp['@business_details'], party_data)
