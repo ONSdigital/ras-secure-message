@@ -14,7 +14,7 @@ class PartyService:
     def get_business_details(business_ids):
         """Retrieves the business details from the party service"""
         params = urlencode([("id", business_id) for business_id in business_ids])
-        response = requests.get(f"{current_app.config['_PARTY_SERVICE']}party-api/v1/businesses",
+        response = requests.get(f"{current_app.config['PARTY_SERVICE']}party-api/v1/businesses",
                                 auth=current_app.config['BASIC_AUTH'], verify=False, params=params)
         try:
             response.raise_for_status()
