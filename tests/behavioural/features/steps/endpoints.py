@@ -110,6 +110,14 @@ def step_impl_the_threads_in_specific_survey_are_returned(context, survey):
     context.bdd_helper.store_messages_response_data(context.response.data)
 
 
+@when("the threads for business '{business_id}' in survey '{survey}' are read")
+@given("the threads for business '{business_id}' in survey '{survey}' are read")
+def step_impl_the_threads_in_specific_survey_and_business_are_returned(context, survey, business_id):
+    url = context.bdd_helper.threads_get_url + f"?survey={survey}&business_id={business_id}"
+    context.response = context.client.get(url, headers=context.bdd_helper.headers)
+    context.bdd_helper.store_messages_response_data(context.response.data)
+
+
 @when("the threads in are read with filters for both default and alternate surveys")
 def step_impl_the_threads_in_default_and_alternate_are_returned(context):
     url = context.bdd_helper.threads_get_url + f"?survey={context.bdd_helper.default_survey}" \

@@ -282,6 +282,40 @@ Scenario Outline: There are 3 conversations between respondent and internal , re
     | specific user |
     | group        |
 
+  Scenario Outline: There are 3 new conversations between an respondent and internal user each with 2  messages ,
+                    2 conversations are for one business_id and the third is for another ,
+                    Validate that when we filter by both survey and business id that the correct threads are returned
+
+    Given sending from respondent to internal <user>
+      And the survey is set to 'additional_survey_1'
+      And the business_id is set to 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc'
+      And the message is sent
+      And the thread id is set to the last returned thread id
+      And the message is sent
+
+      And the thread_id is set to empty
+      And the survey is set to 'additional_survey_2'
+      And the business_id is set to 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc'
+      And the message is sent
+      And the thread id is set to the last returned thread id
+      And the message is sent
+
+      And the thread_id is set to empty
+      And the survey is set to 'additional_survey_1'
+      And the business_id is set to 'b3ba864b-7cbc-4f44-84fe-88dc018a1a4c'
+      And the message is sent
+      And the thread id is set to the last returned thread id
+      And the message is sent
+
+    When the threads for business 'b3ba864b-7cbc-4f44-84fe-88dc018a1a4c' in survey 'additional_survey_1' are read
+    Then  a success status code 200 is returned
+      And  '1' messages are returned
+
+
+    Examples: user type
+    | user        |
+    | specific user |
+    | group        |
 
   Scenario Outline: There are 3 conversations between an internal user and respondent each with 2 messages,
                     each with different business_ids, Validate that only 2 messages returned when we restrict by business_id
