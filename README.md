@@ -119,12 +119,12 @@ For each external application which secure-message communicates with there are 3
 
 | Environment Variable              | Description                         | Default
 |-----------------------------------|-------------------------------------|-------------------------------
-| RAS_PARTY_SERVICE_HOST            | Host address for RAS party service  | 'http'
-| RAS_PARTY_SERVICE_PORT            | Port for RAS party service          | 'localhost'
-| RAS_PARTY_SERVICE_PROTOCOL        | Protocol used for RAS party service | '8081'
+| PARTY_SERVICE_HOST            | Host address for RAS party service  | 'http'
+| PARTY_SERVICE_PORT            | Port for RAS party service          | 'localhost'
+| PARTY_SERVICE_PROTOCOL        | Protocol used for RAS party service | '8081'
 
 The services these variables exist for are listed below with the beginnings of their variables and their github links:
 
 | Service                         | Start of variables          | Github
 |---------------------------------|-----------------------------|-----------------------------
-| Party service                   | RAS_PARTY_SERVICE           | https://github.com/ONSdigital/ras-party
+| Party service                   | PARTY_SERVICE           | https://github.com/ONSdigital/ras-party
