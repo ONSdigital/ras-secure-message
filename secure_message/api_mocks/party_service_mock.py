@@ -228,6 +228,38 @@ class PartyServiceMock:
                     ],
                     "partyId": "additional_ru3",
                     "sampleUnitRef": "50012345678"
+                },
+                {
+                    "enrolments": [
+                        {
+                            "enrolmentStatus": "ENABLED",
+                            "name": "Business Register and Employment Survey",
+                            "surveyId": "33333333-22222-3333-4444-88dc018a1a4c"
+                        },
+                        {
+                            "enrolmentStatus": "ENABLED",
+                            "name": "Business Register and Employment Survey",
+                            "surveyId": "11111111-22222-3333-4444-88dc018a1a4c"
+                        },
+                        {
+                            "enrolmentStatus": "ENABLED",
+                            "name": "Additional survey 1",
+                            "surveyId": "additional_survey_1"
+                        },
+                        {
+                            "enrolmentStatus": "ENABLED",
+                            "name": "Additional survey 2",
+                            "surveyId": "additional_survey_2"
+                        },
+                        {
+                            "enrolmentStatus": "ENABLED",
+                            "name": "Additional survey 3",
+                            "surveyId": "additional_survey_3"
+                        },
+
+                    ],
+                    "partyId": "b3ba864b-7cbc-4f44-84fe-88dc018a1a4c",
+                    "sampleUnitRef": "50012345678"
                 }
             ],
             "firstName": "Chandana",
