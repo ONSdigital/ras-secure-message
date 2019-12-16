@@ -127,7 +127,24 @@ class ThreadList(Resource):
 
 
 class ThreadCounter(Resource):
-    """Get count of all open or closed messages"""
+    """Get count of all conversations for a specific internal user
+    Typically for a specific survey, supports filtering by case, collection exercise, business party id etc
+    Args:
+        business_id If set , restricts search to conversations regarding this specific party id
+        surveys  If set allows the count to be restricted by a list of survey_ids
+        cc  If set , allows the count to be restricted by a particular  case
+        ce  If set, alows the count to be restricted by a particular collection exercise
+        is_closed If set to 'true' only counts closed conversations, else only open conversations
+        my_conversations If set to 'true only counts my conversations.
+            I.e conversations where the current user id is the to actor id
+        new_respondent_conversations If set to 'true'only counts conversations where the to actor is set to 'GROUP'
+        all_conversation_types If set 'true', overrides is_closed, my_conversations and new_respondent_conversations and
+            returns 4 counts 1 for each of , open , closed, my_conversations and new_respondent_conversations
+
+    Returns:
+        if all_conversation_types is set 'true' returns json representing all 4 counts
+        else returns the count for the single type combination requested.
+    """
     @staticmethod
     def get():
         if not g.user.is_internal:
@@ -136,5 +153,9 @@ class ThreadCounter(Resource):
 
         logger.info("Getting count of threads for user", user_uuid=g.user.user_uuid)
         message_args = get_options(request.args)
+
+        if message_args.all_conversation_types:
+            logger.info("Getting counts for all conversation states for user", user_uuid=g.user.user_uuid)
+            return jsonify(totals=Retriever.thread_count_by_survey_and_conversation_states(message_args, g.user))
 
         return jsonify(total=Retriever.thread_count_by_survey(message_args, g.user))

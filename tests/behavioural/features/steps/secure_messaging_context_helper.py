@@ -74,6 +74,10 @@ class SecureMessagingContextHelper:
         self._messages_responses_data = []
         self._last_saved_message_data = None
         self._last_returned_thread_count = 0
+        self._last_returned_thread_counts_all_conversation_types = {'open': 0,
+                                                                    'closed': 0,
+                                                                    'my_conversations': 0,
+                                                                    'new_respondent_conversations': 0}
         self.additional_respondent_claims = {}
 
         # Urls
@@ -223,6 +227,14 @@ class SecureMessagingContextHelper:
     @thread_count.setter
     def thread_count(self, value):
         self._last_returned_thread_count = int(value)
+
+    @property
+    def thread_counts_all_conversation_types(self):
+        return self._last_returned_thread_counts_all_conversation_types
+
+    @thread_counts_all_conversation_types.setter
+    def thread_counts_all_conversation_types(self, value):
+        self._last_returned_thread_counts_all_conversation_types = value
 
     @property
     def sent_messages(self):

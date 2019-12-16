@@ -444,6 +444,10 @@ Available search criteria matches those on get threads:
 * is_closed - If set true then only closed conversations will be considered. Defaults to false if omitted.
 * my_conversations - If set true then will only return conversations where the currently signed in user is an actor in the last message of the conversation.
 * new_respondent_conversations - If set true then only counts new conversations by the respondent. I.e ones not replied to
+* all_conversation_types - If set true will override is_closed, my_conversations and new_respondent_conversations
+  in the count end point, and return 4 counts for open, close, my_conversations and new_respondent_conversations.
+  Slower than asking for a specific conversation type so only use where all 4 counts are needed. 
+  Use specific counts if they suffice.
 * business_id - If set then restrict conversations to those regarding a specific ru
 * cc - If set then restricts the conversations to a specific collection case
 * ce - If set then restricts the conversations to a specific collction exercise

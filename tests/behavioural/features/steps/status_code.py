@@ -8,6 +8,12 @@ def step_impl_200_success_returned(context):
     nose.tools.assert_equal(context.response.status_code, 200)
 
 
+@then('a success status code no content 204 is returned')
+def step_impl_204_success_returned(context):
+    """validate that the status code was 204"""
+    nose.tools.assert_equal(context.response.status_code, 204)
+
+
 @then('a created status code 201 is returned')
 def step_impl_201_success_returned(context):
     """validate that the status code was 201"""
