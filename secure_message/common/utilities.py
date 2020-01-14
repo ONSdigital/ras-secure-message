@@ -14,7 +14,26 @@ MessageArgs = collections.namedtuple(
 
 
 def get_options(args):
-    """extract options from request , allow label to be set by caller"""
+    """extract options from request , allow label to be set by caller
+
+    :param args, contains search arguments. Not all end points support all args
+    :returns MessageArgs named tuple containing the args for the search
+
+    business_id If set , restricts search to conversations regarding this specific party id
+    surveys  If set allows the count to be restricted by a list of survey_ids
+    cc  If set , allows the count to be restricted by a particular  case
+    ce  If set, alows the count to be restricted by a particular collection exercise
+    is_closed If set to 'true' only counts closed conversations, else only open conversations
+    my_conversations If set to 'true only counts my conversations.
+        I.e conversations where the current user id is the to actor id
+    new_respondent_conversations If set to 'true'only counts conversations where the to actor is set to 'GROUP'
+    all_conversation_types If set 'true', overrides is_closed, my_conversations and new_respondent_conversations
+        and returns 4 counts 1 for each of , open , closed, my_conversations and new_respondent_conversations
+    page If set requests the specific page of information to return
+    limit If set it sets the maximum number of results to return
+    desc If present, requests the information in descending order
+
+    """
 
     fields = {'page': 1, 'limit': MESSAGE_QUERY_LIMIT, 'business_id': None, 'surveys': None,
               'desc': True, 'cc': None, 'label': None, 'ce': None, 'is_closed': False,

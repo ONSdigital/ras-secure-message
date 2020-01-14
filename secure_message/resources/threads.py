@@ -129,21 +129,9 @@ class ThreadList(Resource):
 class ThreadCounter(Resource):
     """Get count of all conversations for a specific internal user
     Typically for a specific survey, supports filtering by case, collection exercise, business party id etc
-    Args:
-        business_id If set , restricts search to conversations regarding this specific party id
-        surveys  If set allows the count to be restricted by a list of survey_ids
-        cc  If set , allows the count to be restricted by a particular  case
-        ce  If set, alows the count to be restricted by a particular collection exercise
-        is_closed If set to 'true' only counts closed conversations, else only open conversations
-        my_conversations If set to 'true only counts my conversations.
-            I.e conversations where the current user id is the to actor id
-        new_respondent_conversations If set to 'true'only counts conversations where the to actor is set to 'GROUP'
-        all_conversation_types If set 'true', overrides is_closed, my_conversations and new_respondent_conversations and
-            returns 4 counts 1 for each of , open , closed, my_conversations and new_respondent_conversations
 
-    Returns:
-        if all_conversation_types is set 'true' returns json representing all 4 counts
-        else returns the count for the single type combination requested.
+    :returns if all_conversation_types is set 'true' returns json representing all 4 counts
+              else returns the count for the single type combination requested.
     """
     @staticmethod
     def get():

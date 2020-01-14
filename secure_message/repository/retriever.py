@@ -85,7 +85,7 @@ class Retriever:
 
         totals = {}
 
-        args = set_conversation_type_args(request_args, is_closed=False)  # is_closed shown simply for clarity
+        args = set_conversation_type_args(request_args)  # is_closed defaults to False
         totals['open'] = Retriever.thread_count_by_survey(args, user)
 
         args = set_conversation_type_args(request_args, is_closed=True)
