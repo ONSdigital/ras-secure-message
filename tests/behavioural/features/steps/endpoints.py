@@ -319,6 +319,24 @@ def _step_impl_get_threads_count(context, args):
         context.bdd_helper.thread_count = -1
 
 
+def _step_impl_get_threads_count_for_all_conversation_types(context, args):
+    url = context.bdd_helper.threads_get_count_url + args
+    context.response = context.client.get(url, headers=context.bdd_helper.headers)
+    response_data = context.response.data
+    if context.response.status_code == 200:
+        context.bdd_helper.thread_counts_all_conversation_types = json.loads(response_data)["totals"]
+    else:
+        context.bdd_helper.thread_counts_all_conversation_types = None
+
+
 @then("A count of '{count}' is returned")
 def step_impl_the_return_count_is(context, count):
     nose.tools.assert_equal(count, context.bdd_helper.last_saved_message_data['msg_to'])
+
+
+@when("the count of all conversation types closed threads for current user is made")
+@given("the count of all conversation types closed threads for current user is made")
+def step_impl_all_conversation_types_count_are_counted(context):
+    """access the messages_count endpoint with all_conversation_types set"""
+    url_args = f"?all_conversation_types=true"
+    _step_impl_get_threads_count_for_all_conversation_types(context, url_args)

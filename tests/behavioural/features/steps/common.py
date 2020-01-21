@@ -56,8 +56,30 @@ def step_impl_n_messages_returned(context, message_count):
 
 
 @then("the thread count is '{thread_count}' threads")
-def sep_impl_thread_count_validate(context, thread_count):
+def step_impl_thread_count_validate(context, thread_count):
     nose.tools.assert_equal(int(thread_count), context.bdd_helper.thread_count)
+
+
+@then("the thread open count is '{thread_count}' threads")
+def step_impl_open_thread_count_validate(context, thread_count):
+    nose.tools.assert_equal(int(thread_count), context.bdd_helper.thread_counts_all_conversation_types['open'])
+
+
+@then("the thread closed count is '{thread_count}' threads")
+def step_impl_closed_thread_count_validate(context, thread_count):
+    nose.tools.assert_equal(int(thread_count), context.bdd_helper.thread_counts_all_conversation_types['closed'])
+
+
+@then("the thread my_conversations count is '{thread_count}' threads")
+def step_impl_my_conversations_thread_count_validate(context, thread_count):
+    nose.tools.assert_equal(int(thread_count),
+                            context.bdd_helper.thread_counts_all_conversation_types['my_conversations'])
+
+
+@then("the thread new_respondent_conversations count is '{thread_count}' threads")
+def step_impl_new_respondent_conversations_thread_count_validate(context, thread_count):
+    nose.tools.assert_equal(int(thread_count),
+                            context.bdd_helper.thread_counts_all_conversation_types['new_respondent_conversations'])
 
 
 @given("debug step")

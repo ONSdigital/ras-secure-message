@@ -10,15 +10,34 @@ from secure_message.services.service_toggles import party, internal_user_service
 logger = wrap_logger(logging.getLogger(__name__))
 MessageArgs = collections.namedtuple(
     'MessageArgs',
-    'page limit business_id surveys cc label desc ce is_closed my_conversations new_respondent_conversations')
+    'page limit business_id surveys cc label desc ce is_closed my_conversations new_respondent_conversations all_conversation_types')
 
 
 def get_options(args):
-    """extract options from request , allow label to be set by caller"""
+    """extract options from request , allow label to be set by caller
+
+    :param args, contains search arguments. Not all end points support all args
+    :returns MessageArgs named tuple containing the args for the search
+
+    business_id If set , restricts search to conversations regarding this specific party id
+    surveys  If set allows the count to be restricted by a list of survey_ids
+    cc  If set , allows the count to be restricted by a particular  case
+    ce  If set, alows the count to be restricted by a particular collection exercise
+    is_closed If set to 'true' only counts closed conversations, else only open conversations
+    my_conversations If set to 'true only counts my conversations.
+        I.e conversations where the current user id is the to actor id
+    new_respondent_conversations If set to 'true'only counts conversations where the to actor is set to 'GROUP'
+    all_conversation_types If set 'true', overrides is_closed, my_conversations and new_respondent_conversations
+        and returns 4 counts 1 for each of , open , closed, my_conversations and new_respondent_conversations
+    page If set requests the specific page of information to return
+    limit If set it sets the maximum number of results to return
+    desc If present, requests the information in descending order
+
+    """
 
     fields = {'page': 1, 'limit': MESSAGE_QUERY_LIMIT, 'business_id': None, 'surveys': None,
               'desc': True, 'cc': None, 'label': None, 'ce': None, 'is_closed': False,
-              'my_conversations': False, 'new_respondent_conversations': False}
+              'my_conversations': False, 'new_respondent_conversations': False, 'all_conversation_types': False}
 
     for field in ['cc', 'ce', 'business_id', 'label']:
         if args.get(field):
@@ -42,11 +61,34 @@ def get_options(args):
     if args.get('new_respondent_conversations') == 'true':
         fields['new_respondent_conversations'] = True
 
+    if args.get('all_conversation_types') == 'true':
+        fields['all_conversation_types'] = True
+
     return MessageArgs(page=fields['page'], limit=fields['limit'], business_id=fields['business_id'],
                        surveys=fields['surveys'], cc=fields['cc'], label=fields['label'],
                        desc=fields['desc'], ce=fields['ce'], is_closed=fields['is_closed'],
                        my_conversations=fields['my_conversations'],
-                       new_respondent_conversations=fields['new_respondent_conversations'])
+                       new_respondent_conversations=fields['new_respondent_conversations'],
+                       all_conversation_types=fields['all_conversation_types'])
+
+
+def set_conversation_type_args(existing_args, is_closed=False, my_conversations=False, new_conversations=False,
+                               all_types=False):
+    """Returns a new set of args based on the existing args which are a named tuple,
+    but allow the conversation type only to be changed"""
+
+    return MessageArgs(page=existing_args.page,
+                       limit=existing_args.limit,
+                       business_id=existing_args.business_id,
+                       surveys=existing_args.surveys,
+                       cc=existing_args.cc,
+                       label=existing_args.label,
+                       desc=existing_args.desc,
+                       ce=existing_args.ce,
+                       is_closed=is_closed,
+                       my_conversations=my_conversations,
+                       new_respondent_conversations=new_conversations,
+                       all_conversation_types=all_types)
 
 
 def generate_string_query_args(args):
