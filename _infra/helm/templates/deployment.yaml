@@ -1,10 +1,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: ras-secure-message
-  labels:
-    run: ras-secure-message
-    helm.release: RELEASE-NAME
+  name: {{ .Chart.Name }}
 spec:
   replicas: 1
   strategy:
@@ -14,19 +11,19 @@ spec:
     type: RollingUpdate
   selector:
     matchLabels:
-      app: ras-secure-message
-      env: dev
+      app: {{ .Chart.Name }}
+      env: "{{ .Values.env }}"
       version: "v1.2"
   template:
     metadata:
       labels:
-        app: ras-secure-message
-        env: dev
+        app: {{ .Chart.Name }}
+        env: "{{ .Values.env }}"
         version: "v1.2"
     spec:
       containers:
-        - name: ras-secure-message
-          image: "eu.gcr.io/rm-ras-sandbox/ras-secure-message:migration-sandbox"
+        - name: {{ .Chart.Name }}
+          image: "eu.gcr.io/rm-ras-sandbox/{{ .Values.image.reposiroyName }}:(( .Values.image.tag }}"
           imagePullPolicy: IfNotPresent
           ports:
             - name: http-server

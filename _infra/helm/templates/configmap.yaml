@@ -1,7 +1,0 @@
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: ras-secure-message-config
-data:
-  .env: |-
-

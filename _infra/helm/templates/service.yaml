@@ -1,14 +1,11 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: ras-secure-message
-  labels:
-    run: ras-secure-message
-    helm.release: RELEASE-NAME
+  name: {{ .Chart.Name }}
 spec:
   type: ClusterIP
   ports:
   - port: 5050
     protocol: TCP
   selector:
-    app: ras-secure-message
+    app: {{ .Chart.Name }}
