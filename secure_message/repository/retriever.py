@@ -10,6 +10,7 @@ from werkzeug.exceptions import InternalServerError, NotFound, Forbidden
 from secure_message.constants import NON_SPECIFIC_INTERNAL_USER
 from secure_message.common.eventsapi import EventsApi
 from secure_message.common.labels import Labels
+from secure_message.common.utilities import set_conversation_type_args
 from secure_message.repository.database import Conversation, db, Events, SecureMessage, Status
 
 logger = wrap_logger(logging.getLogger(__name__))
@@ -73,6 +74,30 @@ class Retriever:
             logger.error('Error retrieving count of threads by survey from database', error=e)
             raise InternalServerError(description="Error retrieving count of threads from database")
         return result
+
+    @staticmethod
+    def thread_count_by_survey_and_conversation_states(request_args, user):
+        """Return 4 conversation counts. They are for open, closed, my conversations and
+        new_respondent_conversation.
+        Given each of these counts uses different clauses to define them and they are not mutually exclusive,
+        they are difficult to achieve with the current db structure in a single query, hence this submits 4 db queries.
+        """
+
+        totals = {}
+
+        args = set_conversation_type_args(request_args)  # is_closed defaults to False
+        totals['open'] = Retriever.thread_count_by_survey(args, user)
+
+        args = set_conversation_type_args(request_args, is_closed=True)
+        totals['closed'] = Retriever.thread_count_by_survey(args, user)
+
+        args = set_conversation_type_args(request_args, my_conversations=True)
+        totals['my_conversations'] = Retriever.thread_count_by_survey(args, user)
+
+        args = set_conversation_type_args(request_args, new_conversations=True)
+        totals['new_respondent_conversations'] = Retriever.thread_count_by_survey(args, user)
+
+        return totals
 
     @staticmethod
     def retrieve_thread_list(user, request_args):

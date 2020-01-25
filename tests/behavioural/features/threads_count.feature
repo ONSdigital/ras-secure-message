@@ -165,3 +165,34 @@ Scenario: Respondent sends messages to different ru, internal user filters by ru
   When  the user is set as internal specific user
     And the count of open threads for current user and business_id of 'additional_ru1' is made
   Then  the thread count is '2' threads
+
+Scenario: Internal user gets threads count with all_conversation_types when messages sent to a specific user
+   Given sending from respondent to internal specific user
+     And '7' messages are sent
+    When the user is set as internal specific user
+     And the count of all conversation types closed threads for current user is made
+    Then the thread open count is '7' threads
+     And the thread closed count is '0' threads
+     And the thread my_conversations count is '7' threads
+     And the thread new_respondent_conversations count is '0' threads
+
+Scenario: Internal user gets threads count with all_conversation_types when messages sent to a general user
+   Given sending from respondent to internal group
+     And '7' messages are sent
+    When the user is set as internal specific user
+     And the count of all conversation types closed threads for current user is made
+    Then the thread open count is '7' threads
+     And the thread closed count is '0' threads
+     And the thread my_conversations count is '0' threads
+     And the thread new_respondent_conversations count is '7' threads
+
+Scenario: Internal user gets threads count with all_conversation_types with a closed message and messages sent to GROUP
+   Given sending from respondent to internal group
+     And '7' messages are sent
+     And the user is set as internal specific user
+     And the last returned thread is closed
+    When the count of all conversation types closed threads for current user is made
+    Then the thread open count is '6' threads
+     And the thread closed count is '1' threads
+     And the thread my_conversations count is '0' threads
+     And the thread new_respondent_conversations count is '6' threads
