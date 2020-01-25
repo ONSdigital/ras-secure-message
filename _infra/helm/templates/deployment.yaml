@@ -1,0 +1,119 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Chart.Name }}
+spec:
+  replicas: 1
+  strategy:
+    rollingUpdate:
+      maxSurge:
+      maxUnavailable:
+    type: RollingUpdate
+  selector:
+    matchLabels:
+      app: {{ .Chart.Name }}
+      env: "{{ .Values.env }}"
+  template:
+    metadata:
+      labels:
+        app: {{ .Chart.Name }}
+        env: "{{ .Values.env }}"
+    spec:
+      containers:
+        - name: {{ .Chart.Name }}
+          image: "eu.gcr.io/ons-rasrmbs-management/{{ .Chart.Name }}:{{ .Chart.AppVersion }}"
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: http-server
+              containerPort: 5050
+          readinessProbe:
+            httpGet:
+              path: /info
+              port: 5050
+            initialDelaySeconds: 5
+            periodSeconds: 20
+            failureThreshold: 5
+            successThreshold: 1
+            timeoutSeconds: 5
+          livenessProbe:
+            httpGet:
+              path: /info
+              port: 5050
+            initialDelaySeconds: 5
+            periodSeconds: 20
+            failureThreshold: 5
+            successThreshold: 1
+            timeoutSeconds: 5
+          env:
+          - name: DB_HOST
+            value: $(POSTGRES_SERVICE_HOST)
+          - name: DB_PORT
+            valueFrom:
+              secretKeyRef:
+                name: db-config
+                key: db-port
+          - name: DB_NAME
+            valueFrom:
+              secretKeyRef:
+                name: db-config
+                key: db-name
+          - name: DB_USERNAME
+            valueFrom:
+              secretKeyRef:
+                name: db-credentials
+                key: username
+          - name: DB_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: db-credentials
+                key: password
+          - name: SECURITY_USER_NAME
+            valueFrom:
+              secretKeyRef:
+                name: security-credentials
+                key: security-user
+          - name: SECURITY_USER_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: security-credentials
+                key: security-password
+          - name: PORT
+            value: "5050"
+          - name: SECURE_MESSAGING_DATABASE_URL
+            value: "postgresql://$(DB_USERNAME):$(DB_PASSWORD)@$(DB_HOST):$(DB_PORT)/$(DB_NAME)"
+          - name: SM_JWT_ENCRYPT
+            value: "0"
+          - name: JWT_SECRET
+            valueFrom:
+              secretKeyRef:
+                name: jwt-secret
+                key: jwt-secret
+          - name: NOTIFICATION_API_KEY
+            value: "$(NOTIFICATION_API_KEY)"
+          - name: NOTIFICATION_TEMPLATE_ID
+            value: "$(NOTIFICATION_TEMPLATE_ID)"
+          - name: SERVICE_ID
+            value: "$(SERVICE_ID)"
+          - name: PARTY_SERVICE_HOST
+            value: "$(RAS_PARTY_SERVICE_HOST)"
+          - name: PARTY_SERVICE_PORT
+            value: "$(RAS_PARTY_SERVICE_PORT)"
+          - name: USE_UAA
+            value: "1"
+          - name: UAA_URL
+            value: "http://$(UAA_SERVICE_HOST):$(UAA_SERVICE_PORT)"
+          - name: CLIENT_ID
+            value: "secure_message"
+          - name: CLIENT_SECRET
+            value: "password"
+          - name: ZIPKIN_DSN
+            value: "http://$(ZIPKIN_SERVICE_HOST):$(ZIPKIN_SERVICE_PORT)/api/v1/spans"
+          - name: ZIPKIN_SAMPLE_RATE
+            value: "100"
+          resources:
+            limits:
+              cpu: 1000m
+              memory: 512Mi
+            requests:
+              cpu: 500m
+              memory: 256Mi
