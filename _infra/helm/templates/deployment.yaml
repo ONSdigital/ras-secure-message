@@ -6,8 +6,8 @@ spec:
   replicas: 1
   strategy:
     rollingUpdate:
-      maxSurge:
-      maxUnavailable:
+      maxSurge: 1
+      maxUnavailable: 1
     type: RollingUpdate
   selector:
     matchLabels:
@@ -95,9 +95,9 @@ spec:
           - name: SERVICE_ID
             value: "$(SERVICE_ID)"
           - name: PARTY_SERVICE_HOST
-            value: "$(RAS_PARTY_SERVICE_HOST)"
+            value: "$(PARTY_SERVICE_HOST)"
           - name: PARTY_SERVICE_PORT
-            value: "$(RAS_PARTY_SERVICE_PORT)"
+            value: "$(PARTY_SERVICE_PORT)"
           - name: USE_UAA
             value: "1"
           - name: UAA_URL
@@ -111,9 +111,4 @@ spec:
           - name: ZIPKIN_SAMPLE_RATE
             value: "100"
           resources:
-            limits:
-              cpu: 1000m
-              memory: 512Mi
-            requests:
-              cpu: 500m
-              memory: 256Mi
+            {{ toYaml .Values.resources | nindent 12 }}
