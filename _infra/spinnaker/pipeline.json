@@ -1,0 +1,21 @@
+{
+  "schema": "v2",
+  "application": "secure-message",
+  "name": "secure-message",
+  "template": {
+    "artifactAccount": "front50ArtifactCredentials",
+    "reference": "spinnaker://rasrmApplicationTemplate",
+    "type": "front50/pipelineTemplate"
+  },
+  "variables": {
+    "name": "secure-message",
+    "defaultHelmChart": "secure-message-0.1.0.tgz",
+    "helmChartMatcher": "secure-message-.*\\.tgz"
+  },
+  "exclude": [],
+  "triggers": [],
+  "parameters": [],
+  "notifications": [],
+  "description": "",
+  "stages": []
+}
