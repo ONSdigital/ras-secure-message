@@ -78,7 +78,7 @@ spec:
                 name: security-credentials
                 key: security-password
           - name: PORT
-            value: "{{.Values.container.port}}"
+            value: "{{ .Values.container.port }}"
           - name: SECURE_MESSAGING_DATABASE_URL
             value: "postgresql://$(DB_USERNAME):$(DB_PASSWORD)@$(DB_HOST):$(DB_PORT)/$(DB_NAME)"
           - name: SM_JWT_ENCRYPT
