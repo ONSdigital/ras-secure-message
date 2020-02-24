@@ -3,33 +3,33 @@ kind: Deployment
 metadata:
   name: {{ .Chart.Name }}
 spec:
-  replicas: 1
+  replicas: {{ .Values.replicaCount }}
   strategy:
     rollingUpdate:
-      maxSurge: 1
-      maxUnavailable: 1
+      maxSurge:  {{ .Values.rollingUpdate.maxSurge }}
+      maxUnavailable: {{ .Values.rollingUpdate.maxUnavailable }}
     type: RollingUpdate
   selector:
     matchLabels:
       app: {{ .Chart.Name }}
-      env: "{{ .Values.env }}"
+      env: {{ .Values.env }}
   template:
     metadata:
       labels:
         app: {{ .Chart.Name }}
-        env: "{{ .Values.env }}"
+        env: {{ .Values.env }}
     spec:
       containers:
         - name: {{ .Chart.Name }}
-          image: "eu.gcr.io/ons-rasrmbs-management/{{ .Chart.Name }}:{{ .Chart.AppVersion }}"
-          imagePullPolicy: IfNotPresent
+          image: "{{ .Values.image.name }}/{{ .Chart.Name }}:{{ .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
           ports:
             - name: http-server
-              containerPort: 5050
+              containerPort: {{ .Values.container.port }}
           readinessProbe:
             httpGet:
               path: /info
-              port: 5050
+              port: {{ .Values.container.port }}
             initialDelaySeconds: 5
             periodSeconds: 20
             failureThreshold: 5
@@ -38,7 +38,7 @@ spec:
           livenessProbe:
             httpGet:
               path: /info
-              port: 5050
+              port: {{ .Values.container.port }}
             initialDelaySeconds: 5
             periodSeconds: 20
             failureThreshold: 5
@@ -78,7 +78,7 @@ spec:
                 name: security-credentials
                 key: security-password
           - name: PORT
-            value: "5050"
+            value: "{{ .Values.container.port }}"
           - name: SECURE_MESSAGING_DATABASE_URL
             value: "postgresql://$(DB_USERNAME):$(DB_PASSWORD)@$(DB_HOST):$(DB_PORT)/$(DB_NAME)"
           - name: SM_JWT_ENCRYPT
@@ -103,9 +103,15 @@ spec:
           - name: UAA_URL
             value: "http://$(UAA_SERVICE_HOST):$(UAA_SERVICE_PORT)"
           - name: CLIENT_ID
-            value: "secure_message"
+            valueFrom:
+              secretKeyRef:
+                name: {{ .Chart.Name }}
+                key: client-id
           - name: CLIENT_SECRET
-            value: "password"
+            valueFrom:
+              secretKeyRef:
+                name: {{ .Chart.Name }}
+                key: client-secret
           - name: ZIPKIN_DSN
             value: "http://$(ZIPKIN_SERVICE_HOST):$(ZIPKIN_SERVICE_PORT)/api/v1/spans"
           - name: ZIPKIN_SAMPLE_RATE

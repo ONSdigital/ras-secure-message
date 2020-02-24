@@ -1,0 +1,26 @@
+replicaCount: 1
+
+namespace: minikube
+env: minikube
+
+container:
+  port: 80
+
+service:
+  port: 80
+
+rollingUpdate:
+    maxSurge: 1
+    maxUnavailable:
+
+image:
+  name: eu.gcr.io/ons-rasrmbs-management
+  pullPolicy: IfNotPresent
+
+resources:
+  requests:
+    memory: "128Mi"
+
+client:
+  id: secure_message
+  secret: password
