@@ -4,7 +4,7 @@ namespace: minikube
 env: minikube
 
 container:
-  port: 80
+  port: 8080
 
 service:
   port: 80
