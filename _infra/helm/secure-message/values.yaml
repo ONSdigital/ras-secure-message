@@ -8,7 +8,7 @@ rollingUpdate:
 
 image:
   name: eu.gcr.io/ons-rasrmbs-management
-  pullPolicy: IfNotPresent
+  pullPolicy: Always
 
 database:
   managedPostgres: false
