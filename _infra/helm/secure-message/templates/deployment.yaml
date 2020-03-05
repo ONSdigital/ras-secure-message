@@ -124,7 +124,7 @@ spec:
             value: "{{ .Values.container.port }}"
           - name: SECURE_MESSAGING_DATABASE_URL
             {{- if .Values.database.sqlProxyEnabled }}
-            value: "postgresql://$(DB_USERNAME):$(DB_PASSWORD)@$127.0.0.1:$(DB_PORT)/$(DB_NAME)"
+            value: "postgresql://$(DB_USERNAME):$(DB_PASSWORD)@127.0.0.1:$(DB_PORT)/$(DB_NAME)"
             {{- else }}
             value: "postgresql://$(DB_USERNAME):$(DB_PASSWORD)@$(DB_HOST):$(DB_PORT)/$(DB_NAME)"
             {{- end }}
