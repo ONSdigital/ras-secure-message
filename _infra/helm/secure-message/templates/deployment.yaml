@@ -152,13 +152,13 @@ spec:
           - name: CLIENT_ID
             valueFrom:
               secretKeyRef:
-                name: {{ .Chart.Name }}
-                key: client-id
+                name: client-credentials
+                key: client-user
           - name: CLIENT_SECRET
             valueFrom:
               secretKeyRef:
-                name: {{ .Chart.Name }}
-                key: client-secret
+                name: client-credentials
+                key: client-password
           - name: ZIPKIN_DSN
             value: "http://$(ZIPKIN_SERVICE_HOST):$(ZIPKIN_SERVICE_PORT)/api/v1/spans"
           - name: ZIPKIN_SAMPLE_RATE
