@@ -139,6 +139,8 @@ spec:
             value: "$(NOTIFICATION_API_KEY)"
           - name: NOTIFICATION_TEMPLATE_ID
             value: "$(NOTIFICATION_TEMPLATE_ID)"
+          - name: NOTIFY_VIA_GOV_NOTIFY
+            value: {{ .Values.email.enabled }}
           - name: SERVICE_ID
             value: "$(SERVICE_ID)"
           - name: PARTY_SERVICE_HOST

@@ -30,3 +30,6 @@ resources:
 client:
   id: secure_message
   secret: password
+
+email:
+  enabled: "0"
