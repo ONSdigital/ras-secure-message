@@ -142,13 +142,25 @@ spec:
           - name: SERVICE_ID
             value: "$(SERVICE_ID)"
           - name: PARTY_SERVICE_HOST
+            {{- if .Values.dns.enabled }}
+            value: "party.{{ .Values.namespace }}.svc.cluster.local"
+            {{- else }}
             value: "$(PARTY_SERVICE_HOST)"
+            {{- end }}
           - name: PARTY_SERVICE_PORT
+            {{- if .Values.dns.enabled }}
+            value: "{{ .Values.dns.wellKnownPort }}"
+            {{- else }}
             value: "$(PARTY_SERVICE_PORT)"
+            {{- end }}
           - name: USE_UAA
             value: "1"
           - name: UAA_URL
+            {{- if .Values.dns.enabled }}
+            value: "http://uaa.{{ .Values.namespace }}.svc.cluster.local:{{ .Values.dns.wellKnownPort }}"
+            {{- else }}
             value: "http://$(UAA_SERVICE_HOST):$(UAA_SERVICE_PORT)"
+            {{- end }}
           - name: CLIENT_ID
             valueFrom:
               secretKeyRef:

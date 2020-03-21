@@ -30,3 +30,7 @@ resources:
 client:
   id: secure_message
   secret: password
+
+dns:
+  enabled: false
+  wellKnownPort: 8080
