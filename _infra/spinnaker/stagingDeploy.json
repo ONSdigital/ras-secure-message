@@ -1,16 +1,16 @@
 {
   "schema": "v2",
   "application": "secure-message",
-  "name": "secure-message",
+  "name": "deploy staging",
   "template": {
     "artifactAccount": "front50ArtifactCredentials",
-    "reference": "spinnaker://rasrmApplicationTemplate",
+    "reference": "spinnaker://individualDeploymentTemplate",
     "type": "front50/pipelineTemplate"
   },
   "variables": {
-    "name": "secure-message",
-    "defaultHelmChart": "secure-message-0.1.0.tgz",
-    "helmChartMatcher": "secure-message-.*\\.tgz"
+    "namespace": "staging",
+    "environment": "dev",
+    "service": "secure-message"
   },
   "exclude": [],
   "triggers": [],
