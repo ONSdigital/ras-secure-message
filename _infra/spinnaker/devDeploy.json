@@ -9,8 +9,10 @@
   },
   "variables": {
     "namespace": "dev",
+    "configNamespace": "dev",
     "environment": "dev",
-    "service": "secure-message"
+    "service": "secure-message",
+    "bucket": "ras-rm-configuration"
   },
   "exclude": [],
   "triggers": [],
