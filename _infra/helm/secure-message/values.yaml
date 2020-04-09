@@ -7,7 +7,9 @@ rollingUpdate:
   maxUnavailable: 1
 
 image:
+  devRepo: eu.gcr.io/ons-rasrmbs-management
   name: eu.gcr.io/ons-rasrmbs-management
+  tag: latest
   pullPolicy: Always
 
 database:
@@ -21,7 +23,7 @@ database:
 container:
   port: 8080
 service:
-  port: 80
+  port: 8080
 
 resources:
   requests:
@@ -33,3 +35,7 @@ client:
 
 email:
   enabled: "0"
+
+dns:
+  enabled: false
+  wellKnownPort: 8080

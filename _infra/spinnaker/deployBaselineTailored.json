@@ -1,0 +1,19 @@
+{
+  "schema": "v2",
+  "application": "secure-message",
+  "name": "deploy baseline",
+  "template": {
+    "artifactAccount": "front50ArtifactCredentials",
+    "reference": "spinnaker://deployBaselineTailored:latest",
+    "type": "front50/pipelineTemplate"
+  },
+  "variables": {
+    "application": "secure-message"
+  },
+  "exclude": [],
+  "triggers": [],
+  "parameters": [],
+  "notifications": [],
+  "description": "",
+  "stages": []
+}

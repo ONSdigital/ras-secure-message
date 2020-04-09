@@ -1,0 +1,21 @@
+{
+  "schema": "v2",
+  "application": "secure-message",
+  "name": "deploy staging",
+  "template": {
+    "artifactAccount": "front50ArtifactCredentials",
+    "reference": "spinnaker://deployBaseline",
+    "type": "front50/pipelineTemplate"
+  },
+  "variables": {
+    "namespace": "staging",
+    "environment": "dev",
+    "service": "secure-message"
+  },
+  "exclude": [],
+  "triggers": [],
+  "parameters": [],
+  "notifications": [],
+  "description": "",
+  "stages": []
+}
