@@ -33,6 +33,13 @@ client:
   id: secure_message
   secret: password
 
+email:
+  enabled: "0"
+  frontstageHost: "localhost:8082"
+  frontstageProtocol: "http"
+  templates:
+    notification: "insert-uuid-here"
+
 dns:
   enabled: false
   wellKnownPort: 8080

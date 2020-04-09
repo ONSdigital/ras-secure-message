@@ -139,12 +139,20 @@ spec:
               secretKeyRef:
                 name: jwt-secret
                 key: jwt-secret
-          - name: NOTIFICATION_API_KEY
-            value: "$(NOTIFICATION_API_KEY)"
           - name: NOTIFICATION_TEMPLATE_ID
-            value: "$(NOTIFICATION_TEMPLATE_ID)"
-          - name: SERVICE_ID
-            value: "$(SERVICE_ID)"
+            value: "{{ .Values.email.templates.notification }}"
+          - name: NOTIFY_VIA_GOV_NOTIFY
+            value: {{ .Values.email.enabled }}
+          - name: NOTIFY_GATEWAY_URL
+            {{- if .Values.dns.enabled }}
+            value: "http://notify-gateway.{{ .Values.namespace }}.svc.cluster.local:{{ .Values.dns.wellKnownPort }}/emails/"
+            {{- else }}
+            value: "http://$(NOTIFY_GATEWAY_SERVICE_HOST):$(NOTIFY_GATEWAY_SERVICE_PORT)/emails/"
+            {{- end }}
+          - name: FRONTSTAGE_SERVICE_HOST
+            value: "{{ .Values.email.frontstageHost }}"
+          - name: FRONTSTAGE_SERVICE_PROTOCOL
+            value: "{{ .Values.email.frontstageProtocol }}"
           - name: PARTY_SERVICE_HOST
             {{- if .Values.dns.enabled }}
             value: "party.{{ .Values.namespace }}.svc.cluster.local"

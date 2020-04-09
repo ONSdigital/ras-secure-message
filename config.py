@@ -33,11 +33,8 @@ class Config:
     SMS_LOG_LEVEL = os.getenv('SMS_LOG_LEVEL', 'DEBUG')
 
     # EMAIL NOTIFICATION SETTINGS
-    NOTIFICATION_SERVICE_ID = os.getenv('SERVICE_ID')
     NOTIFY_VIA_GOV_NOTIFY = os.getenv('NOTIFY_VIA_GOV_NOTIFY')
-    NOTIFICATION_API_KEY = os.getenv('NOTIFICATION_API_KEY')
     NOTIFICATION_TEMPLATE_ID = os.getenv('NOTIFICATION_TEMPLATE_ID')
-    NOTIFICATION_COMBINED_KEY = f'key-name-{NOTIFICATION_SERVICE_ID}-{NOTIFICATION_API_KEY}'
     NOTIFICATION_DEV_EMAIL = os.getenv('NOTIFICATION_DEV_EMAIL', 'notanemail@email.com')
     NOTIFY_GATEWAY_URL = os.getenv('NOTIFY_GATEWAY_URL')
     REQUESTS_POST_TIMEOUT = os.getenv('REQUESTS_POST_TIMEOUT', 20)
@@ -67,12 +64,10 @@ class Config:
     UAA_URL = os.getenv('UAA_URL')
 
     NON_DEFAULT_VARIABLES = ['JWT_SECRET', 'SECURITY_USER_NAME', 'SECURITY_USER_PASSWORD',
-                             'NOTIFICATION_API_KEY', 'SERVICE_ID', 'NOTIFICATION_TEMPLATE_ID',
-                             'CLIENT_ID', 'CLIENT_SECRET']
+                             'NOTIFICATION_TEMPLATE_ID', 'CLIENT_ID', 'CLIENT_SECRET']
 
     # These should always be set in the environment on prod
     JWT_ALGORITHM = os.getenv('JWT_ALGORITHM')
-    SERVICE_ID = os.getenv('SERVICE_ID')
 
     # Basic auth parameters
     SECURITY_USER_NAME = os.getenv('SECURITY_USER_NAME')
@@ -91,14 +86,12 @@ class DevConfig(Config):
     JWT_SECRET = os.getenv('JWT_SECRET', 'testsecret')
     JWT_ALGORITHM = os.getenv('JWT_ALGORITHM', 'HS256')
     NOTIFY_VIA_GOV_NOTIFY = os.getenv('NOTIFY_VIA_GOV_NOTIFY', '0')
-    NOTIFICATION_API_KEY = os.getenv('NOTIFICATION_API_KEY', 'test_notification_api_key')
     NOTIFICATION_TEMPLATE_ID = os.getenv(
         'NOTIFICATION_TEMPLATE_ID', 'test_notification_template_id')
     NOTIFY_GATEWAY_URL = os.getenv('NOTIFY_GATEWAY_URL', 'http://localhost:5181/emails/')
     SECURITY_USER_NAME = os.getenv('SECURITY_USER_NAME', 'admin')
     SECURITY_USER_PASSWORD = os.getenv('SECURITY_USER_PASSWORD', 'secret')
     BASIC_AUTH = (SECURITY_USER_NAME, SECURITY_USER_PASSWORD)
-    SERVICE_ID = os.getenv('SERVICE_ID', 'test_service_id')
 
     # uaa
     CLIENT_ID = os.getenv('CLIENT_ID', 'secure_message')
