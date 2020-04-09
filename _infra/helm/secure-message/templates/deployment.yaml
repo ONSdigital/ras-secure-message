@@ -151,6 +151,10 @@ spec:
             {{- end }}
           - name: SERVICE_ID
             value: "$(SERVICE_ID)"
+          - name: FRONTSTAGE_SERVICE_HOST
+            value: "{{ .Values.email.frontstageHost }}"
+          - name: FRONTSTAGE_SERVICE_PROTOCOL
+            value: "{{ .Values.email.frontstageProtocol }}"
           - name: PARTY_SERVICE_HOST
             {{- if .Values.dns.enabled }}
             value: "party.{{ .Values.namespace }}.svc.cluster.local"

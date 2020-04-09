@@ -35,6 +35,8 @@ client:
 
 email:
   enabled: "0"
+  frontstageHost: "localhost:8082"
+  frontstageProtocol: "http"
   templates:
     notification: "insert-uuid-here"
 
