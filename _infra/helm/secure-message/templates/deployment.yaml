@@ -142,7 +142,7 @@ spec:
           - name: NOTIFICATION_TEMPLATE_ID
             value: "{{ .Values.email.templates.notification }}"
           - name: NOTIFY_VIA_GOV_NOTIFY
-            value: {{ .Values.email.enabled }}
+            value: "{{ .Values.email.enabled }}"
           - name: NOTIFY_GATEWAY_URL
             {{- if .Values.dns.enabled }}
             value: "http://notify-gateway.{{ .Values.namespace }}.svc.cluster.local:{{ .Values.dns.wellKnownPort }}/emails/"
