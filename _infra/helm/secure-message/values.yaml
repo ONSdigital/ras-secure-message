@@ -35,6 +35,8 @@ client:
 
 email:
   enabled: "0"
+  templates:
+    notification: "insert-uuid-here"
 
 dns:
   enabled: false

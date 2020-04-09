@@ -20,7 +20,6 @@ services:
       JWT_SECRET: testsecret
       SECURITY_USER_NAME: admin
       SECURITY_USER_PASSWORD: secret
-      NOTIFICATION_API_KEY: test_notification_api_key
       NOTIFICATION_TEMPLATE_ID: test_notification_template_id
       SERVICE_ID: test_service_id
     restart: always
