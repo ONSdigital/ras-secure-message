@@ -149,8 +149,6 @@ spec:
             {{- else }}
             value: "http://$(NOTIFY_GATEWAY_SERVICE_HOST):$(NOTIFY_GATEWAY_SERVICE_PORT)/emails/"
             {{- end }}
-          - name: SERVICE_ID
-            value: "$(SERVICE_ID)"
           - name: FRONTSTAGE_SERVICE_HOST
             value: "{{ .Values.email.frontstageHost }}"
           - name: FRONTSTAGE_SERVICE_PROTOCOL

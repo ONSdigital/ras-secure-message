@@ -21,7 +21,6 @@ services:
       SECURITY_USER_NAME: admin
       SECURITY_USER_PASSWORD: secret
       NOTIFICATION_TEMPLATE_ID: test_notification_template_id
-      SERVICE_ID: test_service_id
     restart: always
     depends_on:
       - db
