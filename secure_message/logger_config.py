@@ -1,10 +1,6 @@
 import logging
 import os
 import sys
-import flask
-
-from flask import g
-
 from structlog import configure
 from structlog.processors import JSONRenderer, TimeStamper
 from structlog.stdlib import add_log_level, filter_by_level
@@ -27,7 +23,7 @@ def logger_initial_config():
         event_dict['service'] = service_name
         return event_dict
 
-    def add_severity_level(logger, method_name, event_dict):
+    def add_severity_level(logger, method_name, event_dict):  # pylint: disable=unused-argument
         """
         Add the log level to the event dict.
         """
@@ -36,19 +32,6 @@ def logger_initial_config():
             method_name = "warning"
 
         event_dict["severity"] = method_name
-        return event_dict
-
-    def zipkin_ids(logger, method_name, event_dict):  # pylint:disable=unused-argument
-        event_dict['trace'] = ''
-        event_dict['span'] = ''
-        event_dict['parent'] = ''
-        if not flask.has_app_context():
-            return event_dict
-        if '_zipkin_span' not in g:
-            return event_dict
-        event_dict['span'] = g._zipkin_span.zipkin_attrs.span_id  # pylint:disable=protected-access
-        event_dict['trace'] = g._zipkin_span.zipkin_attrs.trace_id  # pylint:disable=protected-access
-        event_dict['parent'] = g._zipkin_span.zipkin_attrs.parent_span_id  # pylint:disable=protected-access
         return event_dict
 
     logging.basicConfig(stream=sys.stdout,
