@@ -99,7 +99,6 @@ Environment variables available for configuration are listed below:
 | SMS_LOG_LEVEL                   | Log level for the application                                 | 'DEBUG'
 | SECURITY_USER_NAME              | Username for basic auth                                       | N/A
 | SECURITY_USER_PASSWORD          | Password for basic auth                                       | N/A
-| JWT_ALGORITHM                   | Algorithm used to code JWT                                    | 'HS256'
 | JWT_SECRET                      | SECRET used to code JWT                                       | N/A
 | SECURE_MESSAGING_DATABASE_URL   | Database URI                                                  | postgresql://postgres:postgres@localhost:5432
 | NOTIFICATION_TEMPLATE_ID        | Template id for Gov Notify service                            | N/A
