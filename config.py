@@ -4,10 +4,7 @@ from distutils.util import strtobool
 
 from structlog import wrap_logger
 
-from secure_message.cloud.cloud_foundry import ONSCloudFoundry
 
-# use cf env to extract Cloud Foundry environment
-cf = ONSCloudFoundry()
 logger = wrap_logger(logging.getLogger(__name__))
 
 
@@ -22,12 +19,7 @@ class Config:
     SECURE_MESSAGING_DATABASE_URL = os.getenv(
         'SECURE_MESSAGING_DATABASE_URL', 'postgresql://postgres:postgres@localhost:5432')
 
-    if cf.detected:
-        logger.info('Cloud Foundry environment identified.',
-                    protocol=cf.protocol, database=cf.database())
-        SQLALCHEMY_DATABASE_URI = cf.credentials()
-    else:
-        SQLALCHEMY_DATABASE_URI = SECURE_MESSAGING_DATABASE_URL
+
 
     # LOGGING SETTINGS
     SMS_LOG_LEVEL = os.getenv('SMS_LOG_LEVEL', 'DEBUG')
@@ -40,7 +32,6 @@ class Config:
     REQUESTS_POST_TIMEOUT = os.getenv('REQUESTS_POST_TIMEOUT', 20)
 
     # JWT authentication config
-    SM_JWT_ALGORITHM = os.getenv('JWT_ALGORITHM', 'HS256')
     JWT_SECRET = os.getenv('JWT_SECRET')
 
     # Services
@@ -71,6 +62,7 @@ class Config:
 
     # SQLAlchemy
     SQLALCHEMY_TRACK_MODIFICATIONS = os.getenv('SQLALCHEMY_TRACK_MODIFICATIONS', False)
+    SQLALCHEMY_DATABASE_URI = SECURE_MESSAGING_DATABASE_URL
 
     # UAA
     USE_UAA = 1
