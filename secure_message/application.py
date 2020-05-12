@@ -148,7 +148,7 @@ def get_client_token(client_id, client_secret, url):
             logger.warning("Client error encountered. Shutting down.")
             sys.exit(1)
     except requests.RequestException as e:
-        logger.exception(f"{e.__class__.__name__} occured while retrieving client token.")
+        logger.exception(f"{e.__class__.__name__} occurred while retrieving client token.")
         logger.info("Retrying client token retrieval in 10 seconds.")
         sleep(10)
         return get_client_token(client_id, client_secret, url)
