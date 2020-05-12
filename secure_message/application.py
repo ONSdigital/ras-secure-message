@@ -2,7 +2,6 @@ import logging
 import os
 import sys
 from time import sleep
-import requestsdefaulter
 
 from flask import Flask, request
 from flask import json, jsonify

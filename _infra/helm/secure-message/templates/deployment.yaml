@@ -183,9 +183,5 @@ spec:
               secretKeyRef:
                 name: client-credentials
                 key: client-password
-          - name: ZIPKIN_DSN
-            value: "http://$(ZIPKIN_SERVICE_HOST):$(ZIPKIN_SERVICE_PORT)/api/v1/spans"
-          - name: ZIPKIN_SAMPLE_RATE
-            value: "100"
           resources:
             {{ toYaml .Values.resources | nindent 12 }}
