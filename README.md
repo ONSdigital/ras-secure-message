@@ -107,10 +107,6 @@ Environment variables available for configuration are listed below:
 | CLIENT_SECRET                   | Password of the client service in UAA                         | N/A
 | UAA_URL                         | URL of a UAA instance                                         | N/A
 | USE_UAA                         | Sets whether a client token should be retrieved               | 1
-| ZIPKIN_DISABLE                  | Totally disable Zipkin (including tracing headers)            | False
-| ZIPKIN_DSN                      | Zipkin Sample API URL (e.g. http://zipkin:9411/api/v1/spans)  | None
-| ZIPKIN_SAMPLE_RATE              | Percentage of requests to send to zipkin span API             | 0
-
 
 For each external application which secure-message communicates with there are 3 environment variables e.g. for the RAS Party service:
 

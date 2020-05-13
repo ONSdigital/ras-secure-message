@@ -37,6 +37,7 @@ def logger_initial_config():
     logging.basicConfig(stream=sys.stdout,
                         level=log_level,
                         format=logger_format)
+
     configure(processors=[add_severity_level, add_log_level,
                           filter_by_level,
                           add_service,
