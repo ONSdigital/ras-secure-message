@@ -32,7 +32,7 @@ Set environmental variables. Replace $SOURCE_ROOT with the parent directory of t
 
 ```
 RAS_SM_PATH=$SOURCE_ROOT/ras-secure-message
-SMS_LOG_LEVEL = DEBUG
+LOGGING_LEVEL = DEBUG
 ```
 
 Run the application
@@ -96,28 +96,15 @@ Environment variables available for configuration are listed below:
 
 | Environment Variable            | Description                                                   | Default
 |---------------------------------|---------------------------------------------------------------|-------------------------------
-| SMS_LOG_LEVEL                   | Log level for the application                                 | 'DEBUG'
+| LOGGING_LEVEL                   | Log level for the application                                 | 'DEBUG'
 | SECURITY_USER_NAME              | Username for basic auth                                       | N/A
 | SECURITY_USER_PASSWORD          | Password for basic auth                                       | N/A
 | JWT_SECRET                      | SECRET used to code JWT                                       | N/A
-| SECURE_MESSAGING_DATABASE_URL   | Database URI                                                  | postgresql://postgres:postgres@localhost:5432
+| DATABASE_URL                    | Database URI                                                  | postgresql://postgres:postgres@localhost:5432
 | NOTIFICATION_TEMPLATE_ID        | Template id for Gov Notify service                            | N/A
 | NOTIFY_VIA_GOV_NOTIFY           | Toggle for using Gov Notify for notifications                 | '1' (enable Gov Notify email notifications)
+| PARTY_URL                       | URL of the ras-party service                                  | N/A
 | CLIENT_ID                       | ID of the client service in UAA                               | N/A
 | CLIENT_SECRET                   | Password of the client service in UAA                         | N/A
 | UAA_URL                         | URL of a UAA instance                                         | N/A
 | USE_UAA                         | Sets whether a client token should be retrieved               | 1
-
-For each external application which secure-message communicates with there are 3 environment variables e.g. for the RAS Party service:
-
-| Environment Variable              | Description                         | Default
-|-----------------------------------|-------------------------------------|-------------------------------
-| PARTY_SERVICE_HOST            | Host address for RAS party service  | 'http'
-| PARTY_SERVICE_PORT            | Port for RAS party service          | 'localhost'
-| PARTY_SERVICE_PROTOCOL        | Protocol used for RAS party service | '8081'
-
-The services these variables exist for are listed below with the beginnings of their variables and their github links:
-
-| Service                         | Start of variables          | Github
-|---------------------------------|-----------------------------|-----------------------------
-| Party service                   | PARTY_SERVICE           | https://github.com/ONSdigital/ras-party

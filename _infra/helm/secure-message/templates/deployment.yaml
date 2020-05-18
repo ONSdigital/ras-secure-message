@@ -126,7 +126,7 @@ spec:
                 key: security-password
           - name: PORT
             value: "{{ .Values.container.port }}"
-          - name: SECURE_MESSAGING_DATABASE_URL
+          - name: DATABASE_URL
             {{- if .Values.database.sqlProxyEnabled }}
             value: "postgresql://$(DB_USERNAME):$(DB_PASSWORD)@127.0.0.1:$(DB_PORT)/$(DB_NAME)"
             {{- else }}
@@ -149,21 +149,13 @@ spec:
             {{- else }}
             value: "http://$(NOTIFY_GATEWAY_SERVICE_HOST):$(NOTIFY_GATEWAY_SERVICE_PORT)/emails/"
             {{- end }}
-          - name: FRONTSTAGE_SERVICE_HOST
-            value: "{{ .Values.email.frontstageHost }}"
-          - name: FRONTSTAGE_SERVICE_PROTOCOL
-            value: "{{ .Values.email.frontstageProtocol }}"
-          - name: PARTY_SERVICE_HOST
+          - name: FRONTSTAGE_URL
+            value: "{{ .Values.email.frontstageProtocol}}://{{ .Values.email.frontstageHost }}"
+          - name: PARTY_URL
             {{- if .Values.dns.enabled }}
-            value: "party.{{ .Values.namespace }}.svc.cluster.local"
+            value: "http://party.{{ .Values.namespace }}.svc.cluster.local:{{ .Values.dns.wellKnownPort }}"
             {{- else }}
-            value: "$(PARTY_SERVICE_HOST)"
-            {{- end }}
-          - name: PARTY_SERVICE_PORT
-            {{- if .Values.dns.enabled }}
-            value: "{{ .Values.dns.wellKnownPort }}"
-            {{- else }}
-            value: "$(PARTY_SERVICE_PORT)"
+            value: "http://$(PARTY_SERVICE_HOST):$(PARTY_SERVICE_PORT)"
             {{- end }}
           - name: USE_UAA
             value: "1"

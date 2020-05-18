@@ -43,12 +43,10 @@ class HealthTestCase(unittest.TestCase):
         response = self.client.get('/health/details')
         details = {'Name': '',
                    'Version': '',
-                   'SMS Log level': '',
+                   'Logging level': '',
                    'API Functionality': '',
                    'Using party service mock': '',
-                   'RAS PARTY SERVICE HOST': '',
-                   'RAS PARTY SERVICE PORT': '',
-                   'RAS PARTY SERVICE PROTOCOL': '',
+                   'RAS-PARTY URL': '',
                    'NOTIFY VIA GOV NOTIFY': ''}
 
         self.assertEqual(json.loads(response.get_data()).keys(), details.keys())

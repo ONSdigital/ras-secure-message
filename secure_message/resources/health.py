@@ -42,12 +42,10 @@ class HealthDetails(Resource):
 
         details = {'Name': 'ras-secure-message',
                    'Version': current_app.config['VERSION'],
-                   'SMS Log level': current_app.config['SMS_LOG_LEVEL'],
+                   'Logging level': current_app.config['LOGGING_LEVEL'],
                    'API Functionality': func_list,
                    'Using party service mock': party.using_mock,
-                   'RAS PARTY SERVICE HOST': current_app.config['PARTY_SERVICE_HOST'],
-                   'RAS PARTY SERVICE PORT': current_app.config['PARTY_SERVICE_PORT'],
-                   'RAS PARTY SERVICE PROTOCOL': current_app.config['PARTY_SERVICE_PROTOCOL'],
+                   'RAS-PARTY URL': current_app.config['PARTY_URL'],
                    'NOTIFY VIA GOV NOTIFY': current_app.config['NOTIFY_VIA_GOV_NOTIFY']}
 
         return jsonify(details)

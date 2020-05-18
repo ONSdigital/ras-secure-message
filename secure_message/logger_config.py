@@ -9,7 +9,7 @@ from structlog.stdlib import add_log_level, filter_by_level
 def logger_initial_config():
     logger_date_format = os.getenv('LOGGING_DATE_FORMAT', "%Y-%m-%dT%H:%M%s")
     logger_format = "%(message)s"
-    log_level = os.getenv('SMS_LOG_LEVEL', 'DEBUG')
+    log_level = os.getenv('LOGGING_LEVEL', 'DEBUG')
     service_name = 'ras-secure-message'
     try:
         indent = int(os.getenv('JSON_INDENT_LOGGING'))
