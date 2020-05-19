@@ -717,7 +717,7 @@ Returns more detailed information about secure message including some of the env
   "RAS PARTY SERVICE HOST": "ras-party-service-sit.apps.devtest.onsclofo.uk",
   "RAS PARTY SERVICE PORT": "80",
   "RAS PARTY SERVICE PROTOCOL": "http",
-  "SMS Log level": "DEBUG",
+  "Logging level": "DEBUG",
   "Using party service mock": false,
   "Version": "0.1.2"
 }

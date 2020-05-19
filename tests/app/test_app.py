@@ -99,7 +99,7 @@ class AppTestCase(unittest.TestCase):
         url = "http://localhost:5050/messages"
 
         self.client.post(url, data=json.dumps(self.test_message), headers=self.internal_user_header)
-        engine = create_engine(self.app.config['SECURE_MESSAGING_DATABASE_URL'], echo=True)
+        engine = create_engine(self.app.config['DATABASE_URL'], echo=True)
         with engine.connect() as con:
             db_data = con.execute('SELECT * FROM securemessage.secure_message WHERE id = (SELECT MAX(id) FROM securemessage.secure_message)')
             self.assertEqual(db_data.rowcount, 1)
@@ -135,7 +135,7 @@ class AppTestCase(unittest.TestCase):
 
         # Now read back the message to get the thread ID
 
-        engine = create_engine(self.app.config['SECURE_MESSAGING_DATABASE_URL'], echo=True)
+        engine = create_engine(self.app.config['DATABASE_URL'], echo=True)
         with engine.connect() as con:
             db_data = con.execute('SELECT * FROM securemessage.secure_message WHERE id = (SELECT MAX(id) FROM securemessage.secure_message)')
             for row in db_data:

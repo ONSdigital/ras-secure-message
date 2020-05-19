@@ -20,9 +20,9 @@ class AlertsTestCase(unittest.TestCase):
     def test_alert_user_send_if_forwarded_to_alert_method(self):
         """sending email notification"""
         sut = AlertUser(Mock(AlertViaGovNotify))
-        sut.send(self.app.config['NOTIFICATION_DEV_EMAIL'], personalisation=self.personalisation, msg_id=None)
-        sut.alert_method.send.assert_called_with(self.app.config['NOTIFICATION_DEV_EMAIL'], None, self.personalisation,
-                                                 survey_id=None, party_id=None)
+        test_email = 'notanemail@email.com'
+        sut.send(test_email, personalisation=self.personalisation, msg_id=None)
+        sut.alert_method.send.assert_called_with(test_email, None, self.personalisation, survey_id=None, party_id=None)
 
     def test_init_with_alerter_params_sets_alert_method(self):
         """test uses alert_method from constructor if provided"""

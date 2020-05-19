@@ -280,8 +280,8 @@ class MessageSchemaTestCase(unittest.TestCase):
             message_send = MessageSend()
             response = message_send._create_message_url(self.threadId)
 
-            self.assertTrue(response == {'MESSAGE_URL': f'{current_app.config["RAS_FRONTSTAGE_SERVICE"]}'
-                                                        f'secure-message/threads/{self.threadId}#latest-message'})
+            self.assertTrue(response == {'MESSAGE_URL': f'{current_app.config["FRONTSTAGE_URL"]}'
+                                                        f'/secure-message/threads/{self.threadId}#latest-message'})
 
 
 if __name__ == '__main__':
