@@ -23,6 +23,14 @@ jobs:
   build:
     name: Build & Package
     runs-on: ubuntu-latest
+    services:
+      # Label used to access the service container
+      postgres:
+        # Docker Hub image
+        image: postgres:9.4
+        ports:
+          # Maps port 6379 on service container to the host
+          - 5432:5432
     steps:
       - uses: actions/checkout@v2
         with:
