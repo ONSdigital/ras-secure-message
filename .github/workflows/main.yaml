@@ -44,8 +44,10 @@ jobs:
         run: |
           pip install pipenv
           pipenv install --dev --deploy
-      - name: Run Tox
-        run: make test
+      - name: Run Tests
+        run: |
+          pipenv run behave --format progress
+          export APP_SETTINGS=TestConfig && pipenv run pytest && unset APP_SETTINGS
       - uses: GoogleCloudPlatform/github-actions/setup-gcloud@master
         with:
           version: '270.0.0'
