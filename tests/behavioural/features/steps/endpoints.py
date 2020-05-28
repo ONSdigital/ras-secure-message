@@ -90,14 +90,14 @@ def step_impl_the_threads_are_read(context):
 
 @when('the threads are read with my_conversations set true')
 def step_impl_the_threads_are_read_with_my_conversations_set_true(context):
-    url = context.bdd_helper.threads_get_url + f"?my_conversations=true"
+    url = context.bdd_helper.threads_get_url + "?my_conversations=true"
     context.response = context.client.get(url, headers=context.bdd_helper.headers)
     context.bdd_helper.store_messages_response_data(context.response.data)
 
 
 @when('the threads are read with new_respondent_conversations set true')
 def step_impl_the_threads_are_read_with_new_respondent_conversations_set_true(context):
-    url = context.bdd_helper.threads_get_url + f"?new_respondent_conversations=true"
+    url = context.bdd_helper.threads_get_url + "?new_respondent_conversations=true"
     context.response = context.client.get(url, headers=context.bdd_helper.headers)
     context.bdd_helper.store_messages_response_data(context.response.data)
 
@@ -259,7 +259,7 @@ def step_impl_the_open_threads_count_for_default_survey_are_counted(context):
 @when("the count of open threads is made")
 def step_impl_the_open_threads_count_are_counted(context):
     """access the messages_count endpoint to get the count of unread conversations"""
-    url = context.bdd_helper.threads_get_count_url + f"?is_closed=false"
+    url = context.bdd_helper.threads_get_count_url + "?is_closed=false"
     context.response = context.client.get(url, headers=context.bdd_helper.headers)
     response_data = context.response.data
     context.bdd_helper.thread_count = json.loads(response_data)["total"]
@@ -269,7 +269,7 @@ def step_impl_the_open_threads_count_are_counted(context):
 @given("the count of open threads for current user is made")
 def step_impl_my_open_threads_count_are_counted(context):
     """access the messages_count endpoint to get the count of my unread conversations"""
-    url_args = f"?is_closed=false&my_conversations=true"
+    url_args = "?is_closed=false&my_conversations=true"
     _step_impl_get_threads_count(context, url_args)
 
 
@@ -299,13 +299,13 @@ def step_impl_my_open_threads_count_are_counted_by_ru(context, business_id):
 @when("the count of closed threads for current user is made")
 @given("the count of closed threads for current user is made")
 def step_impl_my_closed_threads_count_are_counted(context):
-    url_args = f"?is_closed=true&my_conversations=true"
+    url_args = "?is_closed=true&my_conversations=true"
     _step_impl_get_threads_count(context, url_args)
 
 
 @when("the count of threads for new respondent conversations is made")
 def step_impl_new_respondent_conversations_thread_count_are_counted(context):
-    url_args = f"?new_respondent_conversations=true"
+    url_args = "?new_respondent_conversations=true"
     _step_impl_get_threads_count(context, url_args)
 
 
@@ -338,5 +338,5 @@ def step_impl_the_return_count_is(context, count):
 @given("the count of all conversation types closed threads for current user is made")
 def step_impl_all_conversation_types_count_are_counted(context):
     """access the messages_count endpoint with all_conversation_types set"""
-    url_args = f"?all_conversation_types=true"
+    url_args = "?all_conversation_types=true"
     _step_impl_get_threads_count_for_all_conversation_types(context, url_args)

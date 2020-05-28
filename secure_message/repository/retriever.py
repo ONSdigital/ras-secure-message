@@ -254,9 +254,7 @@ class Retriever:
                 .filter(SecureMessage.thread_id == thread_id) \
                 .filter(or_(and_(SecureMessage.from_internal.is_(False), Status.label == Labels.INBOX.value),  # NOQA
                             and_(SecureMessage.from_internal.is_(True),
-                                 Status.label.in_([Labels.SENT.value]))
-                           )
-                       ) \
+                                 Status.label.in_([Labels.SENT.value])))) \
                 .filter(Events.event == EventsApi.SENT.value) \
                 .order_by(Status.id.desc())
 
