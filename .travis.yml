@@ -10,6 +10,7 @@ cache:
 
 install:
     - pip install pipenv
+    - pip install --upgrade numpy 
     - pipenv install --dev --deploy
 
 script:
@@ -28,7 +29,6 @@ branches:
 env:
   global:
     - PIPENV_IGNORE_VIRTUALENVS=1
-    - NUMPY_VERSION=1.18
 
 addons:
   postgresql: "9.6"
