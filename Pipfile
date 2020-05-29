@@ -22,6 +22,7 @@ retrying = "*"
 maya = "*"
 PyJWT = "*"
 requestsdefaulter = "*"
+numpy = "*"
 
 [dev-packages]
 pylint = "*"
