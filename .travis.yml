@@ -1,6 +1,6 @@
 language: python
 sudo: required
-dist: trusty
+dist: bionic
 python: '3.6'
 
 # before_install:
@@ -10,7 +10,6 @@ cache:
 
 install:
     - pip install pipenv
-    - pip install --upgrade numpy 
     - pipenv install --dev --deploy
 
 script:
