@@ -135,10 +135,6 @@ class ThreadCounter(Resource):
     """
     @staticmethod
     def get():
-        if not g.user.is_internal:
-            logger.info("Thread count should be internal users only", user_uuid=g.user.user_uuid)
-            abort(403)
-
         logger.info("Getting count of threads for user", user_uuid=g.user.user_uuid)
         message_args = get_options(request.args)
 
