@@ -42,10 +42,10 @@ jobs:
         with:
           fetch-depth: '0'
           token: ${{ secrets.BOT_TOKEN }}
-      - name: Set up Python 3.6
+      - name: Set up Python 3.8
         uses: actions/setup-python@v2
         with:
-          python-version: '3.6'
+          python-version: '3.8'
       - name: Get Dependencies
         run: |
           pip install pipenv
