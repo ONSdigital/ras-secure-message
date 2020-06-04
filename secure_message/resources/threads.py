@@ -144,6 +144,6 @@ class ThreadCounter(Resource):
 
         if message_args.unread_conversations:
             logger.info("Getting counts of unread conversations", user_uuid=g.user.user_uuid)
-            return jsonify(totals=Retriever.unread_message_count(g.user))
+            return jsonify(total=Retriever.unread_message_count(g.user))
 
         return jsonify(total=Retriever.thread_count_by_survey(message_args, g.user))
