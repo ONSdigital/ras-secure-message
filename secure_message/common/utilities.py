@@ -10,7 +10,7 @@ from secure_message.services.service_toggles import party, internal_user_service
 logger = wrap_logger(logging.getLogger(__name__))
 MessageArgs = collections.namedtuple(
     'MessageArgs',
-    'page limit business_id surveys cc label desc ce is_closed my_conversations new_respondent_conversations all_conversation_types')
+    'page limit business_id surveys cc label desc ce is_closed my_conversations new_respondent_conversations all_conversation_types unread_conversations')
 
 
 def get_options(args):
@@ -37,7 +37,8 @@ def get_options(args):
 
     fields = {'page': 1, 'limit': MESSAGE_QUERY_LIMIT, 'business_id': None, 'surveys': None,
               'desc': True, 'cc': None, 'label': None, 'ce': None, 'is_closed': False,
-              'my_conversations': False, 'new_respondent_conversations': False, 'all_conversation_types': False}
+              'my_conversations': False, 'new_respondent_conversations': False, 'all_conversation_types': False,
+              'unread_conversations': False}
 
     for field in ['cc', 'ce', 'business_id', 'label']:
         if args.get(field):
@@ -64,16 +65,20 @@ def get_options(args):
     if args.get('all_conversation_types') == 'true':
         fields['all_conversation_types'] = True
 
+    if args.get('unread_conversations') == 'true':
+        fields['unread_conversations'] = True
+
     return MessageArgs(page=fields['page'], limit=fields['limit'], business_id=fields['business_id'],
                        surveys=fields['surveys'], cc=fields['cc'], label=fields['label'],
                        desc=fields['desc'], ce=fields['ce'], is_closed=fields['is_closed'],
                        my_conversations=fields['my_conversations'],
                        new_respondent_conversations=fields['new_respondent_conversations'],
-                       all_conversation_types=fields['all_conversation_types'])
+                       all_conversation_types=fields['all_conversation_types'],
+                       unread_conversations=fields['unread_conversations'])
 
 
 def set_conversation_type_args(existing_args, is_closed=False, my_conversations=False, new_conversations=False,
-                               all_types=False):
+                               all_types=False, unread_conversations=False):
     """Returns a new set of args based on the existing args which are a named tuple,
     but allow the conversation type only to be changed"""
 
@@ -88,7 +93,8 @@ def set_conversation_type_args(existing_args, is_closed=False, my_conversations=
                        is_closed=is_closed,
                        my_conversations=my_conversations,
                        new_respondent_conversations=new_conversations,
-                       all_conversation_types=all_types)
+                       all_conversation_types=all_types,
+                       unread_conversations=unread_conversations)
 
 
 def generate_string_query_args(args):

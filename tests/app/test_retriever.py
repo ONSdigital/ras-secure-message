@@ -318,7 +318,8 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
             is_closed=False,
             my_conversations=False,
             new_respondent_conversations=False,
-            all_conversation_types=False)
+            all_conversation_types=False,
+            unread_conversations=False)
 
         for _ in range(5):
             self.create_thread(no_of_messages=2)
@@ -349,7 +350,8 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
             is_closed=False,
             my_conversations=True,
             new_respondent_conversations=False,
-            all_conversation_types=False)
+            all_conversation_types=False,
+            unread_conversations=False)
 
         for _ in range(5):
             self.create_thread(no_of_messages=2)
