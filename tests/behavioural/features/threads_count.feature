@@ -105,12 +105,6 @@ Scenario: 2 Respondents start conversations , Internal user gets threads count w
    And the count of threads for new respondent conversations is made
   Then the thread count is '2' threads
 
-Scenario: respondent gets threads count
-  Given sending from respondent to internal specific user
-   And '7' messages are sent
-  When the count of open threads for current user is made
-  Then a forbidden status code 403 is returned
-
 Scenario: two internal users send to a respondent
   Given sending from internal specific user to respondent
    And '7' messages are sent

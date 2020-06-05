@@ -135,15 +135,15 @@ class ThreadCounter(Resource):
     """
     @staticmethod
     def get():
-        if not g.user.is_internal:
-            logger.info("Thread count should be internal users only", user_uuid=g.user.user_uuid)
-            abort(403)
-
         logger.info("Getting count of threads for user", user_uuid=g.user.user_uuid)
         message_args = get_options(request.args)
 
         if message_args.all_conversation_types:
             logger.info("Getting counts for all conversation states for user", user_uuid=g.user.user_uuid)
             return jsonify(totals=Retriever.thread_count_by_survey_and_conversation_states(message_args, g.user))
+
+        if message_args.unread_conversations:
+            logger.info("Getting counts of unread conversations", user_uuid=g.user.user_uuid)
+            return jsonify(total=Retriever.unread_message_count(g.user))
 
         return jsonify(total=Retriever.thread_count_by_survey(message_args, g.user))
