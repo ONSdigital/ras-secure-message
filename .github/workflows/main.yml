@@ -93,13 +93,6 @@ jobs:
         run: |
           mv $IMAGE-${{ env.HELM_VERSION }}.tgz $IMAGE-latest.tgz
           gsutil cp $IMAGE-*.tgz gs://$ARTIFACT_BUCKET/$IMAGE/
-      
-      - name: CI hook
-        if: github.ref != 'refs/heads/master'
-        run: |
-          gcloud pubsub topics publish $SPINNAKER_TOPIC --project $HOST \
-          --message "{ \"kind\": \"storage#object\", \"name\": \"$IMAGE/$IMAGE-latest.tgz\", \"bucket\": \"$ARTIFACT_BUCKET\", \"parameters\": { \"tag\": \"${{ steps.release.outputs.pr_number }}\", \"actor\": \"$GITHUB_ACTOR\" } }" \
-          --attribute ci="actions"
 
       - name: Set current tag
         if: github.ref != 'refs/heads/master'
@@ -192,4 +185,4 @@ jobs:
         run: |
           gcloud pubsub topics publish $SPINNAKER_TOPIC --project $HOST \
           --message "{ \"kind\": \"storage#object\", \"name\": \"$IMAGE/$IMAGE-${{ env.HELM_VERSION }}.tgz\", \"bucket\": \"$ARTIFACT_BUCKET\" }" \
-          --attribute ci="actions"
+          --attribute cd="actions"
