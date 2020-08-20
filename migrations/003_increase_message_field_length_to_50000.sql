@@ -1,0 +1,1 @@
+ALTER TABLE securemessage.secure_message ALTER COLUMN body VARCHAR (50000);
