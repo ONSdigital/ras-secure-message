@@ -47,7 +47,7 @@ See the endpoint descriptions for detailed usage of each field. This is an overv
 * From . (msg_from) This is the uuid of the actor that sent a message. If the actor is a respondent then it is their user uuid. If they are an internal user then it will be their user uuid.
 * To . (msg_to) These are the user uuids of the recipients of the message. Currently only one to user is supported. The message to can be as 'From' but with the addition that it can be the constant 'GROUP' to indicate that the message is being sent to a group handling the specific survey at the ons.
 * Subject . (subject) The subject of the message. Limited in the API to 100 characters , but since replies are prefixed with 'Re: ' then in practice it is 96 characters.
-* Body . (body) Up to 10000 characters.
+* Body . (body) Up to 50000 characters.
 * Survey . (survey). This is the uuid of the survey . It is mandatory when saving a message.
 * Collection Exercise .  (collection exercise) uuid of the collection exercise , can be used as a filter option (ce)
 * Reporting unit . (ru) uuid of the reporting unit . Can be used as a filter option.

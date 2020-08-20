@@ -63,7 +63,7 @@ Feature: Get thread by id Endpoint
 
   Scenario Outline: Respondent sends a message to internal group, validate the entire message body is received
     Given sending from respondent to internal <user>
-      And   the message body is '10000' characters long
+      And   the message body is '50000' characters long
       And   the message is sent
     When the thread is read
     Then  a success status code 200 is returned
