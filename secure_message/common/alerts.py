@@ -54,8 +54,8 @@ class AlertViaGovNotify:
         future = self.publisher.publish(topic_path, data=payload_str.encode())
 
         try:
-            msg_id = future.result()
-            bound_logger.info("Publish succeeded", msg_id=msg_id)
+            message = future.result()
+            bound_logger.info("Publish succeeded", msg_id=message)
         except TimeoutError as e:
             bound_logger.error("Publish to pubsub timed out", exc_info=True)
             raise RasNotifyException("Publish to pubsub timed out", error=e)

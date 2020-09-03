@@ -4,7 +4,8 @@ from unittest.mock import Mock
 
 from secure_message.application import create_app
 from secure_message.exception.exceptions import RasNotifyException
-from secure_message.common.alerts import AlertUser, AlertViaGovNotify
+from secure_message.common.alerts import AlertViaGovNotify
+import json
 
 
 class AlertsTestCase(unittest.TestCase):
@@ -17,56 +18,42 @@ class AlertsTestCase(unittest.TestCase):
 
     personalisation = {"RANDOM_URL": "randomemail"}
 
-    def test_alert_user_send_if_forwarded_to_alert_method(self):
-        """sending email notification"""
-        sut = AlertUser(Mock(AlertViaGovNotify))
-        test_email = 'notanemail@email.com'
-        sut.send(test_email, personalisation=self.personalisation, msg_id=None)
-        sut.alert_method.send.assert_called_with(test_email, None, self.personalisation, survey_id=None, party_id=None)
-
-    def test_init_with_alerter_params_sets_alert_method(self):
-        """test uses alert_method from constructor if provided"""
-        sut = AlertUser(Mock(AlertViaGovNotify))
-        self.assertTrue(isinstance(sut.alert_method, Mock))
-
-    def test_init_with_alerter_no_params_sets_alert_method_to_alert_via_gov_notify(self):
-        """test uses AlertViaGovNotify if no alert_method specified"""
-        sut = AlertUser()
-        self.assertTrue(isinstance(sut.alert_method, AlertViaGovNotify))
-
-    @mock.patch('requests.post')
-    def test_post_to_notify_gateway_with_correct_params(self, mock_notify_gateway_post):
-        mock_response = mock.Mock()
-        mock_response.status_code = 201
-        mock_response.json.return_value = {"id": 1}
-        mock_notify_gateway_post.return_value = mock_response
-
-        alert_user = AlertUser(AlertViaGovNotify)
+    def test_post_to_notify_gateway_with_correct_params(self):
+        future = mock.MagicMock()
+        publisher = mock.MagicMock()
+        publisher.publish.return_value = future
+        alert = AlertViaGovNotify({
+            'NOTIFICATION_TEMPLATE_ID': "123",
+            "GOOGLE_CLOUD_PROJECT": "test",
+            "PUBSUB_TOPIC": "testTopic"
+        })
+        expectedPayload = json.dumps({
+            "emailAddress": "test@email.com",
+            "personalisation": self.personalisation,
+            "reference": "myReference"
+        }).encode()
+        alert.publisher = publisher
         with self.app.app_context():
-            alert_user.send('test@email.com', 'myReference', self.personalisation)
+            alert.send('test@email.com', 'myReference', self.personalisation, "survey123", "party123")
 
-        mock_notify_gateway_post.assert_called_once_with(
-            'http://localhost:5181/emails/test_notification_template_id',
-            auth=("admin", "secret"), json={"emailAddress": "test@email.com", "reference": "myReference",
-                                            "personalisation": self.personalisation},
-            timeout=20)
+        publisher.assert_called_once_with('topic_path', data=expectedPayload)
 
-    @mock.patch('requests.post')
-    def test_post_to_notify_gateway_throws_exception(self, mock_notify_gateway_post):
-        mock_response = mock.MagicMock()
-        mock_response.status_code = 500
-        mock_notify_gateway_post.return_value = mock_response
+    def test_request_to_notify_with_pubsub_timeout_error(self):
+        """Tests if the future.result() raises a TimeoutError then the function raises a RasNotifyException"""
+        future = mock.MagicMock()
+        future.result.side_effect = TimeoutError("bad")
+        publisher = mock.MagicMock()
+        publisher.publish.return_value = future
 
-        alert_user = AlertUser(AlertViaGovNotify)
-
-        with self.app.app_context(), self.assertRaises(RasNotifyException):
-            alert_user.send('test@email.com', 'myReference', self.personalisation,)
-
-        mock_notify_gateway_post.assert_called_once_with(
-            'http://localhost:5181/emails/test_notification_template_id',
-            auth=("admin", "secret"), json={"emailAddress": "test@email.com", "reference": "myReference",
-                                            "personalisation": self.personalisation},
-            timeout=20)
+        # Given a mocked notify gateway
+        alert = AlertViaGovNotify({
+            'NOTIFICATION_TEMPLATE_ID': "123",
+            "GOOGLE_CLOUD_PROJECT": "test",
+            "PUBSUB_TOPIC": "testTopic"
+        })
+        alert.publisher = publisher
+        with self.assertRaises(RasNotifyException):
+            alert.send('test@email.com', data={})
 
 
 if __name__ == '__main__':
