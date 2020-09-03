@@ -36,7 +36,7 @@ class AlertsTestCase(unittest.TestCase):
         with self.app.app_context():
             alert.send('test@email.com', 'myReference', self.personalisation, "survey123", "party123")
 
-        publisher.assert_called_once_with('topic_path', data=expectedPayload)
+        publisher.publish.assert_called_once_with('topic_path', data=expectedPayload)
 
     def test_request_to_notify_with_pubsub_timeout_error(self):
         """Tests if the future.result() raises a TimeoutError then the function raises a RasNotifyException"""
@@ -53,7 +53,7 @@ class AlertsTestCase(unittest.TestCase):
         })
         alert.publisher = publisher
         with self.assertRaises(RasNotifyException):
-            alert.send('test@email.com', data={})
+            alert.send('test@email.com', 'myReference', self.personalisation, "survey123", "party123")
 
 
 if __name__ == '__main__':
