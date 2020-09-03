@@ -21,6 +21,9 @@ spec:
     spec:
       {{- if .Values.database.sqlProxyEnabled }}
       volumes:
+        - name: google-cloud-key
+          secret:
+            secretName: google-application-credentials
         - name: cloudsql-instance-credentials
           secret:
             secretName: cloudsql-proxy-credentials
@@ -145,6 +148,8 @@ spec:
             value: "{{ .Values.email.enabled }}"
           - name: GOOGLE_CLOUD_PROJECT
             value: "{{ .Values.gcp.project }}"
+          - name: GOOGLE_APPLICATION_CREDENTIALS
+            value: /var/secrets/google/credentials.json
           - name: PUBSUB_TOPIC
             value: "{{ .Values.gcp.topic }}"
           - name: FRONTSTAGE_URL

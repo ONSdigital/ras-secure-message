@@ -48,6 +48,9 @@ class Config:
     SQLALCHEMY_TRACK_MODIFICATIONS = os.getenv('SQLALCHEMY_TRACK_MODIFICATIONS', False)
     SQLALCHEMY_DATABASE_URI = DATABASE_URL
 
+    GOOGLE_CLOUD_PROJECT = os.getenv('GOOGLE_CLOUD_PROJECT', 'ras-rm-sandbox')
+    PUBSUB_TOPIC = os.getenv('PUBSUB_TOPIC', 'ras-rm-notify-test')
+
 
 class DevConfig(Config):
 
@@ -74,3 +77,5 @@ class TestConfig(DevConfig):
 
     # LOGGING SETTINGS
     LOGGING_LEVEL = 'ERROR'
+    GOOGLE_CLOUD_PROJECT = 'test-project-id'
+    PUBSUB_TOPIC = 'ras-rm-notify-test'
