@@ -7,7 +7,7 @@ from flask import current_app, json
 from sqlalchemy import create_engine
 
 from secure_message import application, constants
-from secure_message.common.alerts import AlertUser, AlertViaGovNotify
+from secure_message.common.alerts import AlertViaGovNotify
 from secure_message.repository import database
 from secure_message.authentication.jwt import encode
 from secure_message.services.service_toggles import party, internal_user_service
@@ -30,8 +30,6 @@ class AppTestCase(unittest.TestCase):
         self.client = self.app.test_client()
         self.engine = create_engine(self.app.config['SQLALCHEMY_DATABASE_URI'])
 
-        AlertUser.alert_method = mock.Mock(AlertViaGovNotify)
-
         internal_token_data = {constants.USER_IDENTIFIER: AppTestCase.SPECIFIC_INTERNAL_USER,
                                "role": "internal"}
 
@@ -44,8 +42,6 @@ class AppTestCase(unittest.TestCase):
         with self.app.app_context():
             internal_signed_jwt = encode(internal_token_data)
             external_signed_jwt = encode(external_token_data)
-
-        AlertUser.alert_method = mock.Mock(AlertViaLogging)
 
         self.internal_user_header = {'Content-Type': 'application/json', 'Authorization': internal_signed_jwt}
         self.external_user_header = {'Content-Type': 'application/json', 'Authorization': external_signed_jwt}
