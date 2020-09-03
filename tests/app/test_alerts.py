@@ -21,6 +21,7 @@ class AlertsTestCase(unittest.TestCase):
     def test_post_to_notify_gateway_with_correct_params(self):
         future = mock.MagicMock()
         publisher = mock.MagicMock()
+        publisher.topic_path.return_value = 'projects/test/topics/testTopic'
         publisher.publish.return_value = future
         alert = AlertViaGovNotify({
             'NOTIFICATION_TEMPLATE_ID': "123",
@@ -36,7 +37,7 @@ class AlertsTestCase(unittest.TestCase):
         with self.app.app_context():
             alert.send('test@email.com', 'myReference', self.personalisation, "survey123", "party123")
 
-        publisher.publish.assert_called_once_with('topic_path', data=expectedPayload)
+        publisher.publish.assert_called_once_with('projects/test/topics/testTopic', data=expectedPayload)
 
     def test_request_to_notify_with_pubsub_timeout_error(self):
         """Tests if the future.result() raises a TimeoutError then the function raises a RasNotifyException"""

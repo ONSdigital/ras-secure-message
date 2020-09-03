@@ -58,10 +58,10 @@ class AlertViaGovNotify:
             bound_logger.info("Publish succeeded", msg_id=message)
         except TimeoutError as e:
             bound_logger.error("Publish to pubsub timed out", exc_info=True)
-            raise RasNotifyException("Publish to pubsub timed out", error=e)
+            raise RasNotifyException(survey_id=survey_id, party_id=party_id)
         except Exception as e: # noqa
             bound_logger.error("A non-timeout error was raised when publishing to pubsub", exc_info=True)
-            raise RasNotifyException("A non-timeout error was raised when publishing to pubsub", error=e)
+            raise RasNotifyException(survey_id=survey_id, party_id=party_id)
 
 
 class AlertViaLogging:
