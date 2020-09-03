@@ -23,6 +23,7 @@ maya = "*"
 PyJWT = "*"
 requestsdefaulter = "*"
 numpy = "*"
+google-cloud-pubsub = "*"
 
 [dev-packages]
 pylint = "*"
