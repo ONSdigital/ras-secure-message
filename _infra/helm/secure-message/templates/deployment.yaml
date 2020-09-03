@@ -143,12 +143,10 @@ spec:
             value: "{{ .Values.email.templates.notification }}"
           - name: NOTIFY_VIA_GOV_NOTIFY
             value: "{{ .Values.email.enabled }}"
-          - name: NOTIFY_GATEWAY_URL
-            {{- if .Values.dns.enabled }}
-            value: "http://notify-gateway.{{ .Values.namespace }}.svc.cluster.local:{{ .Values.dns.wellKnownPort }}/emails/"
-            {{- else }}
-            value: "http://$(NOTIFY_GATEWAY_SERVICE_HOST):$(NOTIFY_GATEWAY_SERVICE_PORT)/emails/"
-            {{- end }}
+          - name: GOOGLE_CLOUD_PROJECT
+            value: "{{ .Values.gcp.project }}"
+          - name: PUBSUB_TOPIC
+            value: "{{ .Values.gcp.topic }}"
           - name: FRONTSTAGE_URL
             value: "{{ .Values.email.frontstageProtocol}}://{{ .Values.email.frontstageHost }}"
           - name: PARTY_URL
