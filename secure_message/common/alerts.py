@@ -1,9 +1,6 @@
 import logging
 import json
-from urllib import parse as urlparse
 
-from flask import current_app
-import requests
 from structlog import wrap_logger
 
 from secure_message.exception.exceptions import RasNotifyException
