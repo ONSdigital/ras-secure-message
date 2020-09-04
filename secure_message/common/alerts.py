@@ -39,9 +39,12 @@ class AlertViaGovNotify:
         bound_logger = logger.bind(template_id=self.template_id, project_id=self.project_id, topic_id=self.topic_id)
         bound_logger.info("Sending email via pubsub")
         payload = {
-            "emailAddress": email,
-            "personalisation": personalisation,
-            "reference": msg_id
+            'notify': {
+                'email_address': email,
+                "personalisation": personalisation,
+                "reference": msg_id,
+                'template_id': self.template_id,
+            }
         }
 
         payload_str = json.dumps(payload)
