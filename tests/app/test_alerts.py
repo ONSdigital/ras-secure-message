@@ -30,7 +30,8 @@ class AlertsTestCase(unittest.TestCase):
         expectedPayload = json.dumps({
             "emailAddress": "test@email.com",
             "personalisation": self.personalisation,
-            "reference": "myReference"
+            "reference": "myReference",
+            "template_id": "123"
         }).encode()
         alert.publisher = publisher
         with self.app.app_context():
