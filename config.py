@@ -20,7 +20,6 @@ class Config:
     # EMAIL NOTIFICATION SETTINGS
     NOTIFY_VIA_GOV_NOTIFY = os.getenv('NOTIFY_VIA_GOV_NOTIFY')
     NOTIFICATION_TEMPLATE_ID = os.getenv('NOTIFICATION_TEMPLATE_ID')
-    NOTIFY_GATEWAY_URL = os.getenv('NOTIFY_GATEWAY_URL')
     REQUESTS_POST_TIMEOUT = os.getenv('REQUESTS_POST_TIMEOUT', 20)
 
     # JWT authentication config
@@ -48,13 +47,15 @@ class Config:
     SQLALCHEMY_TRACK_MODIFICATIONS = os.getenv('SQLALCHEMY_TRACK_MODIFICATIONS', False)
     SQLALCHEMY_DATABASE_URI = DATABASE_URL
 
+    GOOGLE_CLOUD_PROJECT = os.getenv('GOOGLE_CLOUD_PROJECT', 'ras-rm-sandbox')
+    PUBSUB_TOPIC = os.getenv('PUBSUB_TOPIC', 'ras-rm-notify-test')
+
 
 class DevConfig(Config):
 
     JWT_SECRET = os.getenv('JWT_SECRET', 'testsecret')
     NOTIFY_VIA_GOV_NOTIFY = os.getenv('NOTIFY_VIA_GOV_NOTIFY', '0')
     NOTIFICATION_TEMPLATE_ID = os.getenv('NOTIFICATION_TEMPLATE_ID', 'test_notification_template_id')
-    NOTIFY_GATEWAY_URL = os.getenv('NOTIFY_GATEWAY_URL', 'http://localhost:5181/emails/')
     FRONTSTAGE_URL = os.getenv('PARTY_URL', 'http://localhost:8082')
     PARTY_URL = os.getenv('PARTY_URL', 'http://localhost:8081')
     SECURITY_USER_NAME = os.getenv('SECURITY_USER_NAME', 'admin')
@@ -74,3 +75,5 @@ class TestConfig(DevConfig):
 
     # LOGGING SETTINGS
     LOGGING_LEVEL = 'ERROR'
+    GOOGLE_CLOUD_PROJECT = 'test-project-id'
+    PUBSUB_TOPIC = 'ras-rm-notify-test'

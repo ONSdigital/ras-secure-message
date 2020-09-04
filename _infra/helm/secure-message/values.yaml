@@ -40,6 +40,10 @@ email:
   templates:
     notification: "insert-uuid-here"
 
+gcp:
+  project: ras-rm-sandbox
+  topic: ras-rm-notify-test
+
 dns:
   enabled: false
   wellKnownPort: 8080

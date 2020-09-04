@@ -6,7 +6,7 @@ from structlog import wrap_logger
 from werkzeug.exceptions import BadRequest, NotFound
 
 from secure_message import constants
-from secure_message.common.alerts import AlertUser, AlertViaGovNotify, AlertViaLogging
+from secure_message.common.alerts import AlertViaGovNotify, AlertViaLogging
 from secure_message.common.eventsapi import EventsApi
 from secure_message.common.labels import Labels
 from secure_message.repository.modifier import Modifier
@@ -105,11 +105,9 @@ class MessageSend(Resource):
             if party_data:
                 if 'emailAddress' in party_data[0] and party_data[0]['emailAddress'].strip():
                     recipient_email = party_data[0]['emailAddress'].strip()
-                    alert_method = AlertViaLogging() if current_app.config['NOTIFY_VIA_GOV_NOTIFY'] == '0' else AlertViaGovNotify()
-                    alert_user = AlertUser(alert_method)
+                    alert_method = AlertViaLogging() if current_app.config['NOTIFY_VIA_GOV_NOTIFY'] == '0' else AlertViaGovNotify(current_app.config)
                     personalisation = MessageSend._create_message_url(message.thread_id)
-                    alert_user.send(recipient_email, message.msg_id, personalisation=personalisation,
-                                    survey_id=message.survey, party_id=party_data[0]['id'])
+                    alert_method.send(recipient_email, message.msg_id, personalisation, message.survey, party_data[0]['id'])
                 else:
                     logger.error('User does not have an emailAddress specified', msg_to=message.msg_to[0])
             # else not testable as fails validation
