@@ -19,11 +19,11 @@ spec:
         app: {{ .Chart.Name }}
         env: {{ .Values.env }}
     spec:
-      {{- if .Values.database.sqlProxyEnabled }}
       volumes:
         - name: google-cloud-key
           secret:
             secretName: google-application-credentials
+        {{- if .Values.database.sqlProxyEnabled }}
         - name: cloudsql-instance-credentials
           secret:
             secretName: cloudsql-proxy-credentials
@@ -31,7 +31,7 @@ spec:
             items:
             - key: "credentials.json"
               path: "credentials.json"
-      {{- end }}
+        {{- end }}
       containers:
         {{- if .Values.database.sqlProxyEnabled }}
         - name: cloudsql-proxy
