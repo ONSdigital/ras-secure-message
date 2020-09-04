@@ -1,6 +1,5 @@
 import unittest
 from unittest import mock
-from unittest.mock import Mock
 
 from secure_message.application import create_app
 from secure_message.exception.exceptions import RasNotifyException

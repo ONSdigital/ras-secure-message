@@ -1,5 +1,4 @@
 import unittest
-from unittest import mock
 from unittest.mock import patch
 from datetime import datetime, timezone
 
@@ -7,7 +6,6 @@ from flask import current_app, json
 from sqlalchemy import create_engine
 
 from secure_message import application, constants
-from secure_message.common.alerts import AlertViaGovNotify
 from secure_message.repository import database
 from secure_message.authentication.jwt import encode
 from secure_message.services.service_toggles import party, internal_user_service
