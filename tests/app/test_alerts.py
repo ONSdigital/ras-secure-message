@@ -27,12 +27,12 @@ class AlertsTestCase(unittest.TestCase):
             "GOOGLE_CLOUD_PROJECT": "test",
             "PUBSUB_TOPIC": "testTopic"
         })
-        expectedPayload = json.dumps({
+        expectedPayload = json.dumps({"notify":{
             "emailAddress": "test@email.com",
             "personalisation": self.personalisation,
             "reference": "myReference",
             "template_id": "123"
-        }).encode()
+        }}).encode()
         alert.publisher = publisher
         with self.app.app_context():
             alert.send('test@email.com', 'myReference', self.personalisation, "survey123", "party123")
