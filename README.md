@@ -108,3 +108,7 @@ Environment variables available for configuration are listed below:
 | CLIENT_SECRET                   | Password of the client service in UAA                         | N/A
 | UAA_URL                         | URL of a UAA instance                                         | N/A
 | USE_UAA                         | Sets whether a client token should be retrieved               | 1
+
+## Database migrations
+
+Although there exists a 'migrations' folder for SQL database migration files, this service does not currently use any database migration tools such as Alembic. As such, the migration files are simply there for record-keeping purposes. Migration scripts will need to be performed manually on the database.
