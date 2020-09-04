@@ -28,7 +28,7 @@ class AlertsTestCase(unittest.TestCase):
             "PUBSUB_TOPIC": "testTopic"
         })
         expectedPayload = json.dumps({"notify":{
-            "emailAddress": "test@email.com",
+            "email_address": "test@email.com",
             "personalisation": self.personalisation,
             "reference": "myReference",
             "template_id": "123"
