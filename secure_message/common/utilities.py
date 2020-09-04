@@ -13,11 +13,11 @@ MessageArgs = collections.namedtuple(
     'page limit business_id surveys cc label desc ce is_closed my_conversations new_respondent_conversations all_conversation_types unread_conversations')
 
 
-def get_options(args):
+def get_options(args):  # NOQA pylint:disable=too-complex
     """extract options from request , allow label to be set by caller
 
-    :param args, contains search arguments. Not all end points support all args
-    :returns MessageArgs named tuple containing the args for the search
+    :param args: contains search arguments. Not all end points support all args
+    :returns: MessageArgs named tuple containing the args for the search
 
     business_id If set , restricts search to conversations regarding this specific party id
     surveys  If set allows the count to be restricted by a list of survey_ids

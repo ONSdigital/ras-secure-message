@@ -127,14 +127,15 @@ class ThreadList(Resource):
 
 
 class ThreadCounter(Resource):
-    """Get count of all conversations for a specific internal user
-    Typically for a specific survey, supports filtering by case, collection exercise, business party id etc
 
-    :returns if all_conversation_types is set 'true' returns json representing all 4 counts
-              else returns the count for the single type combination requested.
-    """
     @staticmethod
     def get():
+        """Get count of all conversations for a specific internal user
+        Typically for a specific survey, supports filtering by case, collection exercise, business party id etc
+
+        :returns: if all_conversation_types is set 'true' returns json representing all 4 counts
+                  else returns the count for the single type combination requested.
+        """
         logger.info("Getting count of threads for user", user_uuid=g.user.user_uuid)
         message_args = get_options(request.args)
 
