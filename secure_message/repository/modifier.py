@@ -4,13 +4,13 @@ import logging
 from flask import jsonify
 from sqlalchemy.exc import SQLAlchemyError
 from structlog import wrap_logger
-from werkzeug.exceptions import InternalServerError
+from werkzeug.exceptions import InternalServerError, NotFound
 
 from secure_message.common.eventsapi import EventsApi
 from secure_message.common.labels import Labels
 from secure_message.repository.database import db, SecureMessage, Status, Events
 from secure_message.services.service_toggles import internal_user_service
-
+from secure_message.repository.retriever import Retriever
 
 logger = wrap_logger(logging.getLogger(__name__))
 
@@ -81,6 +81,25 @@ class Modifier:
     @staticmethod
     def mark_message_as_read(message, user):
         """Remove unread label from status"""
+        logger.debug("marking message as read with id", message=message['msg_id'])
+        Modifier._mark_read(message, user)
+        # also need to mark any other messages in the conversation as read
+        if message['thread_id']:
+            try:
+                conversation = Retriever.retrieve_thread(message['thread_id'], user)
+                logger.debug("conversation found with thread id", thread_id=message['thread_id'])
+                for msg in conversation.all():
+                    Modifier._mark_read(msg.serialize(user), user)
+                    logger.debug("marking message is read with id", msg=msg.msg_id)
+            except NotFound:
+                # message is not part of a conversation
+                logger.debug("no conversation found with thread id", thread_id=message['thread_id'])
+        # return true as this what the original method did and there seems to be a weird pattern of either returning
+        # a response or a boolean for every function throughout this application.
+        return True
+
+    @staticmethod
+    def _mark_read(message, user):
         inbox = Labels.INBOX.value
         unread = Labels.UNREAD.value
         if inbox in message['labels'] and unread in message['labels'] and 'read_date' not in message:
@@ -98,7 +117,6 @@ class Modifier:
                 logger.exception('Error adding read information to message', msg_id=message['msg_id'])
                 raise InternalServerError(description="Error adding read information to message")
         Modifier.remove_label(unread, message, user)
-        return True
 
     @staticmethod
     def close_conversation(metadata, user):

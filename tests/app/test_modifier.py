@@ -44,7 +44,7 @@ class ModifyTestCaseHelper:
                         f"'{constants.NON_SPECIFIC_INTERNAL_USER}')"
                 con.execute(query)
                 query = f"INSERT INTO securemessage.status(label, msg_id, actor) VALUES('UNREAD', '{msg_id}'," \
-                        f" '{constants.NON_SPECIFIC_INTERNAL_USER}')"
+                        f"'{constants.NON_SPECIFIC_INTERNAL_USER}')"
                 con.execute(query)
                 query = f'''INSERT INTO securemessage.events(event, msg_id, date_time)
                          VALUES('{EventsApi.SENT.value}', '{msg_id}', '2017-02-03 00:00:00')'''
@@ -54,6 +54,36 @@ class ModifyTestCaseHelper:
                             VALUES('{EventsApi.READ.value}', '{msg_id}', '2017-02-03 00:00:00')'''
                     con.execute(query)
 
+        return thread_id
+
+    def create_conversation_with_respondent_as_unread(self, user, message_count=0):
+        """Adds a specified number of Messages to the db in a single thread"""
+        # we should not be inserting records into the db for a unit test but sadly without a greater rework its the only way
+        thread_id = str(uuid.uuid4())
+        with self.engine.connect() as con:
+            for i in range(message_count):
+                msg_id = str(uuid.uuid4())
+                # Only the first message in a thread needs a entry in the conversation table
+                if i == 0:
+                    query = f'''INSERT INTO securemessage.conversation(id, is_closed, closed_by, closed_by_uuid) VALUES('{thread_id}', false, '', '')'''
+                    con.execute(query)
+                query = f'''INSERT INTO securemessage.secure_message(id, msg_id, subject, body, thread_id,
+                        collection_case, business_id, collection_exercise, survey) VALUES ({i}, '{msg_id}', 'test','test','{thread_id}',
+                        'ACollectionCase', 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc', 'ACollectionExercise',
+                        '{user.user_uuid}')'''
+                con.execute(query)
+                query = f'''INSERT INTO securemessage.status(label, msg_id, actor) VALUES('SENT', '{msg_id}',
+                        '{constants.NON_SPECIFIC_INTERNAL_USER}')'''
+                con.execute(query)
+                query = f"INSERT INTO securemessage.status(label, msg_id, actor) VALUES('INBOX', '{msg_id}', " \
+                        f"'{user.user_uuid}')"
+                con.execute(query)
+                query = f"INSERT INTO securemessage.status(label, msg_id, actor) VALUES('UNREAD', '{msg_id}'," \
+                        f" '{user.user_uuid}')"
+                con.execute(query)
+                query = f'''INSERT INTO securemessage.events(event, msg_id, date_time)
+                         VALUES('{EventsApi.SENT.value}', '{msg_id}', '2020-11-20 00:00:00')'''
+                con.execute(query)
         return thread_id
 
     def add_conversation(self, conversation_id=str(uuid.uuid4()), is_closed=False, closed_by='', closed_by_uuid='', closed_at=None):
@@ -96,6 +126,33 @@ class ModifyTestCase(unittest.TestCase, ModifyTestCaseHelper):
 
     def tearDown(self):
         self.engine.dispose()
+
+    def test_all_messages_in_conversation_marked_unread(self):
+        # create a thead with two messages
+        conversation_id = self.create_conversation_with_respondent_as_unread(user=self.user_respondent, message_count=2)
+        with self.app.app_context():
+            conversation = Retriever.retrieve_thread(conversation_id, self.user_respondent)
+            for msg in conversation.all():
+                # as there's two indications that a message is unread, first check the read at isn't set
+                self.assertIsNone(msg.read_at)
+                # now collect all the message labels
+                labels = []
+                for status in msg.statuses:
+                    labels.append(status.label)
+                # and check the unread is present
+                self.assertTrue("UNREAD" in labels)
+            # now mark the first message as read and check the whole conversation is now read
+            Modifier.mark_message_as_read(conversation[0].serialize(self.user_respondent), self.user_respondent)
+            con = Retriever.retrieve_thread(conversation_id, self.user_respondent)
+            for msg in con.all():
+                # message read should now be set
+                self.assertIsNotNone(msg.read_at)
+                # collect the labels againg
+                labels = []
+                for status in msg.statuses:
+                    labels.append(status.label)
+                # and there should be no unread
+                self.assertFalse("UNREAD" in labels)
 
     def test_close_conversation(self):
         """Test close conversation works"""

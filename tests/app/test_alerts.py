@@ -27,7 +27,7 @@ class AlertsTestCase(unittest.TestCase):
             "GOOGLE_CLOUD_PROJECT": "test",
             "PUBSUB_TOPIC": "testTopic"
         })
-        expectedPayload = json.dumps({"notify":{
+        expectedPayload = json.dumps({"notify": {
             "email_address": "test@email.com",
             "personalisation": self.personalisation,
             "reference": "myReference",
