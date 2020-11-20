@@ -128,7 +128,7 @@ class ModifyTestCase(unittest.TestCase, ModifyTestCaseHelper):
         self.engine.dispose()
 
     def test_all_messages_in_conversation_marked_unread(self):
-        # create a thead with two messages
+        # create a thread with two messages
         conversation_id = self.create_conversation_with_respondent_as_unread(user=self.user_respondent, message_count=2)
         with self.app.app_context():
             conversation = Retriever.retrieve_thread(conversation_id, self.user_respondent)

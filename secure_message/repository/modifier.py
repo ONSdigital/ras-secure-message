@@ -82,8 +82,9 @@ class Modifier:
     def mark_message_as_read(message, user):
         """Remove unread label from status"""
         logger.debug("marking message as read with id", message=message['msg_id'])
+        # mark the message as read i.e. remove the unread label and set the `read at` time.
         Modifier._mark_read(message, user)
-        # also need to mark any other messages in the conversation as read
+        # also need to mark any other messages in the thread as read
         if message['thread_id']:
             try:
                 conversation = Retriever.retrieve_thread(message['thread_id'], user)
