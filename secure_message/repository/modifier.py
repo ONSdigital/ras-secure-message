@@ -102,6 +102,7 @@ class Modifier:
     def _mark_read(message, user):
         inbox = Labels.INBOX.value
         unread = Labels.UNREAD.value
+        # message is unread if it has an UNREAD label and the `read_at` time isn't set
         if inbox in message['labels'] and unread in message['labels'] and 'read_date' not in message:
             # Save to both events and secure_message table for now.  In future, the save to the
             # events table will be removed.

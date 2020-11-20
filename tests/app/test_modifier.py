@@ -133,7 +133,7 @@ class ModifyTestCase(unittest.TestCase, ModifyTestCaseHelper):
         with self.app.app_context():
             conversation = Retriever.retrieve_thread(conversation_id, self.user_respondent)
             for msg in conversation.all():
-                # as there's two indications that a message is unread, first check the read at isn't set
+                # as there's two ways that a message is unread, first check the `read at` time isn't set
                 self.assertIsNone(msg.read_at)
                 # now collect all the message labels
                 labels = []
@@ -145,9 +145,9 @@ class ModifyTestCase(unittest.TestCase, ModifyTestCaseHelper):
             Modifier.mark_message_as_read(conversation[0].serialize(self.user_respondent), self.user_respondent)
             con = Retriever.retrieve_thread(conversation_id, self.user_respondent)
             for msg in con.all():
-                # message read should now be set
+                # message `read at` should now be set
                 self.assertIsNotNone(msg.read_at)
-                # collect the labels againg
+                # collect the labels again
                 labels = []
                 for status in msg.statuses:
                     labels.append(status.label)
