@@ -4,13 +4,12 @@ import logging
 from flask import jsonify
 from sqlalchemy.exc import SQLAlchemyError
 from structlog import wrap_logger
-from werkzeug.exceptions import InternalServerError, NotFound
+from werkzeug.exceptions import InternalServerError
 
 from secure_message.common.eventsapi import EventsApi
 from secure_message.common.labels import Labels
 from secure_message.repository.database import db, SecureMessage, Status, Events
 from secure_message.services.service_toggles import internal_user_service
-from secure_message.repository.retriever import Retriever
 
 logger = wrap_logger(logging.getLogger(__name__))
 
@@ -82,22 +81,35 @@ class Modifier:
     def mark_message_as_read(message, user):
         """Remove unread label from status"""
         logger.debug("marking message as read with id", message=message['msg_id'])
-        # mark the message as read i.e. remove the unread label and set the `read at` time.
-        Modifier._mark_read(message, user)
-        # also need to mark any other messages in the thread as read
+        # if message is part of a thread mark all messages as read
         if message['thread_id']:
-            try:
-                conversation = Retriever.retrieve_thread(message['thread_id'], user)
-                logger.debug("conversation found with thread id", thread_id=message['thread_id'])
-                for msg in conversation.all():
-                    Modifier._mark_read(msg.serialize(user), user)
-                    logger.debug("marking message is read with id", msg=msg.msg_id)
-            except NotFound:
-                # message is not part of a conversation
-                logger.debug("no conversation found with thread id", thread_id=message['thread_id'])
+            Modifier._mark_all_read(message['thread_id'], user)
+        else:
+            # mark the message as read i.e. remove the unread label and set the `read at` time.
+            Modifier._mark_read(message, user)
         # return true as this what the original method did and there seems to be a weird pattern of either returning
         # a response or a boolean for every function throughout this application.
         return True
+
+    @staticmethod
+    def _mark_all_read(thread_id, user):
+        inbox = Labels.INBOX.value
+        unread = Labels.UNREAD.value
+        try:
+            secure_messages = SecureMessage.query.filter(SecureMessage.thread_id == thread_id)
+            for secure_message in secure_messages.all():
+                message = secure_message.serialize(user)
+                if inbox in message['labels'] and unread in message['labels'] and 'read_date' not in message:
+                    event = Events(msg_id=message['msg_id'], event=EventsApi.READ.value)
+                    db.session.add(event)
+                    secure_message.read_at = datetime.utcnow()
+                    db.session.add(secure_message)
+                    Modifier.remove_label(Labels.UNREAD.value, message, user)
+            db.session.commit()
+        except SQLAlchemyError:
+            db.session.rollback()
+            logger.exception('Error marking thread as read', thread_id=thread_id)
+            raise InternalServerError(description="Error marking thread as read")
 
     @staticmethod
     def _mark_read(message, user):
