@@ -21,17 +21,25 @@ service:
   port: 8080
 
 resources:
-  requests:
-    memory: "250Mi"
-    cpu: "25m"
-  limits:
-    cpu: "100m"
-    memory: "750Mi"
+  application:
+    requests:
+      memory: "250Mi"
+      cpu: "35m"
+    limits:
+      memory: "750Mi"
+      cpu: "200m"
+  proxy:
+    requests:
+      memory: "25Mi"
+      cpu: "5m"
+    limits:
+      memory: "64Mi"
+      cpu: "100m"
 
 autoscaling: false
 scaleAt:
   # These are expressed as a percentage of resources.requests, not resources.limits
-  memoryPercentage: 200
+  memoryPercentage: 150
   cpuPercentage: 200
 replicas: 1
 rollingUpdate:
