@@ -1,7 +1,7 @@
 # ras-secure-message
-[![Build Status](https://travis-ci.org/ONSdigital/ras-secure-message.svg?branch=master)](https://travis-ci.org/ONSdigital/ras-secure-message)
+[![Build Status](https://travis-ci.org/ONSdigital/ras-secure-message.svg?branch=main)](https://travis-ci.org/ONSdigital/ras-secure-message)
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/4e427a826650454d98ed74dade65a4ff)](https://www.codacy.com/app/ONSDigital/ras-secure-message)
-[![codecov](https://codecov.io/gh/ONSdigital/ras-secure-message/branch/master/graph/badge.svg)](https://codecov.io/gh/ONSdigital/ras-secure-message)
+[![codecov](https://codecov.io/gh/ONSdigital/ras-secure-message/branch/main/graph/badge.svg)](https://codecov.io/gh/ONSdigital/ras-secure-message)
 
 
 ## Setup
