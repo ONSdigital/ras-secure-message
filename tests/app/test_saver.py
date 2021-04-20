@@ -78,6 +78,7 @@ class SaverTestCase(unittest.TestCase):
                 self.assertIsNone(row['closed_by'])
                 self.assertIsNone(row['closed_by_uuid'])
                 self.assertIsNone(row['closed_at'])
+                self.assertTrue(row['category'] is not None)
 
     def test_save_msg_status_raises_message_save_exception_on_db_error(self):
         """Tests MessageSaveException generated if db commit fails saving message"""
