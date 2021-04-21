@@ -191,8 +191,8 @@ class Conversation(db.Model):
     closed_by = Column('closed_by', String())
     closed_by_uuid = Column('closed_by_uuid', String(length=60))
     closed_at = Column('closed_at', DateTime())
-    category = Column('category', String(length=60),server_default='SURVEY')
- 
+    category = Column('category', String(length=60), server_default='SURVEY')
+
     def __init__(self, is_closed=False, closed_by=None, closed_by_uuid=None, closed_at=None):
         self.is_closed = is_closed
         self.closed_by = closed_by

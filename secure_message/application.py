@@ -102,7 +102,7 @@ def cache_client_token(app):
     app.oauth_client_token_expires_at = maya.now().add(seconds=expires_in)
 
 
-def get_client_token(client_id, client_secret, url):
+def get_client_token(client_id, client_secret, url):  # NOQA pylint:disable=inconsistent-return-statements
     headers = {'Content-Type': 'application/x-www-form-urlencoded',
                'Accept': 'application/json'}
 
