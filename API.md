@@ -86,7 +86,7 @@ Retrieves a list of messages based on the selected parameters passed on the quer
 | business_id | `string` | aaa1aa1a-1aa1-1111-aa11-11a11aa111aa | optionally restrict by ru id  |
 | survey | `string` | aaa1aa1a-1aa1-1111-aa11-11a11aa111aa | optionally restrict by survey  |
 | label | `string` | INBOX/SENT | used to select types of messages to return e.g SENT or INBOX |
-| ce (collection_exercise) | `string`| aaa1aa1a-1aa1-1111-aa11-11a11aa111aa | optionally restrict by collection exercise |
+| ce (exercise_id) | `string`| aaa1aa1a-1aa1-1111-aa11-11a11aa111aa | optionally restrict by collection exercise |
 | desc (descending) | `boolean` | True/False | order by date descending (else ascending) |
 | limit | `int` | 2 | maximum number of messages to return per page |
 | page  | 'int' | 1 | which page of data to return |
@@ -154,7 +154,7 @@ Note that if the user is a respondent the get messages returns messages which ma
             },
             "body": "Test uuid",
             "collection_case": "ACollectionCase",
-            "collection_exercise": "",
+            "exercise_id": "",
             "labels": [
                 "INBOX"
             ],
@@ -320,7 +320,7 @@ Note, the response will have either uuids or 'GROUP' for the user ids, and a uui
       },
       "body": "Test",
       "collection_case": "collection case1",
-      "collection_exercise": "collection exercise1",
+      "exercise_id": "collection exercise1",
       "from_internal": "False",
       "labels": [
         "SENT"
@@ -365,7 +365,7 @@ Note, the response will have either uuids or 'GROUP' for the user ids, and a uui
       },
       "body": "Test",
       "collection_case": "collection case1",
-      "collection_exercise": "collection exercise1",
+      "exercise_id": "collection exercise1",
       "from_internal": "False",
       "labels": [
         "SENT"
@@ -410,7 +410,7 @@ Note, the response will have either uuids or 'GROUP' for the user ids, and a uui
       },
       "body": "Test",
       "collection_case": "collection case1",
-      "collection_exercise": "collection exercise1",
+      "exercise_id": "collection exercise1",
       "from_internal": "False",
       "labels": [
         "SENT"
@@ -515,7 +515,7 @@ Messages should have survey_id, collection_case and use either a uuid or "GROUP"
       },
       "body": "Test",
       "collection_case": "collection case1",
-      "collection_exercise": "collection exercise1",
+      "exercise_id": "collection exercise1",
       "from_internal": "False",
       "labels": [
         "SENT"
@@ -560,7 +560,7 @@ Messages should have survey_id, collection_case and use either a uuid or "GROUP"
       },
       "body": "Test",
       "collection_case": "collection case1",
-      "collection_exercise": "collection exercise1",
+      "exercise_id": "collection exercise1",
       "from_internal": "True",
       "labels": [
         "INBOX",
@@ -606,7 +606,7 @@ Messages should have survey_id, collection_case and use either a uuid or "GROUP"
       },
       "body": "Test",
       "collection_case": "collection case1",
-      "collection_exercise": "collection exercise1",
+      "exercise_id": "collection exercise1",
       "from_internal": "False",
       "labels": [
         "SENT"

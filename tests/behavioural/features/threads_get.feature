@@ -447,19 +447,19 @@ Scenario Outline: There are 3 conversations between respondent and internal , re
                     each with different collection exercise validate , that only 2 messages returned when we restrict by collection exercise
 
     Given sending from internal <user> to respondent
-      And the collection_exercise is set to 'ce1'
+      And the exercise_id is set to 'ce1'
       And the message is sent
       And the thread id is set to the last returned thread id
       And the message is sent
 
       And the thread_id is set to empty
-      And the collection_exercise is set to 'ce2'
+      And the exercise_id is set to 'ce2'
       And the message is sent
       And the thread id is set to the last returned thread id
       And the message is sent
 
       And the thread_id is set to empty
-      And the collection_exercise is set to 'ce1'
+      And the exercise_id is set to 'ce1'
       And the message is sent
       And the thread id is set to the last returned thread id
       And the message is sent
@@ -478,19 +478,19 @@ Scenario Outline: There are 3 conversations between respondent and internal , re
                     each with different collection exercise validate , that only 2 messages returned when we restrict by collection exercise
 
     Given sending from respondent to internal <user>
-      And the collection_exercise is set to 'ce1'
+      And the exercise_id is set to 'ce1'
       And the message is sent
       And the thread id is set to the last returned thread id
       And the message is sent
 
       And the thread_id is set to empty
-      And the collection_exercise is set to 'ce2'
+      And the exercise_id is set to 'ce2'
       And the message is sent
       And the thread id is set to the last returned thread id
       And the message is sent
 
       And the thread_id is set to empty
-      And the collection_exercise is set to 'ce1'
+      And the exercise_id is set to 'ce1'
       And the message is sent
       And the thread id is set to the last returned thread id
       And the message is sent
