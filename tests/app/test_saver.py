@@ -147,4 +147,4 @@ class SaverTestCase(unittest.TestCase):
         with self.engine.connect() as con:
             request = con.execute('SELECT COUNT(securemessage.secure_message.id) FROM securemessage.secure_message')
             for row in request:
-                self.assertTrue(row._row[0] == 1)
+                self.assertTrue(row['count'] == 1)
