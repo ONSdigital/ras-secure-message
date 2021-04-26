@@ -136,7 +136,7 @@ def step_impl_the_threads_in_specific_business_id_are_returned(context, business
 
 @when("the threads with collection case '{cc}' are read")
 @given("the threads with collection case '{cc}' are read")
-def step_impl_the_threads_in_specific_collection_case_id_are_returned(context, cc):
+def step_impl_the_threads_in_specific_case_id_are_returned(context, cc):
     url = context.bdd_helper.threads_get_url + f"?cc={cc}"
     context.response = context.client.get(url, headers=context.bdd_helper.headers)
     context.bdd_helper.store_messages_response_data(context.response.data)
@@ -144,7 +144,7 @@ def step_impl_the_threads_in_specific_collection_case_id_are_returned(context, c
 
 @when("the threads with collection exercise '{ce}' are read")
 @given("the threads with collection exercise '{ce}' are read")
-def step_impl_the_threads_in_specific_collection_case_exercise_are_returned(context, ce):
+def step_impl_the_threads_in_specific_case_id_exercise_are_returned(context, ce):
     url = context.bdd_helper.threads_get_url + f"?ce={ce}"
     context.response = context.client.get(url, headers=context.bdd_helper.headers)
     context.bdd_helper.store_messages_response_data(context.response.data)

@@ -26,8 +26,8 @@ class SecureMessagingContextHelper:
     __ADDITIONAL_SURVEY_2 = 'additional_survey_2'
     __ADDITIONAL_SURVEY_3 = 'additional_survey_3'
 
-    __DEFAULT_COLLECTION_CASE = 'collection case1'             # UUID in real use, string for testing clarity
-    __ALTERNATE_COLLECTION_CASE = 'AnotherCollectionCase'      # UUID in real use, string for testing clarity
+    __DEFAULT_CASE_ID = 'collection case1'             # UUID in real use, string for testing clarity
+    __ALTERNATE_CASE_ID = 'AnotherCollectionCase'      # UUID in real use, string for testing clarity
 
     __DEFAULT_EXERCISE_ID = 'collection exercise1'     # UUID in real use, string for testing clarity
     __ALTERNATE_EXERCISE_ID = 'AnotherCollectionExercise'  # UUID in real use, string for testing clarity
@@ -59,7 +59,7 @@ class SecureMessagingContextHelper:
                                      'subject': 'Hello World',
                                      'body': 'Test',
                                      'thread_id': '',
-                                     'collection_case': __DEFAULT_COLLECTION_CASE,
+                                     'case_id': __DEFAULT_CASE_ID,
                                      'exercise_id': __DEFAULT_EXERCISE_ID,
                                      'business_id': __DEFAULT_BUSINESS_ID,
                                      'survey': __DEFAULT_SURVEY}
@@ -290,11 +290,11 @@ class SecureMessagingContextHelper:
     def use_default_survey(self):
         self._message_data['survey'] = SecureMessagingContextHelper.__DEFAULT_SURVEY
 
-    def use_alternate_collection_case(self):
-        self._message_data['collection_case'] = SecureMessagingContextHelper.__ALTERNATE_COLLECTION_CASE
+    def use_alternate_case_id(self):
+        self._message_data['case_id'] = SecureMessagingContextHelper.__ALTERNATE_CASE_ID
 
-    def use_default_collection_case(self):
-        self._message_data['collection_case'] = SecureMessagingContextHelper.__DEFAULT_COLLECTION_CASE
+    def use_default_case_id(self):
+        self._message_data['case_id'] = SecureMessagingContextHelper.__DEFAULT_CASE_ID
 
     def use_alternate_exercise_id(self):
         self._message_data['exercise_id'] = SecureMessagingContextHelper.__ALTERNATE_exercise_id

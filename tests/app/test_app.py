@@ -49,7 +49,7 @@ class AppTestCase(unittest.TestCase):
                              'subject': 'MyMessage',
                              'body': 'hello',
                              'thread_id': "",
-                             'collection_case': 'ACollectionCase',
+                             'case_id': 'ACollectionCase',
                              'exercise_id': 'ACollectionExercise',
                              'business_id': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc',
                              'survey': self.BRES_SURVEY}
@@ -167,7 +167,7 @@ class AppTestCase(unittest.TestCase):
                         'msg_from': 'ce12b958-2a5f-44f4-a6da-861e59070a31',
                         'subject': 'MyMessage',
                         'body': 'hello',
-                        'collection_case': 'ACollectionCase',
+                        'case_id': 'ACollectionCase',
                         'exercise_id': 'ACollectionExercise',
                         'business_id': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc',
                         'survey': self.BRES_SURVEY}

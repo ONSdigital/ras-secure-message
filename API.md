@@ -82,7 +82,7 @@ Retrieves a list of messages based on the selected parameters passed on the quer
 
 | `**Variable**` | `**Type**` | `**Example Value**` | `**Notes**` |
 | :---: | :---: | :---: | :---: |
-| cc (collection_case) | `string` | 0000000000000000 | optionally restrict by collection case |
+| cc (case_id) | `string` | 0000000000000000 | optionally restrict by collection case |
 | business_id | `string` | aaa1aa1a-1aa1-1111-aa11-11a11aa111aa | optionally restrict by ru id  |
 | survey | `string` | aaa1aa1a-1aa1-1111-aa11-11a11aa111aa | optionally restrict by survey  |
 | label | `string` | INBOX/SENT | used to select types of messages to return e.g SENT or INBOX |
@@ -153,7 +153,7 @@ Note that if the user is a respondent the get messages returns messages which ma
                 }
             },
             "body": "Test uuid",
-            "collection_case": "ACollectionCase",
+            "case_id": "ACollectionCase",
             "exercise_id": "",
             "labels": [
                 "INBOX"
@@ -194,7 +194,7 @@ When a message is posted, typically, no msg_id is supplied.
   "body": "Test uuid",
   "thread_id": "",
   "business_id": "f1a5e99c-8edf-489a-9c72-6cabe6c387fc",
-  "collection_case": "ACollectionCase",
+  "case_id": "ACollectionCase",
   "survey": "BRES"
 }
 ```
@@ -205,7 +205,7 @@ When a message is posted, typically, no msg_id is supplied.
 * msg_from - The current user uuid
 * thread_id - Should be set to the thread id of the message being replied to if the message is a reply, else left empty
 * survey - Should be the uuid of the survey.
-* collection_case - The uuid of the collection case. Can be used as a filter option (cc).
+* case_id - The uuid of the collection case. Can be used as a filter option (cc).
 
 ```json
 {
@@ -215,7 +215,7 @@ When a message is posted, typically, no msg_id is supplied.
   "body": "Test uuid",
   "thread_id": "",
   "business_id": "f1a5e99c-8edf-489a-9c72-6cabe6c387fc",
-  "collection_case": "ACollectionCase",
+  "case_id": "ACollectionCase",
   "survey": "2346e99c-8edf-489a-9c72-6cabe6c387fc"
 }
 ```
@@ -319,7 +319,7 @@ Note, the response will have either uuids or 'GROUP' for the user ids, and a uui
         }
       },
       "body": "Test",
-      "collection_case": "collection case1",
+      "case_id": "collection case1",
       "exercise_id": "collection exercise1",
       "from_internal": "False",
       "labels": [
@@ -364,7 +364,7 @@ Note, the response will have either uuids or 'GROUP' for the user ids, and a uui
         }
       },
       "body": "Test",
-      "collection_case": "collection case1",
+      "case_id": "collection case1",
       "exercise_id": "collection exercise1",
       "from_internal": "False",
       "labels": [
@@ -409,7 +409,7 @@ Note, the response will have either uuids or 'GROUP' for the user ids, and a uui
         }
       },
       "body": "Test",
-      "collection_case": "collection case1",
+      "case_id": "collection case1",
       "exercise_id": "collection exercise1",
       "from_internal": "False",
       "labels": [
@@ -473,7 +473,7 @@ sub conversations are in progress (i.e two internal users replying on a thread )
 
 ### Example JSON Response
 
-Messages should have survey_id, collection_case and use either a uuid or "GROUP" for the internal user.
+Messages should have survey_id, case_id and use either a uuid or "GROUP" for the internal user.
 
 ```json
 {
@@ -514,7 +514,7 @@ Messages should have survey_id, collection_case and use either a uuid or "GROUP"
         }
       },
       "body": "Test",
-      "collection_case": "collection case1",
+      "case_id": "collection case1",
       "exercise_id": "collection exercise1",
       "from_internal": "False",
       "labels": [
@@ -559,7 +559,7 @@ Messages should have survey_id, collection_case and use either a uuid or "GROUP"
         }
       },
       "body": "Test",
-      "collection_case": "collection case1",
+      "case_id": "collection case1",
       "exercise_id": "collection exercise1",
       "from_internal": "True",
       "labels": [
@@ -605,7 +605,7 @@ Messages should have survey_id, collection_case and use either a uuid or "GROUP"
         }
       },
       "body": "Test",
-      "collection_case": "collection case1",
+      "case_id": "collection case1",
       "exercise_id": "collection exercise1",
       "from_internal": "False",
       "labels": [
