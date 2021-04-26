@@ -33,13 +33,13 @@ class Retriever:
         return result
 
     @staticmethod
-    def thread_count_by_survey(request_args, user):
+    def thread_count_by_survey_id(request_args, user):
         """Count users threads for a specific survey"""
 
         conditions = []
 
         if request_args.surveys:
-            conditions.append(SecureMessage.survey.in_(request_args.surveys))
+            conditions.append(SecureMessage.survey_id.in_(request_args.surveys))
 
         if request_args.business_id:
             conditions.append(SecureMessage.business_id == request_args.business_id)
@@ -71,12 +71,12 @@ class Retriever:
             result = SecureMessage.query.filter(and_(*conditions)).distinct(SecureMessage.msg_id).count()
 
         except Exception as e:
-            logger.error('Error retrieving count of threads by survey from database', error=e)
+            logger.error('Error retrieving count of threads by survey_id from database', error=e)
             raise InternalServerError(description="Error retrieving count of threads from database")
         return result
 
     @staticmethod
-    def thread_count_by_survey_and_conversation_states(request_args, user):
+    def thread_count_by_survey_id_and_conversation_states(request_args, user):
         """Return 4 conversation counts. They are for open, closed, my conversations and
         new_respondent_conversation.
         Given each of these counts uses different clauses to define them and they are not mutually exclusive,
@@ -86,16 +86,16 @@ class Retriever:
         totals = {}
 
         args = set_conversation_type_args(request_args)  # is_closed defaults to False
-        totals['open'] = Retriever.thread_count_by_survey(args, user)
+        totals['open'] = Retriever.thread_count_by_survey_id(args, user)
 
         args = set_conversation_type_args(request_args, is_closed=True)
-        totals['closed'] = Retriever.thread_count_by_survey(args, user)
+        totals['closed'] = Retriever.thread_count_by_survey_id(args, user)
 
         args = set_conversation_type_args(request_args, my_conversations=True)
-        totals['my_conversations'] = Retriever.thread_count_by_survey(args, user)
+        totals['my_conversations'] = Retriever.thread_count_by_survey_id(args, user)
 
         args = set_conversation_type_args(request_args, new_conversations=True)
-        totals['new_respondent_conversations'] = Retriever.thread_count_by_survey(args, user)
+        totals['new_respondent_conversations'] = Retriever.thread_count_by_survey_id(args, user)
 
         return totals
 
@@ -115,7 +115,7 @@ class Retriever:
             conditions.append(SecureMessage.business_id == request_args.business_id)
 
         if request_args.surveys:
-            conditions.append(SecureMessage.survey.in_(request_args.surveys))
+            conditions.append(SecureMessage.survey_id.in_(request_args.surveys))
 
         if request_args.cc:
             conditions.append(SecureMessage.case_id == request_args.cc)
@@ -155,7 +155,7 @@ class Retriever:
             conditions.append(SecureMessage.business_id == request_args.business_id)
 
         if request_args.surveys:
-            conditions.append(SecureMessage.survey.in_(request_args.surveys))
+            conditions.append(SecureMessage.survey_id.in_(request_args.surveys))
 
         if request_args.cc:
             conditions.append(SecureMessage.case_id == request_args.cc)

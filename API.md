@@ -48,7 +48,7 @@ See the endpoint descriptions for detailed usage of each field. This is an overv
 * To . (msg_to) These are the user uuids of the recipients of the message. Currently only one to user is supported. The message to can be as 'From' but with the addition that it can be the constant 'GROUP' to indicate that the message is being sent to a group handling the specific survey at the ons.
 * Subject . (subject) The subject of the message. Limited in the API to 100 characters , but since replies are prefixed with 'Re: ' then in practice it is 96 characters.
 * Body . (body) Up to 50000 characters.
-* Survey . (survey). This is the uuid of the survey . It is mandatory when saving a message.
+* survey_id . (survey_id). This is the uuid of the survey_id . It is mandatory when saving a message.
 * Collection Exercise .  (collection exercise) uuid of the collection exercise , can be used as a filter option (ce)
 * Reporting unit . (ru) uuid of the reporting unit . Can be used as a filter option.
 * Labels . These can be used to set a status on a message, or retrieve messages with a specific label. Valid labels:
@@ -84,7 +84,7 @@ Retrieves a list of messages based on the selected parameters passed on the quer
 | :---: | :---: | :---: | :---: |
 | cc (case_id) | `string` | 0000000000000000 | optionally restrict by collection case |
 | business_id | `string` | aaa1aa1a-1aa1-1111-aa11-11a11aa111aa | optionally restrict by ru id  |
-| survey | `string` | aaa1aa1a-1aa1-1111-aa11-11a11aa111aa | optionally restrict by survey  |
+| survey_id | `string` | aaa1aa1a-1aa1-1111-aa11-11a11aa111aa | optionally restrict by survey_id  |
 | label | `string` | INBOX/SENT | used to select types of messages to return e.g SENT or INBOX |
 | ce (exercise_id) | `string`| aaa1aa1a-1aa1-1111-aa11-11a11aa111aa | optionally restrict by collection exercise |
 | desc (descending) | `boolean` | True/False | order by date descending (else ascending) |
@@ -92,7 +92,7 @@ Retrieves a list of messages based on the selected parameters passed on the quer
 | page  | 'int' | 1 | which page of data to return |
 
 * An example of using one the above would be: `GET /messages?limit=2`
-* Using multiple parameters: `GET /messages?limit=2&label=INBOX&survey=12345678981047653839`
+* Using multiple parameters: `GET /messages?limit=2&label=INBOX&survey_id=12345678981047653839`
 
 Note that if the user is a respondent the get messages returns messages which match the uuid of the user passed in the JWT and that satisfy any additional filter criteria. If the user is internal then it matches messages sent to all internal users that satisfy the additional filter criteria . Typically that would be restricted by survey_id so that only messages  of a specific survey are returned.
 
@@ -166,7 +166,7 @@ Note that if the user is a respondent the get messages returns messages which ma
             ],
             "business_id": "f1a5e99c-8edf-489a-9c72-6cabe6c387fc",
             "subject": "Test uuid",
-            "survey": "BRES",
+            "survey_id": "BRES",
             "thread_id": "ae46748b-c6e6-4859-a57a-86e01db2dcbc"
         }
 ]}
@@ -195,7 +195,7 @@ When a message is posted, typically, no msg_id is supplied.
   "thread_id": "",
   "business_id": "f1a5e99c-8edf-489a-9c72-6cabe6c387fc",
   "case_id": "ACollectionCase",
-  "survey": "BRES"
+  "survey_id": "BRES"
 }
 ```
 
@@ -204,7 +204,7 @@ When a message is posted, typically, no msg_id is supplied.
 * msg_to - Should be set to a specific user uuid if known , else to the constant 'GROUP' if sending to an unknown user in ONS
 * msg_from - The current user uuid
 * thread_id - Should be set to the thread id of the message being replied to if the message is a reply, else left empty
-* survey - Should be the uuid of the survey.
+* survey_id - Should be the uuid of the survey_id.
 * case_id - The uuid of the collection case. Can be used as a filter option (cc).
 
 ```json
@@ -216,7 +216,7 @@ When a message is posted, typically, no msg_id is supplied.
   "thread_id": "",
   "business_id": "f1a5e99c-8edf-489a-9c72-6cabe6c387fc",
   "case_id": "ACollectionCase",
-  "survey": "2346e99c-8edf-489a-9c72-6cabe6c387fc"
+  "survey_id": "2346e99c-8edf-489a-9c72-6cabe6c387fc"
 }
 ```
 
@@ -333,7 +333,7 @@ Note, the response will have either uuids or 'GROUP' for the user ids, and a uui
       "business_id": "f1a5e99c-8edf-489a-9c72-6cabe6c387fc",
       "sent_date": "2018-02-22 14:54:25.637222",
       "subject": "Hello World",
-      "survey": "33333333-22222-3333-4444-88dc018a1a4c",
+      "survey_id": "33333333-22222-3333-4444-88dc018a1a4c",
       "thread_id": "8966ecec-c77d-413e-993c-9bdb44b62b86"
     },
     {

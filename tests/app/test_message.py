@@ -214,12 +214,12 @@ class MessageSchemaTestCase(unittest.TestCase):
     def test_missing_survey_causes_error(self):
         """marshalling message with no survey field"""
         self.json_message['msg_to'] = ["01b51fcc-ed43-4cdb-ad1c-450f9986859b"]
-        self.json_message['survey'] = ''
+        self.json_message['survey_id'] = ''
         with self.app.app_context():
             g.user = User(self.json_message['msg_from'], 'respondent')
             schema = MessageSchema()
             errors = schema.load(self.json_message)[1]
-        self.assertTrue(errors == {'survey': ['Please enter a survey']})
+        self.assertTrue(errors == {'survey_id': ['Please enter a survey']})
 
     def test_same_to_from_causes_error(self):
         """marshalling message with same to and from field"""

@@ -9,7 +9,7 @@ MAX_MSG_ID_LEN = 60               # Maximum size of a message UUID in a message
 MAX_CASE__D_LEN = 60      # Maximum size of the message collection case identifier
 MAX_BUSINESS_ID_LEN = 60          # Maximum size of the message business_id identifier
 MAX_BUSINESS_NAME_LEN = 60        # Maximum size of the message business name identifier
-MAX_SURVEY_LEN = 60               # Maximum size of the message collection instrument identifier
+MAX_SURVEY_ID_LEN = 60               # Maximum size of the message collection instrument identifier
 MAX_EXERCISE_ID_LEN = 60  # Maximum size of the message collection exercise identifier
 
 # Status Table Column Size Definitions
