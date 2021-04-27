@@ -33,7 +33,7 @@ class ModifyTestCaseHelper:
                     query = f'''INSERT INTO securemessage.conversation(id, is_closed, closed_by, closed_by_uuid) VALUES('{thread_id}', false, '', '')'''
                     con.execute(query)
                 query = f'''INSERT INTO securemessage.secure_message(id, msg_id, subject, body, thread_id,
-                        collection_case, business_id, collection_exercise, survey) VALUES ({i}, '{msg_id}', 'test','test','{thread_id}',
+                        collection_case, business_id, exercise_id, survey) VALUES ({i}, '{msg_id}', 'test','test','{thread_id}',
                         'ACollectionCase', 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc', 'ACollectionExercise',
                         '{constants.NON_SPECIFIC_INTERNAL_USER}')'''
                 con.execute(query)
@@ -68,7 +68,7 @@ class ModifyTestCaseHelper:
                     query = f'''INSERT INTO securemessage.conversation(id, is_closed, closed_by, closed_by_uuid) VALUES('{thread_id}', false, '', '')'''
                     con.execute(query)
                 query = f'''INSERT INTO securemessage.secure_message(id, msg_id, subject, body, thread_id,
-                        collection_case, business_id, collection_exercise, survey) VALUES ({i}, '{msg_id}', 'test','test','{thread_id}',
+                        collection_case, business_id, exercise_id, survey) VALUES ({i}, '{msg_id}', 'test','test','{thread_id}',
                         'ACollectionCase', 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc', 'ACollectionExercise',
                         '{user.user_uuid}')'''
                 con.execute(query)

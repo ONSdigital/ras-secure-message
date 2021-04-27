@@ -34,7 +34,7 @@ class RetrieverTestCaseHelper:
 
         with self.engine.connect() as con:
             query = f'''INSERT INTO securemessage.secure_message(msg_id, subject, body, thread_id,
-                    collection_case, business_id, survey, collection_exercise, from_internal) VALUES ('{msg_id}', '{subject}','{body}',
+                    collection_case, business_id, survey, exercise_id, from_internal) VALUES ('{msg_id}', '{subject}','{body}',
                     '{thread_id}', '{collection_case}', '{business_id}', '{survey}', '{collection_exercise}', '{from_internal}')'''
             con.execute(query)
 
