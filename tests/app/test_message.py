@@ -26,11 +26,11 @@ class MessageTestCase(unittest.TestCase):
         sut = Message('from', 'subject', 'body', ['to'], '5', 'AMsgId', 'ACollectionCase',
                       'ASurveyType', 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc', 'CollectionExercise')
         sut_str = repr(sut)
-        expected = '<Message(msg_id=AMsgId msg_to=[\'to\'] msg_from=from subject=subject body=body thread_id=5 collection_case=ACollectionCase ' \
+        expected = '<Message(msg_id=AMsgId msg_to=[\'to\'] msg_from=from subject=subject body=body thread_id=5 case_id=ACollectionCase ' \
                    'business_id=f1a5e99c-8edf-489a-9c72-6cabe6c387fc exercise_id=CollectionExercise survey=ASurveyType from_internal=False)>'
         self.assertEqual(sut_str, expected)
 
-    def test_message_with_different_collection_case_not_equal(self):
+    def test_message_with_different_case_id_not_equal(self):
         """testing two different Message objects are not equal"""
         message1 = Message('1', '2', '3', '4', '5', 'ACollectionCase',
                            'f1a5e99c-8edf-489a-9c72-6cabe6c387f', 'ASurveyType', 'ACollectionExercise')

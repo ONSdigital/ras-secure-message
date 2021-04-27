@@ -59,7 +59,7 @@ class SecureMessagingContextHelper:
                                      'subject': 'Hello World',
                                      'body': 'Test',
                                      'thread_id': '',
-                                     'collection_case': __DEFAULT_COLLECTION_CASE,
+                                     'case_id': __DEFAULT_COLLECTION_CASE,
                                      'exercise_id': __DEFAULT_COLLECTION_EXERCISE,
                                      'business_id': __DEFAULT_BUSINESS_ID,
                                      'survey': __DEFAULT_SURVEY}
@@ -290,11 +290,11 @@ class SecureMessagingContextHelper:
     def use_default_survey(self):
         self._message_data['survey'] = SecureMessagingContextHelper.__DEFAULT_SURVEY
 
-    def use_alternate_collection_case(self):
-        self._message_data['collection_case'] = SecureMessagingContextHelper.__ALTERNATE_COLLECTION_CASE
+    def use_alternate_case_id(self):
+        self._message_data['case_id'] = SecureMessagingContextHelper.__ALTERNATE_COLLECTION_CASE
 
     def use_default_collection_case(self):
-        self._message_data['collection_case'] = SecureMessagingContextHelper.__DEFAULT_COLLECTION_CASE
+        self._message_data['case_id'] = SecureMessagingContextHelper.__DEFAULT_COLLECTION_CASE
 
     def use_alternate_collection_exercise(self):
         self._message_data['exercise_id'] = SecureMessagingContextHelper.__ALTERNATE_COLLECTION_EXERCISE

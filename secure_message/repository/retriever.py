@@ -45,7 +45,7 @@ class Retriever:
             conditions.append(SecureMessage.business_id == request_args.business_id)
 
         if request_args.cc:
-            conditions.append(SecureMessage.collection_case == request_args.cc)
+            conditions.append(SecureMessage.case_id == request_args.cc)
 
         if request_args.ce:
             conditions.append(SecureMessage.exercise_id == request_args.ce)
@@ -118,7 +118,7 @@ class Retriever:
             conditions.append(SecureMessage.survey.in_(request_args.surveys))
 
         if request_args.cc:
-            conditions.append(SecureMessage.collection_case == request_args.cc)
+            conditions.append(SecureMessage.case_id == request_args.cc)
 
         if request_args.ce:
             conditions.append(SecureMessage.exercise_id == request_args.ce)
@@ -158,7 +158,7 @@ class Retriever:
             conditions.append(SecureMessage.survey.in_(request_args.surveys))
 
         if request_args.cc:
-            conditions.append(SecureMessage.collection_case == request_args.cc)
+            conditions.append(SecureMessage.case_id == request_args.cc)
 
         if request_args.ce:
             conditions.append(SecureMessage.exercise_id == request_args.ce)

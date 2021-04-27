@@ -27,15 +27,15 @@ class RetrieverTestCaseHelper:
 
     """Helper class for Retriever Tests"""
     def add_secure_message(self, msg_id, subject="test", body="test", thread_id="ThreadId",
-                           collection_case="ACollectionCase", business_id="f1a5e99c-8edf-489a-9c72-6cabe6c387fc",
+                           case_id="ACollectionCase", business_id="f1a5e99c-8edf-489a-9c72-6cabe6c387fc",
                            survey=BRES_SURVEY, exercise_id='CollectionExercise', from_internal=False):
 
         """ Populate the secure_message table"""
 
         with self.engine.connect() as con:
             query = f'''INSERT INTO securemessage.secure_message(msg_id, subject, body, thread_id,
-                    collection_case, business_id, survey, exercise_id, from_internal) VALUES ('{msg_id}', '{subject}','{body}',
-                    '{thread_id}', '{collection_case}', '{business_id}', '{survey}', '{exercise_id}', '{from_internal}')'''
+                    case_id, business_id, survey, exercise_id, from_internal) VALUES ('{msg_id}', '{subject}','{body}',
+                    '{thread_id}', '{case_id}', '{business_id}', '{survey}', '{exercise_id}', '{from_internal}')'''
             con.execute(query)
 
     def add_conversation(self, conversation_id, is_closed=False):
