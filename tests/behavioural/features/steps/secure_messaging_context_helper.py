@@ -60,7 +60,7 @@ class SecureMessagingContextHelper:
                                      'body': 'Test',
                                      'thread_id': '',
                                      'collection_case': __DEFAULT_COLLECTION_CASE,
-                                     'collection_exercise': __DEFAULT_COLLECTION_EXERCISE,
+                                     'exercise_id': __DEFAULT_COLLECTION_EXERCISE,
                                      'business_id': __DEFAULT_BUSINESS_ID,
                                      'survey': __DEFAULT_SURVEY}
 
@@ -297,10 +297,10 @@ class SecureMessagingContextHelper:
         self._message_data['collection_case'] = SecureMessagingContextHelper.__DEFAULT_COLLECTION_CASE
 
     def use_alternate_collection_exercise(self):
-        self._message_data['collection_exercise'] = SecureMessagingContextHelper.__ALTERNATE_COLLECTION_EXERCISE
+        self._message_data['exercise_id'] = SecureMessagingContextHelper.__ALTERNATE_COLLECTION_EXERCISE
 
     def use_default_collection_exercise(self):
-        self._message_data['collection_exercise'] = SecureMessagingContextHelper.__DEFAULT_COLLECTION_EXERCISE
+        self._message_data['exercise_id'] = SecureMessagingContextHelper.__DEFAULT_COLLECTION_EXERCISE
 
     def add_additional_respondent_claim(self, business_id, survey):
         """Add an ru/survey pair to the additional claims """

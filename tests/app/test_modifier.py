@@ -262,7 +262,7 @@ class ModifyTestCase(unittest.TestCase, ModifyTestCaseHelper):
                                  'body': 'hello',
                                  'thread_id': '',
                                  'collection_case': 'ACollectionCase',
-                                 'collection_exercise': 'ACollectionExercise',
+                                 'exercise_id': 'ACollectionExercise',
                                  'business_id': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc',
                                  'survey': self.BRES_SURVEY,
                                  'from_internal': True}
@@ -280,7 +280,7 @@ class ModifyTestCase(unittest.TestCase, ModifyTestCaseHelper):
                                      'body': 'hello',
                                      'thread_id': '',
                                      'collection_case': 'ACollectionCase',
-                                     'collection_exercise': 'ACollectionExercise',
+                                     'exercise_id': 'ACollectionExercise',
                                      'business_id': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc',
                                      'survey': self.BRES_SURVEY,
                                      'from_internal': False}
@@ -298,7 +298,7 @@ class ModifyTestCase(unittest.TestCase, ModifyTestCaseHelper):
                                     'body': 'hello',
                                     'thread_id': '',
                                     'collection_case': 'ACollectionCase',
-                                    'collection_exercise': 'ACollectionExercise',
+                                    'exercise_id': 'ACollectionExercise',
                                     'business_id': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc',
                                     'survey': self.BRES_SURVEY,
                                     'from_internal': False}
@@ -314,7 +314,7 @@ class ModifyTestCase(unittest.TestCase, ModifyTestCaseHelper):
                                   'body': 'hello',
                                   'thread_id': '',
                                   'collection_case': 'ACollectionCase',
-                                  'collection_exercise': 'ACollectionExercise',
+                                  'exercise_id': 'ACollectionExercise',
                                   'business_id': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc',
                                   'survey': self.BRES_SURVEY,
                                   'from_internal': False}

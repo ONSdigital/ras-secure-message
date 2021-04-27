@@ -36,7 +36,7 @@ class UtilitiesTestCase(unittest.TestCase):
 
     messages_external_first = [{'body': 'Reply body from respondent',
                                 'collection_case': '',
-                                'collection_exercise': '',
+                                'exercise_id': '',
                                 'from_internal': False,
                                 'labels': ['INBOX'],
                                 'msg_from': '0a7ad740-10d5-4ecb-b7ca-3c0384afb882',
@@ -50,7 +50,7 @@ class UtilitiesTestCase(unittest.TestCase):
                                 'thread_id': '53a430f1-de21-4279-b17e-1bfb4c4813a6'},
                                {'body': 'Reply body from internal user',
                                 'collection_case': '',
-                                'collection_exercise': '',
+                                'exercise_id': '',
                                 'from_internal': True,
                                 'labels': ['INBOX'],
                                 'msg_from': '01b51fcc-ed43-4cdb-ad1c-450f9986859b',
@@ -65,7 +65,7 @@ class UtilitiesTestCase(unittest.TestCase):
 
     messages_internal_first = [{'body': 'Reply body from internal user',
                                 'collection_case': '',
-                                'collection_exercise': '',
+                                'exercise_id': '',
                                 'from_internal': True,
                                 'labels': ['INBOX'],
                                 'msg_from': '01b51fcc-ed43-4cdb-ad1c-450f9986859b',
@@ -79,7 +79,7 @@ class UtilitiesTestCase(unittest.TestCase):
                                 'thread_id': '53a430f1-de21-4279-b17e-1bfb4c4813a6'},
                                {'body': 'Reply body from respondent',
                                 'collection_case': '',
-                                'collection_exercise': '',
+                                'exercise_id': '',
                                 'from_internal': False,
                                 'labels': ['INBOX'],
                                 'msg_from': '0a7ad740-10d5-4ecb-b7ca-3c0384afb882',
@@ -103,7 +103,7 @@ class UtilitiesTestCase(unittest.TestCase):
 
     def test_get_business_details_with_external_message_first(self):
 
-        populated_message = [{'body': 'Reply body from respondent', 'collection_case': '', 'collection_exercise': '',
+        populated_message = [{'body': 'Reply body from respondent', 'collection_case': '', 'exercise_id': '',
                               'from_internal': False,
                               'labels': ['INBOX'], 'msg_from': '0a7ad740-10d5-4ecb-b7ca-3c0384afb882',
                               'msg_id': '048ffdb5-18f0-46f0-bfa0-ea298521c513',
@@ -114,7 +114,7 @@ class UtilitiesTestCase(unittest.TestCase):
                               'survey': 'cb8accda-6118-4d3b-85a3-149e28960c54',
                               'thread_id': '53a430f1-de21-4279-b17e-1bfb4c4813a6',
                               '@business_details': {'id': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc', 'name': 'Apple'}},
-                             {'body': 'Reply body from internal user', 'collection_case': '', 'collection_exercise': '',
+                             {'body': 'Reply body from internal user', 'collection_case': '', 'exercise_id': '',
                               'from_internal': True,
                               'labels': ['INBOX'], 'msg_from': '01b51fcc-ed43-4cdb-ad1c-450f9986859b',
                               'msg_id': '048ffdb5-18f0-46f0-bfa0-ea298521c513',
@@ -140,7 +140,7 @@ class UtilitiesTestCase(unittest.TestCase):
 
     def test_get_business_details_with_internal_message_first(self):
 
-        populated_message = [{'body': 'Reply body from internal user', 'collection_case': '', 'collection_exercise': '',
+        populated_message = [{'body': 'Reply body from internal user', 'collection_case': '', 'exercise_id': '',
                               'from_internal': True,
                               'labels': ['INBOX'], 'msg_from': '01b51fcc-ed43-4cdb-ad1c-450f9986859b',
                               'msg_id': '048ffdb5-18f0-46f0-bfa0-ea298521c513',
@@ -151,7 +151,7 @@ class UtilitiesTestCase(unittest.TestCase):
                               'survey': 'cb8accda-6118-4d3b-85a3-149e28960c54',
                               'thread_id': '53a430f1-de21-4279-b17e-1bfb4c4813a6',
                               '@business_details': {'id': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc', 'name': 'Apple'}},
-                             {'body': 'Reply body from respondent', 'collection_case': '', 'collection_exercise': '',
+                             {'body': 'Reply body from respondent', 'collection_case': '', 'exercise_id': '',
                               'from_internal': False,
                               'labels': ['INBOX'], 'msg_from': '0a7ad740-10d5-4ecb-b7ca-3c0384afb882',
                               'msg_id': '048ffdb5-18f0-46f0-bfa0-ea298521c513',
@@ -179,7 +179,7 @@ class UtilitiesTestCase(unittest.TestCase):
 
     def test_add_from_details_with_external_message_first(self):
 
-        populated_message = [{'body': 'Reply body from respondent', 'collection_case': '', 'collection_exercise': '',
+        populated_message = [{'body': 'Reply body from respondent', 'collection_case': '', 'exercise_id': '',
                               'from_internal': False,
                               'labels': ['INBOX'], 'msg_from': '0a7ad740-10d5-4ecb-b7ca-3c0384afb882',
                               'msg_id': '048ffdb5-18f0-46f0-bfa0-ea298521c513',
@@ -193,7 +193,7 @@ class UtilitiesTestCase(unittest.TestCase):
                                             'lastName': 'Oorschot',
                                             'emailAddress': 'vana123@aol.com', 'telephone': '+443069990289',
                                             'status': 'ACTIVE', 'sampleUnitType': 'BI'}},
-                             {'body': 'Reply body from internal user', 'collection_case': '', 'collection_exercise': '',
+                             {'body': 'Reply body from internal user', 'collection_case': '', 'exercise_id': '',
                               'from_internal': True,
                               'labels': ['INBOX'], 'msg_from': '01b51fcc-ed43-4cdb-ad1c-450f9986859b',
                               'msg_id': '048ffdb5-18f0-46f0-bfa0-ea298521c513',
@@ -224,7 +224,7 @@ class UtilitiesTestCase(unittest.TestCase):
 
     def test_add_from_details_with_internal_message_first(self):
 
-        populated_message = [{'body': 'Reply body from internal user', 'collection_case': '', 'collection_exercise': '',
+        populated_message = [{'body': 'Reply body from internal user', 'collection_case': '', 'exercise_id': '',
                               'from_internal': True,
                               'labels': ['INBOX'], 'msg_from': '01b51fcc-ed43-4cdb-ad1c-450f9986859b',
                               'msg_id': '048ffdb5-18f0-46f0-bfa0-ea298521c513',
@@ -237,7 +237,7 @@ class UtilitiesTestCase(unittest.TestCase):
                               '@msg_from': {'id': '01b51fcc-ed43-4cdb-ad1c-450f9986859b', 'firstName': 'fred',
                                             'lastName': 'flinstone',
                                             'emailAddress': 'mock@email.com'}},
-                             {'body': 'Reply body from respondent', 'collection_case': '', 'collection_exercise': '',
+                             {'body': 'Reply body from respondent', 'collection_case': '', 'exercise_id': '',
                               'from_internal': False,
                               'labels': ['INBOX'], 'msg_from': '0a7ad740-10d5-4ecb-b7ca-3c0384afb882',
                               'msg_id': '048ffdb5-18f0-46f0-bfa0-ea298521c513',
@@ -267,7 +267,7 @@ class UtilitiesTestCase(unittest.TestCase):
 
     def test_add_to_details_with_external_message_first(self):
 
-        populated_message = [{'body': 'Reply body from respondent', 'collection_case': '', 'collection_exercise': '',
+        populated_message = [{'body': 'Reply body from respondent', 'collection_case': '', 'exercise_id': '',
                               'from_internal': False,
                               'labels': ['INBOX'], 'msg_from': '0a7ad740-10d5-4ecb-b7ca-3c0384afb882',
                               'msg_id': '048ffdb5-18f0-46f0-bfa0-ea298521c513',
@@ -279,7 +279,7 @@ class UtilitiesTestCase(unittest.TestCase):
                               'thread_id': '53a430f1-de21-4279-b17e-1bfb4c4813a6',
                               '@msg_to': [{'id': '01b51fcc-ed43-4cdb-ad1c-450f9986859b', 'firstName': 'fred',
                                            'lastName': 'flinstone', 'emailAddress': 'mock@email.com'}]},
-                             {'body': 'Reply body from internal user', 'collection_case': '', 'collection_exercise': '',
+                             {'body': 'Reply body from internal user', 'collection_case': '', 'exercise_id': '',
                               'from_internal': True,
                               'labels': ['INBOX'], 'msg_from': '01b51fcc-ed43-4cdb-ad1c-450f9986859b',
                               'msg_id': '048ffdb5-18f0-46f0-bfa0-ea298521c513',
@@ -311,7 +311,7 @@ class UtilitiesTestCase(unittest.TestCase):
 
     def test_add_to_details_with_internal_message_first(self):
 
-        populated_message = [{'body': 'Reply body from internal user', 'collection_case': '', 'collection_exercise': '',
+        populated_message = [{'body': 'Reply body from internal user', 'collection_case': '', 'exercise_id': '',
                               'from_internal': True,
                               'labels': ['INBOX'], 'msg_from': '01b51fcc-ed43-4cdb-ad1c-450f9986859b',
                               'msg_id': '048ffdb5-18f0-46f0-bfa0-ea298521c513',
@@ -325,7 +325,7 @@ class UtilitiesTestCase(unittest.TestCase):
                                            'lastName': 'Oorschot',
                                            'emailAddress': 'vana123@aol.com', 'telephone': '+443069990289',
                                            'status': 'ACTIVE', 'sampleUnitType': 'BI'}]},
-                             {'body': 'Reply body from respondent', 'collection_case': '', 'collection_exercise': '',
+                             {'body': 'Reply body from respondent', 'collection_case': '', 'exercise_id': '',
                               'from_internal': False,
                               'labels': ['INBOX'], 'msg_from': '0a7ad740-10d5-4ecb-b7ca-3c0384afb882',
                               'msg_id': '048ffdb5-18f0-46f0-bfa0-ea298521c513',
