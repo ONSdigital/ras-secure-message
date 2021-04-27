@@ -48,7 +48,7 @@ class Retriever:
             conditions.append(SecureMessage.collection_case == request_args.cc)
 
         if request_args.ce:
-            conditions.append(SecureMessage.collection_exercise == request_args.ce)
+            conditions.append(SecureMessage.exercise_id == request_args.ce)
 
         try:
             t = db.session.query(SecureMessage.thread_id, func.max(SecureMessage.id)  # pylint:disable=no-member
@@ -121,7 +121,7 @@ class Retriever:
             conditions.append(SecureMessage.collection_case == request_args.cc)
 
         if request_args.ce:
-            conditions.append(SecureMessage.collection_exercise == request_args.ce)
+            conditions.append(SecureMessage.exercise_id == request_args.ce)
 
         try:
             t = db.session.query(SecureMessage.thread_id, func.max(SecureMessage.id)  # pylint:disable=no-member
@@ -161,7 +161,7 @@ class Retriever:
             conditions.append(SecureMessage.collection_case == request_args.cc)
 
         if request_args.ce:
-            conditions.append(SecureMessage.collection_exercise == request_args.ce)
+            conditions.append(SecureMessage.exercise_id == request_args.ce)
 
         try:
             t = db.session.query(SecureMessage.thread_id, func.max(SecureMessage.id)  # pylint:disable=no-member

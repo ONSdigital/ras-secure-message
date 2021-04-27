@@ -15,7 +15,7 @@ class Message:
     """Class to hold message attributes"""
 
     def __init__(self, msg_from, subject, body, msg_to='', thread_id=None, msg_id='', collection_case='',
-                 survey='', business_id='', collection_exercise='', from_internal=False):
+                 survey='', business_id='', exercise_id='', from_internal=False):
 
         self.msg_id = str(uuid.uuid4()) if not msg_id else msg_id  # If empty msg_id assign to a uuid
         self.msg_to = None if not msg_to else msg_to
@@ -25,14 +25,14 @@ class Message:
         self.thread_id = self.msg_id if not thread_id else thread_id  # If empty thread_id then set to message id
         self.collection_case = collection_case
         self.business_id = business_id
-        self.collection_exercise = collection_exercise
+        self.exercise_id = exercise_id
         self.survey = survey
         self.from_internal = from_internal
 
     def __repr__(self):
         return f'<Message(msg_id={self.msg_id} msg_to={self.msg_to} msg_from={self.msg_from} subject={self.subject}' \
                f' body={self.body} thread_id={self.thread_id} collection_case={self.collection_case} business_id={self.business_id}' \
-               f' collection_exercise={self.collection_exercise} survey={self.survey} from_internal={self.from_internal})>'
+               f' exercise_id={self.exercise_id} survey={self.survey} from_internal={self.from_internal})>'
 
     def __eq__(self, other):
         if isinstance(other, Message):
@@ -52,7 +52,7 @@ class MessageSchema(Schema):
     collection_case = fields.Str(allow_none=True)
     business_id = fields.Str(required=True)
     survey = fields.Str(required=True)
-    collection_exercise = fields.Str(allow_none=True)
+    exercise_id = fields.Str(allow_none=True)
     from_internal = fields.Boolean(allow_none=True)
 
     @pre_load
@@ -114,9 +114,9 @@ class MessageSchema(Schema):
     def validate_collection_case(self, collection_case):
         self.validate_field_length("collection_case", len(collection_case), constants.MAX_COLLECTION_CASE_LEN)
 
-    @validates("collection_exercise")
-    def validate_collection_exercise(self, collection_exercise):
-        self.validate_field_length("collection_exercise", len(collection_exercise), constants.MAX_COLLECTION_EXERCISE_LEN)
+    @validates("exercise_id")
+    def validate_exercise_id(self, exercise_id):
+        self.validate_field_length("exercise_id", len(exercise_id), constants.MAX_COLLECTION_EXERCISE_LEN)
 
     @post_load
     def make_message(self, data):  # NOQA pylint:disable=no-self-use
