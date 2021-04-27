@@ -107,7 +107,7 @@ class MessageSend(Resource):
                     recipient_email = party_data[0]['emailAddress'].strip()
                     alert_method = AlertViaLogging() if current_app.config['NOTIFY_VIA_GOV_NOTIFY'] == '0' else AlertViaGovNotify(current_app.config)
                     personalisation = MessageSend._create_message_url(message.thread_id)
-                    alert_method.send(recipient_email, message.msg_id, personalisation, message.survey, party_data[0]['id'])
+                    alert_method.send(recipient_email, message.msg_id, personalisation, message.survey_id, party_data[0]['id'])
                 else:
                     logger.error('User does not have an emailAddress specified', msg_to=message.msg_to[0])
             # else not testable as fails validation

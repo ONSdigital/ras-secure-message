@@ -70,5 +70,5 @@ class AlertViaLogging:
     """Alert goes via gov notify (0) or via logs (1)"""
 
     def send(self, email, msg_id, personalisation, survey_id, party_id):  # NOQA pylint:disable=no-self-use
-        logger.info('Email sent', email=email, msg_id=msg_id, personalisation=personalisation, survey=survey_id,
+        logger.info('Email sent', email=email, msg_id=msg_id, personalisation=personalisation, survey_id=survey_id,
                     party_id=party_id)

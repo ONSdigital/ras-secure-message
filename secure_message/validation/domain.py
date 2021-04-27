@@ -15,7 +15,7 @@ class Message:
     """Class to hold message attributes"""
 
     def __init__(self, msg_from, subject, body, msg_to='', thread_id=None, msg_id='', case_id='',
-                 survey='', business_id='', exercise_id='', from_internal=False):
+                 survey_id='', business_id='', exercise_id='', from_internal=False):
 
         self.msg_id = str(uuid.uuid4()) if not msg_id else msg_id  # If empty msg_id assign to a uuid
         self.msg_to = None if not msg_to else msg_to
@@ -26,13 +26,13 @@ class Message:
         self.case_id = case_id
         self.business_id = business_id
         self.exercise_id = exercise_id
-        self.survey = survey
+        self.survey_id = survey_id
         self.from_internal = from_internal
 
     def __repr__(self):
         return f'<Message(msg_id={self.msg_id} msg_to={self.msg_to} msg_from={self.msg_from} subject={self.subject}' \
                f' body={self.body} thread_id={self.thread_id} case_id={self.case_id} business_id={self.business_id}' \
-               f' exercise_id={self.exercise_id} survey={self.survey} from_internal={self.from_internal})>'
+               f' exercise_id={self.exercise_id} survey_id={self.survey_id} from_internal={self.from_internal})>'
 
     def __eq__(self, other):
         if isinstance(other, Message):
@@ -51,7 +51,7 @@ class MessageSchema(Schema):
     thread_id = fields.Str(allow_none=True)
     case_id = fields.Str(allow_none=True)
     business_id = fields.Str(required=True)
-    survey = fields.Str(required=True)
+    survey_id = fields.Str(required=True)
     exercise_id = fields.Str(allow_none=True)
     from_internal = fields.Boolean(allow_none=True)
 
@@ -102,9 +102,9 @@ class MessageSchema(Schema):
         if thread_id is not None:
             self.validate_field_length("Thread", len(thread_id), constants.MAX_THREAD_LEN)
 
-    @validates("survey")
-    def validate_survey(self, survey):
-        self.validate_non_zero_field_length("Survey", len(survey), constants.MAX_SURVEY_LEN)
+    @validates("survey_id")
+    def validate_survey(self, survey_id):
+        self.validate_non_zero_field_length("Survey", len(survey_id), constants.MAX_SURVEY_LEN)
 
     @validates("business_id")
     def validate_business_id(self, business_id):

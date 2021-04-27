@@ -52,7 +52,7 @@ class AppTestCase(unittest.TestCase):
                              'case_id': 'ACollectionCase',
                              'exercise_id': 'ACollectionExercise',
                              'business_id': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc',
-                             'survey': self.BRES_SURVEY}
+                             'survey_id': self.BRES_SURVEY}
 
         with self.app.app_context():
             database.db.init_app(current_app)
@@ -75,7 +75,7 @@ class AppTestCase(unittest.TestCase):
                 'thread': "?",
                 'business_id': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc',
                 'create_date': datetime.now(timezone.utc),
-                'survey': 'a-uuid-for-the-survey'}
+                'survey_id': 'a-uuid-for-the-survey'}
 
         response = self.client.post(url, data=json.dumps(data), headers=self.internal_user_header)
         self.assertEqual(response.status_code, 201)  # check post has succeeded
@@ -170,7 +170,7 @@ class AppTestCase(unittest.TestCase):
                         'case_id': 'ACollectionCase',
                         'exercise_id': 'ACollectionExercise',
                         'business_id': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc',
-                        'survey': self.BRES_SURVEY}
+                        'survey_id': self.BRES_SURVEY}
         try:
             self.client.post(url, data=json.dumps(test_message), headers=self.internal_user_header)
             self.assertTrue(True)  # i.e no exception
@@ -186,7 +186,7 @@ class AppTestCase(unittest.TestCase):
 
         with self.engine.connect() as con:
             db_data = con.execute("SELECT * FROM securemessage.status WHERE label='SENT' AND msg_id='{0}' AND actor='{1}'"
-                                  .format(data['msg_id'], self.test_message['survey']))
+                                  .format(data['msg_id'], self.test_message['survey_id']))
             for row in db_data:
                 self.assertTrue(row is not None)
 
@@ -226,7 +226,7 @@ class AppTestCase(unittest.TestCase):
         with self.engine.connect() as con:
             db_data = con.execute("SELECT * FROM securemessage.status WHERE "
                                   "msg_id='{0}' AND actor='{1}' AND label='SENT'"
-                                  .format(data['msg_id'], self.test_message['survey']))
+                                  .format(data['msg_id'], self.test_message['survey_id']))
             for row in db_data:
                 self.assertTrue(row is not None)
 

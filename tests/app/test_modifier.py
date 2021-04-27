@@ -33,7 +33,7 @@ class ModifyTestCaseHelper:
                     query = f'''INSERT INTO securemessage.conversation(id, is_closed, closed_by, closed_by_uuid) VALUES('{thread_id}', false, '', '')'''
                     con.execute(query)
                 query = f'''INSERT INTO securemessage.secure_message(id, msg_id, subject, body, thread_id,
-                        case_id, business_id, exercise_id, survey) VALUES ({i}, '{msg_id}', 'test','test','{thread_id}',
+                        case_id, business_id, exercise_id, survey_id) VALUES ({i}, '{msg_id}', 'test','test','{thread_id}',
                         'ACollectionCase', 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc', 'ACollectionExercise',
                         '{constants.NON_SPECIFIC_INTERNAL_USER}')'''
                 con.execute(query)
@@ -68,7 +68,7 @@ class ModifyTestCaseHelper:
                     query = f'''INSERT INTO securemessage.conversation(id, is_closed, closed_by, closed_by_uuid) VALUES('{thread_id}', false, '', '')'''
                     con.execute(query)
                 query = f'''INSERT INTO securemessage.secure_message(id, msg_id, subject, body, thread_id,
-                        case_id, business_id, exercise_id, survey) VALUES ({i}, '{msg_id}', 'test','test','{thread_id}',
+                        case_id, business_id, exercise_id, survey_id) VALUES ({i}, '{msg_id}', 'test','test','{thread_id}',
                         'ACollectionCase', 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc', 'ACollectionExercise',
                         '{user.user_uuid}')'''
                 con.execute(query)
@@ -245,14 +245,14 @@ class ModifyTestCase(unittest.TestCase, ModifyTestCaseHelper):
             database.db.drop_all()
             with current_app.test_request_context():
                 with self.assertRaises(InternalServerError):
-                    Modifier.add_label('UNREAD', {'survey': 'survey'}, self.user_internal)
+                    Modifier.add_label('UNREAD', {'survey_id': 'survey_id'}, self.user_internal)
 
     def test_exception_for_remove_label_raises(self):
         with self.app.app_context():
             database.db.drop_all()
             with current_app.test_request_context():
                 with self.assertRaises(InternalServerError):
-                    Modifier.remove_label('UNREAD', {'survey': 'survey'}, self.user_internal)
+                    Modifier.remove_label('UNREAD', {'survey_id': 'survey_id'}, self.user_internal)
 
     def test_get_label_actor_to_respondent(self):
         message_to_respondent = {'msg_id': 'test1',
@@ -264,7 +264,7 @@ class ModifyTestCase(unittest.TestCase, ModifyTestCaseHelper):
                                  'case_id': 'ACollectionCase',
                                  'exercise_id': 'ACollectionExercise',
                                  'business_id': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc',
-                                 'survey': self.BRES_SURVEY,
+                                 'survey_id': self.BRES_SURVEY,
                                  'from_internal': True}
 
         self.assertEqual(Modifier._get_label_actor(user=self.user_internal, message=message_to_respondent),
@@ -282,7 +282,7 @@ class ModifyTestCase(unittest.TestCase, ModifyTestCaseHelper):
                                      'case_id': 'ACollectionCase',
                                      'exercise_id': 'ACollectionExercise',
                                      'business_id': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc',
-                                     'survey': self.BRES_SURVEY,
+                                     'survey_id': self.BRES_SURVEY,
                                      'from_internal': False}
 
         self.assertEqual(Modifier._get_label_actor(user=self.user_internal, message=message_to_internal_group),
@@ -300,7 +300,7 @@ class ModifyTestCase(unittest.TestCase, ModifyTestCaseHelper):
                                     'case_id': 'ACollectionCase',
                                     'exercise_id': 'ACollectionExercise',
                                     'business_id': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc',
-                                    'survey': self.BRES_SURVEY,
+                                    'survey_id': self.BRES_SURVEY,
                                     'from_internal': False}
 
         self.assertEqual(Modifier._get_label_actor(user=self.user_internal, message=message_to_internal_user),
@@ -316,7 +316,7 @@ class ModifyTestCase(unittest.TestCase, ModifyTestCaseHelper):
                                   'case_id': 'ACollectionCase',
                                   'exercise_id': 'ACollectionExercise',
                                   'business_id': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc',
-                                  'survey': self.BRES_SURVEY,
+                                  'survey_id': self.BRES_SURVEY,
                                   'from_internal': False}
 
         with self.assertRaises(InternalServerError):

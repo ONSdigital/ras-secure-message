@@ -27,7 +27,7 @@ class MessageTestCase(unittest.TestCase):
                       'ASurveyType', 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc', 'CollectionExercise')
         sut_str = repr(sut)
         expected = '<Message(msg_id=AMsgId msg_to=[\'to\'] msg_from=from subject=subject body=body thread_id=5 case_id=ACollectionCase ' \
-                   'business_id=f1a5e99c-8edf-489a-9c72-6cabe6c387fc exercise_id=CollectionExercise survey=ASurveyType from_internal=False)>'
+                   'business_id=f1a5e99c-8edf-489a-9c72-6cabe6c387fc exercise_id=CollectionExercise survey_id=ASurveyType from_internal=False)>'
         self.assertEqual(sut_str, expected)
 
     def test_message_with_different_case_id_not_equal(self):
@@ -83,7 +83,7 @@ class MessageSchemaTestCase(unittest.TestCase):
     def setUp(self):
         """setup test environment"""
         self.json_message = {'msg_to': ['Tej'], 'msg_from': 'Gemma', 'subject': 'MyMessage', 'body': 'hello',
-                             'thread_id': "", 'business_id': "7fc0e8ab-189c-4794-b8f4-9f05a1db185b", 'survey': "RSI"}
+                             'thread_id': "", 'business_id': "7fc0e8ab-189c-4794-b8f4-9f05a1db185b", 'survey_id': "RSI"}
         self.now = datetime.now(timezone.utc)
         internal_user_service.use_mock_service()
         party.use_mock_service()
@@ -120,7 +120,7 @@ class MessageSchemaTestCase(unittest.TestCase):
 
     def test_missing_body_fails_validation(self):
         """marshalling message with no body field """
-        message = {'msg_to': ['01b51fcc-ed43-4cdb-ad1c-450f9986859b'], 'msg_from': 'torrance', 'body': '', 'survey': 'RSI', 'subject': 'MyMessage',
+        message = {'msg_to': ['01b51fcc-ed43-4cdb-ad1c-450f9986859b'], 'msg_from': 'torrance', 'body': '', 'survey_id': 'RSI', 'subject': 'MyMessage',
                    'business_id': '7fc0e8ab-189c-4794-b8f4-9f05a1db185b'}
 
         with self.app.app_context():
@@ -212,14 +212,14 @@ class MessageSchemaTestCase(unittest.TestCase):
         self.assertTrue(errors == {'_schema': ['read_date can not be set']})
 
     def test_missing_survey_causes_error(self):
-        """marshalling message with no survey field"""
+        """marshalling message with no survey_id field"""
         self.json_message['msg_to'] = ["01b51fcc-ed43-4cdb-ad1c-450f9986859b"]
-        self.json_message['survey'] = ''
+        self.json_message['survey_id'] = ''
         with self.app.app_context():
             g.user = User(self.json_message['msg_from'], 'respondent')
             schema = MessageSchema()
             errors = schema.load(self.json_message)[1]
-        self.assertTrue(errors == {'survey': ['Please enter a survey']})
+        self.assertTrue(errors == {'survey_id': ['Please enter a survey']})
 
     def test_same_to_from_causes_error(self):
         """marshalling message with same to and from field"""

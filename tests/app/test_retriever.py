@@ -28,14 +28,14 @@ class RetrieverTestCaseHelper:
     """Helper class for Retriever Tests"""
     def add_secure_message(self, msg_id, subject="test", body="test", thread_id="ThreadId",
                            case_id="ACollectionCase", business_id="f1a5e99c-8edf-489a-9c72-6cabe6c387fc",
-                           survey=BRES_SURVEY, exercise_id='CollectionExercise', from_internal=False):
+                           survey_id=BRES_SURVEY, exercise_id='CollectionExercise', from_internal=False):
 
         """ Populate the secure_message table"""
 
         with self.engine.connect() as con:
             query = f'''INSERT INTO securemessage.secure_message(msg_id, subject, body, thread_id,
-                    case_id, business_id, survey, exercise_id, from_internal) VALUES ('{msg_id}', '{subject}','{body}',
-                    '{thread_id}', '{case_id}', '{business_id}', '{survey}', '{exercise_id}', '{from_internal}')'''
+                    case_id, business_id, survey_id, exercise_id, from_internal) VALUES ('{msg_id}', '{subject}','{body}',
+                    '{thread_id}', '{case_id}', '{business_id}', '{survey_id}', '{exercise_id}', '{from_internal}')'''
             con.execute(query)
 
     def add_conversation(self, conversation_id, is_closed=False):
@@ -66,7 +66,7 @@ class RetrieverTestCaseHelper:
         msg_id = str(uuid.uuid4())
         thread_id = msg_id
         self.add_conversation(conversation_id=thread_id)
-        self.add_secure_message(msg_id=msg_id, thread_id=thread_id, survey=self.BRES_SURVEY, from_internal=False)
+        self.add_secure_message(msg_id=msg_id, thread_id=thread_id, survey_id=self.BRES_SURVEY, from_internal=False)
         self.add_status(label="SENT", msg_id=msg_id, actor=external_actor)
         self.add_status(label="INBOX", msg_id=msg_id, actor=internal_actor)
         self.add_event(event=EventsApi.SENT.value, msg_id=msg_id, date_time=datetime.utcnow())
@@ -76,7 +76,7 @@ class RetrieverTestCaseHelper:
             for _ in range(no_of_messages - 1):
                 msg_id = str(uuid.uuid4())
                 self.add_secure_message(msg_id=msg_id, thread_id=thread_id,
-                                        survey=self.BRES_SURVEY, from_internal=True)
+                                        survey_id=self.BRES_SURVEY, from_internal=True)
                 self.add_status(label="SENT", msg_id=msg_id, actor=internal_actor)
                 self.add_status(label="UNREAD", msg_id=msg_id, actor=external_actor)
                 self.add_status(label="INBOX", msg_id=msg_id, actor=external_actor)
