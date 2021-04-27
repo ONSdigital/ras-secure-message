@@ -27,7 +27,7 @@ class SecureMessage(db.Model):
     thread_id = Column("thread_id", String(constants.MAX_THREAD_LEN + 1), ForeignKey('conversation.id'), index=True)
     collection_case = Column("collection_case", String(constants.MAX_COLLECTION_CASE_LEN + 1))
     business_id = Column("business_id", String(constants.MAX_BUSINESS_ID_LEN + 1))
-    collection_exercise = Column("collection_exercise", String(constants.MAX_COLLECTION_EXERCISE_LEN + 1))
+    exercise_id = Column("exercise_id", String(constants.MAX_COLLECTION_EXERCISE_LEN + 1))
     survey = Column("survey", String(constants.MAX_SURVEY_LEN + 1))
     from_internal = Column('from_internal', Boolean())
     sent_at = Column('sent_at', DateTime(), default=datetime.utcnow)
@@ -36,10 +36,10 @@ class SecureMessage(db.Model):
     statuses = relationship('Status', backref='secure_message', lazy="dynamic")
     events = relationship('Events', backref='secure_message', order_by='Events.date_time', lazy="dynamic")
 
-    __table_args__ = (Index("idx_ru_survey_cc", "business_id", "survey", "collection_case", "collection_exercise"), )
+    __table_args__ = (Index("idx_ru_survey_cc", "business_id", "survey", "collection_case", "exercise_id"), )
 
     def __init__(self, msg_id="", subject="", body="", thread_id="", collection_case='',
-                 business_id='', survey='', collection_exercise='', from_internal=False, read_at=None):
+                 business_id='', survey='', exercise_id='', from_internal=False, read_at=None):
 
         logger.debug(f"Initialised Secure Message entity: msg_id: {id}")
         self.msg_id = msg_id
@@ -49,13 +49,13 @@ class SecureMessage(db.Model):
         self.collection_case = collection_case
         self.business_id = business_id
         self.survey = survey
-        self.collection_exercise = collection_exercise
+        self.exercise_id = exercise_id
         self.from_internal = from_internal
         self.read_at = read_at
 
     def __repr__(self):
         return f'<SecureMessage(msg_id={self.msg_id} subject={self.subject} body={self.body} thread_id={self.thread_id}' \
-               f' collection_case={self.collection_case} business_id={self.business_id} collection_exercise={self.collection_exercise}' \
+               f' collection_case={self.collection_case} business_id={self.business_id} exercise_id={self.exercise_id}' \
                f' survey={self.survey} from_internal={self.from_internal} sent_at={self.sent_at} read_at={self.read_at})>'
 
     def set_from_domain_model(self, domain_model):
@@ -67,7 +67,7 @@ class SecureMessage(db.Model):
         self.collection_case = domain_model.collection_case
         self.business_id = domain_model.business_id
         self.survey = domain_model.survey
-        self.collection_exercise = domain_model.collection_exercise
+        self.exercise_id = domain_model.exercise_id
         self.from_internal = domain_model.from_internal
 
     def serialize(self, user, body_summary=False):
@@ -81,7 +81,7 @@ class SecureMessage(db.Model):
                    'collection_case': self.collection_case,
                    'business_id': self.business_id,
                    'survey': self.survey,
-                   'collection_exercise': self.collection_exercise,
+                   'exercise_id': self.exercise_id,
                    'from_internal': self.from_internal,
                    '_links': '',
                    'labels': []}
