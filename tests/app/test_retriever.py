@@ -27,15 +27,15 @@ class RetrieverTestCaseHelper:
 
     """Helper class for Retriever Tests"""
     def add_secure_message(self, msg_id, subject="test", body="test", thread_id="ThreadId",
-                           case_id="ACollectionCase", business_id="f1a5e99c-8edf-489a-9c72-6cabe6c387fc",
-                           survey=BRES_SURVEY, exercise_id='CollectionExercise', from_internal=False):
+                           collection_case="ACollectionCase", business_id="f1a5e99c-8edf-489a-9c72-6cabe6c387fc",
+                           survey=BRES_SURVEY, collection_exercise='CollectionExercise', from_internal=False):
 
         """ Populate the secure_message table"""
 
         with self.engine.connect() as con:
             query = f'''INSERT INTO securemessage.secure_message(msg_id, subject, body, thread_id,
-                    case_id, business_id, survey_id, exercise_id, from_internal) VALUES ('{msg_id}', '{subject}','{body}',
-                    '{thread_id}', '{case_id}', '{business_id}', '{survey}', '{exercise_id}', '{from_internal}')'''
+                    collection_case, business_id, survey, collection_exercise, from_internal) VALUES ('{msg_id}', '{subject}','{body}',
+                    '{thread_id}', '{collection_case}', '{business_id}', '{survey}', '{collection_exercise}', '{from_internal}')'''
             con.execute(query)
 
     def add_conversation(self, conversation_id, is_closed=False):
@@ -66,7 +66,7 @@ class RetrieverTestCaseHelper:
         msg_id = str(uuid.uuid4())
         thread_id = msg_id
         self.add_conversation(conversation_id=thread_id)
-        self.add_secure_message(msg_id=msg_id, thread_id=thread_id, survey_id=self.BRES_SURVEY, from_internal=False)
+        self.add_secure_message(msg_id=msg_id, thread_id=thread_id, survey=self.BRES_SURVEY, from_internal=False)
         self.add_status(label="SENT", msg_id=msg_id, actor=external_actor)
         self.add_status(label="INBOX", msg_id=msg_id, actor=internal_actor)
         self.add_event(event=EventsApi.SENT.value, msg_id=msg_id, date_time=datetime.utcnow())
@@ -76,7 +76,7 @@ class RetrieverTestCaseHelper:
             for _ in range(no_of_messages - 1):
                 msg_id = str(uuid.uuid4())
                 self.add_secure_message(msg_id=msg_id, thread_id=thread_id,
-                                        survey_id=self.BRES_SURVEY, from_internal=True)
+                                        survey=self.BRES_SURVEY, from_internal=True)
                 self.add_status(label="SENT", msg_id=msg_id, actor=internal_actor)
                 self.add_status(label="UNREAD", msg_id=msg_id, actor=external_actor)
                 self.add_status(label="INBOX", msg_id=msg_id, actor=external_actor)
@@ -303,7 +303,7 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
                     self.assertEqual(date[x], str(thread.all()[0].events[0].date_time))
                     self.assertEqual(msg_ids[x], thread.all()[0].events[0].msg_id)
 
-    def test_thread_count_by_survey_id_my_conversations_off(self):
+    def test_thread_count_by_survey_my_conversations_off(self):
         """checks that the returned thread count is the same for every internal user
         even if they are not part of the conversations"""
         request_args = MessageArgs(
@@ -327,15 +327,15 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
         with self.app.app_context():
             with current_app.test_request_context():
 
-                thread_count_internal = Retriever.thread_count_by_survey_id(request_args,
+                thread_count_internal = Retriever.thread_count_by_survey(request_args,
                                                                          User(self.default_internal_actor,
                                                                               role='internal'))
-                thread_count_second_internal = Retriever.thread_count_by_survey_id(request_args,
+                thread_count_second_internal = Retriever.thread_count_by_survey(request_args,
                                                                                 User(self.second_internal_actor,
                                                                                      role='internal'))
                 self.assertEqual(thread_count_internal, thread_count_second_internal)
 
-    def test_thread_count_by_survey_id_my_conversations_on(self):
+    def test_thread_count_by_survey_my_conversations_on(self):
         """checks that the returned thread count is the same for every internal user
         even if they are not part of the conversations"""
         request_args = MessageArgs(
@@ -358,10 +358,10 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
 
         with self.app.app_context():
             with current_app.test_request_context():
-                thread_count_internal = Retriever.thread_count_by_survey_id(request_args,
+                thread_count_internal = Retriever.thread_count_by_survey(request_args,
                                                                          User(self.default_internal_actor,
                                                                               role='internal'))
-                thread_count_second_internal = Retriever.thread_count_by_survey_id(request_args,
+                thread_count_second_internal = Retriever.thread_count_by_survey(request_args,
                                                                                 User(self.second_internal_actor,
                                                                                      role='internal'))
                 self.assertEqual(thread_count_internal, 5)

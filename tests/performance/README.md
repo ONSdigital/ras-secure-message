@@ -21,7 +21,7 @@ ran previously should have some reporting units set up for this.  After sending 
   - msg_from
   - msg_to
   - business_id
-  - survey_id
+  - survey
 - Finally, run the script.
 
 ### Function testing guide

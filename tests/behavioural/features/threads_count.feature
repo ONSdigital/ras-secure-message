@@ -124,11 +124,11 @@ Scenario: Respondent sends multiple messages to group , internal user gets count
 
 Scenario: Respondent sends messages to different ce, internal user filters by ce
   Given sending from respondent to internal specific user
-    And the exercise_id is set to 'ce1'
+    And the collection_exercise is set to 'ce1'
     And the message is sent
-    And the exercise_id is set to 'ce1'
+    And the collection_exercise is set to 'ce1'
     And the message is sent
-    And the exercise_id is set to 'ce2'
+    And the collection_exercise is set to 'ce2'
     And the message is sent
   When  the user is set as internal specific user
     And the count of open threads for current user and ce of 'ce1' is made
