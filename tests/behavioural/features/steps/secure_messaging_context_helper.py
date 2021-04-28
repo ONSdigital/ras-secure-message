@@ -62,7 +62,7 @@ class SecureMessagingContextHelper:
                                      'case_id': __DEFAULT_COLLECTION_CASE,
                                      'exercise_id': __DEFAULT_COLLECTION_EXERCISE,
                                      'business_id': __DEFAULT_BUSINESS_ID,
-                                     'survey': __DEFAULT_SURVEY}
+                                     'survey_id': __DEFAULT_SURVEY}
 
     def __init__(self):
         self._token_data = {}
