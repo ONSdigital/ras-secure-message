@@ -11,7 +11,7 @@ logger = wrap_logger(logging.getLogger(__name__))
 class PartyService:
 
     @staticmethod
-    def get_business_details(business_ids):
+    def get_business_details(business_ids: list[str]):
         """Retrieves the business details from the party service"""
         params = urlencode([("id", business_id) for business_id in business_ids])
         response = requests.get(f"{current_app.config['PARTY_URL']}/party-api/v1/businesses",
@@ -65,7 +65,7 @@ class PartyService:
         return claim_response.lower() == 'valid'
 
     @staticmethod
-    def _get_user_details_from_party_service(uuids):
+    def _get_user_details_from_party_service(uuids: list[str]):
         params = urlencode([("id", uuid) for uuid in uuids])
         response = requests.get(f"{current_app.config['PARTY_URL']}/party-api/v1/respondents",
                                 auth=current_app.config['BASIC_AUTH'], verify=False, params=params)
