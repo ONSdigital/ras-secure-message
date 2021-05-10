@@ -19,17 +19,13 @@ class AlertViaGovNotify:
         self.topic_id = self.config['PUBSUB_TOPIC']
         self.publisher = None
 
-    def send(self, email, msg_id, personalisation, survey_id, party_id):
+    def send(self, email: str, msg_id: str, personalisation: dict, survey_id: str, party_id):
         """Sends an email via pubsub topic
 
         :param email: Email address to send the email too
-        :type email: str
         :param msg_id: the notification reference
-        :type msg_id: str
         :param personalisation: A dictionary containing variables that will be used in the email e.g., names, ru refs
-        :type personalisation: dict
         :param survey_id: the survey Id
-        :type survey_id: str
         :param party_id: the party UUID
         :type party_id: UUID
         :raises RasNotifyError: Raised on any Exception that occurs.  Most likely will happen if there is an issue when
