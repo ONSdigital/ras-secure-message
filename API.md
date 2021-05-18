@@ -11,7 +11,6 @@
   * [Modify Message Labels](#modify-message-labels)
 * Conversations
   * [Get conversation list](#get-conversation-list)
-  * [Get conversation list](#get-conversation-list)
   * [Get conversations count](#get-conversations-count)
   * [Patch Conversation Metadata](#patch-conversation-metadata)
 * Health and Status

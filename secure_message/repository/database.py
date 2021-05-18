@@ -193,8 +193,9 @@ class Conversation(db.Model):
     closed_at = Column('closed_at', DateTime())
     category = Column('category', String(length=60), server_default='SURVEY')
 
-    def __init__(self, is_closed=False, closed_by=None, closed_by_uuid=None, closed_at=None):
+    def __init__(self, is_closed=False, closed_by=None, closed_by_uuid=None, closed_at=None, category=None):
         self.is_closed = is_closed
         self.closed_by = closed_by
         self.closed_by_uuid = closed_by_uuid
         self.closed_at = closed_at
+        self.category = category
