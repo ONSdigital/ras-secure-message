@@ -10,7 +10,8 @@ from secure_message.services.service_toggles import party, internal_user_service
 logger = wrap_logger(logging.getLogger(__name__))
 MessageArgs = collections.namedtuple(
     'MessageArgs',
-    'page limit business_id surveys cc label desc ce is_closed my_conversations new_respondent_conversations all_conversation_types unread_conversations category')
+    'page limit business_id surveys cc label desc ce is_closed my_conversations new_respondent_conversations '
+    'all_conversation_types unread_conversations category')
 
 
 def get_options(args):  # NOQA pylint:disable=too-complex
@@ -228,7 +229,8 @@ def add_business_details(messages):
     business_details = party.get_business_details(business_ids)
 
     for message in messages:
-        message['@business_details'] = next((business for business in business_details if business["id"] == message['business_id']), None)
+        message['@business_details'] = next(
+            (business for business in business_details if business["id"] == message['business_id']), None)
     return messages
 
 

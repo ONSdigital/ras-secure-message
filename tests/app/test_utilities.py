@@ -8,7 +8,8 @@ from secure_message.services.service_toggles import party, internal_user_service
 
 
 def get_args(page=1, limit=100, surveys=None, cc="", ru="", label="", desc=True, ce="", is_closed=False,
-             my_conversations=False, new_respondent_conversations=False, all_conversation_types=False, unread_conversations=False):
+             my_conversations=False, new_respondent_conversations=False, all_conversation_types=False,
+             unread_conversations=False, category=None):
     return MessageArgs(page=page,
                        limit=limit,
                        surveys=surveys,
@@ -21,7 +22,8 @@ def get_args(page=1, limit=100, surveys=None, cc="", ru="", label="", desc=True,
                        my_conversations=my_conversations,
                        new_respondent_conversations=new_respondent_conversations,
                        all_conversation_types=all_conversation_types,
-                       unread_conversations=unread_conversations)
+                       unread_conversations=unread_conversations,
+                       category=category)
 
 
 class UtilitiesTestCase(unittest.TestCase):
