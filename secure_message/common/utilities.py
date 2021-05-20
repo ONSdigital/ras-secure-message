@@ -42,7 +42,7 @@ def get_options(args):  # NOQA pylint:disable=too-complex
               'my_conversations': False, 'new_respondent_conversations': False, 'all_conversation_types': False,
               'unread_conversations': False, 'category': None}
 
-    for field in ['cc', 'ce', 'business_id', 'label']:
+    for field in ['cc', 'ce', 'business_id', 'label', 'category']:
         if args.get(field):
             fields[field] = str(args.get(field))
 
