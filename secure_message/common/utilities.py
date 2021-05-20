@@ -10,7 +10,7 @@ from secure_message.services.service_toggles import party, internal_user_service
 logger = wrap_logger(logging.getLogger(__name__))
 MessageArgs = collections.namedtuple(
     'MessageArgs',
-    'page limit business_id surveys cc label desc ce is_closed my_conversations new_respondent_conversations all_conversation_types unread_conversations')
+    'page limit business_id surveys cc label desc ce is_closed my_conversations new_respondent_conversations all_conversation_types unread_conversations category')
 
 
 def get_options(args):  # NOQA pylint:disable=too-complex
@@ -32,13 +32,14 @@ def get_options(args):  # NOQA pylint:disable=too-complex
     page If set requests the specific page of information to return
     limit If set it sets the maximum number of results to return
     desc If present, requests the information in descending order
+    category If set, get threads of a particular category
 
     """
 
     fields = {'page': 1, 'limit': MESSAGE_QUERY_LIMIT, 'business_id': None, 'surveys': None,
               'desc': True, 'cc': None, 'label': None, 'ce': None, 'is_closed': False,
               'my_conversations': False, 'new_respondent_conversations': False, 'all_conversation_types': False,
-              'unread_conversations': False}
+              'unread_conversations': False, 'category': None}
 
     for field in ['cc', 'ce', 'business_id', 'label']:
         if args.get(field):
@@ -74,7 +75,7 @@ def get_options(args):  # NOQA pylint:disable=too-complex
                        my_conversations=fields['my_conversations'],
                        new_respondent_conversations=fields['new_respondent_conversations'],
                        all_conversation_types=fields['all_conversation_types'],
-                       unread_conversations=fields['unread_conversations'])
+                       unread_conversations=fields['unread_conversations'], category=fields['category'])
 
 
 def set_conversation_type_args(existing_args, is_closed=False, my_conversations=False, new_conversations=False,
@@ -94,7 +95,8 @@ def set_conversation_type_args(existing_args, is_closed=False, my_conversations=
                        my_conversations=my_conversations,
                        new_respondent_conversations=new_conversations,
                        all_conversation_types=all_types,
-                       unread_conversations=unread_conversations)
+                       unread_conversations=unread_conversations,
+                       category=existing_args.category)
 
 
 def generate_string_query_args(args):
@@ -108,7 +110,8 @@ def generate_string_query_args(args):
     return urllib.parse.urlencode(params)
 
 
-def process_paginated_list(paginated_list, host_url, user, message_args, endpoint=MESSAGE_LIST_ENDPOINT, body_summary=True):
+def process_paginated_list(paginated_list, host_url, user, message_args, endpoint=MESSAGE_LIST_ENDPOINT,
+                           body_summary=True):
     """used to change a pagination object to json format with links"""
     messages = []
     string_query_args = generate_string_query_args(message_args)

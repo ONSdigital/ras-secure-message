@@ -163,6 +163,9 @@ class Retriever:
         if request_args.ce:
             conditions.append(SecureMessage.collection_exercise == request_args.ce)
 
+        if request_args.category:
+            conditions.append(Conversation.category == request_args.category)
+
         try:
             t = db.session.query(SecureMessage.thread_id, func.max(SecureMessage.id)  # pylint:disable=no-member
                                  .label('max_id')) \
