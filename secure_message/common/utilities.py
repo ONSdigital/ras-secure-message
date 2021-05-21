@@ -14,7 +14,7 @@ MessageArgs = collections.namedtuple(
     'all_conversation_types unread_conversations category')
 
 
-def get_options(args):  # NOQA pylint:disable=too-complex
+def get_options(args) -> MessageArgs:  # NOQA pylint:disable=too-complex
     """extract options from request , allow label to be set by caller
 
     :param args: contains search arguments. Not all end points support all args
@@ -80,7 +80,7 @@ def get_options(args):  # NOQA pylint:disable=too-complex
 
 
 def set_conversation_type_args(existing_args, is_closed=False, my_conversations=False, new_conversations=False,
-                               all_types=False, unread_conversations=False):
+                               all_types=False, unread_conversations=False) -> MessageArgs:
     """Returns a new set of args based on the existing args which are a named tuple,
     but allow the conversation type only to be changed"""
 
@@ -111,8 +111,8 @@ def generate_string_query_args(args):
     return urllib.parse.urlencode(params)
 
 
-def process_paginated_list(paginated_list, host_url, user, message_args, endpoint=MESSAGE_LIST_ENDPOINT,
-                           body_summary=True):
+def process_paginated_list(paginated_list, host_url: str, user, message_args, endpoint=MESSAGE_LIST_ENDPOINT,
+                           body_summary=True) -> tuple[list, dict]:
     """used to change a pagination object to json format with links"""
     messages = []
     string_query_args = generate_string_query_args(message_args)
@@ -176,7 +176,7 @@ def add_to_details(messages):
     return messages
 
 
-def add_from_details(messages):
+def add_from_details(messages: list) -> list:
     """Adds a @msg_from key to every message in a list of messages.
     Every msg_to uuid is resolved to include details of the user.
 
@@ -204,7 +204,7 @@ def add_from_details(messages):
     return messages
 
 
-def get_external_user_uuid_list(messages):
+def get_external_user_uuid_list(messages: list) -> set:
     """Compiles a list of all unique the external user (respondent) uuids from a list of messages"""
     external_user_uuids = set()
 
