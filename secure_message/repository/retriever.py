@@ -39,16 +39,16 @@ class Retriever:
         conditions = []
 
         if request_args.surveys:
-            conditions.append(SecureMessage.survey.in_(request_args.surveys))
+            conditions.append(SecureMessage.survey_id.in_(request_args.surveys))
 
         if request_args.business_id:
             conditions.append(SecureMessage.business_id == request_args.business_id)
 
         if request_args.cc:
-            conditions.append(SecureMessage.collection_case == request_args.cc)
+            conditions.append(SecureMessage.case_id == request_args.cc)
 
         if request_args.ce:
-            conditions.append(SecureMessage.collection_exercise == request_args.ce)
+            conditions.append(SecureMessage.exercise_id == request_args.ce)
 
         try:
             t = db.session.query(SecureMessage.thread_id, func.max(SecureMessage.id)  # pylint:disable=no-member
@@ -115,13 +115,13 @@ class Retriever:
             conditions.append(SecureMessage.business_id == request_args.business_id)
 
         if request_args.surveys:
-            conditions.append(SecureMessage.survey.in_(request_args.surveys))
+            conditions.append(SecureMessage.survey_id.in_(request_args.surveys))
 
         if request_args.cc:
-            conditions.append(SecureMessage.collection_case == request_args.cc)
+            conditions.append(SecureMessage.case_id == request_args.cc)
 
         if request_args.ce:
-            conditions.append(SecureMessage.collection_exercise == request_args.ce)
+            conditions.append(SecureMessage.exercise_id == request_args.ce)
 
         try:
             t = db.session.query(SecureMessage.thread_id, func.max(SecureMessage.id)  # pylint:disable=no-member
@@ -154,13 +154,13 @@ class Retriever:
             conditions.append(SecureMessage.business_id == request_args.business_id)
 
         if request_args.surveys:
-            conditions.append(SecureMessage.survey.in_(request_args.surveys))
+            conditions.append(SecureMessage.survey_id.in_(request_args.surveys))
 
         if request_args.cc:
-            conditions.append(SecureMessage.collection_case == request_args.cc)
+            conditions.append(SecureMessage.case_id == request_args.cc)
 
         if request_args.ce:
-            conditions.append(SecureMessage.collection_exercise == request_args.ce)
+            conditions.append(SecureMessage.exercise_id == request_args.ce)
 
         try:
             subquery_filter = [Conversation.is_closed.is_(request_args.is_closed)]

@@ -28,7 +28,7 @@ class LoggingTestCase(unittest.TestCase):
         out = StringIO()
         sys.stdout = out
         message = {'msg_to': [constants.NON_SPECIFIC_INTERNAL_USER], 'msg_from': self.msg_from, 'subject': 'hello', 'body': 'hello world',
-                   'thread_id': '', 'business_id': self.business_id, 'survey': self.survey_id}
+                   'thread_id': '', 'business_id': self.business_id, 'survey_id': self.survey_id}
         with self.app.app_context():
             g.user = User('Gemma', 'respondent')
             schema = MessageSchema()

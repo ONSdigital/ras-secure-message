@@ -102,18 +102,18 @@ def step_impl_the_threads_are_read_with_new_respondent_conversations_set_true(co
     context.bdd_helper.store_messages_response_data(context.response.data)
 
 
-@when("the threads in survey '{survey}' are read")
-@given("the threads in survey '{survey}' are read")
-def step_impl_the_threads_in_specific_survey_are_returned(context, survey):
-    url = context.bdd_helper.threads_get_url + f"?survey={survey}"
+@when("the threads in survey '{survey_id}' are read")
+@given("the threads in survey '{survey_id}' are read")
+def step_impl_the_threads_in_specific_survey_are_returned(context, survey_id):
+    url = context.bdd_helper.threads_get_url + f"?survey={survey_id}"
     context.response = context.client.get(url, headers=context.bdd_helper.headers)
     context.bdd_helper.store_messages_response_data(context.response.data)
 
 
-@when("the threads for business '{business_id}' in survey '{survey}' are read")
-@given("the threads for business '{business_id}' in survey '{survey}' are read")
-def step_impl_the_threads_in_specific_survey_and_business_are_returned(context, survey, business_id):
-    url = context.bdd_helper.threads_get_url + f"?survey={survey}&business_id={business_id}"
+@when("the threads for business '{business_id}' in survey '{survey_id}' are read")
+@given("the threads for business '{business_id}' in survey '{survey_id}' are read")
+def step_impl_the_threads_in_specific_survey_and_business_are_returned(context, survey_id, business_id):
+    url = context.bdd_helper.threads_get_url + f"?survey={survey_id}&business_id={business_id}"
     context.response = context.client.get(url, headers=context.bdd_helper.headers)
     context.bdd_helper.store_messages_response_data(context.response.data)
 
@@ -236,11 +236,11 @@ def step_impl_access_messages_endpoint_with_post_method(context):
                                            headers=context.bdd_helper.headers)
 
 
-@when("the count of open threads in survey '{survey}'")
-@given("the count of open threads in survey '{survey}'")
-def step_impl_the_open_threads_count_for_specific_survey_are_counted(context, survey):
+@when("the count of open threads in survey '{survey_id}'")
+@given("the count of open threads in survey '{survey_id}'")
+def step_impl_the_open_threads_count_for_specific_survey_are_counted(context, survey_id):
     """access the messages_count endpoint to get the count of unread conversations"""
-    url = context.bdd_helper.threads_get_count_url + f"?survey={survey}&is_closed=false"
+    url = context.bdd_helper.threads_get_count_url + f"?survey={survey_id}&is_closed=false"
     context.response = context.client.get(url, headers=context.bdd_helper.headers)
     response_data = context.response.data
     context.bdd_helper.thread_count = json.loads(response_data)["total"]
