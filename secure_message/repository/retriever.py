@@ -163,12 +163,15 @@ class Retriever:
             conditions.append(SecureMessage.collection_exercise == request_args.ce)
 
         try:
-            # TODO - Make the category filter optional
+            subquery_filter = [Conversation.is_closed.is_(request_args.is_closed)]
+
+            if request_args.category:
+                subquery_filter.append(Conversation.category == request_args.category)
+
             t = db.session.query(SecureMessage.thread_id, func.max(SecureMessage.id)  # pylint:disable=no-member
                                  .label('max_id')) \
                 .join(Conversation) \
-                .filter(Conversation.is_closed.is_(request_args.is_closed)) \
-                .filter(Conversation.category == request_args.category) \
+                .filter(and_(*subquery_filter)) \
                 .group_by(SecureMessage.thread_id).subquery('t')
 
             conditions.append(SecureMessage.thread_id == t.c.thread_id)
