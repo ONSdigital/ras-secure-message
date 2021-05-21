@@ -14,8 +14,8 @@ for x in range(0, 50):
         "body": body,
         "thread_id": "",
         "business_id": "47e5859b-5d18-4c73-a91c-05491f6c6167",
-        "collection_case": "",
-        "survey": "02b9c366-7397-42f7-942a-76dc5876d86d"
+        "case_id": "",
+        "survey_id": "02b9c366-7397-42f7-942a-76dc5876d86d"
     }
     response = post("http://localhost:5050/messages",
                     headers={'Authorization': '<insert jwt here>',

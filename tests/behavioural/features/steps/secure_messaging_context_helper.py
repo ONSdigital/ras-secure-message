@@ -59,10 +59,10 @@ class SecureMessagingContextHelper:
                                      'subject': 'Hello World',
                                      'body': 'Test',
                                      'thread_id': '',
-                                     'collection_case': __DEFAULT_COLLECTION_CASE,
-                                     'collection_exercise': __DEFAULT_COLLECTION_EXERCISE,
+                                     'case_id': __DEFAULT_COLLECTION_CASE,
+                                     'exercise_id': __DEFAULT_COLLECTION_EXERCISE,
                                      'business_id': __DEFAULT_BUSINESS_ID,
-                                     'survey': __DEFAULT_SURVEY}
+                                     'survey_id': __DEFAULT_SURVEY}
 
     def __init__(self):
         self._token_data = {}
@@ -285,23 +285,23 @@ class SecureMessagingContextHelper:
         self._message_data['business_id'] = SecureMessagingContextHelper.__DEFAULT_BUSINESS_ID
 
     def use_alternate_survey(self):
-        self._message_data['survey'] = SecureMessagingContextHelper.__ALTERNATE_SURVEY
+        self._message_data['survey_id'] = SecureMessagingContextHelper.__ALTERNATE_SURVEY
 
     def use_default_survey(self):
-        self._message_data['survey'] = SecureMessagingContextHelper.__DEFAULT_SURVEY
+        self._message_data['survey_id'] = SecureMessagingContextHelper.__DEFAULT_SURVEY
 
-    def use_alternate_collection_case(self):
-        self._message_data['collection_case'] = SecureMessagingContextHelper.__ALTERNATE_COLLECTION_CASE
+    def use_alternate_case_id(self):
+        self._message_data['case_id'] = SecureMessagingContextHelper.__ALTERNATE_COLLECTION_CASE
 
     def use_default_collection_case(self):
-        self._message_data['collection_case'] = SecureMessagingContextHelper.__DEFAULT_COLLECTION_CASE
+        self._message_data['case_id'] = SecureMessagingContextHelper.__DEFAULT_COLLECTION_CASE
 
     def use_alternate_collection_exercise(self):
-        self._message_data['collection_exercise'] = SecureMessagingContextHelper.__ALTERNATE_COLLECTION_EXERCISE
+        self._message_data['exercise_id'] = SecureMessagingContextHelper.__ALTERNATE_COLLECTION_EXERCISE
 
     def use_default_collection_exercise(self):
-        self._message_data['collection_exercise'] = SecureMessagingContextHelper.__DEFAULT_COLLECTION_EXERCISE
+        self._message_data['exercise_id'] = SecureMessagingContextHelper.__DEFAULT_COLLECTION_EXERCISE
 
-    def add_additional_respondent_claim(self, business_id, survey):
+    def add_additional_respondent_claim(self, business_id, survey_id):
         """Add an ru/survey pair to the additional claims """
-        self.additional_respondent_claims[business_id] = survey
+        self.additional_respondent_claims[business_id] = survey_id
