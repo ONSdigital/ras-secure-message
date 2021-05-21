@@ -38,11 +38,12 @@ class RetrieverTestCaseHelper:
                     '{thread_id}', '{case_id}', '{business_id}', '{survey_id}', '{exercise_id}', '{from_internal}')'''
             con.execute(query)
 
-    def add_conversation(self, conversation_id, is_closed=False):
+    def add_conversation(self, conversation_id, is_closed=False, category='SURVEY'):
         """ Populate the conversation table"""
 
         with self.engine.connect() as con:
-            query = f"INSERT INTO securemessage.conversation(id, is_closed) VALUES('{conversation_id}', '{is_closed}')"
+            query = f"INSERT INTO securemessage.conversation(id, is_closed, category) " \
+                    f"VALUES('{conversation_id}', '{is_closed}', '{category}')"
             con.execute(query)
 
     def add_status(self, label, msg_id, actor):
@@ -60,12 +61,13 @@ class RetrieverTestCaseHelper:
                     f" VALUES('{event}', '{msg_id}', '{date_time}')"
             con.execute(query)
 
-    def create_thread(self, no_of_messages=1, external_actor=default_external_actor, internal_actor=default_internal_actor):
+    def create_thread(self, no_of_messages=1, external_actor=default_external_actor,
+                      internal_actor=default_internal_actor, category='SURVEY'):
         """Populate the db with a thread with a specified number of messages"""
 
         msg_id = str(uuid.uuid4())
         thread_id = msg_id
-        self.add_conversation(conversation_id=thread_id)
+        self.add_conversation(conversation_id=thread_id, category=category)
         self.add_secure_message(msg_id=msg_id, thread_id=thread_id, survey_id=self.BRES_SURVEY, from_internal=False)
         self.add_status(label="SENT", msg_id=msg_id, actor=external_actor)
         self.add_status(label="INBOX", msg_id=msg_id, actor=internal_actor)
@@ -226,6 +228,30 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
             with current_app.test_request_context():
                 with self.assertRaises(NotFound):
                     Retriever.retrieve_thread('anotherThreadId', self.user_respondent)
+
+    def test_thread_list_gets_messages_of_specific_category(self):
+        """retrieves threads from database for a specific category"""
+        self.create_thread(category='SURVEY')
+        self.create_thread(category='ACCOUNT')
+
+        with self.app.app_context():
+            with current_app.test_request_context():
+                args = get_args(category='ACCOUNT')
+                response = Retriever.retrieve_thread_list(self.user_internal, args)
+
+                self.assertEqual(len(response.items), 1)
+
+    def test_thread_list_all_messages_when_no_category_provided(self):
+        """retrieves all threads for the user if a category isn't specified"""
+        self.create_thread(category='SURVEY')
+        self.create_thread(category='ACCOUNT')
+
+        with self.app.app_context():
+            with current_app.test_request_context():
+                args = get_args()
+                response = Retriever.retrieve_thread_list(self.user_internal, args)
+
+                self.assertEqual(len(response.items), 2)
 
     def test_thread_list_returned_in_descending_order_respondent(self):
         """retrieves threads from database in desc sent_date order for respondent"""
