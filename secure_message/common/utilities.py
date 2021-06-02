@@ -10,10 +10,11 @@ from secure_message.services.service_toggles import party, internal_user_service
 logger = wrap_logger(logging.getLogger(__name__))
 MessageArgs = collections.namedtuple(
     'MessageArgs',
-    'page limit business_id surveys cc label desc ce is_closed my_conversations new_respondent_conversations all_conversation_types unread_conversations')
+    'page limit business_id surveys cc label desc ce is_closed my_conversations new_respondent_conversations '
+    'all_conversation_types unread_conversations category')
 
 
-def get_options(args):  # NOQA pylint:disable=too-complex
+def get_options(args) -> MessageArgs:  # NOQA pylint:disable=too-complex
     """extract options from request , allow label to be set by caller
 
     :param args: contains search arguments. Not all end points support all args
@@ -32,15 +33,16 @@ def get_options(args):  # NOQA pylint:disable=too-complex
     page If set requests the specific page of information to return
     limit If set it sets the maximum number of results to return
     desc If present, requests the information in descending order
+    category If set, get threads of a particular category
 
     """
 
     fields = {'page': 1, 'limit': MESSAGE_QUERY_LIMIT, 'business_id': None, 'surveys': None,
               'desc': True, 'cc': None, 'label': None, 'ce': None, 'is_closed': False,
               'my_conversations': False, 'new_respondent_conversations': False, 'all_conversation_types': False,
-              'unread_conversations': False}
+              'unread_conversations': False, 'category': None}
 
-    for field in ['cc', 'ce', 'business_id', 'label']:
+    for field in ['cc', 'ce', 'business_id', 'label', 'category']:
         if args.get(field):
             fields[field] = str(args.get(field))
 
@@ -74,11 +76,11 @@ def get_options(args):  # NOQA pylint:disable=too-complex
                        my_conversations=fields['my_conversations'],
                        new_respondent_conversations=fields['new_respondent_conversations'],
                        all_conversation_types=fields['all_conversation_types'],
-                       unread_conversations=fields['unread_conversations'])
+                       unread_conversations=fields['unread_conversations'], category=fields['category'])
 
 
 def set_conversation_type_args(existing_args, is_closed=False, my_conversations=False, new_conversations=False,
-                               all_types=False, unread_conversations=False):
+                               all_types=False, unread_conversations=False) -> MessageArgs:
     """Returns a new set of args based on the existing args which are a named tuple,
     but allow the conversation type only to be changed"""
 
@@ -94,7 +96,8 @@ def set_conversation_type_args(existing_args, is_closed=False, my_conversations=
                        my_conversations=my_conversations,
                        new_respondent_conversations=new_conversations,
                        all_conversation_types=all_types,
-                       unread_conversations=unread_conversations)
+                       unread_conversations=unread_conversations,
+                       category=existing_args.category)
 
 
 def generate_string_query_args(args):
@@ -108,7 +111,8 @@ def generate_string_query_args(args):
     return urllib.parse.urlencode(params)
 
 
-def process_paginated_list(paginated_list, host_url, user, message_args, endpoint=MESSAGE_LIST_ENDPOINT, body_summary=True):
+def process_paginated_list(paginated_list, host_url: str, user, message_args, endpoint=MESSAGE_LIST_ENDPOINT,
+                           body_summary=True) -> tuple[list, dict]:
     """used to change a pagination object to json format with links"""
     messages = []
     string_query_args = generate_string_query_args(message_args)
@@ -172,7 +176,7 @@ def add_to_details(messages):
     return messages
 
 
-def add_from_details(messages):
+def add_from_details(messages: list) -> list:
     """Adds a @msg_from key to every message in a list of messages.
     Every msg_to uuid is resolved to include details of the user.
 
@@ -200,7 +204,7 @@ def add_from_details(messages):
     return messages
 
 
-def get_external_user_uuid_list(messages):
+def get_external_user_uuid_list(messages: list) -> set:
     """Compiles a list of all unique the external user (respondent) uuids from a list of messages"""
     external_user_uuids = set()
 
@@ -225,7 +229,8 @@ def add_business_details(messages):
     business_details = party.get_business_details(business_ids)
 
     for message in messages:
-        message['@business_details'] = next((business for business in business_details if business["id"] == message['business_id']), None)
+        message['@business_details'] = next(
+            (business for business in business_details if business["id"] == message['business_id']), None)
     return messages
 
 

@@ -148,7 +148,6 @@ class Retriever:
     def _retrieve_internal_thread_list(request_args, user):
         """Retrieve a list of threads for an internal user"""
         conditions = []
-
         logger.info("Retrieving list of threads for internal user", user_uuid=user.user_uuid)
 
         if request_args.business_id:
@@ -164,10 +163,15 @@ class Retriever:
             conditions.append(SecureMessage.exercise_id == request_args.ce)
 
         try:
+            subquery_filter = [Conversation.is_closed.is_(request_args.is_closed)]
+
+            if request_args.category:
+                subquery_filter.append(Conversation.category == request_args.category)
+
             t = db.session.query(SecureMessage.thread_id, func.max(SecureMessage.id)  # pylint:disable=no-member
                                  .label('max_id')) \
                 .join(Conversation) \
-                .filter(Conversation.is_closed.is_(request_args.is_closed)) \
+                .filter(and_(*subquery_filter)) \
                 .group_by(SecureMessage.thread_id).subquery('t')
 
             conditions.append(SecureMessage.thread_id == t.c.thread_id)
