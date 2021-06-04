@@ -55,18 +55,23 @@ class ThreadById(Resource):
 
         bound_logger.info("Retrieving metadata for thread")
         request_data = request.get_json()
-        metadata = Retriever.retrieve_conversation_metadata(thread_id)
-        if metadata is None:
+        conversation = Retriever.retrieve_conversation_metadata(thread_id)
+        if conversation is None:
             abort(404)
-        ThreadById._validate_request(request_data, metadata)
+        ThreadById._validate_request(request_data, conversation)
 
         bound_logger.info("Attempting to modify metadata for thread")
-        if request_data.get('is_closed'):
-            bound_logger.info("About to close conversation")
-            Modifier.close_conversation(metadata, g.user)
-        else:
-            bound_logger.info("About to re-open conversation")
-            Modifier.open_conversation(metadata, g.user)
+        Modifier.patch_conversation(request_data, conversation)
+
+        if request_data.get('is_closed') is not None:
+            if request_data.get('is_closed'):  # TODO verify it works with true and false values
+                # TODO redo logic to only open conversation if is_closed is true
+                bound_logger.info("About to close conversation")
+                Modifier.close_conversation(conversation, g.user)
+            else:
+                # TODO redo logic to only open conversation if is_closed is false
+                bound_logger.info("About to re-open conversation")
+                Modifier.open_conversation(conversation, g.user)
 
         bound_logger.info("Thread metadata update successful")
         bound_logger.unbind('thread_id', 'user_uuid')
@@ -80,18 +85,20 @@ class ThreadById(Resource):
         if not request_data:
             bound_logger.info('No properties provided')
             raise BadRequest(description="No properties provided")
-        if 'is_closed' not in request_data:
+        # TODO Tidy up validation function
+        if 'category' not in request_data and 'is_closed' not in request_data:
             bound_logger.info('Invalid properties provided')
-            raise BadRequest(description="Only 'is_closed' property may be provided")
-        if not isinstance(request_data['is_closed'], bool):
-            bound_logger.info('Invalid value provided')
-            raise BadRequest(description="Invalid value provided")
-        if metadata.is_closed and request_data['is_closed'] is True:
-            bound_logger.info("Conversation already closed")
-            raise BadRequest(description="Conversation already closed")
-        if not metadata.is_closed and request_data['is_closed'] is False:
-            bound_logger.info("Conversation already open")
-            raise BadRequest(description="Conversation already open")
+            raise BadRequest(description="Neither 'is_closed' or 'category' found in payload")
+        if 'is_closed' in request_data:
+            if not isinstance(request_data['is_closed'], bool):
+                bound_logger.info('Invalid value provided')
+                raise BadRequest(description="Invalid value provided")
+            if metadata.is_closed and request_data['is_closed'] is True:
+                bound_logger.info("Conversation already closed")
+                raise BadRequest(description="Conversation already closed")
+            if not metadata.is_closed and request_data['is_closed'] is False:
+                bound_logger.info("Conversation already open")
+                raise BadRequest(description="Conversation already open")
 
         bound_logger.info("Thread validation successful")
         bound_logger.unbind('thread_id', 'user_uuid')

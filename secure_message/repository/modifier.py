@@ -8,7 +8,7 @@ from werkzeug.exceptions import InternalServerError
 
 from secure_message.common.eventsapi import EventsApi
 from secure_message.common.labels import Labels
-from secure_message.repository.database import db, SecureMessage, Status, Events
+from secure_message.repository.database import db, SecureMessage, Status, Events, Conversation
 from secure_message.services.service_toggles import internal_user_service
 
 logger = wrap_logger(logging.getLogger(__name__))
@@ -133,7 +133,30 @@ class Modifier:
         Modifier.remove_label(unread, message, user)
 
     @staticmethod
-    def close_conversation(metadata, user):
+    def patch_conversation(request_data: dict, conversation: Conversation):
+        """
+        Goes through each key of the request and updates the conversation object with it if it doesn't match
+        what is in the conversation.  Won't update `is_closed`, `closed_by` and `closed_by_uuid` as these are currently
+        handled in a different manner in another function.
+
+        :param request_data: Json containing which fields should be patched
+        :param conversation: An object containing the currently saved database data
+        """
+        bound_logger = logger.bind(conversation_id=conversation.id)
+
+        for field in ['category']:
+            # TODO need to figure out validation for the values in the fields
+            if request_data.get(field) != getattr(conversation, field):
+                setattr(conversation, field, request_data[field])
+        try:
+            db.session.commit()
+        except SQLAlchemyError:
+            db.session.rollback()
+            bound_logger.exception("Database error occurred while opening conversation")
+            raise InternalServerError(description="Database error occurred while opening conversation")
+
+    @staticmethod
+    def close_conversation(metadata: Conversation, user):
         bound_logger = logger.bind(conversation_id=metadata.id, user_id=user.user_uuid)
         bound_logger.info("Getting user details")
 
@@ -149,14 +172,14 @@ class Modifier:
             db.session.commit()
         except SQLAlchemyError:
             db.session.rollback()
-            bound_logger.exception("Database error occured while closing conversation")
-            raise InternalServerError(description="Database error occured while closing conversation")
+            bound_logger.exception("Database error occurred while closing conversation")
+            raise InternalServerError(description="Database error occurred while closing conversation")
 
         bound_logger.info("Successfully closed conversation")
         bound_logger.unbind('conversation_id', 'user_id')
 
     @staticmethod
-    def open_conversation(metadata, user):
+    def open_conversation(metadata: Conversation, user):
         bound_logger = logger.bind(conversation_id=metadata.id, user_id=user.user_uuid)
 
         try:

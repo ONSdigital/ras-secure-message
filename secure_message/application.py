@@ -80,7 +80,7 @@ def create_app(config=None):
 
     @app.errorhandler(Exception)
     def handle_exception(error):  # NOQA pylint:disable=unused-variable
-        logger.exception(error=error)
+        logger.exception(error)
         response = jsonify({"error": "Unknown internal error"})
         response.status_code = 500
         return response
