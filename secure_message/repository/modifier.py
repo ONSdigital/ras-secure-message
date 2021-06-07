@@ -145,9 +145,13 @@ class Modifier:
         bound_logger = logger.bind(conversation_id=conversation.id)
 
         for field in ['category']:
-            # TODO need to figure out validation for the values in the fields
-            if request_data.get(field) != getattr(conversation, field):
+            # Looks a bit awkward but getattr/setattr lets us loop over all the fields as we can't access fields
+            # in the object like a dictionary.
+
+            if request_data.get(field) and request_data.get(field) != getattr(conversation, field):
                 setattr(conversation, field, request_data[field])
+            else:
+                logger.info("Value is the same as what is in the database, leaving unchanged", field=field)
         try:
             db.session.commit()
         except SQLAlchemyError:

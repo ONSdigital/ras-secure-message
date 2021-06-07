@@ -112,7 +112,7 @@ def step_impl_the_threads_in_specific_survey_are_returned(context, survey_id):
 
 @when("the threads for business '{business_id}' in survey '{survey_id}' are read")
 @given("the threads for business '{business_id}' in survey '{survey_id}' are read")
-def step_impl_the_threads_in_specific_survey_and_business_are_returned(context, survey_id, business_id):
+def step_impl_the_threads_in_specific_survey_and_business_are_returned(context, business_id, survey_id):
     url = context.bdd_helper.threads_get_url + f"?survey={survey_id}&business_id={business_id}"
     context.response = context.client.get(url, headers=context.bdd_helper.headers)
     context.bdd_helper.store_messages_response_data(context.response.data)

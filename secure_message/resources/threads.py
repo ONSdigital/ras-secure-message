@@ -3,12 +3,14 @@ import logging
 from werkzeug.exceptions import BadRequest
 from flask import abort, g, jsonify, request
 from flask_restful import Resource
+from marshmallow import ValidationError
 from structlog import wrap_logger
 
 from secure_message.common.utilities import get_options, process_paginated_list, add_users_and_business_details
 from secure_message.constants import THREAD_LIST_ENDPOINT
 from secure_message.repository.modifier import Modifier
 from secure_message.repository.retriever import Retriever
+from secure_message.validation.thread import ThreadPatch
 
 logger = wrap_logger(logging.getLogger(__name__))
 
@@ -58,18 +60,16 @@ class ThreadById(Resource):
         conversation = Retriever.retrieve_conversation_metadata(thread_id)
         if conversation is None:
             abort(404)
-        ThreadById._validate_request(request_data, conversation)
+        ThreadById._validate_patch_request(request_data, conversation)
 
         bound_logger.info("Attempting to modify metadata for thread")
         Modifier.patch_conversation(request_data, conversation)
 
         if request_data.get('is_closed') is not None:
             if request_data.get('is_closed'):  # TODO verify it works with true and false values
-                # TODO redo logic to only open conversation if is_closed is true
                 bound_logger.info("About to close conversation")
                 Modifier.close_conversation(conversation, g.user)
             else:
-                # TODO redo logic to only open conversation if is_closed is false
                 bound_logger.info("About to re-open conversation")
                 Modifier.open_conversation(conversation, g.user)
 
@@ -78,21 +78,22 @@ class ThreadById(Resource):
         return '', 204
 
     @staticmethod
-    def _validate_request(request_data, metadata):
+    def _validate_patch_request(request_data, metadata):
         """Used to validate data within request body"""
         bound_logger = logger.bind(thread_id=metadata.id, user_uuid=g.user.user_uuid)
         # Check if it's empty
         if not request_data:
             bound_logger.info('No properties provided')
             raise BadRequest(description="No properties provided")
-        # TODO Tidy up validation function
-        if 'category' not in request_data and 'is_closed' not in request_data:
-            bound_logger.info('Invalid properties provided')
-            raise BadRequest(description="Neither 'is_closed' or 'category' found in payload")
+
+        try:
+            ThreadPatch(strict=True).load(request_data)
+        except ValidationError as e:
+            bound_logger.error("Errors found when validating request data", errors=e.messages)
+            raise BadRequest(e.messages)
+
+        # Perform extra validation that marshmallow cannot handle
         if 'is_closed' in request_data:
-            if not isinstance(request_data['is_closed'], bool):
-                bound_logger.info('Invalid value provided')
-                raise BadRequest(description="Invalid value provided")
             if metadata.is_closed and request_data['is_closed'] is True:
                 bound_logger.info("Conversation already closed")
                 raise BadRequest(description="Conversation already closed")
