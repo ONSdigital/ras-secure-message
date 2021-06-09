@@ -160,6 +160,30 @@ class Modifier:
             raise InternalServerError(description="Database error occurred while opening conversation")
 
     @staticmethod
+    def patch_message(request_data: dict, message: SecureMessage):
+        """
+        Goes through each key of the request and updates the message object with the value if it doesn't match
+        what is already in the message.
+
+        :param request_data: Json containing which fields should be patched
+        :param message: An dict containing the currently saved database data
+        """
+        bound_logger = logger.bind(message_id=message.msg_id)
+        try:
+            for field in ['survey_id', 'case_id', 'business_id', 'exercise_id']:
+                # Currently not possible to clear a value in a field.
+                if request_data.get(field) and request_data.get(field) != getattr(message, field):
+                    setattr(message, field, request_data[field])
+                else:
+                    logger.info("Value is the same as what is in the database, leaving unchanged", field=field)
+
+            db.session.commit()
+        except SQLAlchemyError:
+            db.session.rollback()
+            bound_logger.exception("Database error occurred while opening conversation")
+            raise InternalServerError(description="Database error occurred while opening conversation")
+
+    @staticmethod
     def close_conversation(metadata: Conversation, user):
         bound_logger = logger.bind(conversation_id=metadata.id, user_id=user.user_uuid)
         bound_logger.info("Getting user details")

@@ -22,7 +22,7 @@ from secure_message.logger_config import logger_initial_config
 from secure_message.repository import database
 from secure_message.resources.health import DatabaseHealth, Health, HealthDetails
 from secure_message.resources.info import Info
-from secure_message.resources.messages import MessageModifyById, MessageSend
+from secure_message.resources.messages import MessageById, MessageModifyById, MessageSend
 from secure_message.resources.threads import ThreadById, ThreadCounter, ThreadList
 
 logger = wrap_logger(logging.getLogger(__name__))
@@ -55,6 +55,7 @@ def create_app(config=None):
     api.add_resource(Info, '/info')
 
     api.add_resource(MessageSend, '/messages')
+    api.add_resource(MessageById, '/messages/<message_id>')
     api.add_resource(MessageModifyById, '/messages/modify/<message_id>')
 
     api.add_resource(ThreadList, '/threads')

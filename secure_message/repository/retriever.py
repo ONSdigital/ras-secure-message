@@ -198,8 +198,28 @@ class Retriever:
         return result
 
     @staticmethod
-    def retrieve_message(message_id, user):
-        """returns single message from db"""
+    def retrieve_plain_message(message_id: str) -> SecureMessage:
+        """
+        Gets a single message from the secure_message table
+
+        :param message_id: The 'msg_id' of the message
+        :return: A SecureMessage object containing the data from the database about the message
+        """
+        logger.info("Retrieving message", message_id=message_id)
+        try:
+            result = SecureMessage.query.filter_by(msg_id=message_id).one()
+            if result is None:
+                logger.info('Message ID not found', message_id=message_id)
+                raise NotFound(description=f"Message with msg_id '{message_id}' does not exist")
+        except SQLAlchemyError:
+            logger.exception('Error retrieving message from database')
+            raise InternalServerError(description="Error retrieving message from database")
+
+        return result
+
+    @staticmethod
+    def retrieve_message(message_id: str, user) -> dict:
+        """returns single message from db.  Comes with additional metadata around labels"""
         db_model = SecureMessage()
         logger.info("Retrieving message", message_id=message_id)
         try:

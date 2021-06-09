@@ -142,3 +142,11 @@ class MessageSchema(Schema):
         if length > max_field_len:
             logger.info('Field is too large', field_name=field_name, length=length, max_field_len=max_field_len)
             raise ValidationError(f'{field_name} field length must not be greater than {max_field_len}', field_name, [], data)
+
+
+class MessagePatch(Schema):
+    """Class to marshal JSON to Message"""
+    case_id = fields.UUID()
+    business_id = fields.UUID()
+    survey_id = fields.UUID()
+    exercise_id = fields.UUID()
