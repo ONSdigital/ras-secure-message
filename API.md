@@ -518,18 +518,15 @@ sub conversations are in progress (i.e two internal users replying on a thread )
 
 ### Example JSON Response
 
-Messages should have survey_id, collection_case and use either a uuid or "GROUP" for the internal user.
+Messages should have populated survey_id if the category is 'SURVEY', a collection_case and use either a uuid or "GROUP" for the internal user.
 
 ```json
 {
-  "_links": {
-    "first": {
-      "href": "http://localhost:5050/threads/78e3caa6-2e27-4ad3-bd38-168b2cc3ef5d"
-    },
-    "self": {
-      "href": "http://localhost:5050/threads/78e3caa6-2e27-4ad3-bd38-168b2cc3ef5d?page=1&limit=20"
-    }
-  },
+  "category": "SURVEY",
+  "closed_at": null,
+  "closed_by": null,
+  "closed_by_uuid": null,
+  "is_closed": false,
   "messages": [
     {
       "@msg_from": {
@@ -667,7 +664,15 @@ Messages should have survey_id, collection_case and use either a uuid or "GROUP"
       "survey": "33333333-22222-3333-4444-88dc018a1a4c",
       "thread_id": "78e3caa6-2e27-4ad3-bd38-168b2cc3ef5d"
     }
-  ]
+  ],
+  "_links": {
+    "first": {
+      "href": "http://localhost:5050/threads/78e3caa6-2e27-4ad3-bd38-168b2cc3ef5d"
+    },
+    "self": {
+      "href": "http://localhost:5050/threads/78e3caa6-2e27-4ad3-bd38-168b2cc3ef5d?page=1&limit=20"
+    }
+  }
 }
 ```
 

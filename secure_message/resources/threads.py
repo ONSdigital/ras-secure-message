@@ -32,16 +32,15 @@ class ThreadById(Resource):
             msg = message.serialize(g.user, body_summary=False)
             messages.append(msg)
 
-        if conversation_metadata and conversation_metadata.is_closed:
-            return jsonify({"messages": add_users_and_business_details(messages),
-                            "is_closed": conversation_metadata.is_closed,
-                            "closed_by": conversation_metadata.closed_by,
-                            "closed_by_uuid": conversation_metadata.closed_by_uuid,
-                            "closed_at": conversation_metadata.closed_at.isoformat(),
-                            "category": conversation_metadata.category})
+        closed_at = None if conversation_metadata.closed_at is None else conversation_metadata.closed_at.isoformat()
 
         return jsonify({"messages": add_users_and_business_details(messages),
-                        "is_closed": False})
+                        "is_closed": conversation_metadata.is_closed,
+                        "closed_by": conversation_metadata.closed_by,
+                        "closed_by_uuid": conversation_metadata.closed_by_uuid,
+                        "closed_at": closed_at,
+                        "category": conversation_metadata.category})
+
 
     @staticmethod
     def patch(thread_id):
