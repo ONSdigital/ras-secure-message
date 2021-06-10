@@ -20,7 +20,7 @@ from secure_message.validation.domain import MessageSchema, MessagePatch
 logger = wrap_logger(logging.getLogger(__name__))
 
 
-"""Rest endpoint for message resources. Messages are immutable, they can only be created."""
+"""Rest endpoint for message resources."""
 
 
 class MessageSend(Resource):
