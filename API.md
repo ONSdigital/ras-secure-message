@@ -495,7 +495,7 @@ Available search criteria matches those on get threads:
   Use specific counts if they suffice.
 * business_id - If set then restrict conversations to those regarding a specific ru
 * cc - If set then restricts the conversations to a specific collection case
-* ce - If set then restricts the conversations to a specific collction exercise
+* ce - If set then restricts the conversations to a specific collection exercise
 
 ### Example JSON Response
 
@@ -740,7 +740,8 @@ Similar to health but validates that the current database connection is valid. H
 
 `GET /health/details`
 
-Returns more detailed information about secure message including some of the environment variables. Bypasses all aspects of the JWT.
+Returns more detailed information about secure message including a number of environment variables.
+Bypasses all aspects of the JWT.
 
 ### Example JSON Response
 
@@ -758,12 +759,9 @@ Returns more detailed information about secure message including some of the env
     "/messages/count": "Get count of unread messages",
     "/messages/modify/<message_id>": "Update message status by id"
   },
-  "APP Log Level": "INFO",
   "NOTIFY VIA GOV NOTIFY": "0",
   "Name": "ras-secure-message",
-  "RAS PARTY SERVICE HOST": "ras-party-service-sit.apps.devtest.onsclofo.uk",
-  "RAS PARTY SERVICE PORT": "80",
-  "RAS PARTY SERVICE PROTOCOL": "http",
+  "RAS-PARTY URL": "https://localhost:8080",
   "Logging level": "DEBUG",
   "Using party service mock": false,
   "Version": "0.1.2"
