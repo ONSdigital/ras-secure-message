@@ -17,6 +17,6 @@ class ThreadPatch(Schema):
         if not value:
             raise ValidationError("category cannot be empty")
 
-        valid_survey_categories = ['SURVEY', 'TECHNICAL']
+        valid_survey_categories = ['SURVEY', 'TECHNICAL', 'MISC']
         if value and value not in valid_survey_categories:
             raise ValidationError(f"category can only be one of {valid_survey_categories}")
