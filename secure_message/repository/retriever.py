@@ -37,6 +37,7 @@ class Retriever:
         """Count users threads for a specific survey"""
 
         conditions = []
+        conversation_condition = [Conversation.is_closed.is_(request_args.is_closed)]
 
         if request_args.surveys:
             conditions.append(SecureMessage.survey_id.in_(request_args.surveys))
@@ -50,11 +51,14 @@ class Retriever:
         if request_args.ce:
             conditions.append(SecureMessage.exercise_id == request_args.ce)
 
+        if request_args.category:
+            conversation_condition.append(Conversation.category == request_args.category)
+
         try:
             t = db.session.query(SecureMessage.thread_id, func.max(SecureMessage.id)  # pylint:disable=no-member
                                  .label('max_id')) \
                 .join(Conversation) \
-                .filter(Conversation.is_closed.is_(request_args.is_closed)) \
+                .filter(*conversation_condition) \
                 .group_by(SecureMessage.thread_id).subquery('t')
 
             conditions.append(SecureMessage.thread_id == t.c.thread_id)
