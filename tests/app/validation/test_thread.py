@@ -18,7 +18,8 @@ class MessageSchemaTestCase(unittest.TestCase):
         with self.assertRaises(ValidationError) as e:
             ThreadPatch(strict=True).load(test_dict)
 
-        self.assertEqual(e.exception.messages, {'category': ["category can only be one of ['SURVEY', 'TECHNICAL']"]})
+        self.assertEqual(e.exception.messages,
+                         {'category': ["category can only be one of ['SURVEY', 'TECHNICAL', 'MISC']"]})
 
     def test_invalid_is_closed_fails_validation(self):
         test_dict = {'is_closed': 'string'}
