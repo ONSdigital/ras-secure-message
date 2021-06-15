@@ -65,7 +65,7 @@ class ThreadById(Resource):
         Modifier.patch_conversation(request_data, conversation)
 
         if request_data.get('is_closed') is not None:
-            if request_data.get('is_closed'):  # TODO verify it works with true and false values
+            if request_data.get('is_closed'):
                 bound_logger.info("About to close conversation")
                 Modifier.close_conversation(conversation, g.user)
             else:
