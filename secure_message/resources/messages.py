@@ -63,7 +63,6 @@ class MessageSend(Resource):
         """Saves the message to the database along with the subsequent status and audit"""
         Saver.save_message(message.data)
         Saver.save_msg_event(message.data.msg_id, EventsApi.SENT.value)
-
         Saver.save_msg_status(message.data.msg_from, message.data.msg_id, Labels.SENT.value)
         Saver.save_msg_status(message.data.msg_to[0], message.data.msg_id, Labels.INBOX.value)
         Saver.save_msg_status(message.data.msg_to[0], message.data.msg_id, Labels.UNREAD.value)
