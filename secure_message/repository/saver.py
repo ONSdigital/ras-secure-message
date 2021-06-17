@@ -24,7 +24,7 @@ class Saver:
                 conversation = Conversation()
                 conversation.id = db_message.thread_id
                 if hasattr(domain_message, 'category'):
-                    logger.info("setting message category as", category=db_message.category)
+                    logger.info("setting message category as", category=domain_message.category)
                     conversation.category = domain_message.category
                 else:
                     logger.info("category not defined, hence defaulting to Survey")

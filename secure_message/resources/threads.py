@@ -39,6 +39,7 @@ class ThreadById(Resource):
                             "category": conversation_metadata.category})
 
         return jsonify({"messages": add_users_and_business_details(messages),
+                        "category": conversation_metadata.category,
                         "is_closed": False})
 
     @staticmethod

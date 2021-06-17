@@ -18,6 +18,16 @@ Feature: Message Send Endpoint
       And  the msg_category is set to 'TECHNICAL'
     When the message is sent
     Then a created status code 201 is returned
+    Examples: user type
+    | user        |
+    | specific user |
+    | group        |
+
+  Scenario Outline: Respondent sending a valid MISC message to specific user and receiving a 201
+    Given sending from respondent to internal <user>
+      And  the msg_category is set to 'MISC'
+    When the message is sent
+    Then a created status code 201 is returned
 
     Examples: user type
     | user        |
