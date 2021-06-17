@@ -150,8 +150,6 @@ class Modifier:
 
             if request_data.get(field) and request_data.get(field) != getattr(conversation, field):
                 setattr(conversation, field, request_data[field])
-            else:
-                logger.info("Value is the same as what is in the database, leaving unchanged", field=field)
         try:
             db.session.commit()
         except SQLAlchemyError:
@@ -174,8 +172,6 @@ class Modifier:
                 # Currently not possible to clear a value in a field.
                 if request_data.get(field) and request_data.get(field) != getattr(message, field):
                     setattr(message, field, request_data[field])
-                else:
-                    logger.info("Value is the same as what is in the database, leaving unchanged", field=field)
 
             db.session.commit()
         except SQLAlchemyError:
