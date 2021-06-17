@@ -28,7 +28,7 @@ class MessageTestCase(unittest.TestCase):
         sut_str = repr(sut)
         expected = '<Message(msg_id=AMsgId msg_to=[\'to\'] msg_from=from subject=subject body=body thread_id=5 ' \
                    'case_id=ACollectionCase business_id=f1a5e99c-8edf-489a-9c72-6cabe6c387fc ' \
-                   'exercise_id=CollectionExercise survey_id=ASurveyType from_internal=False category=)>'
+                   'exercise_id=CollectionExercise survey_id=ASurveyType from_internal=False category=None)>'
         self.assertEqual(sut_str, expected)
 
     def test_technical_message(self):

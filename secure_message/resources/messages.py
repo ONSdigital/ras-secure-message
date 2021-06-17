@@ -38,8 +38,10 @@ class MessageSend(Resource):
             logger.info('Message send failed', errors=message.errors)
             return make_response(jsonify(message.errors), 400)
 
+        has_survey_category = False if 'category' in post_data and post_data['category'] in ['TECHNICAL', 'MISC'] else \
+            True
         # Validate claim
-        if not self._has_valid_claim(g.user, message.data) and self._has_survey_category:
+        if not self._has_valid_claim(g.user, message.data) and has_survey_category:
             logger.info("Message send failed", error="Invalid claim")
             return make_response(jsonify("Invalid claim"), 403)
 
@@ -50,10 +52,6 @@ class MessageSend(Resource):
         return make_response(jsonify({'status': '201',
                                       'msg_id': message.data.msg_id,
                                       'thread_id': message.data.thread_id}), 201)
-
-    @staticmethod
-    def _has_survey_category(post_data):
-        return False if post_data['category'] and post_data['category'] in ['TECHNICAL', 'MISC'] else True
 
     @staticmethod
     def _has_valid_claim(user, message):

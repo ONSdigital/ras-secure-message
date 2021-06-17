@@ -14,7 +14,7 @@ class Message:
     """Class to hold message attributes"""
 
     def __init__(self, msg_from, subject, body, msg_to='', thread_id=None, msg_id='', case_id='',
-                 survey_id='', business_id='', exercise_id='', from_internal=False, category=''):
+                 survey_id='', business_id='', exercise_id='', from_internal=False, category=None):
         self.msg_id = str(uuid.uuid4()) if not msg_id else msg_id  # If empty msg_id assign to a uuid
         self.msg_to = None if not msg_to else msg_to
         self.msg_from = msg_from
