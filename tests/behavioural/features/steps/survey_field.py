@@ -39,7 +39,7 @@ def step_impl_survey_set_to_default(context):
 
 
 @when("the survey_id of the message is changed to '{survey_id}'")
-def step_impl_the_response_message_thread_is_closed(context, survey_id):
+def step_impl_the_message_survey_id_set(context, survey_id):
     """close the conversation of the last saved message"""
     msg_id = context.bdd_helper.single_message_responses_data[0]['msg_id']
     url = context.bdd_helper.message_patch_url.format(msg_id)
@@ -48,7 +48,7 @@ def step_impl_the_response_message_thread_is_closed(context, survey_id):
 
 
 @when("the survey_id of the message is changed to an empty string")
-def step_impl_the_response_message_thread_is_closed(context):
+def step_impl_the_message_survey_is_set_to_empty_string(context):
     """close the conversation of the last saved message"""
     msg_id = context.bdd_helper.single_message_responses_data[0]['msg_id']
     url = context.bdd_helper.message_patch_url.format(msg_id)

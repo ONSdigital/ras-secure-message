@@ -13,7 +13,7 @@ def step_impl_the_response_message_thread_is_closed(context):
 
 
 @when("the category of the thread is changed to '{category}'")
-def step_impl_the_response_message_thread_is_closed(context, category):
+def step_impl_the_response_message_thread_category_is_set(context, category):
     """close the conversation of the last saved message"""
     thread_id = context.bdd_helper.single_message_responses_data[0]['thread_id']
     url = context.bdd_helper.thread_get_url.format(thread_id)

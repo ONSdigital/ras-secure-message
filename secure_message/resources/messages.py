@@ -176,7 +176,7 @@ class MessageById(Resource):
             raise BadRequest(description="No properties provided")
 
         try:
-            MessagePatch(strict=True).load(request_data)
+            MessagePatch().load(request_data)
         except ValidationError as e:
             bound_logger.error("Errors found when validating request data", errors=e.messages)
             raise BadRequest(e.messages)
