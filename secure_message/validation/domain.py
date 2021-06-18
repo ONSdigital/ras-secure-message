@@ -56,13 +56,13 @@ class MessageSchema(Schema):
     from_internal = fields.Boolean(allow_none=True)
 
     @pre_load
-    def check_sent_and_read_date(self, data):
+    def check_sent_and_read_date(self, data, **kwargs):
         self.validate_not_present(data, 'sent_date')
         self.validate_not_present(data, 'read_date')
         return data
 
     @validates_schema
-    def validate_to_from_not_equal(self, data):   # NOQA pylint:disable=no-self-use
+    def validate_to_from_not_equal(self, data, **kwargs):   # NOQA pylint:disable=no-self-use
         if 'msg_to' in data.keys() and 'msg_from' in data.keys() and data['msg_to'][0] == data['msg_from']:
             logger.info('Message to and message from cannot be the same', message_to=data['msg_to'][0], message_from=data['msg_from'])
             raise ValidationError("msg_to and msg_from fields can not be the same.")
@@ -119,7 +119,7 @@ class MessageSchema(Schema):
         self.validate_field_length("exercise_id", len(exercise_id), constants.MAX_COLLECTION_EXERCISE_LEN)
 
     @post_load
-    def make_message(self, data):  # NOQA pylint:disable=no-self-use
+    def make_message(self, data, **kwargs):  # NOQA pylint:disable=no-self-use
         logger.debug('Build message', data=data)
         return Message(**data)
 

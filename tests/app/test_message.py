@@ -2,6 +2,7 @@ import unittest
 from datetime import datetime, timezone
 
 from flask import g, current_app
+from marshmallow.exceptions import ValidationError
 
 from secure_message import constants
 from secure_message.services.service_toggles import internal_user_service, party
@@ -92,31 +93,32 @@ class MessageSchemaTestCase(unittest.TestCase):
     def test_valid_message_passes_validation(self):
         """marshaling a valid message"""
         self.json_message['msg_to'] = ["01b51fcc-ed43-4cdb-ad1c-450f9986859b"]
-        schema = MessageSchema()
         with self.app.app_context():
             g.user = User(self.json_message['msg_from'], 'respondent')
-            result = schema.load(self.json_message)
-        self.assertTrue(result.errors == {})
+            try:
+                MessageSchema().load(self.json_message)
+            except ValidationError:
+                self.fail("Schema should've been correct and not thrown an error")
 
     def test_valid_domain_message_passes_deserialization(self):
         """checking marshaling message object to json does not raise errors"""
-        schema = MessageSchema()
         message_object = Message(**{'msg_to': ['Tej'], 'msg_from': 'Gemma', 'subject': 'MyMessage', 'body': 'hello',
                                     'thread_id': "", 'business_id': "7fc0e8ab-189c-4794-b8f4-9f05a1db185b"})
-        message_json = schema.dumps(message_object)
-        self.assertTrue(message_json.errors == {})
+        try:
+            MessageSchema().dumps(message_object)
+        except ValidationError:
+            self.fail("Schema should've been correct and not thrown an error")
 
     def test_body_too_big_fails_validation(self):
         """marshalling message with body field too long """
         self.json_message['body'] = "x" * (MAX_BODY_LEN + 1)
-        expected_error = f"Body field length must not be greater than {MAX_BODY_LEN}"
 
         with self.app.app_context():
             g.user = User(self.json_message['msg_from'], 'respondent')
-            schema = MessageSchema()
-            sut = schema.load(self.json_message)
+            with self.assertRaises(ValidationError) as e:
+                _ = MessageSchema().load(self.json_message)
 
-        self.assertTrue(expected_error in sut.errors['body'])
+        self.assertEqual(e.exception.messages, {'body': [f"Body field length must not be greater than {MAX_BODY_LEN}"]})
 
     def test_missing_body_fails_validation(self):
         """marshalling message with no body field """
@@ -125,9 +127,10 @@ class MessageSchemaTestCase(unittest.TestCase):
 
         with self.app.app_context():
             g.user = User(message['msg_from'], 'respondent')
-            schema = MessageSchema()
-            errors = schema.load(message)[1]
-        self.assertTrue(errors == {'body': ['Please enter a message']})
+            with self.assertRaises(ValidationError) as e:
+                _ = MessageSchema().load(message)[1]
+
+        self.assertEqual(e.exception.messages, {'body': ['Please enter a message']})
 
     def test_missing_subject_fails_validation(self):
         """marshalling message with no subject field """
@@ -135,9 +138,9 @@ class MessageSchemaTestCase(unittest.TestCase):
         self.json_message['msg_to'] = ["01b51fcc-ed43-4cdb-ad1c-450f9986859b"]
         with self.app.app_context():
             g.user = User(self.json_message['msg_from'], 'respondent')
-            schema = MessageSchema()
-            errors = schema.load(self.json_message)[1]
-        self.assertTrue(errors == {'subject': ['Missing data for required field.']})
+            with self.assertRaises(ValidationError) as e:
+                _ = MessageSchema().load(self.json_message)[1]
+        self.assertEqual(e.exception.messages, {'subject': ['Missing data for required field.']})
 
     def test_empty_subject_fails_validation(self):
         """marshalling message with no subject field """
@@ -145,9 +148,9 @@ class MessageSchemaTestCase(unittest.TestCase):
         self.json_message['msg_to'] = ["01b51fcc-ed43-4cdb-ad1c-450f9986859b"]
         with self.app.app_context():
             g.user = User(self.json_message['msg_from'], 'respondent')
-            schema = MessageSchema()
-            errors = schema.load(self.json_message)[1]
-        self.assertTrue(errors == {'subject': ['Please enter a subject']})
+            with self.assertRaises(ValidationError) as e:
+                _ = MessageSchema().load(self.json_message)[1]
+        self.assertEqual(e.exception.messages, {'subject': ['Please enter a subject']})
 
     def test_subject_with_only_spaces_fails_validation(self):
         """marshalling message with no subject field """
@@ -155,9 +158,10 @@ class MessageSchemaTestCase(unittest.TestCase):
         self.json_message['msg_to'] = ["01b51fcc-ed43-4cdb-ad1c-450f9986859b"]
         with self.app.app_context():
             g.user = User(self.json_message['msg_from'], 'respondent')
-            schema = MessageSchema()
-            errors = schema.load(self.json_message)[1]
-        self.assertTrue(errors == {'subject': ['Please enter a subject']})
+            with self.assertRaises(ValidationError) as e:
+                _ = MessageSchema().load(self.json_message)[1]
+
+        self.assertEqual(e.exception.messages, {'subject': ['Please enter a subject']})
 
     def test_subject_field_too_long_causes_error(self):
         """marshalling message with subject field too long"""
@@ -165,9 +169,10 @@ class MessageSchemaTestCase(unittest.TestCase):
         expected_error = f"Subject field length must not be greater than {MAX_SUBJECT_LEN}"
         with self.app.app_context():
             g.user = User(self.json_message['msg_from'], 'respondent')
-            schema = MessageSchema()
-            sut = schema.load(self.json_message)
-        self.assertTrue(expected_error in sut.errors['subject'])
+            with self.assertRaises(ValidationError) as e:
+                _ = MessageSchema().load(self.json_message)
+
+        self.assertEqual(e.exception.messages, {'subject': [expected_error]})
 
     def test_missing_thread_field_does_not_cause_error(self):
         """marshalling message with no thread_id field"""
@@ -185,9 +190,10 @@ class MessageSchemaTestCase(unittest.TestCase):
         expected_error = f"Thread field length must not be greater than {MAX_THREAD_LEN}"
         with self.app.app_context():
             g.user = User(self.json_message['msg_from'], 'respondent')
-            schema = MessageSchema()
-            sut = schema.load(self.json_message)
-        self.assertTrue(expected_error in sut.errors['thread_id'])
+            with self.assertRaises(ValidationError) as e:
+                _ = MessageSchema().load(self.json_message)
+
+        self.assertEqual(e.exception.messages, {'thread_id': [expected_error]})
 
     def test_missing_msg_id_causes_a_string_the_same_length_as_uuid_to_be_used(self):
         """Missing msg_id causes a uuid is used"""
@@ -209,7 +215,7 @@ class MessageSchemaTestCase(unittest.TestCase):
             schema = MessageSchema()
             errors = schema.load(message)[1]
 
-        self.assertTrue(errors == {'_schema': ['read_date can not be set']})
+        self.assertEqual(errors, {'_schema': ['read_date can not be set']})
 
     def test_missing_survey_causes_error(self):
         """marshalling message with no survey_id field"""
@@ -217,9 +223,9 @@ class MessageSchemaTestCase(unittest.TestCase):
         self.json_message['survey_id'] = ''
         with self.app.app_context():
             g.user = User(self.json_message['msg_from'], 'respondent')
-            schema = MessageSchema()
-            errors = schema.load(self.json_message)[1]
-        self.assertTrue(errors == {'survey_id': ['Please enter a survey']})
+            with self.assertRaises(ValidationError) as e:
+                MessageSchema().load(self.json_message)
+        self.assertEqual(e.exception.messages, {'survey_id': ['Please enter a survey']})
 
     def test_same_to_from_causes_error(self):
         """marshalling message with same to and from field"""
@@ -227,10 +233,10 @@ class MessageSchemaTestCase(unittest.TestCase):
         self.json_message['msg_to'] = ["01b51fcc-ed43-4cdb-ad1c-450f9986859b"]
         with self.app.app_context():
             g.user = User(self.json_message['msg_from'], 'respondent')
-            schema = MessageSchema()
-            errors = schema.load(self.json_message)[1]
+            with self.assertRaises(ValidationError) as e:
+                MessageSchema().load(self.json_message)
 
-        self.assertTrue(errors == {'_schema': ['msg_to and msg_from fields can not be the same.']})
+        self.assertTrue(e.exception.messages == {'_schema': ['msg_to and msg_from fields can not be the same.']})
 
     def test_msg_to_list_of_string(self):
         """marshalling message where msg_to field is list of strings"""
@@ -240,17 +246,17 @@ class MessageSchemaTestCase(unittest.TestCase):
             schema = MessageSchema()
             errors = schema.load(self.json_message)[1]
 
-        self.assertTrue(errors == {})
+        self.assertEqual(errors, {})
 
     def test_msg_to_string(self):
         """marshalling message where msg_to field is string"""
         self.json_message['msg_to'] = ["01b51fcc-ed43-4cdb-ad1c-450f9986859b"]
         with self.app.app_context():
             g.user = User(self.json_message['msg_from'], 'respondent')
-            schema = MessageSchema()
-            errors = schema.load(self.json_message)[1]
-
-        self.assertTrue(errors == {})
+            try:
+                MessageSchema().load(self.json_message)[1]
+            except ValidationError:
+                self.fail("Schema should've been correct and not thrown an error")
 
     def test_msg_from_string(self):
         """marshalling message where msg_from field is string"""
@@ -269,10 +275,10 @@ class MessageSchemaTestCase(unittest.TestCase):
         self.json_message['msg_from'] = "01b51fcc-ed43-4cdb-ad1c-450f9986859b"
         with self.app.app_context():
             g.user = User("01b51fcc-ed43-4cdb-ad1c-450f9986859b", 'internal')
-            schema = MessageSchema()
-            errors = schema.load(self.json_message)[1]
+            with self.assertRaises(ValidationError) as e:
+                MessageSchema().load(self.json_message)
 
-        self.assertTrue(errors == {'msg_to': ['NotAValidUser is not a valid respondent.']})
+        self.assertEqual(e.exception.messages, {'msg_to': ['NotAValidUser is not a valid respondent.']})
 
     def test_message_url_is_created_correctly(self):
         self.threadId = 'threadid'

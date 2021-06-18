@@ -154,7 +154,7 @@ class MessageById(Resource):
 
         bound_logger.info("Retrieving metadata for thread")
         request_data = request.get_json()
-        message = Retriever.retrieve_plain_message(message_id)  # TODO rename function
+        message = Retriever.retrieve_populated_message_object(message_id)
         if message is None:
             abort(404)
         self._validate_patch_request(request_data, message)

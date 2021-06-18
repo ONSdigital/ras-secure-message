@@ -52,6 +52,7 @@ jobs:
           pipenv install --dev --deploy
       - name: Run Tests
         run: |
+          make test
           pipenv run behave --format progress
           export APP_SETTINGS=TestConfig && pipenv run pytest && unset APP_SETTINGS
       - uses: google-github-actions/setup-gcloud@master
