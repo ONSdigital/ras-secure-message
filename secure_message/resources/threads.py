@@ -85,7 +85,11 @@ class ThreadById(Resource):
             raise BadRequest(description="No properties provided")
 
         try:
+<<<<<<< HEAD
             ThreadPatch().load(request_data)
+=======
+            ThreadPatch(strict=True).load(request_data)
+>>>>>>> origin/main
         except ValidationError as e:
             bound_logger.error("Errors found when validating request data", errors=e.messages)
             raise BadRequest(e.messages)
