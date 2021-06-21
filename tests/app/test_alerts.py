@@ -12,7 +12,7 @@ class AlertsTestCase(unittest.TestCase):
 
     def setUp(self):
         """setup test environment"""
-        self.app = create_app()
+        self.app = create_app(config='TestConfig')
         self.app.testing = True
 
     personalisation = {"RANDOM_URL": "randomemail"}

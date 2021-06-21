@@ -88,7 +88,7 @@ class MessageSchemaTestCase(unittest.TestCase):
         self.now = datetime.now(timezone.utc)
         internal_user_service.use_mock_service()
         party.use_mock_service()
-        self.app = create_app()
+        self.app = create_app(config='TestConfig')
 
     def test_valid_message_passes_validation(self):
         """marshaling a valid message"""

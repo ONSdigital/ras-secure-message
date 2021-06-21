@@ -21,7 +21,7 @@ class LoggingTestCase(unittest.TestCase):
 
     def setUp(self):
         """creates a test client"""
-        self.app = create_app()
+        self.app = create_app(config='TestConfig')
 
     def test_logging_message_endpoint(self):
         """logging message endpoint"""

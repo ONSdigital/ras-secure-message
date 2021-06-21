@@ -8,7 +8,7 @@ from secure_message.services.service_toggles import internal_user_service, party
 class PartyTestCase(unittest.TestCase):
 
     def setUp(self):
-        self.app = create_app()
+        self.app = create_app(config='TestConfig')
         self.client = self.app.test_client()
         internal_user_service.use_mock_service()
         party.use_mock_service()

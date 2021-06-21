@@ -54,7 +54,7 @@ jobs:
         run: |
           make test
           pipenv run behave --format progress
-          export APP_SETTINGS=TestConfig && pipenv run pytest && unset APP_SETTINGS
+          pipenv run pytest
       - uses: google-github-actions/setup-gcloud@master
         with:
           version: '270.0.0'

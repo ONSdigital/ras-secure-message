@@ -91,7 +91,7 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
     """Test case for message retrieval"""
     def setUp(self):
         """setup test environment"""
-        self.app = create_app()
+        self.app = create_app(config='TestConfig')
         self.app.testing = True
         self.engine = create_engine(self.app.config['SQLALCHEMY_DATABASE_URI'])
         self.MESSAGE_LIST_ENDPOINT = "http://localhost:5050/messages"

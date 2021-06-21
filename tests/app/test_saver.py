@@ -21,7 +21,7 @@ class SaverTestCase(unittest.TestCase):
     """Test case for message saving"""
     def setUp(self):
         """setup test environment"""
-        app = create_app()
+        app = create_app(config='TestConfig')
         app.testing = True
 
         self.engine = create_engine(app.config['SQLALCHEMY_DATABASE_URI'])

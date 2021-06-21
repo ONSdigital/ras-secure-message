@@ -29,7 +29,6 @@ class RasNotifyException(MessageSaveException):
 
 
 class MissingEnvironmentVariable(Exception):
-    def __init__(self, defaults):      # pylint:disable=super-init-not-called
-        missing_env_variables = [var for var in defaults if not os.environ.get(var)]
-        logger.error('Missing environment variables', variables=missing_env_variables)
-        sys.exit("Application failed to start")
+    def __init__(self, config_items_with_empty_values):      # pylint:disable=super-init-not-called
+        logger.error('Missing environment variables', variables=config_items_with_empty_values)
+        sys.exit("Application failed to start. Missing these variables: " + str(config_items_with_empty_values))
