@@ -6,13 +6,14 @@
 * [Message Fields](#message-fields)
 * [JWT](#jwt)
 * Messages
-  * [Get Message List](#get-message-list)
-  * [Send Message](#send-message)
-  * [Modify Message Labels](#modify-message-labels)
+  * [Get message list](#get-message-list)
+  * [Send message](#send-message)
+  * [Patch message](#patch-message)
+  * [Modify message labels](#modify-message-labels)
 * Conversations
   * [Get conversation list](#get-conversation-list)
   * [Get conversations count](#get-conversations-count)
-  * [Patch Conversation Metadata](#patch-conversation-metadata)
+  * [Patch conversation](#patch-conversation)
 * Health and Status
   * [Get Health](#get-health)
   * [Get Health With Database-status](#get-health-with-database-status)
@@ -25,11 +26,14 @@ The secure message service provides a method by which messages may be passed bet
 
 The 'secure' aspect alludes to it not being email , it uses a message store in a database within the ONS. So that the only time 'messages' leave is to be rendered on a web page.
 
-Messages are sent using an email-like set of characteristics (From, To, Subject and Body). They also encompass ONS specific meta data such as survey, collection case, reporting unit and collection instrument.
+Messages are sent using an email-like set of characteristics (From, To, Subject and Body).
+They also encompass ONS specific meta data such as survey, collection case, reporting unit and collection instrument.
 
 The api uses UUIDs to define from, to, survey, collection case, reporting unit and collection exercise.
 
-Each message is stored internally with a set of flags that indicate the state of the message per actor. These flags are known as labels in the service. That is if person A sends a message to person B then person A will have a label of SENT and person B will have a labels of INBOX and UNREAD. This storage of state per actor is crucial.
+Each message is stored internally with a set of flags that indicate the state of the message per actor. These flags are known as labels in the service.
+That is if person A sends a message to person B then person A will have a label of SENT and person B will have a labels of INBOX and UNREAD.
+This storage of state per actor is crucial.
 
 The api endpoints fall into 4 groups:
 
@@ -65,9 +69,11 @@ this currently has two fields:
 * party_id which is how the user is identified, this should be the users uuid
 * role which is set to either 'internal' for ons staff or 'respondent' for respondents.
 
-The algorithm and secret are defined in the configuration file. If the algorithm and/or secret are out of step between client and secure message service then the JWT will fail checks and the service will return a 500.
+The algorithm and secret are defined in the configuration file.
+If the algorithm and/or secret are out of step between client and secure message service then the JWT will fail checks and the service will return a 500.
 
-Being able to get a response from a health or info endpoint but 500's from a message post or read is often an indicator that something in this area is not configured correctly. An easy check for config is to access the /health/details endpoint.
+Being able to get a response from a health or info endpoint but 500's from a message post or read is often an indicator that something in this area is not configured correctly.
+An easy check for config is to access the /health/details endpoint.
 
 ## Get Message List
 
@@ -93,7 +99,9 @@ Retrieves a list of messages based on the selected parameters passed on the quer
 * An example of using one the above would be: `GET /messages?limit=2`
 * Using multiple parameters: `GET /messages?limit=2&label=INBOX&survey=12345678981047653839`
 
-Note that if the user is a respondent the get messages returns messages which match the uuid of the user passed in the JWT and that satisfy any additional filter criteria. If the user is internal then it matches messages sent to all internal users that satisfy the additional filter criteria . Typically that would be restricted by survey_id so that only messages  of a specific survey are returned.
+Note that if the user is a respondent the get messages returns messages which match the uuid of the user passed in the JWT and that satisfy any additional filter criteria.
+If the user is internal then it matches messages sent to all internal users that satisfy the additional filter criteria.
+Typically, that would be restricted by survey_id so that only messages  of a specific survey are returned.
 
 ### Example JSON Response
 
@@ -171,7 +179,8 @@ Note that if the user is a respondent the get messages returns messages which ma
 ]}
 ```
 
-Note the message response contains @msg_from , @msg_to and @business_details . These hold values that the secure message api has resolved from the party service or the user authentication service. They are not guaranteed to be populated if the service is not available or if the message was sent to 'GROUP'
+Note the message response contains @msg_from , @msg_to and @business_details . These hold values that the secure message api has resolved from the party service or the user authentication service.
+They are not guaranteed to be populated if the service is not available or if the message was sent to 'GROUP'
 
 ## Send Message
 
@@ -221,7 +230,8 @@ When a message is posted, typically, no msg_id is supplied.
 
 ### Example JSON Response version 1 and 2
 
-Note if the message is a new message ( not a reply to an existing one) then the thread_id and the message_id will be the same. This indicates that this message is the first in a conversation. Subsequent messages in a conversation will have their own msg_id but all share the same thread_id
+Note if the message is a new message ( not a reply to an existing one) then the thread_id and the message_id will be the same.
+This indicates that this message is the first in a conversation. Subsequent messages in a conversation will have their own msg_id but all share the same thread_id
 
 ```json
 {
@@ -230,6 +240,42 @@ Note if the message is a new message ( not a reply to an existing one) then the 
     "thread_id": "f0bf34fd-f5bd-4a17-a641-7ad976fef140"
 }
 ```
+
+## Patch Message
+
+`PATCH /messages/<msg_id>`
+
+This is used to update select fields in a message.  The fields that are changeable are:
+
+| Variable  | Type    | Notes |
+| :---:     | :---:   | :---: |
+| business_id | uuid | Cannot be set to an empty value |
+| case_id  | uuid | Cannot be set to an empty value |
+| exercise_id | uuid | Cannot be set to an empty value |
+| survey_id | uuid | Cannot be set to an empty value |
+
+Only the parameters you want to patch should be included in the call.  It's important to note, the id of the
+message is the `msg_id`, NOT the `id` of the message.
+
+### Example JSON payload
+
+```json
+{
+  "survey_id": "30b97a0c-7efe-4555-8384-2f4f74ebc029",
+  "case_id": "437934d4-9993-48e2-9290-7ab546c91f0b"
+}
+```
+
+There is no example response as a successful call will return a 204 with no extra content.
+Below is a list of possible return values:
+
+| Status | Notes |
+| :---: | :---: |
+| 204 | Success |
+| 400 | Incorrect payload data supplied |
+| 403 | Unauthorised.  |
+| 404 | msg_id supplied not found in the database |
+| 500 | Server-side error |
 
 ## Modify Message Labels
 
@@ -449,7 +495,7 @@ Available search criteria matches those on get threads:
   Use specific counts if they suffice.
 * business_id - If set then restrict conversations to those regarding a specific ru
 * cc - If set then restricts the conversations to a specific collection case
-* ce - If set then restricts the conversations to a specific collction exercise
+* ce - If set then restricts the conversations to a specific collection exercise
 
 ### Example JSON Response
 
@@ -472,18 +518,15 @@ sub conversations are in progress (i.e two internal users replying on a thread )
 
 ### Example JSON Response
 
-Messages should have survey_id, collection_case and use either a uuid or "GROUP" for the internal user.
+Messages should have populated survey_id if the category is 'SURVEY', a collection_case and use either a uuid or "GROUP" for the internal user.
 
 ```json
 {
-  "_links": {
-    "first": {
-      "href": "http://localhost:5050/threads/78e3caa6-2e27-4ad3-bd38-168b2cc3ef5d"
-    },
-    "self": {
-      "href": "http://localhost:5050/threads/78e3caa6-2e27-4ad3-bd38-168b2cc3ef5d?page=1&limit=20"
-    }
-  },
+  "category": "SURVEY",
+  "closed_at": null,
+  "closed_by": null,
+  "closed_by_uuid": null,
+  "is_closed": false,
   "messages": [
     {
       "@msg_from": {
@@ -621,23 +664,32 @@ Messages should have survey_id, collection_case and use either a uuid or "GROUP"
       "survey": "33333333-22222-3333-4444-88dc018a1a4c",
       "thread_id": "78e3caa6-2e27-4ad3-bd38-168b2cc3ef5d"
     }
-  ]
+  ],
+  "_links": {
+    "first": {
+      "href": "http://localhost:5050/threads/78e3caa6-2e27-4ad3-bd38-168b2cc3ef5d"
+    },
+    "self": {
+      "href": "http://localhost:5050/threads/78e3caa6-2e27-4ad3-bd38-168b2cc3ef5d?page=1&limit=20"
+    }
+  }
 }
 ```
 
 Note, See message get for descriptions of @msg_from, @msg_to and @business_details
 [Get Message List](#get-message-list)
 
-## Patch Conversation Metadata
+## Patch Conversation
 
 `PATCH /threads/<thread_id>`
 
 This is used to add/remove metadata to a conversation.  Below is a list of the parameters that can be
 patched:
 
-| Variable | Type| Notes |
-| :---: | :---: | :--: |
-| is_closed | `boolean` | Only internal users are allowed to close conversations.
+| Variable  | Type    | Notes |
+| :---:     | :---:   | :---: |
+| is_closed | boolean | Only internal users are allowed to close conversations. |
+| category  | str     | Category the conversation relates too |
 
 Only the parameters you want to patch should be included in the call.
 
@@ -645,7 +697,8 @@ Only the parameters you want to patch should be included in the call.
 
 ```json
 {
-    "is_closed": true
+    "is_closed": true,
+    "category": "TECHNICAL"
 }
 ```
 
@@ -654,7 +707,7 @@ Below is a list of possible return values:
 
 | Status | Notes |
 | :---: | :---: |
-| 204 | Successful call |
+| 204 | Success |
 | 400 | Incorrect payload data supplied |
 | 403 | Unauthorised.  |
 | 404 | Thread id supplied not found in the database |
@@ -692,7 +745,8 @@ Similar to health but validates that the current database connection is valid. H
 
 `GET /health/details`
 
-Returns more detailed information about secure message including some of the environment variables. Bypasses all aspects of the JWT.
+Returns more detailed information about secure message including a number of environment variables.
+Bypasses all aspects of the JWT.
 
 ### Example JSON Response
 
@@ -710,12 +764,9 @@ Returns more detailed information about secure message including some of the env
     "/messages/count": "Get count of unread messages",
     "/messages/modify/<message_id>": "Update message status by id"
   },
-  "APP Log Level": "INFO",
   "NOTIFY VIA GOV NOTIFY": "0",
   "Name": "ras-secure-message",
-  "RAS PARTY SERVICE HOST": "ras-party-service-sit.apps.devtest.onsclofo.uk",
-  "RAS PARTY SERVICE PORT": "80",
-  "RAS PARTY SERVICE PROTOCOL": "http",
+  "RAS-PARTY URL": "https://localhost:8080",
   "Logging level": "DEBUG",
   "Using party service mock": false,
   "Version": "0.1.2"
