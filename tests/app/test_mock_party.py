@@ -36,11 +36,11 @@ class PartyTestCase(unittest.TestCase):
         for detail in business_details:
             self.assertIn(detail['id'], list_business_id)
 
-    def test_get_user_details_returns_none_if_uuid_not_known(self):
+    def test_get_user_details_returns_empty_list_if_uuid_not_known(self):
         user = 'SomeoneWhoClearlyDoesNotExist'
         sut = PartyServiceMock()
         result_data = sut.get_user_details(user)
-        self.assertIsNone(result_data)
+        self.assertEqual(result_data, [])
 
     def test_get_business_details_returns_none_if_business_id_not_known(self):
         uuid = 'ABusinessThatDoesNotExist'

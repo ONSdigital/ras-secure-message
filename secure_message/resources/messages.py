@@ -4,7 +4,7 @@ from flask import abort, request, jsonify, g, current_app, make_response
 from flask_restful import Resource
 from marshmallow import ValidationError
 from structlog import wrap_logger
-from werkzeug.exceptions import BadRequest, NotFound
+from werkzeug.exceptions import BadRequest
 
 from secure_message import constants
 from secure_message.common.alerts import AlertViaGovNotify, AlertViaLogging
@@ -78,12 +78,6 @@ class MessageSend(Resource):
             raise BadRequest(e.messages)
 
         if post_data.get('thread_id'):
-            if post_data['from_internal'] and not party.get_users_details(post_data['msg_to']):
-                # If an internal person is sending a message to a respondent, we need to check that they exist.
-                # If they don't exist (because they've been deleted) then we raise a NotFound exception as the
-                # respondent can't be found in the system.
-                raise NotFound(description="Respondent not found")
-
             conversation_metadata = Retriever.retrieve_conversation_metadata(post_data.get('thread_id'))
             # Ideally, we'd return a 404 if there isn't a record in the conversation table.  But until we
             # ensure there is a record in here for every thread_id in the secure_message table, we just have to

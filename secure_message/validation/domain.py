@@ -70,7 +70,7 @@ class MessageSchema(Schema):
     def validate_to(self, msg_to):
         for item in msg_to:
             self.validate_non_zero_field_length("msg_to", len(item), constants.MAX_TO_LEN)
-            if g.user.is_internal:  # internal user must be sending to a respondent
+            if g.user.is_internal:  # Internal user sending to a respondent
                 if not g.user.is_valid_respondent(item):
                     logger.info('Not a valid respondent', user=item)
                     raise ValidationError(f"{item} is not a valid respondent.")
