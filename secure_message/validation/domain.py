@@ -13,7 +13,6 @@ logger = wrap_logger(logging.getLogger(__name__))
 class Message:
 
     """Class to hold message attributes"""
-
     def __init__(self, msg_from, subject, body, msg_to='', thread_id=None, msg_id='', case_id='',
                  survey_id='', business_id='', exercise_id='', from_internal=False):
 
@@ -56,13 +55,13 @@ class MessageSchema(Schema):
     from_internal = fields.Boolean(allow_none=True)
 
     @pre_load
-    def check_sent_and_read_date(self, data, **kwargs):
+    def check_sent_and_read_date(self, data, **kwargs): # NOQA pylint:disable=unused-argument
         self.validate_not_present(data, 'sent_date')
         self.validate_not_present(data, 'read_date')
         return data
 
     @validates_schema
-    def validate_to_from_not_equal(self, data, **kwargs):   # NOQA pylint:disable=no-self-use
+    def validate_to_from_not_equal(self, data, **kwargs):   # NOQA pylint:disable=no-self-use,unused-argument
         if 'msg_to' in data.keys() and 'msg_from' in data.keys() and data['msg_to'][0] == data['msg_from']:
             logger.info('Message to and message from cannot be the same', message_to=data['msg_to'][0], message_from=data['msg_from'])
             raise ValidationError("msg_to and msg_from fields can not be the same.")
@@ -119,7 +118,7 @@ class MessageSchema(Schema):
         self.validate_field_length("exercise_id", len(exercise_id), constants.MAX_COLLECTION_EXERCISE_LEN)
 
     @post_load
-    def make_message(self, data, **kwargs):  # NOQA pylint:disable=no-self-use
+    def make_message(self, data, **kwargs):  # NOQA pylint:disable=no-self-use,unused-argument
         logger.debug('Build message', data=data)
         return Message(**data)
 
