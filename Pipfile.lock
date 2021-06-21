@@ -187,11 +187,11 @@
         },
         "google-cloud-pubsub": {
             "hashes": [
-                "sha256:3f2b02685bff11c46a21a7f181d46cc08b7d47863ecca0500facb24436775345",
-                "sha256:8706557b71532c76aec48409dcac189caac47cf2decb8850ae75694bf70326b2"
+                "sha256:9bccec50a8c645d4d34424796a07a83b0201fd62385722f77948d45a86153c8f",
+                "sha256:e1315a3caebd5a6a824ec9197b908cc724ebdfd29abbc8b7569fa2aa6733bf97"
             ],
             "index": "pypi",
-            "version": "==2.5.0"
+            "version": "==2.6.0"
         },
         "googleapis-common-protos": {
             "extras": [
@@ -1125,11 +1125,11 @@
         },
         "isort": {
             "hashes": [
-                "sha256:0a943902919f65c5684ac4e0154b1ad4fac6dcaa5d9f3426b732f1c8b5419be6",
-                "sha256:2bb1680aad211e3c9944dbce1d4ba09a989f04e238296c87fe2139faa26d655d"
+                "sha256:8fd40deb804e5ce21dbbb92d0a9a79907209a0f2ba42be571c2963499c0d4829",
+                "sha256:e6b6111242682a9082738d0ba71a48ba5db0fa6fdabb169db9de13b48ad51840"
             ],
-            "markers": "python_version >= '3.6' and python_version < '4'",
-            "version": "==5.8.0"
+            "markers": "python_version < '4' and python_full_version >= '3.6.1'",
+            "version": "==5.9.0"
         },
         "itsdangerous": {
             "hashes": [

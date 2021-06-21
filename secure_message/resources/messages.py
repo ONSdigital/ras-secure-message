@@ -37,22 +37,18 @@ class MessageSend(Resource):
         post_data['from_internal'] = g.user.is_internal
         message = self._validate_post_data(post_data)
 
-        if message.errors:
-            logger.info('Message send failed', errors=message.errors)
-            return make_response(jsonify(message.errors), 400)
-
         # Validate claim
-        if not self._has_valid_claim(g.user, message.data):
+        if not self._has_valid_claim(g.user, message):
             logger.info("Message send failed", error="Invalid claim")
             return make_response(jsonify("Invalid claim"), 403)
 
         logger.info("Message passed validation")
         self._message_save(message)
         # listener errors are logged but still a 201 reported
-        MessageSend._alert_listeners(message.data)
+        MessageSend._alert_listeners(message)
         return make_response(jsonify({'status': '201',
-                                      'msg_id': message.data.msg_id,
-                                      'thread_id': message.data.thread_id}), 201)
+                                      'msg_id': message.msg_id,
+                                      'thread_id': message.thread_id}), 201)
 
     @staticmethod
     def _has_valid_claim(user, message):
@@ -63,19 +59,23 @@ class MessageSend(Resource):
     @staticmethod
     def _message_save(message):
         """Saves the message to the database along with the subsequent status and audit"""
-        Saver.save_message(message.data)
-        Saver.save_msg_event(message.data.msg_id, EventsApi.SENT.value)
+        Saver.save_message(message)
+        Saver.save_msg_event(message.msg_id, EventsApi.SENT.value)
 
-        Saver.save_msg_status(message.data.msg_from, message.data.msg_id, Labels.SENT.value)
-        Saver.save_msg_status(message.data.msg_to[0], message.data.msg_id, Labels.INBOX.value)
-        Saver.save_msg_status(message.data.msg_to[0], message.data.msg_id, Labels.UNREAD.value)
+        Saver.save_msg_status(message.msg_from, message.msg_id, Labels.SENT.value)
+        Saver.save_msg_status(message.msg_to[0], message.msg_id, Labels.INBOX.value)
+        Saver.save_msg_status(message.msg_to[0], message.msg_id, Labels.UNREAD.value)
 
     @staticmethod
     def _validate_post_data(post_data):
         if 'msg_id' in post_data:
             raise BadRequest(description="Message can not include msg_id")
 
-        message = MessageSchema().load(post_data)
+        try:
+            message = MessageSchema().load(post_data)
+        except ValidationError as e:
+            logger.info('Message send failed', errors=e.messages)
+            raise BadRequest(e.messages)
 
         if post_data.get('thread_id'):
             if post_data['from_internal'] and not party.get_users_details(post_data['msg_to']):

@@ -12,9 +12,8 @@ class ThreadPatch(Schema):
     category = fields.Str()
     is_closed = fields.Boolean()
 
-    @staticmethod
     @validates("category")
-    def validate_category(value):
+    def validate_category(self, value):  # NOQA pylint:disable=no-self-use
         if not value:
             raise ValidationError("category cannot be empty")
 

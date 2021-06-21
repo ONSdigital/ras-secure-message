@@ -180,9 +180,10 @@ class MessageSchemaTestCase(unittest.TestCase):
         self.json_message.pop('thread_id', "")
         with self.app.app_context():
             g.user = User(self.json_message['msg_from'], 'respondent')
-            schema = MessageSchema()
-            errors = schema.load(self.json_message)[1]
-        self.assertTrue(errors == {})
+            try:
+                MessageSchema().load(self.json_message)
+            except ValidationError:
+                self.fail("Schema should've been correct and not thrown an error")
 
     def test_thread_field_too_long_causes_error(self):
         """marshalling message with thread_id field too long"""
@@ -201,9 +202,8 @@ class MessageSchemaTestCase(unittest.TestCase):
         self.json_message['msg_to'] = ['01b51fcc-ed43-4cdb-ad1c-450f9986859b']
         with self.app.app_context():
             g.user = User(self.json_message['msg_from'], 'respondent')
-            schema = MessageSchema()
-            sut = schema.load(self.json_message)
-        self.assertEqual(len(sut.data.msg_id), 36)
+            output = MessageSchema().load(self.json_message)
+        self.assertEqual(len(output.msg_id), 36)
 
     def test_setting_read_date_field_causes_error(self):
         """marshalling message with no thread_id field"""
@@ -212,10 +212,10 @@ class MessageSchemaTestCase(unittest.TestCase):
 
         with self.app.app_context():
             g.user = User(message['msg_from'], 'respondent')
-            schema = MessageSchema()
-            errors = schema.load(message)[1]
+            with self.assertRaises(ValidationError) as e:
+                MessageSchema().load(message)
 
-        self.assertEqual(errors, {'_schema': ['read_date can not be set']})
+        self.assertEqual(e.exception.messages, {'_schema': ['read_date can not be set']})
 
     def test_missing_survey_causes_error(self):
         """marshalling message with no survey_id field"""
@@ -243,10 +243,10 @@ class MessageSchemaTestCase(unittest.TestCase):
         self.json_message['msg_to'] = ["01b51fcc-ed43-4cdb-ad1c-450f9986859b"]
         with self.app.app_context():
             g.user = User(self.json_message['msg_from'], 'respondent')
-            schema = MessageSchema()
-            errors = schema.load(self.json_message)[1]
-
-        self.assertEqual(errors, {})
+            try:
+                MessageSchema().load(self.json_message)
+            except ValidationError:
+                self.fail("Schema should've been correct and not thrown an error")
 
     def test_msg_to_string(self):
         """marshalling message where msg_to field is string"""
@@ -254,7 +254,7 @@ class MessageSchemaTestCase(unittest.TestCase):
         with self.app.app_context():
             g.user = User(self.json_message['msg_from'], 'respondent')
             try:
-                MessageSchema().load(self.json_message)[1]
+                MessageSchema().load(self.json_message)
             except ValidationError:
                 self.fail("Schema should've been correct and not thrown an error")
 
@@ -264,10 +264,10 @@ class MessageSchemaTestCase(unittest.TestCase):
         self.json_message['msg_from'] = "01b51fcc-ed43-4cdb-ad1c-450f9986859b"
         with self.app.app_context():
             g.user = User(self.json_message['msg_from'], 'respondent')
-            schema = MessageSchema()
-            errors = schema.load(self.json_message)[1]
-
-        self.assertTrue(errors == {})
+            try:
+                MessageSchema().load(self.json_message)
+            except ValidationError:
+                self.fail("Schema should've been correct and not thrown an error")
 
     def test_msg_to_validation_invalid_respondent(self):
         """marshalling message where msg_to field is a invalid user"""
