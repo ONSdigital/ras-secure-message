@@ -41,7 +41,6 @@ class ThreadById(Resource):
                         "closed_at": closed_at,
                         "category": conversation_metadata.category})
 
-
     @staticmethod
     def patch(thread_id):
         """Modify conversation metadata"""
