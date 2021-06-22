@@ -15,7 +15,7 @@ from secure_message.repository.modifier import Modifier
 from secure_message.repository.retriever import Retriever
 from secure_message.repository.saver import Saver
 from secure_message.services.service_toggles import party, internal_user_service
-from secure_message.validation.domain import MessageSchema, MessagePatch
+from secure_message.validation.domain import MessageSchema, MessagePatch, Message
 
 logger = wrap_logger(logging.getLogger(__name__))
 
@@ -40,7 +40,7 @@ class MessageSend(Resource):
         has_survey_category = False if 'category' in post_data and post_data['category'] in ['TECHNICAL', 'MISC'] else \
             True
         # Validate claim
-        if not self._has_valid_claim(g.user, message.data) and has_survey_category:
+        if not self._has_valid_claim(g.user, message) and has_survey_category:
             logger.info("Message send failed", error="Invalid claim")
             return make_response(jsonify("Invalid claim"), 403)
 
@@ -53,13 +53,13 @@ class MessageSend(Resource):
                                       'thread_id': message.thread_id}), 201)
 
     @staticmethod
-    def _has_valid_claim(user, message):
+    def _has_valid_claim(user, message: Message) -> bool:
         """Validates that the user has a valid claim to interact with the business and survey in the post data
         internal users have claims to everything, respondents need to check against party"""
         return user.is_internal or party.does_user_have_claim(user.user_uuid, message.business_id, message.survey_id)
 
     @staticmethod
-    def _message_save(message):
+    def _message_save(message: Message):
         """Saves the message to the database along with the subsequent status and audit"""
         Saver.save_message(message)
         Saver.save_msg_event(message.msg_id, EventsApi.SENT.value)
@@ -69,7 +69,7 @@ class MessageSend(Resource):
         Saver.save_msg_status(message.msg_to[0], message.msg_id, Labels.UNREAD.value)
 
     @staticmethod
-    def _validate_post_data(post_data):
+    def _validate_post_data(post_data: dict) -> Message:
         if 'msg_id' in post_data:
             raise BadRequest(description="Message can not include msg_id")
 
