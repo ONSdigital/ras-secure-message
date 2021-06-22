@@ -8,7 +8,6 @@ start:
 
 lint:
 	export APP_SETTINGS=DevConfig && pipenv run flake8 ./secure_message ./tests
-	pipenv run pylint --output-format=colorized -j 0 --reports=n ./secure_message
 	pipenv check ./secure_message ./tests
 
 unit-test:
