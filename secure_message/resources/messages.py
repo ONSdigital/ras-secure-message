@@ -1,7 +1,8 @@
 import logging
 
-from flask import request, jsonify, g, current_app, make_response
+from flask import abort, request, jsonify, g, current_app, make_response
 from flask_restful import Resource
+from marshmallow import ValidationError
 from structlog import wrap_logger
 from werkzeug.exceptions import BadRequest, NotFound
 
@@ -9,15 +10,17 @@ from secure_message import constants
 from secure_message.common.alerts import AlertViaGovNotify, AlertViaLogging
 from secure_message.common.eventsapi import EventsApi
 from secure_message.common.labels import Labels
+from secure_message.repository.database import SecureMessage
 from secure_message.repository.modifier import Modifier
 from secure_message.repository.retriever import Retriever
 from secure_message.repository.saver import Saver
 from secure_message.services.service_toggles import party, internal_user_service
-from secure_message.validation.domain import MessageSchema
+from secure_message.validation.domain import MessageSchema, MessagePatch
 
 logger = wrap_logger(logging.getLogger(__name__))
 
-"""Rest endpoint for message resources. Messages are immutable, they can only be created."""
+
+"""Rest endpoint for message resources."""
 
 
 class MessageSend(Resource):
@@ -124,7 +127,6 @@ class MessageSend(Resource):
 
     @staticmethod
     def _get_user_name(user, message):
-
         user_name = 'Unknown user'
         is_internal_user = user.is_internal
         user_data = internal_user_service.get_user_details(message.msg_from) if is_internal_user else party. \
@@ -138,6 +140,49 @@ class MessageSend(Resource):
                 user_name = full_name
 
         return user_name
+
+
+class MessageById(Resource):
+
+    def patch(self, message_id: str):
+        """Patch message data"""
+        bound_logger = logger.bind(message_id=message_id, user_uuid=g.user.user_uuid)
+        bound_logger.info("Validating request")
+        if not g.user.is_internal:
+            bound_logger.info("Message modification is forbidden")
+            abort(403)
+        if request.headers.get('Content-Type', '').lower() != 'application/json':
+            bound_logger.info('Request must set accept content type "application/json" in header.')
+            raise BadRequest(description='Request must set accept content type "application/json" in header.')
+
+        bound_logger.info("Retrieving metadata for thread")
+        request_data = request.get_json()
+        message = Retriever.retrieve_plain_message(message_id)  # TODO rename function
+        if message is None:
+            abort(404)
+        self._validate_patch_request(request_data, message)
+
+        bound_logger.info("Attempting to modify data for message")
+        Modifier.patch_message(request_data, message)
+
+        bound_logger.info("Message data update successful")
+        bound_logger.unbind('message_id', 'user_uuid')
+        return '', 204
+
+    @staticmethod
+    def _validate_patch_request(request_data: dict, message: SecureMessage):
+        """Used to validate data within request body"""
+        bound_logger = logger.bind(message_id=message.msg_id, user_uuid=g.user.user_uuid)
+        # Check if it's empty
+        if not request_data:
+            bound_logger.info('No properties provided')
+            raise BadRequest(description="No properties provided")
+
+        try:
+            MessagePatch(strict=True).load(request_data)
+        except ValidationError as e:
+            bound_logger.error("Errors found when validating request data", errors=e.messages)
+            raise BadRequest(e.messages)
 
 
 class MessageModifyById(Resource):

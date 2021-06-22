@@ -11,6 +11,7 @@ logger = wrap_logger(logging.getLogger(__name__))
 
 
 class Message:
+
     """Class to hold message attributes"""
 
     def __init__(self, msg_from, subject, body, msg_to='', thread_id=None, msg_id='', case_id='',
@@ -41,6 +42,7 @@ class Message:
 
 
 class MessageSchema(Schema):
+
     """ Class to marshal JSON to Message"""
     msg_id = fields.Str(allow_none=True)
     msg_to = fields.List(fields.String(required=True))
@@ -156,3 +158,11 @@ class MessageSchema(Schema):
             logger.info('Category unknown', field_name=field_name)
             raise ValidationError(f'{field_name} category unknown', field_name, [],
                                   data)
+
+
+class MessagePatch(Schema):
+    """Class to marshal JSON to Message"""
+    case_id = fields.UUID()
+    business_id = fields.UUID()
+    survey_id = fields.UUID()
+    exercise_id = fields.UUID()

@@ -36,3 +36,21 @@ def step_impl_survey_set_to_alternate(context):
 def step_impl_survey_set_to_default(context):
     """set the message data survey field to be that of the default survey as in the helper"""
     context.bdd_helper.use_default_survey()
+
+
+@when("the survey_id of the message is changed to '{survey_id}'")
+def step_impl_the_response_message_thread_is_closed(context, survey_id):
+    """close the conversation of the last saved message"""
+    msg_id = context.bdd_helper.single_message_responses_data[0]['msg_id']
+    url = context.bdd_helper.message_patch_url.format(msg_id)
+    context.response = context.client.patch(url, data=json.dumps({"survey_id": survey_id}),
+                                            headers=context.bdd_helper.headers)
+
+
+@when("the survey_id of the message is changed to an empty string")
+def step_impl_the_response_message_thread_is_closed(context):
+    """close the conversation of the last saved message"""
+    msg_id = context.bdd_helper.single_message_responses_data[0]['msg_id']
+    url = context.bdd_helper.message_patch_url.format(msg_id)
+    context.response = context.client.patch(url, data=json.dumps({"survey_id": ""}),
+                                            headers=context.bdd_helper.headers)

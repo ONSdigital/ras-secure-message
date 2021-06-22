@@ -84,6 +84,7 @@ class SecureMessagingContextHelper:
 
         self._message_post_url = SecureMessagingContextHelper.__BASE_URL + "/messages"
         self._message_get_url = SecureMessagingContextHelper.__BASE_URL + "/message/{0}"
+        self._message_patch_url = SecureMessagingContextHelper.__BASE_URL + "/messages/{0}"
         self._message_put_url = SecureMessagingContextHelper.__BASE_URL + "/messages/modify/{}"
         self._threads_get_count_url = SecureMessagingContextHelper.__BASE_URL + "/messages/count"
 
@@ -171,6 +172,10 @@ class SecureMessagingContextHelper:
     @property
     def message_get_url(self):
         return self._message_get_url
+
+    @property
+    def message_patch_url(self):
+        return self._message_patch_url
 
     @property
     def message_put_url(self):
