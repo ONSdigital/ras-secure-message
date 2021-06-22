@@ -48,7 +48,7 @@ def step_impl_the_response_message_thread_is_closed(context, survey_id):
 
 
 @when("the survey_id of the message is changed to an empty string")
-def step_impl_the_response_message_thread_is_closed(context):
+def step_impl_the_response_message_thread_is_closed(context):  # noqa: F811
     """close the conversation of the last saved message"""
     msg_id = context.bdd_helper.single_message_responses_data[0]['msg_id']
     url = context.bdd_helper.message_patch_url.format(msg_id)

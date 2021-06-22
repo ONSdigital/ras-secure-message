@@ -41,8 +41,10 @@ class MessageSend(Resource):
             logger.info('Message send failed', errors=message.errors)
             return make_response(jsonify(message.errors), 400)
 
+        has_survey_category = False if 'category' in post_data and post_data['category'] in ['TECHNICAL', 'MISC'] else \
+            True
         # Validate claim
-        if not self._has_valid_claim(g.user, message.data):
+        if not self._has_valid_claim(g.user, message.data) and has_survey_category:
             logger.info("Message send failed", error="Invalid claim")
             return make_response(jsonify("Invalid claim"), 403)
 
@@ -65,7 +67,6 @@ class MessageSend(Resource):
         """Saves the message to the database along with the subsequent status and audit"""
         Saver.save_message(message.data)
         Saver.save_msg_event(message.data.msg_id, EventsApi.SENT.value)
-
         Saver.save_msg_status(message.data.msg_from, message.data.msg_id, Labels.SENT.value)
         Saver.save_msg_status(message.data.msg_to[0], message.data.msg_id, Labels.INBOX.value)
         Saver.save_msg_status(message.data.msg_to[0], message.data.msg_id, Labels.UNREAD.value)
@@ -109,9 +110,11 @@ class MessageSend(Resource):
             if party_data:
                 if 'emailAddress' in party_data[0] and party_data[0]['emailAddress'].strip():
                     recipient_email = party_data[0]['emailAddress'].strip()
-                    alert_method = AlertViaLogging() if current_app.config['NOTIFY_VIA_GOV_NOTIFY'] == '0' else AlertViaGovNotify(current_app.config)
+                    alert_method = AlertViaLogging() if current_app.config['NOTIFY_VIA_GOV_NOTIFY'] == '0' else \
+                        AlertViaGovNotify(current_app.config)
                     personalisation = MessageSend._create_message_url(message.thread_id)
-                    alert_method.send(recipient_email, message.msg_id, personalisation, message.survey_id, party_data[0]['id'])
+                    alert_method.send(recipient_email, message.msg_id, personalisation, message.survey_id,
+                                      party_data[0]['id'])
                 else:
                     logger.error('User does not have an emailAddress specified', msg_to=message.msg_to[0])
             # else not testable as fails validation
@@ -126,7 +129,7 @@ class MessageSend(Resource):
     def _get_user_name(user, message):
         user_name = 'Unknown user'
         is_internal_user = user.is_internal
-        user_data = internal_user_service.get_user_details(message.msg_from) if is_internal_user else party.\
+        user_data = internal_user_service.get_user_details(message.msg_from) if is_internal_user else party. \
             get_user_details(message.msg_from)
 
         if user_data:
