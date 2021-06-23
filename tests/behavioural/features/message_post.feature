@@ -15,7 +15,7 @@ Feature: Message Send Endpoint
 
   Scenario Outline: Respondent sending a valid Technical message to specific user and receiving a 201
     Given sending from respondent to internal <user>
-      And  the msg_category is set to 'TECHNICAL'
+      And  the category is set to 'TECHNICAL'
     When the message is sent
     Then a created status code 201 is returned
     Examples: user type
@@ -25,7 +25,7 @@ Feature: Message Send Endpoint
 
   Scenario Outline: Respondent sending a valid MISC message to specific user and receiving a 201
     Given sending from respondent to internal <user>
-      And  the msg_category is set to 'MISC'
+      And  the category is set to 'MISC'
     When the message is sent
     Then a created status code 201 is returned
 
