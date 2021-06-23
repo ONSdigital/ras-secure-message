@@ -1,7 +1,8 @@
 from datetime import datetime
 import logging
+from typing import Union
 
-from flask import jsonify
+from flask import jsonify, Response
 from sqlalchemy.exc import SQLAlchemyError
 from structlog import wrap_logger
 from werkzeug.exceptions import InternalServerError
@@ -62,7 +63,7 @@ class Modifier:
             raise InternalServerError(description="Error removing label from database")
 
     @staticmethod
-    def add_unread(message, user):
+    def add_unread(message: dict, user) -> Union[bool, Response]:
         """Add unread label to status"""
         unread = Labels.UNREAD.value
         inbox = Labels.INBOX.value
@@ -74,7 +75,7 @@ class Modifier:
             return True
         res = jsonify({'status': 'error'})
         res.status_code = 400
-        logging.error('Error adding unread label', status_code=res.status_code)
+        logger.error('Error adding unread label', status_code=res.status_code)
         return res
 
     @staticmethod
@@ -99,7 +100,7 @@ class Modifier:
             secure_messages = SecureMessage.query.filter(SecureMessage.thread_id == thread_id)
             for secure_message in secure_messages.all():
                 message = secure_message.serialize(user)
-                if inbox in message['labels'] and unread in message['labels'] and 'read_date' not in message:
+                if inbox in message['labels'] and unread in message['labels']:
                     event = Events(msg_id=message['msg_id'], event=EventsApi.READ.value)
                     db.session.add(event)
                     secure_message.read_at = datetime.utcnow()
@@ -168,10 +169,11 @@ class Modifier:
         """
         bound_logger = logger.bind(message_id=message.msg_id)
         try:
-            for field in ['survey_id', 'case_id', 'business_id', 'exercise_id']:
-                # Currently not possible to clear a value in a field.
-                if request_data.get(field) and request_data.get(field) != getattr(message, field):
-                    setattr(message, field, request_data[field])
+            changeable_values = ['survey_id', 'case_id', 'business_id', 'exercise_id', 'read_at']
+            for key in request_data.keys():
+                if key in changeable_values:
+                    if request_data.get(key) != getattr(message, key):
+                        setattr(message, key, request_data[key])
 
             db.session.commit()
         except SQLAlchemyError:
