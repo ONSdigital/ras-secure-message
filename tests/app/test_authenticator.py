@@ -14,7 +14,7 @@ class AuthenticationTestCase(unittest.TestCase):
 
     def setUp(self):
         """setup test environment"""
-        self.app = create_app()
+        self.app = create_app(config='TestConfig')
 
     def test_authentication_jwt_pass(self):
         """Authenticate request using correct JWT"""

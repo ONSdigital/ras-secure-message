@@ -1,6 +1,5 @@
 import unittest
 from unittest.mock import patch
-from datetime import datetime, timezone
 
 from flask import current_app, json
 from sqlalchemy import create_engine
@@ -24,7 +23,7 @@ class AppTestCase(unittest.TestCase):
 
     def setUp(self):
         """setup test environment"""
-        self.app = application.create_app()
+        self.app = application.create_app(config='TestConfig')
         self.client = self.app.test_client()
         self.engine = create_engine(self.app.config['SQLALCHEMY_DATABASE_URI'])
 
@@ -72,9 +71,7 @@ class AppTestCase(unittest.TestCase):
                 'msg_from': AppTestCase.SPECIFIC_INTERNAL_USER,
                 'subject': 'MyMessage',
                 'body': 'hello',
-                'thread': "?",
                 'business_id': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc',
-                'create_date': datetime.now(timezone.utc),
                 'survey_id': 'a-uuid-for-the-survey'}
 
         response = self.client.post(url, data=json.dumps(data), headers=self.internal_user_header)

@@ -4,7 +4,7 @@ from flask import abort, request, jsonify, g, current_app, make_response
 from flask_restful import Resource
 from marshmallow import ValidationError
 from structlog import wrap_logger
-from werkzeug.exceptions import BadRequest, NotFound
+from werkzeug.exceptions import BadRequest
 
 from secure_message import constants
 from secure_message.common.alerts import AlertViaGovNotify, AlertViaLogging
@@ -15,7 +15,7 @@ from secure_message.repository.modifier import Modifier
 from secure_message.repository.retriever import Retriever
 from secure_message.repository.saver import Saver
 from secure_message.services.service_toggles import party, internal_user_service
-from secure_message.validation.domain import MessageSchema, MessagePatch
+from secure_message.validation.domain import MessageSchema, MessagePatch, Message
 
 logger = wrap_logger(logging.getLogger(__name__))
 
@@ -37,54 +37,49 @@ class MessageSend(Resource):
         post_data['from_internal'] = g.user.is_internal
         message = self._validate_post_data(post_data)
 
-        if message.errors:
-            logger.info('Message send failed', errors=message.errors)
-            return make_response(jsonify(message.errors), 400)
-
         has_survey_category = False if 'category' in post_data and post_data['category'] in ['TECHNICAL', 'MISC'] else \
             True
         # Validate claim
-        if not self._has_valid_claim(g.user, message.data) and has_survey_category:
+        if not self._has_valid_claim(g.user, message) and has_survey_category:
             logger.info("Message send failed", error="Invalid claim")
             return make_response(jsonify("Invalid claim"), 403)
 
         logger.info("Message passed validation")
         self._message_save(message)
         # listener errors are logged but still a 201 reported
-        MessageSend._alert_listeners(message.data)
+        MessageSend._alert_listeners(message)
         return make_response(jsonify({'status': '201',
-                                      'msg_id': message.data.msg_id,
-                                      'thread_id': message.data.thread_id}), 201)
+                                      'msg_id': message.msg_id,
+                                      'thread_id': message.thread_id}), 201)
 
     @staticmethod
-    def _has_valid_claim(user, message):
+    def _has_valid_claim(user, message: Message) -> bool:
         """Validates that the user has a valid claim to interact with the business and survey in the post data
         internal users have claims to everything, respondents need to check against party"""
         return user.is_internal or party.does_user_have_claim(user.user_uuid, message.business_id, message.survey_id)
 
     @staticmethod
-    def _message_save(message):
+    def _message_save(message: Message):
         """Saves the message to the database along with the subsequent status and audit"""
-        Saver.save_message(message.data)
-        Saver.save_msg_event(message.data.msg_id, EventsApi.SENT.value)
-        Saver.save_msg_status(message.data.msg_from, message.data.msg_id, Labels.SENT.value)
-        Saver.save_msg_status(message.data.msg_to[0], message.data.msg_id, Labels.INBOX.value)
-        Saver.save_msg_status(message.data.msg_to[0], message.data.msg_id, Labels.UNREAD.value)
+        Saver.save_message(message)
+        Saver.save_msg_event(message.msg_id, EventsApi.SENT.value)
+
+        Saver.save_msg_status(message.msg_from, message.msg_id, Labels.SENT.value)
+        Saver.save_msg_status(message.msg_to[0], message.msg_id, Labels.INBOX.value)
+        Saver.save_msg_status(message.msg_to[0], message.msg_id, Labels.UNREAD.value)
 
     @staticmethod
-    def _validate_post_data(post_data):
+    def _validate_post_data(post_data: dict) -> Message:
         if 'msg_id' in post_data:
             raise BadRequest(description="Message can not include msg_id")
 
-        message = MessageSchema().load(post_data)
+        try:
+            message = MessageSchema().load(post_data)
+        except ValidationError as e:
+            logger.info('Message send failed', errors=e.messages)
+            raise BadRequest(e.messages)
 
         if post_data.get('thread_id'):
-            if post_data['from_internal'] and not party.get_users_details(post_data['msg_to']):
-                # If an internal person is sending a message to a respondent, we need to check that they exist.
-                # If they don't exist (because they've been deleted) then we raise a NotFound exception as the
-                # respondent can't be found in the system.
-                raise NotFound(description="Respondent not found")
-
             conversation_metadata = Retriever.retrieve_conversation_metadata(post_data.get('thread_id'))
             # Ideally, we'd return a 404 if there isn't a record in the conversation table.  But until we
             # ensure there is a record in here for every thread_id in the secure_message table, we just have to
@@ -157,7 +152,7 @@ class MessageById(Resource):
 
         bound_logger.info("Retrieving metadata for thread")
         request_data = request.get_json()
-        message = Retriever.retrieve_plain_message(message_id)  # TODO rename function
+        message = Retriever.retrieve_populated_message_object(message_id)
         if message is None:
             abort(404)
         self._validate_patch_request(request_data, message)
@@ -179,7 +174,7 @@ class MessageById(Resource):
             raise BadRequest(description="No properties provided")
 
         try:
-            MessagePatch(strict=True).load(request_data)
+            MessagePatch().load(request_data)
         except ValidationError as e:
             bound_logger.error("Errors found when validating request data", errors=e.messages)
             raise BadRequest(e.messages)

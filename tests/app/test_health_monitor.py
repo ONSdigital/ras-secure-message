@@ -11,7 +11,7 @@ class HealthTestCase(unittest.TestCase):
     """Test case for application health monitor"""
     def setUp(self):
         """setup test environment"""
-        self.app = create_app()
+        self.app = create_app(config='TestConfig')
         self.client = self.app.test_client()
         self.app.testing = True
         with self.app.app_context():
