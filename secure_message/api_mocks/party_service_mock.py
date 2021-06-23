@@ -21,7 +21,7 @@ class PartyServiceMock:
         user_details = [self._respondent_ids[uuid] for uuid in self._respondent_ids if uuid in uuids]
         if not user_details:
             logger.error(f'Party service failed for uuid:{uuids}')
-            user_details = None
+            user_details = []
         return user_details
 
     def does_user_have_claim(self, user_id, business_id, survey_id):

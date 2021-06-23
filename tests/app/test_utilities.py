@@ -31,7 +31,7 @@ class UtilitiesTestCase(unittest.TestCase):
 
     def setUp(self):
         """setup test environment"""
-        self.app = create_app()
+        self.app = create_app(config='TestConfig')
         self.app.testing = True
         party.use_mock_service()
         internal_user_service.use_mock_service()

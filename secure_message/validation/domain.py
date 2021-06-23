@@ -13,7 +13,6 @@ logger = wrap_logger(logging.getLogger(__name__))
 class Message:
 
     """Class to hold message attributes"""
-
     def __init__(self, msg_from, subject, body, msg_to='', thread_id=None, msg_id='', case_id='',
                  survey_id='', business_id='', exercise_id='', from_internal=False, category=None):
         self.msg_id = str(uuid.uuid4()) if not msg_id else msg_id  # If empty msg_id assign to a uuid
@@ -58,13 +57,13 @@ class MessageSchema(Schema):
     category = fields.Str(required=False)
 
     @pre_load
-    def check_sent_and_read_date(self, data):
+    def check_sent_and_read_date(self, data, **kwargs): # NOQA pylint:disable=unused-argument
         self.validate_not_present(data, 'sent_date')
         self.validate_not_present(data, 'read_date')
         return data
 
     @validates_schema
-    def validate_to_from_not_equal(self, data):  # NOQA pylint:disable=no-self-use
+    def validate_to_from_not_equal(self, data, **kwargs):   # NOQA pylint:disable=no-self-use,unused-argument
         if 'msg_to' in data.keys() and 'msg_from' in data.keys() and data['msg_to'][0] == data['msg_from']:
             logger.info('Message to and message from cannot be the same', message_to=data['msg_to'][0],
                         message_from=data['msg_from'])
@@ -74,7 +73,7 @@ class MessageSchema(Schema):
     def validate_to(self, msg_to):
         for item in msg_to:
             self.validate_non_zero_field_length("msg_to", len(item), constants.MAX_TO_LEN)
-            if g.user.is_internal:  # internal user must be sending to a respondent
+            if g.user.is_internal:  # Internal user sending to a respondent
                 if not g.user.is_valid_respondent(item):
                     logger.info('Not a valid respondent', user=item)
                     raise ValidationError(f"{item} is not a valid respondent.")
@@ -127,7 +126,7 @@ class MessageSchema(Schema):
         self.validate_category_type("category")
 
     @post_load
-    def make_message(self, data):  # NOQA pylint:disable=no-self-use
+    def make_message(self, data, **kwargs):  # NOQA pylint:disable=no-self-use,unused-argument
         logger.debug('Build message', data=data)
         return Message(**data)
 

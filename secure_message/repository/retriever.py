@@ -202,7 +202,7 @@ class Retriever:
         return result
 
     @staticmethod
-    def retrieve_plain_message(message_id: str) -> SecureMessage:
+    def retrieve_populated_message_object(message_id: str) -> SecureMessage:
         """
         Gets a single message from the secure_message table
 

@@ -22,4 +22,4 @@ class User:
 
     @staticmethod
     def is_valid_respondent(uuid):
-        return party.get_user_details(uuid) is not None
+        return bool(party.get_user_details(uuid))

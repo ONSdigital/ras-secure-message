@@ -15,7 +15,7 @@ class TestClientTokenFunctions(unittest.TestCase):
 
     def setUp(self):
         """setup test environment"""
-        self.app = application.create_app()
+        self.app = application.create_app(config='TestConfig')
         self.client = self.app.test_client()
         self.engine = create_engine(self.app.config['SQLALCHEMY_DATABASE_URI'])
 
