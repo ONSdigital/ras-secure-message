@@ -56,6 +56,7 @@ class ThreadById(Resource):
         bound_logger.info("Retrieving metadata for thread")
         request_data = request.get_json()
         conversation = Retriever.retrieve_conversation_metadata(thread_id)
+
         if conversation is None:
             abort(404)
         ThreadById._validate_patch_request(request_data, conversation)
@@ -70,6 +71,19 @@ class ThreadById(Resource):
             else:
                 bound_logger.info("About to re-open conversation")
                 Modifier.open_conversation(conversation, g.user)
+        else:  # If anything changes in a thread that isn't is_closed, mark as unread
+            bound_logger.info("Marking thread as unread after thread data change")
+            full_conversation = Retriever.retrieve_thread(thread_id, g.user)
+
+            # First message in the list is always the most recent due to retrieve_thread ordering by id
+            most_recent_message = full_conversation[0].serialize(g.user)
+            if 'UNREAD' not in most_recent_message['labels']:
+                result = Modifier.add_unread(most_recent_message, g.user)
+
+                # Result will be either True (on success) or a response object (on failure)
+                if type(result) is not bool:
+                    return result
+                Modifier.patch_message({'read_at': None}, full_conversation[0])
 
         bound_logger.info("Thread metadata update successful")
         bound_logger.unbind('thread_id', 'user_uuid')

@@ -165,3 +165,4 @@ class MessagePatch(Schema):
     business_id = fields.UUID()
     survey_id = fields.UUID()
     exercise_id = fields.UUID()
+    read_at = fields.DateTime(allow_none=True)

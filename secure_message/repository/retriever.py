@@ -274,7 +274,7 @@ class Retriever:
         return result
 
     @staticmethod
-    def _retrieve_thread_for_internal_user(thread_id):
+    def _retrieve_thread_for_internal_user(thread_id: str):
         """returns paginated list of messages for thread id for an internal user"""
 
         try:
