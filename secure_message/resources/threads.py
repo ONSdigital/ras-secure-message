@@ -7,7 +7,6 @@ from marshmallow import ValidationError
 from structlog import wrap_logger
 
 from secure_message.common.utilities import get_options, process_paginated_list, add_users_and_business_details
-from secure_message.common.labels import Labels
 from secure_message.constants import THREAD_LIST_ENDPOINT
 from secure_message.repository.modifier import Modifier
 from secure_message.repository.retriever import Retriever
