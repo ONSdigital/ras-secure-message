@@ -7,7 +7,7 @@ start:
 	pipenv run python run.py
 
 lint:
-	export APP_SETTINGS=DevConfig && pipenv run flake8 ./secure_message ./tests
+	pipenv run flake8 ./secure_message ./tests
 	pipenv check ./secure_message ./tests
 	pipenv run isort . 
 
