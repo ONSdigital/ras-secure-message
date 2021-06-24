@@ -65,6 +65,7 @@ class Modifier:
     @staticmethod
     def add_unread(message: dict, user) -> Union[bool, Response]:
         """Add unread label to status"""
+        logger.info('Attempting to add unread label to message', msg_id=message['msg_id'], labels=message['labels'])
         unread = Labels.UNREAD.value
         inbox = Labels.INBOX.value
         if inbox in message['labels']:
@@ -75,7 +76,8 @@ class Modifier:
             return True
         res = jsonify({'status': 'error'})
         res.status_code = 400
-        logger.error('Error adding unread label', status_code=res.status_code)
+        logger.error('Error adding unread label', status_code=res.status_code, msg_id=message['msg_id'],
+                     labels=message['labels'])
         return res
 
     @staticmethod
@@ -167,7 +169,8 @@ class Modifier:
         :param request_data: Json containing which fields should be patched
         :param message: An dict containing the currently saved database data
         """
-        bound_logger = logger.bind(message_id=message.msg_id)
+        bound_logger = logger.bind(message_id=message.msg_id, request_data=request_data)
+        bound_logger.info("Attempting to patch message")
         try:
             changeable_values = ['survey_id', 'case_id', 'business_id', 'exercise_id', 'read_at']
             for key in request_data.keys():
@@ -178,8 +181,8 @@ class Modifier:
             db.session.commit()
         except SQLAlchemyError:
             db.session.rollback()
-            bound_logger.exception("Database error occurred while opening conversation")
-            raise InternalServerError(description="Database error occurred while opening conversation")
+            bound_logger.exception("Database error occurred while patching message")
+            raise InternalServerError(description="Database error occurred while patching message")
 
     @staticmethod
     def close_conversation(metadata: Conversation, user):
