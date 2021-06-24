@@ -9,12 +9,17 @@ start:
 lint:
 	pipenv run flake8 ./secure_message ./tests
 	pipenv check ./secure_message ./tests
-	pipenv run isort . 
+	pipenv run isort .
+
+lint-check:
+	pipenv run flake8 ./secure_message ./tests
+	pipenv check ./secure_message ./tests
+	pipenv run isort . --check-only -v
 
 unit-test:
 	pipenv run pytest
 
-test: lint
+test: lint-check
 	pipenv run behave --format progress
 	pipenv run pytest
 
