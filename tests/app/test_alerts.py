@@ -1,10 +1,10 @@
+import json
 import unittest
 from unittest import mock
 
 from secure_message.application import create_app
-from secure_message.exception.exceptions import RasNotifyException
 from secure_message.common.alerts import AlertViaGovNotify
-import json
+from secure_message.exception.exceptions import RasNotifyException
 
 
 class AlertsTestCase(unittest.TestCase):

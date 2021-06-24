@@ -1,5 +1,5 @@
-from sqlite3 import DatabaseError
 import sys
+from sqlite3 import DatabaseError
 
 from sqlalchemy import create_engine, insert
 from sqlalchemy.orm import sessionmaker

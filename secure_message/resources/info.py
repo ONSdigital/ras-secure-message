@@ -2,7 +2,7 @@ import json
 import logging
 from pathlib import Path
 
-from flask import jsonify, make_response, current_app
+from flask import current_app, jsonify, make_response
 from flask_restful import Resource
 from structlog import wrap_logger
 

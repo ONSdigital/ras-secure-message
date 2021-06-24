@@ -1,8 +1,8 @@
 import unittest
 
-from secure_message.services.service_toggles import Party, InternalUser
 from secure_message.api_mocks.party_service_mock import PartyServiceMock
 from secure_message.services.party_service import PartyService
+from secure_message.services.service_toggles import InternalUser, Party
 
 
 class ServiceMockTestCase(unittest.TestCase):

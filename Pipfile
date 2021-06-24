@@ -27,6 +27,7 @@ google-cloud-pubsub = "*"
 
 [dev-packages]
 pylint = "*"
+isort = "*"
 flake8 = "*"
 behave = "*"
 locustio = "==0.14.6"

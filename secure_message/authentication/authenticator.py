@@ -6,8 +6,8 @@ from structlog import wrap_logger
 from werkzeug.exceptions import BadRequest
 
 from secure_message import constants
-from secure_message.validation.user import User
 from secure_message.authentication.jwt import decode
+from secure_message.validation.user import User
 
 logger = wrap_logger(logging.getLogger(__name__))
 
