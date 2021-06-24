@@ -222,6 +222,24 @@ class ModifyTestCase(unittest.TestCase, ModifyTestCaseHelper):
             delta = datetime.datetime.utcnow() - db_message.read_at
             self.assertTrue(delta.total_seconds() < 3)
 
+    def test_read_date_is_reset(self):
+        """testing message read_date is changed when unread label is removed for a second time"""
+        self.populate_database(1)
+        with self.engine.connect() as con:
+            query = con.execute('SELECT msg_id FROM securemessage.secure_message LIMIT 1')
+            msg_id = query.first()[0]
+        with self.app.app_context():
+            with current_app.test_request_context():
+                message = Retriever.retrieve_message(msg_id, self.user_internal)
+                Modifier.mark_message_as_read(message, self.user_internal)
+                message = Retriever.retrieve_message(msg_id, self.user_internal)
+                read_date_set = message['read_date']
+                Modifier.add_unread(message, self.user_internal)
+                message = Retriever.retrieve_message(msg_id, self.user_internal)
+                Modifier.mark_message_as_read(message, self.user_internal)
+                message = Retriever.retrieve_message(msg_id, self.user_internal)
+                self.assertNotEqual(message['read_date'], read_date_set)
+
     def test_exception_for_add_label_raises(self):
         with self.app.app_context():
             database.db.drop_all()
