@@ -68,7 +68,7 @@ def create_app(config=None):
         cache_client_token(app)
 
     @app.before_request
-    def before_request():  # NOQA pylint:disable=unused-variable
+    def before_request():
         if app.config['USE_UAA']:
             refresh_client_token_if_required(app)
         if _request_requires_authentication():
@@ -80,7 +80,7 @@ def create_app(config=None):
         return None
 
     @app.errorhandler(Exception)
-    def handle_exception(error):  # NOQA pylint:disable=unused-variable
+    def handle_exception(error):
         logger.exception(error)
         response = jsonify({"error": "Unknown internal error"})
         response.status_code = 500
@@ -103,7 +103,7 @@ def cache_client_token(app):
     app.oauth_client_token_expires_at = maya.now().add(seconds=expires_in)
 
 
-def get_client_token(client_id, client_secret, url):  # NOQA pylint:disable=inconsistent-return-statements
+def get_client_token(client_id, client_secret, url):
     headers = {'Content-Type': 'application/x-www-form-urlencoded',
                'Accept': 'application/json'}
 
@@ -161,7 +161,7 @@ def create_db(app):
         event.listen(database.db.metadata, 'before_create', DDL(
             "CREATE SCHEMA IF NOT EXISTS securemessage"))
         database.db.create_all()
-        database.db.session.commit()  # NOQA pylint:disable=no-member
+        database.db.session.commit()
 
 
 def _request_requires_authentication():

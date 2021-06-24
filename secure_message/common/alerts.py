@@ -46,7 +46,7 @@ class AlertViaGovNotify:
         payload_str = json.dumps(payload)
         if self.publisher is None:
             self.publisher = pubsub_v1.PublisherClient()
-        topic_path = self.publisher.topic_path(self.project_id, self.topic_id) # NOQA pylint:disable=no-member
+        topic_path = self.publisher.topic_path(self.project_id, self.topic_id)
 
         bound_logger.info("About to publish to pubsub")
         future = self.publisher.publish(topic_path, data=payload_str.encode())
@@ -65,6 +65,6 @@ class AlertViaGovNotify:
 class AlertViaLogging:
     """Alert goes via gov notify (0) or via logs (1)"""
 
-    def send(self, email, msg_id, personalisation, survey_id, party_id):  # NOQA pylint:disable=no-self-use
+    def send(self, email, msg_id, personalisation, survey_id, party_id):
         logger.info('Email sent', email=email, msg_id=msg_id, personalisation=personalisation, survey_id=survey_id,
                     party_id=party_id)

@@ -26,7 +26,7 @@ class ServiceMockToggle:
         self._service_name = service_name
         self._real_service = real_service()
         self._mock_service = mock_service()
-        self.use_mock_service() if use_mock else self.use_real_service()  # pylint:disable=expression-not-assigned
+        self.use_mock_service() if use_mock else self.use_real_service()
 
     def use_mock_service(self):
         self._service = self._mock_service

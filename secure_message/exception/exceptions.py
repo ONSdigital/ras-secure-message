@@ -28,6 +28,6 @@ class RasNotifyException(MessageSaveException):
 
 
 class MissingEnvironmentVariable(Exception):
-    def __init__(self, config_items_with_empty_values):      # pylint:disable=super-init-not-called
+    def __init__(self, config_items_with_empty_values):
         logger.error('Missing environment variables', variables=config_items_with_empty_values)
         sys.exit("Application failed to start. Missing these variables: " + str(config_items_with_empty_values))

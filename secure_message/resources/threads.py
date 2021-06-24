@@ -78,11 +78,7 @@ class ThreadById(Resource):
             # First message in the list is always the most recent due to retrieve_thread ordering by id
             most_recent_message = full_conversation[0].serialize(g.user)
             if 'UNREAD' not in most_recent_message['labels']:
-                result = Modifier.add_unread(most_recent_message, g.user)
-
-                # Result will be either True (on success) or a response object (on failure)
-                if type(result) is not bool:
-                    return result
+                Modifier.add_unread(most_recent_message, g.user)
                 Modifier.patch_message({'read_at': None}, full_conversation[0])
 
         bound_logger.info("Thread metadata update successful")

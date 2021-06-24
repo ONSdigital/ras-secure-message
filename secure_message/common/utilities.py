@@ -14,7 +14,7 @@ MessageArgs = collections.namedtuple(
     'all_conversation_types unread_conversations category')
 
 
-def get_options(args) -> MessageArgs:  # NOQA pylint:disable=too-complex
+def get_options(args) -> MessageArgs:
     """extract options from request , allow label to be set by caller
 
     :param args: contains search arguments. Not all end points support all args

@@ -1,11 +1,9 @@
 from datetime import datetime
 import logging
-from typing import Union
 
-from flask import jsonify, Response
 from sqlalchemy.exc import SQLAlchemyError
 from structlog import wrap_logger
-from werkzeug.exceptions import InternalServerError
+from werkzeug.exceptions import BadRequest, InternalServerError
 
 from secure_message.common.eventsapi import EventsApi
 from secure_message.common.labels import Labels
@@ -63,8 +61,11 @@ class Modifier:
             raise InternalServerError(description="Error removing label from database")
 
     @staticmethod
-    def add_unread(message: dict, user) -> Union[bool, Response]:
-        """Add unread label to status"""
+    def add_unread(message: dict, user) -> bool:
+        """Add unread label to status
+
+        :raises BadRequest: Raised when message doesn't have an INBOX label
+        """
         unread = Labels.UNREAD.value
         inbox = Labels.INBOX.value
         if inbox in message['labels']:
@@ -73,10 +74,9 @@ class Modifier:
                 return True
             Modifier.add_label(unread, message, user)
             return True
-        res = jsonify({'status': 'error'})
-        res.status_code = 400
-        logger.error('Error adding unread label', status_code=res.status_code)
-        return res
+
+        logger.error('Error adding unread label. Message is missing INBOX label')
+        raise BadRequest(description='Error adding unread label. Message is missing INBOX label')
 
     @staticmethod
     def mark_message_as_read(message, user):
