@@ -2,8 +2,8 @@
 Module to generate jwt token
 """
 
-from flask import current_app
 import jwt
+from flask import current_app
 
 
 def encode(data):

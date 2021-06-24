@@ -2,9 +2,11 @@ import copy
 import unittest
 
 from secure_message.application import create_app
-from secure_message.common.utilities import MessageArgs, add_to_details, add_from_details, add_business_details, \
-    add_users_and_business_details
-from secure_message.services.service_toggles import party, internal_user_service
+from secure_message.common.utilities import (MessageArgs, add_business_details,
+                                             add_from_details, add_to_details,
+                                             add_users_and_business_details)
+from secure_message.services.service_toggles import (internal_user_service,
+                                                     party)
 
 
 def get_args(page=1, limit=100, surveys=None, cc="", ru="", label="", desc=True, ce="", is_closed=False,

@@ -1,7 +1,7 @@
 import logging
 
+from flask import current_app, jsonify
 from flask_restful import Resource
-from flask import jsonify, current_app
 from structlog import wrap_logger
 
 from secure_message.repository.retriever import Retriever

@@ -3,10 +3,10 @@ import unittest
 from flask import Response
 from werkzeug.exceptions import BadRequest
 
-from secure_message.application import create_app
-from secure_message.authentication.authenticator import check_jwt, authenticate
-from secure_message.authentication.jwt import encode, decode
 from secure_message import constants
+from secure_message.application import create_app
+from secure_message.authentication.authenticator import authenticate, check_jwt
+from secure_message.authentication.jwt import decode, encode
 
 
 class AuthenticationTestCase(unittest.TestCase):

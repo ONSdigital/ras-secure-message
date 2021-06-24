@@ -1,8 +1,9 @@
 import logging
 import uuid
 
-from marshmallow import Schema, fields, post_load, validates, ValidationError, pre_load, validates_schema
 from flask import g
+from marshmallow import (Schema, ValidationError, fields, post_load, pre_load,
+                         validates, validates_schema)
 from structlog import wrap_logger
 
 from secure_message import constants

@@ -2,8 +2,10 @@ import logging
 
 from sqlalchemy.exc import SQLAlchemyError
 from structlog import wrap_logger
+
 from secure_message.exception.exceptions import MessageSaveException
-from secure_message.repository.database import db, Conversation, Events, SecureMessage, Status
+from secure_message.repository.database import (Conversation, Events,
+                                                SecureMessage, Status, db)
 
 logger = wrap_logger(logging.getLogger(__name__))
 

@@ -1,10 +1,12 @@
 import logging
-
 from datetime import datetime, timezone
-from structlog import wrap_logger
+
 from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy import Boolean, Column, String, Integer, DateTime, ForeignKey, Index, MetaData
+from sqlalchemy import (Boolean, Column, DateTime, ForeignKey, Index, Integer,
+                        MetaData, String)
 from sqlalchemy.orm import relationship
+from structlog import wrap_logger
+
 from secure_message import constants
 from secure_message.common.eventsapi import EventsApi
 from secure_message.common.labels import Labels

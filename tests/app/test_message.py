@@ -1,16 +1,18 @@
 import unittest
 from datetime import datetime, timezone
 
-from flask import g, current_app
+from flask import current_app, g
 from marshmallow.exceptions import ValidationError
 
 from secure_message import constants
-from secure_message.services.service_toggles import internal_user_service, party
+from secure_message.application import create_app
+from secure_message.constants import (MAX_BODY_LEN, MAX_SUBJECT_LEN,
+                                      MAX_THREAD_LEN)
+from secure_message.resources.messages import MessageSend
+from secure_message.services.service_toggles import (internal_user_service,
+                                                     party)
 from secure_message.validation.domain import Message, MessageSchema
 from secure_message.validation.user import User
-from secure_message.application import create_app
-from secure_message.constants import MAX_SUBJECT_LEN, MAX_BODY_LEN, MAX_THREAD_LEN
-from secure_message.resources.messages import MessageSend
 
 
 class MessageTestCase(unittest.TestCase):

@@ -1,8 +1,9 @@
 import unittest
 
-from secure_message.application import create_app
 from secure_message.api_mocks.party_service_mock import PartyServiceMock
-from secure_message.services.service_toggles import internal_user_service, party
+from secure_message.application import create_app
+from secure_message.services.service_toggles import (internal_user_service,
+                                                     party)
 
 
 class PartyTestCase(unittest.TestCase):

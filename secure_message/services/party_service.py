@@ -1,10 +1,11 @@
 import logging
 from urllib.parse import urlencode
 
-from flask import current_app
 import requests
+from flask import current_app
 from requests import HTTPError
 from structlog import wrap_logger
+
 logger = wrap_logger(logging.getLogger(__name__))
 
 
