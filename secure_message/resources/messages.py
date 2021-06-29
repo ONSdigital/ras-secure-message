@@ -95,7 +95,7 @@ class MessageSend(Resource):
         """used to alert user once messages have been saved"""
         try:
             MessageSend._try_send_alert_email(message)
-        except Exception as e:  # NOQA pylint:disable=broad-except
+        except Exception as e:
             logger.error('Uncaught exception in Message.alert_listeners', exception=e)
 
     @staticmethod
@@ -235,7 +235,7 @@ class MessageModifyById(Resource):
             raise BadRequest(description="No label provided")
 
         label = request_data["label"]
-        if label not in Labels.label_list.value:  # NOQA pylint:disable=unsupported-membership-test
+        if label not in Labels.label_list.value:
             logger.info('Invalid label provided', label=label)
             raise BadRequest(description=f"Invalid label provided: {label}")
 

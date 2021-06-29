@@ -12,7 +12,7 @@ def encode(data):
     """
     jwt_algorithm = 'HS256'
     jwt_secret = current_app.config['JWT_SECRET']
-    return jwt.encode(data, jwt_secret, algorithm=jwt_algorithm, headers={"alg": jwt_algorithm, 'typ': 'jwt'})  # NOQA pylint:disable-all
+    return jwt.encode(data, jwt_secret, algorithm=jwt_algorithm, headers={"alg": jwt_algorithm, 'typ': 'jwt'})
 
 
 def decode(token):

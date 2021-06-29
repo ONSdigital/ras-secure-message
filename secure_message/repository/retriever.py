@@ -56,7 +56,7 @@ class Retriever:
             conversation_condition.append(Conversation.category == request_args.category)
 
         try:
-            t = db.session.query(SecureMessage.thread_id, func.max(SecureMessage.id)  # pylint:disable=no-member
+            t = db.session.query(SecureMessage.thread_id, func.max(SecureMessage.id)
                                  .label('max_id')) \
                 .join(Conversation) \
                 .filter(*conversation_condition) \
@@ -129,7 +129,7 @@ class Retriever:
             conditions.append(SecureMessage.exercise_id == request_args.ce)
 
         try:
-            t = db.session.query(SecureMessage.thread_id, func.max(SecureMessage.id)  # pylint:disable=no-member
+            t = db.session.query(SecureMessage.thread_id, func.max(SecureMessage.id)
                                  .label('max_id')) \
                 .join(Conversation) \
                 .join(Status) \
@@ -173,7 +173,7 @@ class Retriever:
             if request_args.category:
                 subquery_filter.append(Conversation.category == request_args.category)
 
-            t = db.session.query(SecureMessage.thread_id, func.max(SecureMessage.id)  # pylint:disable=no-member
+            t = db.session.query(SecureMessage.thread_id, func.max(SecureMessage.id)
                                  .label('max_id')) \
                 .join(Conversation) \
                 .filter(and_(*subquery_filter)) \
@@ -311,7 +311,7 @@ class Retriever:
         """checks if db connection is working"""
         try:
             SecureMessage().query.limit(1).all()
-        except Exception as e:  # NOQA pylint:disable=broad-except
+        except Exception as e:
             logger.exception('No connection to database')
             response = jsonify({"status": "unhealthy", "errors": str(e)})
             response.status_code = 500

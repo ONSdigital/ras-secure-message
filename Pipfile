@@ -26,7 +26,6 @@ numpy = "*"
 google-cloud-pubsub = "*"
 
 [dev-packages]
-pylint = "*"
 flake8 = "*"
 isort = "*"
 behave = "*"

@@ -24,7 +24,7 @@ def logger_initial_config():
         event_dict['service'] = service_name
         return event_dict
 
-    def add_severity_level(logger, method_name, event_dict):  # pylint: disable=unused-argument
+    def add_severity_level(logger, method_name, event_dict):
         """
         Add the log level to the event dict.
         """

@@ -58,13 +58,13 @@ class MessageSchema(Schema):
     category = fields.Str(required=False)
 
     @pre_load
-    def check_sent_and_read_date(self, data, **kwargs): # NOQA pylint:disable=unused-argument
+    def check_sent_and_read_date(self, data, **kwargs):
         self.validate_not_present(data, 'sent_date')
         self.validate_not_present(data, 'read_date')
         return data
 
     @validates_schema
-    def validate_to_from_not_equal(self, data, **kwargs):   # NOQA pylint:disable=no-self-use,unused-argument
+    def validate_to_from_not_equal(self, data, **kwargs):
         if 'msg_to' in data.keys() and 'msg_from' in data.keys() and data['msg_to'][0] == data['msg_from']:
             logger.info('Message to and message from cannot be the same', message_to=data['msg_to'][0],
                         message_from=data['msg_from'])
@@ -127,7 +127,7 @@ class MessageSchema(Schema):
         self.validate_category_type("category")
 
     @post_load
-    def make_message(self, data, **kwargs):  # NOQA pylint:disable=no-self-use,unused-argument
+    def make_message(self, data, **kwargs):
         logger.debug('Build message', data=data)
         return Message(**data)
 
