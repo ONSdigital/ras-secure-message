@@ -5,13 +5,14 @@ from sqlalchemy import and_, func, or_
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm.exc import NoResultFound
 from structlog import wrap_logger
-from werkzeug.exceptions import InternalServerError, NotFound, Forbidden
+from werkzeug.exceptions import Forbidden, InternalServerError, NotFound
 
-from secure_message.constants import NON_SPECIFIC_INTERNAL_USER
 from secure_message.common.eventsapi import EventsApi
 from secure_message.common.labels import Labels
 from secure_message.common.utilities import set_conversation_type_args
-from secure_message.repository.database import Conversation, db, Events, SecureMessage, Status
+from secure_message.constants import NON_SPECIFIC_INTERNAL_USER
+from secure_message.repository.database import (Conversation, Events,
+                                                SecureMessage, Status, db)
 
 logger = wrap_logger(logging.getLogger(__name__))
 

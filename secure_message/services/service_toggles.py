@@ -2,11 +2,11 @@ import logging
 
 from structlog import wrap_logger
 
-from secure_message.api_mocks.internal_user_service_mock import InternalUserServiceMock
+from secure_message.api_mocks.internal_user_service_mock import \
+    InternalUserServiceMock
 from secure_message.api_mocks.party_service_mock import PartyServiceMock
 from secure_message.services.internal_user_service import InternalUserService
 from secure_message.services.party_service import PartyService
-
 
 #
 # A ServiceMockToggle is intended to support switching between a Mock and a Real Service without the

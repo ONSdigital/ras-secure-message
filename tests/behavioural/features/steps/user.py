@@ -1,13 +1,15 @@
 from behave import given, when
-from tests.behavioural.features.steps.from_field import step_impl_the_msg_from_is_set_to_respondent
-from tests.behavioural.features.steps.from_field import step_impl_the_msg_from_is_set_to_internal_specific_user
-from tests.behavioural.features.steps.from_field import step_impl_the_msg_from_is_set_to_internal_group_user
-from tests.behavioural.features.steps.from_field import step_impl_the_msg_from_is_set_to_alternate_internal_specific_user
 
-from tests.behavioural.features.steps.to_field import step_impl_the_msg_to_is_set_to_respondent
-from tests.behavioural.features.steps.to_field import step_impl_the_msg_to_is_set_to_internal_group_user
-from tests.behavioural.features.steps.to_field import step_impl_the_msg_to_is_set_to_internal_specific_user
 from secure_message import constants
+from tests.behavioural.features.steps.from_field import (
+    step_impl_the_msg_from_is_set_to_alternate_internal_specific_user,
+    step_impl_the_msg_from_is_set_to_internal_group_user,
+    step_impl_the_msg_from_is_set_to_internal_specific_user,
+    step_impl_the_msg_from_is_set_to_respondent)
+from tests.behavioural.features.steps.to_field import (
+    step_impl_the_msg_to_is_set_to_internal_group_user,
+    step_impl_the_msg_to_is_set_to_internal_specific_user,
+    step_impl_the_msg_to_is_set_to_respondent)
 
 
 @given("the user is set as internal")

@@ -1,6 +1,7 @@
 import nose.tools
 from behave import then
 from flask import json
+
 from secure_message.services.service_toggles import party
 
 

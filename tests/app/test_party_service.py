@@ -1,6 +1,7 @@
 import unittest
 
 import requests_mock
+
 from secure_message.application import create_app
 from secure_message.services.party_service import PartyService
 

@@ -1,10 +1,12 @@
+import nose.tools
 from behave import given, then, when
 from flask import current_app
-import nose.tools
 
-from secure_message.services.service_toggles import party, internal_user_service
 from secure_message.repository import database
-from tests.behavioural.features.steps.secure_messaging_context_helper import SecureMessagingContextHelper
+from secure_message.services.service_toggles import (internal_user_service,
+                                                     party)
+from tests.behavioural.features.steps.secure_messaging_context_helper import \
+    SecureMessagingContextHelper
 
 
 @given("prepare for tests using '{service_type}' services")

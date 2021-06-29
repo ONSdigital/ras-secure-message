@@ -1,6 +1,7 @@
 import nose.tools
 from behave import given, then, when
 from flask import json
+
 from secure_message import constants
 from secure_message.constants import NON_SPECIFIC_INTERNAL_USER
 

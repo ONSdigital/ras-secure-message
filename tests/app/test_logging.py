@@ -5,8 +5,8 @@ from io import StringIO
 from flask import g
 
 from secure_message import constants
-from secure_message.validation.domain import MessageSchema
 from secure_message.application import create_app
+from secure_message.validation.domain import MessageSchema
 from secure_message.validation.user import User
 
 sys.path.append('../../ras-secure-message')

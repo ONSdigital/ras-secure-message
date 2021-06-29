@@ -1,5 +1,5 @@
-from datetime import datetime
 import logging
+from datetime import datetime
 
 from sqlalchemy.exc import SQLAlchemyError
 from structlog import wrap_logger
@@ -7,7 +7,8 @@ from werkzeug.exceptions import BadRequest, InternalServerError
 
 from secure_message.common.eventsapi import EventsApi
 from secure_message.common.labels import Labels
-from secure_message.repository.database import db, SecureMessage, Status, Events, Conversation
+from secure_message.repository.database import (Conversation, Events,
+                                                SecureMessage, Status, db)
 from secure_message.services.service_toggles import internal_user_service
 
 logger = wrap_logger(logging.getLogger(__name__))
@@ -66,6 +67,7 @@ class Modifier:
 
         :raises BadRequest: Raised when message doesn't have an INBOX label
         """
+        logger.info('Attempting to add unread label to message', msg_id=message['msg_id'], labels=message['labels'])
         unread = Labels.UNREAD.value
         inbox = Labels.INBOX.value
         if inbox in message['labels']:
@@ -167,7 +169,8 @@ class Modifier:
         :param request_data: Json containing which fields should be patched
         :param message: An dict containing the currently saved database data
         """
-        bound_logger = logger.bind(message_id=message.msg_id)
+        bound_logger = logger.bind(message_id=message.msg_id, request_data=request_data)
+        bound_logger.info("Attempting to patch message")
         try:
             changeable_values = ['survey_id', 'case_id', 'business_id', 'exercise_id', 'read_at']
             for key in request_data.keys():
@@ -178,8 +181,8 @@ class Modifier:
             db.session.commit()
         except SQLAlchemyError:
             db.session.rollback()
-            bound_logger.exception("Database error occurred while opening conversation")
-            raise InternalServerError(description="Database error occurred while opening conversation")
+            bound_logger.exception("Database error occurred while patching message")
+            raise InternalServerError(description="Database error occurred while patching message")
 
     @staticmethod
     def close_conversation(metadata: Conversation, user):

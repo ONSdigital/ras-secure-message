@@ -1,7 +1,8 @@
-from sqlalchemy import create_engine, and_
+from sqlalchemy import and_, create_engine
 from sqlalchemy.orm import sessionmaker
-from secure_message.repository.database import SecureMessage, Events
-from config import Config # NOQA
+
+from config import Config  # NOQA
+from secure_message.repository.database import Events, SecureMessage
 
 engine = create_engine(Config.SQLALCHEMY_DATABASE_URI)
 Session = sessionmaker(bind=engine)

@@ -5,13 +5,14 @@ from flask import current_app, json
 from sqlalchemy import create_engine
 
 from secure_message import application, constants
-from secure_message.repository import database
+from secure_message.api_mocks.party_service_mock import PartyServiceMock
 from secure_message.authentication.jwt import encode
-from secure_message.services.service_toggles import party, internal_user_service
+from secure_message.common.alerts import AlertViaLogging
+from secure_message.repository import database
 from secure_message.resources.messages import MessageSend
 from secure_message.resources.messages import logger as message_logger
-from secure_message.common.alerts import AlertViaLogging
-from secure_message.api_mocks.party_service_mock import PartyServiceMock
+from secure_message.services.service_toggles import (internal_user_service,
+                                                     party)
 
 
 class AppTestCase(unittest.TestCase):

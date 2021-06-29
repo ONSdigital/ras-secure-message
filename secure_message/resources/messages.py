@@ -1,6 +1,6 @@
 import logging
 
-from flask import abort, request, jsonify, g, current_app, make_response
+from flask import abort, current_app, g, jsonify, make_response, request
 from flask_restful import Resource
 from marshmallow import ValidationError
 from structlog import wrap_logger
@@ -14,8 +14,10 @@ from secure_message.repository.database import SecureMessage
 from secure_message.repository.modifier import Modifier
 from secure_message.repository.retriever import Retriever
 from secure_message.repository.saver import Saver
-from secure_message.services.service_toggles import party, internal_user_service
-from secure_message.validation.domain import MessageSchema, MessagePatch, Message
+from secure_message.services.service_toggles import (internal_user_service,
+                                                     party)
+from secure_message.validation.domain import (Message, MessagePatch,
+                                              MessageSchema)
 
 logger = wrap_logger(logging.getLogger(__name__))
 

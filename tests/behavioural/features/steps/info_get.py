@@ -1,6 +1,6 @@
+import nose
 from behave import given, then
 from flask import json
-import nose
 
 # Scenario 1: User requests info
 

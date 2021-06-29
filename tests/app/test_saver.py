@@ -1,20 +1,19 @@
 import datetime
 import unittest
-from unittest import mock
 import uuid
+from unittest import mock
 
 from flask import current_app
 from sqlalchemy import create_engine
 from sqlalchemy.exc import SQLAlchemyError
 
-from secure_message.common.eventsapi import EventsApi
-from secure_message.repository.saver import Saver
-from secure_message.repository import database
-from secure_message.repository.database import db
 from secure_message.application import create_app
+from secure_message.common.eventsapi import EventsApi
 from secure_message.exception.exceptions import MessageSaveException
+from secure_message.repository import database
+from secure_message.repository.database import SecureMessage, db
+from secure_message.repository.saver import Saver
 from secure_message.validation.domain import Message
-from secure_message.repository.database import SecureMessage
 
 
 class SaverTestCase(unittest.TestCase):

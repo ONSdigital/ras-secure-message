@@ -4,8 +4,11 @@ import urllib.parse
 
 from structlog import wrap_logger
 
-from secure_message.constants import MESSAGE_BY_ID_ENDPOINT, MESSAGE_LIST_ENDPOINT, MESSAGE_QUERY_LIMIT
-from secure_message.services.service_toggles import party, internal_user_service
+from secure_message.constants import (MESSAGE_BY_ID_ENDPOINT,
+                                      MESSAGE_LIST_ENDPOINT,
+                                      MESSAGE_QUERY_LIMIT)
+from secure_message.services.service_toggles import (internal_user_service,
+                                                     party)
 
 logger = wrap_logger(logging.getLogger(__name__))
 MessageArgs = collections.namedtuple(
