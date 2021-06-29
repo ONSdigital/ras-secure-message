@@ -1,12 +1,11 @@
 import copy
-import nose.tools
 
-from behave import given, when, then
+import nose.tools
+from behave import given, then, when
 from flask import json
 
 
 # These steps generate http requests and responses
-
 @given("the message is sent")
 @when("the message is sent")
 def step_impl_the_message_is_sent(context):

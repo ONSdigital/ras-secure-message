@@ -2,8 +2,8 @@ import copy
 
 from flask import json
 
-from secure_message.authentication.jwt import encode
 from secure_message import constants
+from secure_message.authentication.jwt import encode
 
 
 class SecureMessagingContextHelper:

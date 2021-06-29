@@ -4,14 +4,14 @@ from datetime import datetime
 
 from flask import current_app
 from sqlalchemy import create_engine
-from werkzeug.exceptions import NotFound, Forbidden
+from werkzeug.exceptions import Forbidden, NotFound
 
 from secure_message.application import create_app
 from secure_message.common.eventsapi import EventsApi
 from secure_message.common.utilities import MessageArgs
+from secure_message.constants import MESSAGE_QUERY_LIMIT
 from secure_message.repository import database
 from secure_message.repository.retriever import Retriever
-from secure_message.constants import MESSAGE_QUERY_LIMIT
 from secure_message.services.service_toggles import party
 from secure_message.validation.user import User
 from tests.app.test_utilities import get_args

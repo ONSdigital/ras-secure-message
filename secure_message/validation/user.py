@@ -1,4 +1,5 @@
-from secure_message.services.service_toggles import party, internal_user_service
+from secure_message.services.service_toggles import (internal_user_service,
+                                                     party)
 
 
 class User:

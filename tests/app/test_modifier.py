@@ -8,12 +8,12 @@ from werkzeug.exceptions import InternalServerError
 
 from secure_message import constants
 from secure_message.application import create_app
-from secure_message.services.service_toggles import internal_user_service
 from secure_message.common.eventsapi import EventsApi
 from secure_message.repository import database
 from secure_message.repository.database import SecureMessage
 from secure_message.repository.modifier import Modifier
 from secure_message.repository.retriever import Retriever
+from secure_message.services.service_toggles import internal_user_service
 from secure_message.validation.user import User
 
 

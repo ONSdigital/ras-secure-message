@@ -1,6 +1,7 @@
 import logging
 import os
 import sys
+
 from structlog import configure
 from structlog.processors import JSONRenderer, TimeStamper
 from structlog.stdlib import add_log_level, filter_by_level

@@ -1,15 +1,16 @@
-from datetime import datetime
 import logging
+from datetime import datetime
 from typing import Union
 
-from flask import jsonify, Response
+from flask import Response, jsonify
 from sqlalchemy.exc import SQLAlchemyError
 from structlog import wrap_logger
 from werkzeug.exceptions import InternalServerError
 
 from secure_message.common.eventsapi import EventsApi
 from secure_message.common.labels import Labels
-from secure_message.repository.database import db, SecureMessage, Status, Events, Conversation
+from secure_message.repository.database import (Conversation, Events,
+                                                SecureMessage, Status, db)
 from secure_message.services.service_toggles import internal_user_service
 
 logger = wrap_logger(logging.getLogger(__name__))

@@ -1,5 +1,5 @@
-from datetime import timedelta
 import unittest
+from datetime import timedelta
 from unittest import mock
 
 import maya

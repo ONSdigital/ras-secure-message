@@ -3,27 +3,28 @@ import os
 import sys
 from time import sleep
 
-from flask import Flask, request
-from flask import json, jsonify
-from flask_restful import Api
-from flask_cors import CORS
 import maya
-from retrying import retry
 import requests
+from flask import Flask, json, jsonify, request
+from flask_cors import CORS
+from flask_restful import Api
 from requests.adapters import HTTPAdapter
+from retrying import retry
 from sqlalchemy import DDL, event
 from sqlalchemy.exc import DatabaseError, ProgrammingError
 from structlog import wrap_logger
-
 
 from secure_message.authentication.authenticator import authenticate
 from secure_message.exception.exceptions import MissingEnvironmentVariable
 from secure_message.logger_config import logger_initial_config
 from secure_message.repository import database
-from secure_message.resources.health import DatabaseHealth, Health, HealthDetails
+from secure_message.resources.health import (DatabaseHealth, Health,
+                                             HealthDetails)
 from secure_message.resources.info import Info
-from secure_message.resources.messages import MessageById, MessageModifyById, MessageSend
-from secure_message.resources.threads import ThreadById, ThreadCounter, ThreadList
+from secure_message.resources.messages import (MessageById, MessageModifyById,
+                                               MessageSend)
+from secure_message.resources.threads import (ThreadById, ThreadCounter,
+                                              ThreadList)
 
 logger = wrap_logger(logging.getLogger(__name__))
 

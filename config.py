@@ -1,8 +1,7 @@
-import os
 import logging
+import os
 
 from structlog import wrap_logger
-
 
 logger = wrap_logger(logging.getLogger(__name__))
 
