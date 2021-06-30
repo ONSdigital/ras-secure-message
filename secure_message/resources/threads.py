@@ -79,9 +79,14 @@ class ThreadById(Resource):
 
             # First message in the list is always the most recent due to retrieve_thread ordering by id
             most_recent_message = full_conversation[0].serialize(g.user)
-            if 'UNREAD' not in most_recent_message['labels']:
-                Modifier.add_unread(most_recent_message, g.user)
-                Modifier.patch_message({'read_at': None}, full_conversation[0])
+
+            # We only want to mark messages as unread if the most recent message was from a respondent.  Otherwise,
+            # we're marking our own message as unread which is a bit pointless.
+            if not most_recent_message.from_internal:
+                if 'INBOX' in most_recent_message['labels']:
+                    if 'UNREAD' not in most_recent_message['labels']:
+                        Modifier.add_unread(most_recent_message, g.user)
+                        Modifier.patch_message({'read_at': None}, full_conversation[0])
 
         bound_logger.info("Thread metadata update successful")
         bound_logger.unbind('thread_id', 'user_uuid')
