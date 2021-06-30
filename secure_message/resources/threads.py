@@ -82,7 +82,7 @@ class ThreadById(Resource):
 
             # We only want to mark messages as unread if the most recent message was from a respondent.  Otherwise,
             # we're marking our own message as unread which is a bit pointless.
-            if not most_recent_message.from_internal:
+            if not most_recent_message['from_internal']:
                 if 'INBOX' in most_recent_message['labels']:
                     if 'UNREAD' not in most_recent_message['labels']:
                         Modifier.add_unread(most_recent_message, g.user)
