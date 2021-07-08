@@ -6,9 +6,11 @@ from marshmallow import ValidationError
 from structlog import wrap_logger
 from werkzeug.exceptions import BadRequest
 
-from secure_message.common.utilities import (add_users_and_business_details,
-                                             get_options,
-                                             process_paginated_list)
+from secure_message.common.utilities import (
+    add_users_and_business_details,
+    get_options,
+    process_paginated_list,
+)
 from secure_message.constants import THREAD_LIST_ENDPOINT
 from secure_message.repository.modifier import Modifier
 from secure_message.repository.retriever import Retriever
@@ -36,12 +38,16 @@ class ThreadById(Resource):
 
         closed_at = None if conversation_metadata.closed_at is None else conversation_metadata.closed_at.isoformat()
 
-        return jsonify({"messages": add_users_and_business_details(messages),
-                        "is_closed": conversation_metadata.is_closed,
-                        "closed_by": conversation_metadata.closed_by,
-                        "closed_by_uuid": conversation_metadata.closed_by_uuid,
-                        "closed_at": closed_at,
-                        "category": conversation_metadata.category})
+        return jsonify(
+            {
+                "messages": add_users_and_business_details(messages),
+                "is_closed": conversation_metadata.is_closed,
+                "closed_by": conversation_metadata.closed_by,
+                "closed_by_uuid": conversation_metadata.closed_by_uuid,
+                "closed_at": closed_at,
+                "category": conversation_metadata.category,
+            }
+        )
 
     @staticmethod
     def patch(thread_id):
@@ -51,7 +57,7 @@ class ThreadById(Resource):
         if not g.user.is_internal:
             bound_logger.info("Thread modification is forbidden")
             abort(403)
-        if request.headers.get('Content-Type', '').lower() != 'application/json':
+        if request.headers.get("Content-Type", "").lower() != "application/json":
             bound_logger.info('Request must set accept content type "application/json" in header.')
             raise BadRequest(description='Request must set accept content type "application/json" in header.')
 
@@ -66,8 +72,8 @@ class ThreadById(Resource):
         bound_logger.info("Attempting to modify metadata for thread")
         Modifier.patch_conversation(request_data, conversation)
 
-        if request_data.get('is_closed') is not None:
-            if request_data.get('is_closed'):
+        if request_data.get("is_closed") is not None:
+            if request_data.get("is_closed"):
                 bound_logger.info("About to close conversation")
                 Modifier.close_conversation(conversation, g.user)
             else:
@@ -82,15 +88,15 @@ class ThreadById(Resource):
 
             # We only want to mark messages as unread if the most recent message was from a respondent.  Otherwise,
             # we're marking our own message as unread which is a bit pointless.
-            if not most_recent_message['from_internal']:
-                if 'INBOX' in most_recent_message['labels']:
-                    if 'UNREAD' not in most_recent_message['labels']:
+            if not most_recent_message["from_internal"]:
+                if "INBOX" in most_recent_message["labels"]:
+                    if "UNREAD" not in most_recent_message["labels"]:
                         Modifier.add_unread(most_recent_message, g.user)
-                        Modifier.patch_message({'read_at': None}, full_conversation[0])
+                        Modifier.patch_message({"read_at": None}, full_conversation[0])
 
         bound_logger.info("Thread metadata update successful")
-        bound_logger.unbind('thread_id', 'user_uuid')
-        return '', 204
+        bound_logger.unbind("thread_id", "user_uuid")
+        return "", 204
 
     @staticmethod
     def _validate_patch_request(request_data, metadata):
@@ -98,7 +104,7 @@ class ThreadById(Resource):
         bound_logger = logger.bind(thread_id=metadata.id, user_uuid=g.user.user_uuid)
         # Check if it's empty
         if not request_data:
-            bound_logger.info('No properties provided')
+            bound_logger.info("No properties provided")
             raise BadRequest(description="No properties provided")
 
         try:
@@ -108,16 +114,16 @@ class ThreadById(Resource):
             raise BadRequest(e.messages)
 
         # Perform extra validation that marshmallow cannot handle
-        if 'is_closed' in request_data:
-            if metadata.is_closed and request_data['is_closed'] is True:
+        if "is_closed" in request_data:
+            if metadata.is_closed and request_data["is_closed"] is True:
                 bound_logger.info("Conversation already closed")
                 raise BadRequest(description="Conversation already closed")
-            if not metadata.is_closed and request_data['is_closed'] is False:
+            if not metadata.is_closed and request_data["is_closed"] is False:
                 bound_logger.info("Conversation already open")
                 raise BadRequest(description="Conversation already open")
 
         bound_logger.info("Thread validation successful")
-        bound_logger.unbind('thread_id', 'user_uuid')
+        bound_logger.unbind("thread_id", "user_uuid")
 
 
 class ThreadList(Resource):
@@ -142,16 +148,15 @@ class ThreadList(Resource):
     @staticmethod
     def _validate_request(request_args, user):
         if request_args.my_conversations and user.is_respondent:
-            logger.info('My conversations option not available to respondents', user_uuid=user.user_uuid)
+            logger.info("My conversations option not available to respondents", user_uuid=user.user_uuid)
             raise BadRequest(description="My conversations option not available to respondents")
 
         if request_args.new_respondent_conversations and user.is_respondent:
-            logger.info('New respondent conversation option not available to respondents', user_uuid=user.user_uuid)
+            logger.info("New respondent conversation option not available to respondents", user_uuid=user.user_uuid)
             raise BadRequest(description="New respondent conversation option not available to respondents")
 
 
 class ThreadCounter(Resource):
-
     @staticmethod
     def get():
         """Get count of all conversations for a specific internal user

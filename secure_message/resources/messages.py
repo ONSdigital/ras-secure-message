@@ -14,10 +14,8 @@ from secure_message.repository.database import SecureMessage
 from secure_message.repository.modifier import Modifier
 from secure_message.repository.retriever import Retriever
 from secure_message.repository.saver import Saver
-from secure_message.services.service_toggles import (internal_user_service,
-                                                     party)
-from secure_message.validation.domain import (Message, MessagePatch,
-                                              MessageSchema)
+from secure_message.services.service_toggles import internal_user_service, party
+from secure_message.validation.domain import Message, MessagePatch, MessageSchema
 
 logger = wrap_logger(logging.getLogger(__name__))
 
@@ -31,16 +29,17 @@ class MessageSend(Resource):
     def post(self):
         """used to handle POST requests to send a message"""
         logger.info("Message send POST request.")
-        if request.headers.get('Content-Type', '').lower() != 'application/json':
+        if request.headers.get("Content-Type", "").lower() != "application/json":
             # API only returns JSON
             logger.info('Request must set accept content type "application/json" in header.')
         post_data = request.get_json(force=True)
 
-        post_data['from_internal'] = g.user.is_internal
+        post_data["from_internal"] = g.user.is_internal
         message = self._validate_post_data(post_data)
 
-        has_survey_category = False if 'category' in post_data and post_data['category'] in ['TECHNICAL', 'MISC'] else \
-            True
+        has_survey_category = (
+            False if "category" in post_data and post_data["category"] in ["TECHNICAL", "MISC"] else True
+        )
         # Validate claim
         if not self._has_valid_claim(g.user, message) and has_survey_category:
             logger.info("Message send failed", error="Invalid claim")
@@ -50,9 +49,7 @@ class MessageSend(Resource):
         self._message_save(message)
         # listener errors are logged but still a 201 reported
         MessageSend._alert_listeners(message)
-        return make_response(jsonify({'status': '201',
-                                      'msg_id': message.msg_id,
-                                      'thread_id': message.thread_id}), 201)
+        return make_response(jsonify({"status": "201", "msg_id": message.msg_id, "thread_id": message.thread_id}), 201)
 
     @staticmethod
     def _has_valid_claim(user, message: Message) -> bool:
@@ -72,17 +69,17 @@ class MessageSend(Resource):
 
     @staticmethod
     def _validate_post_data(post_data: dict) -> Message:
-        if 'msg_id' in post_data:
+        if "msg_id" in post_data:
             raise BadRequest(description="Message can not include msg_id")
 
         try:
             message = MessageSchema().load(post_data)
         except ValidationError as e:
-            logger.info('Message send failed', errors=e.messages)
+            logger.info("Message send failed", errors=e.messages)
             raise BadRequest(e.messages)
 
-        if post_data.get('thread_id'):
-            conversation_metadata = Retriever.retrieve_conversation_metadata(post_data.get('thread_id'))
+        if post_data.get("thread_id"):
+            conversation_metadata = Retriever.retrieve_conversation_metadata(post_data.get("thread_id"))
             # Ideally, we'd return a 404 if there isn't a record in the conversation table.  But until we
             # ensure there is a record in here for every thread_id in the secure_message table, we just have to
             # assume that it's fine if it's empty.
@@ -96,7 +93,7 @@ class MessageSend(Resource):
         try:
             MessageSend._try_send_alert_email(message)
         except Exception as e:
-            logger.error('Uncaught exception in Message.alert_listeners', exception=e)
+            logger.error("Uncaught exception in Message.alert_listeners", exception=e)
 
     @staticmethod
     def _try_send_alert_email(message):
@@ -105,15 +102,19 @@ class MessageSend(Resource):
         if g.user.is_internal:
             party_data = party.get_user_details(message.msg_to[0])  # NOQA TODO avoid 2 lookups (see validate)
             if party_data:
-                if 'emailAddress' in party_data[0] and party_data[0]['emailAddress'].strip():
-                    recipient_email = party_data[0]['emailAddress'].strip()
-                    alert_method = AlertViaLogging() if current_app.config['NOTIFY_VIA_GOV_NOTIFY'] == '0' else \
-                        AlertViaGovNotify(current_app.config)
+                if "emailAddress" in party_data[0] and party_data[0]["emailAddress"].strip():
+                    recipient_email = party_data[0]["emailAddress"].strip()
+                    alert_method = (
+                        AlertViaLogging()
+                        if current_app.config["NOTIFY_VIA_GOV_NOTIFY"] == "0"
+                        else AlertViaGovNotify(current_app.config)
+                    )
                     personalisation = MessageSend._create_message_url(message.thread_id)
-                    alert_method.send(recipient_email, message.msg_id, personalisation, message.survey_id,
-                                      party_data[0]['id'])
+                    alert_method.send(
+                        recipient_email, message.msg_id, personalisation, message.survey_id, party_data[0]["id"]
+                    )
                 else:
-                    logger.error('User does not have an emailAddress specified', msg_to=message.msg_to[0])
+                    logger.error("User does not have an emailAddress specified", msg_to=message.msg_to[0])
             # else not testable as fails validation
         return party_data
 
@@ -124,15 +125,18 @@ class MessageSend(Resource):
 
     @staticmethod
     def _get_user_name(user, message):
-        user_name = 'Unknown user'
+        user_name = "Unknown user"
         is_internal_user = user.is_internal
-        user_data = internal_user_service.get_user_details(message.msg_from) if is_internal_user else party. \
-            get_user_details(message.msg_from)
+        user_data = (
+            internal_user_service.get_user_details(message.msg_from)
+            if is_internal_user
+            else party.get_user_details(message.msg_from)
+        )
 
         if user_data:
-            first_name = user_data.get('firstName', '') if is_internal_user else user_data[0].get('firstName', '')
-            last_name = user_data.get('lastName', '') if is_internal_user else user_data[0].get('lastName', '')
-            full_name = f'{first_name} {last_name}'.strip()
+            first_name = user_data.get("firstName", "") if is_internal_user else user_data[0].get("firstName", "")
+            last_name = user_data.get("lastName", "") if is_internal_user else user_data[0].get("lastName", "")
+            full_name = f"{first_name} {last_name}".strip()
             if full_name:
                 user_name = full_name
 
@@ -140,7 +144,6 @@ class MessageSend(Resource):
 
 
 class MessageById(Resource):
-
     def patch(self, message_id: str):
         """Patch message data"""
         bound_logger = logger.bind(message_id=message_id, user_uuid=g.user.user_uuid)
@@ -148,7 +151,7 @@ class MessageById(Resource):
         if not g.user.is_internal:
             bound_logger.info("Message modification is forbidden")
             abort(403)
-        if request.headers.get('Content-Type', '').lower() != 'application/json':
+        if request.headers.get("Content-Type", "").lower() != "application/json":
             bound_logger.info('Request must set accept content type "application/json" in header.')
             raise BadRequest(description='Request must set accept content type "application/json" in header.')
 
@@ -163,8 +166,8 @@ class MessageById(Resource):
         Modifier.patch_message(request_data, message)
 
         bound_logger.info("Message data update successful")
-        bound_logger.unbind('message_id', 'user_uuid')
-        return '', 204
+        bound_logger.unbind("message_id", "user_uuid")
+        return "", 204
 
     @staticmethod
     def _validate_patch_request(request_data: dict, message: SecureMessage):
@@ -172,7 +175,7 @@ class MessageById(Resource):
         bound_logger = logger.bind(message_id=message.msg_id, user_uuid=g.user.user_uuid)
         # Check if it's empty
         if not request_data:
-            bound_logger.info('No properties provided')
+            bound_logger.info("No properties provided")
             raise BadRequest(description="No properties provided")
 
         try:
@@ -199,20 +202,20 @@ class MessageModifyById(Resource):
             resp = MessageModifyById._modify_label(action, message, g.user, label)
 
         if resp:
-            res = jsonify({'status': 'ok'})
+            res = jsonify({"status": "ok"})
             res.status_code = 200
 
         else:
-            res = jsonify({'status': 'error'})
+            res = jsonify({"status": "error"})
             res.status_code = 400
-            logger.error('Error updating message', msg_id=message_id, status_code=res.status_code)
+            logger.error("Error updating message", msg_id=message_id, status_code=res.status_code)
         return res
 
     @staticmethod
     def _modify_label(action, message, user, label):
         """Adds or deletes a label"""
-        label_exists = label in message['labels']
-        if action == 'add' and not label_exists:
+        label_exists = label in message["labels"]
+        if action == "add" and not label_exists:
             return Modifier.add_label(label, message, user)
         if label_exists:
             return Modifier.remove_label(label, message, user)
@@ -221,35 +224,35 @@ class MessageModifyById(Resource):
     @staticmethod
     def _try_modify_unread(action, message, user):
         """Used to validate that the label can be modified to read"""
-        if message['msg_to'][0] != user.user_uuid and message['msg_to'][0] != constants.NON_SPECIFIC_INTERNAL_USER:
+        if message["msg_to"][0] != user.user_uuid and message["msg_to"][0] != constants.NON_SPECIFIC_INTERNAL_USER:
             return False
-        if action == 'add':
+        if action == "add":
             return Modifier.add_unread(message, user)
         return Modifier.mark_message_as_read(message, user)
 
     @staticmethod
     def _validate_request(request_data):
         """Used to validate data within request body for ModifyById"""
-        if 'label' not in request_data:
-            logger.info('No label provided')
+        if "label" not in request_data:
+            logger.info("No label provided")
             raise BadRequest(description="No label provided")
 
         label = request_data["label"]
         if label not in Labels.label_list.value:
-            logger.info('Invalid label provided', label=label)
+            logger.info("Invalid label provided", label=label)
             raise BadRequest(description=f"Invalid label provided: {label}")
 
         if label != Labels.UNREAD.value:
-            logger.info('Non modifiable label provided', label=label)
+            logger.info("Non modifiable label provided", label=label)
             raise BadRequest(description=f"Non modifiable label provided: {label}")
 
-        if 'action' not in request_data:
-            logger.info('No action provided')
+        if "action" not in request_data:
+            logger.info("No action provided")
             raise BadRequest(description="No action provided")
 
         action = request_data["action"]
         if action not in ["add", "remove"]:
-            logger.info('Invalid action requested', action=action)
+            logger.info("Invalid action requested", action=action)
             raise BadRequest(description=f"Invalid action requested: {action}")
 
         return action, label

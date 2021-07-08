@@ -15,10 +15,10 @@ try:
     subquery = db.query(Conversation.id)
     distinct_ids = db.query(SecureMessage.thread_id).filter(~SecureMessage.thread_id.in_(subquery)).distinct()
     for thread_id in distinct_ids:
-        db.execute(insert(Conversation).values({'id': thread_id, 'is_closed': 'False'}))
-        print('Added thread_id: {}'.format(thread_id[0]))
+        db.execute(insert(Conversation).values({"id": thread_id, "is_closed": "False"}))
+        print("Added thread_id: {}".format(thread_id[0]))
     db.commit()
 except DatabaseError:
     db.rollback()
     print(DatabaseError)
-    sys.exit('Exiting')
+    sys.exit("Exiting")

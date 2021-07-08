@@ -10,6 +10,6 @@ def before_scenario(context, scenario):
 
 
 def before_all(context):
-    context.app = create_app(config='TestConfig')
+    context.app = create_app(config="TestConfig")
     with context.app.app_context():
         context.client = current_app.test_client()

@@ -18,14 +18,16 @@ from secure_message.validation.domain import Message
 
 class SaverTestCase(unittest.TestCase):
     """Test case for message saving"""
+
     def setUp(self):
         """setup test environment"""
-        app = create_app(config='TestConfig')
+        app = create_app(config="TestConfig")
         app.testing = True
 
-        self.engine = create_engine(app.config['SQLALCHEMY_DATABASE_URI'])
-        self.test_message = Message(**{'msg_to': 'tej', 'msg_from': 'gemma', 'subject': 'MyMessage',
-                                       'body': 'hello', 'thread_id': ""})
+        self.engine = create_engine(app.config["SQLALCHEMY_DATABASE_URI"])
+        self.test_message = Message(
+            **{"msg_to": "tej", "msg_from": "gemma", "subject": "MyMessage", "body": "hello", "thread_id": ""}
+        )
         with app.app_context():
             database.db.init_app(current_app)
             database.db.drop_all()
@@ -44,12 +46,12 @@ class SaverTestCase(unittest.TestCase):
 
     def test_saved_msg_status_and_sent_time_has_been_saved(self):
         """retrieves message status from database"""
-        message_status = {'msg_id': 'AMsgId', 'actor': 'Tej'}
+        message_status = {"msg_id": "AMsgId", "actor": "Tej"}
         with self.app.app_context():
             with current_app.test_request_context():
-                Saver().save_message(SecureMessage(msg_id='AMsgId', thread_id='AMsgId'))
-                Saver().save_msg_status(message_status['actor'], message_status['msg_id'], 'INBOX, UNREAD')
-                result = SecureMessage.query.filter(SecureMessage.msg_id == 'AMsgId').one()
+                Saver().save_message(SecureMessage(msg_id="AMsgId", thread_id="AMsgId"))
+                Saver().save_msg_status(message_status["actor"], message_status["msg_id"], "INBOX, UNREAD")
+                result = SecureMessage.query.filter(SecureMessage.msg_id == "AMsgId").one()
                 self.assertTrue(isinstance(result.sent_at, datetime.datetime))
                 # Test that sent_at timestamp on message is less than 3 seconds old to prove it
                 # was only just created
@@ -59,7 +61,7 @@ class SaverTestCase(unittest.TestCase):
         # This is horrible and barely tests anything... needs to be rewritten to test
         # WHAT statuses are in the database, not just that is literally anything there
         with self.engine.connect() as con:
-            request = con.execute('SELECT * FROM securemessage.status')
+            request = con.execute("SELECT * FROM securemessage.status")
             for row in request:
                 self.assertTrue(row is not None)
 
@@ -69,40 +71,40 @@ class SaverTestCase(unittest.TestCase):
             random_uuid = str(uuid.uuid4())
             Saver.save_message(SecureMessage(msg_id=random_uuid, thread_id=random_uuid))
             with self.engine.connect() as con:
-                request = con.execute('SELECT * FROM securemessage.conversation')
+                request = con.execute("SELECT * FROM securemessage.conversation")
                 row = request.fetchone()
                 # Newly created record should be mostly empty
-                self.assertEqual(row['id'], random_uuid)
-                self.assertFalse(row['is_closed'])
-                self.assertIsNone(row['closed_by'])
-                self.assertIsNone(row['closed_by_uuid'])
-                self.assertIsNone(row['closed_at'])
-                self.assertTrue(row['category'] is not None)
+                self.assertEqual(row["id"], random_uuid)
+                self.assertFalse(row["is_closed"])
+                self.assertIsNone(row["closed_by"])
+                self.assertIsNone(row["closed_by_uuid"])
+                self.assertIsNone(row["closed_at"])
+                self.assertTrue(row["category"] is not None)
 
     def test_save_msg_status_raises_message_save_exception_on_db_error(self):
         """Tests MessageSaveException generated if db commit fails saving message"""
         with self.app.app_context():
             mock_session = mock.Mock(db.session)
             mock_session.commit.side_effect = SQLAlchemyError("Not Saved")
-            message_status = {'msg_id': 'AMsgId', 'actor': 'Tej'}
+            message_status = {"msg_id": "AMsgId", "actor": "Tej"}
             with current_app.test_request_context():
                 with self.assertRaises(MessageSaveException):
-                    Saver().save_msg_status(message_status['actor'], message_status['msg_id'], 'INBOX', mock_session)
+                    Saver().save_msg_status(message_status["actor"], message_status["msg_id"], "INBOX", mock_session)
 
     def test_saved_msg_event_has_been_saved(self):
         """retrieves message event from database"""
-        message_event = {'msg_id': 'AMsgId', 'event': EventsApi.SENT.value, 'date_time': ''}
+        message_event = {"msg_id": "AMsgId", "event": EventsApi.SENT.value, "date_time": ""}
         with self.app.app_context():
             with current_app.test_request_context():
-                Saver().save_message(SecureMessage(msg_id='AMsgId', thread_id='AMsgId'))
-                Saver().save_msg_event(message_event['msg_id'], message_event['event'])
+                Saver().save_message(SecureMessage(msg_id="AMsgId", thread_id="AMsgId"))
+                Saver().save_msg_event(message_event["msg_id"], message_event["event"])
 
         with self.engine.connect() as con:
-            request = con.execute('SELECT * FROM securemessage.events')
+            request = con.execute("SELECT * FROM securemessage.events")
             for row in request:
                 self.assertTrue(row is not None)
-                self.assertTrue(row[1] == message_event['event'])
-                self.assertTrue(row[2] == message_event['msg_id'])
+                self.assertTrue(row[1] == message_event["event"])
+                self.assertTrue(row[2] == message_event["msg_id"])
                 self.assertTrue(row[3] is not None)
 
     def test_save_event_raises_message_save_exception_on_db_error(self):
@@ -110,27 +112,27 @@ class SaverTestCase(unittest.TestCase):
         with self.app.app_context():
             mock_session = mock.Mock(db.session)
             mock_session.commit.side_effect = SQLAlchemyError("Not Saved")
-            message_event = {'msg_id': 'AMsgId', 'event': EventsApi.SENT.value, 'date_time': ''}
+            message_event = {"msg_id": "AMsgId", "event": EventsApi.SENT.value, "date_time": ""}
 
             with current_app.test_request_context():
                 with self.assertRaises(MessageSaveException):
-                    Saver().save_msg_event(message_event['msg_id'], message_event['event'], mock_session)
+                    Saver().save_msg_event(message_event["msg_id"], message_event["event"], mock_session)
 
     def test_status_commit_exception_raises_message_save_exception(self):
         """check status commit exception clears the session"""
-        message_status = {'msg_id': 'AMsgId', 'actor': 'Tej'}
+        message_status = {"msg_id": "AMsgId", "actor": "Tej"}
         with self.app.app_context():
             with current_app.test_request_context():
                 with self.assertRaises(MessageSaveException):
-                    Saver().save_msg_status(message_status['actor'], message_status['msg_id'], 'INBOX, UNREAD')
+                    Saver().save_msg_status(message_status["actor"], message_status["msg_id"], "INBOX, UNREAD")
 
     def test_event_commit_exception_raises_message_save_exception(self):
         """check event commit exception clears the session"""
-        message_event = {'msg_id': 'AMsgId', 'event': EventsApi.SENT.value, 'date_time': ''}
+        message_event = {"msg_id": "AMsgId", "event": EventsApi.SENT.value, "date_time": ""}
         with self.app.app_context():
             with current_app.test_request_context():
                 with self.assertRaises(MessageSaveException):
-                    Saver().save_msg_event(message_event['msg_id'], message_event['event'])
+                    Saver().save_msg_event(message_event["msg_id"], message_event["event"])
 
     def test_msg_commit_exception_does_a_rollback(self):
         """check message commit exception clears the session"""
@@ -144,6 +146,6 @@ class SaverTestCase(unittest.TestCase):
                 Saver().save_message(self.test_message)
 
         with self.engine.connect() as con:
-            request = con.execute('SELECT COUNT(securemessage.secure_message.id) FROM securemessage.secure_message')
+            request = con.execute("SELECT COUNT(securemessage.secure_message.id) FROM securemessage.secure_message")
             for row in request:
-                self.assertTrue(row['count'] == 1)
+                self.assertTrue(row["count"] == 1)

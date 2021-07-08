@@ -9,9 +9,10 @@ from secure_message.repository.retriever import Retriever
 
 class HealthTestCase(unittest.TestCase):
     """Test case for application health monitor"""
+
     def setUp(self):
         """setup test environment"""
-        self.app = create_app(config='TestConfig')
+        self.app = create_app(config="TestConfig")
         self.client = self.app.test_client()
         self.app.testing = True
         with self.app.app_context():
@@ -22,12 +23,12 @@ class HealthTestCase(unittest.TestCase):
 
     def test_health_status(self):
         """sends GET request to the application health monitor endpoint"""
-        response = self.client.get('/health')
+        response = self.client.get("/health")
         self.assertEqual(response.status_code, 200)
 
     def test_db_health_status_healthy(self):
         """sends GET request to the application db health monitor endpoint"""
-        response = self.client.get('/health/db')
+        response = self.client.get("/health/db")
         self.assertEqual(response.status_code, 200)
 
     def test_db_connection_test_fails(self):
@@ -40,17 +41,19 @@ class HealthTestCase(unittest.TestCase):
 
     def test_keys_in_app_details_true(self):
         """sends GET request to the application health details endpoint"""
-        response = self.client.get('/health/details')
-        details = {'Name': '',
-                   'Version': '',
-                   'Logging level': '',
-                   'API Functionality': '',
-                   'Using party service mock': '',
-                   'RAS-PARTY URL': '',
-                   'NOTIFY VIA GOV NOTIFY': ''}
+        response = self.client.get("/health/details")
+        details = {
+            "Name": "",
+            "Version": "",
+            "Logging level": "",
+            "API Functionality": "",
+            "Using party service mock": "",
+            "RAS-PARTY URL": "",
+            "NOTIFY VIA GOV NOTIFY": "",
+        }
 
         self.assertEqual(json.loads(response.get_data()).keys(), details.keys())
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()

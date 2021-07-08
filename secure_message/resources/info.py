@@ -16,12 +16,14 @@ class Info(Resource):
     @staticmethod
     def get():
         _health_check = {}
-        if Path('git_info').exists():
-            with open('git_info') as io:
+        if Path("git_info").exists():
+            with open("git_info") as io:
                 _health_check = json.loads(io.read())
 
-        info = {"name": 'ras-secure-message',
-                "version": current_app.config['VERSION'], }
+        info = {
+            "name": "ras-secure-message",
+            "version": current_app.config["VERSION"],
+        }
 
         info = dict(_health_check, **info)
 

@@ -5,11 +5,13 @@ from tests.behavioural.features.steps.from_field import (
     step_impl_the_msg_from_is_set_to_alternate_internal_specific_user,
     step_impl_the_msg_from_is_set_to_internal_group_user,
     step_impl_the_msg_from_is_set_to_internal_specific_user,
-    step_impl_the_msg_from_is_set_to_respondent)
+    step_impl_the_msg_from_is_set_to_respondent,
+)
 from tests.behavioural.features.steps.to_field import (
     step_impl_the_msg_to_is_set_to_internal_group_user,
     step_impl_the_msg_to_is_set_to_internal_specific_user,
-    step_impl_the_msg_to_is_set_to_respondent)
+    step_impl_the_msg_to_is_set_to_respondent,
+)
 
 
 @given("the user is set as internal")
@@ -23,7 +25,7 @@ def step_impl_the_user_is_internal(context):
 @given("the user is set as alternative respondent")
 @when("the user is set as alternative respondent")
 def step_impl_the_user_is_set_as_alternative_respondent(context):
-    """ Set the user to the alternative respondent as set in the helper"""
+    """Set the user to the alternative respondent as set in the helper"""
     with context.app.app_context():
         context.bdd_helper.token_data = context.bdd_helper.alternative_respondent_user_token
 
@@ -63,10 +65,14 @@ def step_impl_set_token_to_respondent_with_no_role(context):
 @when("the user token is set to a internal user with no role associated")
 def step_impl_set_token_to_internal_with_no_role(context):
     with context.app.app_context():
-        context.bdd_helper.token_data = {constants.USER_IDENTIFIER: context.bdd_helper.internal_id_specific_user, "role": ""}
+        context.bdd_helper.token_data = {
+            constants.USER_IDENTIFIER: context.bdd_helper.internal_id_specific_user,
+            "role": "",
+        }
 
 
 # Version 2 Steps Below
+
 
 @given("sending from respondent to internal specific user")
 @when("sending from respondent to internal specific user")

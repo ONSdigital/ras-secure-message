@@ -9,7 +9,7 @@ class ServiceMockTestCase(unittest.TestCase):
     """Test case for toggling between a service and its mock"""
 
     def test_use_mock_service_uses_mock(self):
-        """Test can use mock """
+        """Test can use mock"""
         sut = Party(False)
         sut.use_mock_service()
         self.assertTrue(isinstance(sut._service, PartyServiceMock))

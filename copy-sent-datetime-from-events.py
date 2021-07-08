@@ -9,9 +9,11 @@ Session = sessionmaker(bind=engine)
 session = Session()
 
 try:
-    messages_without_sent_at = session.query(SecureMessage).filter(SecureMessage.sent_at == None).all() # noqa
+    messages_without_sent_at = session.query(SecureMessage).filter(SecureMessage.sent_at == None).all()  # noqa
     for message in messages_without_sent_at:
-        sent_event = session.query(Events).filter(and_(message.msg_id == Events.msg_id, Events.event == 'Sent')).one_or_none()
+        sent_event = (
+            session.query(Events).filter(and_(message.msg_id == Events.msg_id, Events.event == "Sent")).one_or_none()
+        )
         if sent_event is not None:
             message.sent_at = sent_event.date_time
             session.add(message)
@@ -22,9 +24,11 @@ except Exception as e:
 
 
 try:
-    messages_without_read_at = session.query(SecureMessage).filter(SecureMessage.read_at == None).all() # noqa
+    messages_without_read_at = session.query(SecureMessage).filter(SecureMessage.read_at == None).all()  # noqa
     for message in messages_without_read_at:
-        read_event = session.query(Events).filter(and_(message.msg_id == Events.msg_id, Events.event == 'Read')).one_or_none()
+        read_event = (
+            session.query(Events).filter(and_(message.msg_id == Events.msg_id, Events.event == "Read")).one_or_none()
+        )
         if read_event is not None:
             message.read_at = read_event.date_time
             session.add(message)

@@ -30,66 +30,92 @@ class ModifyTestCaseHelper:
                 msg_id = str(uuid.uuid4())
                 # Only the first message in a thread needs a entry in the conversation table
                 if i == 0:
-                    query = f'''INSERT INTO securemessage.conversation(id, is_closed, closed_by, closed_by_uuid) VALUES('{thread_id}', false, '', '')'''
+                    query = (
+                        f"INSERT INTO securemessage.conversation(id, is_closed, closed_by, closed_by_uuid) "
+                        f"VALUES('{thread_id}', false, '', '')"
+                    )
                     con.execute(query)
-                query = f'''INSERT INTO securemessage.secure_message(id, msg_id, subject, body, thread_id,
-                        case_id, business_id, exercise_id, survey_id) VALUES ({i}, '{msg_id}', 'test','test','{thread_id}',
-                        'ACollectionCase', 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc', 'ACollectionExercise',
-                        '{constants.NON_SPECIFIC_INTERNAL_USER}')'''
+                query = (
+                    f"INSERT INTO securemessage.secure_message(id, msg_id, subject, body, thread_id, "
+                    f"case_id, business_id, exercise_id, survey_id) VALUES({i}, '{msg_id}', 'test','test',"
+                    f"'{thread_id}','ACollectionCase', 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc', 'ACollectionExercise',"
+                    f"'{constants.NON_SPECIFIC_INTERNAL_USER}')"
+                )
                 con.execute(query)
-                query = f'''INSERT INTO securemessage.status(label, msg_id, actor) VALUES('SENT', '{msg_id}',
-                        '0a7ad740-10d5-4ecb-b7ca-3c0384afb882')'''
+                query = (
+                    f"INSERT INTO securemessage.status(label, msg_id, actor)"
+                    f"VALUES('SENT', '{msg_id}','0a7ad740-10d5-4ecb-b7ca-3c0384afb882')"
+                )
                 con.execute(query)
-                query = f"INSERT INTO securemessage.status(label, msg_id, actor) VALUES('INBOX', '{msg_id}', " \
-                        f"'{constants.NON_SPECIFIC_INTERNAL_USER}')"
+                query = (
+                    f"INSERT INTO securemessage.status(label, msg_id, actor) VALUES('INBOX', '{msg_id}', "
+                    f"'{constants.NON_SPECIFIC_INTERNAL_USER}')"
+                )
                 con.execute(query)
-                query = f"INSERT INTO securemessage.status(label, msg_id, actor) VALUES('UNREAD', '{msg_id}'," \
-                        f"'{constants.NON_SPECIFIC_INTERNAL_USER}')"
+                query = (
+                    f"INSERT INTO securemessage.status(label, msg_id, actor) VALUES('UNREAD', '{msg_id}',"
+                    f"'{constants.NON_SPECIFIC_INTERNAL_USER}')"
+                )
                 con.execute(query)
-                query = f'''INSERT INTO securemessage.events(event, msg_id, date_time)
-                         VALUES('{EventsApi.SENT.value}', '{msg_id}', '2017-02-03 00:00:00')'''
+                query = f"""INSERT INTO securemessage.events(event, msg_id, date_time)
+                         VALUES('{EventsApi.SENT.value}', '{msg_id}', '2017-02-03 00:00:00')"""
                 con.execute(query)
                 if mark_as_read:
-                    query = f'''INSERT INTO securemessage.events(event, msg_id, date_time)
-                            VALUES('{EventsApi.READ.value}', '{msg_id}', '2017-02-03 00:00:00')'''
+                    query = f"""INSERT INTO securemessage.events(event, msg_id, date_time)
+                            VALUES('{EventsApi.READ.value}', '{msg_id}', '2017-02-03 00:00:00')"""
                     con.execute(query)
 
         return thread_id
 
     def create_conversation_with_respondent_as_unread(self, user, message_count=0):
         """Adds a specified number of Messages to the db in a single thread"""
-        # we should not be inserting records into the db for a unit test but sadly without a greater rework its the only way
+        # we should not be inserting records into the db for a unit test but sadly without a greater rework
+        # its the only way
         thread_id = str(uuid.uuid4())
         with self.engine.connect() as con:
             for i in range(message_count):
                 msg_id = str(uuid.uuid4())
                 # Only the first message in a thread needs a entry in the conversation table
                 if i == 0:
-                    query = f'''INSERT INTO securemessage.conversation(id, is_closed, closed_by, closed_by_uuid) VALUES('{thread_id}', false, '', '')'''
+                    query = (
+                        f"INSERT INTO securemessage.conversation(id, is_closed, closed_by, closed_by_uuid) "
+                        f"VALUES('{thread_id}', false, '', '')"
+                    )
                     con.execute(query)
-                query = f'''INSERT INTO securemessage.secure_message(id, msg_id, subject, body, thread_id,
-                        case_id, business_id, exercise_id, survey_id) VALUES ({i}, '{msg_id}', 'test','test','{thread_id}',
-                        'ACollectionCase', 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc', 'ACollectionExercise',
-                        '{user.user_uuid}')'''
+                query = (
+                    f"INSERT INTO securemessage.secure_message(id, msg_id, subject, body, thread_id,"
+                    f"case_id, business_id, exercise_id, survey_id) VALUES({i}, '{msg_id}', 'test','test',"
+                    f"'{thread_id}','ACollectionCase', 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc', 'ACollectionExercise',"
+                    f"'{user.user_uuid}')"
+                )
                 con.execute(query)
-                query = f'''INSERT INTO securemessage.status(label, msg_id, actor) VALUES('SENT', '{msg_id}',
-                        '{constants.NON_SPECIFIC_INTERNAL_USER}')'''
+                query = (
+                    f"INSERT INTO securemessage.status(label, msg_id, actor) "
+                    f"VALUES('SENT','{msg_id}', '{constants.NON_SPECIFIC_INTERNAL_USER}')"
+                )
                 con.execute(query)
-                query = f"INSERT INTO securemessage.status(label, msg_id, actor) VALUES('INBOX', '{msg_id}', " \
-                        f"'{user.user_uuid}')"
+                query = (
+                    f"INSERT INTO securemessage.status(label, msg_id, actor) VALUES('INBOX', '{msg_id}', "
+                    f"'{user.user_uuid}')"
+                )
                 con.execute(query)
-                query = f"INSERT INTO securemessage.status(label, msg_id, actor) VALUES('UNREAD', '{msg_id}'," \
-                        f" '{user.user_uuid}')"
+                query = (
+                    f"INSERT INTO securemessage.status(label, msg_id, actor) VALUES('UNREAD', '{msg_id}',"
+                    f" '{user.user_uuid}')"
+                )
                 con.execute(query)
-                query = f'''INSERT INTO securemessage.events(event, msg_id, date_time)
-                         VALUES('{EventsApi.SENT.value}', '{msg_id}', '2020-11-20 00:00:00')'''
+                query = f"""INSERT INTO securemessage.events(event, msg_id, date_time)
+                         VALUES('{EventsApi.SENT.value}', '{msg_id}', '2020-11-20 00:00:00')"""
                 con.execute(query)
         return thread_id
 
-    def add_conversation(self, conversation_id=str(uuid.uuid4()), is_closed=False, closed_by='', closed_by_uuid='', closed_at=None):
-        """ Populate the conversation table"""
-        # If conversation created needs to be closed, values are generated for you.  These can be overrriden by passing them
-        # into function (i.e., if you need a specific name, but don't care about anything else, then only pass in 'closed_by')
+    def add_conversation(
+        self, conversation_id=str(uuid.uuid4()), is_closed=False, closed_by="", closed_by_uuid="", closed_at=None
+    ):
+        """Populate the conversation table"""
+        # If conversation created needs to be closed, values are generated for you.  These can be overrriden
+        # by passing them into function (i.e., if you need a specific name, but don't care about anything else,
+        # then only pass in 'closed_by')
         if is_closed:
             if not closed_by:
                 closed_by = "Some person"
@@ -98,8 +124,10 @@ class ModifyTestCaseHelper:
             if not closed_at:
                 closed_at = datetime.datetime.utcnow()
         with self.engine.connect() as con:
-            query = f'''INSERT INTO securemessage.conversation(id, is_closed, closed_by, closed_by_uuid, closed_at) VALUES('{conversation_id}',
-                    '{is_closed}', '{closed_by}', '{closed_by_uuid}', '{closed_at}')'''
+            query = (
+                f"INSERT INTO securemessage.conversation(id, is_closed, closed_by, closed_by_uuid, closed_at) "
+                f"VALUES('{conversation_id}', '{is_closed}', '{closed_by}', '{closed_by_uuid}', '{closed_at}')"
+            )
             con.execute(query)
         return conversation_id
 
@@ -110,10 +138,10 @@ class ModifyTestCase(unittest.TestCase, ModifyTestCaseHelper):
     def setUp(self):
         """setup test environment"""
 
-        self.app = create_app(config='TestConfig')
+        self.app = create_app(config="TestConfig")
 
         self.app.testing = True
-        self.engine = create_engine(self.app.config['SQLALCHEMY_DATABASE_URI'])
+        self.engine = create_engine(self.app.config["SQLALCHEMY_DATABASE_URI"])
 
         with self.app.app_context():
             database.db.init_app(current_app)
@@ -121,8 +149,8 @@ class ModifyTestCase(unittest.TestCase, ModifyTestCaseHelper):
             database.db.create_all()
             self.db = database.db
 
-        self.user_internal = User('ce12b958-2a5f-44f4-a6da-861e59070a31', 'internal')
-        self.user_respondent = User('0a7ad740-10d5-4ecb-b7ca-3c0384afb882', 'respondent')
+        self.user_internal = User("ce12b958-2a5f-44f4-a6da-861e59070a31", "internal")
+        self.user_respondent = User("0a7ad740-10d5-4ecb-b7ca-3c0384afb882", "respondent")
 
     def tearDown(self):
         self.engine.dispose()
@@ -190,7 +218,7 @@ class ModifyTestCase(unittest.TestCase, ModifyTestCaseHelper):
         """testing duplicate message labels are not added to the database"""
         self.populate_database(1)
         with self.engine.connect() as con:
-            query = con.execute('SELECT msg_id FROM securemessage.secure_message LIMIT 1')
+            query = con.execute("SELECT msg_id FROM securemessage.secure_message LIMIT 1")
             msg_id = query.first()[0]
         with self.app.app_context():
             with current_app.test_request_context():
@@ -213,9 +241,9 @@ class ModifyTestCase(unittest.TestCase, ModifyTestCaseHelper):
             serialised_message = Retriever.retrieve_message(thread[0].msg_id, self.user_internal)
             Modifier.mark_message_as_read(serialised_message, self.user_internal)
             serialised_message = Retriever.retrieve_message(thread[0].msg_id, self.user_internal)
-            db_message = SecureMessage.query.filter(SecureMessage.msg_id == serialised_message['msg_id']).one()
+            db_message = SecureMessage.query.filter(SecureMessage.msg_id == serialised_message["msg_id"]).one()
 
-            self.assertIsNotNone(serialised_message['read_date'])
+            self.assertIsNotNone(serialised_message["read_date"])
             self.assertTrue(isinstance(db_message.read_at, datetime.datetime))
             # Test that timestamp on read message is less than 3 seconds old to prove it
             # was only just created
@@ -226,102 +254,122 @@ class ModifyTestCase(unittest.TestCase, ModifyTestCaseHelper):
         """testing message read_date is changed when unread label is removed for a second time"""
         self.populate_database(1)
         with self.engine.connect() as con:
-            query = con.execute('SELECT msg_id FROM securemessage.secure_message LIMIT 1')
+            query = con.execute("SELECT msg_id FROM securemessage.secure_message LIMIT 1")
             msg_id = query.first()[0]
         with self.app.app_context():
             with current_app.test_request_context():
                 message = Retriever.retrieve_message(msg_id, self.user_internal)
                 Modifier.mark_message_as_read(message, self.user_internal)
                 message = Retriever.retrieve_message(msg_id, self.user_internal)
-                read_date_set = message['read_date']
+                read_date_set = message["read_date"]
                 Modifier.add_unread(message, self.user_internal)
                 message = Retriever.retrieve_message(msg_id, self.user_internal)
                 Modifier.mark_message_as_read(message, self.user_internal)
                 message = Retriever.retrieve_message(msg_id, self.user_internal)
-                self.assertNotEqual(message['read_date'], read_date_set)
+                self.assertNotEqual(message["read_date"], read_date_set)
 
     def test_exception_for_add_label_raises(self):
         with self.app.app_context():
             database.db.drop_all()
             with current_app.test_request_context():
                 with self.assertRaises(InternalServerError):
-                    Modifier.add_label('UNREAD', {'survey_id': 'survey_id'}, self.user_internal)
+                    Modifier.add_label("UNREAD", {"survey_id": "survey_id"}, self.user_internal)
 
     def test_exception_for_remove_label_raises(self):
         with self.app.app_context():
             database.db.drop_all()
             with current_app.test_request_context():
                 with self.assertRaises(InternalServerError):
-                    Modifier.remove_label('UNREAD', {'survey_id': 'survey_id'}, self.user_internal)
+                    Modifier.remove_label("UNREAD", {"survey_id": "survey_id"}, self.user_internal)
 
     def test_get_label_actor_to_respondent(self):
-        message_to_respondent = {'msg_id': 'test1',
-                                 'msg_to': ['0a7ad740-10d5-4ecb-b7ca-3c0384afb882'],
-                                 'msg_from': 'ce12b958-2a5f-44f4-a6da-861e59070a31',
-                                 'subject': 'MyMessage',
-                                 'body': 'hello',
-                                 'thread_id': '',
-                                 'case_id': 'ACollectionCase',
-                                 'exercise_id': 'ACollectionExercise',
-                                 'business_id': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc',
-                                 'survey_id': self.BRES_SURVEY,
-                                 'from_internal': True}
+        message_to_respondent = {
+            "msg_id": "test1",
+            "msg_to": ["0a7ad740-10d5-4ecb-b7ca-3c0384afb882"],
+            "msg_from": "ce12b958-2a5f-44f4-a6da-861e59070a31",
+            "subject": "MyMessage",
+            "body": "hello",
+            "thread_id": "",
+            "case_id": "ACollectionCase",
+            "exercise_id": "ACollectionExercise",
+            "business_id": "f1a5e99c-8edf-489a-9c72-6cabe6c387fc",
+            "survey_id": self.BRES_SURVEY,
+            "from_internal": True,
+        }
 
-        self.assertEqual(Modifier._get_label_actor(user=self.user_internal, message=message_to_respondent),
-                         'ce12b958-2a5f-44f4-a6da-861e59070a31')
-        self.assertEqual(Modifier._get_label_actor(user=self.user_respondent, message=message_to_respondent),
-                         '0a7ad740-10d5-4ecb-b7ca-3c0384afb882')
+        self.assertEqual(
+            Modifier._get_label_actor(user=self.user_internal, message=message_to_respondent),
+            "ce12b958-2a5f-44f4-a6da-861e59070a31",
+        )
+        self.assertEqual(
+            Modifier._get_label_actor(user=self.user_respondent, message=message_to_respondent),
+            "0a7ad740-10d5-4ecb-b7ca-3c0384afb882",
+        )
 
     def test_get_label_actor_to_group(self):
-        message_to_internal_group = {'msg_id': 'test3',
-                                     'msg_to': [constants.NON_SPECIFIC_INTERNAL_USER],
-                                     'msg_from': '0a7ad740-10d5-4ecb-b7ca-3c0384afb882',
-                                     'subject': 'MyMessage',
-                                     'body': 'hello',
-                                     'thread_id': '',
-                                     'case_id': 'ACollectionCase',
-                                     'exercise_id': 'ACollectionExercise',
-                                     'business_id': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc',
-                                     'survey_id': self.BRES_SURVEY,
-                                     'from_internal': False}
+        message_to_internal_group = {
+            "msg_id": "test3",
+            "msg_to": [constants.NON_SPECIFIC_INTERNAL_USER],
+            "msg_from": "0a7ad740-10d5-4ecb-b7ca-3c0384afb882",
+            "subject": "MyMessage",
+            "body": "hello",
+            "thread_id": "",
+            "case_id": "ACollectionCase",
+            "exercise_id": "ACollectionExercise",
+            "business_id": "f1a5e99c-8edf-489a-9c72-6cabe6c387fc",
+            "survey_id": self.BRES_SURVEY,
+            "from_internal": False,
+        }
 
-        self.assertEqual(Modifier._get_label_actor(user=self.user_internal, message=message_to_internal_group),
-                         constants.NON_SPECIFIC_INTERNAL_USER)
-        self.assertEqual(Modifier._get_label_actor(user=self.user_respondent, message=message_to_internal_group),
-                         '0a7ad740-10d5-4ecb-b7ca-3c0384afb882')
+        self.assertEqual(
+            Modifier._get_label_actor(user=self.user_internal, message=message_to_internal_group),
+            constants.NON_SPECIFIC_INTERNAL_USER,
+        )
+        self.assertEqual(
+            Modifier._get_label_actor(user=self.user_respondent, message=message_to_internal_group),
+            "0a7ad740-10d5-4ecb-b7ca-3c0384afb882",
+        )
 
     def test_get_label_actor_to_internal_user(self):
-        message_to_internal_user = {'msg_id': 'test4',
-                                    'msg_to': ['ce12b958-2a5f-44f4-a6da-861e59070a31'],
-                                    'msg_from': '0a7ad740-10d5-4ecb-b7ca-3c0384afb882',
-                                    'subject': 'MyMessage',
-                                    'body': 'hello',
-                                    'thread_id': '',
-                                    'case_id': 'ACollectionCase',
-                                    'exercise_id': 'ACollectionExercise',
-                                    'business_id': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc',
-                                    'survey_id': self.BRES_SURVEY,
-                                    'from_internal': False}
+        message_to_internal_user = {
+            "msg_id": "test4",
+            "msg_to": ["ce12b958-2a5f-44f4-a6da-861e59070a31"],
+            "msg_from": "0a7ad740-10d5-4ecb-b7ca-3c0384afb882",
+            "subject": "MyMessage",
+            "body": "hello",
+            "thread_id": "",
+            "case_id": "ACollectionCase",
+            "exercise_id": "ACollectionExercise",
+            "business_id": "f1a5e99c-8edf-489a-9c72-6cabe6c387fc",
+            "survey_id": self.BRES_SURVEY,
+            "from_internal": False,
+        }
 
-        self.assertEqual(Modifier._get_label_actor(user=self.user_internal, message=message_to_internal_user),
-                         'ce12b958-2a5f-44f4-a6da-861e59070a31')
-        self.assertEqual(Modifier._get_label_actor(user=self.user_respondent, message=message_to_internal_user),
-                         '0a7ad740-10d5-4ecb-b7ca-3c0384afb882')
+        self.assertEqual(
+            Modifier._get_label_actor(user=self.user_internal, message=message_to_internal_user),
+            "ce12b958-2a5f-44f4-a6da-861e59070a31",
+        )
+        self.assertEqual(
+            Modifier._get_label_actor(user=self.user_respondent, message=message_to_internal_user),
+            "0a7ad740-10d5-4ecb-b7ca-3c0384afb882",
+        )
 
     def test_get_label_actor_raises_exception_for_missing_fields(self):
-        message_missing_fields = {'msg_id': 'test5',
-                                  'subject': 'MyMessage',
-                                  'body': 'hello',
-                                  'thread_id': '',
-                                  'case_id': 'ACollectionCase',
-                                  'exercise_id': 'ACollectionExercise',
-                                  'business_id': 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc',
-                                  'survey_id': self.BRES_SURVEY,
-                                  'from_internal': False}
+        message_missing_fields = {
+            "msg_id": "test5",
+            "subject": "MyMessage",
+            "body": "hello",
+            "thread_id": "",
+            "case_id": "ACollectionCase",
+            "exercise_id": "ACollectionExercise",
+            "business_id": "f1a5e99c-8edf-489a-9c72-6cabe6c387fc",
+            "survey_id": self.BRES_SURVEY,
+            "from_internal": False,
+        }
 
         with self.assertRaises(InternalServerError):
             Modifier._get_label_actor(user=self.user_internal, message=message_missing_fields)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()

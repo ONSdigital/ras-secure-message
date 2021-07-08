@@ -1,5 +1,4 @@
-from secure_message.services.service_toggles import (internal_user_service,
-                                                     party)
+from secure_message.services.service_toggles import internal_user_service, party
 
 
 class User:
@@ -11,11 +10,11 @@ class User:
 
     @property
     def is_internal(self):
-        return bool(self.role == 'internal')
+        return bool(self.role == "internal")
 
     @property
     def is_respondent(self):
-        return bool(self.role == 'respondent')
+        return bool(self.role == "respondent")
 
     @staticmethod
     def is_valid_internal_user(uuid):

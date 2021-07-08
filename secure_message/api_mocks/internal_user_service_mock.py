@@ -15,50 +15,40 @@ class InternalUserServiceMock:
                 "id": "Someuuid",
                 "firstName": "fred",
                 "lastName": "flinstone",
-                "emailAddress": "mock@email.com"
+                "emailAddress": "mock@email.com",
             },
             "01b51fcc-ed43-4cdb-ad1c-450f9986859b": {
                 "id": "01b51fcc-ed43-4cdb-ad1c-450f9986859b",
                 "firstName": "fred",
                 "lastName": "flinstone",
-                "emailAddress": "mock@email.com"
+                "emailAddress": "mock@email.com",
             },
             "f62dfda8-73b0-4e0e-97cf-1b06327a6712": {
                 "id": "01b51fcc-ed43-4cdb-ad1c-450f9986859b",
                 "firstName": "fred",
                 "lastName": "flinstone",
-                "emailAddress": "mock@email.com"
+                "emailAddress": "mock@email.com",
             },
             "ce12b958-2a5f-44f4-a6da-861e59070a31": {
                 "id": "ce12b958-2a5f-44f4-a6da-861e59070a31",
                 "firstName": "Selphie",
                 "lastName": "Tilmitt",
-                "emailAddress": "selphie@mockemail.com"
+                "emailAddress": "selphie@mockemail.com",
             },
-            "Tej": {
-                "id": "Tej",
-                "firstName": "Tejas",
-                "lastName": "patel",
-                "emailAddress": "mock@email.com"
-            },
-            "BRES": {
-                "id": "BRES",
-                "firstName": "BRES",
-                "lastName": "",
-                "emailAddress": "mock@email.com"
-            },
+            "Tej": {"id": "Tej", "firstName": "Tejas", "lastName": "patel", "emailAddress": "mock@email.com"},
+            "BRES": {"id": "BRES", "firstName": "BRES", "lastName": "", "emailAddress": "mock@email.com"},
             "SpecificInternalUserId": {
                 "id": "SpecificInternalUserId",
                 "firstName": "Internal",
                 "lastName": "User",
-                "emailAddress": "mock@email.com"
+                "emailAddress": "mock@email.com",
             },
             "AlternateSpecificInternalUserId": {
                 "id": "AlternateSpecificInternalUserId",
                 "firstName": "alternate",
                 "lastName": "Internal_user",
-                "emailAddress": "mock@email.com"
-            }
+                "emailAddress": "mock@email.com",
+            },
         }
 
     def get_user_details(self, uuid):

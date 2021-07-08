@@ -4,8 +4,13 @@ from sqlalchemy.exc import SQLAlchemyError
 from structlog import wrap_logger
 
 from secure_message.exception.exceptions import MessageSaveException
-from secure_message.repository.database import (Conversation, Events,
-                                                SecureMessage, Status, db)
+from secure_message.repository.database import (
+    Conversation,
+    Events,
+    SecureMessage,
+    Status,
+    db,
+)
 
 logger = wrap_logger(logging.getLogger(__name__))
 
@@ -25,7 +30,7 @@ class Saver:
                 logger.info("Setting thread id", thread_id=db_message.thread_id)
                 conversation = Conversation()
                 conversation.id = db_message.thread_id
-                if hasattr(domain_message, 'category'):
+                if hasattr(domain_message, "category"):
                     logger.info("setting message category as", category=domain_message.category)
                     conversation.category = domain_message.category
                 else:
@@ -38,8 +43,8 @@ class Saver:
             session.commit()
         except SQLAlchemyError:
             session.rollback()
-            logger.exception('Secure message save failed')
-            raise MessageSaveException('Message save failed')
+            logger.exception("Secure message save failed")
+            raise MessageSaveException("Message save failed")
 
     @staticmethod
     def save_msg_status(actor, msg_id, label, session=db.session):
@@ -52,8 +57,8 @@ class Saver:
             session.commit()
         except SQLAlchemyError:
             session.rollback()
-            logger.exception('Message status save failed')
-            raise MessageSaveException('Message save failed')
+            logger.exception("Message status save failed")
+            raise MessageSaveException("Message save failed")
 
     @staticmethod
     def save_msg_event(msg_id, event, session=db.session):
@@ -65,5 +70,5 @@ class Saver:
             session.commit()
         except SQLAlchemyError:
             session.rollback()
-            logger.exception('Message event save failed')
-            raise MessageSaveException('Message save failed')
+            logger.exception("Message event save failed")
+            raise MessageSaveException("Message save failed")
