@@ -18,13 +18,14 @@ from secure_message.authentication.authenticator import authenticate
 from secure_message.exception.exceptions import MissingEnvironmentVariable
 from secure_message.logger_config import logger_initial_config
 from secure_message.repository import database
-from secure_message.resources.health import (DatabaseHealth, Health,
-                                             HealthDetails)
+from secure_message.resources.health import DatabaseHealth, Health, HealthDetails
 from secure_message.resources.info import Info
-from secure_message.resources.messages import (MessageById, MessageModifyById,
-                                               MessageSend)
-from secure_message.resources.threads import (ThreadById, ThreadCounter,
-                                              ThreadList)
+from secure_message.resources.messages import (
+    MessageById,
+    MessageModifyById,
+    MessageSend,
+)
+from secure_message.resources.threads import ThreadById, ThreadCounter, ThreadList
 
 logger = wrap_logger(logging.getLogger(__name__))
 
@@ -37,8 +38,7 @@ def create_app(config=None):
 
     logger_initial_config()
 
-    missing_vars = [var for var in app.config['NON_DEFAULT_VARIABLES']
-                    if app.config.get(var) is None]
+    missing_vars = [var for var in app.config["NON_DEFAULT_VARIABLES"] if app.config.get(var) is None]
 
     if missing_vars:
         raise MissingEnvironmentVariable(missing_vars)
@@ -46,37 +46,37 @@ def create_app(config=None):
     api = Api(app)
     CORS(app)
 
-    logger.info('Starting Secure Message Service...', config=app_config)
+    logger.info("Starting Secure Message Service...", config=app_config)
 
     create_db(app)
 
-    api.add_resource(Health, '/health')
-    api.add_resource(DatabaseHealth, '/health/db')
-    api.add_resource(HealthDetails, '/health/details')
-    api.add_resource(Info, '/info')
+    api.add_resource(Health, "/health")
+    api.add_resource(DatabaseHealth, "/health/db")
+    api.add_resource(HealthDetails, "/health/details")
+    api.add_resource(Info, "/info")
 
-    api.add_resource(MessageSend, '/messages')
-    api.add_resource(MessageById, '/messages/<message_id>')
-    api.add_resource(MessageModifyById, '/messages/modify/<message_id>')
+    api.add_resource(MessageSend, "/messages")
+    api.add_resource(MessageById, "/messages/<message_id>")
+    api.add_resource(MessageModifyById, "/messages/modify/<message_id>")
 
-    api.add_resource(ThreadList, '/threads')
-    api.add_resource(ThreadById, '/threads/<thread_id>')
-    api.add_resource(ThreadCounter, '/messages/count')
+    api.add_resource(ThreadList, "/threads")
+    api.add_resource(ThreadById, "/threads/<thread_id>")
+    api.add_resource(ThreadCounter, "/messages/count")
 
     app.oauth_client_token_expires_at = maya.now()
 
-    if app.config['USE_UAA']:
+    if app.config["USE_UAA"]:
         cache_client_token(app)
 
     @app.before_request
     def before_request():
-        if app.config['USE_UAA']:
+        if app.config["USE_UAA"]:
             refresh_client_token_if_required(app)
         if _request_requires_authentication():
             log_request()
             res = authenticate(request.headers)
-            if res != {'status': "ok"}:
-                logger.error('Failed to authenticate user', result=res)
+            if res != {"status": "ok"}:
+                logger.error("Failed to authenticate user", result=res)
                 return res
         return None
 
@@ -96,33 +96,27 @@ def refresh_client_token_if_required(app):
 
 
 def cache_client_token(app):
-    app.oauth_client_token = get_client_token(app.config['CLIENT_ID'],
-                                              app.config['CLIENT_SECRET'],
-                                              app.config['UAA_URL'])
+    app.oauth_client_token = get_client_token(
+        app.config["CLIENT_ID"], app.config["CLIENT_SECRET"], app.config["UAA_URL"]
+    )
 
-    expires_in = app.oauth_client_token['expires_in'] - 10
+    expires_in = app.oauth_client_token["expires_in"] - 10
     app.oauth_client_token_expires_at = maya.now().add(seconds=expires_in)
 
 
 def get_client_token(client_id, client_secret, url):
-    headers = {'Content-Type': 'application/x-www-form-urlencoded',
-               'Accept': 'application/json'}
+    headers = {"Content-Type": "application/x-www-form-urlencoded", "Accept": "application/json"}
 
-    payload = {'grant_type': 'client_credentials',
-               'response_type': 'token',
-               'token_format': 'opaque'}
+    payload = {"grant_type": "client_credentials", "response_type": "token", "token_format": "opaque"}
 
-    get_token_url = f'{url}/oauth/token'
+    get_token_url = f"{url}/oauth/token"
 
     s = requests.Session()
     s.mount(get_token_url, HTTPAdapter(max_retries=15))
 
     try:
         logger.info("Attempting to GET client token from UAA")
-        response = s.post(get_token_url,
-                          headers=headers,
-                          params=payload,
-                          auth=(client_id, client_secret))
+        response = s.post(get_token_url, headers=headers, params=payload, auth=(client_id, client_secret))
         response.raise_for_status()
 
         try:
@@ -134,8 +128,7 @@ def get_client_token(client_id, client_secret, url):
             return get_client_token(client_id, client_secret, url)
 
     except requests.HTTPError as e:
-        logger.exception(
-            f"{e.response.status_code} response received while retrieving client token.")
+        logger.exception(f"{e.response.status_code} response received while retrieving client token.")
         if e.response.status_code >= 500:
             logger.info("Retrying client token retrieval in 1 seconds.")
             sleep(1)
@@ -151,7 +144,7 @@ def get_client_token(client_id, client_secret, url):
 
 
 def retry_if_database_error(exception):
-    logger.error('Database error has occurred', error=exception)
+    logger.error("Database error has occurred", error=exception)
     return isinstance(exception, DatabaseError) and not isinstance(exception, ProgrammingError)
 
 
@@ -159,27 +152,31 @@ def retry_if_database_error(exception):
 def create_db(app):
     database.db.init_app(app)
     with app.app_context():
-        event.listen(database.db.metadata, 'before_create', DDL(
-            "CREATE SCHEMA IF NOT EXISTS securemessage"))
+        event.listen(database.db.metadata, "before_create", DDL("CREATE SCHEMA IF NOT EXISTS securemessage"))
         database.db.create_all()
         database.db.session.commit()
 
 
 def _request_requires_authentication():
-    return request.endpoint is not None and 'health' not in request.endpoint and request.endpoint != 'info' and request.method != 'OPTIONS'
+    return (
+        request.endpoint is not None
+        and "health" not in request.endpoint
+        and request.endpoint != "info"
+        and request.method != "OPTIONS"
+    )
 
 
 def log_request():
-    """ Outputs the request header, body and parameters information from request in the form of a debug logger"""
+    """Outputs the request header, body and parameters information from request in the form of a debug logger"""
     header = request.headers
     header_list = []
     for x, y in header.items():
-        header_list.append(str(x) + ': ' + str(y) + ', ')
-    headers = ''.join(header_list)
+        header_list.append(str(x) + ": " + str(y) + ", ")
+    headers = "".join(header_list)
 
     req_data = request.data
-    if req_data is None or req_data == b'':
-        req_data = 'Empty'
+    if req_data is None or req_data == b"":
+        req_data = "Empty"
     else:
         req_data = json.loads(req_data)
 
@@ -189,7 +186,7 @@ def log_request():
 
     for key, val in req_args.items():
         count += 1
-        args_list.append('arg ' + str(count) + ' = ' + str(key) + ': ' + str(val))
+        args_list.append("arg " + str(count) + " = " + str(key) + ": " + str(val))
 
-    params = ''.join(args_list)
-    logger.debug('Incoming request', headers=headers, req_data=req_data, arguments=params)
+    params = "".join(args_list)
+    logger.debug("Incoming request", headers=headers, req_data=req_data, arguments=params)

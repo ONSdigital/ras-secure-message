@@ -20,9 +20,11 @@ class InternalUserService:
         logger.info("Getting user details from uaa", uuid=uuid)
         url = f"{current_app.config['UAA_URL']}/Users/{uuid}"
         uaa_token = current_app.oauth_client_token
-        headers = {'Accept': 'application/json',
-                   'Authorization': 'Bearer ' + uaa_token.get('access_token'),
-                   'Content-Type': 'application/json'}
+        headers = {
+            "Accept": "application/json",
+            "Authorization": "Bearer " + uaa_token.get("access_token"),
+            "Content-Type": "application/json",
+        }
 
         try:
             response = requests.get(url, headers=headers)
@@ -38,9 +40,9 @@ class InternalUserService:
         try:
             user_details = {
                 "id": uuid,
-                "firstName": resp_json['name']['givenName'],
-                "lastName": resp_json['name']['familyName'],
-                "emailAddress": resp_json['emails'][0]['value']
+                "firstName": resp_json["name"]["givenName"],
+                "lastName": resp_json["name"]["familyName"],
+                "emailAddress": resp_json["emails"][0]["value"],
             }
             logger.info("Successfully retrieved and formatted user details", uuid=uuid)
             return user_details
@@ -52,10 +54,5 @@ class InternalUserService:
 
     @staticmethod
     def get_default_user_details(uuid):
-        user_details = {
-            "id": uuid,
-            "firstName": "ONS",
-            "lastName": "User",
-            "emailAddress": ""
-        }
+        user_details = {"id": uuid, "firstName": "ONS", "lastName": "User", "emailAddress": ""}
         return user_details

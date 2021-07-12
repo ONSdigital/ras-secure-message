@@ -7,8 +7,13 @@ from werkzeug.exceptions import BadRequest, InternalServerError
 
 from secure_message.common.eventsapi import EventsApi
 from secure_message.common.labels import Labels
-from secure_message.repository.database import (Conversation, Events,
-                                                SecureMessage, Status, db)
+from secure_message.repository.database import (
+    Conversation,
+    Events,
+    SecureMessage,
+    Status,
+    db,
+)
 from secure_message.services.service_toggles import internal_user_service
 
 logger = wrap_logger(logging.getLogger(__name__))
@@ -22,10 +27,10 @@ class Modifier:
         try:
             if user.is_respondent:
                 actor = user.user_uuid
-            elif message['from_internal']:
-                actor = message['msg_from']
+            elif message["from_internal"]:
+                actor = message["msg_from"]
             else:
-                actor = message['msg_to'][0]
+                actor = message["msg_to"][0]
         except KeyError:
             logger.exception("Failed to remove label, no msg_to field")
             raise InternalServerError(description="Error getting actor details from message")
@@ -38,13 +43,13 @@ class Modifier:
         actor = Modifier._get_label_actor(user=user, message=message)
 
         try:
-            status = Status(label=label, msg_id=message['msg_id'], actor=actor)
+            status = Status(label=label, msg_id=message["msg_id"], actor=actor)
             session.add(status)
             session.commit()
             return True
         except Exception as e:
             session.rollback()
-            logger.error('Error adding label to database', msg_id=message, label=label, user_uuid=actor, error=e)
+            logger.error("Error adding label to database", msg_id=message, label=label, user_uuid=actor, error=e)
             raise InternalServerError(description="Error adding label to database")
 
     @staticmethod
@@ -53,12 +58,13 @@ class Modifier:
         actor = Modifier._get_label_actor(user=user, message=message)
 
         try:
-            query = "DELETE FROM securemessage.status WHERE label = '{0}' and msg_id = '{1}' and actor = '{2}'". \
-                format(label, message['msg_id'], actor)
+            query = "DELETE FROM securemessage.status WHERE label = '{0}' and msg_id = '{1}' and actor = '{2}'".format(
+                label, message["msg_id"], actor
+            )
             db.get_engine(app=db.get_app()).execute(query)
             return True
         except Exception as e:
-            logger.error('Error removing label from database', msg_id=message, label=label, user_uuid=actor, error=e)
+            logger.error("Error removing label from database", msg_id=message, label=label, user_uuid=actor, error=e)
             raise InternalServerError(description="Error removing label from database")
 
     @staticmethod
@@ -67,26 +73,26 @@ class Modifier:
 
         :raises BadRequest: Raised when message doesn't have an INBOX label
         """
-        logger.info('Attempting to add unread label to message', msg_id=message['msg_id'], labels=message['labels'])
+        logger.info("Attempting to add unread label to message", msg_id=message["msg_id"], labels=message["labels"])
         unread = Labels.UNREAD.value
         inbox = Labels.INBOX.value
-        if inbox in message['labels']:
-            if unread in message['labels']:
+        if inbox in message["labels"]:
+            if unread in message["labels"]:
                 # Unread label already exists
                 return True
             Modifier.add_label(unread, message, user)
             return True
 
-        logger.error('Error adding unread label. Message is missing INBOX label')
-        raise BadRequest(description='Error adding unread label. Message is missing INBOX label')
+        logger.error("Error adding unread label. Message is missing INBOX label")
+        raise BadRequest(description="Error adding unread label. Message is missing INBOX label")
 
     @staticmethod
     def mark_message_as_read(message, user):
         """Remove unread label from status"""
-        logger.debug("marking message as read with id", message=message['msg_id'])
+        logger.debug("marking message as read with id", message=message["msg_id"])
         # if message is part of a thread mark all messages as read
-        if message['thread_id']:
-            Modifier._mark_all_read(message['thread_id'], user)
+        if message["thread_id"]:
+            Modifier._mark_all_read(message["thread_id"], user)
         else:
             # mark the message as read i.e. remove the unread label and set the `read at` time.
             Modifier._mark_read(message, user)
@@ -102,8 +108,8 @@ class Modifier:
             secure_messages = SecureMessage.query.filter(SecureMessage.thread_id == thread_id)
             for secure_message in secure_messages.all():
                 message = secure_message.serialize(user)
-                if inbox in message['labels'] and unread in message['labels']:
-                    event = Events(msg_id=message['msg_id'], event=EventsApi.READ.value)
+                if inbox in message["labels"] and unread in message["labels"]:
+                    event = Events(msg_id=message["msg_id"], event=EventsApi.READ.value)
                     db.session.add(event)
                     secure_message.read_at = datetime.utcnow()
                     db.session.add(secure_message)
@@ -111,7 +117,7 @@ class Modifier:
             db.session.commit()
         except SQLAlchemyError:
             db.session.rollback()
-            logger.exception('Error marking thread as read', thread_id=thread_id)
+            logger.exception("Error marking thread as read", thread_id=thread_id)
             raise InternalServerError(description="Error marking thread as read")
 
     @staticmethod
@@ -119,19 +125,19 @@ class Modifier:
         inbox = Labels.INBOX.value
         unread = Labels.UNREAD.value
         # message is unread if it has an UNREAD label and the `read_at` time isn't set
-        if inbox in message['labels'] and unread in message['labels'] and 'read_date' not in message:
+        if inbox in message["labels"] and unread in message["labels"] and "read_date" not in message:
             # Save to both events and secure_message table for now.  In future, the save to the
             # events table will be removed.
             try:
-                event = Events(msg_id=message['msg_id'], event=EventsApi.READ.value)
+                event = Events(msg_id=message["msg_id"], event=EventsApi.READ.value)
                 db.session.add(event)
-                secure_message = SecureMessage.query.filter(SecureMessage.msg_id == message['msg_id']).one()
+                secure_message = SecureMessage.query.filter(SecureMessage.msg_id == message["msg_id"]).one()
                 secure_message.read_at = datetime.utcnow()
                 db.session.add(secure_message)
                 db.session.commit()
             except SQLAlchemyError:
                 db.session.rollback()
-                logger.exception('Error adding read information to message', msg_id=message['msg_id'])
+                logger.exception("Error adding read information to message", msg_id=message["msg_id"])
                 raise InternalServerError(description="Error adding read information to message")
         Modifier.remove_label(unread, message, user)
 
@@ -147,7 +153,7 @@ class Modifier:
         """
         bound_logger = logger.bind(conversation_id=conversation.id)
 
-        for field in ['category']:
+        for field in ["category"]:
             # Looks a bit awkward but getattr/setattr lets us loop over all the fields as we can't access fields
             # in the object like a dictionary.
 
@@ -172,7 +178,7 @@ class Modifier:
         bound_logger = logger.bind(message_id=message.msg_id, request_data=request_data)
         bound_logger.info("Attempting to patch message")
         try:
-            changeable_values = ['survey_id', 'case_id', 'business_id', 'exercise_id', 'read_at']
+            changeable_values = ["survey_id", "case_id", "business_id", "exercise_id", "read_at"]
             for key in request_data.keys():
                 if key in changeable_values:
                     if request_data.get(key) != getattr(message, key):
@@ -205,7 +211,7 @@ class Modifier:
             raise InternalServerError(description="Database error occurred while closing conversation")
 
         bound_logger.info("Successfully closed conversation")
-        bound_logger.unbind('conversation_id', 'user_id')
+        bound_logger.unbind("conversation_id", "user_id")
 
     @staticmethod
     def open_conversation(metadata: Conversation, user):
@@ -224,4 +230,4 @@ class Modifier:
             raise InternalServerError(description="Database error occured while opening conversation")
 
         bound_logger.info("Successfully re-opened conversation")
-        bound_logger.unbind('conversation_id', 'user_id')
+        bound_logger.unbind("conversation_id", "user_id")

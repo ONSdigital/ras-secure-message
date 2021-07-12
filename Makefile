@@ -7,14 +7,16 @@ start:
 	pipenv run python run.py
 
 lint:
-	pipenv run flake8 ./secure_message ./tests
-	pipenv check ./secure_message ./tests
+	pipenv run flake8
+	pipenv check
 	pipenv run isort .
+	pipenv run black --line-length 120 .
 
 lint-check:
-	pipenv run flake8 ./secure_message ./tests
-	pipenv check ./secure_message ./tests
-	pipenv run isort . --check-only -v
+	pipenv run flake8
+	pipenv check
+	pipenv run isort --check-only .
+	pipenv run black --line-length 120 .
 
 unit-test:
 	pipenv run pytest

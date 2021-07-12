@@ -37,15 +37,17 @@ class HealthDetails(Resource):
         """returns environment and api endpoint details"""
         func_list = {}
         for rule in current_app.url_map.iter_rules():
-            if rule.endpoint != 'static':
+            if rule.endpoint != "static":
                 func_list[rule.rule] = current_app.view_functions[rule.endpoint].__doc__
 
-        details = {'Name': 'ras-secure-message',
-                   'Version': current_app.config['VERSION'],
-                   'Logging level': current_app.config['LOGGING_LEVEL'],
-                   'API Functionality': func_list,
-                   'Using party service mock': party.using_mock,
-                   'RAS-PARTY URL': current_app.config['PARTY_URL'],
-                   'NOTIFY VIA GOV NOTIFY': current_app.config['NOTIFY_VIA_GOV_NOTIFY']}
+        details = {
+            "Name": "ras-secure-message",
+            "Version": current_app.config["VERSION"],
+            "Logging level": current_app.config["LOGGING_LEVEL"],
+            "API Functionality": func_list,
+            "Using party service mock": party.using_mock,
+            "RAS-PARTY URL": current_app.config["PARTY_URL"],
+            "NOTIFY VIA GOV NOTIFY": current_app.config["NOTIFY_VIA_GOV_NOTIFY"],
+        }
 
         return jsonify(details)

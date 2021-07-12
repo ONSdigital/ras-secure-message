@@ -18,15 +18,16 @@ class InternalUserServiceTestCase(unittest.TestCase):
         """Test get business details sends a request and returns data"""
 
         sut = InternalUserService()
-        expected = {"id": constants.NON_SPECIFIC_INTERNAL_USER,
-                    "firstName": "ONS",
-                    "lastName": "User",
-                    "emailAddress": ""
-                    }
+        expected = {
+            "id": constants.NON_SPECIFIC_INTERNAL_USER,
+            "firstName": "ONS",
+            "lastName": "User",
+            "emailAddress": "",
+        }
         actual = sut.get_user_details(constants.NON_SPECIFIC_INTERNAL_USER)
 
         self.assertEqual(expected, actual)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()

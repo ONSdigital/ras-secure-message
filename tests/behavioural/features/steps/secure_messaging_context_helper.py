@@ -17,20 +17,21 @@ class SecureMessagingContextHelper:
     The dunder constants are used to specify constants for use in steps in a single place
 
     """
-    __DEFAULT_BUSINESS_ID = 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc'
-    __ALTERNATE_BUSINESS_ID = 'b3ba864b-7cbc-4f44-84fe-88dc018a1a4c'
 
-    __DEFAULT_SURVEY = '33333333-22222-3333-4444-88dc018a1a4c'
-    __ALTERNATE_SURVEY = '11111111-22222-3333-4444-88dc018a1a4c'
-    __ADDITIONAL_SURVEY_1 = 'additional_survey_1'
-    __ADDITIONAL_SURVEY_2 = 'additional_survey_2'
-    __ADDITIONAL_SURVEY_3 = 'additional_survey_3'
+    __DEFAULT_BUSINESS_ID = "f1a5e99c-8edf-489a-9c72-6cabe6c387fc"
+    __ALTERNATE_BUSINESS_ID = "b3ba864b-7cbc-4f44-84fe-88dc018a1a4c"
 
-    __DEFAULT_COLLECTION_CASE = 'collection case1'             # UUID in real use, string for testing clarity
-    __ALTERNATE_COLLECTION_CASE = 'AnotherCollectionCase'      # UUID in real use, string for testing clarity
+    __DEFAULT_SURVEY = "33333333-22222-3333-4444-88dc018a1a4c"
+    __ALTERNATE_SURVEY = "11111111-22222-3333-4444-88dc018a1a4c"
+    __ADDITIONAL_SURVEY_1 = "additional_survey_1"
+    __ADDITIONAL_SURVEY_2 = "additional_survey_2"
+    __ADDITIONAL_SURVEY_3 = "additional_survey_3"
 
-    __DEFAULT_COLLECTION_EXERCISE = 'collection exercise1'     # UUID in real use, string for testing clarity
-    __ALTERNATE_COLLECTION_EXERCISE = 'AnotherCollectionExercise'  # UUID in real use, string for testing clarity
+    __DEFAULT_COLLECTION_CASE = "collection case1"  # UUID in real use, string for testing clarity
+    __ALTERNATE_COLLECTION_CASE = "AnotherCollectionCase"  # UUID in real use, string for testing clarity
+
+    __DEFAULT_COLLECTION_EXERCISE = "collection exercise1"  # UUID in real use, string for testing clarity
+    __ALTERNATE_COLLECTION_EXERCISE = "AnotherCollectionExercise"  # UUID in real use, string for testing clarity
 
     __INTERNAL_USER_SPECIFIC_USER_ID = "SpecificInternalUserId"  # UUID in real use, string for testing clarity
     __INTERNAL_USER_GROUP = constants.NON_SPECIFIC_INTERNAL_USER
@@ -39,34 +40,40 @@ class SecureMessagingContextHelper:
 
     __INTERNAL_GROUP_USER_TOKEN = {constants.USER_IDENTIFIER: __INTERNAL_USER_GROUP, "role": "internal"}
     __INTERNAL_SPECIFIC_USER_TOKEN = {constants.USER_IDENTIFIER: __INTERNAL_USER_SPECIFIC_USER_ID, "role": "internal"}
-    __ALTERNATIVE_SPECIFIC_USER_TOKEN = {constants.USER_IDENTIFIER: __ALTERNATIVE_INTERNAL_USER_SPECIFIC_USER_ID, "role": "internal"}
+    __ALTERNATIVE_SPECIFIC_USER_TOKEN = {
+        constants.USER_IDENTIFIER: __ALTERNATIVE_INTERNAL_USER_SPECIFIC_USER_ID,
+        "role": "internal",
+    }
 
     __RESPONDENT_USER_ID = "01b51fcc-ed43-4cdb-ad1c-450f9986859b"
     __RESPONDENT_USER_TOKEN = {constants.USER_IDENTIFIER: __RESPONDENT_USER_ID, "role": "respondent"}
 
     __ALTERNATIVE_RESPONDENT_USER_ID = "0a7ad740-10d5-4ecb-b7ca-3c0384afb882"
-    __ALTERNATIVE_RESPONDENT_USER_TOKEN = {constants.USER_IDENTIFIER: __ALTERNATIVE_RESPONDENT_USER_ID,
-                                           "role": "respondent"}
+    __ALTERNATIVE_RESPONDENT_USER_TOKEN = {
+        constants.USER_IDENTIFIER: __ALTERNATIVE_RESPONDENT_USER_ID,
+        "role": "respondent",
+    }
 
     __DELETED_RESPONDENT_USER_ID = "778f60f6-5b5f-4617-b71b-26c0607c769c"
-    __DELETED_RESPONDENT_USER_TOKEN = {constants.USER_IDENTIFIER: __DELETED_RESPONDENT_USER_ID,
-                                       "role": "respondent"}
+    __DELETED_RESPONDENT_USER_TOKEN = {constants.USER_IDENTIFIER: __DELETED_RESPONDENT_USER_ID, "role": "respondent"}
 
     __BASE_URL = "http://localhost:5050"
 
-    __default_message_data = data = {'msg_to': ['0a7ad740-10d5-4ecb-b7ca-3c0384afb882'],
-                                     'msg_from': '01b51fcc-ed43-4cdb-ad1c-450f9986859b',
-                                     'subject': 'Hello World',
-                                     'body': 'Test',
-                                     'thread_id': '',
-                                     'case_id': __DEFAULT_COLLECTION_CASE,
-                                     'exercise_id': __DEFAULT_COLLECTION_EXERCISE,
-                                     'business_id': __DEFAULT_BUSINESS_ID,
-                                     'survey_id': __DEFAULT_SURVEY}
+    __default_message_data = data = {
+        "msg_to": ["0a7ad740-10d5-4ecb-b7ca-3c0384afb882"],
+        "msg_from": "01b51fcc-ed43-4cdb-ad1c-450f9986859b",
+        "subject": "Hello World",
+        "body": "Test",
+        "thread_id": "",
+        "case_id": __DEFAULT_COLLECTION_CASE,
+        "exercise_id": __DEFAULT_COLLECTION_EXERCISE,
+        "business_id": __DEFAULT_BUSINESS_ID,
+        "survey_id": __DEFAULT_SURVEY,
+    }
 
     def __init__(self):
         self._token_data = {}
-        self._headers = {'Content-Type': 'application/json', 'Authorization': ''}
+        self._headers = {"Content-Type": "application/json", "Authorization": ""}
         self.token_data = SecureMessagingContextHelper.__INTERNAL_SPECIFIC_USER_TOKEN  # use attribute to set headers
         self._message_data = copy.deepcopy(SecureMessagingContextHelper.__default_message_data)
         self._sent_messages = []
@@ -74,10 +81,12 @@ class SecureMessagingContextHelper:
         self._messages_responses_data = []
         self._last_saved_message_data = None
         self._last_returned_thread_count = 0
-        self._last_returned_thread_counts_all_conversation_types = {'open': 0,
-                                                                    'closed': 0,
-                                                                    'my_conversations': 0,
-                                                                    'new_respondent_conversations': 0}
+        self._last_returned_thread_counts_all_conversation_types = {
+            "open": 0,
+            "closed": 0,
+            "my_conversations": 0,
+            "new_respondent_conversations": 0,
+        }
         self.additional_respondent_claims = {}
 
         # Urls
@@ -99,11 +108,11 @@ class SecureMessagingContextHelper:
     def token_data(self):
         return self._token_data
 
-    @token_data.setter         # headers property automatically updated each time token_data changed
+    @token_data.setter  # headers property automatically updated each time token_data changed
     def token_data(self, value):
         """Token data setter that makes sure that the headers are updated if the token data changes"""
         self._token_data = value
-        self._headers['Authorization'] = encode(self._token_data)
+        self._headers["Authorization"] = encode(self._token_data)
 
     @property
     def headers(self):
@@ -133,7 +142,7 @@ class SecureMessagingContextHelper:
     def alternative_internal_specific_user_token(self):
         return copy.deepcopy(SecureMessagingContextHelper.__ALTERNATIVE_SPECIFIC_USER_TOKEN)
 
-    @property       # return an external user that the client is free to change
+    @property  # return an external user that the client is free to change
     def respondent_user_token(self):
         return copy.deepcopy(SecureMessagingContextHelper.__RESPONDENT_USER_TOKEN)
 
@@ -243,7 +252,7 @@ class SecureMessagingContextHelper:
 
     @property
     def sent_messages(self):
-        return self._sent_messages   # allows direct access
+        return self._sent_messages  # allows direct access
 
     @property
     def single_message_responses_data(self):
@@ -284,29 +293,29 @@ class SecureMessagingContextHelper:
         return copy.copy(self.__DEFAULT_BUSINESS_ID)
 
     def use_alternate_business_id(self):
-        self._message_data['business_id'] = SecureMessagingContextHelper.__ALTERNATE_BUSINESS_ID
+        self._message_data["business_id"] = SecureMessagingContextHelper.__ALTERNATE_BUSINESS_ID
 
     def use_default_business_id(self):
-        self._message_data['business_id'] = SecureMessagingContextHelper.__DEFAULT_BUSINESS_ID
+        self._message_data["business_id"] = SecureMessagingContextHelper.__DEFAULT_BUSINESS_ID
 
     def use_alternate_survey(self):
-        self._message_data['survey_id'] = SecureMessagingContextHelper.__ALTERNATE_SURVEY
+        self._message_data["survey_id"] = SecureMessagingContextHelper.__ALTERNATE_SURVEY
 
     def use_default_survey(self):
-        self._message_data['survey_id'] = SecureMessagingContextHelper.__DEFAULT_SURVEY
+        self._message_data["survey_id"] = SecureMessagingContextHelper.__DEFAULT_SURVEY
 
     def use_alternate_case_id(self):
-        self._message_data['case_id'] = SecureMessagingContextHelper.__ALTERNATE_COLLECTION_CASE
+        self._message_data["case_id"] = SecureMessagingContextHelper.__ALTERNATE_COLLECTION_CASE
 
     def use_default_collection_case(self):
-        self._message_data['case_id'] = SecureMessagingContextHelper.__DEFAULT_COLLECTION_CASE
+        self._message_data["case_id"] = SecureMessagingContextHelper.__DEFAULT_COLLECTION_CASE
 
     def use_alternate_collection_exercise(self):
-        self._message_data['exercise_id'] = SecureMessagingContextHelper.__ALTERNATE_COLLECTION_EXERCISE
+        self._message_data["exercise_id"] = SecureMessagingContextHelper.__ALTERNATE_COLLECTION_EXERCISE
 
     def use_default_collection_exercise(self):
-        self._message_data['exercise_id'] = SecureMessagingContextHelper.__DEFAULT_COLLECTION_EXERCISE
+        self._message_data["exercise_id"] = SecureMessagingContextHelper.__DEFAULT_COLLECTION_EXERCISE
 
     def add_additional_respondent_claim(self, business_id, survey_id):
-        """Add an ru/survey pair to the additional claims """
+        """Add an ru/survey pair to the additional claims"""
         self.additional_respondent_claims[business_id] = survey_id

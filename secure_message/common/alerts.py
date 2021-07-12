@@ -14,9 +14,9 @@ class AlertViaGovNotify:
 
     def __init__(self, config):
         self.config = config
-        self.template_id = self.config['NOTIFICATION_TEMPLATE_ID']
-        self.project_id = self.config['GOOGLE_CLOUD_PROJECT']
-        self.topic_id = self.config['PUBSUB_TOPIC']
+        self.template_id = self.config["NOTIFICATION_TEMPLATE_ID"]
+        self.project_id = self.config["GOOGLE_CLOUD_PROJECT"]
+        self.topic_id = self.config["PUBSUB_TOPIC"]
         self.publisher = None
 
     def send(self, email: str, msg_id: str, personalisation: dict, survey_id: str, party_id):
@@ -35,11 +35,11 @@ class AlertViaGovNotify:
         bound_logger = logger.bind(template_id=self.template_id, project_id=self.project_id, topic_id=self.topic_id)
         bound_logger.info("Sending email via pubsub")
         payload = {
-            'notify': {
-                'email_address': email,
+            "notify": {
+                "email_address": email,
                 "personalisation": personalisation,
                 "reference": msg_id,
-                'template_id': self.template_id,
+                "template_id": self.template_id,
             }
         }
 
@@ -57,7 +57,7 @@ class AlertViaGovNotify:
         except TimeoutError:
             bound_logger.error("Publish to pubsub timed out", exc_info=True)
             raise RasNotifyException(survey_id=survey_id, party_id=party_id)
-        except Exception: # noqa
+        except Exception:  # noqa
             bound_logger.error("A non-timeout error was raised when publishing to pubsub", exc_info=True)
             raise RasNotifyException(survey_id=survey_id, party_id=party_id)
 
@@ -66,5 +66,11 @@ class AlertViaLogging:
     """Alert goes via gov notify (0) or via logs (1)"""
 
     def send(self, email, msg_id, personalisation, survey_id, party_id):
-        logger.info('Email sent', email=email, msg_id=msg_id, personalisation=personalisation, survey_id=survey_id,
-                    party_id=party_id)
+        logger.info(
+            "Email sent",
+            email=email,
+            msg_id=msg_id,
+            personalisation=personalisation,
+            survey_id=survey_id,
+            party_id=party_id,
+        )

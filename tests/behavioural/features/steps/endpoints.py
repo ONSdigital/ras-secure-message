@@ -11,9 +11,11 @@ from flask import json
 def step_impl_the_message_is_sent(context):
     """sends the current message data to the message send endpoint"""
     context.bdd_helper.sent_messages.extend([copy.deepcopy(context.bdd_helper.message_data)])
-    context.response = context.client.post(context.bdd_helper.message_post_url,
-                                           data=json.dumps(context.bdd_helper.message_data),
-                                           headers=context.bdd_helper.headers)
+    context.response = context.client.post(
+        context.bdd_helper.message_post_url,
+        data=json.dumps(context.bdd_helper.message_data),
+        headers=context.bdd_helper.headers,
+    )
 
     returned_data = json.loads(context.response.data)
     _try_persist_msg_and_thread_id_to_context(context, returned_data)
@@ -41,8 +43,9 @@ def step_impl_the_specific_message_id_is_retrieved_on_specific_msg_id(context, m
     """modify the labels on a specified message id"""
     url = context.bdd_helper.message_put_url.format(msg_id)
 
-    context.response = context.client.put(url, data=json.dumps(context.bdd_helper.message_data),
-                                          headers=context.bdd_helper.headers)
+    context.response = context.client.put(
+        url, data=json.dumps(context.bdd_helper.message_data), headers=context.bdd_helper.headers
+    )
     context.bdd_helper.store_last_single_message_response_data(context.response)
 
 
@@ -67,13 +70,13 @@ def step_impl_the_thread_is_read(context):
 
 def _try_persist_msg_and_thread_id_to_context(context, returned_data):
     """common function used to extract msg_id and thread_id from returned messages"""
-    if 'msg_id' in returned_data:
-        context.msg_id = returned_data['msg_id']
+    if "msg_id" in returned_data:
+        context.msg_id = returned_data["msg_id"]
     else:
         context.msg_id = "NOT RETURNED"
 
-    if 'thread_id' in returned_data:
-        context.thread_id = returned_data['thread_id']
+    if "thread_id" in returned_data:
+        context.thread_id = returned_data["thread_id"]
     else:
         context.thread_id = "NOT RETURNED"
 
@@ -87,14 +90,14 @@ def step_impl_the_threads_are_read(context):
     context.bdd_helper.store_messages_response_data(context.response.data)
 
 
-@when('the threads are read with my_conversations set true')
+@when("the threads are read with my_conversations set true")
 def step_impl_the_threads_are_read_with_my_conversations_set_true(context):
     url = context.bdd_helper.threads_get_url + "?my_conversations=true"
     context.response = context.client.get(url, headers=context.bdd_helper.headers)
     context.bdd_helper.store_messages_response_data(context.response.data)
 
 
-@when('the threads are read with new_respondent_conversations set true')
+@when("the threads are read with new_respondent_conversations set true")
 def step_impl_the_threads_are_read_with_new_respondent_conversations_set_true(context):
     url = context.bdd_helper.threads_get_url + "?new_respondent_conversations=true"
     context.response = context.client.get(url, headers=context.bdd_helper.headers)
@@ -119,8 +122,10 @@ def step_impl_the_threads_in_specific_survey_and_business_are_returned(context, 
 
 @when("the threads in are read with filters for both default and alternate surveys")
 def step_impl_the_threads_in_default_and_alternate_are_returned(context):
-    url = context.bdd_helper.threads_get_url + f"?survey={context.bdd_helper.default_survey}" \
-                                               f"&survey={context.bdd_helper.alternate_survey}"
+    url = (
+        context.bdd_helper.threads_get_url + f"?survey={context.bdd_helper.default_survey}"
+        f"&survey={context.bdd_helper.alternate_survey}"
+    )
     context.response = context.client.get(url, headers=context.bdd_helper.headers)
     context.bdd_helper.store_messages_response_data(context.response.data)
 
@@ -182,57 +187,71 @@ def step_impl_access_health_details_endpoint_with_post_method(context):
 @when("user accesses the /message/id endpoint with using the POST method")
 def step_impl_access_message_id_endpoint_with_post_method(context):
     context.bdd_helper.sent_messages.extend([context.bdd_helper.message_data])
-    context.response = context.client.post(context.bdd_helper.message_get_url,
-                                           data=json.dumps(context.bdd_helper.message_data),
-                                           headers=context.bdd_helper.headers)
+    context.response = context.client.post(
+        context.bdd_helper.message_get_url,
+        data=json.dumps(context.bdd_helper.message_data),
+        headers=context.bdd_helper.headers,
+    )
 
 
 @when("user accesses the /message/id endpoint with using the PUT method")
 def step_impl_access_message_id_endpoint_with_put_method(context):
     context.bdd_helper.sent_messages.extend([context.bdd_helper.message_data])
-    context.response = context.client.put(context.bdd_helper.message_get_url,
-                                          data=json.dumps(context.bdd_helper.message_data),
-                                          headers=context.bdd_helper.headers)
+    context.response = context.client.put(
+        context.bdd_helper.message_get_url,
+        data=json.dumps(context.bdd_helper.message_data),
+        headers=context.bdd_helper.headers,
+    )
 
 
 @when("user accesses the /message/id/modify endpoint with using the GET method")
 def step_impl_access_message_id_endpoint_with_get_method(context):
     context.bdd_helper.sent_messages.extend([context.bdd_helper.message_data])
-    context.response = context.client.get(context.bdd_helper.message_put_url,
-                                          data=json.dumps(context.bdd_helper.message_data),
-                                          headers=context.bdd_helper.headers)
+    context.response = context.client.get(
+        context.bdd_helper.message_put_url,
+        data=json.dumps(context.bdd_helper.message_data),
+        headers=context.bdd_helper.headers,
+    )
 
 
 @when("user accesses the /message/id/modify endpoint with using the POST method")
 def step_impl_access_message_id_modify_endpoint_with_post_method(context):
     context.bdd_helper.sent_messages.extend([context.bdd_helper.message_data])
-    context.response = context.client.post(context.bdd_helper.message_put_url,
-                                           data=json.dumps(context.bdd_helper.message_data),
-                                           headers=context.bdd_helper.headers)
+    context.response = context.client.post(
+        context.bdd_helper.message_put_url,
+        data=json.dumps(context.bdd_helper.message_data),
+        headers=context.bdd_helper.headers,
+    )
 
 
 @when("user accesses the /message/send endpoint with using the PUT method")
 def step_impl_access_message_send_endpoint_with_put_method(context):
     context.bdd_helper.sent_messages.extend([context.bdd_helper.message_data])
-    context.response = context.client.put(context.bdd_helper.message_post_url,
-                                          data=json.dumps(context.bdd_helper.message_data),
-                                          headers=context.bdd_helper.headers)
+    context.response = context.client.put(
+        context.bdd_helper.message_post_url,
+        data=json.dumps(context.bdd_helper.message_data),
+        headers=context.bdd_helper.headers,
+    )
 
 
 @when("user accesses the /messages endpoint with using the PUT method")
 def step_impl_access_messages_endpoint_with_wrong_method(context):
     context.bdd_helper.sent_messages.extend([context.bdd_helper.message_data])
-    context.response = context.client.put(context.bdd_helper.messages_post_url,
-                                          data=json.dumps(context.bdd_helper.message_data),
-                                          headers=context.bdd_helper.headers)
+    context.response = context.client.put(
+        context.bdd_helper.messages_post_url,
+        data=json.dumps(context.bdd_helper.message_data),
+        headers=context.bdd_helper.headers,
+    )
 
 
 @when("user accesses the /messages endpoint with using the POST method")
 def step_impl_access_messages_endpoint_with_post_method(context):
     context.bdd_helper.sent_messages.extend([context.bdd_helper.message_data])
-    context.response = context.client.post(context.bdd_helper.messages_post_url,
-                                           data=json.dumps(context.bdd_helper.message_data),
-                                           headers=context.bdd_helper.headers)
+    context.response = context.client.post(
+        context.bdd_helper.messages_post_url,
+        data=json.dumps(context.bdd_helper.message_data),
+        headers=context.bdd_helper.headers,
+    )
 
 
 @when("the count of open threads in survey '{survey_id}'")
@@ -330,7 +349,7 @@ def _step_impl_get_threads_count_for_all_conversation_types(context, args):
 
 @then("A count of '{count}' is returned")
 def step_impl_the_return_count_is(context, count):
-    nose.tools.assert_equal(count, context.bdd_helper.last_saved_message_data['msg_to'])
+    nose.tools.assert_equal(count, context.bdd_helper.last_saved_message_data["msg_to"])
 
 
 @when("the count of all conversation types closed threads for current user is made")
