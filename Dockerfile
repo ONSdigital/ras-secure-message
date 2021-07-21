@@ -12,3 +12,6 @@ HEALTHCHECK --interval=1m30s --timeout=10s --retries=3 \
 
 COPY . /app
 RUN pipenv install --deploy --system
+RUN pip3 install -r requirements.txt.dm
+
+CMD ["./startup.sh"]
