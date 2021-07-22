@@ -8,7 +8,7 @@ WORKDIR /app
 
 COPY . /app
 RUN pipenv install --deploy --system
-
+RUN pip3 install -r requirements.txt.dm
 EXPOSE 80
 CMD ["gunicorn", "-c", "gunicorn.py", "app:app"]
 
