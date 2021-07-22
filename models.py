@@ -13,8 +13,8 @@ class Conversation(Base):
 
     id = Column(String(60), primary_key=True, index=True)
     is_closed = Column(Boolean)
+    test2 = Column(Boolean)
     closed_by = Column(String)
-    test = Column(String)
     closed_by_uuid = Column(String(60))
     closed_at = Column(DateTime)
     category = Column(String(60), server_default=text("'SURVEY'::character varying"))
