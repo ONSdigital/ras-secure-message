@@ -216,10 +216,10 @@ Feature: Message Send Endpoint
    When the message is sent
    Then a forbidden status code 403 is returned
 
- Scenario: Respondent sends a message for a survey they have no claim for, user should receive 403
+ Scenario: Respondent sends a message for a survey they are not enrolled on, user should receive 201
    Given the user is set as respondent
     And  the from is set to respondent
     And  the to is set to internal specific user
-    And the survey is set to 'Some survey they cannot have a claim for'
+    And the survey is set to 'Some survey they are not enrolled on'
    When the message is sent
-   Then a forbidden status code 403 is returned
+   Then a created status code 201 is returned

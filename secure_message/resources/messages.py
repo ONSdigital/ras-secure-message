@@ -55,7 +55,7 @@ class MessageSend(Resource):
     def _has_valid_claim(user, message: Message) -> bool:
         """Validates that the user has a valid claim to interact with the business and survey in the post data
         internal users have claims to everything, respondents need to check against party"""
-        return user.is_internal or party.does_user_have_claim(user.user_uuid, message.business_id, message.survey_id)
+        return user.is_internal or party.does_user_have_claim(user.user_uuid, message.business_id)
 
     @staticmethod
     def _message_save(message: Message):
