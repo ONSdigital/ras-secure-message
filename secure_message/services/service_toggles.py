@@ -55,8 +55,8 @@ class Party(ServiceMockToggle):
     def get_users_details(self, uuids):
         return self._service.get_users_details(uuids)
 
-    def does_user_have_claim(self, user_id, business_id, survey_id):
-        return self._service.does_user_have_claim(user_id, business_id, survey_id)
+    def does_user_have_claim(self, user_id, business_id):
+        return self._service.does_user_have_claim(user_id, business_id)
 
 
 class InternalUser(ServiceMockToggle):
