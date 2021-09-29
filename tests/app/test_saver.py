@@ -92,7 +92,7 @@ class SaverTestCase(unittest.TestCase):
                 with self.assertRaises(MessageSaveException):
                     Saver().save_msg_status(message_status["actor"], message_status["msg_id"], "INBOX", mock_session)
 
-    def test_saved_msg_event_has_been_saved(self):
+    def test_saved_msg_id_and_sent_at_has_been_saved(self):
         """retrieves message event from database"""
         with self.app.app_context():
             with current_app.test_request_context():
@@ -102,11 +102,12 @@ class SaverTestCase(unittest.TestCase):
             request = con.execute("SELECT * FROM securemessage.secure_message limit 1")
             for row in request:
                 self.assertTrue(row is not None)
-                self.assertTrue(row[1] == "AMsgId")
+                self.assertTrue(row["msg_id"] == "AMsgId")
 
                 # Just check that sent_at (11th element) is set without checking the value as we don't have it
-                self.assertIsInstance(row[10], datetime.datetime)
-                self.assertTrue(row[10] is not None)
+                self.assertIsInstance(row["sent_at"], datetime.datetime)
+                self.assertTrue(row["sent_at"] is not None)
+            con.close()
 
     def test_status_commit_exception_raises_message_save_exception(self):
         """check status commit exception clears the session"""

@@ -4,13 +4,7 @@ from sqlalchemy.exc import SQLAlchemyError
 from structlog import wrap_logger
 
 from secure_message.exception.exceptions import MessageSaveException
-from secure_message.repository.database import (
-    Conversation,
-    Events,
-    SecureMessage,
-    Status,
-    db,
-)
+from secure_message.repository.database import Conversation, SecureMessage, Status, db
 
 logger = wrap_logger(logging.getLogger(__name__))
 
@@ -58,17 +52,4 @@ class Saver:
         except SQLAlchemyError:
             session.rollback()
             logger.exception("Message status save failed")
-            raise MessageSaveException("Message save failed")
-
-    @staticmethod
-    def save_msg_event(msg_id, event, session=db.session):
-        """save message events to events database"""
-        event = Events(msg_id=msg_id, event=event)
-
-        try:
-            session.add(event)
-            session.commit()
-        except SQLAlchemyError:
-            session.rollback()
-            logger.exception("Message event save failed")
             raise MessageSaveException("Message save failed")

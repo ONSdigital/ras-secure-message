@@ -80,16 +80,6 @@ class RetrieverTestCaseHelper:
             query = f"INSERT INTO securemessage.status(label, msg_id, actor) VALUES('{label}', '{msg_id}', '{actor}')"
             con.execute(query)
 
-    def add_event(self, event, msg_id, date_time):
-        """Populate the event table"""
-
-        with self.engine.connect() as con:
-            query = (
-                f"INSERT INTO securemessage.events(event, msg_id, date_time)"
-                f" VALUES('{event}', '{msg_id}', '{date_time}')"
-            )
-            con.execute(query)
-
     def create_thread(
         self,
         no_of_messages=1,
@@ -226,6 +216,7 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
                     response = Retriever.retrieve_message(msg_id, self.user_internal)
                     self.assertTrue("modified_date" not in response)
                     self.assertTrue(response["sent_date"] != "N/A")
+            con.close()
 
     def test_read_date_returned_for_message(self):
         """retrieves message using id and checks the read date returned"""
@@ -238,6 +229,7 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
                     response = Retriever.retrieve_message(msg_id, self.user_internal)
                     self.assertTrue("modified_date" not in response)
                     self.assertTrue(response["read_date"] != "N/A")
+            con.close()
 
     def test_all_msg_returned_for_thread_id(self):
         """retrieves messages for thread_id from database"""

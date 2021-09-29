@@ -1,3 +1,4 @@
+import datetime
 import unittest
 from unittest.mock import patch
 
@@ -218,11 +219,10 @@ class AppTestCase(unittest.TestCase):
         data = json.loads(response.data)
 
         with self.engine.connect() as con:
-            db_data = con.execute(
-                f"SELECT * FROM securemessage.events WHERE event='Sent' AND msg_id='{data['msg_id']}'"
-            )
+            db_data = con.execute(f"SELECT * FROM securemessage.secure_message where msg_id='{data['msg_id']}'")
             for row in db_data:
                 self.assertTrue(row is not None)
+                self.assertTrue(isinstance(row["sent_at"], datetime.datetime))
 
     def test_message_post_stores_labels_correctly_for_recipient_of_message(self):
         """posts to message send end point to ensure labels are saved as expected"""
