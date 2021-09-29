@@ -8,7 +8,6 @@ from werkzeug.exceptions import BadRequest
 
 from secure_message import constants
 from secure_message.common.alerts import AlertViaGovNotify, AlertViaLogging
-from secure_message.common.eventsapi import EventsApi
 from secure_message.common.labels import Labels
 from secure_message.repository.database import SecureMessage
 from secure_message.repository.modifier import Modifier
@@ -61,8 +60,6 @@ class MessageSend(Resource):
     def _message_save(message: Message):
         """Saves the message to the database along with the subsequent status and audit"""
         Saver.save_message(message)
-        Saver.save_msg_event(message.msg_id, EventsApi.SENT.value)
-
         Saver.save_msg_status(message.msg_from, message.msg_id, Labels.SENT.value)
         Saver.save_msg_status(message.msg_to[0], message.msg_id, Labels.INBOX.value)
         Saver.save_msg_status(message.msg_to[0], message.msg_id, Labels.UNREAD.value)

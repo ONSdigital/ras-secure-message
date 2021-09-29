@@ -7,17 +7,10 @@ from sqlalchemy.orm.exc import NoResultFound
 from structlog import wrap_logger
 from werkzeug.exceptions import Forbidden, InternalServerError, NotFound
 
-from secure_message.common.eventsapi import EventsApi
 from secure_message.common.labels import Labels
 from secure_message.common.utilities import set_conversation_type_args
 from secure_message.constants import NON_SPECIFIC_INTERNAL_USER
-from secure_message.repository.database import (
-    Conversation,
-    Events,
-    SecureMessage,
-    Status,
-    db,
-)
+from secure_message.repository.database import Conversation, SecureMessage, Status, db
 
 logger = wrap_logger(logging.getLogger(__name__))
 
@@ -300,8 +293,7 @@ class Retriever:
 
         try:
             result = (
-                SecureMessage.query.join(Events)
-                .join(Status)
+                SecureMessage.query.join(Status)
                 .filter(SecureMessage.thread_id == thread_id)
                 .filter(
                     or_(
@@ -309,7 +301,6 @@ class Retriever:
                         and_(SecureMessage.from_internal.is_(True), Status.label.in_([Labels.SENT.value])),
                     )
                 )
-                .filter(Events.event == EventsApi.SENT.value)
                 .order_by(Status.id.desc())
             )
 

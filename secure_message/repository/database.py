@@ -16,7 +16,6 @@ from sqlalchemy.orm import relationship
 from structlog import wrap_logger
 
 from secure_message import constants
-from secure_message.common.eventsapi import EventsApi
 from secure_message.common.labels import Labels
 
 logger = wrap_logger(logging.getLogger(__name__))
@@ -108,6 +107,8 @@ class SecureMessage(db.Model):
             "survey_id": self.survey_id,
             "exercise_id": self.exercise_id,
             "from_internal": self.from_internal,
+            "sent_date": self.sent_at,
+            "read_date": self.read_at,
             "_links": "",
             "labels": [],
         }
@@ -116,8 +117,6 @@ class SecureMessage(db.Model):
             self._populate_to_from_and_labels_internal_user(message)
         else:
             self._populate_to_from_and_labels_respondent(user, message)
-
-        self._populate_events(message)
 
         return message
 
@@ -150,13 +149,6 @@ class SecureMessage(db.Model):
             message["msg_to"].append(row.actor)
         elif row.label == Labels.SENT.value:
             message["msg_from"] = row.actor
-
-    def _populate_events(self, message):
-        for row in self.events:
-            if row.event == EventsApi.SENT.value:
-                message["sent_date"] = str(row.date_time)
-            elif row.event == EventsApi.READ.value:
-                message["read_date"] = str(row.date_time)
 
 
 class Status(db.Model):

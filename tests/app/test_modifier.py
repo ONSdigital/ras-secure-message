@@ -8,7 +8,6 @@ from werkzeug.exceptions import InternalServerError
 
 from secure_message import constants
 from secure_message.application import create_app
-from secure_message.common.eventsapi import EventsApi
 from secure_message.repository import database
 from secure_message.repository.database import SecureMessage
 from secure_message.repository.modifier import Modifier
@@ -35,13 +34,24 @@ class ModifyTestCaseHelper:
                         f"VALUES('{thread_id}', false, '', '')"
                     )
                     con.execute(query)
-                query = (
-                    f"INSERT INTO securemessage.secure_message(id, msg_id, subject, body, thread_id, "
-                    f"case_id, business_id, exercise_id, survey_id) VALUES({i}, '{msg_id}', 'test','test',"
-                    f"'{thread_id}','ACollectionCase', 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc', 'ACollectionExercise',"
-                    f"'{constants.NON_SPECIFIC_INTERNAL_USER}')"
-                )
-                con.execute(query)
+                sent_at = datetime.datetime.utcnow()
+                if mark_as_read:
+                    read_at = datetime.datetime.utcnow()
+                    query = (
+                        f"INSERT INTO securemessage.secure_message(id, msg_id, subject, body, thread_id, "
+                        f"case_id, business_id, exercise_id, survey_id, sent_at, read_at) VALUES({i}, '{msg_id}', "
+                        f"'test','test','{thread_id}','ACollectionCase', 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc', "
+                        f"'ACollectionExercise','{constants.NON_SPECIFIC_INTERNAL_USER}', '{sent_at}', '{read_at}')"
+                    )
+                    con.execute(query)
+                else:
+                    query = (
+                        f"INSERT INTO securemessage.secure_message(id, msg_id, subject, body, thread_id, "
+                        f"case_id, business_id, exercise_id, survey_id, sent_at) VALUES({i}, '{msg_id}', 'test','test',"
+                        f"'{thread_id}','ACollectionCase', 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc', "
+                        f"'ACollectionExercise','{constants.NON_SPECIFIC_INTERNAL_USER}', '{sent_at}')"
+                    )
+                    con.execute(query)
                 query = (
                     f"INSERT INTO securemessage.status(label, msg_id, actor)"
                     f"VALUES('SENT', '{msg_id}','0a7ad740-10d5-4ecb-b7ca-3c0384afb882')"
@@ -57,13 +67,6 @@ class ModifyTestCaseHelper:
                     f"'{constants.NON_SPECIFIC_INTERNAL_USER}')"
                 )
                 con.execute(query)
-                query = f"""INSERT INTO securemessage.events(event, msg_id, date_time)
-                         VALUES('{EventsApi.SENT.value}', '{msg_id}', '2017-02-03 00:00:00')"""
-                con.execute(query)
-                if mark_as_read:
-                    query = f"""INSERT INTO securemessage.events(event, msg_id, date_time)
-                            VALUES('{EventsApi.READ.value}', '{msg_id}', '2017-02-03 00:00:00')"""
-                    con.execute(query)
 
         return thread_id
 
@@ -74,6 +77,7 @@ class ModifyTestCaseHelper:
         thread_id = str(uuid.uuid4())
         with self.engine.connect() as con:
             for i in range(message_count):
+                sent_at = datetime.datetime.utcnow()
                 msg_id = str(uuid.uuid4())
                 # Only the first message in a thread needs a entry in the conversation table
                 if i == 0:
@@ -84,9 +88,9 @@ class ModifyTestCaseHelper:
                     con.execute(query)
                 query = (
                     f"INSERT INTO securemessage.secure_message(id, msg_id, subject, body, thread_id,"
-                    f"case_id, business_id, exercise_id, survey_id) VALUES({i}, '{msg_id}', 'test','test',"
+                    f"case_id, business_id, exercise_id, survey_id, sent_at) VALUES({i}, '{msg_id}', 'test','test',"
                     f"'{thread_id}','ACollectionCase', 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc', 'ACollectionExercise',"
-                    f"'{user.user_uuid}')"
+                    f"'{user.user_uuid}', '{sent_at}')"
                 )
                 con.execute(query)
                 query = (
@@ -103,9 +107,6 @@ class ModifyTestCaseHelper:
                     f"INSERT INTO securemessage.status(label, msg_id, actor) VALUES('UNREAD', '{msg_id}',"
                     f" '{user.user_uuid}')"
                 )
-                con.execute(query)
-                query = f"""INSERT INTO securemessage.events(event, msg_id, date_time)
-                         VALUES('{EventsApi.SENT.value}', '{msg_id}', '2020-11-20 00:00:00')"""
                 con.execute(query)
         return thread_id
 

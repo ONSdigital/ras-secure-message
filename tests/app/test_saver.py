@@ -8,7 +8,6 @@ from sqlalchemy import create_engine
 from sqlalchemy.exc import SQLAlchemyError
 
 from secure_message.application import create_app
-from secure_message.common.eventsapi import EventsApi
 from secure_message.exception.exceptions import MessageSaveException
 from secure_message.repository import database
 from secure_message.repository.database import SecureMessage, db
@@ -64,6 +63,7 @@ class SaverTestCase(unittest.TestCase):
             request = con.execute("SELECT * FROM securemessage.status")
             for row in request:
                 self.assertTrue(row is not None)
+            con.close()
 
     def test_saved_new_thread_creates_entry_in_conversation_table(self):
         """retrieves message status from database"""
@@ -80,6 +80,7 @@ class SaverTestCase(unittest.TestCase):
                 self.assertIsNone(row["closed_by_uuid"])
                 self.assertIsNone(row["closed_at"])
                 self.assertTrue(row["category"] is not None)
+                con.close()
 
     def test_save_msg_status_raises_message_save_exception_on_db_error(self):
         """Tests MessageSaveException generated if db commit fails saving message"""
@@ -93,30 +94,19 @@ class SaverTestCase(unittest.TestCase):
 
     def test_saved_msg_event_has_been_saved(self):
         """retrieves message event from database"""
-        message_event = {"msg_id": "AMsgId", "event": EventsApi.SENT.value, "date_time": ""}
         with self.app.app_context():
             with current_app.test_request_context():
                 Saver().save_message(SecureMessage(msg_id="AMsgId", thread_id="AMsgId"))
-                Saver().save_msg_event(message_event["msg_id"], message_event["event"])
 
         with self.engine.connect() as con:
-            request = con.execute("SELECT * FROM securemessage.events")
+            request = con.execute("SELECT * FROM securemessage.secure_message limit 1")
             for row in request:
                 self.assertTrue(row is not None)
-                self.assertTrue(row[1] == message_event["event"])
-                self.assertTrue(row[2] == message_event["msg_id"])
-                self.assertTrue(row[3] is not None)
+                self.assertTrue(row[1] == "AMsgId")
 
-    def test_save_event_raises_message_save_exception_on_db_error(self):
-        """Tests MessageSaveException generated if db commit fails saving message event"""
-        with self.app.app_context():
-            mock_session = mock.Mock(db.session)
-            mock_session.commit.side_effect = SQLAlchemyError("Not Saved")
-            message_event = {"msg_id": "AMsgId", "event": EventsApi.SENT.value, "date_time": ""}
-
-            with current_app.test_request_context():
-                with self.assertRaises(MessageSaveException):
-                    Saver().save_msg_event(message_event["msg_id"], message_event["event"], mock_session)
+                # Just check that sent_at (11th element) is set without checking the value as we don't have it
+                self.assertIsInstance(row[10], datetime.datetime)
+                self.assertTrue(row[10] is not None)
 
     def test_status_commit_exception_raises_message_save_exception(self):
         """check status commit exception clears the session"""
@@ -125,14 +115,6 @@ class SaverTestCase(unittest.TestCase):
             with current_app.test_request_context():
                 with self.assertRaises(MessageSaveException):
                     Saver().save_msg_status(message_status["actor"], message_status["msg_id"], "INBOX, UNREAD")
-
-    def test_event_commit_exception_raises_message_save_exception(self):
-        """check event commit exception clears the session"""
-        message_event = {"msg_id": "AMsgId", "event": EventsApi.SENT.value, "date_time": ""}
-        with self.app.app_context():
-            with current_app.test_request_context():
-                with self.assertRaises(MessageSaveException):
-                    Saver().save_msg_event(message_event["msg_id"], message_event["event"])
 
     def test_msg_commit_exception_does_a_rollback(self):
         """check message commit exception clears the session"""

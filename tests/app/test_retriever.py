@@ -7,7 +7,6 @@ from sqlalchemy import create_engine
 from werkzeug.exceptions import Forbidden, NotFound
 
 from secure_message.application import create_app
-from secure_message.common.eventsapi import EventsApi
 from secure_message.common.utilities import MessageArgs
 from secure_message.constants import MESSAGE_QUERY_LIMIT
 from secure_message.repository import database
@@ -38,17 +37,30 @@ class RetrieverTestCaseHelper:
         survey_id=BRES_SURVEY,
         exercise_id="CollectionExercise",
         from_internal=False,
+        sent_at=datetime.utcnow(),
+        include_read_at=False,
     ):
 
         """Populate the secure_message table"""
 
         with self.engine.connect() as con:
-            query = (
-                f"INSERT INTO securemessage.secure_message(msg_id, subject, body, thread_id,"
-                f"case_id, business_id, survey_id, exercise_id, from_internal)"
-                f"VALUES ('{msg_id}', '{subject}','{body}',"
-                f"'{thread_id}', '{case_id}', '{business_id}', '{survey_id}', '{exercise_id}', '{from_internal}')"
-            )
+            if include_read_at:
+                read_at = datetime.utcnow()
+                query = (
+                    f"INSERT INTO securemessage.secure_message(msg_id, subject, body, thread_id,"
+                    f"case_id, business_id, survey_id, exercise_id, from_internal, sent_at, read_at)"
+                    f"VALUES ('{msg_id}', '{subject}','{body}',"
+                    f"'{thread_id}', '{case_id}', '{business_id}', '{survey_id}',"
+                    f" '{exercise_id}', '{from_internal}',  '{sent_at}', '{read_at}')"
+                )
+            else:
+                query = (
+                    f"INSERT INTO securemessage.secure_message(msg_id, subject, body, thread_id,"
+                    f"case_id, business_id, survey_id, exercise_id, from_internal, sent_at)"
+                    f"VALUES ('{msg_id}', '{subject}','{body}',"
+                    f"'{thread_id}', '{case_id}', '{business_id}', '{survey_id}',"
+                    f" '{exercise_id}', '{from_internal}',  '{sent_at}')"
+                )
             con.execute(query)
 
     def add_conversation(self, conversation_id, is_closed=False, category="SURVEY"):
@@ -84,28 +96,36 @@ class RetrieverTestCaseHelper:
         external_actor=default_external_actor,
         internal_actor=default_internal_actor,
         category="SURVEY",
+        include_read_at=False,
     ):
         """Populate the db with a thread with a specified number of messages"""
 
         msg_id = str(uuid.uuid4())
         thread_id = msg_id
         self.add_conversation(conversation_id=thread_id, category=category)
-        self.add_secure_message(msg_id=msg_id, thread_id=thread_id, survey_id=self.BRES_SURVEY, from_internal=False)
+        self.add_secure_message(
+            msg_id=msg_id,
+            thread_id=thread_id,
+            survey_id=self.BRES_SURVEY,
+            from_internal=False,
+            include_read_at=include_read_at,
+        )
         self.add_status(label="SENT", msg_id=msg_id, actor=external_actor)
         self.add_status(label="INBOX", msg_id=msg_id, actor=internal_actor)
-        self.add_event(event=EventsApi.SENT.value, msg_id=msg_id, date_time=datetime.utcnow())
-        self.add_event(event=EventsApi.READ.value, msg_id=msg_id, date_time=datetime.utcnow())
 
         if no_of_messages > 1:
             for _ in range(no_of_messages - 1):
                 msg_id = str(uuid.uuid4())
                 self.add_secure_message(
-                    msg_id=msg_id, thread_id=thread_id, survey_id=self.BRES_SURVEY, from_internal=True
+                    msg_id=msg_id,
+                    thread_id=thread_id,
+                    survey_id=self.BRES_SURVEY,
+                    from_internal=True,
+                    include_read_at=include_read_at,
                 )
                 self.add_status(label="SENT", msg_id=msg_id, actor=internal_actor)
                 self.add_status(label="UNREAD", msg_id=msg_id, actor=external_actor)
                 self.add_status(label="INBOX", msg_id=msg_id, actor=external_actor)
-                self.add_event(event=EventsApi.SENT.value, msg_id=msg_id, date_time=datetime.utcnow())
 
         return thread_id
 
@@ -209,14 +229,9 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
 
     def test_read_date_returned_for_message(self):
         """retrieves message using id and checks the read date returned"""
-        self.create_thread(no_of_messages=2)
+        self.create_thread(no_of_messages=2, include_read_at=True)
         with self.engine.connect() as con:
-            query_sql = (
-                "SELECT securemessage.secure_message.msg_id FROM securemessage.secure_message "
-                "JOIN securemessage.events ON securemessage.secure_message.msg_id = securemessage.events.msg_id "
-                "WHERE securemessage.events.event = '" + EventsApi.READ.value + "' LIMIT 1"
-            )
-            query = con.execute(query_sql)
+            query = con.execute("SELECT msg_id FROM securemessage.secure_message LIMIT 1")
             msg_id = query.first()[0]
             with self.app.app_context():
                 with current_app.test_request_context():
@@ -242,7 +257,7 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
                 response = Retriever.retrieve_thread(thread_id, self.user_respondent)
                 self.assertEqual(len(response.all()), 6)
 
-                sent = [str(message.events[0].date_time) for message in response.all()]
+                sent = [str(message.sent_at) for message in response.all()]
 
                 desc_date = sorted(sent, reverse=True)
                 self.assertEqual(len(sent), 6)
@@ -348,12 +363,11 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
 
                 self.assertEqual(len(msg_ids), 5)
 
-                args = get_args(page=1, limit=MESSAGE_QUERY_LIMIT)
-
                 for x in range(0, len(thread_ids)):
                     thread = Retriever.retrieve_thread(thread_ids[x], self.user_internal)
-                    self.assertEqual(date[x], str(thread.all()[0].events[0].date_time))
-                    self.assertEqual(msg_ids[x], thread.all()[0].events[0].msg_id)
+                    first_msg_in_thread = thread.all()[0]
+                    self.assertEqual(date[x], first_msg_in_thread.sent_at)
+                    self.assertEqual(msg_ids[x], first_msg_in_thread.msg_id)
 
     def test_thread_count_by_survey_my_conversations_off(self):
         """checks that the returned thread count is the same for every internal user
