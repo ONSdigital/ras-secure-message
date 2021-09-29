@@ -1,5 +1,5 @@
 import logging
-from datetime import datetime, timezone
+from datetime import datetime
 
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import (
@@ -43,7 +43,6 @@ class SecureMessage(db.Model):
     read_at = Column("read_at", DateTime())
 
     statuses = relationship("Status", backref="secure_message", lazy="dynamic")
-    events = relationship("Events", backref="secure_message", order_by="Events.date_time", lazy="dynamic")
 
     __table_args__ = (Index("idx_ru_survey_cc", "business_id", "survey_id", "case_id", "exercise_id"),)
 
@@ -178,26 +177,6 @@ class Status(db.Model):
         data = {"msg_id": self.msg_id, "actor": self.actor, "label": self.label}
 
         return data
-
-
-class Events(db.Model):
-    """Events table model"""
-
-    __tablename__ = "events"
-
-    id = Column("id", Integer(), primary_key=True)
-    event = Column("event", String(constants.MAX_EVENT_LEN + 1))
-    msg_id = Column("msg_id", String(constants.MAX_MSG_ID_LEN + 1), ForeignKey("secure_message.msg_id"), index=True)
-    date_time = Column("date_time", DateTime())
-    __table_args__ = (Index("idx_msg_id_event", "msg_id", "event"),)
-
-    def __init__(self, msg_id="", event=""):
-        self.msg_id = msg_id
-        self.event = event
-        self.date_time = datetime.now(timezone.utc)
-
-    def __repr__(self):
-        return f"<Events(msg_id={self.msg_id} event={self.event}, date_time={self.date_time}"
 
 
 class Conversation(db.Model):
