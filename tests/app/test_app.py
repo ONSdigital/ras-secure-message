@@ -211,8 +211,8 @@ class AppTestCase(unittest.TestCase):
             for row in db_data:
                 self.assertTrue(row is not None)
 
-    def test_message_post_stores_events_correctly_for_message(self):
-        """posts to message send end point to ensure events are saved as expected"""
+    def test_message_post_stores_sent_at_correctly_for_message(self):
+        """posts to message send end point to ensure sent_at is saved as expected"""
         url = "http://localhost:5050/messages"
 
         response = self.client.post(url, data=json.dumps(self.test_message), headers=self.internal_user_header)
