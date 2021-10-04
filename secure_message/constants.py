@@ -17,10 +17,6 @@ MAX_COLLECTION_EXERCISE_LEN = 60  # Maximum size of the message collection exerc
 MAX_STATUS_LABEL_LEN = 50  # Maximum length of a label column
 MAX_STATUS_ACTOR_LEN = 100  # Maximum length of the actor column
 
-# Events Table Column Size Definitions
-
-MAX_EVENT_LEN = 20  # Maximum length of a event column
-
 # Endpoint names
 
 MESSAGE_BY_ID_ENDPOINT = "message"

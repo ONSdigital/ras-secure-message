@@ -5,15 +5,8 @@ from sqlalchemy.exc import SQLAlchemyError
 from structlog import wrap_logger
 from werkzeug.exceptions import BadRequest, InternalServerError
 
-from secure_message.common.eventsapi import EventsApi
 from secure_message.common.labels import Labels
-from secure_message.repository.database import (
-    Conversation,
-    Events,
-    SecureMessage,
-    Status,
-    db,
-)
+from secure_message.repository.database import Conversation, SecureMessage, Status, db
 from secure_message.services.service_toggles import internal_user_service
 
 logger = wrap_logger(logging.getLogger(__name__))
@@ -109,8 +102,6 @@ class Modifier:
             for secure_message in secure_messages.all():
                 message = secure_message.serialize(user)
                 if inbox in message["labels"] and unread in message["labels"]:
-                    event = Events(msg_id=message["msg_id"], event=EventsApi.READ.value)
-                    db.session.add(event)
                     secure_message.read_at = datetime.utcnow()
                     db.session.add(secure_message)
                     Modifier.remove_label(Labels.UNREAD.value, message, user)
@@ -126,11 +117,7 @@ class Modifier:
         unread = Labels.UNREAD.value
         # message is unread if it has an UNREAD label and the `read_at` time isn't set
         if inbox in message["labels"] and unread in message["labels"] and "read_date" not in message:
-            # Save to both events and secure_message table for now.  In future, the save to the
-            # events table will be removed.
             try:
-                event = Events(msg_id=message["msg_id"], event=EventsApi.READ.value)
-                db.session.add(event)
                 secure_message = SecureMessage.query.filter(SecureMessage.msg_id == message["msg_id"]).one()
                 secure_message.read_at = datetime.utcnow()
                 db.session.add(secure_message)
