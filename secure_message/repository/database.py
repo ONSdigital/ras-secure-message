@@ -1,5 +1,5 @@
 import logging
-from datetime import datetime
+from datetime import datetime, timezone
 
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import (
@@ -39,7 +39,7 @@ class SecureMessage(db.Model):
     exercise_id = Column("exercise_id", String(constants.MAX_COLLECTION_EXERCISE_LEN + 1))
     survey_id = Column("survey_id", String(constants.MAX_SURVEY_LEN + 1))
     from_internal = Column("from_internal", Boolean())
-    sent_at = Column("sent_at", DateTime(), default=datetime.utcnow)
+    sent_at = Column("sent_at", DateTime(), default=datetime.now(timezone.utc))
     read_at = Column("read_at", DateTime())
 
     statuses = relationship("Status", backref="secure_message", lazy="dynamic")

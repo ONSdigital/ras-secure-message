@@ -1,5 +1,5 @@
 import logging
-from datetime import datetime
+from datetime import datetime, timezone
 
 from sqlalchemy.exc import SQLAlchemyError
 from structlog import wrap_logger
@@ -102,7 +102,7 @@ class Modifier:
             for secure_message in secure_messages.all():
                 message = secure_message.serialize(user)
                 if inbox in message["labels"] and unread in message["labels"]:
-                    secure_message.read_at = datetime.utcnow()
+                    secure_message.read_at = datetime.now(timezone.utc)
                     db.session.add(secure_message)
                     Modifier.remove_label(Labels.UNREAD.value, message, user)
             db.session.commit()
@@ -119,7 +119,7 @@ class Modifier:
         if inbox in message["labels"] and unread in message["labels"] and "read_date" not in message:
             try:
                 secure_message = SecureMessage.query.filter(SecureMessage.msg_id == message["msg_id"]).one()
-                secure_message.read_at = datetime.utcnow()
+                secure_message.read_at = datetime.now(timezone.utc)
                 db.session.add(secure_message)
                 db.session.commit()
             except SQLAlchemyError:
@@ -188,7 +188,7 @@ class Modifier:
         try:
             bound_logger.info("Closing conversation")
             metadata.is_closed = True
-            metadata.closed_at = datetime.utcnow()
+            metadata.closed_at = datetime.now(timezone.utc)
             metadata.closed_by = f"{user_details.get('firstName')} {user_details.get('lastName')}"
             metadata.closed_by_uuid = user.user_uuid
             db.session.commit()
