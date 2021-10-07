@@ -106,8 +106,8 @@ class SecureMessage(db.Model):
             "survey_id": self.survey_id,
             "exercise_id": self.exercise_id,
             "from_internal": self.from_internal,
-            "sent_date": self.sent_at,
-            "read_date": self.read_at,
+            "sent_date": str(self.sent_at),
+            "read_date": str(self.read_at),
             "_links": "",
             "labels": [],
         }
