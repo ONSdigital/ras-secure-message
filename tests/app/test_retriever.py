@@ -358,7 +358,7 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
                 for x in range(0, len(thread_ids)):
                     thread = Retriever.retrieve_thread(thread_ids[x], self.user_internal)
                     first_msg_in_thread = thread.all()[0]
-                    self.assertEqual(date[x], first_msg_in_thread.sent_at)
+                    self.assertEqual(date[x], str(first_msg_in_thread.sent_at))
                     self.assertEqual(msg_ids[x], first_msg_in_thread.msg_id)
 
     def test_thread_count_by_survey_my_conversations_off(self):
