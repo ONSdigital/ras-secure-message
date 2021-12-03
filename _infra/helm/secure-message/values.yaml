@@ -24,16 +24,16 @@ resources:
   application:
     requests:
       memory: "275Mi"
-      cpu: "35m"
+      cpu: "100m"
     limits:
       memory: "350Mi"
-      cpu: "100m"
+      cpu: "200m"
   proxy:
     requests:
-      memory: "25Mi"
-      cpu: "5m"
-    limits:
       memory: "64Mi"
+      cpu: "20m"
+    limits:
+      memory: "128Mi"
       cpu: "100m"
 
 autoscaling: false
