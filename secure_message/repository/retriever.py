@@ -56,7 +56,7 @@ class Retriever:
 
         if request_args.category:
             conversation_condition.append(Conversation.category == request_args.category)
-        
+
         if request_args.my_conversations:
             conditions.append(Status.actor == user.user_uuid)
             conditions.append(Status.msg_id == SecureMessage.msg_id)
@@ -66,7 +66,10 @@ class Retriever:
             conditions.append(Status.actor == NON_SPECIFIC_INTERNAL_USER)
 
         try:
-            result = SecureMessage.query.filter(and_(*conditions)).distinct(SecureMessage.msg_id).count()
+            result = (
+                SecureMessage.query.join(Conversation).filter(*conversation_condition)
+                .filter(and_(*conditions)).distinct(SecureMessage.msg_id).count()
+            )
         except Exception as e:
             logger.error("Error retrieving count of threads by survey from database", error=e)
             raise InternalServerError(description="Error retrieving count of threads from database")
