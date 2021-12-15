@@ -56,29 +56,17 @@ class Retriever:
 
         if request_args.category:
             conversation_condition.append(Conversation.category == request_args.category)
+        
+        if request_args.my_conversations:
+            conditions.append(Status.actor == user.user_uuid)
+            conditions.append(Status.msg_id == SecureMessage.msg_id)
+
+        if request_args.new_respondent_conversations:
+            conditions.append(Status.msg_id == SecureMessage.msg_id)
+            conditions.append(Status.actor == NON_SPECIFIC_INTERNAL_USER)
 
         try:
-            t = (
-                db.session.query(SecureMessage.thread_id, func.max(SecureMessage.id).label("max_id"))
-                .join(Conversation)
-                .filter(*conversation_condition)
-                .group_by(SecureMessage.thread_id)
-                .subquery("t")
-            )
-
-            conditions.append(SecureMessage.thread_id == t.c.thread_id)
-            conditions.append(SecureMessage.id == t.c.max_id)
-
-            if request_args.my_conversations:
-                conditions.append(Status.actor == user.user_uuid)
-                conditions.append(Status.msg_id == SecureMessage.msg_id)
-
-            if request_args.new_respondent_conversations:
-                conditions.append(Status.msg_id == SecureMessage.msg_id)
-                conditions.append(Status.actor == NON_SPECIFIC_INTERNAL_USER)
-
             result = SecureMessage.query.filter(and_(*conditions)).distinct(SecureMessage.msg_id).count()
-
         except Exception as e:
             logger.error("Error retrieving count of threads by survey from database", error=e)
             raise InternalServerError(description="Error retrieving count of threads from database")
