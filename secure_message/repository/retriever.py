@@ -67,7 +67,7 @@ class Retriever:
 
         try:
             result = (
-                SecureMessage.query.join(Conversation).filter(*conversation_condition)
+                SecureMessage.query.join(Conversation).join(Status).filter(*conversation_condition)
                 .filter(and_(*conditions)).distinct(SecureMessage.msg_id).count()
             )
         except Exception as e:
