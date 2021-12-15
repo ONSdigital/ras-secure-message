@@ -52,6 +52,7 @@ class Config:
     # SQLAlchemy
     SQLALCHEMY_TRACK_MODIFICATIONS = os.getenv("SQLALCHEMY_TRACK_MODIFICATIONS", False)
     SQLALCHEMY_DATABASE_URI = DATABASE_URL
+    SQLALCHEMY_ECHO = True
 
     GOOGLE_CLOUD_PROJECT = os.getenv("GOOGLE_CLOUD_PROJECT", "ras-rm-sandbox")
     PUBSUB_TOPIC = os.getenv("PUBSUB_TOPIC", "ras-rm-notify-test")
@@ -67,6 +68,7 @@ class DevConfig(Config):
     SECURITY_USER_NAME = os.getenv("SECURITY_USER_NAME", "admin")
     SECURITY_USER_PASSWORD = os.getenv("SECURITY_USER_PASSWORD", "secret")
     BASIC_AUTH = (SECURITY_USER_NAME, SECURITY_USER_PASSWORD)
+    SQLALCHEMY_ECHO = True
 
     # UAA
     CLIENT_ID = os.getenv("CLIENT_ID", "secure_message")
@@ -78,6 +80,7 @@ class DevConfig(Config):
 class TestConfig(DevConfig):
     TESTING = True
     USE_UAA = 0
+    SQLALCHEMY_ECHO = True
 
     # LOGGING SETTINGS
     LOGGING_LEVEL = "ERROR"
