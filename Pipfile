@@ -4,7 +4,7 @@ verify_ssl = true
 url = "https://pypi.python.org/simple"
 
 [requires]
-python_version = "3.9"
+python_version = "3.10"
 
 [packages]
 Flask = "*"
@@ -26,7 +26,7 @@ numpy = "*"
 google-cloud-pubsub = "*"
 
 [dev-packages]
-black = "==21.6b0"
+black = "==21.12b0"
 flake8 = "*"
 isort = "*"
 behave = "*"
