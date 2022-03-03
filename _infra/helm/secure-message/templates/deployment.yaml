@@ -177,11 +177,11 @@ spec:
             valueFrom:
               secretKeyRef:
                 name: secure-message
-                key: client-user
+                key: client-id
           - name: CLIENT_SECRET
             valueFrom:
               secretKeyRef:
                 name: secure-message
-                key: client-password
+                key: client-secret
           resources:
             {{ toYaml .Values.resources.application | nindent 12 }}
