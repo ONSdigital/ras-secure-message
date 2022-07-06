@@ -26,7 +26,7 @@ numpy = "*"
 google-cloud-pubsub = "*"
 
 [dev-packages]
-black = "==21.12b0"
+black = "*"
 flake8 = "*"
 isort = "*"
 behave = "*"
