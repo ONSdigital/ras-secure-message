@@ -32,10 +32,12 @@ class InternalUserService:
             resp_json = response.json()
         except HTTPError:
             logger.exception("Failed to get user info", uuid=uuid)
-            raise
+            user_details = InternalUserService.get_default_user_details(uuid)
+            return user_details
         except ValueError:
             logger.exception("Failed to decode response JSON", uuid=uuid)
-            raise
+            user_details = InternalUserService.get_default_user_details(uuid)
+            return user_details
 
         try:
             user_details = {
