@@ -146,13 +146,6 @@ class Retriever:
             conditions.append(SecureMessage.thread_id == t.c.thread_id)
             conditions.append(SecureMessage.id == t.c.max_id)
 
-            logger.info("BELOW ARE THE REQUEST ARGS")
-            logger.info(request_args)
-            logger.info(request_args.page)
-            logger.info(request_args.limit)
-
-            # try testing out keywords on the v2 sql-alchemy to get a better understanding of paginate method
-
             result = (
                 SecureMessage.query.filter(and_(*conditions))
                 .order_by(t.c.max_id.desc())
