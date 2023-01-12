@@ -28,7 +28,6 @@ class SaverTestCase(unittest.TestCase):
             **{"msg_to": "tej", "msg_from": "gemma", "subject": "MyMessage", "body": "hello", "thread_id": ""}
         )
         with app.app_context():
-            database.db.init_app(current_app)
             database.db.drop_all()
             database.db.create_all()
             self.db = database.db

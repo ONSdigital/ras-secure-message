@@ -131,7 +131,6 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
         self.MESSAGE_LIST_ENDPOINT = "http://localhost:5050/messages"
         self.MESSAGE_BY_ID_ENDPOINT = "http://localhost:5050/message/"
         with self.app.app_context():
-            database.db.init_app(current_app)
             database.db.drop_all()
             database.db.create_all()
             self.db = database.db

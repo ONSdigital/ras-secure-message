@@ -56,7 +56,6 @@ class AppTestCase(unittest.TestCase):
         }
 
         with self.app.app_context():
-            database.db.init_app(current_app)
             database.db.drop_all()
             database.db.create_all()
             self.db = database.db

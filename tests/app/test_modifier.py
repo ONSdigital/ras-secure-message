@@ -145,7 +145,6 @@ class ModifyTestCase(unittest.TestCase, ModifyTestCaseHelper):
         self.engine = create_engine(self.app.config["SQLALCHEMY_DATABASE_URI"])
 
         with self.app.app_context():
-            database.db.init_app(current_app)
             database.db.drop_all()
             database.db.create_all()
             self.db = database.db
