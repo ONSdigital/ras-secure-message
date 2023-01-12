@@ -151,7 +151,7 @@ class Retriever:
             logger.info(request_args.page)
             logger.info(request_args.limit)
 
-            #try testing out keywords on the v2 sql-alchemy to get a better understanding of paginate method
+            # try testing out keywords on the v2 sql-alchemy to get a better understanding of paginate method
 
             result = (
                 SecureMessage.query.filter(and_(*conditions))
