@@ -13,7 +13,7 @@ lint:
 	pipenv run flake8
 
 lint-check:
-	#pipenv check -i 51668
+	pipenv check -i 51668
 	pipenv run isort --check-only .
 	pipenv run black --line-length 120 .
 	pipenv run flake8
