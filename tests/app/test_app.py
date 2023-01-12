@@ -2,7 +2,7 @@ import datetime
 import unittest
 from unittest.mock import patch
 
-from flask import current_app, json
+from flask import json
 from sqlalchemy import create_engine
 
 from secure_message import application, constants
