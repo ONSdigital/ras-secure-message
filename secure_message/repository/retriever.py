@@ -149,7 +149,7 @@ class Retriever:
             result = (
                 SecureMessage.query.filter(and_(*conditions))
                 .order_by(t.c.max_id.desc())
-                .paginate(request_args.page, request_args.limit, False)
+                .paginate(page=request_args.page, per_page=request_args.limit, error_out=False)
             )
 
         except SQLAlchemyError:
@@ -207,7 +207,7 @@ class Retriever:
             result = (
                 SecureMessage.query.filter(and_(*conditions))
                 .order_by(t.c.max_id.desc())
-                .paginate(request_args.page, request_args.limit, False)
+                .paginate(page=request_args.page, per_page=request_args.limit, error_out=False)
             )
 
         except SQLAlchemyError:

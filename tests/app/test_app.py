@@ -2,7 +2,7 @@ import datetime
 import unittest
 from unittest.mock import patch
 
-from flask import current_app, json
+from flask import json
 from sqlalchemy import create_engine
 
 from secure_message import application, constants
@@ -56,7 +56,6 @@ class AppTestCase(unittest.TestCase):
         }
 
         with self.app.app_context():
-            database.db.init_app(current_app)
             database.db.drop_all()
             database.db.create_all()
             self.db = database.db

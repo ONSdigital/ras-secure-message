@@ -1,6 +1,5 @@
 import nose.tools
 from behave import given, then, when
-from flask import current_app
 
 from secure_message.repository import database
 from secure_message.services.service_toggles import internal_user_service, party
@@ -27,7 +26,6 @@ def step_impl_prepare_for_tests(context, service_type):
 def step_impl_reset_db(context):
     """Reset database and use the context test helper."""
     with context.app.app_context():
-        database.db.init_app(current_app)
         database.db.drop_all()
         database.db.create_all()
 
