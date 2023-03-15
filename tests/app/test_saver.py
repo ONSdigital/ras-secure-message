@@ -4,7 +4,7 @@ import uuid
 from unittest import mock
 
 from flask import current_app
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, text
 from sqlalchemy.exc import SQLAlchemyError
 
 from secure_message.application import create_app
@@ -59,7 +59,7 @@ class SaverTestCase(unittest.TestCase):
         # This is horrible and barely tests anything... needs to be rewritten to test
         # WHAT statuses are in the database, not just that is literally anything there
         with self.engine.connect() as con:
-            request = con.execute("SELECT * FROM securemessage.status")
+            request = con.execute(text("SELECT * FROM securemessage.status"))
             for row in request:
                 self.assertTrue(row is not None)
             con.close()
@@ -70,7 +70,7 @@ class SaverTestCase(unittest.TestCase):
             random_uuid = str(uuid.uuid4())
             Saver.save_message(SecureMessage(msg_id=random_uuid, thread_id=random_uuid))
             with self.engine.connect() as con:
-                request = con.execute("SELECT * FROM securemessage.conversation")
+                request = con.execute(text("SELECT * FROM securemessage.conversation"))
                 row = request.fetchone()
                 # Newly created record should be mostly empty
                 self.assertEqual(row["id"], random_uuid)
@@ -98,7 +98,7 @@ class SaverTestCase(unittest.TestCase):
                 Saver().save_message(SecureMessage(msg_id="AMsgId", thread_id="AMsgId"))
 
         with self.engine.connect() as con:
-            request = con.execute("SELECT * FROM securemessage.secure_message limit 1")
+            request = con.execute(text("SELECT * FROM securemessage.secure_message limit 1"))
             for row in request:
                 self.assertTrue(row is not None)
                 self.assertTrue(row["msg_id"] == "AMsgId")
@@ -128,6 +128,8 @@ class SaverTestCase(unittest.TestCase):
                 Saver().save_message(self.test_message)
 
         with self.engine.connect() as con:
-            request = con.execute("SELECT COUNT(securemessage.secure_message.id) FROM securemessage.secure_message")
+            request = con.execute(
+                text("SELECT COUNT(securemessage.secure_message.id) FROM securemessage.secure_message")
+            )
             for row in request:
                 self.assertTrue(row["count"] == 1)

@@ -3,7 +3,7 @@ import unittest
 from unittest.mock import patch
 
 from flask import json
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, text
 
 from secure_message import application, constants
 from secure_message.api_mocks.party_service_mock import PartyServiceMock
@@ -82,8 +82,10 @@ class AppTestCase(unittest.TestCase):
 
         with self.engine.connect() as con:
             db_data = con.execute(
-                "SELECT * FROM securemessage.secure_message "
-                "WHERE id = (SELECT MAX(id) FROM securemessage.secure_message)"
+                text(
+                    "SELECT * FROM securemessage.secure_message "
+                    "WHERE id = (SELECT MAX(id) FROM securemessage.secure_message)"
+                )
             )
             self.assertEqual(db_data.rowcount, 1)
             for row in db_data:
@@ -99,8 +101,10 @@ class AppTestCase(unittest.TestCase):
         engine = create_engine(self.app.config["DATABASE_URL"], echo=True)
         with engine.connect() as con:
             db_data = con.execute(
-                "SELECT * FROM securemessage.secure_message "
-                "WHERE id = (SELECT MAX(id) FROM securemessage.secure_message)"
+                text(
+                    "SELECT * FROM securemessage.secure_message "
+                    "WHERE id = (SELECT MAX(id) FROM securemessage.secure_message)"
+                )
             )
             self.assertEqual(db_data.rowcount, 1)
             for row in db_data:
@@ -144,8 +148,10 @@ class AppTestCase(unittest.TestCase):
         engine = create_engine(self.app.config["DATABASE_URL"], echo=True)
         with engine.connect() as con:
             db_data = con.execute(
-                "SELECT * FROM securemessage.secure_message "
-                "WHERE id = (SELECT MAX(id) FROM securemessage.secure_message)"
+                text(
+                    "SELECT * FROM securemessage.secure_message "
+                    "WHERE id = (SELECT MAX(id) FROM securemessage.secure_message)"
+                )
             )
             for row in db_data:
                 self.test_message["thread_id"] = row["thread_id"]
@@ -156,7 +162,7 @@ class AppTestCase(unittest.TestCase):
         # Now read back the two messages
         original_msg_id = original_thread_id = reply_msg_id = reply_thread_id = ""
         with engine.connect() as con:
-            request = con.execute("SELECT * FROM securemessage.secure_message ORDER BY id DESC")
+            request = con.execute(text("SELECT * FROM securemessage.secure_message ORDER BY id DESC"))
             for row in request:
                 if row[0] == 1:
                     original_msg_id = row["msg_id"]
@@ -203,8 +209,10 @@ class AppTestCase(unittest.TestCase):
 
         with self.engine.connect() as con:
             db_data = con.execute(
-                "SELECT * FROM securemessage.status WHERE label='SENT' AND msg_id='{0}' AND actor='{1}'".format(
-                    data["msg_id"], self.test_message["survey_id"]
+                text(
+                    "SELECT * FROM securemessage.status WHERE label='SENT' AND msg_id='{0}' AND actor='{1}'".format(
+                        data["msg_id"], self.test_message["survey_id"]
+                    )
                 )
             )
             for row in db_data:
@@ -218,7 +226,7 @@ class AppTestCase(unittest.TestCase):
         data = json.loads(response.data)
 
         with self.engine.connect() as con:
-            db_data = con.execute(f"SELECT * FROM securemessage.secure_message where msg_id='{data['msg_id']}'")
+            db_data = con.execute(text(f"SELECT * FROM securemessage.secure_message where msg_id='{data['msg_id']}'"))
             for row in db_data:
                 self.assertTrue(row is not None)
                 self.assertTrue(isinstance(row["sent_at"], datetime.datetime))
@@ -232,9 +240,11 @@ class AppTestCase(unittest.TestCase):
         # dereferencing msg_to for purpose of test
         with self.engine.connect() as con:
             db_data = con.execute(
-                "SELECT * FROM securemessage.status WHERE "
-                "label='INBOX' OR label='UNREAD' AND msg_id='{0}'"
-                " AND actor='{1}'".format(data["msg_id"], self.test_message["msg_to"][0])
+                text(
+                    "SELECT * FROM securemessage.status WHERE "
+                    "label='INBOX' OR label='UNREAD' AND msg_id='{0}'"
+                    " AND actor='{1}'".format(data["msg_id"], self.test_message["msg_to"][0])
+                )
             )
             for row in db_data:
                 self.assertTrue(row is not None)
@@ -248,8 +258,12 @@ class AppTestCase(unittest.TestCase):
 
         with self.engine.connect() as con:
             db_data = con.execute(
-                "SELECT * FROM securemessage.status WHERE "
-                "msg_id='{0}' AND actor='{1}' AND label='SENT'".format(data["msg_id"], self.test_message["survey_id"])
+                text(
+                    "SELECT * FROM securemessage.status WHERE "
+                    "msg_id='{0}' AND actor='{1}' AND label='SENT'".format(
+                        data["msg_id"], self.test_message["survey_id"]
+                    )
+                )
             )
             for row in db_data:
                 self.assertTrue(row is not None)

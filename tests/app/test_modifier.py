@@ -3,7 +3,7 @@ import unittest
 import uuid
 
 from flask import current_app
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, text
 from werkzeug.exceptions import InternalServerError
 
 from secure_message import constants
@@ -33,7 +33,7 @@ class ModifyTestCaseHelper:
                         f"INSERT INTO securemessage.conversation(id, is_closed, closed_by, closed_by_uuid) "
                         f"VALUES('{thread_id}', false, '', '')"
                     )
-                    con.execute(query)
+                    con.execute(text(query))
                 sent_at = datetime.datetime.utcnow()
                 if mark_as_read:
                     read_at = datetime.datetime.utcnow()
@@ -43,7 +43,7 @@ class ModifyTestCaseHelper:
                         f"'test','test','{thread_id}','ACollectionCase', 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc', "
                         f"'ACollectionExercise','{constants.NON_SPECIFIC_INTERNAL_USER}', '{sent_at}', '{read_at}')"
                     )
-                    con.execute(query)
+                    con.execute(text(query))
                 else:
                     query = (
                         f"INSERT INTO securemessage.secure_message(id, msg_id, subject, body, thread_id, "
@@ -51,22 +51,22 @@ class ModifyTestCaseHelper:
                         f"'{thread_id}','ACollectionCase', 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc', "
                         f"'ACollectionExercise','{constants.NON_SPECIFIC_INTERNAL_USER}', '{sent_at}')"
                     )
-                    con.execute(query)
+                    con.execute(text(query))
                 query = (
                     f"INSERT INTO securemessage.status(label, msg_id, actor)"
                     f"VALUES('SENT', '{msg_id}','0a7ad740-10d5-4ecb-b7ca-3c0384afb882')"
                 )
-                con.execute(query)
+                con.execute(text(query))
                 query = (
                     f"INSERT INTO securemessage.status(label, msg_id, actor) VALUES('INBOX', '{msg_id}', "
                     f"'{constants.NON_SPECIFIC_INTERNAL_USER}')"
                 )
-                con.execute(query)
+                con.execute(text(query))
                 query = (
                     f"INSERT INTO securemessage.status(label, msg_id, actor) VALUES('UNREAD', '{msg_id}',"
                     f"'{constants.NON_SPECIFIC_INTERNAL_USER}')"
                 )
-                con.execute(query)
+                con.execute(text(query))
 
         return thread_id
 
@@ -85,29 +85,29 @@ class ModifyTestCaseHelper:
                         f"INSERT INTO securemessage.conversation(id, is_closed, closed_by, closed_by_uuid) "
                         f"VALUES('{thread_id}', false, '', '')"
                     )
-                    con.execute(query)
+                    con.execute(text(query))
                 query = (
                     f"INSERT INTO securemessage.secure_message(id, msg_id, subject, body, thread_id,"
                     f"case_id, business_id, exercise_id, survey_id, sent_at) VALUES({i}, '{msg_id}', 'test','test',"
                     f"'{thread_id}','ACollectionCase', 'f1a5e99c-8edf-489a-9c72-6cabe6c387fc', 'ACollectionExercise',"
                     f"'{user.user_uuid}', '{sent_at}')"
                 )
-                con.execute(query)
+                con.execute(text(query))
                 query = (
                     f"INSERT INTO securemessage.status(label, msg_id, actor) "
                     f"VALUES('SENT','{msg_id}', '{constants.NON_SPECIFIC_INTERNAL_USER}')"
                 )
-                con.execute(query)
+                con.execute(text(query))
                 query = (
                     f"INSERT INTO securemessage.status(label, msg_id, actor) VALUES('INBOX', '{msg_id}', "
                     f"'{user.user_uuid}')"
                 )
-                con.execute(query)
+                con.execute(text(query))
                 query = (
                     f"INSERT INTO securemessage.status(label, msg_id, actor) VALUES('UNREAD', '{msg_id}',"
                     f" '{user.user_uuid}')"
                 )
-                con.execute(query)
+                con.execute(text(query))
         return thread_id
 
     def add_conversation(
@@ -129,7 +129,7 @@ class ModifyTestCaseHelper:
                 f"INSERT INTO securemessage.conversation(id, is_closed, closed_by, closed_by_uuid, closed_at) "
                 f"VALUES('{conversation_id}', '{is_closed}', '{closed_by}', '{closed_by_uuid}', '{closed_at}')"
             )
-            con.execute(query)
+            con.execute(text(query))
         return conversation_id
 
 
@@ -218,7 +218,7 @@ class ModifyTestCase(unittest.TestCase, ModifyTestCaseHelper):
         """testing duplicate message labels are not added to the database"""
         self.populate_database(1)
         with self.engine.connect() as con:
-            query = con.execute("SELECT msg_id FROM securemessage.secure_message LIMIT 1")
+            query = con.execute(text("SELECT msg_id FROM securemessage.secure_message LIMIT 1"))
             msg_id = query.first()[0]
         with self.app.app_context():
             with current_app.test_request_context():
@@ -227,7 +227,7 @@ class ModifyTestCase(unittest.TestCase, ModifyTestCaseHelper):
                 Modifier.add_unread(message, self.user_internal)
         with self.engine.connect() as con:
             query = f"SELECT count(label) FROM securemessage.status WHERE msg_id = '{msg_id}' AND label = 'UNREAD'"
-            query_x = con.execute(query)
+            query_x = con.execute(text(query))
             unread_label_total = []
             for row in query_x:
                 unread_label_total.append(row[0])
@@ -254,7 +254,7 @@ class ModifyTestCase(unittest.TestCase, ModifyTestCaseHelper):
         """testing message read_date is changed when unread label is removed for a second time"""
         self.populate_database(1)
         with self.engine.connect() as con:
-            query = con.execute("SELECT msg_id FROM securemessage.secure_message LIMIT 1")
+            query = con.execute(text("SELECT msg_id FROM securemessage.secure_message LIMIT 1"))
             msg_id = query.first()[0]
         with self.app.app_context():
             with current_app.test_request_context():
