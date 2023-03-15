@@ -153,7 +153,7 @@ class AppTestCase(unittest.TestCase):
                     "WHERE id = (SELECT MAX(id) FROM securemessage.secure_message)"
                 )
             )
-            for row in db_data:
+            for row in db_data.mappings():
                 self.test_message["thread_id"] = row["thread_id"]
 
         # Now submit a new message as a reply , Message Id empty , thread id same as last one
@@ -163,11 +163,11 @@ class AppTestCase(unittest.TestCase):
         original_msg_id = original_thread_id = reply_msg_id = reply_thread_id = ""
         with engine.begin() as con:
             request = con.execute(text("SELECT * FROM securemessage.secure_message ORDER BY id DESC"))
-            for row in request:
-                if row[0] == 1:
+            for row in request.mappings():
+                if row["id"] == 1:
                     original_msg_id = row["msg_id"]
                     original_thread_id = row["thread_id"]
-                if row[0] == 2:
+                if row["id"] == 2:
                     reply_msg_id = row["msg_id"]
                     reply_thread_id = row["thread_id"]
 
