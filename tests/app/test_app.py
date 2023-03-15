@@ -80,7 +80,7 @@ class AppTestCase(unittest.TestCase):
         response = self.client.post(url, data=json.dumps(data), headers=self.internal_user_header)
         self.assertEqual(response.status_code, 201)  # check post has succeeded
 
-        with self.engine.connect() as con:
+        with self.engine.begin() as con:
             db_data = con.execute(
                 text(
                     "SELECT * FROM securemessage.secure_message "
@@ -99,7 +99,7 @@ class AppTestCase(unittest.TestCase):
 
         self.client.post(url, data=json.dumps(self.test_message), headers=self.internal_user_header)
         engine = create_engine(self.app.config["DATABASE_URL"], echo=True)
-        with engine.connect() as con:
+        with engine.begin() as con:
             db_data = con.execute(
                 text(
                     "SELECT * FROM securemessage.secure_message "
@@ -146,7 +146,7 @@ class AppTestCase(unittest.TestCase):
         # Now read back the message to get the thread ID
 
         engine = create_engine(self.app.config["DATABASE_URL"], echo=True)
-        with engine.connect() as con:
+        with engine.begin() as con:
             db_data = con.execute(
                 text(
                     "SELECT * FROM securemessage.secure_message "
@@ -161,7 +161,7 @@ class AppTestCase(unittest.TestCase):
 
         # Now read back the two messages
         original_msg_id = original_thread_id = reply_msg_id = reply_thread_id = ""
-        with engine.connect() as con:
+        with engine.begin() as con:
             request = con.execute(text("SELECT * FROM securemessage.secure_message ORDER BY id DESC"))
             for row in request:
                 if row[0] == 1:
@@ -207,7 +207,7 @@ class AppTestCase(unittest.TestCase):
         response = self.client.post(url, data=json.dumps(self.test_message), headers=self.internal_user_header)
         data = json.loads(response.data)
 
-        with self.engine.connect() as con:
+        with self.engine.begin() as con:
             db_data = con.execute(
                 text(
                     "SELECT * FROM securemessage.status WHERE label='SENT' AND msg_id='{0}' AND actor='{1}'".format(
@@ -225,7 +225,7 @@ class AppTestCase(unittest.TestCase):
         response = self.client.post(url, data=json.dumps(self.test_message), headers=self.internal_user_header)
         data = json.loads(response.data)
 
-        with self.engine.connect() as con:
+        with self.engine.begin() as con:
             db_data = con.execute(text(f"SELECT * FROM securemessage.secure_message where msg_id='{data['msg_id']}'"))
             for row in db_data:
                 self.assertTrue(row is not None)
@@ -238,7 +238,7 @@ class AppTestCase(unittest.TestCase):
         response = self.client.post(url, data=json.dumps(self.test_message), headers=self.internal_user_header)
         data = json.loads(response.data)
         # dereferencing msg_to for purpose of test
-        with self.engine.connect() as con:
+        with self.engine.begin() as con:
             db_data = con.execute(
                 text(
                     "SELECT * FROM securemessage.status WHERE "
@@ -256,7 +256,7 @@ class AppTestCase(unittest.TestCase):
         response = self.client.post(url, data=json.dumps(self.test_message), headers=self.internal_user_header)
         data = json.loads(response.data)
 
-        with self.engine.connect() as con:
+        with self.engine.begin() as con:
             db_data = con.execute(
                 text(
                     "SELECT * FROM securemessage.status WHERE "

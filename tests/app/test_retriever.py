@@ -41,7 +41,7 @@ class RetrieverTestCaseHelper:
     ):
         """Populate the secure_message table"""
 
-        with self.engine.connect() as con:
+        with self.engine.begin() as con:
             if include_read_at:
                 read_at = datetime.utcnow()
                 query = (
@@ -64,7 +64,7 @@ class RetrieverTestCaseHelper:
     def add_conversation(self, conversation_id, is_closed=False, category="SURVEY"):
         """Populate the conversation table"""
 
-        with self.engine.connect() as con:
+        with self.engine.begin() as con:
             query = (
                 f"INSERT INTO securemessage.conversation(id, is_closed, category) "
                 f"VALUES('{conversation_id}', '{is_closed}', '{category}')"
@@ -74,7 +74,7 @@ class RetrieverTestCaseHelper:
     def add_status(self, label, msg_id, actor):
         """Populate the status table"""
 
-        with self.engine.connect() as con:
+        with self.engine.begin() as con:
             query = f"INSERT INTO securemessage.status(label, msg_id, actor) VALUES('{label}', '{msg_id}', '{actor}')"
             con.execute(text(query))
 
@@ -142,7 +142,7 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
     def test_msg_returned_with_msg_id_true(self):
         """retrieves message using id"""
         self.create_thread(no_of_messages=2)
-        with self.engine.connect() as con:
+        with self.engine.begin() as con:
             query = con.execute(text("SELECT msg_id FROM securemessage.secure_message LIMIT 1"))
             msg_id = query.first()[0]
             with self.app.app_context():
@@ -169,7 +169,7 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
     def test_correct_labels_returned_internal(self):
         """retrieves message using id and checks the labels are correct"""
         self.create_thread()
-        with self.engine.connect() as con:
+        with self.engine.begin() as con:
             query = con.execute(text("SELECT msg_id FROM securemessage.secure_message LIMIT 1"))
             msg_id = query.first()[0]
             with self.app.app_context():
@@ -181,7 +181,7 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
     def test_correct_labels_returned_external(self):
         """retrieves message using id and checks the labels are correct"""
         self.create_thread()
-        with self.engine.connect() as con:
+        with self.engine.begin() as con:
             query = con.execute(text("SELECT msg_id FROM securemessage.secure_message LIMIT 1"))
             msg_id = query.first()[0]
             with self.app.app_context():
@@ -193,7 +193,7 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
     def test_correct_to_and_from_returned_internal_user(self):
         """retrieves message using id and checks the to and from urns are correct"""
         self.create_thread(internal_actor=self.user_internal.user_uuid)
-        with self.engine.connect() as con:
+        with self.engine.begin() as con:
             query = con.execute(text("SELECT msg_id FROM securemessage.secure_message LIMIT 1"))
             msg_id = query.first()[0]
             with self.app.app_context():
@@ -205,7 +205,7 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
     def test_sent_date_returned_for_message(self):
         """retrieves message using id and checks the sent date returned"""
         self.create_thread()
-        with self.engine.connect() as con:
+        with self.engine.begin() as con:
             query = con.execute(text("SELECT msg_id FROM securemessage.secure_message LIMIT 1"))
             msg_id = query.first()[0]
             with self.app.app_context():
@@ -218,7 +218,7 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
     def test_read_date_returned_for_message(self):
         """retrieves message using id and checks the read date returned"""
         self.create_thread(no_of_messages=2, include_read_at=True)
-        with self.engine.connect() as con:
+        with self.engine.begin() as con:
             query = con.execute(text("SELECT msg_id FROM securemessage.secure_message LIMIT 1"))
             msg_id = query.first()[0]
             with self.app.app_context():
