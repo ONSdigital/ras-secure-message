@@ -55,7 +55,8 @@ class Modifier:
             query = "DELETE FROM securemessage.status WHERE label = '{0}' and msg_id = '{1}' and actor = '{2}'".format(
                 label, message["msg_id"], actor
             )
-            db.engine.execute(text(query))
+            with db.engine.begin() as conn:
+                conn.execute(text(query))
             return True
         except Exception as e:
             logger.error("Error removing label from database", msg_id=message, label=label, user_uuid=actor, error=e)

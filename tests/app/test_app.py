@@ -88,7 +88,7 @@ class AppTestCase(unittest.TestCase):
                 )
             )
             self.assertEqual(db_data.rowcount, 1)
-            for row in db_data:
+            for row in db_data.mappings():
                 data = {"subject": row["subject"], "body": row["body"]}
                 self.assertEqual({"subject": "MyMessage", "body": "hello"}, data)
 
@@ -107,7 +107,7 @@ class AppTestCase(unittest.TestCase):
                 )
             )
             self.assertEqual(db_data.rowcount, 1)
-            for row in db_data:
+            for row in db_data.mappings():
                 self.assertEqual(len(row["msg_id"]), 36)
 
     def test_thread_patch_without_content_type_in_header_fails(self):
@@ -215,7 +215,7 @@ class AppTestCase(unittest.TestCase):
                     )
                 )
             )
-            for row in db_data:
+            for row in db_data.mappings():
                 self.assertTrue(row is not None)
 
     def test_message_post_stores_sent_at_correctly_for_message(self):
@@ -227,7 +227,7 @@ class AppTestCase(unittest.TestCase):
 
         with self.engine.begin() as con:
             db_data = con.execute(text(f"SELECT * FROM securemessage.secure_message where msg_id='{data['msg_id']}'"))
-            for row in db_data:
+            for row in db_data.mappings():
                 self.assertTrue(row is not None)
                 self.assertTrue(isinstance(row["sent_at"], datetime.datetime))
 
@@ -246,7 +246,7 @@ class AppTestCase(unittest.TestCase):
                     " AND actor='{1}'".format(data["msg_id"], self.test_message["msg_to"][0])
                 )
             )
-            for row in db_data:
+            for row in db_data.mappings():
                 self.assertTrue(row is not None)
 
     def test_message_post_stores_status_correctly_for_internal_user(self):
@@ -265,7 +265,7 @@ class AppTestCase(unittest.TestCase):
                     )
                 )
             )
-            for row in db_data:
+            for row in db_data.mappings():
                 self.assertTrue(row is not None)
 
     @patch.object(

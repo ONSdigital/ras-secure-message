@@ -60,7 +60,7 @@ class SaverTestCase(unittest.TestCase):
         # WHAT statuses are in the database, not just that is literally anything there
         with self.engine.begin() as con:
             request = con.execute(text("SELECT * FROM securemessage.status"))
-            for row in request:
+            for row in request.mappings():
                 self.assertTrue(row is not None)
             con.close()
 
@@ -71,7 +71,7 @@ class SaverTestCase(unittest.TestCase):
             Saver.save_message(SecureMessage(msg_id=random_uuid, thread_id=random_uuid))
             with self.engine.begin() as con:
                 request = con.execute(text("SELECT * FROM securemessage.conversation"))
-                row = request.fetchone()
+                row = request.mappings().fetchone()
                 # Newly created record should be mostly empty
                 self.assertEqual(row["id"], random_uuid)
                 self.assertFalse(row["is_closed"])
@@ -99,7 +99,7 @@ class SaverTestCase(unittest.TestCase):
 
         with self.engine.begin() as con:
             request = con.execute(text("SELECT * FROM securemessage.secure_message limit 1"))
-            for row in request:
+            for row in request.mappings():
                 self.assertTrue(row is not None)
                 self.assertTrue(row["msg_id"] == "AMsgId")
 
@@ -131,5 +131,5 @@ class SaverTestCase(unittest.TestCase):
             request = con.execute(
                 text("SELECT COUNT(securemessage.secure_message.id) FROM securemessage.secure_message")
             )
-            for row in request:
+            for row in request.mappings():
                 self.assertTrue(row["count"] == 1)
