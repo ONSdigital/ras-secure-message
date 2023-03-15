@@ -17,7 +17,6 @@ from tests.app.test_utilities import get_args
 
 
 class RetrieverTestCaseHelper:
-
     default_internal_actor = "internal_actor"
     second_internal_actor = "second_internal_actor"
     default_external_actor = "external_actor"
@@ -40,7 +39,6 @@ class RetrieverTestCaseHelper:
         sent_at=datetime.utcnow(),
         include_read_at=False,
     ):
-
         """Populate the secure_message table"""
 
         with self.engine.connect() as con:
@@ -385,7 +383,6 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
 
         with self.app.app_context():
             with current_app.test_request_context():
-
                 thread_count_internal = Retriever.thread_count_by_survey(
                     request_args, User(self.default_internal_actor, role="internal")
                 )

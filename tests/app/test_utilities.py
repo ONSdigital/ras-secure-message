@@ -146,7 +146,6 @@ class UtilitiesTestCase(unittest.TestCase):
     business_record = {"id": "f1a5e99c-8edf-489a-9c72-6cabe6c387fc", "name": "Apple"}
 
     def test_get_business_details_with_external_message_first(self):
-
         populated_message = [
             {
                 "body": "Reply body from respondent",
@@ -197,7 +196,6 @@ class UtilitiesTestCase(unittest.TestCase):
             self.assertEqual(result[1], populated_message[1])
 
     def test_get_business_details_with_internal_message_first(self):
-
         populated_message = [
             {
                 "body": "Reply body from internal user",
@@ -250,7 +248,6 @@ class UtilitiesTestCase(unittest.TestCase):
             self.assertEqual(result[1], populated_message[1])
 
     def test_add_from_details_with_external_message_first(self):
-
         populated_message = [
             {
                 "body": "Reply body from respondent",
@@ -317,7 +314,6 @@ class UtilitiesTestCase(unittest.TestCase):
             self.assertEqual(result[1], populated_message[1])
 
     def test_add_from_details_with_internal_message_first(self):
-
         populated_message = [
             {
                 "body": "Reply body from internal user",
@@ -382,7 +378,6 @@ class UtilitiesTestCase(unittest.TestCase):
             self.assertEqual(result[1], populated_message[1])
 
     def test_add_to_details_with_external_message_first(self):
-
         populated_message = [
             {
                 "body": "Reply body from respondent",
@@ -453,7 +448,6 @@ class UtilitiesTestCase(unittest.TestCase):
             self.assertEqual(result[1], populated_message[1])
 
     def test_add_to_details_with_internal_message_first(self):
-
         populated_message = [
             {
                 "body": "Reply body from internal user",
@@ -524,11 +518,9 @@ class UtilitiesTestCase(unittest.TestCase):
             self.assertEqual(result[1], populated_message[1])
 
     def test_add_users_and_business_details_raises_value_error_with_none_value(self):
-
         with self.assertRaises(ValueError):
             add_users_and_business_details(messages=None)
 
     def test_add_users_and_business_details_raises_value_error_with_empty_list(self):
-
         with self.assertRaises(ValueError):
             add_users_and_business_details(messages=[])

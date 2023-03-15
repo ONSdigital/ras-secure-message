@@ -91,7 +91,6 @@ def step_impl_the_at_msg_to_is_set_to_internal_group_user(context):
 
 @then("the at_msg_to is set correctly for internal group for all messages")
 def step_impl_the_at_msg_to_is_set_to_internal_group_user_for_all_messages(context):
-
     expected = {"id": NON_SPECIFIC_INTERNAL_USER, "firstName": "ONS", "lastName": "User", "emailAddress": ""}
     for msg in context.bdd_helper.messages_responses_data[0]["messages"]:
         nose.tools.assert_equal(msg["@msg_to"][0], expected)
