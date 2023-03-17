@@ -3,7 +3,7 @@ import unittest
 from unittest.mock import patch
 
 from flask import json
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, text
 
 from secure_message import application, constants
 from secure_message.api_mocks.party_service_mock import PartyServiceMock
@@ -80,13 +80,15 @@ class AppTestCase(unittest.TestCase):
         response = self.client.post(url, data=json.dumps(data), headers=self.internal_user_header)
         self.assertEqual(response.status_code, 201)  # check post has succeeded
 
-        with self.engine.connect() as con:
+        with self.engine.begin() as con:
             db_data = con.execute(
-                "SELECT * FROM securemessage.secure_message "
-                "WHERE id = (SELECT MAX(id) FROM securemessage.secure_message)"
+                text(
+                    "SELECT * FROM securemessage.secure_message "
+                    "WHERE id = (SELECT MAX(id) FROM securemessage.secure_message)"
+                )
             )
             self.assertEqual(db_data.rowcount, 1)
-            for row in db_data:
+            for row in db_data.mappings():
                 data = {"subject": row["subject"], "body": row["body"]}
                 self.assertEqual({"subject": "MyMessage", "body": "hello"}, data)
 
@@ -97,13 +99,15 @@ class AppTestCase(unittest.TestCase):
 
         self.client.post(url, data=json.dumps(self.test_message), headers=self.internal_user_header)
         engine = create_engine(self.app.config["DATABASE_URL"], echo=True)
-        with engine.connect() as con:
+        with engine.begin() as con:
             db_data = con.execute(
-                "SELECT * FROM securemessage.secure_message "
-                "WHERE id = (SELECT MAX(id) FROM securemessage.secure_message)"
+                text(
+                    "SELECT * FROM securemessage.secure_message "
+                    "WHERE id = (SELECT MAX(id) FROM securemessage.secure_message)"
+                )
             )
             self.assertEqual(db_data.rowcount, 1)
-            for row in db_data:
+            for row in db_data.mappings():
                 self.assertEqual(len(row["msg_id"]), 36)
 
     def test_thread_patch_without_content_type_in_header_fails(self):
@@ -142,12 +146,14 @@ class AppTestCase(unittest.TestCase):
         # Now read back the message to get the thread ID
 
         engine = create_engine(self.app.config["DATABASE_URL"], echo=True)
-        with engine.connect() as con:
+        with engine.begin() as con:
             db_data = con.execute(
-                "SELECT * FROM securemessage.secure_message "
-                "WHERE id = (SELECT MAX(id) FROM securemessage.secure_message)"
+                text(
+                    "SELECT * FROM securemessage.secure_message "
+                    "WHERE id = (SELECT MAX(id) FROM securemessage.secure_message)"
+                )
             )
-            for row in db_data:
+            for row in db_data.mappings():
                 self.test_message["thread_id"] = row["thread_id"]
 
         # Now submit a new message as a reply , Message Id empty , thread id same as last one
@@ -155,13 +161,13 @@ class AppTestCase(unittest.TestCase):
 
         # Now read back the two messages
         original_msg_id = original_thread_id = reply_msg_id = reply_thread_id = ""
-        with engine.connect() as con:
-            request = con.execute("SELECT * FROM securemessage.secure_message ORDER BY id DESC")
-            for row in request:
-                if row[0] == 1:
+        with engine.begin() as con:
+            request = con.execute(text("SELECT * FROM securemessage.secure_message ORDER BY id DESC"))
+            for row in request.mappings():
+                if row["id"] == 1:
                     original_msg_id = row["msg_id"]
                     original_thread_id = row["thread_id"]
-                if row[0] == 2:
+                if row["id"] == 2:
                     reply_msg_id = row["msg_id"]
                     reply_thread_id = row["thread_id"]
 
@@ -201,13 +207,15 @@ class AppTestCase(unittest.TestCase):
         response = self.client.post(url, data=json.dumps(self.test_message), headers=self.internal_user_header)
         data = json.loads(response.data)
 
-        with self.engine.connect() as con:
+        with self.engine.begin() as con:
             db_data = con.execute(
-                "SELECT * FROM securemessage.status WHERE label='SENT' AND msg_id='{0}' AND actor='{1}'".format(
-                    data["msg_id"], self.test_message["survey_id"]
+                text(
+                    "SELECT * FROM securemessage.status WHERE label='SENT' AND msg_id='{0}' AND actor='{1}'".format(
+                        data["msg_id"], self.test_message["survey_id"]
+                    )
                 )
             )
-            for row in db_data:
+            for row in db_data.mappings():
                 self.assertTrue(row is not None)
 
     def test_message_post_stores_sent_at_correctly_for_message(self):
@@ -217,9 +225,9 @@ class AppTestCase(unittest.TestCase):
         response = self.client.post(url, data=json.dumps(self.test_message), headers=self.internal_user_header)
         data = json.loads(response.data)
 
-        with self.engine.connect() as con:
-            db_data = con.execute(f"SELECT * FROM securemessage.secure_message where msg_id='{data['msg_id']}'")
-            for row in db_data:
+        with self.engine.begin() as con:
+            db_data = con.execute(text(f"SELECT * FROM securemessage.secure_message where msg_id='{data['msg_id']}'"))
+            for row in db_data.mappings():
                 self.assertTrue(row is not None)
                 self.assertTrue(isinstance(row["sent_at"], datetime.datetime))
 
@@ -230,13 +238,15 @@ class AppTestCase(unittest.TestCase):
         response = self.client.post(url, data=json.dumps(self.test_message), headers=self.internal_user_header)
         data = json.loads(response.data)
         # dereferencing msg_to for purpose of test
-        with self.engine.connect() as con:
+        with self.engine.begin() as con:
             db_data = con.execute(
-                "SELECT * FROM securemessage.status WHERE "
-                "label='INBOX' OR label='UNREAD' AND msg_id='{0}'"
-                " AND actor='{1}'".format(data["msg_id"], self.test_message["msg_to"][0])
+                text(
+                    "SELECT * FROM securemessage.status WHERE "
+                    "label='INBOX' OR label='UNREAD' AND msg_id='{0}'"
+                    " AND actor='{1}'".format(data["msg_id"], self.test_message["msg_to"][0])
+                )
             )
-            for row in db_data:
+            for row in db_data.mappings():
                 self.assertTrue(row is not None)
 
     def test_message_post_stores_status_correctly_for_internal_user(self):
@@ -246,12 +256,16 @@ class AppTestCase(unittest.TestCase):
         response = self.client.post(url, data=json.dumps(self.test_message), headers=self.internal_user_header)
         data = json.loads(response.data)
 
-        with self.engine.connect() as con:
+        with self.engine.begin() as con:
             db_data = con.execute(
-                "SELECT * FROM securemessage.status WHERE "
-                "msg_id='{0}' AND actor='{1}' AND label='SENT'".format(data["msg_id"], self.test_message["survey_id"])
+                text(
+                    "SELECT * FROM securemessage.status WHERE "
+                    "msg_id='{0}' AND actor='{1}' AND label='SENT'".format(
+                        data["msg_id"], self.test_message["survey_id"]
+                    )
+                )
             )
-            for row in db_data:
+            for row in db_data.mappings():
                 self.assertTrue(row is not None)
 
     @patch.object(

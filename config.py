@@ -58,7 +58,6 @@ class Config:
 
 
 class DevConfig(Config):
-
     JWT_SECRET = os.getenv("JWT_SECRET", "testsecret")
     NOTIFY_VIA_GOV_NOTIFY = os.getenv("NOTIFY_VIA_GOV_NOTIFY", "0")
     NOTIFICATION_TEMPLATE_ID = os.getenv("NOTIFICATION_TEMPLATE_ID", "test_notification_template_id")

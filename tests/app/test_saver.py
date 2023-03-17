@@ -4,7 +4,7 @@ import uuid
 from unittest import mock
 
 from flask import current_app
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, text
 from sqlalchemy.exc import SQLAlchemyError
 
 from secure_message.application import create_app
@@ -58,9 +58,9 @@ class SaverTestCase(unittest.TestCase):
 
         # This is horrible and barely tests anything... needs to be rewritten to test
         # WHAT statuses are in the database, not just that is literally anything there
-        with self.engine.connect() as con:
-            request = con.execute("SELECT * FROM securemessage.status")
-            for row in request:
+        with self.engine.begin() as con:
+            request = con.execute(text("SELECT * FROM securemessage.status"))
+            for row in request.mappings():
                 self.assertTrue(row is not None)
             con.close()
 
@@ -69,9 +69,9 @@ class SaverTestCase(unittest.TestCase):
         with self.app.app_context():
             random_uuid = str(uuid.uuid4())
             Saver.save_message(SecureMessage(msg_id=random_uuid, thread_id=random_uuid))
-            with self.engine.connect() as con:
-                request = con.execute("SELECT * FROM securemessage.conversation")
-                row = request.fetchone()
+            with self.engine.begin() as con:
+                request = con.execute(text("SELECT * FROM securemessage.conversation"))
+                row = request.mappings().fetchone()
                 # Newly created record should be mostly empty
                 self.assertEqual(row["id"], random_uuid)
                 self.assertFalse(row["is_closed"])
@@ -97,9 +97,9 @@ class SaverTestCase(unittest.TestCase):
             with current_app.test_request_context():
                 Saver().save_message(SecureMessage(msg_id="AMsgId", thread_id="AMsgId"))
 
-        with self.engine.connect() as con:
-            request = con.execute("SELECT * FROM securemessage.secure_message limit 1")
-            for row in request:
+        with self.engine.begin() as con:
+            request = con.execute(text("SELECT * FROM securemessage.secure_message limit 1"))
+            for row in request.mappings():
                 self.assertTrue(row is not None)
                 self.assertTrue(row["msg_id"] == "AMsgId")
 
@@ -127,7 +127,9 @@ class SaverTestCase(unittest.TestCase):
                 self.db.create_all()
                 Saver().save_message(self.test_message)
 
-        with self.engine.connect() as con:
-            request = con.execute("SELECT COUNT(securemessage.secure_message.id) FROM securemessage.secure_message")
-            for row in request:
+        with self.engine.begin() as con:
+            request = con.execute(
+                text("SELECT COUNT(securemessage.secure_message.id) FROM securemessage.secure_message")
+            )
+            for row in request.mappings():
                 self.assertTrue(row["count"] == 1)

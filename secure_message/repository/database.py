@@ -59,7 +59,6 @@ class SecureMessage(db.Model):
         from_internal=False,
         read_at=None,
     ):
-
         logger.debug(f"Initialised Secure Message entity: msg_id: {id}")
         self.msg_id = msg_id
         self.subject = subject

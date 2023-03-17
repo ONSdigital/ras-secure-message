@@ -13,7 +13,6 @@ logger = wrap_logger(logging.getLogger(__name__))
 
 
 def authenticate(headers):
-
     if headers.get("Authorization"):
         jwt_token = headers.get("Authorization")
         res = check_jwt(jwt_token)
