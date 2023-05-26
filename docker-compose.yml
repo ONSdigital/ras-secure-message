@@ -2,32 +2,15 @@ version: '2'
 
 services:
   db:
-    image: postgres:9.4
+    image: postgres:9.6
     environment:
-      POSTGRES_PASSWORD: rasmessage
-      POSTGRES_USER: rasmessage
-      POSTGRES_DB: messages
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_USER: postgres
+      POSTGRES_DB: securemessage
     ports:
       - "5432:5432"
     networks:
       - secure
-
-  secure-messaging-api:
-    build: ./
-    environment:
-      DATABASE_URL: postgres://rasmessage:rasmessage@db:5432/messages
-      RAS_SM_PATH: ./
-      JWT_SECRET: testsecret
-      SECURITY_USER_NAME: admin
-      SECURITY_USER_PASSWORD: secret
-      NOTIFICATION_TEMPLATE_ID: test_notification_template_id
-    restart: always
-    depends_on:
-      - db
-    networks:
-      - secure
-    ports:
-      - "5050:5050"
 
 networks:
   secure:

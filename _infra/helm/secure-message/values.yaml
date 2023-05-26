@@ -23,15 +23,15 @@ service:
 resources:
   application:
     requests:
-      memory: "275Mi"
-      cpu: "100m"
+      memory: "300Mi"
+      cpu: "150m"
     limits:
-      memory: "350Mi"
-      cpu: "200m"
+      memory: "375Mi"
+      cpu: "300m"
   proxy:
     requests:
       memory: "64Mi"
-      cpu: "20m"
+      cpu: "30m"
     limits:
       memory: "128Mi"
       cpu: "100m"

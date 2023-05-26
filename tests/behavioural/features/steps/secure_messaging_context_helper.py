@@ -7,8 +7,8 @@ from secure_message.authentication.jwt import encode
 
 
 class SecureMessagingContextHelper:
-    """The bdd test helper is used to pass information between steps . In use it is attached to the context so that we know
-    that the data cannot leak between steps as it can if we use variables declared independently from the context
+    """The bdd test helper is used to pass information between steps . In use it is attached to the context so that we
+    know that the data cannot leak between steps as it can if we use variables declared independently from the context
 
     The message data holds data that will be sent to an endpoint
     single_message_responses_data holds responses regarding a specific message

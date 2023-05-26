@@ -157,7 +157,6 @@ class MessageSchema(Schema):
 
     @post_load
     def make_message(self, data, **kwargs):
-        logger.debug("Build message", data=data)
         return Message(**data)
 
     @staticmethod

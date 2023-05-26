@@ -62,6 +62,10 @@ Ensure there is a postgres instance running on port 5432
 ```bash
 docker run -d -p 5432:5432 --name postgres -e POSTGRES_PASSWORD=postgres -e POSTGRES_DB=postgres -d postgres
 ```
+or you can use the docker-compose.yml file to create postgres
+```bash
+docker-compose up
+```
 
 Run the tests with make
 ```bash
@@ -92,20 +96,20 @@ $ curl http://127.0.0.1:5050/health
 
 Environment variables available for configuration are listed below:
 
-| Environment Variable            | Description                                                   | Default
-|---------------------------------|---------------------------------------------------------------|-------------------------------
-| LOGGING_LEVEL                   | Log level for the application                                 | 'DEBUG'
-| SECURITY_USER_NAME              | Username for basic auth                                       | N/A
-| SECURITY_USER_PASSWORD          | Password for basic auth                                       | N/A
-| JWT_SECRET                      | SECRET used to code JWT                                       | N/A
-| DATABASE_URL                    | Database URI                                                  | postgresql://postgres:postgres@localhost:5432
-| NOTIFICATION_TEMPLATE_ID        | Template id for Gov Notify service                            | N/A
-| NOTIFY_VIA_GOV_NOTIFY           | Toggle for using Gov Notify for notifications                 | '1' (enable Gov Notify email notifications)
-| PARTY_URL                       | URL of the ras-party service                                  | N/A
-| CLIENT_ID                       | ID of the client service in UAA                               | N/A
-| CLIENT_SECRET                   | Password of the client service in UAA                         | N/A
-| UAA_URL                         | URL of a UAA instance                                         | N/A
-| USE_UAA                         | Sets whether a client token should be retrieved               | 1
+| Environment Variable     | Description                                     | Default                                       |
+|--------------------------|-------------------------------------------------|-----------------------------------------------|
+| LOGGING_LEVEL            | Log level for the application                   | 'DEBUG'                                       |
+| SECURITY_USER_NAME       | Username for basic auth                         | N/A                                           |
+| SECURITY_USER_PASSWORD   | Password for basic auth                         | N/A                                           |
+| JWT_SECRET               | SECRET used to code JWT                         | N/A                                           |
+| DATABASE_URL             | Database URI                                    | postgresql://postgres:postgres@localhost:5432 |
+| NOTIFICATION_TEMPLATE_ID | Template id for Gov Notify service              | N/A                                           |
+| NOTIFY_VIA_GOV_NOTIFY    | Toggle for using Gov Notify for notifications   | '1' (enable Gov Notify email notifications)   |
+| PARTY_URL                | URL of the ras-party service                    | N/A                                           |
+| CLIENT_ID                | ID of the client service in UAA                 | N/A                                           |
+| CLIENT_SECRET            | Password of the client service in UAA           | N/A                                           |
+| UAA_URL                  | URL of a UAA instance                           | N/A                                           |
+| USE_UAA                  | Sets whether a client token should be retrieved | 1                                             |
 
 ## Database migrations
 
