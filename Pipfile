@@ -7,7 +7,7 @@ url = "https://pypi.python.org/simple"
 python_version = "3.11"
 
 [packages]
-Flask = "*"
+Flask = "==2.2.5"
 Flask-RESTful = "*"
 Flask-SQLAlchemy = "*"
 Flask-Cors = "*"
