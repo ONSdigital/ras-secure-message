@@ -35,6 +35,7 @@ def step_impl_403_returned(context):
 @then("a not found status code 404 is returned")
 def step_impl_404_returned(context):
     """validate that the status code was 404"""
+    nose.tools.assert_in(str(context.bdd_helper.token_data['party_id']), context.response.text)
     nose.tools.assert_equal(context.response.status_code, 404)
 
 

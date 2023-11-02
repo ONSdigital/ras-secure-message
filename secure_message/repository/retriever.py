@@ -6,7 +6,7 @@ from sqlalchemy import and_, func, or_
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm.exc import NoResultFound
 from structlog import wrap_logger
-from werkzeug.exceptions import Forbidden, InternalServerError
+from werkzeug.exceptions import Forbidden, InternalServerError, NotFound
 
 from secure_message.common.labels import Labels
 from secure_message.common.utilities import set_conversation_type_args
@@ -232,10 +232,7 @@ class Retriever:
             result = SecureMessage.query.filter_by(msg_id=message_id).one()
             if result is None:
                 logger.info("Message ID not found", message_id=message_id)
-                if not user_id:
-                    user_id = NON_SPECIFIC_INTERNAL_USER
-                user_details = InternalUserService.get_default_user_details(user_id)
-                return user_details
+                raise NotFound(description=f"Message with msg_id '{message_id}' does not exist")
         except SQLAlchemyError:
             logger.exception("Error retrieving message from database")
             raise InternalServerError(description="Error retrieving message from database")
@@ -251,12 +248,12 @@ class Retriever:
             result = db_model.query.filter_by(msg_id=message_id).first()
             if result is None:
                 logger.info("Message ID not found", message_id=message_id)
-                if not user.user_id:
+                if not user.user_uuid:
                     user_id = NON_SPECIFIC_INTERNAL_USER
                 else:
-                    user_id = user.user_id
+                    user_id = user.user_uuid
                 user_details = InternalUserService.get_default_user_details(user_id)
-                return user_details
+                raise NotFound(description=f"Default user not found: {user_details}")
         except SQLAlchemyError:
             logger.exception("Error retrieving message from database")
             raise InternalServerError(description="Error retrieving message from database")
@@ -279,12 +276,12 @@ class Retriever:
 
             if not result.all():
                 logger.info("Thread does not exist", thread_id=thread_id, user_id=user.user_uuid)
-                if not user.user_id:
+                if not user.user_uuid:
                     user_id = NON_SPECIFIC_INTERNAL_USER
                 else:
-                    user_id = user.user_id
+                    user_id = user.user_uuid
                 user_details = InternalUserService.get_default_user_details(user_id)
-                return user_details
+                raise NotFound(description=f"Default user not found: {user_details}")
 
             result = result.filter(Status.actor == user.user_uuid).order_by(SecureMessage.id.desc())
 
@@ -319,16 +316,16 @@ class Retriever:
                 )
                 .order_by(Status.id.desc())
             )
-
+            test = result.all()
+            test = test
             if not result.all():
                 logger.info("Thread not retrieved for internal user", thread_id=thread_id)
-                if not user.user_id:
+                if not user.user_uuid:
                     user_id = NON_SPECIFIC_INTERNAL_USER
                 else:
-                    user_id = user.user_id
+                    user_id = user.user_uuid
                 user_details = InternalUserService.get_default_user_details(user_id)
-                return user_details
-
+                raise NotFound(description=f"Default user not found: {user_details}")
         except SQLAlchemyError:
             logger.exception("Error retrieving conversation from database", thread_id=thread_id)
             raise InternalServerError(description=f"Error retrieving conversation '{thread_id}' from database")
