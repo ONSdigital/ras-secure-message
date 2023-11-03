@@ -47,13 +47,13 @@ class InternalUserServiceTestCase(unittest.TestCase):
 
     @requests_mock.mock()
     def test_default_user_returned_if_http_error_403(self, mock_request):
-        NON_CURRENT_USER = "bb7c51c0-96b7-441d-9881-4ad1a3d3d396"
+        FORBIDDEN_USER = "bb7c51c0-96b7-441d-9881-4ad1a3d3d396"
         with self.app.app_context():
             with current_app.test_request_context():
-                uaa_url = f"{current_app.config['UAA_URL']}/Users/{NON_CURRENT_USER}"
+                uaa_url = f"{current_app.config['UAA_URL']}/Users/{FORBIDDEN_USER}"
                 mock_request.get(uaa_url, status_code=403, reason="Forbidden", text="{}")
                 with self.assertRaises(HTTPError):
-                    InternalUserService().get_user_details(NON_CURRENT_USER)
+                    InternalUserService().get_user_details(FORBIDDEN_USER)
 
     @requests_mock.mock()
     def test_default_user_returned_if_http_error_404(self, mock_request):
