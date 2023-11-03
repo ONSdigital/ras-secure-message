@@ -30,12 +30,14 @@ class InternalUserService:
             response.raise_for_status()
             resp_json = response.json()
         except HTTPError:
+            user_details = InternalUserService.get_default_user_details(uuid)
             if response.status_code == 404:
                 logger.info("Failed to get user info", uuid=uuid)
+                return user_details
             else:
                 logger.exception("Failed to get user info", uuid=uuid)
-            user_details = InternalUserService.get_default_user_details(uuid)
-            return user_details
+                raise
+
         except ValueError:
             logger.exception("Failed to decode response JSON", uuid=uuid)
             user_details = InternalUserService.get_default_user_details(uuid)
