@@ -2,8 +2,8 @@ import unittest
 
 import requests_mock
 from flask import current_app
-
 from requests import HTTPError
+
 from secure_message import constants
 from secure_message.application import create_app
 from secure_message.services.internal_user_service import InternalUserService
@@ -27,7 +27,7 @@ class InternalUserServiceTestCase(unittest.TestCase):
             "token_type": "bearer",
             "expires_in": 43199,
             "scope": "clients.read emails.write scim.userids password.write idps.write notifications.write "
-                     "oauth.login scim.write critical_notifications.write",
+            "oauth.login scim.write critical_notifications.write",
             "jti": "705288eea2474641bde364032d465157",
         }
 
@@ -63,7 +63,7 @@ class InternalUserServiceTestCase(unittest.TestCase):
                 uaa_url = f"{current_app.config['UAA_URL']}/Users/{NON_CURRENT_USER}"
                 mock_request.get(uaa_url, status_code=404, reason="Not found", text="{}")
                 response = InternalUserService().get_user_details(NON_CURRENT_USER)
-                self.assertEqual(NON_CURRENT_USER, response['id'])
+                self.assertEqual(NON_CURRENT_USER, response["id"])
 
 
 if __name__ == "__main__":
