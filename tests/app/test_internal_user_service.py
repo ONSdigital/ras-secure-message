@@ -46,24 +46,24 @@ class InternalUserServiceTestCase(unittest.TestCase):
         self.assertEqual(expected, actual)
 
     @requests_mock.mock()
-    def test_default_user_returned_if_http_error_403(self, mock_request):
-        FORBIDDEN_USER = "bb7c51c0-96b7-441d-9881-4ad1a3d3d396"
+    def test_default_user_returned_if_not_http_error_404(self, mock_request):
+        HTTP_ERROR_USER = "bb7c51c0-96b7-441d-9881-4ad1a3d3d396"
         with self.app.app_context():
             with current_app.test_request_context():
-                uaa_url = f"{current_app.config['UAA_URL']}/Users/{FORBIDDEN_USER}"
-                mock_request.get(uaa_url, status_code=403, reason="Forbidden", text="{}")
+                uaa_url = f"{current_app.config['UAA_URL']}/Users/{HTTP_ERROR_USER}"
+                mock_request.get(uaa_url, status_code=401, reason="Forbidden", text="{}")
                 with self.assertRaises(HTTPError):
-                    InternalUserService().get_user_details(FORBIDDEN_USER)
+                    InternalUserService().get_user_details(HTTP_ERROR_USER)
 
     @requests_mock.mock()
     def test_default_user_returned_if_http_error_404(self, mock_request):
-        NON_CURRENT_USER = "bb7c51c0-96b7-441d-9881-4ad1a3d3d396"
+        DELETED_USER = "bb7c51c0-96b7-441d-9881-4ad1a3d3d396"
         with self.app.app_context():
             with current_app.test_request_context():
-                uaa_url = f"{current_app.config['UAA_URL']}/Users/{NON_CURRENT_USER}"
+                uaa_url = f"{current_app.config['UAA_URL']}/Users/{DELETED_USER}"
                 mock_request.get(uaa_url, status_code=404, reason="Not found", text="{}")
-                response = InternalUserService().get_user_details(NON_CURRENT_USER)
-                self.assertEqual(NON_CURRENT_USER, response["id"])
+                response = InternalUserService().get_user_details(DELETED_USER)
+                self.assertEqual(DELETED_USER, response["id"])
 
 
 if __name__ == "__main__":
