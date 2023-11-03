@@ -150,15 +150,13 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
                     response = Retriever.retrieve_message(msg_id, self.user_internal)
                     self.assertEqual(response["msg_id"], msg_id)
 
-    def test_msg_returned_with_default_user_id_and_404(self):
+    def test_msg_returned_with_msg_id_returns_404(self):
         """retrieves message using id that doesn't exist"""
         message_id = "1"
         with self.app.app_context():
             with current_app.test_request_context():
-                with self.assertRaises(NotFound) as not_found:
+                with self.assertRaises(NotFound):
                     Retriever.retrieve_message(message_id, self.user_internal)
-                response = not_found.exception
-                self.assertIn(self.user_internal.user_uuid, response.description)
 
     def test_get_nonexistant_conversation_returns_none(self):
         """retrieves message using id that doesn't exist"""
@@ -254,14 +252,12 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
                 self.assertEqual(len(sent), 6)
                 self.assertListEqual(desc_date, sent)
 
-    def test_thread_returned_with_thread_id_returns_default_user_id_and_404(self):
+    def test_thread_returned_with_thread_id_returns_404(self):
         """retrieves thread using id that doesn't exist"""
         with self.app.app_context():
             with current_app.test_request_context():
-                with self.assertRaises(NotFound) as not_found:
+                with self.assertRaises(NotFound):
                     Retriever.retrieve_thread("anotherThreadId", self.user_respondent)
-                response = not_found.exception
-                self.assertIn(self.user_respondent.user_uuid, response.description)
 
     def test_thread_list_gets_messages_of_specific_category(self):
         """retrieves threads from database for a specific category"""

@@ -25,13 +25,15 @@ class InternalUserService:
             "Authorization": "Bearer " + uaa_token.get("access_token"),
             "Content-Type": "application/json",
         }
-
+        response = requests.get(url, headers=headers)
         try:
-            response = requests.get(url, headers=headers)
             response.raise_for_status()
             resp_json = response.json()
         except HTTPError:
-            logger.exception("Failed to get user info", uuid=uuid)
+            if response.status_code == 404:
+                logger.info("Failed to get user info", uuid=uuid)
+            else:
+                logger.exception("Failed to get user info", uuid=uuid)
             user_details = InternalUserService.get_default_user_details(uuid)
             return user_details
         except ValueError:

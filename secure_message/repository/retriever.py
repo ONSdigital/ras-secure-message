@@ -1,5 +1,4 @@
 import logging
-import uuid
 
 from flask import jsonify
 from sqlalchemy import and_, func, or_
@@ -12,7 +11,6 @@ from secure_message.common.labels import Labels
 from secure_message.common.utilities import set_conversation_type_args
 from secure_message.constants import NON_SPECIFIC_INTERNAL_USER
 from secure_message.repository.database import Conversation, SecureMessage, Status, db
-from secure_message.services.internal_user_service import InternalUserService
 
 logger = wrap_logger(logging.getLogger(__name__))
 
@@ -219,11 +217,10 @@ class Retriever:
         return result
 
     @staticmethod
-    def retrieve_populated_message_object(message_id: str, user_id: uuid) -> SecureMessage:
+    def retrieve_populated_message_object(message_id: str) -> SecureMessage:
         """
         Gets a single message from the secure_message table
 
-        :param user_id: used to return default user id
         :param message_id: The 'msg_id' of the message
         :return: A SecureMessage object containing the data from the database about the message
         """
@@ -248,12 +245,7 @@ class Retriever:
             result = db_model.query.filter_by(msg_id=message_id).first()
             if result is None:
                 logger.info("Message ID not found", message_id=message_id)
-                if not user.user_uuid:
-                    user_id = NON_SPECIFIC_INTERNAL_USER
-                else:
-                    user_id = user.user_uuid
-                user_details = InternalUserService.get_default_user_details(user_id)
-                raise NotFound(description=f"Default user not found: {user_details}")
+                raise NotFound(description=f"Message with msg_id '{message_id}' does not exist")
         except SQLAlchemyError:
             logger.exception("Error retrieving message from database")
             raise InternalServerError(description="Error retrieving message from database")
@@ -266,7 +258,7 @@ class Retriever:
             logger.info("Retrieving messages in thread for respondent", thread_id=thread_id, user_uuid=user.user_uuid)
             return Retriever._retrieve_thread_for_respondent(thread_id, user)
         logger.info("Retrieving messages in thread for internal user", thread_id=thread_id, user_uuid=user.user_uuid)
-        return Retriever._retrieve_thread_for_internal_user(thread_id, user)
+        return Retriever._retrieve_thread_for_internal_user(thread_id)
 
     @staticmethod
     def _retrieve_thread_for_respondent(thread_id, user):
@@ -276,12 +268,7 @@ class Retriever:
 
             if not result.all():
                 logger.info("Thread does not exist", thread_id=thread_id, user_id=user.user_uuid)
-                if not user.user_uuid:
-                    user_id = NON_SPECIFIC_INTERNAL_USER
-                else:
-                    user_id = user.user_uuid
-                user_details = InternalUserService.get_default_user_details(user_id)
-                raise NotFound(description=f"Default user not found: {user_details}")
+                raise NotFound(description=f"Conversation with thread_id '{thread_id}' does not exist")
 
             result = result.filter(Status.actor == user.user_uuid).order_by(SecureMessage.id.desc())
 
@@ -301,7 +288,7 @@ class Retriever:
         return result
 
     @staticmethod
-    def _retrieve_thread_for_internal_user(thread_id: str, user: uuid):
+    def _retrieve_thread_for_internal_user(thread_id: str):
         """returns paginated list of messages for thread id for an internal user"""
 
         try:
@@ -316,16 +303,11 @@ class Retriever:
                 )
                 .order_by(Status.id.desc())
             )
-            test = result.all()
-            test = test
+
             if not result.all():
                 logger.info("Thread not retrieved for internal user", thread_id=thread_id)
-                if not user.user_uuid:
-                    user_id = NON_SPECIFIC_INTERNAL_USER
-                else:
-                    user_id = user.user_uuid
-                user_details = InternalUserService.get_default_user_details(user_id)
-                raise NotFound(description=f"Default user not found: {user_details}")
+                raise NotFound(description=f"Conversation with thread_id {thread_id} not retrieved")
+
         except SQLAlchemyError:
             logger.exception("Error retrieving conversation from database", thread_id=thread_id)
             raise InternalServerError(description=f"Error retrieving conversation '{thread_id}' from database")

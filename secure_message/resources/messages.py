@@ -154,7 +154,7 @@ class MessageById(Resource):
 
         bound_logger.info("Retrieving metadata for thread")
         request_data = request.get_json()
-        message = Retriever.retrieve_populated_message_object(message_id, g.user.user_uuid)
+        message = Retriever.retrieve_populated_message_object(message_id)
         if message is None:
             abort(404)
         self._validate_patch_request(request_data, message)
@@ -193,13 +193,10 @@ class MessageModifyById(Resource):
         action, label = MessageModifyById._validate_request(request_data)
         message = Retriever.retrieve_message(message_id, g.user)
 
-        if "msg_to" in message:
-            if label == Labels.UNREAD.value:
-                resp = MessageModifyById._try_modify_unread(action, message, g.user)
-            else:
-                resp = MessageModifyById._modify_label(action, message, g.user, label)
+        if label == Labels.UNREAD.value:
+            resp = MessageModifyById._try_modify_unread(action, message, g.user)
         else:
-            return message
+            resp = MessageModifyById._modify_label(action, message, g.user, label)
 
         if resp:
             res = jsonify({"status": "ok"})
