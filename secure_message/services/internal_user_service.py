@@ -32,7 +32,7 @@ class InternalUserService:
         except HTTPError:
             user_details = InternalUserService.get_default_user_details(uuid)
             if response.status_code == 404:
-                logger.info("Failed to get user info", uuid=uuid)
+                logger.info("Unable to find user in database", uuid=uuid)
                 return user_details
             else:
                 logger.exception("Failed to get user info", uuid=uuid)
