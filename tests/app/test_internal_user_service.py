@@ -48,7 +48,7 @@ class InternalUserServiceTestCase(unittest.TestCase):
         self.assertEqual(expected, actual)
 
     @requests_mock.mock()
-    def test_default_user_returned_if_http_error_non_404(self, mock_request):
+    def test_http_error_raised_on_user_401(self, mock_request):
         with self.app.app_context():
             uaa_url = f"{current_app.config['UAA_URL']}/Users/{self.user_id}"
             mock_request.get(uaa_url, status_code=401)
@@ -61,7 +61,10 @@ class InternalUserServiceTestCase(unittest.TestCase):
             uaa_url = f"{current_app.config['UAA_URL']}/Users/{self.user_id}"
             mock_request.get(uaa_url, status_code=404)
             response = InternalUserService().get_user_details(self.user_id)
+            response = response
             self.assertEqual(self.user_id, response["id"])
+            self.assertEqual("ONS", response['firstName'])
+            self.assertEqual("User", response['lastName'])
 
 
 if __name__ == "__main__":
