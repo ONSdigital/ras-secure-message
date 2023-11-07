@@ -27,9 +27,11 @@ class InternalUserServiceTestCase(unittest.TestCase):
             "token_type": "bearer",
             "expires_in": 43199,
             "scope": "clients.read emails.write scim.userids password.write idps.write notifications.write "
-            "oauth.login scim.write critical_notifications.write",
+                     "oauth.login scim.write critical_notifications.write",
             "jti": "705288eea2474641bde364032d465157",
         }
+
+    user_id = "bb7c51c0-96b7-441d-9881-4ad1a3d3d396"
 
     def test_results_default_information_returned_for_group_user(self):
         """Test get business details sends a request and returns data"""
@@ -46,24 +48,20 @@ class InternalUserServiceTestCase(unittest.TestCase):
         self.assertEqual(expected, actual)
 
     @requests_mock.mock()
-    def test_default_user_returned_if_not_http_error_404(self, mock_request):
-        HTTP_ERROR_USER = "bb7c51c0-96b7-441d-9881-4ad1a3d3d396"
+    def test_default_user_returned_if_http_error_non_404(self, mock_request):
         with self.app.app_context():
-            with current_app.test_request_context():
-                uaa_url = f"{current_app.config['UAA_URL']}/Users/{HTTP_ERROR_USER}"
-                mock_request.get(uaa_url, status_code=401, reason="Forbidden", text="{}")
-                with self.assertRaises(HTTPError):
-                    InternalUserService().get_user_details(HTTP_ERROR_USER)
+            uaa_url = f"{current_app.config['UAA_URL']}/Users/{self.user_id}"
+            mock_request.get(uaa_url, status_code=401)
+            with self.assertRaises(HTTPError):
+                InternalUserService().get_user_details(self.user_id)
 
     @requests_mock.mock()
     def test_default_user_returned_if_http_error_404(self, mock_request):
-        DELETED_USER = "bb7c51c0-96b7-441d-9881-4ad1a3d3d396"
         with self.app.app_context():
-            with current_app.test_request_context():
-                uaa_url = f"{current_app.config['UAA_URL']}/Users/{DELETED_USER}"
-                mock_request.get(uaa_url, status_code=404, reason="Not found", text="{}")
-                response = InternalUserService().get_user_details(DELETED_USER)
-                self.assertEqual(DELETED_USER, response["id"])
+            uaa_url = f"{current_app.config['UAA_URL']}/Users/{self.user_id}"
+            mock_request.get(uaa_url, status_code=404)
+            response = InternalUserService().get_user_details(self.user_id)
+            self.assertEqual(self.user_id, response["id"])
 
 
 if __name__ == "__main__":
