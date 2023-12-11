@@ -24,6 +24,7 @@ PyJWT = "*"
 requestsdefaulter = "*"
 numpy = "*"
 google-cloud-pubsub = "*"
+werkzeug = "*"
 
 [dev-packages]
 black = "*"
