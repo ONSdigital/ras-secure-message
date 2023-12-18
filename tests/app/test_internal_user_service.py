@@ -27,7 +27,7 @@ class InternalUserServiceTestCase(unittest.TestCase):
             "token_type": "bearer",
             "expires_in": 43199,
             "scope": "clients.read emails.write scim.userids password.write idps.write notifications.write "
-                     "oauth.login scim.write critical_notifications.write",
+            "oauth.login scim.write critical_notifications.write",
             "jti": "705288eea2474641bde364032d465157",
         }
 
@@ -63,8 +63,8 @@ class InternalUserServiceTestCase(unittest.TestCase):
             response = InternalUserService().get_user_details(self.user_id)
             response = response
             self.assertEqual(self.user_id, response["id"])
-            self.assertEqual("ONS", response['firstName'])
-            self.assertEqual("User", response['lastName'])
+            self.assertEqual("ONS", response["firstName"])
+            self.assertEqual("User", response["lastName"])
 
 
 if __name__ == "__main__":
