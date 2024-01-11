@@ -61,3 +61,7 @@ gcp:
 dns:
   enabled: false
   wellKnownPort: 8080
+
+app:
+  config:
+    loggingLevel: "INFO"

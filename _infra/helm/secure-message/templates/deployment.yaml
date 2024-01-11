@@ -185,5 +185,7 @@ spec:
               secretKeyRef:
                 name: secure-message
                 key: client-secret
+          - name: LOGGING_LEVEL
+            value: "{{ .Values.app.config.loggingLevel }}"
           resources:
             {{ toYaml .Values.resources.application | nindent 12 }}
