@@ -15,7 +15,7 @@ class Config:
 
     VERSION = "1.3.0"
     DATABASE_URL = os.getenv("DATABASE_URL", "postgresql://postgres:postgres@localhost:5432")
-    LOGGING_LEVEL = os.getenv("LOGGING_LEVEL", "DEBUG")
+    LOGGING_LEVEL = os.getenv("LOGGING_LEVEL", "INFO")
 
     # EMAIL NOTIFICATION SETTINGS
     NOTIFY_VIA_GOV_NOTIFY = os.getenv("NOTIFY_VIA_GOV_NOTIFY")
@@ -58,6 +58,7 @@ class Config:
 
 
 class DevConfig(Config):
+    LOGGING_LEVEL = os.getenv("LOGGING_LEVEL", "DEBUG")
     JWT_SECRET = os.getenv("JWT_SECRET", "testsecret")
     NOTIFY_VIA_GOV_NOTIFY = os.getenv("NOTIFY_VIA_GOV_NOTIFY", "0")
     NOTIFICATION_TEMPLATE_ID = os.getenv("NOTIFICATION_TEMPLATE_ID", "test_notification_template_id")
