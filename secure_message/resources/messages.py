@@ -57,7 +57,7 @@ class MessageSend(Resource):
         self._message_save(message)
         # listener errors are logged but still a 201 reported
         MessageSend._alert_listeners(message)
-        if not g.user.is_internal:
+        if not g.user.is_internal and post_data["survey_id"]:
             logger.info(
                 "Secure message received from Frontstage",
                 survey_id=post_data["survey_id"],
