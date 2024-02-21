@@ -51,14 +51,13 @@ class MessageSend(Resource):
         self._message_save(message)
         # listener errors are logged but still a 201 reported
         MessageSend._alert_listeners(message)
-        if not g.user.is_internal:
-            logger.info(
-                "Secure message received from Frontstage",
-                survey_id=survey_id,
-                collection_exercise_id=collection_exercise_id,
-                category=category,
-                internal_user=post_data["from_internal"],
-            )
+        logger.info(
+            "Message received",
+            survey_id=survey_id,
+            collection_exercise_id=collection_exercise_id,
+            category=category,
+            internal_user=post_data["from_internal"],
+        )
         return make_response(jsonify({"status": "201", "msg_id": message.msg_id, "thread_id": message.thread_id}), 201)
 
     @staticmethod
