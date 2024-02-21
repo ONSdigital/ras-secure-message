@@ -19,6 +19,7 @@ logger = wrap_logger(logging.getLogger(__name__))
 
 
 class Message:
+
     """Class to hold message attributes"""
 
     def __init__(

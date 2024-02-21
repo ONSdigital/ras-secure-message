@@ -8,6 +8,7 @@ logger = wrap_logger(logging.getLogger(__name__))
 
 
 class MessageSaveException(HTTPException):
+
     """This exception is used when the service fails to save a secure message"""
 
     code = 500

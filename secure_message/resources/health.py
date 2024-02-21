@@ -11,6 +11,7 @@ logger = wrap_logger(logging.getLogger(__name__))
 
 
 class Health(Resource):
+
     """Rest endpoint to provide application general health"""
 
     @staticmethod
@@ -19,6 +20,7 @@ class Health(Resource):
 
 
 class DatabaseHealth(Resource):
+
     """Rest endpoint to provide application database health"""
 
     @staticmethod
@@ -27,6 +29,7 @@ class DatabaseHealth(Resource):
 
 
 class HealthDetails(Resource):
+
     """Rest endpoint to provide application details"""
 
     @staticmethod

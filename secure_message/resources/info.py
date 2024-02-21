@@ -10,6 +10,7 @@ logger = wrap_logger(logging.getLogger(__name__))
 
 
 class Info(Resource):
+
     """Rest endpoint to provide application information"""
 
     @staticmethod
