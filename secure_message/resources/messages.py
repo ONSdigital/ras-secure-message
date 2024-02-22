@@ -33,6 +33,7 @@ class MessageSend(Resource):
             logger.info('Request must set accept content type "application/json" in header.')
         post_data = request.get_json(force=True)
 
+        logger.info("Payload", post_data)
         collection_exercise_id = post_data["collection_exercise_id"] if "collection_exercise_id" in post_data else None
         category = post_data["category"] if "category" in post_data else None
         survey_id = post_data["survey_id"] if "survey_id" in post_data else None
