@@ -36,6 +36,7 @@ class Message:
         exercise_id="",
         from_internal=False,
         category=None,
+        collection_exercise_id=None,
     ):
         self.msg_id = str(uuid.uuid4()) if not msg_id else msg_id  # If empty msg_id assign to a uuid
         self.msg_to = None if not msg_to else msg_to
@@ -49,6 +50,7 @@ class Message:
         self.survey_id = survey_id
         self.from_internal = from_internal
         self.category = category
+        self.collection_exercise_id = collection_exercise_id
 
     def __repr__(self):
         return (
