@@ -80,7 +80,7 @@ class MessageSchema(Schema):
     exercise_id = fields.Str(allow_none=True)
     from_internal = fields.Boolean(allow_none=True)
     category = fields.Str(required=False)
-    collection_exercise_id  = fields.Str(required=False)
+    collection_exercise_id = fields.Str(required=False)
 
     @pre_load
     def check_sent_and_read_date(self, data, **kwargs):
