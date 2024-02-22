@@ -35,7 +35,7 @@ class MessageSend(Resource):
 
         logger.info("Payload: " + str(post_data))
         collection_exercise_id = post_data["collection_exercise_id"] if "collection_exercise_id" in post_data else None
-        logger.info("Collection exercise: " + collection_exercise_id)
+        logger.info("Collection exercise: " + str(collection_exercise_id))
         category = post_data["category"] if "category" in post_data else None
         survey_id = post_data["survey_id"] if "survey_id" in post_data else None
         post_data["from_internal"] = g.user.is_internal

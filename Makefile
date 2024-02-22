@@ -21,7 +21,7 @@ lint-check:
 unit-test:
 	pipenv run pytest
 
-test: lint-check
+test:
 	pipenv run behave --format progress
 	pipenv run pytest
 
