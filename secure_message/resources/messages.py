@@ -33,6 +33,9 @@ class MessageSend(Resource):
             logger.info('Request must set accept content type "application/json" in header.')
         post_data = request.get_json(force=True)
 
+        collection_exercise_id = post_data["collection_exercise_id"] if "collection_exercise_id" in post_data else None
+        category = post_data["category"] if "category" in post_data else None
+        survey_id = post_data["survey_id"] if "survey_id" in post_data else None
         post_data["from_internal"] = g.user.is_internal
         message = self._validate_post_data(post_data)
 
@@ -48,6 +51,13 @@ class MessageSend(Resource):
         self._message_save(message)
         # listener errors are logged but still a 201 reported
         MessageSend._alert_listeners(message)
+        logger.info(
+            "Message received",
+            survey_id=survey_id,
+            collection_exercise_id=collection_exercise_id,
+            category=category,
+            internal_user=post_data["from_internal"],
+        )
         return make_response(jsonify({"status": "201", "msg_id": message.msg_id, "thread_id": message.thread_id}), 201)
 
     @staticmethod
