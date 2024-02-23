@@ -14,6 +14,8 @@ from secure_message.repository.database import Conversation, SecureMessage, Stat
 
 logger = wrap_logger(logging.getLogger(__name__))
 
+THREAD_COUNT_ERROR = "Error retrieving count of threads by survey from database"
+
 
 class Retriever:
     """Created when retrieving messages"""
@@ -30,9 +32,12 @@ class Retriever:
                 .filter(Status.label == "UNREAD")
                 .count()
             )
+        except SQLAlchemyError as e:
+            logger.error(THREAD_COUNT_ERROR, error=e)
+            raise
         except Exception:
-            logger.exception("Error retrieving count of unread messages from database")
-            raise InternalServerError(description="Error retrieving count of unread messages from database")
+            logger.exception(THREAD_COUNT_ERROR)
+            raise InternalServerError(description=THREAD_COUNT_ERROR)
         return result
 
     @staticmethod
@@ -79,8 +84,11 @@ class Retriever:
 
             result = SecureMessage.query.filter(and_(*conditions)).distinct(SecureMessage.msg_id).count()
 
+        except SQLAlchemyError as e:
+            logger.error(THREAD_COUNT_ERROR, error=e)
+            raise
         except Exception as e:
-            logger.error("Error retrieving count of threads by survey from database", error=e)
+            logger.error(THREAD_COUNT_ERROR, error=e)
             raise InternalServerError(description="Error retrieving count of threads from database")
         return result
 
@@ -283,7 +291,7 @@ class Retriever:
 
         except SQLAlchemyError:
             logger.exception("Error retrieving conversation from database")
-            raise InternalServerError(description="Error retrieving conversation from database")
+            raise
 
         return result
 
@@ -310,7 +318,7 @@ class Retriever:
 
         except SQLAlchemyError:
             logger.exception("Error retrieving conversation from database", thread_id=thread_id)
-            raise InternalServerError(description=f"Error retrieving conversation '{thread_id}' from database")
+            raise
 
         return result
 
