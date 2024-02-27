@@ -238,9 +238,12 @@ class Retriever:
             if result is None:
                 logger.info("Message ID not found", message_id=message_id)
                 raise NotFound(description=f"Message with msg_id '{message_id}' does not exist")
-        except SQLAlchemyError:
+        except SQLAlchemyError as e:
+            if e.__class__ == NoResultFound:
+                logger.info("Message ID not found", message_id=message_id)
+                raise NotFound(description=f"Message with msg_id '{message_id}' does not exist")
             logger.exception("Error retrieving message from database")
-            raise InternalServerError(description="Error retrieving message from database")
+            raise
 
         return result
 
@@ -256,7 +259,7 @@ class Retriever:
                 raise NotFound(description=f"Message with msg_id '{message_id}' does not exist")
         except SQLAlchemyError:
             logger.exception("Error retrieving message from database")
-            raise InternalServerError(description="Error retrieving message from database")
+            raise
 
         return result.serialize(user)
 
@@ -293,7 +296,7 @@ class Retriever:
             logger.exception("Error retrieving conversation from database")
             raise
 
-        return result
+        return result.all()
 
     @staticmethod
     def _retrieve_thread_for_internal_user(thread_id: str):
@@ -310,9 +313,9 @@ class Retriever:
                     )
                 )
                 .order_by(Status.id.desc())
-            )
+            ).all()
 
-            if not result.all():
+            if not result:
                 logger.info("Thread not retrieved for internal user", thread_id=thread_id)
                 raise NotFound(description=f"Conversation with thread_id {thread_id} not retrieved")
 

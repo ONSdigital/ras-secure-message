@@ -1,6 +1,6 @@
 import logging
 
-from flask import abort, g, jsonify, make_response, request
+from flask import g, jsonify, make_response, request
 from flask_restful import Resource
 from marshmallow import ValidationError
 from sqlalchemy.exc import SQLAlchemyError
@@ -40,7 +40,7 @@ class ThreadById(Resource):
 
         logger.info("Successfully retrieved messages from thread", thread_id=thread_id, user_uuid=g.user.user_uuid)
         messages = []
-        for message in conversation.all():
+        for message in conversation:
             msg = message.serialize(g.user, body_summary=False)
             messages.append(msg)
 
@@ -62,23 +62,27 @@ class ThreadById(Resource):
         """Modify conversation metadata"""
         bound_logger = logger.bind(thread_id=thread_id, user_uuid=g.user.user_uuid)
         bound_logger.info("Validating request")
+
         if not g.user.is_internal:
             bound_logger.info("Thread modification is forbidden")
-            abort(403)
+            return make_response(
+                jsonify({"title": THREAD_SERVICE_ERROR, "message": "Thread modification is forbidden"}), 403
+            )
+
         if request.headers.get("Content-Type", "").lower() != "application/json":
             bound_logger.info('Request must set accept content type "application/json" in header.')
             raise BadRequest(description='Request must set accept content type "application/json" in header.')
 
         bound_logger.info("Retrieving metadata for thread")
         request_data = request.get_json()
-        conversation = Retriever.retrieve_conversation_metadata(thread_id)
-
-        if conversation is None:
-            abort(404)
-        ThreadById._validate_patch_request(request_data, conversation)
-
-        bound_logger.info("Attempting to modify metadata for thread")
         try:
+            conversation = Retriever.retrieve_conversation_metadata(thread_id)
+
+            if conversation is None:
+                return make_response(jsonify({"title": THREAD_SERVICE_ERROR, "message": "Thread not found"}), 404)
+            ThreadById._validate_patch_request(request_data, conversation)
+
+            bound_logger.info("Attempting to modify metadata for thread")
             Modifier.patch_conversation(request_data, conversation)
 
             if request_data.get("is_closed") is not None:

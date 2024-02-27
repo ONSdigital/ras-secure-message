@@ -1,6 +1,6 @@
 import logging
 
-from flask import abort, current_app, g, jsonify, make_response, request
+from flask import current_app, g, jsonify, make_response, request
 from flask_restful import Resource
 from marshmallow import ValidationError
 from sqlalchemy.exc import SQLAlchemyError
@@ -153,20 +153,22 @@ class MessageById(Resource):
         bound_logger.info("Validating request")
         if not g.user.is_internal:
             bound_logger.info("Message modification is forbidden")
-            abort(403)
+            return make_response(
+                jsonify({"title": MESSAGES_SERVICE_ERROR, "message": "Message modification is forbidden"}), 403
+            )
+
         if request.headers.get("Content-Type", "").lower() != "application/json":
             bound_logger.info('Request must set accept content type "application/json" in header.')
             raise BadRequest(description='Request must set accept content type "application/json" in header.')
 
         bound_logger.info("Retrieving metadata for thread")
         request_data = request.get_json()
-        message = Retriever.retrieve_populated_message_object(message_id)
-        if message is None:
-            abort(404)
-        self._validate_patch_request(request_data, message)
-
-        bound_logger.info("Attempting to modify data for message")
         try:
+            message = Retriever.retrieve_populated_message_object(message_id)
+            if message is None:
+                return make_response(jsonify({"title": MESSAGES_SERVICE_ERROR, "message": "Message not found"}), 404)
+            self._validate_patch_request(request_data, message)
+            bound_logger.info("Attempting to modify data for message")
             Modifier.patch_message(request_data, message)
         except SQLAlchemyError as e:
             return make_response(jsonify({"title": MESSAGES_SERVICE_ERROR, "detail": e.__class__.__name__}), 500)
@@ -197,7 +199,6 @@ class MessageModifyById(Resource):
     @staticmethod
     def put(message_id):
         """Update message by status"""
-
         request_data = request.get_json()
         action, label = MessageModifyById._validate_request(request_data)
         message = Retriever.retrieve_message(message_id, g.user)

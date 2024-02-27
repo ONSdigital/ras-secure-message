@@ -121,7 +121,7 @@ class Modifier:
         except SQLAlchemyError:
             db.session.rollback()
             logger.exception("Error marking thread as read", thread_id=thread_id)
-            raise InternalServerError(description="Error marking thread as read")
+            raise
 
     @staticmethod
     def _mark_read(message, user):
@@ -137,7 +137,7 @@ class Modifier:
             except SQLAlchemyError:
                 db.session.rollback()
                 logger.exception("Error adding read information to message", msg_id=message["msg_id"])
-                raise InternalServerError(description="Error adding read information to message")
+                raise
         Modifier.remove_label(unread, message, user)
 
     @staticmethod
@@ -184,7 +184,8 @@ class Modifier:
                         setattr(message, key, request_data[key])
 
             db.session.commit()
-        except SQLAlchemyError:
+        except SQLAlchemyError as e:
+            print(e)
             db.session.rollback()
             bound_logger.exception("Database error occurred while patching message")
             raise
