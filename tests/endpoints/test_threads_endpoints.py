@@ -1,3 +1,4 @@
+import json
 import unittest
 from unittest.mock import patch
 
@@ -110,7 +111,10 @@ class TestThreadsEndpoints(unittest.TestCase):
         response = self.client.patch(url, json=payload, headers=self.internal_user_header)
 
         self.assertEqual(500, response.status_code)
-        self.assertIn(self.SQL_ERROR.encode(), response.data)
+        self.assertEqual(
+            {"detail": "SQLAlchemyError", "title": "Database error when modifying thread"},
+            json.loads(response.get_data()),
+        )
 
     @patch("secure_message.repository.modifier.Modifier.patch_conversation")
     @patch("secure_message.repository.retriever.Retriever.retrieve_conversation_metadata")
@@ -125,7 +129,10 @@ class TestThreadsEndpoints(unittest.TestCase):
         response = self.client.patch(url, json=payload, headers=self.internal_user_header)
 
         self.assertEqual(500, response.status_code)
-        self.assertIn(self.SQL_ERROR.encode(), response.data)
+        self.assertEqual(
+            {"detail": "SQLAlchemyError", "title": "Database error when modifying thread"},
+            json.loads(response.get_data()),
+        )
 
     @patch("secure_message.repository.modifier.Modifier.close_conversation")
     @patch("secure_message.repository.retriever.Retriever.retrieve_conversation_metadata")
@@ -140,7 +147,10 @@ class TestThreadsEndpoints(unittest.TestCase):
         response = self.client.patch(url, json=payload, headers=self.internal_user_header)
 
         self.assertEqual(500, response.status_code)
-        self.assertIn(self.SQL_ERROR.encode(), response.data)
+        self.assertEqual(
+            {"detail": "SQLAlchemyError", "title": "Database error when modifying thread"},
+            json.loads(response.get_data()),
+        )
 
     @patch("secure_message.repository.modifier.Modifier.open_conversation")
     @patch("secure_message.repository.retriever.Retriever.retrieve_conversation_metadata")
@@ -155,7 +165,10 @@ class TestThreadsEndpoints(unittest.TestCase):
         response = self.client.patch(url, json=payload, headers=self.internal_user_header)
 
         self.assertEqual(500, response.status_code)
-        self.assertIn(self.SQL_ERROR.encode(), response.data)
+        self.assertEqual(
+            {"detail": "SQLAlchemyError", "title": "Database error when modifying thread"},
+            json.loads(response.get_data()),
+        )
 
     @patch("secure_message.repository.retriever.Retriever.retrieve_thread")
     @patch("secure_message.repository.retriever.Retriever.retrieve_conversation_metadata")
@@ -170,7 +183,10 @@ class TestThreadsEndpoints(unittest.TestCase):
         response = self.client.patch(url, json=payload, headers=self.internal_user_header)
 
         self.assertEqual(500, response.status_code)
-        self.assertIn(self.SQL_ERROR.encode(), response.data)
+        self.assertEqual(
+            {"detail": "SQLAlchemyError", "title": "Database error when modifying thread"},
+            json.loads(response.get_data()),
+        )
 
     @patch("secure_message.repository.database.SecureMessage.serialize")
     @patch("secure_message.repository.modifier.Modifier.add_unread")
@@ -189,7 +205,9 @@ class TestThreadsEndpoints(unittest.TestCase):
         response = self.client.patch(url, json=payload, headers=self.internal_user_header)
 
         self.assertEqual(500, response.status_code)
-        self.assertIn(self.SQL_ERROR.encode(), response.data)
+        self.assertEqual(
+            {"detail": "SQLAlchemyError", "title": "Database error when modifying thread"}, json.loads(response.data)
+        )
 
     @patch("secure_message.repository.modifier.Modifier.patch_message")
     @patch("secure_message.repository.modifier.Modifier.add_unread")
@@ -215,4 +233,7 @@ class TestThreadsEndpoints(unittest.TestCase):
         response = self.client.patch(url, json=payload, headers=self.internal_user_header)
 
         self.assertEqual(500, response.status_code)
-        self.assertIn(self.SQL_ERROR.encode(), response.data)
+        self.assertEqual(
+            {"detail": "SQLAlchemyError", "title": "Database error when modifying thread"},
+            json.loads(response.get_data()),
+        )

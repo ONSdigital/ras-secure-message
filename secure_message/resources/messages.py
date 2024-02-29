@@ -20,8 +20,6 @@ from secure_message.validation.domain import Message, MessagePatch, MessageSchem
 
 logger = wrap_logger(logging.getLogger(__name__))
 
-MESSAGES_SERVICE_ERROR = "Messages service error"
-
 """Rest endpoint for message resources."""
 
 
@@ -51,7 +49,9 @@ class MessageSend(Resource):
         try:
             self._message_save(message)
         except MessageSaveException as e:
-            return make_response(jsonify({"title": MESSAGES_SERVICE_ERROR, "detail": e.__class__.__name__}), 500)
+            return make_response(
+                jsonify({"title": "Message save error when sending a message", "detail": e.__class__.__name__}), 500
+            )
         # listener errors are logged but still a 201 reported
         MessageSend._alert_listeners(message)
         return make_response(jsonify({"status": "201", "msg_id": message.msg_id, "thread_id": message.thread_id}), 201)
@@ -154,7 +154,7 @@ class MessageById(Resource):
         if not g.user.is_internal:
             bound_logger.info("Message modification is forbidden")
             return make_response(
-                jsonify({"title": MESSAGES_SERVICE_ERROR, "message": "Message modification is forbidden"}), 403
+                jsonify({"title": "Error when modifying message", "message": "Message modification is forbidden"}), 403
             )
 
         if request.headers.get("Content-Type", "").lower() != "application/json":
@@ -166,12 +166,16 @@ class MessageById(Resource):
         try:
             message = Retriever.retrieve_populated_message_object(message_id)
             if message is None:
-                return make_response(jsonify({"title": MESSAGES_SERVICE_ERROR, "message": "Message not found"}), 404)
+                return make_response(
+                    jsonify({"title": "Error when modifying message", "message": "Message not found"}), 404
+                )
             self._validate_patch_request(request_data, message)
             bound_logger.info("Attempting to modify data for message")
             Modifier.patch_message(request_data, message)
         except SQLAlchemyError as e:
-            return make_response(jsonify({"title": MESSAGES_SERVICE_ERROR, "detail": e.__class__.__name__}), 500)
+            return make_response(
+                jsonify({"title": "Database error when modifying message", "detail": e.__class__.__name__}), 500
+            )
 
         bound_logger.info("Message data update successful")
         bound_logger.unbind("message_id", "user_uuid")
@@ -209,7 +213,9 @@ class MessageModifyById(Resource):
             else:
                 resp = MessageModifyById._modify_label(action, message, g.user, label)
         except SQLAlchemyError as e:
-            return make_response(jsonify({"title": MESSAGES_SERVICE_ERROR, "detail": e.__class__.__name__}), 500)
+            return make_response(
+                jsonify({"title": "Database error when updating message status", "detail": e.__class__.__name__}), 500
+            )
 
         if resp:
             return make_response(jsonify({"status": "ok"}), 200)

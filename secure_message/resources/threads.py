@@ -66,7 +66,7 @@ class ThreadById(Resource):
         if not g.user.is_internal:
             bound_logger.info("Thread modification is forbidden")
             return make_response(
-                jsonify({"title": THREAD_SERVICE_ERROR, "message": "Thread modification is forbidden"}), 403
+                jsonify({"title": "Error when modifying thread", "message": "Thread modification is forbidden"}), 403
             )
 
         if request.headers.get("Content-Type", "").lower() != "application/json":
@@ -79,7 +79,9 @@ class ThreadById(Resource):
             conversation = Retriever.retrieve_conversation_metadata(thread_id)
 
             if conversation is None:
-                return make_response(jsonify({"title": THREAD_SERVICE_ERROR, "message": "Thread not found"}), 404)
+                return make_response(
+                    jsonify({"title": "Error when modifying thread", "message": "Thread not found"}), 404
+                )
             ThreadById._validate_patch_request(request_data, conversation)
 
             bound_logger.info("Attempting to modify metadata for thread")
@@ -107,7 +109,9 @@ class ThreadById(Resource):
                             Modifier.add_unread(most_recent_message, g.user)
                             Modifier.patch_message({"read_at": None}, full_conversation[0])
         except SQLAlchemyError as e:
-            return make_response(jsonify({"title": THREAD_SERVICE_ERROR, "detail": e.__class__.__name__}), 500)
+            return make_response(
+                jsonify({"title": "Database error when modifying thread", "detail": e.__class__.__name__}), 500
+            )
 
         bound_logger.info("Thread metadata update successful")
         bound_logger.unbind("thread_id", "user_uuid")
@@ -155,7 +159,9 @@ class ThreadList(Resource):
         try:
             result = Retriever.retrieve_thread_list(g.user, message_args)
         except SQLAlchemyError as e:
-            return make_response(jsonify({"title": THREAD_SERVICE_ERROR, "detail": e.__class__.__name__}), 500)
+            return make_response(
+                jsonify({"title": "Database error when getting thread list", "detail": e.__class__.__name__}), 500
+            )
 
         logger.info("Successfully retrieved threads for user", user_uuid=g.user.user_uuid)
         messages, links = process_paginated_list(result, request.host_url, g.user, message_args, THREAD_LIST_ENDPOINT)
@@ -197,4 +203,6 @@ class ThreadCounter(Resource):
 
             return jsonify(total=Retriever.thread_count_by_survey(message_args, g.user))
         except SQLAlchemyError as e:
-            return make_response(jsonify({"title": THREAD_SERVICE_ERROR, "detail": e.__class__.__name__}), 500)
+            return make_response(
+                jsonify({"title": "Database error when getting thread counts", "detail": e.__class__.__name__}), 500
+            )

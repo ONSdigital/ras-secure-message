@@ -131,7 +131,7 @@ class AppTestCase(unittest.TestCase):
         self.assertEqual(response.status_code, 403)
         self.assertEqual(
             json.loads(response.get_data()),
-            {"message": "Thread modification is forbidden", "title": "Thread service error"},
+            {"message": "Thread modification is forbidden", "title": "Error when modifying thread"},
         )
 
     def test_reply_to_existing_message_has_same_thread_id_and_different_message_id_as_original(self):

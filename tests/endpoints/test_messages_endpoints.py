@@ -62,7 +62,10 @@ class TestMessagesEndpoints(unittest.TestCase):
         response = self.client.post(url, data=json.dumps(self.test_message), headers=self.internal_user_header)
 
         self.assertEqual(500, response.status_code)
-        self.assertIn("Messages service error".encode(), response.data)
+        self.assertEqual(
+            {"detail": "MessageSaveException", "title": "Message save error when sending a message"},
+            json.loads(response.get_data()),
+        )
 
     @patch("secure_message.repository.retriever.Retriever.retrieve_populated_message_object")
     def test_message_patch_retrieval_raises_sql_exception(self, mock_retrieve_message):
@@ -74,8 +77,10 @@ class TestMessagesEndpoints(unittest.TestCase):
         }
         response = self.client.patch(url, json=payload, headers=self.internal_user_header)
         self.assertEqual(response.status_code, 500)
-        self.assertIn("SQLAlchemyError".encode(), response.data)
-        self.assertIn("Messages service error".encode(), response.data)
+        self.assertEqual(
+            {"detail": "SQLAlchemyError", "title": "Database error when modifying message"},
+            json.loads(response.get_data()),
+        )
 
     @patch("secure_message.repository.modifier.Modifier.patch_message")
     @patch("secure_message.repository.retriever.Retriever.retrieve_populated_message_object")
@@ -95,8 +100,10 @@ class TestMessagesEndpoints(unittest.TestCase):
         url = "http://localhost:5050/messages/f1a5e99c-8edf-489a-9c72-6cabe6c387fc"
         response = self.client.patch(url, data=json.dumps({"is_closed": True}), headers=self.internal_user_header)
         self.assertEqual(response.status_code, 500)
-        self.assertIn("SQLAlchemyError".encode(), response.data)
-        self.assertIn("Messages service error".encode(), response.data)
+        self.assertEqual(
+            {"detail": "SQLAlchemyError", "title": "Database error when modifying message"},
+            json.loads(response.get_data()),
+        )
 
     @patch("secure_message.repository.retriever.Retriever.retrieve_message")
     @patch("secure_message.repository.modifier.Modifier.add_unread")
@@ -109,7 +116,10 @@ class TestMessagesEndpoints(unittest.TestCase):
         data = {"label": "UNREAD", "action": "add"}
         response = self.client.put(url, json=data, headers=self.internal_user_header)
         self.assertEqual(response.status_code, 500)
-        self.assertIn("Messages service error".encode(), response.data)
+        self.assertEqual(
+            {"detail": "SQLAlchemyError", "title": "Database error when updating message status"},
+            json.loads(response.get_data()),
+        )
 
     @patch("secure_message.repository.retriever.Retriever.retrieve_message")
     @patch("secure_message.repository.modifier.Modifier.mark_message_as_read")
@@ -122,4 +132,7 @@ class TestMessagesEndpoints(unittest.TestCase):
         data = {"label": "UNREAD", "action": "remove"}
         response = self.client.put(url, json=data, headers=self.internal_user_header)
         self.assertEqual(response.status_code, 500)
-        self.assertIn("Messages service error".encode(), response.data)
+        self.assertEqual(
+            {"detail": "SQLAlchemyError", "title": "Database error when updating message status"},
+            json.loads(response.get_data()),
+        )

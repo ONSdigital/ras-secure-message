@@ -33,11 +33,11 @@ class Retriever:
                 .count()
             )
         except SQLAlchemyError as e:
-            logger.error(THREAD_COUNT_ERROR, error=e)
+            logger.error("Database error when getting unread message count", error=e)
             raise
         except Exception:
-            logger.exception(THREAD_COUNT_ERROR)
-            raise InternalServerError(description=THREAD_COUNT_ERROR)
+            logger.exception("Unknown error when getting unread message count")
+            raise InternalServerError(description="Unknown error when getting unread message count")
         return result
 
     @staticmethod
@@ -85,11 +85,11 @@ class Retriever:
             result = SecureMessage.query.filter(and_(*conditions)).distinct(SecureMessage.msg_id).count()
 
         except SQLAlchemyError as e:
-            logger.error(THREAD_COUNT_ERROR, error=e)
+            logger.error("Database error when getting thread count by survey", error=e)
             raise
         except Exception as e:
-            logger.error(THREAD_COUNT_ERROR, error=e)
-            raise InternalServerError(description="Error retrieving count of threads from database")
+            logger.error("Unknown error when getting thread count by survey", error=e)
+            raise InternalServerError(description="Unknown error when getting thread count by survey")
         return result
 
     @staticmethod
@@ -161,8 +161,8 @@ class Retriever:
             )
 
         except SQLAlchemyError:
-            logger.exception("Error retrieving messages from database")
-            raise InternalServerError(description="Error retrieving messages from database")
+            logger.exception("Database error when retrieving respondent thread list")
+            raise
 
         return result
 
@@ -219,8 +219,8 @@ class Retriever:
             )
 
         except SQLAlchemyError:
-            logger.exception("Error retrieving messages from database")
-            raise InternalServerError(description="Error retrieving messages from database")
+            logger.exception("Database error when retrieving internal thread list")
+            raise
 
         return result
 
@@ -293,7 +293,7 @@ class Retriever:
                 )
 
         except SQLAlchemyError:
-            logger.exception("Error retrieving conversation from database")
+            logger.exception("Database error when retrieving respondent conversation from database")
             raise
 
         return result.all()
@@ -320,7 +320,9 @@ class Retriever:
                 raise NotFound(description=f"Conversation with thread_id {thread_id} not retrieved")
 
         except SQLAlchemyError:
-            logger.exception("Error retrieving conversation from database", thread_id=thread_id)
+            logger.exception(
+                "Database error when retrieving respondent conversation from database", thread_id=thread_id
+            )
             raise
 
         return result
