@@ -14,8 +14,6 @@ from secure_message.repository.database import Conversation, SecureMessage, Stat
 
 logger = wrap_logger(logging.getLogger(__name__))
 
-THREAD_COUNT_ERROR = "Error retrieving count of threads by survey from database"
-
 
 class Retriever:
     """Created when retrieving messages"""

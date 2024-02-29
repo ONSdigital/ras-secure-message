@@ -19,8 +19,6 @@ from secure_message.validation.thread import ThreadPatch
 
 logger = wrap_logger(logging.getLogger(__name__))
 
-THREAD_SERVICE_ERROR = "Thread service error"
-
 
 class ThreadById(Resource):
     """Return list of messages in a thread for user"""
