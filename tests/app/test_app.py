@@ -129,11 +129,10 @@ class AppTestCase(unittest.TestCase):
         url = "http://localhost:5050/threads/f1a5e99c-8edf-489a-9c72-6cabe6c387fc"
         response = self.client.patch(url, data=json.dumps({"is_closed": True}), headers=self.external_user_header)
         self.assertEqual(response.status_code, 403)
-        error_message = (
-            "You don't have the permission to access the requested resource. "
-            "It is either read-protected or not readable by the server."
+        self.assertEqual(
+            json.loads(response.get_data()),
+            {"message": "Thread modification is forbidden", "title": "Error when modifying thread"},
         )
-        self.assertEqual(json.loads(response.get_data()), {"message": error_message})
 
     def test_reply_to_existing_message_has_same_thread_id_and_different_message_id_as_original(self):
         """check a reply gets same thread id as original"""

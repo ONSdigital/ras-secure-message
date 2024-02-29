@@ -41,6 +41,16 @@ class Modifier:
             session.add(status)
             session.commit()
             return True
+        except SQLAlchemyError as e:
+            session.rollback()
+            logger.error(
+                "Database error while adding label to status table",
+                msg_id=message["msg_id"],
+                label=label,
+                user_id=actor,
+                error=e.__class__.__name__,
+            )
+            raise
         except Exception as e:
             session.rollback()
             logger.error("Error adding label to database", msg_id=message, label=label, user_uuid=actor, error=e)
@@ -111,7 +121,7 @@ class Modifier:
         except SQLAlchemyError:
             db.session.rollback()
             logger.exception("Error marking thread as read", thread_id=thread_id)
-            raise InternalServerError(description="Error marking thread as read")
+            raise
 
     @staticmethod
     def _mark_read(message, user):
@@ -127,7 +137,7 @@ class Modifier:
             except SQLAlchemyError:
                 db.session.rollback()
                 logger.exception("Error adding read information to message", msg_id=message["msg_id"])
-                raise InternalServerError(description="Error adding read information to message")
+                raise
         Modifier.remove_label(unread, message, user)
 
     @staticmethod
@@ -153,7 +163,7 @@ class Modifier:
         except SQLAlchemyError:
             db.session.rollback()
             bound_logger.exception("Database error occurred while opening conversation")
-            raise InternalServerError(description="Database error occurred while opening conversation")
+            raise
 
     @staticmethod
     def patch_message(request_data: dict, message: SecureMessage):
@@ -174,10 +184,11 @@ class Modifier:
                         setattr(message, key, request_data[key])
 
             db.session.commit()
-        except SQLAlchemyError:
+        except SQLAlchemyError as e:
+            print(e)
             db.session.rollback()
             bound_logger.exception("Database error occurred while patching message")
-            raise InternalServerError(description="Database error occurred while patching message")
+            raise
 
     @staticmethod
     def close_conversation(metadata: Conversation, user):
@@ -197,7 +208,7 @@ class Modifier:
         except SQLAlchemyError:
             db.session.rollback()
             bound_logger.exception("Database error occurred while closing conversation")
-            raise InternalServerError(description="Database error occurred while closing conversation")
+            raise
 
         bound_logger.info("Successfully closed conversation")
         bound_logger.unbind("conversation_id", "user_id")
@@ -216,7 +227,7 @@ class Modifier:
         except SQLAlchemyError:
             db.session.rollback()
             bound_logger.exception("Database error occured while opening conversation")
-            raise InternalServerError(description="Database error occured while opening conversation")
+            raise
 
         bound_logger.info("Successfully re-opened conversation")
         bound_logger.unbind("conversation_id", "user_id")

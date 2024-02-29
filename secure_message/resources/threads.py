@@ -1,8 +1,9 @@
 import logging
 
-from flask import abort, g, jsonify, request
+from flask import g, jsonify, make_response, request
 from flask_restful import Resource
 from marshmallow import ValidationError
+from sqlalchemy.exc import SQLAlchemyError
 from structlog import wrap_logger
 from werkzeug.exceptions import BadRequest
 
@@ -27,12 +28,17 @@ class ThreadById(Resource):
         """Get messages by thread id"""
         logger.info("Getting messages from thread", thread_id=thread_id, user_uuid=g.user.user_uuid)
 
-        conversation = Retriever.retrieve_thread(thread_id, g.user)
-        conversation_metadata = Retriever.retrieve_conversation_metadata(thread_id)
+        try:
+            conversation = Retriever.retrieve_thread(thread_id, g.user)
+            conversation_metadata = Retriever.retrieve_conversation_metadata(thread_id)
+        except SQLAlchemyError:
+            return make_response(
+                jsonify({"message": "Database error while retrieving message thread", "thread_id": thread_id}), 500
+            )
 
         logger.info("Successfully retrieved messages from thread", thread_id=thread_id, user_uuid=g.user.user_uuid)
         messages = []
-        for message in conversation.all():
+        for message in conversation:
             msg = message.serialize(g.user, body_summary=False)
             messages.append(msg)
 
@@ -54,45 +60,56 @@ class ThreadById(Resource):
         """Modify conversation metadata"""
         bound_logger = logger.bind(thread_id=thread_id, user_uuid=g.user.user_uuid)
         bound_logger.info("Validating request")
+
         if not g.user.is_internal:
             bound_logger.info("Thread modification is forbidden")
-            abort(403)
+            return make_response(
+                jsonify({"title": "Error when modifying thread", "message": "Thread modification is forbidden"}), 403
+            )
+
         if request.headers.get("Content-Type", "").lower() != "application/json":
             bound_logger.info('Request must set accept content type "application/json" in header.')
             raise BadRequest(description='Request must set accept content type "application/json" in header.')
 
         bound_logger.info("Retrieving metadata for thread")
         request_data = request.get_json()
-        conversation = Retriever.retrieve_conversation_metadata(thread_id)
+        try:
+            conversation = Retriever.retrieve_conversation_metadata(thread_id)
 
-        if conversation is None:
-            abort(404)
-        ThreadById._validate_patch_request(request_data, conversation)
+            if conversation is None:
+                return make_response(
+                    jsonify({"title": "Error when modifying thread", "message": "Thread not found"}), 404
+                )
+            ThreadById._validate_patch_request(request_data, conversation)
 
-        bound_logger.info("Attempting to modify metadata for thread")
-        Modifier.patch_conversation(request_data, conversation)
+            bound_logger.info("Attempting to modify metadata for thread")
+            Modifier.patch_conversation(request_data, conversation)
 
-        if request_data.get("is_closed") is not None:
-            if request_data.get("is_closed"):
-                bound_logger.info("About to close conversation")
-                Modifier.close_conversation(conversation, g.user)
-            else:
-                bound_logger.info("About to re-open conversation")
-                Modifier.open_conversation(conversation, g.user)
-        else:  # If anything changes in a thread that isn't is_closed, mark as unread
-            bound_logger.info("Marking thread as unread after thread data change")
-            full_conversation = Retriever.retrieve_thread(thread_id, g.user)
+            if request_data.get("is_closed") is not None:
+                if request_data.get("is_closed"):
+                    bound_logger.info("About to close conversation")
+                    Modifier.close_conversation(conversation, g.user)
+                else:
+                    bound_logger.info("About to re-open conversation")
+                    Modifier.open_conversation(conversation, g.user)
+            else:  # If anything changes in a thread that isn't is_closed, mark as unread
+                bound_logger.info("Marking thread as unread after thread data change")
+                full_conversation = Retriever.retrieve_thread(thread_id, g.user)
 
-            # First message in the list is always the most recent due to retrieve_thread ordering by id
-            most_recent_message = full_conversation[0].serialize(g.user)
+                # First message in the list is always the most recent due to retrieve_thread ordering by id
+                most_recent_message = full_conversation[0].serialize(g.user)
 
-            # We only want to mark messages as unread if the most recent message was from a respondent.  Otherwise,
-            # we're marking our own message as unread which is a bit pointless.
-            if not most_recent_message["from_internal"]:
-                if "INBOX" in most_recent_message["labels"]:
-                    if "UNREAD" not in most_recent_message["labels"]:
-                        Modifier.add_unread(most_recent_message, g.user)
-                        Modifier.patch_message({"read_at": None}, full_conversation[0])
+                # We only want to mark messages as unread if the most recent message was from a respondent.  Otherwise,
+                # we're marking our own message as unread which is a bit pointless.
+                if not most_recent_message["from_internal"]:
+                    if "INBOX" in most_recent_message["labels"]:
+                        if "UNREAD" not in most_recent_message["labels"]:
+                            Modifier.add_unread(most_recent_message, g.user)
+                            Modifier.patch_message({"read_at": None}, full_conversation[0])
+        except SQLAlchemyError as e:
+            return make_response(
+                jsonify({"title": "Database error when modifying thread", "detail": e.__class__.__name__}), 500
+            )
 
         bound_logger.info("Thread metadata update successful")
         bound_logger.unbind("thread_id", "user_uuid")
@@ -137,7 +154,12 @@ class ThreadList(Resource):
 
         ThreadList._validate_request(message_args, g.user)
 
-        result = Retriever.retrieve_thread_list(g.user, message_args)
+        try:
+            result = Retriever.retrieve_thread_list(g.user, message_args)
+        except SQLAlchemyError as e:
+            return make_response(
+                jsonify({"title": "Database error when getting thread list", "detail": e.__class__.__name__}), 500
+            )
 
         logger.info("Successfully retrieved threads for user", user_uuid=g.user.user_uuid)
         messages, links = process_paginated_list(result, request.host_url, g.user, message_args, THREAD_LIST_ENDPOINT)
@@ -168,12 +190,17 @@ class ThreadCounter(Resource):
         logger.info("Getting count of threads for user", user_uuid=g.user.user_uuid)
         message_args = get_options(request.args)
 
-        if message_args.all_conversation_types:
-            logger.info("Getting counts for all conversation states for user", user_uuid=g.user.user_uuid)
-            return jsonify(totals=Retriever.thread_count_by_survey_and_conversation_states(message_args, g.user))
+        try:
+            if message_args.all_conversation_types:
+                logger.info("Getting counts for all conversation states for user", user_uuid=g.user.user_uuid)
+                return jsonify(totals=Retriever.thread_count_by_survey_and_conversation_states(message_args, g.user))
 
-        if message_args.unread_conversations:
-            logger.info("Getting counts of unread conversations", user_uuid=g.user.user_uuid)
-            return jsonify(total=Retriever.unread_message_count(g.user))
+            if message_args.unread_conversations:
+                logger.info("Getting counts of unread conversations", user_uuid=g.user.user_uuid)
+                return jsonify(total=Retriever.unread_message_count(g.user))
 
-        return jsonify(total=Retriever.thread_count_by_survey(message_args, g.user))
+            return jsonify(total=Retriever.thread_count_by_survey(message_args, g.user))
+        except SQLAlchemyError as e:
+            return make_response(
+                jsonify({"title": "Database error when getting thread counts", "detail": e.__class__.__name__}), 500
+            )

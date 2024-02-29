@@ -161,7 +161,7 @@ class ModifyTestCase(unittest.TestCase, ModifyTestCaseHelper):
         conversation_id = self.create_conversation_with_respondent_as_unread(user=self.user_respondent, message_count=2)
         with self.app.app_context():
             conversation = Retriever.retrieve_thread(conversation_id, self.user_respondent)
-            for msg in conversation.all():
+            for msg in conversation:
                 # as there's two ways that a message is unread, first check the `read at` time isn't set
                 self.assertIsNone(msg.read_at)
                 # now collect all the message labels
@@ -173,7 +173,7 @@ class ModifyTestCase(unittest.TestCase, ModifyTestCaseHelper):
             # now mark the first message as read and check the whole conversation is now read
             Modifier.mark_message_as_read(conversation[0].serialize(self.user_respondent), self.user_respondent)
             con = Retriever.retrieve_thread(conversation_id, self.user_respondent)
-            for msg in con.all():
+            for msg in con:
                 # message `read at` should now be set
                 self.assertIsNotNone(msg.read_at)
                 # collect the labels again
@@ -238,7 +238,7 @@ class ModifyTestCase(unittest.TestCase, ModifyTestCaseHelper):
         """testing message read_date is set when unread label is removed"""
         thread_id = self.populate_database(1, mark_as_read=False)
         with self.app.app_context():
-            thread = Retriever.retrieve_thread(thread_id, self.user_respondent).all()
+            thread = Retriever.retrieve_thread(thread_id, self.user_respondent)
             serialised_message = Retriever.retrieve_message(thread[0].msg_id, self.user_internal)
             Modifier.mark_message_as_read(serialised_message, self.user_internal)
             serialised_message = Retriever.retrieve_message(thread[0].msg_id, self.user_internal)

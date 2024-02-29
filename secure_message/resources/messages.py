@@ -1,14 +1,16 @@
 import logging
 
-from flask import abort, current_app, g, jsonify, make_response, request
+from flask import current_app, g, jsonify, make_response, request
 from flask_restful import Resource
 from marshmallow import ValidationError
+from sqlalchemy.exc import SQLAlchemyError
 from structlog import wrap_logger
 from werkzeug.exceptions import BadRequest
 
 from secure_message import constants
 from secure_message.common.alerts import AlertViaGovNotify, AlertViaLogging
 from secure_message.common.labels import Labels
+from secure_message.exception.exceptions import MessageSaveException
 from secure_message.repository.database import SecureMessage
 from secure_message.repository.modifier import Modifier
 from secure_message.repository.retriever import Retriever
@@ -17,7 +19,6 @@ from secure_message.services.service_toggles import internal_user_service, party
 from secure_message.validation.domain import Message, MessagePatch, MessageSchema
 
 logger = wrap_logger(logging.getLogger(__name__))
-
 
 """Rest endpoint for message resources."""
 
@@ -45,7 +46,12 @@ class MessageSend(Resource):
             return make_response(jsonify("Invalid claim"), 403)
 
         logger.info("Message passed validation")
-        self._message_save(message)
+        try:
+            self._message_save(message)
+        except MessageSaveException as e:
+            return make_response(
+                jsonify({"title": "Message save error when sending a message", "detail": e.__class__.__name__}), 500
+            )
         # listener errors are logged but still a 201 reported
         MessageSend._alert_listeners(message)
         return make_response(jsonify({"status": "201", "msg_id": message.msg_id, "thread_id": message.thread_id}), 201)
@@ -147,20 +153,29 @@ class MessageById(Resource):
         bound_logger.info("Validating request")
         if not g.user.is_internal:
             bound_logger.info("Message modification is forbidden")
-            abort(403)
+            return make_response(
+                jsonify({"title": "Error when modifying message", "message": "Message modification is forbidden"}), 403
+            )
+
         if request.headers.get("Content-Type", "").lower() != "application/json":
             bound_logger.info('Request must set accept content type "application/json" in header.')
             raise BadRequest(description='Request must set accept content type "application/json" in header.')
 
         bound_logger.info("Retrieving metadata for thread")
         request_data = request.get_json()
-        message = Retriever.retrieve_populated_message_object(message_id)
-        if message is None:
-            abort(404)
-        self._validate_patch_request(request_data, message)
-
-        bound_logger.info("Attempting to modify data for message")
-        Modifier.patch_message(request_data, message)
+        try:
+            message = Retriever.retrieve_populated_message_object(message_id)
+            if message is None:
+                return make_response(
+                    jsonify({"title": "Error when modifying message", "message": "Message not found"}), 404
+                )
+            self._validate_patch_request(request_data, message)
+            bound_logger.info("Attempting to modify data for message")
+            Modifier.patch_message(request_data, message)
+        except SQLAlchemyError as e:
+            return make_response(
+                jsonify({"title": "Database error when modifying message", "detail": e.__class__.__name__}), 500
+            )
 
         bound_logger.info("Message data update successful")
         bound_logger.unbind("message_id", "user_uuid")
@@ -188,25 +203,25 @@ class MessageModifyById(Resource):
     @staticmethod
     def put(message_id):
         """Update message by status"""
-
         request_data = request.get_json()
         action, label = MessageModifyById._validate_request(request_data)
         message = Retriever.retrieve_message(message_id, g.user)
 
-        if label == Labels.UNREAD.value:
-            resp = MessageModifyById._try_modify_unread(action, message, g.user)
-        else:
-            resp = MessageModifyById._modify_label(action, message, g.user, label)
+        try:
+            if label == Labels.UNREAD.value:
+                resp = MessageModifyById._try_modify_unread(action, message, g.user)
+            else:
+                resp = MessageModifyById._modify_label(action, message, g.user, label)
+        except SQLAlchemyError as e:
+            return make_response(
+                jsonify({"title": "Database error when updating message status", "detail": e.__class__.__name__}), 500
+            )
 
         if resp:
-            res = jsonify({"status": "ok"})
-            res.status_code = 200
-
+            return make_response(jsonify({"status": "ok"}), 200)
         else:
-            res = jsonify({"status": "error"})
-            res.status_code = 400
-            logger.error("Error updating message", msg_id=message_id, status_code=res.status_code)
-        return res
+            logger.error("Error updating message", msg_id=message_id)
+            return make_response(jsonify({"status": "error"}), 400)
 
     @staticmethod
     def _modify_label(action, message, user, label):

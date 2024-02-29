@@ -30,9 +30,12 @@ class Retriever:
                 .filter(Status.label == "UNREAD")
                 .count()
             )
+        except SQLAlchemyError as e:
+            logger.error("Database error when getting unread message count", error=e)
+            raise
         except Exception:
-            logger.exception("Error retrieving count of unread messages from database")
-            raise InternalServerError(description="Error retrieving count of unread messages from database")
+            logger.exception("Unknown error when getting unread message count")
+            raise InternalServerError(description="Unknown error when getting unread message count")
         return result
 
     @staticmethod
@@ -79,9 +82,12 @@ class Retriever:
 
             result = SecureMessage.query.filter(and_(*conditions)).distinct(SecureMessage.msg_id).count()
 
+        except SQLAlchemyError as e:
+            logger.error("Database error when getting thread count by survey", error=e)
+            raise
         except Exception as e:
-            logger.error("Error retrieving count of threads by survey from database", error=e)
-            raise InternalServerError(description="Error retrieving count of threads from database")
+            logger.error("Unknown error when getting thread count by survey", error=e)
+            raise InternalServerError(description="Unknown error when getting thread count by survey")
         return result
 
     @staticmethod
@@ -153,8 +159,8 @@ class Retriever:
             )
 
         except SQLAlchemyError:
-            logger.exception("Error retrieving messages from database")
-            raise InternalServerError(description="Error retrieving messages from database")
+            logger.exception("Database error when retrieving respondent thread list")
+            raise
 
         return result
 
@@ -211,8 +217,8 @@ class Retriever:
             )
 
         except SQLAlchemyError:
-            logger.exception("Error retrieving messages from database")
-            raise InternalServerError(description="Error retrieving messages from database")
+            logger.exception("Database error when retrieving internal thread list")
+            raise
 
         return result
 
@@ -230,9 +236,12 @@ class Retriever:
             if result is None:
                 logger.info("Message ID not found", message_id=message_id)
                 raise NotFound(description=f"Message with msg_id '{message_id}' does not exist")
-        except SQLAlchemyError:
+        except SQLAlchemyError as e:
+            if e.__class__ == NoResultFound:
+                logger.info("Message ID not found", message_id=message_id)
+                raise NotFound(description=f"Message with msg_id '{message_id}' does not exist")
             logger.exception("Error retrieving message from database")
-            raise InternalServerError(description="Error retrieving message from database")
+            raise
 
         return result
 
@@ -248,7 +257,7 @@ class Retriever:
                 raise NotFound(description=f"Message with msg_id '{message_id}' does not exist")
         except SQLAlchemyError:
             logger.exception("Error retrieving message from database")
-            raise InternalServerError(description="Error retrieving message from database")
+            raise
 
         return result.serialize(user)
 
@@ -282,10 +291,10 @@ class Retriever:
                 )
 
         except SQLAlchemyError:
-            logger.exception("Error retrieving conversation from database")
-            raise InternalServerError(description="Error retrieving conversation from database")
+            logger.exception("Database error when retrieving respondent conversation from database")
+            raise
 
-        return result
+        return result.all()
 
     @staticmethod
     def _retrieve_thread_for_internal_user(thread_id: str):
@@ -302,15 +311,17 @@ class Retriever:
                     )
                 )
                 .order_by(Status.id.desc())
-            )
+            ).all()
 
-            if not result.all():
+            if not result:
                 logger.info("Thread not retrieved for internal user", thread_id=thread_id)
                 raise NotFound(description=f"Conversation with thread_id {thread_id} not retrieved")
 
         except SQLAlchemyError:
-            logger.exception("Error retrieving conversation from database", thread_id=thread_id)
-            raise InternalServerError(description=f"Error retrieving conversation '{thread_id}' from database")
+            logger.exception(
+                "Database error when retrieving respondent conversation from database", thread_id=thread_id
+            )
+            raise
 
         return result
 

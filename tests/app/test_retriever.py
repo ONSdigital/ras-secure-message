@@ -235,7 +235,7 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
         with self.app.app_context():
             with current_app.test_request_context():
                 response = Retriever.retrieve_thread(thread_id, self.user_respondent)
-                self.assertEqual(len(response.all()), 6)
+                self.assertEqual(len(response), 6)
 
     def test_thread_returned_in_desc_order(self):
         """check thread returned in correct order"""
@@ -244,9 +244,9 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
         with self.app.app_context():
             with current_app.test_request_context():
                 response = Retriever.retrieve_thread(thread_id, self.user_respondent)
-                self.assertEqual(len(response.all()), 6)
+                self.assertEqual(len(response), 6)
 
-                sent = [str(message.sent_at) for message in response.all()]
+                sent = [str(message.sent_at) for message in response]
 
                 desc_date = sorted(sent, reverse=True)
                 self.assertEqual(len(sent), 6)
@@ -354,7 +354,7 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
 
                 for x in range(0, len(thread_ids)):
                     thread = Retriever.retrieve_thread(thread_ids[x], self.user_internal)
-                    first_msg_in_thread = thread.all()[0]
+                    first_msg_in_thread = thread[0]
                     self.assertEqual(date[x], str(first_msg_in_thread.sent_at))
                     self.assertEqual(msg_ids[x], first_msg_in_thread.msg_id)
 
