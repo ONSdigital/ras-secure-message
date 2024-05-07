@@ -7,7 +7,6 @@ logger = wrap_logger(logging.getLogger(__name__))
 
 
 class ThreadPatch(Schema):
-
     """Class to marshal JSON to Message"""
 
     category = fields.Str()
