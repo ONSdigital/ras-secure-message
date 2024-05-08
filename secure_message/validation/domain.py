@@ -19,7 +19,6 @@ logger = wrap_logger(logging.getLogger(__name__))
 
 
 class Message:
-
     """Class to hold message attributes"""
 
     def __init__(
@@ -65,7 +64,6 @@ class Message:
 
 
 class MessageSchema(Schema):
-
     """Class to marshal JSON to Message"""
 
     msg_id = fields.Str(allow_none=True)
