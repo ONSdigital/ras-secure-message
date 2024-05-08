@@ -70,7 +70,7 @@ class DevConfig(Config):
 
     # UAA
     CLIENT_ID = os.getenv("CLIENT_ID", "secure_message")
-    CLIENT_SECRET = os.getenv("CLIENT_SECRET", "password")
+    CLIENT_SECRET = os.getenv("CLIENT_SECRET", "nearest.location.roll.change")
     UAA_URL = os.getenv("UAA_URL", "http://localhost:9080")
     USE_UAA = int(os.getenv("USE_UAA", 1))
 
