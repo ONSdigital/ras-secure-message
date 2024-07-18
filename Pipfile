@@ -24,7 +24,6 @@ numpy = "*"
 google-cloud-pubsub = "*"
 flask-sqlalchemy = "*"
 flask = "*"
-jinja2 = "*"
 
 [dev-packages]
 black = "*"
