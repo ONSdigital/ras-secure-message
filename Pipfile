@@ -8,7 +8,6 @@ python_version = "3.11"
 
 [packages]
 Flask-RESTful = "*"
-Flask-Cors = "*"
 marshmallow = "*"
 psycopg2-binary = "*"
 SQLAlchemy = "*"
@@ -24,6 +23,8 @@ numpy = "*"
 google-cloud-pubsub = "*"
 flask-sqlalchemy = "*"
 flask = "*"
+urllib3 = "*"
+flask-cors = "*"
 
 [dev-packages]
 black = "*"
