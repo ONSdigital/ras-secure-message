@@ -43,7 +43,7 @@ pipenv run python run.py
 ```
 or
 ```bash
-docker-compose up
+docker compose up
 ```
 or (when postgres is set up)
 ```bash
@@ -64,7 +64,7 @@ docker run -d -p 5432:5432 --name postgres -e POSTGRES_PASSWORD=postgres -e POST
 ```
 or you can use the docker-compose.yml file to create postgres
 ```bash
-docker-compose up
+docker compose up
 ```
 
 Run the tests with make
