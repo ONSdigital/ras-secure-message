@@ -41,7 +41,7 @@ class MessageSend(Resource):
             False if "category" in post_data and post_data["category"] in ["TECHNICAL", "MISC"] else True
         )
         # Validate claim
-        if not self._has_valid_claim(g.user, message) and has_survey_category:
+        if has_survey_category and not self._has_valid_claim(g.user, message):
             logger.info("Message send failed", error="Invalid claim")
             return make_response(jsonify("Invalid claim"), 403)
 
