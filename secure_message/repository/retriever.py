@@ -203,6 +203,7 @@ class Retriever:
             if request_args.my_conversations:
                 conditions.append(Status.actor == user.user_uuid)
                 conditions.append(Status.msg_id == SecureMessage.msg_id)
+                conditions.append(Status.label == Labels.INBOX.value)
 
             # If new_respondent_conversations the actor should be NON_SPECIFIC_INTERNAL_USER i.e Group
             if request_args.new_respondent_conversations:
