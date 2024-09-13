@@ -43,7 +43,7 @@ class PartyService:
         return self._get_user_details_from_party_service(uuids)
 
     @staticmethod
-    def does_user_have_claim(user_id: str, business_id: str, survey_id) -> bool:
+    def does_user_have_claim(user_id: str, business_id: str, survey_id: str) -> bool:
         """Returns true of the user id has a claim on the business_id, survey_id combination
         False if not.
 
@@ -51,7 +51,7 @@ class PartyService:
         to determine what constitutes a valid claim so as to maintain separation of concerns and
         avoid future maintenance issues.
         """
-        params = {"party_uuid": user_id, "business_id": business_id, "survey_id": survey_id}
+        params = {"respondent_id": user_id, "business_id": business_id, "survey_id": survey_id}
 
         response = requests.get(
             f"{current_app.config['PARTY_URL']}/party-api/v1/respondents/claim",
