@@ -28,7 +28,7 @@ class PartyServiceMock:
             user_details = []
         return user_details
 
-    def does_user_have_claim(self, user_id, business_id):
+    def does_user_have_claim(self, user_id, business_id, _):
         user_details = self._respondent_ids[user_id]
         associations = user_details["associations"]
         is_enrolled = self._is_user_associated_to_business(associations, business_id)
