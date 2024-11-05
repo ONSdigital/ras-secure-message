@@ -340,8 +340,8 @@ class Retriever:
         try:
             SecureMessage().query.limit(1).all()
         except Exception as e:
-            logger.exception("No connection to database")
-            response = jsonify({"status": "unhealthy", "errors": str(e)})
+            logger.exception("No connection to database", errors=str(e))
+            response = jsonify({"status": "unhealthy", "errors":" No connection to database"})
             response.status_code = 500
             return response
 
