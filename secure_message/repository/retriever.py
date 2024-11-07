@@ -2,7 +2,7 @@ import logging
 
 from flask import jsonify
 from sqlalchemy import and_, func, or_
-from sqlalchemy.exc import SQLAlchemyError
+from sqlalchemy.exc import SQLAlchemyError, TimeoutError, OperationalError
 from sqlalchemy.orm.exc import NoResultFound
 from structlog import wrap_logger
 from werkzeug.exceptions import Forbidden, InternalServerError, NotFound
@@ -339,9 +339,14 @@ class Retriever:
         """checks if db connection is working"""
         try:
             SecureMessage().query.limit(1).all()
-        except Exception as e:
-            logger.exception("No connection to database", errors=str(e))
-            response = jsonify({"status": "unhealthy", "errors":" No connection to database"})
+        except (OperationalError, TimeoutError) as e:
+            logger.exception("Database connection error", errors=str(e))
+            response = jsonify({"status": "unhealthy", "errors": "Database connection error"})
+            response.status_code = 500
+            return response
+        except SQLAlchemyError as e:
+            logger.exception("Other database error", errors=str(e))
+            response = jsonify({"status": "unhealthy", "errors": "Database error"})
             response.status_code = 500
             return response
 
