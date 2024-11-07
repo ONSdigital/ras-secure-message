@@ -2,7 +2,7 @@ import logging
 
 from flask import jsonify
 from sqlalchemy import and_, func, or_
-from sqlalchemy.exc import SQLAlchemyError, TimeoutError, OperationalError
+from sqlalchemy.exc import OperationalError, SQLAlchemyError, TimeoutError
 from sqlalchemy.orm.exc import NoResultFound
 from structlog import wrap_logger
 from werkzeug.exceptions import Forbidden, InternalServerError, NotFound
