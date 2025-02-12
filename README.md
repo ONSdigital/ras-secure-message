@@ -114,3 +114,4 @@ Environment variables available for configuration are listed below:
 ## Database migrations
 
 Although there exists a 'migrations' folder for SQL database migration files, this service does not currently use any database migration tools such as Alembic. As such, the migration files are simply there for record-keeping purposes. Migration scripts will need to be performed manually on the database.
+
