@@ -18,7 +18,7 @@ UI load time: 7 seconds
 
 Query insight: 
 
- ![query insights open messages](../images/query-insights-open-messages.png)
+ ![query insights open messages](/images/query-insights-open-messages.png)
 
 #### Close messages:  
 
@@ -26,7 +26,7 @@ UI load time: 26 seconds
 
 Query insight: 
 
-![query insights closed messages](../images/query-insights-closed-messages.png)
+![query insights closed messages](/images/query-insights-closed-messages.png)
 
 #### Ru_ref search:  
 
@@ -34,7 +34,7 @@ UI load time: 10 seconds
 
 Query insight: 
 
-![query insights ru_ref messages](../images/query-insights-ru_ref-messages.png)
+![query insights ru_ref messages](/images/query-insights-ru_ref-messages.png)
  
 
 ## Analyses 
@@ -75,7 +75,7 @@ Medium / Good
 
 Both the pagination object and the [tab count](https://github.com/ONSdigital/response-operations-ui/blob/main/response_operations_ui/views/messages.py#L497) are counting the records independently, adding to the latency. For open/closed messages it is unnecessary, for ru_ref searches the tab count is used but adds little value. 
 
-![ru_ref tab counts](../images/ru_ref_tab_counts.png)
+![ru_ref tab counts](/images/ru_ref_tab_counts.png)
 
 #### Possible Solution 
 
