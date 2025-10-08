@@ -121,7 +121,7 @@ Low – high (depending on solution)/ Very high
 
 #### Ru_ref search 
 
-This suffers more from the tab counting [linearly calling](https://github.com/ONSdigital/ras-secure-message/blob/main/secure_message/repository/retriever.py#L94)  each category than the SM query itself 
+This suffers more from the [tab counting linearly](https://github.com/ONSdigital/ras-secure-message/blob/main/secure_message/repository/retriever.py#L94) than the SM query itself 
 
 #### Possible solution 
 
@@ -138,4 +138,4 @@ Low / High
 
 ### Pagination object count 
 
-There is a clear warning in the docs that the [SqlAlchemy pagination count](https://flask-sqlalchemy.readthedocs.io/en/stable/api/#flask_sqlalchemy.SQLAlchemy.paginatemight could be slow or not appropriate for complicated or large queries, this might be worth looking into if latency is still an issue after implementing some of the above. We currently use it, but a more efficient solution might be possible 
+There is a clear warning in the docs that the [SqlAlchemy pagination count](https://flask-sqlalchemy.readthedocs.io/en/stable/api/#flask_sqlalchemy.SQLAlchemy.paginatemight) could be slow or not appropriate for complicated or large queries, this might be worth looking into if latency is still an issue after implementing some of the above. We currently use it, but a more efficient solution might be possible 
