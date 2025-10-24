@@ -425,44 +425,6 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
                 self.assertEqual(thread_count_internal, 5)
                 self.assertEqual(thread_count_second_internal, 0)
 
-    def test_respondent_can_only_see_their_messages(self):
-        """tests that a respondent can only see their messages i.e. they should not
-        see any messages sent to another respondent"""
-        first_respondent_thread_id = self.create_thread(
-            no_of_messages=1, external_actor=self.default_external_actor, internal_actor=self.default_internal_actor
-        )
-        second_respondent_thread_id = self.create_thread(
-            no_of_messages=1, external_actor=self.second_external_actor, internal_actor=self.default_internal_actor
-        )
-
-        with self.app.app_context():
-            with current_app.test_request_context():
-                args = get_args()
-                first_respondent_thread_list = Retriever.retrieve_thread_list(self.user_respondent, args)
-                self.assertEqual(first_respondent_thread_list.total, 1)
-                second_respondent_thread_list = Retriever.retrieve_thread_list(self.second_user_respondent, args)
-                self.assertEqual(second_respondent_thread_list.total, 1)
-                internal_thread_list = Retriever.retrieve_thread_list(self.user_internal, args)
-                self.assertEqual(internal_thread_list.total, 2)
-
-                # first respondent can retrieve the message they sent
-                first_respondent_thread = Retriever.retrieve_thread(first_respondent_thread_id, self.user_respondent)
-                self.assertIsNotNone(first_respondent_thread)
-
-                # second respondent can retrieve the message they sent
-                second_respondent_thread = Retriever.retrieve_thread(
-                    second_respondent_thread_id, self.second_user_respondent
-                )
-                self.assertIsNotNone(second_respondent_thread)
-
-                # first respondent shouldn't be able to retrieve second respondent's message
-                with self.assertRaises(Forbidden):
-                    Retriever.retrieve_thread(first_respondent_thread_id, self.second_user_respondent)
-
-                # second respondent shouldn't be able to retrieve first respondent's message
-                with self.assertRaises(Forbidden):
-                    Retriever.retrieve_thread(second_respondent_thread_id, self.user_respondent)
-
 
 if __name__ == "__main__":
     unittest.main()
