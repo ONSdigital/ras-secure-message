@@ -4,7 +4,7 @@ from datetime import datetime
 
 from flask import current_app
 from sqlalchemy import create_engine, text
-from werkzeug.exceptions import Forbidden, NotFound
+from werkzeug.exceptions import NotFound
 
 from secure_message.application import create_app
 from secure_message.common.utilities import MessageArgs
