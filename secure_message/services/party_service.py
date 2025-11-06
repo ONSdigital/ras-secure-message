@@ -11,14 +11,12 @@ logger = wrap_logger(logging.getLogger(__name__))
 
 class PartyService:
     @staticmethod
-    def get_business_details(business_ids: list[str]):
+    def get_business_details(business_ids: dict):
         """Retrieves the business details from the party service"""
-        params = urlencode([("id", business_id) for business_id in business_ids])
-        response = requests.get(
-            f"{current_app.config['PARTY_URL']}/party-api/v1/businesses",
+        response = requests.post(
+            f"{current_app.config['PARTY_URL']}/party-api/v1/businesses/latest-business-details",
             auth=current_app.config["BASIC_AUTH"],
-            verify=False,
-            params=params,
+            json={"party_uuids": list(business_ids)}
         )
         try:
             response.raise_for_status()
