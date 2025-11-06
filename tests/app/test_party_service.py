@@ -26,8 +26,8 @@ class PartyTestCase(unittest.TestCase):
     def test_get_business_details_single_id_success(self, mock_request):
         """Test get business details with a single uuid"""
         business_ids = ["b08c07c3-df28-4283-bb4c-c048729ce372"]
-        business_data_url = f"{self.app.config['PARTY_URL']}/party-api/v1/businesses?id={business_ids[0]}"
-        mock_request.get(business_data_url, status_code=200, reason="OK", text="{}")
+        business_data_url = f"{self.app.config['PARTY_URL']}/party-api/v1/businesses/latest-business-details"
+        mock_request.post(business_data_url, status_code=200, reason="OK", json=business_ids)
 
         with self.app.app_context():
             PartyService().get_business_details(business_ids)
@@ -38,10 +38,8 @@ class PartyTestCase(unittest.TestCase):
     def test_get_business_details_multiple_id_success(self, mock_request):
         """Test get business details with a multiple uuids at once"""
         business_ids = ["c614e64e-d981-4eba-b016-d9822f09a4fb", "c614e64e-d981-4eba-b016-d9822f09a4f2"]
-        business_data_url = (
-            f"{self.app.config['PARTY_URL']}/party-api/v1/businesses?id={business_ids[0]}&id={business_ids[1]}"
-        )
-        mock_request.get(business_data_url, status_code=200, reason="OK", text="{}")
+        business_data_url = f"{self.app.config['PARTY_URL']}/party-api/v1/businesses/latest-business-details"
+        mock_request.post(business_data_url, status_code=200, reason="OK", json=business_ids)
         with self.app.app_context():
             PartyService().get_business_details(business_ids)
 
@@ -51,8 +49,8 @@ class PartyTestCase(unittest.TestCase):
     def test_get_business_details_client_error(self, mock_request):
         """Test get business details fails and returns an empty list when a non-uuid is sent"""
         business_ids = ["not_a_uuid"]
-        business_data_url = f"{self.app.config['PARTY_URL']}/party-api/v1/businesses?id={business_ids[0]}"
-        mock_request.get(business_data_url, status_code=400, reason="Invalid uuid", text='{"error": "text"}')
+        business_data_url = f"{self.app.config['PARTY_URL']}/party-api/v1/businesses/latest-business-details"
+        mock_request.post(business_data_url, status_code=400, reason="Invalid uuid", json=business_ids)
         with self.app.app_context():
             result = PartyService().get_business_details(business_ids)
 
@@ -64,8 +62,8 @@ class PartyTestCase(unittest.TestCase):
         """Test get business details fails and returns and empty list when the client is unauthorised to
         access the party service"""
         business_ids = ["1234"]
-        business_data_url = f"{self.app.config['PARTY_URL']}/party-api/v1/businesses?id={business_ids[0]}"
-        mock_request.get(business_data_url, status_code=401, reason="unauthorised", text="{}")
+        business_data_url = f"{self.app.config['PARTY_URL']}/party-api/v1/businesses/latest-business-details"
+        mock_request.post(business_data_url, status_code=401, reason="unauthorised", json=business_ids)
         with self.app.app_context():
             result_data = PartyService().get_business_details(business_ids)
 
