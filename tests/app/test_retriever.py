@@ -439,11 +439,11 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
             with current_app.test_request_context():
                 args = get_args()
                 first_respondent_thread_list = Retriever.retrieve_thread_list(self.user_respondent, args)
-                self.assertEqual(first_respondent_thread_list.total, 1)
+                self.assertEqual(len(first_respondent_thread_list.items), 1)
                 second_respondent_thread_list = Retriever.retrieve_thread_list(self.second_user_respondent, args)
-                self.assertEqual(second_respondent_thread_list.total, 1)
+                self.assertEqual(len(second_respondent_thread_list.items), 1)
                 internal_thread_list = Retriever.retrieve_thread_list(self.user_internal, args)
-                self.assertEqual(internal_thread_list.total, 2)
+                self.assertEqual(len(internal_thread_list.items), 2)
 
                 # first respondent can retrieve the message they sent
                 first_respondent_thread = Retriever.retrieve_thread(first_respondent_thread_id, self.user_respondent)
