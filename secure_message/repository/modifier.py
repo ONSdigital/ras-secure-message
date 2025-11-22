@@ -224,7 +224,7 @@ class Modifier:
             db.session.commit()
         except SQLAlchemyError:
             db.session.rollback()
-            bound_logger.exception("Database error occured while opening conversation")
+            bound_logger.exception("Database error occurred while opening conversation")
             raise
 
         bound_logger.info("Successfully re-opened conversation")
