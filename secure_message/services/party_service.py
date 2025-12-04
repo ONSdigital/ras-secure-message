@@ -25,7 +25,7 @@ class PartyService:
                 "Business detail retrieval failed",
                 status_code=response.status_code,
                 text=response.text,
-                business_ids=business_ids,
+                business_ids=business_ids
             )
             return []
 
