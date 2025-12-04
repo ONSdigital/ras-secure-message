@@ -31,7 +31,7 @@ We can only tell when a message has been sent, read initially or closed. We can 
 
 1. Write a cron job to delete messages related to the closed date (5 SP*)
 
-2. We could write code to update the read_at every time a message is viewed, then use that to delete, however I don’t recommend that due to the
+2. We could write code to update the read_at every time a message is viewed, then use that to delete, however I don’t recommend that due to:
    - The additional traffic to the database
    - read_at feels like it might have been implemented for enforcement, this could confuse the initial reason for its inclusion
    - Updating what is a hidden field to a user/respondent to control deletion of a conversation feels inappropriate.  Knowing when a conversation is going to be deleted seems important at least internally, having ambiguity on when it might happen should be avoided
