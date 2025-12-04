@@ -24,7 +24,7 @@ Message dependent, it records basic information regarding whos inbox it is in an
 
 
 ## Summary
-we can only tell when a message has been sent, read initially or closed. We can use the closed date to delete conversations after 12 months, but not the read_at date/time
+We can only tell when a message has been sent, read initially or closed. We can use the closed date to delete conversations after 12 months, but not the read_at date/time
 
 
 ## What we could do
