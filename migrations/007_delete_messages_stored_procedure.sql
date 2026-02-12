@@ -2,7 +2,7 @@ CREATE OR REPLACE PROCEDURE securemessage.delete_closed_conversations(p_close_at
 LANGUAGE plpgsql
 AS $$
 DECLARE
-    backup_suffix TEXT := TO_CHAR(p_close_at, 'YYYYMMDD');
+    backup_suffix TEXT := TO_CHAR(NOW(), 'YYYYMMDDHH24MISS');
 BEGIN
     -- Backup and delete from status
     EXECUTE format(
