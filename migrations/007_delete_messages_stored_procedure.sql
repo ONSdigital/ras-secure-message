@@ -41,3 +41,30 @@ BEGIN
     WHERE closed_at < p_close_at AND is_closed = true;
 END;
 $$;
+
+CREATE OR REPLACE PROCEDURE securemessage.restore_deleted_conversations(p_backup_suffix TEXT)
+LANGUAGE plpgsql
+AS $$
+BEGIN
+    -- Restore conversation
+    EXECUTE format(
+        'INSERT INTO securemessage.conversation SELECT * FROM securemessage._conversation_%s ON CONFLICT DO NOTHING',
+        p_backup_suffix
+    );
+    -- Restore secure_message
+    EXECUTE format(
+        'INSERT INTO securemessage.secure_message SELECT * FROM securemessage._secure_message_%s ON CONFLICT DO NOTHING',
+        p_backup_suffix
+    );
+    -- Restore status
+    EXECUTE format(
+        'INSERT INTO securemessage.status SELECT * FROM securemessage._status_%s ON CONFLICT DO NOTHING',
+        p_backup_suffix
+    );
+    -- Drop backup tables
+    EXECUTE format('DROP TABLE IF EXISTS securemessage._status_%s', p_backup_suffix);
+    EXECUTE format('DROP TABLE IF EXISTS securemessage._secure_message_%s', p_backup_suffix);
+    EXECUTE format('DROP TABLE IF EXISTS securemessage._conversation_%s', p_backup_suffix);
+END;
+$$;
+
