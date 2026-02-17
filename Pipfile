@@ -24,7 +24,6 @@ flask-sqlalchemy = "*"
 flask = "*"
 flask-cors = "*"
 pyjwt = "*"
-proto-plus = "*"
 
 [dev-packages]
 black = "*"
