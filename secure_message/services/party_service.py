@@ -16,7 +16,7 @@ class PartyService:
         response = requests.post(
             f"{current_app.config['PARTY_URL']}/party-api/v1/businesses/latest-business-details",
             auth=current_app.config["BASIC_AUTH"],
-            json={"party_uuids": list(business_ids)},
+            json={"party_uuids": list(business_ids)}
         )
         try:
             response.raise_for_status()
