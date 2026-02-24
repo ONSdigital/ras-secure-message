@@ -46,11 +46,11 @@ class TestThreadsEndpoints(unittest.TestCase):
         ]
 
         self.open_conversation_metadata = Conversation(
-            is_closed=False, closed_by=None, closed_by_uuid=None, closed_at=None, category="SURVEY"
+            is_closed=False, closed_by=None, closed_by_uuid=None, closed_at=None, category="SURVEY", mark_for_deletion=False
         )
 
         self.closed_conversation_metadata = Conversation(
-            is_closed=True, closed_by=None, closed_by_uuid=None, closed_at=None, category="SURVEY"
+            is_closed=True, closed_by=None, closed_by_uuid=None, closed_at=None, category="SURVEY", mark_for_deletion=False
         )
 
         self.serialized_message = {
