@@ -189,7 +189,7 @@ class Conversation(db.Model):
     closed_by_uuid = Column("closed_by_uuid", String(length=60))
     closed_at = Column("closed_at", DateTime())
     category = Column("category", String(length=60), server_default="SURVEY")
-    mark_for_deletion = Column("mark_for_deletion", Boolean(), nullable=True, server_default="false")
+    mark_for_deletion = Column("mark_for_deletion", Boolean(), default=False)
 
     def __init__(
         self,
