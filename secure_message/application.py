@@ -168,6 +168,7 @@ def _request_requires_authentication():
         request.endpoint is not None
         and "health" not in request.endpoint
         and request.endpoint != "info"
+        and request.endpoint != "threadmarkfordeletion"
         and request.method != "OPTIONS"
     )
 
