@@ -238,7 +238,7 @@ class Modifier:
         Mark closed conversations for deletion based on configured offset.
         """
         now: datetime = datetime.now()
-        offset_days: Final[int] = current_app.config["MARK_FOR_DELETION_OFFSET_IN_DAYS"]
+        offset_days: Final[int] = int(current_app.config["MARK_FOR_DELETION_OFFSET_IN_DAYS"])
         cutoff_date: datetime = now - timedelta(days=offset_days)
 
         try:
