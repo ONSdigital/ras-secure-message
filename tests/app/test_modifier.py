@@ -9,7 +9,7 @@ from werkzeug.exceptions import InternalServerError
 from secure_message import constants
 from secure_message.application import create_app
 from secure_message.repository import database
-from secure_message.repository.database import SecureMessage
+from secure_message.repository.database import SecureMessage, db
 from secure_message.repository.modifier import Modifier
 from secure_message.repository.retriever import Retriever
 from secure_message.services.service_toggles import internal_user_service
@@ -370,6 +370,42 @@ class ModifyTestCase(unittest.TestCase, ModifyTestCaseHelper):
 
         with self.assertRaises(InternalServerError):
             Modifier._get_label_actor(user=self.user_internal, message=message_missing_fields)
+
+    def test_closed_conversations_mark_for_deletion(self):
+
+        # Given 4 conversations are created (1 open, 3 closed or which 2 should be marked for deletion)
+        with self.app.app_context():
+            offset = current_app.config["MARK_FOR_DELETION_OFFSET_IN_DAYS"]
+            now = datetime.datetime.utcnow()
+
+            greater_than_deletion_date = now - datetime.timedelta(days=offset + 1)
+            less_than_deletion_date = now - datetime.timedelta(days=offset - 1)
+
+            conv1 = database.Conversation(is_closed=True, closed_at=greater_than_deletion_date)
+            conv1.id = "1"
+            conv2 = database.Conversation(is_closed=True, closed_at=greater_than_deletion_date)
+            conv2.id = "2"
+            conv3 = database.Conversation(is_closed=True, closed_at=less_than_deletion_date)
+            conv3.id = "3"
+            conv4 = database.Conversation(is_closed=False)
+            conv4.id = "4"
+            db.session.add_all([conv1, conv2, conv3, conv4])
+            db.session.commit()
+
+            # When closed_conversations_mark_for_deletion is called
+            updated_count = Modifier.closed_conversations_mark_for_deletion()
+
+            # Then 2 conversations are updated, with mark_for_deletion set to True
+            self.assertEqual(updated_count, 2)
+
+            refreshed = {
+                conv.id: db.session.get(database.Conversation, conv.id) for conv in [conv1, conv2, conv3, conv4]
+            }
+
+            self.assertTrue(refreshed["1"].mark_for_deletion)
+            self.assertTrue(refreshed["2"].mark_for_deletion)
+            self.assertFalse(refreshed["3"].mark_for_deletion)
+            self.assertFalse(refreshed["4"].mark_for_deletion)
 
 
 if __name__ == "__main__":

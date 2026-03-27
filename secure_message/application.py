@@ -25,7 +25,12 @@ from secure_message.resources.messages import (
     MessageModifyById,
     MessageSend,
 )
-from secure_message.resources.threads import ThreadById, ThreadCounter, ThreadList
+from secure_message.resources.threads import (
+    ThreadById,
+    ThreadCounter,
+    ThreadList,
+    ThreadMarkForDeletion,
+)
 
 logger = wrap_logger(logging.getLogger(__name__))
 
@@ -62,6 +67,7 @@ def create_app(config=None):
     api.add_resource(ThreadList, "/threads")
     api.add_resource(ThreadById, "/threads/<thread_id>")
     api.add_resource(ThreadCounter, "/messages/count")
+    api.add_resource(ThreadMarkForDeletion, "/threads/closed/mark_for_deletion")
 
     app.oauth_client_token_expires_at = maya.now()
 
