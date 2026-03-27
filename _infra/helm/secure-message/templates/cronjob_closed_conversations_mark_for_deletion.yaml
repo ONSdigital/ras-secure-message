@@ -3,7 +3,6 @@ kind: CronJob
 metadata:
   name: {{ .Values.crons.closedConversationsMarkForDeletionScheduler.name }}
 spec:
-  suspend: {{ .Values.crons.closedConversationsMarkForDeletionScheduler.suspend }}
   schedule: "{{ .Values.crons.closedConversationsMarkForDeletionScheduler.cron }}"
   jobTemplate:
     spec:
