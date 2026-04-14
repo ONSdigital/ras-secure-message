@@ -1,6 +1,8 @@
 import logging
-from datetime import datetime
+from datetime import datetime, timedelta
+from typing import Final
 
+from flask import current_app
 from sqlalchemy import text
 from sqlalchemy.exc import SQLAlchemyError
 from structlog import wrap_logger
@@ -229,3 +231,24 @@ class Modifier:
 
         bound_logger.info("Successfully re-opened conversation")
         bound_logger.unbind("conversation_id", "user_id")
+
+    @staticmethod
+    def closed_conversations_mark_for_deletion() -> int:
+        """
+        Mark closed conversations for deletion based on configured offset.
+        """
+        now: datetime = datetime.now()
+        offset_days: Final[int] = int(current_app.config["MARK_FOR_DELETION_OFFSET_IN_DAYS"])
+        cutoff_date: datetime = now - timedelta(days=offset_days)
+
+        try:
+            updated_count: int = Conversation.query.filter(Conversation.closed_at < cutoff_date).update(
+                {Conversation.mark_for_deletion: True},
+            )
+            db.session.commit()
+            return updated_count
+
+        except SQLAlchemyError:
+            db.session.rollback()
+            logger.exception("Failed to mark conversations for deletion")
+            raise
