@@ -96,7 +96,7 @@ class MessageSchema(Schema):
             raise ValidationError("msg_to and msg_from fields can not be the same.")
 
     @validates("msg_to")
-    def validate_to(self, msg_to):
+    def validate_to(self, msg_to, **kwargs):
         for item in msg_to:
             self.validate_non_zero_field_length("msg_to", len(item), constants.MAX_TO_LEN)
             if g.user.is_internal:  # Internal user sending to a respondent
@@ -109,7 +109,7 @@ class MessageSchema(Schema):
                     raise ValidationError(f"{item} is not a valid internal user.")
 
     @validates("msg_from")
-    def validate_from(self, msg_from):
+    def validate_from(self, msg_from, **kwargs):
         self.validate_non_zero_field_length("msg_from", len(msg_from), constants.MAX_FROM_LEN)
 
         if msg_from != g.user.user_uuid:
@@ -121,37 +121,37 @@ class MessageSchema(Schema):
             )
 
     @validates("body")
-    def validate_body(self, body):
+    def validate_body(self, body, **kwargs):
         self.validate_non_zero_field_length("Body", len(body), constants.MAX_BODY_LEN)
 
     @validates("subject")
-    def validate_subject(self, subject):
+    def validate_subject(self, subject, **kwargs):
         self.validate_non_zero_field_length("Subject", len(subject.strip()), constants.MAX_SUBJECT_LEN)
 
     @validates("thread_id")
-    def validate_thread(self, thread_id):
+    def validate_thread(self, thread_id, **kwargs):
         if thread_id is not None:
             self.validate_field_length("Thread", len(thread_id), constants.MAX_THREAD_LEN)
 
     @validates("survey_id")
-    def validate_survey(self, survey_id):
+    def validate_survey(self, survey_id, **kwargs):
         self.validate_non_zero_field_length("Survey", len(survey_id), constants.MAX_SURVEY_LEN)
 
     @validates("business_id")
-    def validate_business_id(self, business_id):
+    def validate_business_id(self, business_id, **kwargs):
         self.validate_non_zero_field_length("business_id", len(business_id), constants.MAX_BUSINESS_ID_LEN)
 
     @validates("case_id")
-    def validate_case_id(self, case_id):
+    def validate_case_id(self, case_id, **kwargs):
         self.validate_field_length("case_id", len(case_id), constants.MAX_COLLECTION_CASE_LEN)
 
     @validates("exercise_id")
-    def validate_exercise_id(self, exercise_id):
+    def validate_exercise_id(self, exercise_id, **kwargs):
         self.validate_field_length("exercise_id", len(exercise_id), constants.MAX_COLLECTION_EXERCISE_LEN)
 
     @validates("category")
-    def validate_category(self, category):
-        self.validate_category_type("category")
+    def validate_category(self, category, **kwargs):
+        self.validate_category_type(category)
 
     @post_load
     def make_message(self, data, **kwargs):
