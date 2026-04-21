@@ -9,7 +9,7 @@ python_version = "3.11"
 [packages]
 Flask-RESTful = "*"
 marshmallow = "*"
-psycopg2 = "==2.9.9"
+psycopg2 = "*"
 SQLAlchemy = "*"
 structlog = "*"
 cryptography = "*"
