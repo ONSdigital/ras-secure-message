@@ -50,7 +50,7 @@ jobs:
       - name: Get Dependencies
         run: |
           pip install pipenv
-          pipenv install --dev --deploy
+          pipenv sync --dev --deploy
       - name: Run Tests
         run: |
           make test
