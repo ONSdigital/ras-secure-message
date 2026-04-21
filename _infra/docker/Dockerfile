@@ -7,7 +7,7 @@ RUN pip install pipenv
 WORKDIR /app
 
 COPY . /app
-RUN pipenv sync --system
+RUN pipenv install --deploy --system
 
 EXPOSE 80
 CMD ["gunicorn", "-c", "gunicorn.py", "app:app"]
