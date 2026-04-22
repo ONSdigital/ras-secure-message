@@ -13,7 +13,7 @@ class ThreadPatch(Schema):
     is_closed = fields.Boolean()
 
     @validates("category")
-    def validate_category(self, value):
+    def validate_category(self, value, **kwargs):
         if not value:
             raise ValidationError("category cannot be empty")
 
