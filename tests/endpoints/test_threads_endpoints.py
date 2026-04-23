@@ -9,6 +9,7 @@ from secure_message import application, constants
 from secure_message.authentication.jwt import encode
 from secure_message.repository import database
 from secure_message.repository.database import Conversation, SecureMessage
+from secure_message.resources.threads import ThreadMarkForDeletion
 
 
 class TestThreadsEndpoints(unittest.TestCase):
@@ -46,11 +47,21 @@ class TestThreadsEndpoints(unittest.TestCase):
         ]
 
         self.open_conversation_metadata = Conversation(
-            is_closed=False, closed_by=None, closed_by_uuid=None, closed_at=None, category="SURVEY", mark_for_deletion=False
+            is_closed=False,
+            closed_by=None,
+            closed_by_uuid=None,
+            closed_at=None,
+            category="SURVEY",
+            mark_for_deletion=False,
         )
 
         self.closed_conversation_metadata = Conversation(
-            is_closed=True, closed_by=None, closed_by_uuid=None, closed_at=None, category="SURVEY", mark_for_deletion=False
+            is_closed=True,
+            closed_by=None,
+            closed_by_uuid=None,
+            closed_at=None,
+            category="SURVEY",
+            mark_for_deletion=False,
         )
 
         self.serialized_message = {
@@ -237,3 +248,29 @@ class TestThreadsEndpoints(unittest.TestCase):
             {"detail": "SQLAlchemyError", "title": "Database error when modifying thread"},
             json.loads(response.get_data()),
         )
+
+    @patch("secure_message.repository.modifier.Modifier.closed_conversations_mark_for_deletion")
+    def test_conversation_mark_for_deletion_success(self, closed_conversations_mark_for_deletion):
+        # Given a mocked value of 1 is returned from closed_conversations_mark_for_deletion
+        closed_conversations_mark_for_deletion.return_value = 1
+
+        # When ThreadMarkForDeletion post is called
+        response, status_code = ThreadMarkForDeletion.post()
+
+        # Then a 204 response is returned
+        self.assertEqual(status_code, 204)
+        self.assertEqual(response, "")
+        closed_conversations_mark_for_deletion.assert_called_once()
+
+    @patch("secure_message.repository.modifier.Modifier.closed_conversations_mark_for_deletion")
+    def test_conversation_mark_for_deletion_failure(self, closed_conversations_mark_for_deletion):
+        # Given a mocked side effect of an  SQLAlchemyError
+        closed_conversations_mark_for_deletion.side_effect = SQLAlchemyError()
+
+        # When ThreadMarkForDeletion post is called
+        response, status_code = ThreadMarkForDeletion.post()
+
+        # Then a 500 error is returned
+        self.assertEqual(status_code, 500)
+        self.assertEqual(response, "")
+        closed_conversations_mark_for_deletion.assert_called_once()

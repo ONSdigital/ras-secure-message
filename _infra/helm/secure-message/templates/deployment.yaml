@@ -187,5 +187,7 @@ spec:
                 key: client-secret
           - name: LOGGING_LEVEL
             value: "{{ .Values.app.config.loggingLevel }}"
+          - name: MARK_FOR_DELETION_OFFSET_IN_DAYS
+            value: "{{ .Values.markForDeletionOffsetInDays }}"
           resources:
             {{ toYaml .Values.resources.application | nindent 12 }}

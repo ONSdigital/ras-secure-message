@@ -204,3 +204,16 @@ class ThreadCounter(Resource):
             return make_response(
                 jsonify({"title": "Database error when getting thread counts", "detail": e.__class__.__name__}), 500
             )
+
+
+class ThreadMarkForDeletion(Resource):
+    @staticmethod
+    def post():
+        try:
+            conversation_count = Modifier.closed_conversations_mark_for_deletion()
+            logger.info(f"{conversation_count} conversations marked for deletion")
+            return "", 204
+
+        except SQLAlchemyError:
+            logger.exception("Failed to mark conversations for deletion")
+            return "", 500

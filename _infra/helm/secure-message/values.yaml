@@ -65,3 +65,9 @@ dns:
 app:
   config:
     loggingLevel: "INFO"
+
+crons:
+  closedConversationsMarkForDeletionScheduler:
+    name: sm-closed-conversations-mark-for-deletion
+    cron: "0 0 * * *"
+    target: "/threads/closed/mark_for_deletion"
