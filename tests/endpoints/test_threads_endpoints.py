@@ -9,7 +9,7 @@ from secure_message import application, constants
 from secure_message.authentication.jwt import encode
 from secure_message.repository import database
 from secure_message.repository.database import Conversation, SecureMessage
-from secure_message.resources.threads import ThreadMarkForDeletion, ThreadDeletion
+from secure_message.resources.threads import ThreadDeletion, ThreadMarkForDeletion
 
 
 class TestThreadsEndpoints(unittest.TestCase):
