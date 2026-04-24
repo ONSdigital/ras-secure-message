@@ -411,7 +411,7 @@ class ModifyTestCase(unittest.TestCase, ModifyTestCaseHelper):
             self.assertFalse(refreshed["4"].mark_for_deletion)
 
     def test_closed_conversations_deletion_cascades(self):
-        # Given a conversation which has been marked_for_deletion
+        # Given a conversation where mark_for_deletion is True
         with self.app.app_context():
             conversation_id = "conversation_id"
             msg_id = "msg_id"
@@ -429,21 +429,21 @@ class ModifyTestCase(unittest.TestCase, ModifyTestCaseHelper):
             db.session.add_all([conversation, message, status])
             db.session.commit()
 
-            assert count(database.Conversation, id=conversation_id) == 1
-            assert count(database.SecureMessage, msg_id=msg_id) == 1
-            assert count(database.Status, msg_id=msg_id) == 1
+            self.assertEqual(count(database.Conversation, id=conversation_id), 1)
+            self.assertEqual(count(database.SecureMessage, msg_id=msg_id), 1)
+            self.assertEqual(count(database.Status, msg_id=msg_id), 1)
 
-            # When deletion runs
+            # When closed_conversations_deletion is called
             deleted_count = Modifier.closed_conversations_deletion()
 
             # Then the conversation, secure message and status associated with it are deleted
-            assert deleted_count == 1
-            assert count(database.Conversation, id=conversation_id) == 0
-            assert count(database.SecureMessage, msg_id=msg_id) == 0
-            assert count(database.Status, msg_id=msg_id) == 0
+            self.assertEqual(deleted_count, 1)
+            self.assertEqual(count(database.Conversation, id=conversation_id), 0)
+            self.assertEqual(count(database.SecureMessage, msg_id=msg_id), 0)
+            self.assertEqual(count(database.Status, msg_id=msg_id), 0)
 
     def test_closed_conversations_deletion_does_not_remove_unmarked_conversations(self):
-        # Given a conversation NOT marked_for_deletion
+        # Given a conversation where mark_for_deletion is False
         with self.app.app_context():
             conversation_id = "conversation_id"
             conversation = database.Conversation(
@@ -452,17 +452,18 @@ class ModifyTestCase(unittest.TestCase, ModifyTestCaseHelper):
             conversation.id = conversation_id
             db.session.add(conversation)
             db.session.commit()
-            assert count(database.Conversation, id=conversation_id) == 1
 
-            # When deletion runs
+            self.assertEqual(count(database.Conversation, id=conversation_id), 1)
+
+            # When closed_conversations_deletion is called
             deleted_count = Modifier.closed_conversations_deletion()
 
             # Then the conversation is not deleted
-            assert deleted_count == 0
-            assert count(database.Conversation, id=conversation_id) == 1
+            self.assertEqual(deleted_count, 0)
+            self.assertEqual(count(database.Conversation, id=conversation_id), 1)
 
     def test_closed_conversations_deletion_rolls_back_on_message_delete_error(self):
-        # Given a conversation which has been marked_for_deletion
+        # Given a conversation where mark_for_deletion is True
         with self.app.app_context():
             conversation_id = "conversation_id"
             msg_id = "msg_id"
@@ -479,11 +480,11 @@ class ModifyTestCase(unittest.TestCase, ModifyTestCaseHelper):
             db.session.add_all([conversation, message, status])
             db.session.commit()
 
-            assert count(database.Conversation, id=conversation_id) == 1
-            assert count(database.SecureMessage, msg_id=msg_id) == 1
-            assert count(database.Status, msg_id=msg_id) == 1
+            self.assertEqual(count(database.Conversation, id=conversation_id), 1)
+            self.assertEqual(count(database.SecureMessage, msg_id=msg_id), 1)
+            self.assertEqual(count(database.Status, msg_id=msg_id), 1)
 
-            # When deletion runs, but an SQLAlchemyError is return on deleting SecureMessages
+            # When closed_conversations_deletion is called, but an SQLAlchemyError is returned on deleting SecureMessages
             with patch(
                 "sqlalchemy.orm.query.Query.delete", side_effect=[1, SQLAlchemyError("secure message delete failed")]
             ):
@@ -491,9 +492,9 @@ class ModifyTestCase(unittest.TestCase, ModifyTestCaseHelper):
                     Modifier.closed_conversations_deletion()
 
             # Then the conversation, secure message and status associated with it are not deleted
-            assert count(database.Conversation, id=conversation_id) == 1
-            assert count(database.SecureMessage, msg_id=msg_id) == 1
-            assert count(database.Status, msg_id=msg_id) == 1
+            self.assertEqual(count(database.Conversation, id=conversation_id), 1)
+            self.assertEqual(count(database.SecureMessage, msg_id=msg_id), 1)
+            self.assertEqual(count(database.Status, msg_id=msg_id), 1)
 
 
 def count(model, **filters):
