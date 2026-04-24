@@ -484,7 +484,7 @@ class ModifyTestCase(unittest.TestCase, ModifyTestCaseHelper):
             self.assertEqual(count(database.SecureMessage, msg_id=msg_id), 1)
             self.assertEqual(count(database.Status, msg_id=msg_id), 1)
 
-            # When closed_conversations_deletion is called, but an SQLAlchemyError is returned on deleting SecureMessages
+            # When closed_conversations_deletion is called, but an error is returned on deleting SecureMessages
             with patch(
                 "sqlalchemy.orm.query.Query.delete", side_effect=[1, SQLAlchemyError("secure message delete failed")]
             ):
