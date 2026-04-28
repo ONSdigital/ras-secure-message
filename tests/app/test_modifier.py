@@ -112,7 +112,13 @@ class ModifyTestCaseHelper:
         return thread_id
 
     def add_conversation(
-        self, conversation_id=str(uuid.uuid4()), is_closed=False, closed_by="", closed_by_uuid="", closed_at=None
+        self,
+        conversation_id=str(uuid.uuid4()),
+        is_closed=False,
+        closed_by="",
+        closed_by_uuid="",
+        closed_at=None,
+        mark_for_deletion=False,
     ):
         """Populate the conversation table"""
         # If conversation created needs to be closed, values are generated for you.  These can be overrriden
@@ -127,8 +133,10 @@ class ModifyTestCaseHelper:
                 closed_at = datetime.datetime.utcnow()
         with self.engine.begin() as con:
             query = (
-                f"INSERT INTO securemessage.conversation(id, is_closed, closed_by, closed_by_uuid, closed_at) "
-                f"VALUES('{conversation_id}', '{is_closed}', '{closed_by}', '{closed_by_uuid}', '{closed_at}')"
+                f"INSERT INTO securemessage.conversation(id, is_closed, closed_by, "
+                f"closed_by_uuid, closed_at, mark_for_deletion) "
+                f"VALUES('{conversation_id}', '{is_closed}', '{closed_by}', '{closed_by_uuid}', "
+                f"'{closed_at}', '{mark_for_deletion}')"
             )
             con.execute(text(query))
         return conversation_id
@@ -204,7 +212,7 @@ class ModifyTestCase(unittest.TestCase, ModifyTestCaseHelper):
 
     def test_open_conversation(self):
         """Test re-opening conversation works"""
-        conversation_id = self.add_conversation(is_closed=True)
+        conversation_id = self.add_conversation(is_closed=True, mark_for_deletion=True)
         with self.app.app_context():
             # msg_id is the same as thread id for a conversation of 1
             metadata = Retriever.retrieve_conversation_metadata(conversation_id)
@@ -214,6 +222,7 @@ class ModifyTestCase(unittest.TestCase, ModifyTestCaseHelper):
             self.assertIsNone(metadata.closed_by)
             self.assertIsNone(metadata.closed_by_uuid)
             self.assertIsNone(metadata.closed_at)
+            self.assertFalse(metadata.mark_for_deletion)
 
     def test_two_unread_labels_are_added_to_message(self):
         """testing duplicate message labels are not added to the database"""
