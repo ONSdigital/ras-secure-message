@@ -28,6 +28,7 @@ from secure_message.resources.messages import (
 from secure_message.resources.threads import (
     ThreadById,
     ThreadCounter,
+    ThreadDeletion,
     ThreadList,
     ThreadMarkForDeletion,
 )
@@ -68,6 +69,7 @@ def create_app(config=None):
     api.add_resource(ThreadById, "/threads/<thread_id>")
     api.add_resource(ThreadCounter, "/messages/count")
     api.add_resource(ThreadMarkForDeletion, "/threads/closed/mark_for_deletion")
+    api.add_resource(ThreadDeletion, "/threads/closed/delete")
 
     app.oauth_client_token_expires_at = maya.now()
 
@@ -169,6 +171,7 @@ def _request_requires_authentication():
         and "health" not in request.endpoint
         and request.endpoint != "info"
         and request.endpoint != "threadmarkfordeletion"
+        and request.endpoint != "threaddeletion"
         and request.method != "OPTIONS"
     )
 

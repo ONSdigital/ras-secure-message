@@ -69,5 +69,9 @@ app:
 crons:
   closedConversationsMarkForDeletionScheduler:
     name: sm-closed-conversations-mark-for-deletion
-    cron: "0 0 * * *"
+    cron: "0 1 * * *"
     target: "/threads/closed/mark_for_deletion"
+  closedConversationsDeletionScheduler:
+    name: sm-closed-conversations-deletion
+    cron: "0 0 * * *"
+    target: "/threads/closed/delete"

@@ -217,3 +217,16 @@ class ThreadMarkForDeletion(Resource):
         except SQLAlchemyError:
             logger.exception("Failed to mark conversations for deletion")
             return "", 500
+
+
+class ThreadDeletion(Resource):
+    @staticmethod
+    def delete():
+        try:
+            deleted_count = Modifier.closed_conversations_deletion()
+            logger.info(f"{deleted_count} conversations deleted")
+            return "", 204
+
+        except SQLAlchemyError:
+            logger.exception("Failed to delete conversations")
+            return "", 500

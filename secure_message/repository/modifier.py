@@ -3,7 +3,7 @@ from datetime import datetime, timedelta
 from typing import Final
 
 from flask import current_app
-from sqlalchemy import text
+from sqlalchemy import select, text
 from sqlalchemy.exc import SQLAlchemyError
 from structlog import wrap_logger
 from werkzeug.exceptions import BadRequest, InternalServerError
@@ -252,4 +252,34 @@ class Modifier:
         except SQLAlchemyError:
             db.session.rollback()
             logger.exception("Failed to mark conversations for deletion")
+            raise
+
+    @staticmethod
+    def closed_conversations_deletion() -> int:
+        """
+        Delete conversations, secure messages, and statuses that are marked for deletion.
+        """
+        session = db.session
+        try:
+            conversations_to_delete = select(Conversation.id).where(Conversation.mark_for_deletion.is_(True))
+            messages_to_delete = select(SecureMessage.msg_id).where(
+                SecureMessage.thread_id.in_(conversations_to_delete)
+            )
+
+            session.query(Status).filter(Status.msg_id.in_(messages_to_delete)).delete(synchronize_session=False)
+            session.query(SecureMessage).filter(SecureMessage.thread_id.in_(conversations_to_delete)).delete(
+                synchronize_session=False
+            )
+            deleted_count = (
+                session.query(Conversation)
+                .filter(Conversation.id.in_(conversations_to_delete))
+                .delete(synchronize_session=False)
+            )
+
+            session.commit()
+            return deleted_count
+
+        except SQLAlchemyError:
+            logger.exception("Failed to delete conversations, secure messages and statuses")
+            session.rollback()
             raise

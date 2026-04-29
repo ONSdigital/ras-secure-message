@@ -1,15 +1,15 @@
 apiVersion: batch/v1
 kind: CronJob
 metadata:
-  name: {{ .Values.crons.closedConversationsMarkForDeletionScheduler.name }}
+  name: {{ .Values.crons.closedConversationsDeletionScheduler.name }}
 spec:
-  schedule: "{{ .Values.crons.closedConversationsMarkForDeletionScheduler.cron }}"
+  schedule: "{{ .Values.crons.closedConversationsDeletionScheduler.cron }}"
   jobTemplate:
     spec:
       template:
         spec:
           containers:
-          - name: {{ .Values.crons.closedConversationsMarkForDeletionScheduler.name }}
+          - name: {{ .Values.crons.closedConversationsDeletionScheduler.name }}
             image: europe-west2-docker.pkg.dev/ons-ci-rmrasbs/images/alpine-curl:latest
             env:
             - name: SECURITY_USER_NAME
@@ -23,9 +23,9 @@ spec:
                   name: security-credentials
                   key: security-password
             - name: TARGET
-              value: {{ .Values.crons.closedConversationsMarkForDeletionScheduler.target }}
+              value: {{ .Values.crons.closedConversationsDeletionScheduler.target }}
             args:
             - /bin/sh
             - -c
-            - curl -s -u $(SECURITY_USER_NAME):$(SECURITY_USER_PASSWORD) -X POST http://$(SECURE_MESSAGE_SERVICE_HOST):$(SECURE_MESSAGE_SERVICE_PORT)$(TARGET)
+            - curl -s -u $(SECURITY_USER_NAME):$(SECURITY_USER_PASSWORD) -X DELETE http://$(SECURE_MESSAGE_SERVICE_HOST):$(SECURE_MESSAGE_SERVICE_PORT)$(TARGET)
           restartPolicy: OnFailure
