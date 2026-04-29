@@ -223,6 +223,7 @@ class Modifier:
             metadata.closed_at = None
             metadata.closed_by = None
             metadata.closed_by_uuid = None
+            metadata.mark_for_deletion = False
             db.session.commit()
         except SQLAlchemyError:
             db.session.rollback()
