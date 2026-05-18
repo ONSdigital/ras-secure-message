@@ -4,11 +4,7 @@ import urllib.parse
 
 from structlog import wrap_logger
 
-from secure_message.constants import (
-    MESSAGE_BY_ID_ENDPOINT,
-    MESSAGE_LIST_ENDPOINT,
-    MESSAGE_QUERY_LIMIT,
-)
+from secure_message.constants import MESSAGE_QUERY_LIMIT
 from secure_message.services.service_toggles import internal_user_service, party
 
 logger = wrap_logger(logging.getLogger(__name__))
@@ -145,30 +141,15 @@ def generate_string_query_args(args):
     return urllib.parse.urlencode(params)
 
 
-def process_paginated_list(
-    paginated_list, host_url: str, user, message_args, endpoint=MESSAGE_LIST_ENDPOINT, body_summary=True
-) -> tuple[list, dict]:
-    """used to change a pagination object to json format with links"""
+def process_paginated_list(paginated_list, user, body_summary=True) -> tuple[list, dict]:
+
     messages = []
-    string_query_args = generate_string_query_args(message_args)
 
     for message in paginated_list.items:
         msg = message.serialize(user, body_summary=body_summary)
-        msg["_links"] = {"self": {"href": f"{host_url}{MESSAGE_BY_ID_ENDPOINT}/{msg['msg_id']}"}}
         messages.append(msg)
 
-    links = {
-        "first": {"href": f"{host_url}{endpoint}"},
-        "self": {"href": f"{host_url}{endpoint}?{string_query_args}&page={message_args.page}"},
-    }
-
-    if paginated_list.has_next:
-        links["next"] = {"href": f"{host_url}{endpoint}?{string_query_args}&page={message_args.page + 1}"}
-
-    if paginated_list.has_prev:
-        links["prev"] = {"href": f"{host_url}{endpoint}?{string_query_args}&page={message_args.page - 1}"}
-
-    return messages, links
+    return messages
 
 
 def add_to_details(messages):
@@ -242,7 +223,6 @@ def add_from_details(messages: list) -> list:
 def get_external_user_uuid_list(messages: list) -> set:
     """Compiles a list of all unique the external user (respondent) uuids from a list of messages"""
     external_user_uuids = set()
-
     external_msgs = [message for message in messages if message["from_internal"] is False]
     for message in external_msgs:
         external_user_uuids.add(message["msg_from"])

@@ -71,14 +71,12 @@ class TestThreadsEndpoints(unittest.TestCase):
             "subject": "Something else",
             "body": "test",
             "thread_id": "59f79039-05ab-4ce1-8354-ab9e7c64d925",
-            "case_id": "",
             "business_id": "65c1070f-af33-4c15-a36c-88da9c2d8e4d",
             "survey_id": "02b9c366-7397-42f7-942a-76dc5876d86d",
             "exercise_id": "",
             "from_internal": False,
             "sent_date": "2024-02-27 16:22:20.586406",
             "read_date": "2024-02-27 16:24:31.314681",
-            "_links": "",
             "labels": ["INBOX"],
         }
 

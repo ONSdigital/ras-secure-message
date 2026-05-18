@@ -100,6 +100,7 @@ class RetrieverTestCaseHelper:
         )
         self.add_status(label="SENT", msg_id=msg_id, actor=external_actor)
         self.add_status(label="INBOX", msg_id=msg_id, actor=internal_actor)
+        self.add_status(label="UNREAD", msg_id=msg_id, actor=internal_actor)
 
         if no_of_messages > 1:
             for _ in range(no_of_messages - 1):
@@ -175,7 +176,7 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
             with self.app.app_context():
                 with current_app.test_request_context():
                     response = Retriever.retrieve_message(msg_id, self.user_internal)
-                    labels = ["INBOX"]
+                    labels = ["INBOX", "UNREAD"]
                     self.assertCountEqual(response["labels"], labels)
 
     def test_correct_labels_returned_external(self):
@@ -268,8 +269,34 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
             with current_app.test_request_context():
                 args = get_args(category="ACCOUNT")
                 response = Retriever.retrieve_thread_list(self.user_internal, args)
+                self.assertEqual(len(response), 1)
 
-                self.assertEqual(len(response.items), 1)
+    def test_thread_list_no_message(self):
+        with self.app.app_context():
+            with current_app.test_request_context():
+                args = get_args(category="ACCOUNT")
+                response = Retriever.retrieve_thread_list(self.user_internal, args)
+                self.assertEqual(len(response), 0)
+
+    def test_thread_list_new_respondent_conversations(self):
+        self.create_thread(internal_actor="GROUP")
+        self.create_thread(category="SURVEY")
+
+        with self.app.app_context():
+            with current_app.test_request_context():
+                args = get_args(new_respondent_conversations=True)
+                response = Retriever.retrieve_thread_list(self.user_internal, args)
+                self.assertEqual(len(response), 1)
+                self.assertEqual(response[0]["labels"], ["UNREAD"])
+
+    def test_thread_list_business_id(self):
+        self.create_thread(category="SURVEY")
+        with self.app.app_context():
+            with current_app.test_request_context():
+                args = get_args(ru="f1a5e99c-8edf-489a-9c72-6cabe6c387fc")
+                response = Retriever.retrieve_thread_list(self.user_internal, args)
+                self.assertEqual(len(response), 1)
+                self.assertEqual(response[0]["business_id"], "f1a5e99c-8edf-489a-9c72-6cabe6c387fc")
 
     def test_thread_list_all_messages_when_no_category_provided(self):
         """retrieves all threads for the user if a category isn't specified"""
@@ -280,8 +307,7 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
             with current_app.test_request_context():
                 args = get_args()
                 response = Retriever.retrieve_thread_list(self.user_internal, args)
-
-                self.assertEqual(len(response.items), 2)
+                self.assertEqual(len(response), 2)
 
     def test_thread_list_returned_in_descending_order_respondent(self):
         """retrieves threads from database in desc sent_date order for respondent"""
@@ -294,12 +320,12 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
                 response = Retriever.retrieve_thread_list(self.user_respondent, args)
 
                 date = []
-                for message in response.items:
-                    serialized_msg = message.serialize(self.user_respondent)
-                    if "sent_date" in serialized_msg:
-                        date.append(serialized_msg["sent_date"])
-                    elif "modified_date" in serialized_msg:
-                        date.append(serialized_msg["modified_date"])
+                for message in response:
+
+                    if "sent_date" in message:
+                        date.append(message["sent_date"])
+                    elif "modified_date" in message:
+                        date.append(message["modified_date"])
 
                 desc_date = sorted(date, reverse=True)
                 self.assertEqual(len(date), 5)
@@ -316,12 +342,11 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
                 response = Retriever.retrieve_thread_list(self.user_internal, args)
 
                 date = []
-                for message in response.items:
-                    serialized_msg = message.serialize(self.user_internal)
-                    if "sent_date" in serialized_msg:
-                        date.append(serialized_msg["sent_date"])
-                    elif "modified_date" in serialized_msg:
-                        date.append(serialized_msg["modified_date"])
+                for message in response:
+                    if "sent_date" in message:
+                        date.append(message["sent_date"])
+                    elif "modified_date" in message:
+                        date.append(message["modified_date"])
 
                 desc_date = sorted(date, reverse=True)
                 print(len(date))
@@ -341,14 +366,14 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
                 date = []
                 thread_ids = []
                 msg_ids = []
-                for message in response.items:
-                    serialized_msg = message.serialize(self.user_internal)
-                    if "sent_date" in serialized_msg:
-                        date.append(serialized_msg["sent_date"])
-                    elif "modified_date" in serialized_msg:
-                        date.append(serialized_msg["modified_date"])
-                    thread_ids.append(serialized_msg["thread_id"])
-                    msg_ids.append(serialized_msg["msg_id"])
+                for message in response:
+
+                    if "sent_date" in message:
+                        date.append(message["sent_date"])
+                    elif "modified_date" in message:
+                        date.append(message["modified_date"])
+                    thread_ids.append(message["thread_id"])
+                    msg_ids.append(message["msg_id"])
 
                 self.assertEqual(len(msg_ids), 5)
 
@@ -439,11 +464,11 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
             with current_app.test_request_context():
                 args = get_args()
                 first_respondent_thread_list = Retriever.retrieve_thread_list(self.user_respondent, args)
-                self.assertEqual(len(first_respondent_thread_list.items), 1)
+                self.assertEqual(len(first_respondent_thread_list), 1)
                 second_respondent_thread_list = Retriever.retrieve_thread_list(self.second_user_respondent, args)
-                self.assertEqual(len(second_respondent_thread_list.items), 1)
+                self.assertEqual(len(second_respondent_thread_list), 1)
                 internal_thread_list = Retriever.retrieve_thread_list(self.user_internal, args)
-                self.assertEqual(len(internal_thread_list.items), 2)
+                self.assertEqual(len(internal_thread_list), 2)
 
                 # first respondent can retrieve the message they sent
                 first_respondent_thread = Retriever.retrieve_thread(first_respondent_thread_id, self.user_respondent)

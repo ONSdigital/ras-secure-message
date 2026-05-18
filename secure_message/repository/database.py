@@ -100,14 +100,12 @@ class SecureMessage(db.Model):
             "subject": self.subject,
             "body": self.body[:100] if body_summary else self.body,
             "thread_id": self.thread_id,
-            "case_id": self.case_id,
             "business_id": self.business_id,
             "survey_id": self.survey_id,
             "exercise_id": self.exercise_id,
             "from_internal": self.from_internal,
             "sent_date": str(self.sent_at),
             "read_date": str(self.read_at),
-            "_links": "",
             "labels": [],
         }
 

@@ -1,18 +1,43 @@
 import logging
+from collections import defaultdict
 
 from flask import jsonify
-from sqlalchemy import and_, func, or_
+from sqlalchemy import and_, func, or_, text
 from sqlalchemy.exc import OperationalError, SQLAlchemyError, TimeoutError
 from sqlalchemy.orm.exc import NoResultFound
 from structlog import wrap_logger
 from werkzeug.exceptions import Forbidden, InternalServerError, NotFound
 
 from secure_message.common.labels import Labels
-from secure_message.common.utilities import set_conversation_type_args
+from secure_message.common.utilities import (
+    add_users_and_business_details,
+    process_paginated_list,
+    set_conversation_type_args,
+)
 from secure_message.constants import NON_SPECIFIC_INTERNAL_USER
 from secure_message.repository.database import Conversation, SecureMessage, Status, db
 
 logger = wrap_logger(logging.getLogger(__name__))
+
+
+LATEST_SM_SQL = """
+    INNER JOIN (
+        SELECT
+            sm.thread_id,
+            MAX(sm.id) AS max_id
+        FROM securemessage.secure_message sm
+        INNER JOIN securemessage.conversation c
+            ON c.id = sm.thread_id
+        WHERE {conversation_filters}
+        GROUP BY sm.thread_id
+    ) latest_sm
+        ON sm.id = latest_sm.max_id
+"""
+
+PAGINATION_SQL = """
+ORDER BY sm.msg_id, sm.id DESC
+LIMIT :limit OFFSET :offset
+"""
 
 
 class Retriever:
@@ -40,55 +65,10 @@ class Retriever:
 
     @staticmethod
     def thread_count_by_survey(request_args, user):
-        """Count users threads for a specific survey"""
-
-        conditions = []
-        conversation_condition = [Conversation.is_closed.is_(request_args.is_closed)]
-
-        if request_args.surveys:
-            conditions.append(SecureMessage.survey_id.in_(request_args.surveys))
-
-        if request_args.business_id:
-            conditions.append(SecureMessage.business_id == request_args.business_id)
-
-        if request_args.cc:
-            conditions.append(SecureMessage.case_id == request_args.cc)
-
-        if request_args.ce:
-            conditions.append(SecureMessage.exercise_id == request_args.ce)
-
-        if request_args.category:
-            conversation_condition.append(Conversation.category == request_args.category)
-
-        try:
-            t = (
-                db.session.query(SecureMessage.thread_id, func.max(SecureMessage.id).label("max_id"))
-                .join(Conversation)
-                .filter(*conversation_condition)
-                .group_by(SecureMessage.thread_id)
-                .subquery("t")
-            )
-
-            conditions.append(SecureMessage.thread_id == t.c.thread_id)
-            conditions.append(SecureMessage.id == t.c.max_id)
-
-            if request_args.my_conversations:
-                conditions.append(Status.actor == user.user_uuid)
-                conditions.append(Status.msg_id == SecureMessage.msg_id)
-
-            if request_args.new_respondent_conversations:
-                conditions.append(Status.msg_id == SecureMessage.msg_id)
-                conditions.append(Status.actor == NON_SPECIFIC_INTERNAL_USER)
-
-            result = SecureMessage.query.filter(and_(*conditions)).distinct(SecureMessage.msg_id).count()
-
-        except SQLAlchemyError as e:
-            logger.error("Database error when getting thread count by survey", error=e)
-            raise
-        except Exception as e:
-            logger.error("Unknown error when getting thread count by survey", error=e)
-            raise InternalServerError(description="Unknown error when getting thread count by survey")
-        return result
+        is_actor_query = Retriever._is_actor_query(request_args)
+        filters = Retriever._build_thread_filters(request_args, is_actor_query, user.user_uuid)
+        sql = Retriever._build_thread_query(filters, is_count_query=True, is_actor_query=is_actor_query)
+        return db.session.execute(text(sql), filters["params"]).scalar()
 
     @staticmethod
     def thread_count_by_survey_and_conversation_states(request_args, user):
@@ -116,14 +96,22 @@ class Retriever:
 
     @staticmethod
     def retrieve_thread_list(user, request_args):
-        """returns list of threads from db"""
+        """Returns list of threads from db"""
+
         if user.is_respondent:
             return Retriever._retrieve_respondent_thread_list(request_args, user)
 
-        return Retriever._retrieve_internal_thread_list(request_args, user)
+        messages = Retriever._retrieve_internal_thread_list(request_args, str(user.user_uuid))
+        return add_users_and_business_details(messages) if messages else []
+
+    @staticmethod
+    def _is_actor_query(request_args: dict) -> bool:
+        """Return whether the request filters by actor."""
+        return request_args.my_conversations or request_args.new_respondent_conversations
 
     @staticmethod
     def _retrieve_respondent_thread_list(request_args, user):
+        """maybe here"""
         conditions = []
 
         if request_args.business_id:
@@ -162,65 +150,46 @@ class Retriever:
             logger.exception("Database error when retrieving respondent thread list")
             raise
 
-        return result
+        return process_paginated_list(result, user)
 
     @staticmethod
-    def _retrieve_internal_thread_list(request_args, user):
-        """Retrieve a list of threads for an internal user"""
-        conditions = []
-        logger.info("Retrieving list of threads for internal user", user_uuid=user.user_uuid)
+    def _retrieve_internal_thread_list(request_args: dict, user_id: str) -> list[dict]:
+        """
+        Retrieve a list of internal message threads. Returns the latest message per thread
+        filtered by request arguments.
+        """
 
-        if request_args.business_id:
-            conditions.append(SecureMessage.business_id == request_args.business_id)
+        is_actor_query = Retriever._is_actor_query(request_args)
+        filters = Retriever._build_thread_filters(request_args, is_actor_query, user_id)
 
-        if request_args.surveys:
-            conditions.append(SecureMessage.survey_id.in_(request_args.surveys))
+        params = filters["params"]
+        params["limit"] = request_args.limit
+        params["offset"] = (request_args.page - 1) * request_args.limit
 
-        if request_args.cc:
-            conditions.append(SecureMessage.case_id == request_args.cc)
+        sql = Retriever._build_thread_query(filters, is_actor_query=is_actor_query)
+        rows = db.session.execute(text(sql), params).mappings().all()
 
-        if request_args.ce:
-            conditions.append(SecureMessage.exercise_id == request_args.ce)
+        if not rows:
+            return []
 
-        try:
-            subquery_filter = [Conversation.is_closed.is_(request_args.is_closed)]
+        msg_direction_by_msg_id = {r["msg_id"]: r["from_internal"] for r in rows}
+        message_participants_map = Retriever._build_message_participants_map(msg_direction_by_msg_id)
 
-            if request_args.category:
-                subquery_filter.append(Conversation.category == request_args.category)
-
-            t = (
-                db.session.query(SecureMessage.thread_id, func.max(SecureMessage.id).label("max_id"))
-                .join(Conversation)
-                .filter(and_(*subquery_filter))
-                .group_by(SecureMessage.thread_id)
-                .subquery("t")
-            )
-
-            conditions.append(SecureMessage.thread_id == t.c.thread_id)
-            conditions.append(SecureMessage.id == t.c.max_id)
-
-            # If my_conversations make sure that the user is an actor in the last message in the thread
-            if request_args.my_conversations:
-                conditions.append(Status.actor == user.user_uuid)
-                conditions.append(Status.msg_id == SecureMessage.msg_id)
-
-            # If new_respondent_conversations the actor should be NON_SPECIFIC_INTERNAL_USER i.e Group
-            if request_args.new_respondent_conversations:
-                conditions.append(Status.actor == NON_SPECIFIC_INTERNAL_USER)
-                conditions.append(Status.label == Labels.INBOX.value)
-                conditions.append(Status.msg_id == SecureMessage.msg_id)
-
-            result = (
-                SecureMessage.query.filter(and_(*conditions))
-                .order_by(t.c.max_id.desc())
-                .paginate(page=request_args.page, per_page=request_args.limit, error_out=False, count=False)
-            )
-
-        except SQLAlchemyError:
-            logger.exception("Database error when retrieving internal thread list")
-            raise
-
-        return result
+        return [
+            {
+                "msg_id": r["msg_id"],
+                "msg_to": message_participants_map[r["msg_id"]]["msg_to"],
+                "msg_from": message_participants_map[r["msg_id"]]["msg_from"],
+                "subject": r["subject"],
+                "body": r["body"],
+                "thread_id": r["thread_id"],
+                "business_id": r["business_id"],
+                "from_internal": r["from_internal"],
+                "sent_date": str(r["sent_at"]),
+                "labels": message_participants_map[r["msg_id"]]["labels"],
+            }
+            for r in rows
+        ]
 
     @staticmethod
     def retrieve_populated_message_object(message_id: str) -> SecureMessage:
@@ -351,3 +320,119 @@ class Retriever:
             return response
 
         return jsonify({"status": "healthy", "errors": "none"})
+
+    @staticmethod
+    def _build_thread_filters(request_args: dict, is_actor_query: bool, user_id: str) -> dict:
+        """
+        Builds SQL filter clauses and query parameters for thread queries.
+        """
+
+        conversation_filters = ["c.is_closed IS :is_closed"]
+        secure_message_filters = []
+        actor_filter = None
+        params = {"is_closed": request_args.is_closed}
+
+        if request_args.category:
+            conversation_filters.append("c.category = :category")
+            params["category"] = request_args.category
+
+        if request_args.surveys:
+            secure_message_filters.append("sm.survey_id = ANY(:surveys)")
+            params["surveys"] = request_args.surveys
+
+        if request_args.business_id:
+            secure_message_filters.append("sm.business_id = :business_id")
+            params["business_id"] = request_args.business_id
+
+        if is_actor_query:
+            actor = user_id if request_args.my_conversations else NON_SPECIFIC_INTERNAL_USER
+            actor_filter = "s.actor = :actor"
+            params["actor"] = actor
+
+        return {
+            "conversation_filters": conversation_filters,
+            "actor_filter": actor_filter,
+            "secure_message_filters": secure_message_filters,
+            "params": params,
+        }
+
+    @staticmethod
+    def _build_message_participants_map(msg_direction_by_msg_id: dict) -> dict:
+        """
+        Builds a map so a message from and to can be derived, read status is also included (internal only)
+        """
+
+        status = (
+            db.session.query(Status.msg_id, Status.actor, Status.label)
+            .filter(Status.msg_id.in_(list(msg_direction_by_msg_id)))
+            .all()
+        )
+        grouped = defaultdict(lambda: {"msg_to": [], "msg_from": "", "labels": []})
+
+        for msg_id, actor, label in status:
+            if label == "SENT":
+                grouped[msg_id]["msg_from"] = actor
+            elif label == "INBOX":
+                grouped[msg_id]["msg_to"].append(actor)
+            elif label == "UNREAD":
+                if not msg_direction_by_msg_id.get(msg_id, True):
+                    grouped[msg_id]["labels"].append("UNREAD")
+
+        return grouped
+
+    @staticmethod
+    def _build_thread_query(filters: dict, is_count_query: bool = False, is_actor_query: bool = False) -> str:
+        """
+        Builds the SQL query string for secure message threads. The query can optionally join the status table when
+        actor-based filtering is required. By default, a paginated thread query is built. When `is_count_query`
+        is True, a count query is returned instead.
+
+        """
+
+        if is_count_query:
+            select_sql = "SELECT COUNT(DISTINCT sm.msg_id)"
+        else:
+            select_sql = """
+            SELECT DISTINCT ON (sm.msg_id)
+                sm.msg_id,
+                sm.subject,
+                sm.body,
+                sm.thread_id,
+                sm.business_id,
+                sm.from_internal,
+                sm.sent_at
+            """
+
+        if is_actor_query:
+            from_sql = """
+            FROM securemessage.status s
+            INNER JOIN securemessage.secure_message sm
+                ON sm.msg_id = s.msg_id
+            """
+        else:
+            from_sql = """
+            FROM securemessage.secure_message sm
+            """
+
+        conversation_filters = (
+            " AND ".join(filters["conversation_filters"]) if filters["conversation_filters"] else "TRUE"
+        )
+        latest_sm_sql = LATEST_SM_SQL.format(conversation_filters=conversation_filters)
+        where_clauses = list(filters["secure_message_filters"])
+
+        if is_actor_query:
+            where_clauses.append(filters["actor_filter"])
+
+        where_sql = " AND ".join(where_clauses) if where_clauses else "TRUE"
+
+        sql = f"""
+        {select_sql}
+        {from_sql}
+        {latest_sm_sql}
+        WHERE {where_sql}
+        """
+
+        if not is_count_query:
+            sql += PAGINATION_SQL
+
+        return sql

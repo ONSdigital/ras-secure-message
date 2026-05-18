@@ -106,19 +106,8 @@ Typically, that would be restricted by survey_id so that only messages  of a spe
 ### Example JSON Response
 
 ```json
-{
-    "_links": {
-        "first": {
-            "href": "http://localhost:5050/messages"
-        },
-        "next": {
-            "href": "http://localhost:5050/messages?page=2&limit=20"
-        },
-        "self": {
-            "href": "http://localhost:5050/messages?page=1&limit=20"
-        }
-    },
-    "messages": [
+    {
+      "messages": [
         {
             "@msg_from": {
                 "emailAddress": "",
@@ -154,11 +143,6 @@ Typically, that would be restricted by survey_id so that only messages  of a spe
                 }
             ],
             "@business_details": null,
-            "_links": {
-                "self": {
-                    "href": "http://localhost:5050/message/ae46748b-c6e6-4859-a57a-86e01db2dcbc"
-                }
-            },
             "body": "Test uuid",
             "collection_case": "ACollectionCase",
             "collection_exercise": "",
@@ -327,14 +311,6 @@ Note, the response will have either uuids or 'GROUP' for the user ids, and a uui
 
 ```json
 {
-  "_links": {
-    "first": {
-      "href": "http://localhost:5050/threads"
-    },
-    "self": {
-      "href": "http://localhost:5050/threads?page=1&limit=20"
-    }
-  },
   "messages": [
     {
       "@msg_from": {
@@ -357,11 +333,6 @@ Note, the response will have either uuids or 'GROUP' for the user ids, and a uui
       "@business_details": {
         "id": "f1a5e99c-8edf-489a-9c72-6cabe6c387fc",
         "name": "Apple"
-      },
-      "_links": {
-        "self": {
-          "href": "http://localhost:5050/message/8966ecec-c77d-413e-993c-9bdb44b62b86"
-        }
       },
       "body": "Test",
       "collection_case": "collection case1",
@@ -403,11 +374,6 @@ Note, the response will have either uuids or 'GROUP' for the user ids, and a uui
         "id": "f1a5e99c-8edf-489a-9c72-6cabe6c387fc",
         "name": "Apple"
       },
-      "_links": {
-        "self": {
-          "href": "http://localhost:5050/message/a55ac787-caae-4678-a4a7-a91dc9463b16"
-        }
-      },
       "body": "Test",
       "collection_case": "collection case1",
       "collection_exercise": "collection exercise1",
@@ -447,11 +413,6 @@ Note, the response will have either uuids or 'GROUP' for the user ids, and a uui
       "@business_details": {
         "id": "f1a5e99c-8edf-489a-9c72-6cabe6c387fc",
         "name": "Apple"
-      },
-      "_links": {
-        "self": {
-          "href": "http://localhost:5050/message/16e5b6c5-37d4-41ee-b9d3-9b8eb0b75245"
-        }
       },
       "body": "Test",
       "collection_case": "collection case1",
@@ -550,11 +511,6 @@ Messages should have populated survey_id if the category is 'SURVEY', a collecti
         "id": "f1a5e99c-8edf-489a-9c72-6cabe6c387fc",
         "name": "Apple"
       },
-      "_links": {
-        "self": {
-          "href": "http://localhost:5050/message/c3b0418e-d723-41e9-9a89-4bacac6e8f0b"
-        }
-      },
       "body": "Test",
       "collection_case": "collection case1",
       "collection_exercise": "collection exercise1",
@@ -594,11 +550,6 @@ Messages should have populated survey_id if the category is 'SURVEY', a collecti
       "@business_details": {
         "id": "f1a5e99c-8edf-489a-9c72-6cabe6c387fc",
         "name": "Apple"
-      },
-      "_links": {
-        "self": {
-          "href": "http://localhost:5050/message/1238dfa6-24e5-46d0-9992-338637080672"
-        }
       },
       "body": "Test",
       "collection_case": "collection case1",
@@ -641,11 +592,6 @@ Messages should have populated survey_id if the category is 'SURVEY', a collecti
         "id": "f1a5e99c-8edf-489a-9c72-6cabe6c387fc",
         "name": "Apple"
       },
-      "_links": {
-        "self": {
-          "href": "http://localhost:5050/message/78e3caa6-2e27-4ad3-bd38-168b2cc3ef5d"
-        }
-      },
       "body": "Test",
       "collection_case": "collection case1",
       "collection_exercise": "collection exercise1",
@@ -664,15 +610,7 @@ Messages should have populated survey_id if the category is 'SURVEY', a collecti
       "survey": "33333333-22222-3333-4444-88dc018a1a4c",
       "thread_id": "78e3caa6-2e27-4ad3-bd38-168b2cc3ef5d"
     }
-  ],
-  "_links": {
-    "first": {
-      "href": "http://localhost:5050/threads/78e3caa6-2e27-4ad3-bd38-168b2cc3ef5d"
-    },
-    "self": {
-      "href": "http://localhost:5050/threads/78e3caa6-2e27-4ad3-bd38-168b2cc3ef5d?page=1&limit=20"
-    }
-  }
+  ]
 }
 ```
 
