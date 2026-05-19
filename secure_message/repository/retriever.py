@@ -65,6 +65,8 @@ class Retriever:
 
     @staticmethod
     def thread_count_by_survey(request_args, user):
+        """Count users threads for a specific survey"""
+
         is_actor_query = Retriever._is_actor_query(request_args)
         filters = Retriever._build_thread_filters(request_args, is_actor_query, user.user_uuid)
         sql = Retriever._build_thread_query(filters, is_count_query=True, is_actor_query=is_actor_query)
@@ -111,7 +113,6 @@ class Retriever:
 
     @staticmethod
     def _retrieve_respondent_thread_list(request_args, user):
-        """maybe here"""
         conditions = []
 
         if request_args.business_id:
@@ -181,7 +182,7 @@ class Retriever:
                 "msg_to": message_participants_map[r["msg_id"]]["msg_to"],
                 "msg_from": message_participants_map[r["msg_id"]]["msg_from"],
                 "subject": r["subject"],
-                "body": r["body"],
+                "body": r["body"][:100],
                 "thread_id": r["thread_id"],
                 "business_id": r["business_id"],
                 "from_internal": r["from_internal"],
@@ -372,8 +373,10 @@ class Retriever:
         for msg_id, actor, label in status:
             if label == "SENT":
                 grouped[msg_id]["msg_from"] = actor
+                grouped[msg_id]["labels"].append("SENT")
             elif label == "INBOX":
                 grouped[msg_id]["msg_to"].append(actor)
+                grouped[msg_id]["labels"].append("INBOX")
             elif label == "UNREAD":
                 if not msg_direction_by_msg_id.get(msg_id, True):
                     grouped[msg_id]["labels"].append("UNREAD")

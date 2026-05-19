@@ -100,7 +100,6 @@ class RetrieverTestCaseHelper:
         )
         self.add_status(label="SENT", msg_id=msg_id, actor=external_actor)
         self.add_status(label="INBOX", msg_id=msg_id, actor=internal_actor)
-        self.add_status(label="UNREAD", msg_id=msg_id, actor=internal_actor)
 
         if no_of_messages > 1:
             for _ in range(no_of_messages - 1):
@@ -176,7 +175,7 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
             with self.app.app_context():
                 with current_app.test_request_context():
                     response = Retriever.retrieve_message(msg_id, self.user_internal)
-                    labels = ["INBOX", "UNREAD"]
+                    labels = ["INBOX"]
                     self.assertCountEqual(response["labels"], labels)
 
     def test_correct_labels_returned_external(self):
@@ -279,15 +278,24 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
                 self.assertEqual(len(response), 0)
 
     def test_thread_list_new_respondent_conversations(self):
-        self.create_thread(internal_actor="GROUP")
-        self.create_thread(category="SURVEY")
+        msg_id = str(uuid.uuid4())
+        thread_id = msg_id
+        self.add_conversation(conversation_id=thread_id, category="SURVEY")
+        self.add_secure_message(
+            msg_id=msg_id,
+            thread_id=thread_id,
+            survey_id=self.BRES_SURVEY,
+            from_internal=False,
+        )
+        self.add_status(label="INBOX", msg_id=msg_id, actor="GROUP")
+        self.add_status(label="UNREAD", msg_id=msg_id, actor="GROUP")
 
         with self.app.app_context():
             with current_app.test_request_context():
                 args = get_args(new_respondent_conversations=True)
                 response = Retriever.retrieve_thread_list(self.user_internal, args)
                 self.assertEqual(len(response), 1)
-                self.assertEqual(response[0]["labels"], ["UNREAD"])
+                self.assertEqual(response[0]["labels"], ["INBOX", "UNREAD"])
 
     def test_thread_list_business_id(self):
         self.create_thread(category="SURVEY")
