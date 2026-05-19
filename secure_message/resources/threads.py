@@ -156,6 +156,8 @@ class ThreadList(Resource):
                 jsonify({"title": "Database error when getting thread list", "detail": e.__class__.__name__}), 500
             )
 
+        if messages:
+            messages = add_users_and_business_details(messages)
         return jsonify({"messages": messages})
 
     @staticmethod
