@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "a7d4041e05ea58385fc0f6de3345c6433c0703bea3795dea8e6f1b06ea2de218"
+            "sha256": "debb862d4ff492b659e402110f8924caed14cac1727bffd517aa774ae636274a"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -1386,6 +1386,15 @@
             ],
             "markers": "python_version >= '3.9'",
             "version": "==3.1.8"
+        },
+        "zombie-imp": {
+            "hashes": [
+                "sha256:6ba08bf13602358c7c39561b939e97bba181c7c5f96ff1b2d707e0f43d9e05a7",
+                "sha256:c888321fbd942f1a3205c0923a2f21d3ed6e5ab6c2f6237abf43c147f37df97f"
+            ],
+            "index": "pypi",
+            "markers": "python_version >= '3.7'",
+            "version": "==0.0.4"
         }
     },
     "develop": {
