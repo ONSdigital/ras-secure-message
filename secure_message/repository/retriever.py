@@ -35,7 +35,7 @@ LATEST_SM_SQL = """
 """
 
 PAGINATION_SQL = """
-ORDER BY sm.msg_id, sm.id DESC
+ORDER BY sm.msg_id DESC
 LIMIT :limit OFFSET :offset
 """
 
