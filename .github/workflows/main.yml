@@ -31,8 +31,8 @@ jobs:
         image: postgres:9.4
         env:
           POSTGRES_PASSWORD: postgres
-          POSTGRES_USER: root
-          POSTGRES_DB: postgres
+          POSTGRES_USER: postgres
+          POSTGRES_DB: securemessage
         ports:
           # Maps port 6379 on service container to the host
           - 5432:5432
