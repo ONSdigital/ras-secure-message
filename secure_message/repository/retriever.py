@@ -34,11 +34,6 @@ LATEST_SM_SQL = """
         ON sm.id = latest_sm.max_id
 """
 
-PAGINATION_SQL = """
-ORDER BY sm.msg_id DESC
-LIMIT :limit OFFSET :offset
-"""
-
 
 class Retriever:
     """Created when retrieving messages"""
@@ -435,7 +430,11 @@ class Retriever:
         WHERE {where_sql}
         """
 
-        if not is_count_query:
-            sql += PAGINATION_SQL
+        if is_count_query:
+            return sql
 
-        return sql
+        return f"""
+        SELECT * FROM ({sql}) AS thread_details
+        ORDER BY thread_details.sent_at DESC
+        LIMIT :limit OFFSET :offset
+        """
