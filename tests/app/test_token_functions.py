@@ -38,11 +38,13 @@ class TestClientTokenFunctions(unittest.TestCase):
             m.return_value = self.oauth_client_token
             with self.app.app_context():
                 cache_client_token(self.app)
-                self.assertTrue(
-                    m.called_with(
-                        self.app.config["CLIENT_ID"], self.app.config["CLIENT_SECRET"], self.app.config["UAA_URL"]
-                    )
+                expectedArguments = (
+                    self.app.config["CLIENT_ID"],
+                    self.app.config["CLIENT_SECRET"],
+                    self.app.config["UAA_URL"],
                 )
+
+                self.assertEqual(m.call_args.args, expectedArguments)
                 self.assertEqual(self.app.oauth_client_token, self.oauth_client_token)
                 self.assertAlmostEqual(
                     self.app.oauth_client_token_expires_at,

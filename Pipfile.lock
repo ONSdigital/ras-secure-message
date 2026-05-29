@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "debb862d4ff492b659e402110f8924caed14cac1727bffd517aa774ae636274a"
+            "sha256": "21ad7667a997722e1743f4c40c507bc5cb1d2bab8f8041efb5ed8f1e29144ff0"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -1797,6 +1797,15 @@
             "markers": "python_version >= '3.9'",
             "version": "==2.20.0"
         },
+        "pynose": {
+            "hashes": [
+                "sha256:673751d53fcfc79b1e48c14f36c7a24779ad43676eeb85736934de6a2b3d8ec8",
+                "sha256:81da4e26473f98dd37497248eef4352d3221d1d56edf874a00c6bdda6daf7f49"
+            ],
+            "index": "pypi",
+            "markers": "python_version >= '3.7'",
+            "version": "==1.5.5"
+        },
         "pytest": {
             "hashes": [
                 "sha256:2c5efc453d45394fdd706ade797c0a81091eccd1d6e4bccfcd476e2b8e0ab5d9",
@@ -1984,6 +1993,15 @@
             ],
             "markers": "python_version >= '3.10'",
             "version": "==2.7.0"
+        },
+        "zombie-imp": {
+            "hashes": [
+                "sha256:6ba08bf13602358c7c39561b939e97bba181c7c5f96ff1b2d707e0f43d9e05a7",
+                "sha256:c888321fbd942f1a3205c0923a2f21d3ed6e5ab6c2f6237abf43c147f37df97f"
+            ],
+            "index": "pypi",
+            "markers": "python_version >= '3.7'",
+            "version": "==0.0.4"
         }
     }
 }
