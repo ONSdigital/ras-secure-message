@@ -51,11 +51,6 @@ jobs:
         run: |
           pip install pipenv
           pipenv install --dev --deploy
-      - name: Initialise Database
-        run: |
-          PGPASSWORD=postgres psql -h localhost -U postgres -d postgres -c "CREATE ROLE root WITH LOGIN PASSWORD 'root';"
-          PGPASSWORD=postgres psql -h localhost -U postgres -d postgres -c "ALTER ROLE root CREATEDB;"
-          PGPASSWORD=root psql -h localhost -U root -d postgres -c "CREATE DATABASE securemessage;"
       - name: Run Tests
         run: |
           make test
