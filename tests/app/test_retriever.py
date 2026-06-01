@@ -129,6 +129,7 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
         self.MESSAGE_LIST_ENDPOINT = "http://localhost:5050/messages"
         self.MESSAGE_BY_ID_ENDPOINT = "http://localhost:5050/message/"
         with self.app.app_context():
+            database.db.session.remove()
             database.db.drop_all()
             database.db.create_all()
             self.db = database.db
@@ -143,6 +144,12 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
         """Clean up connections after each test"""
         if hasattr(self, "engine"):
             self.engine.dispose()
+
+        # Then clean up the app context and database
+        if hasattr(self, "app"):
+            with self.app.app_context():
+                database.db.session.remove()
+                database.db.drop_all()
 
     def test_msg_returned_with_msg_id_true(self):
         """retrieves message using id"""
