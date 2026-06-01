@@ -28,6 +28,11 @@ class TestClientTokenFunctions(unittest.TestCase):
             "jti": "705288eea2474641bde364032d465157",
         }
 
+    def tearDown(self):
+        """Clean up connections after each test"""
+        if hasattr(self, "engine"):
+            self.engine.dispose()
+
     def test_set_expiry_on_startup(self):
         """Test token_expires_at is set on app startup"""
         with self.app.app_context():

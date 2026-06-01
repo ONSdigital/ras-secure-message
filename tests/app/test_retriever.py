@@ -139,6 +139,11 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
         self.second_user_respondent = User(RetrieverTestCaseHelper.second_external_actor, "respondent")
         party.use_mock_service()
 
+    def tearDown(self):
+        """Clean up connections after each test"""
+        if hasattr(self, "engine"):
+            self.engine.dispose()
+
     def test_msg_returned_with_msg_id_true(self):
         """retrieves message using id"""
         self.create_thread(no_of_messages=2)

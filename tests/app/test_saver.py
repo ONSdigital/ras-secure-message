@@ -33,6 +33,11 @@ class SaverTestCase(unittest.TestCase):
             self.db = database.db
         self.app = app
 
+    def tearDown(self):
+        """Clean up connections after each test"""
+        if hasattr(self, "engine"):
+            self.engine.dispose()
+
     def test_save_message_raises_message_save_exception_on_db_error(self):
         """Tests exception is logged if message save fails"""
         with self.app.app_context():
