@@ -28,6 +28,7 @@ class SaverTestCase(unittest.TestCase):
             **{"msg_to": "tej", "msg_from": "gemma", "subject": "MyMessage", "body": "hello", "thread_id": ""}
         )
         with app.app_context():
+            database.db.session.remove()
             database.db.drop_all()
             database.db.create_all()
             self.db = database.db
@@ -37,6 +38,12 @@ class SaverTestCase(unittest.TestCase):
         """Clean up connections after each test"""
         if hasattr(self, "engine"):
             self.engine.dispose()
+
+        # Then clean up the app context and database
+        if hasattr(self, "app"):
+            with self.app.app_context():
+                database.db.session.remove()
+                database.db.drop_all()
 
     def test_save_message_raises_message_save_exception_on_db_error(self):
         """Tests exception is logged if message save fails"""
