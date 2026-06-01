@@ -56,6 +56,11 @@ class UtilitiesTestCase(unittest.TestCase):
         party.use_mock_service()
         internal_user_service.use_mock_service()
 
+    def tearDown(self):
+        """Clean up connections after each test"""
+        if hasattr(self, "engine"):
+            self.engine.dispose()
+
     messages_external_first = [
         {
             "body": "Reply body from respondent",
