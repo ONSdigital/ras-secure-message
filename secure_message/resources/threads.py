@@ -7,12 +7,7 @@ from sqlalchemy.exc import SQLAlchemyError
 from structlog import wrap_logger
 from werkzeug.exceptions import BadRequest
 
-from secure_message.common.utilities import (
-    add_users_and_business_details,
-    get_options,
-    process_paginated_list,
-)
-from secure_message.constants import THREAD_LIST_ENDPOINT
+from secure_message.common.utilities import add_users_and_business_details, get_options
 from secure_message.repository.modifier import Modifier
 from secure_message.repository.retriever import Retriever
 from secure_message.validation.thread import ThreadPatch
@@ -155,17 +150,15 @@ class ThreadList(Resource):
         ThreadList._validate_request(message_args, g.user)
 
         try:
-            result = Retriever.retrieve_thread_list(g.user, message_args)
+            messages = Retriever.retrieve_thread_list(g.user, message_args)
         except SQLAlchemyError as e:
             return make_response(
                 jsonify({"title": "Database error when getting thread list", "detail": e.__class__.__name__}), 500
             )
 
-        logger.info("Successfully retrieved threads for user", user_uuid=g.user.user_uuid)
-        messages, links = process_paginated_list(result, request.host_url, g.user, message_args, THREAD_LIST_ENDPOINT)
         if messages:
             messages = add_users_and_business_details(messages)
-        return jsonify({"messages": messages, "_links": links})
+        return jsonify({"messages": messages})
 
     @staticmethod
     def _validate_request(request_args, user):
@@ -189,7 +182,6 @@ class ThreadCounter(Resource):
         """
         logger.info("Getting count of threads for user", user_uuid=g.user.user_uuid)
         message_args = get_options(request.args)
-
         try:
             if message_args.all_conversation_types:
                 logger.info("Getting counts for all conversation states for user", user_uuid=g.user.user_uuid)
@@ -198,7 +190,6 @@ class ThreadCounter(Resource):
             if message_args.unread_conversations:
                 logger.info("Getting counts of unread conversations", user_uuid=g.user.user_uuid)
                 return jsonify(total=Retriever.unread_message_count(g.user))
-
             return jsonify(total=Retriever.thread_count_by_survey(message_args, g.user))
         except SQLAlchemyError as e:
             return make_response(

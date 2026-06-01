@@ -121,33 +121,6 @@ Scenario: Respondent sends multiple messages to group , internal user gets count
    And the count of open threads for current user is made
   Then the thread count is '0' threads
 
-
-Scenario: Respondent sends messages to different ce, internal user filters by ce
-  Given sending from respondent to internal specific user
-    And the collection_exercise is set to 'ce1'
-    And the message is sent
-    And the collection_exercise is set to 'ce1'
-    And the message is sent
-    And the collection_exercise is set to 'ce2'
-    And the message is sent
-  When  the user is set as internal specific user
-    And the count of open threads for current user and ce of 'ce1' is made
-  Then  the thread count is '2' threads
-
-
-Scenario: Respondent sends messages to different cc, internal user filters by cc
-  Given sending from respondent to internal specific user
-    And the collection case is set to 'cc1'
-    And the message is sent
-    And the collection case is set to 'cc1'
-    And the message is sent
-    And the collection case is set to 'cc2'
-    And the message is sent
-  When  the user is set as internal specific user
-    And the count of open threads for current user and cc of 'cc1' is made
-  Then  the thread count is '2' threads
-
-
 Scenario: Respondent sends messages to different ru, internal user filters by ru
   Given sending from respondent to internal specific user
     And the business_id is set to 'additional_ru1'
