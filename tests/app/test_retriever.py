@@ -128,7 +128,7 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
         self.engine = create_engine(
             self.app.config["SQLALCHEMY_DATABASE_URI"],
             pool_size=0,
-            max_overflow=-1,
+            max_overflow=100,
             pool_pre_ping=True,
             echo=False,
         )
