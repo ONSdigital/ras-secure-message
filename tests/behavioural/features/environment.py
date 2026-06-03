@@ -1,6 +1,7 @@
 from flask import current_app
 
 from secure_message.application import create_app
+from secure_message.repository import database
 
 
 def before_scenario(context, scenario):
@@ -16,9 +17,11 @@ def before_all(context):
 
 
 def after_all(context):
-    if hasattr(context, "db_engine"):
-        context.db_engine.dispose()
+    if hasattr(context, "app"):
+        with context.app.app_context():
+            database.db.session.remove()
+
+            database.db.engine.dispose()
 
     import gc
-
     gc.collect()
