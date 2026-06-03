@@ -155,7 +155,6 @@ def retry_if_database_error(exception):
     return isinstance(exception, DatabaseError) and not isinstance(exception, ProgrammingError)
 
 
-# @retry(retry_on_exception=retry_if_database_error, wait_fixed=2000, stop_max_delay=30000, wrap_exception=True)
 def create_db(app):
     database.db.init_app(app)
     with app.app_context():
