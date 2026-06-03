@@ -13,3 +13,12 @@ def before_all(context):
     context.app = create_app(config="TestConfig")
     with context.app.app_context():
         context.client = current_app.test_client()
+
+
+def after_all(context):
+    if hasattr(context, "db_engine"):
+        context.db_engine.dispose()
+
+    import gc
+
+    gc.collect()
