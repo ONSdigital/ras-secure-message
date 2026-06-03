@@ -9,7 +9,6 @@ from flask import Flask, json, jsonify, request
 from flask_cors import CORS
 from flask_restful import Api
 from requests.adapters import HTTPAdapter
-from retrying import retry
 from sqlalchemy import DDL, event
 from sqlalchemy.exc import DatabaseError, ProgrammingError
 from structlog import wrap_logger
@@ -156,7 +155,7 @@ def retry_if_database_error(exception):
     return isinstance(exception, DatabaseError) and not isinstance(exception, ProgrammingError)
 
 
-@retry(retry_on_exception=retry_if_database_error, wait_fixed=2000, stop_max_delay=30000, wrap_exception=True)
+# @retry(retry_on_exception=retry_if_database_error, wait_fixed=2000, stop_max_delay=30000, wrap_exception=True)
 def create_db(app):
     database.db.init_app(app)
     with app.app_context():
