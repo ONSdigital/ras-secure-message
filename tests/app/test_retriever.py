@@ -125,7 +125,13 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
         """setup test environment"""
         self.app = create_app(config="TestConfig")
         self.app.testing = True
-        self.engine = create_engine(self.app.config["SQLALCHEMY_DATABASE_URI"])
+        self.engine = create_engine(
+            self.app.config["SQLALCHEMY_DATABASE_URI"],
+            pool_size=0,
+            max_overflow=100,
+            pool_pre_ping=True,
+            echo=False,
+        )
         self.MESSAGE_LIST_ENDPOINT = "http://localhost:5050/messages"
         self.MESSAGE_BY_ID_ENDPOINT = "http://localhost:5050/message/"
         with self.app.app_context():
@@ -138,6 +144,15 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
         self.user_respondent = User(RetrieverTestCaseHelper.default_external_actor, "respondent")
         self.second_user_respondent = User(RetrieverTestCaseHelper.second_external_actor, "respondent")
         party.use_mock_service()
+
+    def tearDown(self):
+        if hasattr(self, "app"):
+            with self.app.app_context():
+                database.db.session.remove()
+                database.db.drop_all()
+
+        if hasattr(self, "engine"):
+            self.engine.dispose()
 
     def test_msg_returned_with_msg_id_true(self):
         """retrieves message using id"""
