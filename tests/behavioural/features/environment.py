@@ -24,4 +24,5 @@ def after_all(context):
             database.db.engine.dispose()
 
     import gc
+
     gc.collect()
