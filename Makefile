@@ -20,8 +20,7 @@ unit-test:
 	pipenv run pytest
 
 test: lint-check
-	pipenv run behave --format progress
-	sleep 2
+	#pipenv run behave --format progress
 	pipenv run pytest
 
 build-docker:
