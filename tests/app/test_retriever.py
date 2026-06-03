@@ -339,6 +339,28 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
                 self.assertEqual(len(date), 5)
                 self.assertListEqual(desc_date, date)
 
+    def test_thread_list_returned_in_descending_order_internal(self):
+        """retrieves threads from database in desc sent_date order for internal user"""
+        for _ in range(5):
+            self.create_thread(no_of_messages=3)
+
+        with self.app.app_context():
+            with current_app.test_request_context():
+                args = get_args(limit=MESSAGE_QUERY_LIMIT)
+                response = Retriever.retrieve_thread_list(self.user_internal, args)
+
+                date = []
+                for message in response:
+                    if "sent_date" in message:
+                        date.append(message["sent_date"])
+                    elif "modified_date" in message:
+                        date.append(message["modified_date"])
+
+                desc_date = sorted(date, reverse=True)
+                print(len(date))
+                self.assertEqual(len(date), 5)
+                self.assertListEqual(desc_date, date)
+
     def test_latest_message_from_each_thread_chosen_desc(self):
         """checks the message chosen for each thread is the latest message within that thread"""
         for _ in range(5):
