@@ -40,29 +40,26 @@ class RetrieverTestCaseHelper:
         include_read_at=False,
     ):
         """Populate the secure_message table"""
-        try:
-            with self.engine.begin() as con:
-                if include_read_at:
-                    read_at = datetime.utcnow()
-                    query = (
-                        f"INSERT INTO securemessage.secure_message(msg_id, subject, body, thread_id,"
-                        f"case_id, business_id, survey_id, exercise_id, from_internal, sent_at, read_at)"
-                        f"VALUES ('{msg_id}', '{subject}','{body}',"
-                        f"'{thread_id}', '{case_id}', '{business_id}', '{survey_id}',"
-                        f" '{exercise_id}', '{from_internal}',  '{sent_at}', '{read_at}')"
-                    )
-                else:
-                    query = (
-                        f"INSERT INTO securemessage.secure_message(msg_id, subject, body, thread_id,"
-                        f"case_id, business_id, survey_id, exercise_id, from_internal, sent_at)"
-                        f"VALUES ('{msg_id}', '{subject}','{body}',"
-                        f"'{thread_id}', '{case_id}', '{business_id}', '{survey_id}',"
-                        f" '{exercise_id}', '{from_internal}',  '{sent_at}')"
-                    )
-                con.execute(text(query))
-        except Exception as e:
-            self.engine.dispose()
-            raise e
+
+        with self.engine.begin() as con:
+            if include_read_at:
+                read_at = datetime.utcnow()
+                query = (
+                    f"INSERT INTO securemessage.secure_message(msg_id, subject, body, thread_id,"
+                    f"case_id, business_id, survey_id, exercise_id, from_internal, sent_at, read_at)"
+                    f"VALUES ('{msg_id}', '{subject}','{body}',"
+                    f"'{thread_id}', '{case_id}', '{business_id}', '{survey_id}',"
+                    f" '{exercise_id}', '{from_internal}',  '{sent_at}', '{read_at}')"
+                )
+            else:
+                query = (
+                    f"INSERT INTO securemessage.secure_message(msg_id, subject, body, thread_id,"
+                    f"case_id, business_id, survey_id, exercise_id, from_internal, sent_at)"
+                    f"VALUES ('{msg_id}', '{subject}','{body}',"
+                    f"'{thread_id}', '{case_id}', '{business_id}', '{survey_id}',"
+                    f" '{exercise_id}', '{from_internal}',  '{sent_at}')"
+                )
+            con.execute(text(query))
 
     def add_conversation(self, conversation_id, is_closed=False, category="SURVEY"):
         """Populate the conversation table"""
@@ -128,18 +125,10 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
         """setup test environment"""
         self.app = create_app(config="TestConfig")
         self.app.testing = True
-        self.engine = create_engine(
-            self.app.config["SQLALCHEMY_DATABASE_URI"],
-            pool_size=5,
-            max_overflow=10,
-            pool_pre_ping=True,
-            echo=False,
-        )
-
+        self.engine = create_engine(self.app.config["SQLALCHEMY_DATABASE_URI"])
         self.MESSAGE_LIST_ENDPOINT = "http://localhost:5050/messages"
         self.MESSAGE_BY_ID_ENDPOINT = "http://localhost:5050/message/"
         with self.app.app_context():
-            database.db.session.remove()
             database.db.drop_all()
             database.db.create_all()
             self.db = database.db
@@ -149,15 +138,6 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
         self.user_respondent = User(RetrieverTestCaseHelper.default_external_actor, "respondent")
         self.second_user_respondent = User(RetrieverTestCaseHelper.second_external_actor, "respondent")
         party.use_mock_service()
-
-    def tearDown(self):
-        if hasattr(self, "app"):
-            with self.app.app_context():
-                database.db.session.remove()
-                database.db.drop_all()
-
-        if hasattr(self, "engine"):
-            self.engine.dispose()
 
     def test_msg_returned_with_msg_id_true(self):
         """retrieves message using id"""
@@ -336,6 +316,28 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
                 args = get_args()
                 response = Retriever.retrieve_thread_list(self.user_internal, args)
                 self.assertEqual(len(response), 2)
+
+    def test_thread_list_returned_in_descending_order_respondent(self):
+        """retrieves threads from database in desc sent_date order for respondent"""
+        for _ in range(5):
+            self.create_thread(no_of_messages=2)
+
+        with self.app.app_context():
+            with current_app.test_request_context():
+                args = get_args(limit=MESSAGE_QUERY_LIMIT)
+                response = Retriever.retrieve_thread_list(self.user_respondent, args)
+
+                date = []
+                for message in response:
+
+                    if "sent_date" in message:
+                        date.append(message["sent_date"])
+                    elif "modified_date" in message:
+                        date.append(message["modified_date"])
+
+                desc_date = sorted(date, reverse=True)
+                self.assertEqual(len(date), 5)
+                self.assertListEqual(desc_date, date)
 
     def test_thread_list_returned_in_descending_order_internal(self):
         """retrieves threads from database in desc sent_date order for internal user"""
