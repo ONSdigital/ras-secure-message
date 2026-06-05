@@ -28,7 +28,7 @@ jobs:
       # Label used to access the service container
       postgres:
         # Docker Hub image
-        image: postgres:9.4
+        image: postgres:16
         env:
           POSTGRES_PASSWORD: postgres
           POSTGRES_USER: postgres
@@ -43,10 +43,10 @@ jobs:
         with:
           fetch-depth: '0'
           token: ${{ secrets.BOT_TOKEN }}
-      - name: Set up Python 3.11
+      - name: Set up Python 3.14
         uses: actions/setup-python@7f4fc3e22c37d6ff65e88745f38bd3157c663f7c # v4.9.1
         with:
-          python-version: '3.11'
+          python-version: '3.14'
       - name: Get Dependencies
         run: |
           pip install pipenv

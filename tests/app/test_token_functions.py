@@ -4,7 +4,6 @@ from unittest import mock
 
 import maya
 import responses
-from sqlalchemy import create_engine
 
 from secure_message import application
 from secure_message.application import cache_client_token, get_client_token
@@ -17,7 +16,6 @@ class TestClientTokenFunctions(unittest.TestCase):
         """setup test environment"""
         self.app = application.create_app(config="TestConfig")
         self.client = self.app.test_client()
-        self.engine = create_engine(self.app.config["SQLALCHEMY_DATABASE_URI"])
 
         self.oauth_client_token = {
             "access_token": "705288eea2474641bde364032d465157",
@@ -36,14 +34,21 @@ class TestClientTokenFunctions(unittest.TestCase):
     def test_cache_client_token(self):
         with mock.patch("secure_message.application.get_client_token") as m:
             m.return_value = self.oauth_client_token
+
             with self.app.app_context():
                 cache_client_token(self.app)
-                self.assertTrue(
-                    m.called_with(
-                        self.app.config["CLIENT_ID"], self.app.config["CLIENT_SECRET"], self.app.config["UAA_URL"]
-                    )
+
+                m.assert_called_once_with(
+                    self.app.config["CLIENT_ID"],
+                    self.app.config["CLIENT_SECRET"],
+                    self.app.config["UAA_URL"],
                 )
-                self.assertEqual(self.app.oauth_client_token, self.oauth_client_token)
+
+                self.assertEqual(
+                    self.app.oauth_client_token,
+                    self.oauth_client_token,
+                )
+
                 self.assertAlmostEqual(
                     self.app.oauth_client_token_expires_at,
                     maya.now().add(seconds=self.oauth_client_token["expires_in"] - 10),

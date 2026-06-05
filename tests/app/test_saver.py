@@ -4,7 +4,7 @@ import uuid
 from unittest import mock
 
 from flask import current_app
-from sqlalchemy import create_engine, text
+from sqlalchemy import text
 from sqlalchemy.exc import SQLAlchemyError
 
 from secure_message.application import create_app
@@ -23,15 +23,20 @@ class SaverTestCase(unittest.TestCase):
         app = create_app(config="TestConfig")
         app.testing = True
 
-        self.engine = create_engine(app.config["SQLALCHEMY_DATABASE_URI"])
+        self.db = database.db
         self.test_message = Message(
             **{"msg_to": "tej", "msg_from": "gemma", "subject": "MyMessage", "body": "hello", "thread_id": ""}
         )
+
         with app.app_context():
             database.db.drop_all()
             database.db.create_all()
-            self.db = database.db
         self.app = app
+
+    def tearDown(self):
+        with self.app.app_context():
+            self.db.session.remove()
+            self.db.engine.dispose()
 
     def test_save_message_raises_message_save_exception_on_db_error(self):
         """Tests exception is logged if message save fails"""
@@ -58,28 +63,26 @@ class SaverTestCase(unittest.TestCase):
 
         # This is horrible and barely tests anything... needs to be rewritten to test
         # WHAT statuses are in the database, not just that is literally anything there
-        with self.engine.begin() as con:
-            request = con.execute(text("SELECT * FROM securemessage.status"))
+        with self.app.app_context():
+            request = self.db.session.execute(text("SELECT * FROM securemessage.status"))
             for row in request.mappings():
                 self.assertTrue(row is not None)
-            con.close()
 
     def test_saved_new_thread_creates_entry_in_conversation_table(self):
         """retrieves message status from database"""
         with self.app.app_context():
             random_uuid = str(uuid.uuid4())
             Saver.save_message(SecureMessage(msg_id=random_uuid, thread_id=random_uuid))
-            with self.engine.begin() as con:
-                request = con.execute(text("SELECT * FROM securemessage.conversation"))
-                row = request.mappings().fetchone()
-                # Newly created record should be mostly empty
-                self.assertEqual(row["id"], random_uuid)
-                self.assertFalse(row["is_closed"])
-                self.assertIsNone(row["closed_by"])
-                self.assertIsNone(row["closed_by_uuid"])
-                self.assertIsNone(row["closed_at"])
-                self.assertTrue(row["category"] is not None)
-                con.close()
+
+            request = self.db.session.execute(text("SELECT * FROM securemessage.conversation"))
+            row = request.mappings().fetchone()
+            # Newly created record should be mostly empty
+            self.assertEqual(row["id"], random_uuid)
+            self.assertFalse(row["is_closed"])
+            self.assertIsNone(row["closed_by"])
+            self.assertIsNone(row["closed_by_uuid"])
+            self.assertIsNone(row["closed_at"])
+            self.assertTrue(row["category"] is not None)
 
     def test_save_msg_status_raises_message_save_exception_on_db_error(self):
         """Tests MessageSaveException generated if db commit fails saving message"""
@@ -97,8 +100,7 @@ class SaverTestCase(unittest.TestCase):
             with current_app.test_request_context():
                 Saver().save_message(SecureMessage(msg_id="AMsgId", thread_id="AMsgId"))
 
-        with self.engine.begin() as con:
-            request = con.execute(text("SELECT * FROM securemessage.secure_message limit 1"))
+            request = self.db.session.execute(text("SELECT * FROM securemessage.secure_message limit 1"))
             for row in request.mappings():
                 self.assertTrue(row is not None)
                 self.assertTrue(row["msg_id"] == "AMsgId")
@@ -106,7 +108,6 @@ class SaverTestCase(unittest.TestCase):
                 # Just check that sent_at (11th element) is set without checking the value as we don't have it
                 self.assertIsInstance(row["sent_at"], datetime.datetime)
                 self.assertTrue(row["sent_at"] is not None)
-            con.close()
 
     def test_status_commit_exception_raises_message_save_exception(self):
         """check status commit exception clears the session"""
@@ -127,8 +128,7 @@ class SaverTestCase(unittest.TestCase):
                 self.db.create_all()
                 Saver().save_message(self.test_message)
 
-        with self.engine.begin() as con:
-            request = con.execute(
+            request = self.db.session.execute(
                 text("SELECT COUNT(securemessage.secure_message.id) FROM securemessage.secure_message")
             )
             for row in request.mappings():
