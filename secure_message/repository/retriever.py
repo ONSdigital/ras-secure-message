@@ -401,17 +401,6 @@ class Retriever:
                 sm.sent_at
             """
 
-        if is_actor_query:
-            from_sql = """
-            FROM securemessage.status s
-            INNER JOIN securemessage.secure_message sm
-                ON sm.msg_id = s.msg_id
-            """
-        else:
-            from_sql = """
-            FROM securemessage.secure_message sm
-            """
-
         conversation_filters = (
             " AND ".join(filters["conversation_filters"]) if filters["conversation_filters"] else "TRUE"
         )
@@ -419,13 +408,17 @@ class Retriever:
         where_clauses = list(filters["secure_message_filters"])
 
         if is_actor_query:
-            where_clauses.append(filters["actor_filter"])
+            # As we don't use any data from the status table, we only need to check a record exists for the actor.
+            where_clauses.append(f"""
+            EXISTS (SELECT 1 FROM securemessage.status s
+                    WHERE s.msg_id = sm.msg_id AND {filters["actor_filter"]})
+            """)
 
         where_sql = " AND ".join(where_clauses) if where_clauses else "TRUE"
 
         sql = f"""
         {select_sql}
-        {from_sql}
+        FROM securemessage.secure_message sm
         {latest_sm_sql}
         WHERE {where_sql}
         """
