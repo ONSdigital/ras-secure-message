@@ -408,6 +408,7 @@ class Retriever:
         where_clauses = list(filters["secure_message_filters"])
 
         if is_actor_query:
+            # As we don't use any data from the status table, we only need to check a record exists for the actor.
             where_clauses.append(f"""
             EXISTS (SELECT 1 FROM securemessage.status s
                     WHERE s.msg_id = sm.msg_id AND {filters["actor_filter"]})
