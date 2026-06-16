@@ -40,26 +40,29 @@ class RetrieverTestCaseHelper:
         include_read_at=False,
     ):
         """Populate the secure_message table"""
-
-        with self.engine.begin() as con:
-            if include_read_at:
-                read_at = datetime.utcnow()
-                query = (
-                    f"INSERT INTO securemessage.secure_message(msg_id, subject, body, thread_id,"
-                    f"case_id, business_id, survey_id, exercise_id, from_internal, sent_at, read_at)"
-                    f"VALUES ('{msg_id}', '{subject}','{body}',"
-                    f"'{thread_id}', '{case_id}', '{business_id}', '{survey_id}',"
-                    f" '{exercise_id}', '{from_internal}',  '{sent_at}', '{read_at}')"
-                )
-            else:
-                query = (
-                    f"INSERT INTO securemessage.secure_message(msg_id, subject, body, thread_id,"
-                    f"case_id, business_id, survey_id, exercise_id, from_internal, sent_at)"
-                    f"VALUES ('{msg_id}', '{subject}','{body}',"
-                    f"'{thread_id}', '{case_id}', '{business_id}', '{survey_id}',"
-                    f" '{exercise_id}', '{from_internal}',  '{sent_at}')"
-                )
-            con.execute(text(query))
+        try:
+            with self.engine.begin() as con:
+                if include_read_at:
+                    read_at = datetime.utcnow()
+                    query = (
+                        f"INSERT INTO securemessage.secure_message(msg_id, subject, body, thread_id,"
+                        f"case_id, business_id, survey_id, exercise_id, from_internal, sent_at, read_at)"
+                        f"VALUES ('{msg_id}', '{subject}','{body}',"
+                        f"'{thread_id}', '{case_id}', '{business_id}', '{survey_id}',"
+                        f" '{exercise_id}', '{from_internal}',  '{sent_at}', '{read_at}')"
+                    )
+                else:
+                    query = (
+                        f"INSERT INTO securemessage.secure_message(msg_id, subject, body, thread_id,"
+                        f"case_id, business_id, survey_id, exercise_id, from_internal, sent_at)"
+                        f"VALUES ('{msg_id}', '{subject}','{body}',"
+                        f"'{thread_id}', '{case_id}', '{business_id}', '{survey_id}',"
+                        f" '{exercise_id}', '{from_internal}',  '{sent_at}')"
+                    )
+                con.execute(text(query))
+        except Exception as e:
+            self.engine.dispose()
+            raise e
 
     def add_conversation(self, conversation_id, is_closed=False, category="SURVEY"):
         """Populate the conversation table"""
@@ -125,10 +128,18 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
         """setup test environment"""
         self.app = create_app(config="TestConfig")
         self.app.testing = True
-        self.engine = create_engine(self.app.config["SQLALCHEMY_DATABASE_URI"])
+        self.engine = create_engine(
+            self.app.config["SQLALCHEMY_DATABASE_URI"],
+            pool_size=5,
+            max_overflow=10,
+            pool_pre_ping=True,
+            echo=False,
+        )
+
         self.MESSAGE_LIST_ENDPOINT = "http://localhost:5050/messages"
         self.MESSAGE_BY_ID_ENDPOINT = "http://localhost:5050/message/"
         with self.app.app_context():
+            database.db.session.remove()
             database.db.drop_all()
             database.db.create_all()
             self.db = database.db
@@ -138,6 +149,15 @@ class RetrieverTestCase(unittest.TestCase, RetrieverTestCaseHelper):
         self.user_respondent = User(RetrieverTestCaseHelper.default_external_actor, "respondent")
         self.second_user_respondent = User(RetrieverTestCaseHelper.second_external_actor, "respondent")
         party.use_mock_service()
+
+    def tearDown(self):
+        if hasattr(self, "app"):
+            with self.app.app_context():
+                database.db.session.remove()
+                database.db.drop_all()
+
+        if hasattr(self, "engine"):
+            self.engine.dispose()
 
     def test_msg_returned_with_msg_id_true(self):
         """retrieves message using id"""

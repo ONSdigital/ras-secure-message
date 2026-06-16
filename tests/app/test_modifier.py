@@ -154,7 +154,13 @@ class ModifyTestCase(unittest.TestCase, ModifyTestCaseHelper):
         self.app = create_app(config="TestConfig")
 
         self.app.testing = True
-        self.engine = create_engine(self.app.config["SQLALCHEMY_DATABASE_URI"])
+        self.engine = create_engine(
+            self.app.config["SQLALCHEMY_DATABASE_URI"],
+            pool_size=5,
+            max_overflow=0,
+            pool_pre_ping=True,
+            echo=False,
+        )
 
         with self.app.app_context():
             database.db.drop_all()
@@ -384,7 +390,6 @@ class ModifyTestCase(unittest.TestCase, ModifyTestCaseHelper):
             Modifier._get_label_actor(user=self.user_internal, message=message_missing_fields)
 
     def test_closed_conversations_mark_for_deletion(self):
-
         # Given 4 conversations are created (1 open, 3 closed or which 2 should be marked for deletion)
         with self.app.app_context():
             offset = current_app.config["MARK_FOR_DELETION_OFFSET_IN_DAYS"]

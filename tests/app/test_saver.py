@@ -23,15 +23,33 @@ class SaverTestCase(unittest.TestCase):
         app = create_app(config="TestConfig")
         app.testing = True
 
-        self.engine = create_engine(app.config["SQLALCHEMY_DATABASE_URI"])
+        self.engine = create_engine(
+            app.config["SQLALCHEMY_DATABASE_URI"],
+            pool_size=5,
+            max_overflow=0,
+            pool_pre_ping=True,
+            echo=False,
+        )
         self.test_message = Message(
             **{"msg_to": "tej", "msg_from": "gemma", "subject": "MyMessage", "body": "hello", "thread_id": ""}
         )
         with app.app_context():
+            database.db.session.remove()
             database.db.drop_all()
             database.db.create_all()
             self.db = database.db
         self.app = app
+
+    def tearDown(self):
+        """Clean up connections after each test"""
+        if hasattr(self, "engine"):
+            self.engine.dispose()
+
+        # Then clean up the app context and database
+        if hasattr(self, "app"):
+            with self.app.app_context():
+                database.db.session.remove()
+                database.db.drop_all()
 
     def test_save_message_raises_message_save_exception_on_db_error(self):
         """Tests exception is logged if message save fails"""

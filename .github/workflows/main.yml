@@ -33,6 +33,7 @@ jobs:
           POSTGRES_PASSWORD: postgres
           POSTGRES_USER: postgres
           POSTGRES_DB: postgres
+          POSTGRES_INIT_ARGS: "-c max_connections=1000"
         ports:
           # Maps port 6379 on service container to the host
           - 5432:5432
@@ -43,10 +44,10 @@ jobs:
         with:
           fetch-depth: '0'
           token: ${{ secrets.BOT_TOKEN }}
-      - name: Set up Python 3.11
+      - name: Set up Python 3.14
         uses: actions/setup-python@7f4fc3e22c37d6ff65e88745f38bd3157c663f7c # v4.9.1
         with:
-          python-version: '3.11'
+          python-version: '3.14'
       - name: Get Dependencies
         run: |
           pip install pipenv
