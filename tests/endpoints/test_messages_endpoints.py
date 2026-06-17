@@ -2,7 +2,6 @@ import unittest
 from unittest.mock import patch
 
 from flask import json
-from sqlalchemy import create_engine
 from sqlalchemy.exc import SQLAlchemyError
 
 from secure_message import application, constants
@@ -23,7 +22,7 @@ class TestMessagesEndpoints(unittest.TestCase):
         """setup test environment"""
         self.app = application.create_app(config="TestConfig")
         self.client = self.app.test_client()
-        self.engine = create_engine(self.app.config["SQLALCHEMY_DATABASE_URI"])
+        self.db = database.db
 
         internal_token_data = {
             constants.USER_IDENTIFIER: TestMessagesEndpoints.SPECIFIC_INTERNAL_USER,
@@ -50,9 +49,13 @@ class TestMessagesEndpoints(unittest.TestCase):
         with self.app.app_context():
             database.db.drop_all()
             database.db.create_all()
-            self.db = database.db
 
         party.use_mock_service()
+
+    def tearDown(self):
+        with self.app.app_context():
+            self.db.session.remove()
+            self.db.engine.dispose()
 
     @patch("secure_message.repository.saver.Saver.save_message")
     def test_message_post_raises_message_exception(self, mock_message_save):

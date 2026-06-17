@@ -20,6 +20,11 @@ class HealthTestCase(unittest.TestCase):
             database.db.create_all()
             self.db = database.db
 
+    def tearDown(self):
+        with self.app.app_context():
+            self.db.session.remove()
+            self.db.engine.dispose()
+
     def test_health_status(self):
         """sends GET request to the application health monitor endpoint"""
         response = self.client.get("/health")

@@ -2,7 +2,6 @@ import json
 import unittest
 from unittest.mock import patch
 
-from sqlalchemy import create_engine
 from sqlalchemy.exc import SQLAlchemyError
 
 from secure_message import application, constants
@@ -19,7 +18,7 @@ class TestThreadsEndpoints(unittest.TestCase):
     def setUp(self):
         self.app = application.create_app(config="TestConfig")
         self.client = self.app.test_client()
-        self.engine = create_engine(self.app.config["SQLALCHEMY_DATABASE_URI"])
+        self.db = database.db
 
         internal_token_data = {
             constants.USER_IDENTIFIER: TestThreadsEndpoints.SPECIFIC_INTERNAL_USER,
@@ -83,7 +82,11 @@ class TestThreadsEndpoints(unittest.TestCase):
         with self.app.app_context():
             database.db.drop_all()
             database.db.create_all()
-            self.db = database.db
+
+    def tearDown(self):
+        with self.app.app_context():
+            self.db.session.remove()
+            self.db.engine.dispose()
 
     @patch("secure_message.repository.retriever.Retriever.retrieve_thread")
     def test_get_thread_retrieval_raises_sql_exception(self, mock_retriever):

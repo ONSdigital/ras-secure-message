@@ -3,7 +3,7 @@ import unittest
 from unittest.mock import patch
 
 from flask import json
-from sqlalchemy import create_engine, text
+from sqlalchemy import text
 
 from secure_message import application, constants
 from secure_message.api_mocks.party_service_mock import PartyServiceMock
@@ -26,7 +26,7 @@ class AppTestCase(unittest.TestCase):
         """setup test environment"""
         self.app = application.create_app(config="TestConfig")
         self.client = self.app.test_client()
-        self.engine = create_engine(self.app.config["SQLALCHEMY_DATABASE_URI"])
+        self.db = database.db
 
         internal_token_data = {constants.USER_IDENTIFIER: AppTestCase.SPECIFIC_INTERNAL_USER, "role": "internal"}
 
@@ -58,10 +58,14 @@ class AppTestCase(unittest.TestCase):
         with self.app.app_context():
             database.db.drop_all()
             database.db.create_all()
-            self.db = database.db
 
         party.use_mock_service()
         internal_user_service.use_mock_service()
+
+    def tearDown(self):
+        with self.app.app_context():
+            self.db.session.remove()
+            self.db.engine.dispose()
 
     def test_that_checks_post_request_is_within_database(self):
         """check messages from messageSend endpoint saved in database correctly"""
@@ -80,13 +84,14 @@ class AppTestCase(unittest.TestCase):
         response = self.client.post(url, data=json.dumps(data), headers=self.internal_user_header)
         self.assertEqual(response.status_code, 201)  # check post has succeeded
 
-        with self.engine.begin() as con:
-            db_data = con.execute(
+        with self.app.app_context():
+            db_data = self.db.session.execute(
                 text(
                     "SELECT * FROM securemessage.secure_message "
                     "WHERE id = (SELECT MAX(id) FROM securemessage.secure_message)"
                 )
             )
+
             self.assertEqual(db_data.rowcount, 1)
             for row in db_data.mappings():
                 data = {"subject": row["subject"], "body": row["body"]}
@@ -98,9 +103,9 @@ class AppTestCase(unittest.TestCase):
         url = "http://localhost:5050/messages"
 
         self.client.post(url, data=json.dumps(self.test_message), headers=self.internal_user_header)
-        engine = create_engine(self.app.config["DATABASE_URL"], echo=True)
-        with engine.begin() as con:
-            db_data = con.execute(
+
+        with self.app.app_context():
+            db_data = self.db.session.execute(
                 text(
                     "SELECT * FROM securemessage.secure_message "
                     "WHERE id = (SELECT MAX(id) FROM securemessage.secure_message)"
@@ -144,9 +149,8 @@ class AppTestCase(unittest.TestCase):
 
         # Now read back the message to get the thread ID
 
-        engine = create_engine(self.app.config["DATABASE_URL"], echo=True)
-        with engine.begin() as con:
-            db_data = con.execute(
+        with self.app.app_context():
+            db_data = self.db.session.execute(
                 text(
                     "SELECT * FROM securemessage.secure_message "
                     "WHERE id = (SELECT MAX(id) FROM securemessage.secure_message)"
@@ -160,8 +164,8 @@ class AppTestCase(unittest.TestCase):
 
         # Now read back the two messages
         original_msg_id = original_thread_id = reply_msg_id = reply_thread_id = ""
-        with engine.begin() as con:
-            request = con.execute(text("SELECT * FROM securemessage.secure_message ORDER BY id DESC"))
+        with self.app.app_context():
+            request = self.db.session.execute(text("SELECT * FROM securemessage.secure_message ORDER BY id DESC"))
             for row in request.mappings():
                 if row["id"] == 1:
                     original_msg_id = row["msg_id"]
@@ -206,8 +210,8 @@ class AppTestCase(unittest.TestCase):
         response = self.client.post(url, data=json.dumps(self.test_message), headers=self.internal_user_header)
         data = json.loads(response.data)
 
-        with self.engine.begin() as con:
-            db_data = con.execute(
+        with self.app.app_context():
+            db_data = self.db.session.execute(
                 text(
                     "SELECT * FROM securemessage.status WHERE label='SENT' AND msg_id='{0}' AND actor='{1}'".format(
                         data["msg_id"], self.test_message["survey_id"]
@@ -224,8 +228,10 @@ class AppTestCase(unittest.TestCase):
         response = self.client.post(url, data=json.dumps(self.test_message), headers=self.internal_user_header)
         data = json.loads(response.data)
 
-        with self.engine.begin() as con:
-            db_data = con.execute(text(f"SELECT * FROM securemessage.secure_message where msg_id='{data['msg_id']}'"))
+        with self.app.app_context():
+            db_data = self.db.session.execute(
+                text(f"SELECT * FROM securemessage.secure_message where msg_id='{data['msg_id']}'")
+            )
             for row in db_data.mappings():
                 self.assertTrue(row is not None)
                 self.assertTrue(isinstance(row["sent_at"], datetime.datetime))
@@ -237,8 +243,8 @@ class AppTestCase(unittest.TestCase):
         response = self.client.post(url, data=json.dumps(self.test_message), headers=self.internal_user_header)
         data = json.loads(response.data)
         # dereferencing msg_to for purpose of test
-        with self.engine.begin() as con:
-            db_data = con.execute(
+        with self.app.app_context():
+            db_data = self.db.session.execute(
                 text(
                     "SELECT * FROM securemessage.status WHERE "
                     "label='INBOX' OR label='UNREAD' AND msg_id='{0}'"
@@ -255,8 +261,8 @@ class AppTestCase(unittest.TestCase):
         response = self.client.post(url, data=json.dumps(self.test_message), headers=self.internal_user_header)
         data = json.loads(response.data)
 
-        with self.engine.begin() as con:
-            db_data = con.execute(
+        with self.app.app_context():
+            db_data = self.db.session.execute(
                 text(
                     "SELECT * FROM securemessage.status WHERE "
                     "msg_id='{0}' AND actor='{1}' AND label='SENT'".format(
