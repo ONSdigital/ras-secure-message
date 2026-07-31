@@ -136,7 +136,7 @@ spec:
                 key: security-password
           - name: PORT
             value: "{{ .Values.container.port }}"
-          - name: DATABASE_URL
+          - name: DATABASE_URI
             {{- if .Values.database.sqlProxyEnabled }}
             value: "postgresql://$(DB_USERNAME):$(DB_PASSWORD)@127.0.0.1:$(DB_PORT)/$(DB_NAME)"
             {{- else }}

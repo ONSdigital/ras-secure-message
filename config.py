@@ -14,7 +14,7 @@ class Config:
     """
 
     VERSION = "1.3.0"
-    DATABASE_URL = os.getenv("DATABASE_URL", "postgresql://postgres:postgres@localhost:5432")
+    DATABASE_URI = os.getenv("DATABASE_URI", "postgresql://postgres:postgres@localhost:5432")
     LOGGING_LEVEL = os.getenv("LOGGING_LEVEL", "INFO")
 
     # EMAIL NOTIFICATION SETTINGS
@@ -51,7 +51,7 @@ class Config:
 
     # SQLAlchemy
     SQLALCHEMY_TRACK_MODIFICATIONS = os.getenv("SQLALCHEMY_TRACK_MODIFICATIONS", False)
-    SQLALCHEMY_DATABASE_URI = DATABASE_URL
+    SQLALCHEMY_DATABASE_URI = DATABASE_URI
 
     GOOGLE_CLOUD_PROJECT = os.getenv("GOOGLE_CLOUD_PROJECT", "ras-rm-sandbox")
     PUBSUB_TOPIC = os.getenv("PUBSUB_TOPIC", "ras-rm-notify-test")

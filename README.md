@@ -43,7 +43,7 @@ pipenv run python run.py
 ```
 or
 ```bash
-docker compose up
+make start-db
 ```
 or (when postgres is set up)
 ```bash
@@ -62,9 +62,10 @@ Ensure there is a postgres instance running on port 5432
 ```bash
 docker run -d -p 5432:5432 --name postgres -e POSTGRES_PASSWORD=postgres -e POSTGRES_DB=postgres -d postgres
 ```
-or you can use the docker-compose.yml file to create postgres
+or you can use the docker-compose.yml file to create postgres (this passes
+`--env-file _infra/postgres-image`, so local dev and CI share one postgres version)
 ```bash
-docker compose up
+make start-db
 ```
 
 Run the tests with make
@@ -102,7 +103,7 @@ Environment variables available for configuration are listed below:
 | SECURITY_USER_NAME       | Username for basic auth                         | N/A                                           |
 | SECURITY_USER_PASSWORD   | Password for basic auth                         | N/A                                           |
 | JWT_SECRET               | SECRET used to code JWT                         | N/A                                           |
-| DATABASE_URL             | Database URI                                    | postgresql://postgres:postgres@localhost:5432 |
+| DATABASE_URI             | Database URI                                    | postgresql://postgres:postgres@localhost:5432 |
 | NOTIFICATION_TEMPLATE_ID | Template id for Gov Notify service              | N/A                                           |
 | NOTIFY_VIA_GOV_NOTIFY    | Toggle for using Gov Notify for notifications   | '1' (enable Gov Notify email notifications)   |
 | PARTY_URL                | URL of the ras-party service                    | N/A                                           |

@@ -98,7 +98,7 @@ class AppTestCase(unittest.TestCase):
         url = "http://localhost:5050/messages"
 
         self.client.post(url, data=json.dumps(self.test_message), headers=self.internal_user_header)
-        engine = create_engine(self.app.config["DATABASE_URL"], echo=True)
+        engine = create_engine(self.app.config["DATABASE_URI"], echo=True)
         with engine.begin() as con:
             db_data = con.execute(
                 text(
@@ -144,7 +144,7 @@ class AppTestCase(unittest.TestCase):
 
         # Now read back the message to get the thread ID
 
-        engine = create_engine(self.app.config["DATABASE_URL"], echo=True)
+        engine = create_engine(self.app.config["DATABASE_URI"], echo=True)
         with engine.begin() as con:
             db_data = con.execute(
                 text(

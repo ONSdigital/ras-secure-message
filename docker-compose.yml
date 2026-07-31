@@ -1,8 +1,8 @@
-version: '2'
-
 services:
   db:
-    image: postgres:9.6
+    # Single source of truth, shared with CI. Requires --env-file _infra/postgres-image,
+    # so start this with `make start-db` rather than a bare `docker compose up`.
+    image: ${POSTGRES_IMAGE}
     environment:
       POSTGRES_PASSWORD: postgres
       POSTGRES_USER: postgres
@@ -11,6 +11,11 @@ services:
       - "5432:5432"
     networks:
       - secure
+    healthcheck:
+      test: pg_isready
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
 networks:
   secure:
