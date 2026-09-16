@@ -4,7 +4,7 @@
 
 Secure Message was first developed on 11th May 2017, with the first external message sent at 9:40am on 20th September 2017 for BRES, which had a sample size of 693.
 
-At the time, there were no established SLAs and little understanding of the potential volume or load the service would ultimately would need to support. The service was developed internally by QA graduates, managed by two senior QA consultants.
+At the time, there were no established SLAs and little understanding of the potential volume or load the service would ultimately need to support. The service was developed internally by QA graduates, managed by two senior QA consultants.
 
 For the remainder of 2017, Secure Message handled an average of 331 messages per month, including both internal and external messages.
 
