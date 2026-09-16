@@ -182,7 +182,7 @@ The overall improvement has been very significant. The average Secure Message qu
 
 ### After Optimisation
 
-[query_analyser_CPU_after_1_png](images/query_analyser_CPU_after_1.png)
+![query_analyser_CPU_after_1.png](images/query_analyser_CPU_after_1.png)
 
 ![query_analyser_CPU_after_2.png](images/query_analyser_CPU_after_2.png)
 ---
@@ -244,14 +244,14 @@ Secure Message after the changes above accounts for approximately **20% of datab
 
 ### PREPROD
 
-PREPROD is effectively a mirror of PROD, so for the purposes of this estimate the PROD figure has been doubled:
+PREPROD is effectively a mirror of PROD, so cost roughly the same:
 
 
 ### Other Environments
 
 There are also additional environments, including development, sandbox and performance.
 
-These environments are either used irregularly or do not use Cloud SQL in the same way as PROD and PREPROD. Rather than attempting to calculate each individually, an additional **£50 per month** provides a reasonable allowance for Secure Message's usage across these environments.
+These environments are either used irregularly or do not use Cloud SQL at all. Rather than attempting to calculate each individually, an additional **£50 per month** provides a reasonable allowance for Secure Message's usage across these environments.
 
 ### Estimated Total Cost
 
@@ -267,13 +267,13 @@ Taking Cloud SQL, GKE pods and other associated infrastructure costs into accoun
 **£490 per month / £5,880 per year**
 
 
-# Current performance
+## Current performance
 
 Assuming the practice of closing conversations on the business side continues, allowing them to be automatically deleted after the retention period, I do not see any significant performance concerns with Secure Message at its current load.
 
 This is particularly true given the substantial reduction in database CPU usage and the relatively small number of GKE pods currently required to run the application.
 
-I also do not see low level survey growth being a significant concern at this stage, although this will depend heavily on survey sample sizes. But naturally any substantial increase in volume should therefore be tested and monitored before being introduced.
+I also do not see low level survey growth being a concern at this stage, although this will depend heavily on survey sample sizes. But naturally any increase in volume should be tested and monitored before being introduced.
 
 Due to the underlying data model, Secure Message queries will remain slower than would be ideal. However, at current volumes and with the optimisations now in place, this is not something I would consider a significant concern.
 
@@ -300,7 +300,7 @@ Secure Message's overall infrastructure costs also appear reasonable for the ser
 
 The main concern is the longer-term future of Secure Message. I do not believe the existing architecture is well suited to additional development or a substantial increase in load. Fundamentally, the underlying data model is not the right fit for how the service is now being used and would need to be addressed.
 
-On balance, if substantial new functionality or significantly greater scale were required in the future, the time and effort involved would probably be better spent developing a replacement based on a more appropriate architecture and data model, rather than attempting to redevelop the existing service.
+On balance, if new functionality or significantly greater scale were required in the future, the time and effort involved would probably be better spent developing a replacement based on a more appropriate architecture and data model, rather than attempting to redevelop the existing service.
 
 
 
