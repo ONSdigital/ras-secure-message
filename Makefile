@@ -27,7 +27,8 @@ unit-test:
 
 test: lint-check
 	pipenv run behave --format progress
-	pipenv run pytest
+	pipenv run coverage run -m pytest
+	pipenv run coverage report -m
 
 build-docker:
 	docker build .

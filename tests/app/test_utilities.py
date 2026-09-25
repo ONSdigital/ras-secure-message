@@ -8,6 +8,9 @@ from secure_message.common.utilities import (
     add_from_details,
     add_to_details,
     add_users_and_business_details,
+    generate_string_query_args,
+    get_options,
+    set_conversation_type_args,
 )
 from secure_message.services.service_toggles import internal_user_service, party
 
@@ -44,6 +47,149 @@ def get_args(
         unread_conversations=unread_conversations,
         category=category,
     )
+
+
+class MockQueryArgs:
+    def __init__(self, data):
+        self.data = data
+
+    def get(self, key):
+        return self.data.get(key)
+
+    def getlist(self, key):
+        value = self.data.get(key, [])
+        return value if isinstance(value, list) else [value]
+
+
+class QueryArgsTestCase(unittest.TestCase):
+    def test_get_options_parses_query_params(self):
+        args = MockQueryArgs(
+            {
+                "page": "3",
+                "limit": "25",
+                "business_id": "business-123",
+                "cc": "cc-456",
+                "label": "inbox",
+                "ce": "ce-789",
+                "category": "survey",
+                "survey": ["survey-a", "survey-b"],
+                "desc": "false",
+                "is_closed": "true",
+                "my_conversations": "true",
+                "new_respondent_conversations": "true",
+                "all_conversation_types": "true",
+                "unread_conversations": "true",
+            }
+        )
+
+        result = get_options(args)
+
+        self.assertEqual(result.page, 3)
+        self.assertEqual(result.limit, 25)
+        self.assertEqual(result.business_id, "business-123")
+        self.assertEqual(result.cc, "cc-456")
+        self.assertEqual(result.label, "inbox")
+        self.assertEqual(result.ce, "ce-789")
+        self.assertEqual(result.category, "survey")
+        self.assertEqual(result.surveys, ["survey-a", "survey-b"])
+        self.assertFalse(result.desc)
+        self.assertTrue(result.is_closed)
+        self.assertTrue(result.my_conversations)
+        self.assertTrue(result.new_respondent_conversations)
+        self.assertTrue(result.all_conversation_types)
+        self.assertTrue(result.unread_conversations)
+
+    def test_set_conversation_type_args_overrides_only_conversation_flags(self):
+        existing_args = get_args(
+            page=2,
+            limit=50,
+            surveys=["survey-a"],
+            cc="cc-1",
+            ru="business-1",
+            label="label-1",
+            desc=False,
+            ce="ce-1",
+            is_closed=False,
+            my_conversations=True,
+            new_respondent_conversations=False,
+            all_conversation_types=False,
+            unread_conversations=True,
+            category="cat-1",
+        )
+
+        result = set_conversation_type_args(
+            existing_args,
+            is_closed=True,
+            my_conversations=False,
+            new_conversations=True,
+            all_types=True,
+            unread_conversations=False,
+        )
+
+        self.assertEqual(result.page, 2)
+        self.assertEqual(result.limit, 50)
+        self.assertEqual(result.business_id, "business-1")
+        self.assertEqual(result.surveys, ["survey-a"])
+        self.assertEqual(result.cc, "cc-1")
+        self.assertEqual(result.label, "label-1")
+        self.assertFalse(result.desc)
+        self.assertEqual(result.ce, "ce-1")
+        self.assertTrue(result.is_closed)
+        self.assertFalse(result.my_conversations)
+        self.assertTrue(result.new_respondent_conversations)
+        self.assertTrue(result.all_conversation_types)
+        self.assertFalse(result.unread_conversations)
+        self.assertEqual(result.category, "cat-1")
+
+    def test_generate_string_query_args_excludes_page_and_falsey_values(self):
+        args = get_args(
+            page=9,
+            limit=25,
+            surveys=[],
+            cc="",
+            ru="business-123",
+            label="",
+            desc=False,
+            ce=None,
+            is_closed=True,
+            my_conversations=False,
+            new_respondent_conversations=False,
+            all_conversation_types=False,
+            unread_conversations=True,
+            category="cat value",
+        )
+
+        result = generate_string_query_args(args)
+
+        self.assertNotIn("page=", result)
+        self.assertEqual(
+            result,
+            "limit=25&business_id=business-123&is_closed=True&unread_conversations=True&category=cat+value",
+        )
+
+    def test_generate_string_query_args_handles_truthy_fields_only(self):
+        args = get_args(
+            page=1,
+            limit=100,
+            surveys=None,
+            cc="cc-456",
+            ru=None,
+            label="inbox",
+            desc=True,
+            ce="",
+            is_closed=False,
+            my_conversations=True,
+            new_respondent_conversations=False,
+            all_conversation_types=True,
+            unread_conversations=False,
+            category=None,
+        )
+
+        result = generate_string_query_args(args)
+
+        self.assertEqual(
+            result, "limit=100&cc=cc-456&label=inbox&desc=True&my_conversations=True&all_conversation_types=True"
+        )
 
 
 class UtilitiesTestCase(unittest.TestCase):

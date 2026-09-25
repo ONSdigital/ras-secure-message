@@ -1,2 +1,9 @@
 [tool.isort]
 profile = "black"
+
+[tool.coverage.report]
+omit = [
+    "*/tests/*",
+    "*/migrations/*",
+    "*/__init__.py",
+]
