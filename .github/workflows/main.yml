@@ -28,6 +28,10 @@ jobs:
           extract_chart_version() {
             awk -F': *' '$1 == "version" { gsub(/"/, "", $2); print $2; exit }' "$1"
           }
+          
+          extract_app_version() {
+            awk -F': *' '$1 == "appVersion" { gsub(/"/, "", $2); print $2; exit }' "$1"
+          }
 
           to_number() {
             local v="$1"
@@ -36,6 +40,13 @@ jobs:
           }
 
           CURRENT_VERSION=$(extract_chart_version "$CHART_FILE")
+          CURRENT_APP_VERSION=$(extract_app_version "$CHART_FILE")
+          
+          if [ "$CURRENT_VERSION" != "$CURRENT_APP_VERSION" ]; then
+            echo "::error file=$CHART_FILE::Chart.yaml version ($CURRENT_VERSION) must match appVersion ($CURRENT_APP_VERSION)."
+            exit 1
+          fi
+
           echo "Current Chart.yaml version: $CURRENT_VERSION"
 
           if [ "${{ github.event_name }}" = "pull_request" ]; then
