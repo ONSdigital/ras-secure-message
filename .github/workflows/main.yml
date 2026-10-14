@@ -1,3 +1,25 @@
+name: Check helm chart version
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+env:
+  CHART_DIRECTORY: _infra/helm/secure-message
+  CHART_FILE: _infra/helm/secure-message/Chart.yaml
+
+jobs:
+  build:
+    name: Check chart version
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683	 # v4.2.2
+        with:
+          fetch-depth: '0'
+          token: ${{ secrets.BOT_TOKEN }}
+
       - name: Chart.yaml version check
         shell: bash
         run: |
