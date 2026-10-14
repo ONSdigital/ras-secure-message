@@ -43,7 +43,7 @@ jobs:
           CURRENT_APP_VERSION=$(extract_app_version "$CHART_FILE")
           
           if [ "$CURRENT_VERSION" != "$CURRENT_APP_VERSION" ]; then
-            echo "::error file=$CHART_FILE::Chart.yaml version ($CURRENT_VERSION) must match appVersion ($CURRENT_APP_VERSION)."
+            echo "::error file=$CHART_FILE::Chart.yaml appVersion ($CURRENT_APP_VERSION) and version ($CURRENT_VERSION) must match."
             exit 1
           fi
 
