@@ -58,10 +58,13 @@ jobs:
 
           echo "Previous Chart.yaml version: $BASE_VERSION"
 
-          BASE_NUM=$(to_number "$BASE_VERSION")
-          CURRENT_NUM=$(to_number "$CURRENT_VERSION")
+          IFS='.' read -r CURRENT_MAJOR CURRENT_MINOR CURRENT_PATCH <<< "$CURRENT_VERSION"
+          IFS='.' read -r BASE_MAJOR BASE_MINOR BASE_PATCH <<< "$BASE_VERSION"
 
-          if [ "$CURRENT_NUM" -le "$BASE_NUM" ]; then
+
+          if (( CURRENT_MAJOR < BASE_MAJOR )) || \
+             (( CURRENT_MAJOR == BASE_MAJOR && CURRENT_MINOR < BASE_MINOR )) || \
+             (( CURRENT_MAJOR == BASE_MAJOR && CURRENT_MINOR == BASE_MINOR && CURRENT_PATCH <= BASE_PATCH )); then
             echo "::error file=$CHART_FILE::The Helm chart version must increase."
             exit 1
           fi
